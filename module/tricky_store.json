@@ -1,0 +1,211 @@
+{
+  "readme": "# Tricky Store\n\nA trick of keystore. **Android 10 or above is required**.\n\nThis module is used for modifying the certificate chain generated for android key attestation.\n\n[中文 README](README.zh-CN.md)\n\n## Stop opening source\n\nDue to the rampant misuse and the contributions received after open-sourcing being less than expected, this module will be closed-source starting from version 1.1.0.\n\n## Usage\n\n1. Flash this module and reboot.  \n2. For more than DEVICE integrity, put an unrevoked hardware keybox.xml at `/data/adb/tricky_store/keybox.xml` (Optional).  \n3. Customize target packages at `/data/adb/tricky_store/target.txt` (Optional).  \n4. Enjoy!  \n\n**All configuration files will take effect immediately.**\n\n## keybox.xml\n\nformat:\n\n```xml\n<?xml version=\"1.0\"?>\n<AndroidAttestation>\n    <NumberOfKeyboxes>1</NumberOfKeyboxes>\n    <Keybox DeviceID=\"...\">\n        <Key algorithm=\"ecdsa|rsa\">\n            <PrivateKey format=\"pem\">\n-----BEGIN EC PRIVATE KEY-----\n...\n-----END EC PRIVATE KEY-----\n            </PrivateKey>\n            <CertificateChain>\n                <NumberOfCertificates>...</NumberOfCertificates>\n                    <Certificate format=\"pem\">\n-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n                    </Certificate>\n                ... more certificates\n            </CertificateChain>\n        </Key>...\n    </Keybox>\n</AndroidAttestation>\n```\n\n## Support TEE broken devices\n\nTricky Store will hack the leaf certificate by default.\nOn TEE broken devices, this will not work because we can't retrieve the leaf certificate from TEE.\nIn this case, we fallback to use generate key mode automatically.  \n\nYou can add a `!` after a package name to force use generate certificate support for this package.\nAlso, you can add a `?` after a package name to force use leaf hack mode for this package.\n\nFor example:\n\n```\n# target.txt\n# use auto mode for KeyAttestation App\nio.github.vvb2060.keyattestation\n# always use leaf hack mode \nio.github.vvb2060.mahoshojo?\n# always use certificate generating mode for gms\ncom.google.android.gms!\n```\n\n## Customize security patch level (1.2.1+)\n\nCreate the file `/data/adb/tricky_store/security_patch.txt`.\n\nSimple:\n\n```\n# Hack os/vendor/boot security patch level\n20241101\n```\n\nAdvanced:\n\n```\n# os security patch level is 202411\nsystem=202411\n# do not hack boot patch level\nboot=no\n# vendor patch level is 20241101 (another format)\nvendor=2024-11-01\n# default value\n# all=20241101\n# keep consistent with system prop\n# system=prop\n```\n\nNote: this feature will only hack the result of KeyAttestation, it will not do resetprop, you need do it yourself.\n\n## Acknowledgement\n\n- [FrameworkPatch](https://github.com/chiteroman/FrameworkPatch)\n- [BootloaderSpoofer](https://github.com/chiteroman/BootloaderSpoofer)\n- [KeystoreInjection](https://github.com/aviraxp/Zygisk-KeystoreInjection)\n- [LSPosed](https://github.com/LSPosed/LSPosed)\n",
+  "readmeHTML": "<h1>Tricky Store</h1>\n\n<p>A trick of keystore. <b>Android 10 or above is required</b>.</p>\n\n<p>This module is used for modifying the certificate chain generated for android key attestation.</p>\n\n<p><a href=\"README.zh-CN.md\">中文 README</a></p>\n\n<h2>Stop opening source</h2>\n\n<p>Due to the rampant misuse and the contributions received after open-sourcing being less than expected, this module will be closed-source starting from version 1.1.0.</p>\n\n<h2>Usage</h2>\n\n<li>1. Flash this module and reboot.</li>\n<li>2. For more than DEVICE integrity, put an unrevoked hardware keybox.xml at `/data/adb/tricky_store/keybox.xml` (Optional).</li>\n<li>3. Customize target packages at `/data/adb/tricky_store/target.txt` (Optional).</li>\n<li>4. Enjoy!</li>\n\n<p><b>All configuration files will take effect immediately.</b></p>\n\n<h2>keybox.xml</h2>\n\n<p>format:</p>\n\n<pre>&lt;?xml version=\"1.0\"?&gt;\n&lt;AndroidAttestation&gt;\n    &lt;NumberOfKeyboxes&gt;1&lt;/NumberOfKeyboxes&gt;\n    &lt;Keybox DeviceID=\"...\"&gt;\n        &lt;Key algorithm=\"ecdsa|rsa\"&gt;\n            &lt;PrivateKey format=\"pem\"&gt;\n-----BEGIN EC PRIVATE KEY-----\n...\n-----END EC PRIVATE KEY-----\n            &lt;/PrivateKey&gt;\n            &lt;CertificateChain&gt;\n                &lt;NumberOfCertificates&gt;...&lt;/NumberOfCertificates&gt;\n                    &lt;Certificate format=\"pem\"&gt;\n-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n                    &lt;/Certificate&gt;\n                ... more certificates\n            &lt;/CertificateChain&gt;\n        &lt;/Key&gt;...\n    &lt;/Keybox&gt;\n&lt;/AndroidAttestation&gt;</pre>\n\n<h2>Support TEE broken devices</h2>\n\n<p>Tricky Store will hack the leaf certificate by default.</p>\n<p>On TEE broken devices, this will not work because we can't retrieve the leaf certificate from TEE.</p>\n<p>In this case, we fallback to use generate key mode automatically.</p>\n\n<p>You can add a <code>!</code> after a package name to force use generate certificate support for this package.</p>\n<p>Also, you can add a <code>?</code> after a package name to force use leaf hack mode for this package.</p>\n\n<p>For example:</p>\n\n<pre># target.txt\n# use auto mode for KeyAttestation App\nio.github.vvb2060.keyattestation\n# always use leaf hack mode\nio.github.vvb2060.mahoshojo?\n# always use certificate generating mode for gms\ncom.google.android.gms!</pre>\n\n<h2>Customize security patch level (1.2.1+)</h2>\n\n<p>Create the file <code>/data/adb/tricky_store/security_patch.txt</code>.</p>\n\n<p>Simple:</p>\n\n<pre># Hack os/vendor/boot security patch level\n20241101</pre>\n\n<p>Advanced:</p>\n\n<pre># os security patch level is 202411\nsystem=202411\n# do not hack boot patch level\nboot=no\n# vendor patch level is 20241101 (another format)\nvendor=2024-11-01\n# default value\n# all=20241101\n# keep consistent with system prop\n# system=prop</pre>\n\n<p>Note: this feature will only hack the result of KeyAttestation, it will not do resetprop, you need do it yourself.</p>\n\n<h2>Acknowledgement</h2>\n\n<li>[FrameworkPatch](https://github.com/chiteroman/FrameworkPatch)</li>\n<li>[BootloaderSpoofer](https://github.com/chiteroman/BootloaderSpoofer)</li>\n<li>[KeystoreInjection](https://github.com/aviraxp/Zygisk-KeystoreInjection)</li>\n<li>[LSPosed](https://github.com/LSPosed/LSPosed)</li>",
+  "homepageUrl": "https://github.com/5ec1cff/TrickyStore",
+  "sourceUrl": "https://github.com/5ec1cff/TrickyStore",
+  "url": "https://github.com/5ec1cff/TrickyStore",
+  "latestRelease": {
+    "name": "1.4.1",
+    "version": "1.4.1",
+    "time": "2025-11-02T09:56:37Z",
+    "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.4.1/Tricky-Store-v1.4.1-245-72b2e84-release.zip"
+  },
+  "releases": [
+    {
+      "name": "1.4.1",
+      "tagName": "1.4.1",
+      "publishedAt": "2025-11-02T09:56:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.4.1-245-72b2e84-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.4.1/Tricky-Store-v1.4.1-245-72b2e84-release.zip",
+          "size": 2840600,
+          "downloadCount": 931154
+        }
+      ]
+    },
+    {
+      "name": "1.4.0",
+      "tagName": "1.4.0",
+      "publishedAt": "2025-10-20T14:31:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.4.0-235-e15da3d-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.4.0/Tricky-Store-v1.4.0-235-e15da3d-release.zip",
+          "size": 2720036,
+          "downloadCount": 111909
+        }
+      ]
+    },
+    {
+      "name": "1.3.0",
+      "tagName": "1.3.0",
+      "publishedAt": "2025-06-18T12:19:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.3.0-180-8acfa57-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.3.0/Tricky-Store-v1.3.0-180-8acfa57-release.zip",
+          "size": 2694118,
+          "downloadCount": 501045
+        }
+      ]
+    },
+    {
+      "name": "1.2.1",
+      "tagName": "1.2.1",
+      "publishedAt": "2025-02-07T05:43:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.2.1-158-51390a7-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.2.1/Tricky-Store-v1.2.1-158-51390a7-release.zip",
+          "size": 2350601,
+          "downloadCount": 337045
+        }
+      ]
+    },
+    {
+      "name": "1.2.0",
+      "tagName": "1.2.0",
+      "publishedAt": "2024-10-28T14:02:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.2.0-155-331f6fe-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.2.0/Tricky-Store-v1.2.0-155-331f6fe-release.zip",
+          "size": 2277483,
+          "downloadCount": 147394
+        }
+      ]
+    },
+    {
+      "name": "1.2.0-RC2",
+      "tagName": "1.2.0-RC2",
+      "publishedAt": "2024-09-24T13:54:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.2.0-RC2-149-323b944-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.2.0-RC2/Tricky-Store-v1.2.0-RC2-149-323b944-release.zip",
+          "size": 2174188,
+          "downloadCount": 20455
+        }
+      ]
+    },
+    {
+      "name": "1.2.0-RC1",
+      "tagName": "1.2.0-RC1",
+      "publishedAt": "2024-09-05T07:59:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.2.0-RC1-145-8518d4b-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.2.0-RC1/Tricky-Store-v1.2.0-RC1-145-8518d4b-release.zip",
+          "size": 2167336,
+          "downloadCount": 11516
+        }
+      ]
+    },
+    {
+      "name": "1.1.3",
+      "tagName": "1.1.3",
+      "publishedAt": "2024-08-25T16:09:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.1.3-128-820c2b2-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.1.3/Tricky-Store-v1.1.3-128-820c2b2-release.zip",
+          "size": 2164906,
+          "downloadCount": 50708
+        }
+      ]
+    },
+    {
+      "name": "1.1.2",
+      "tagName": "1.1.2",
+      "publishedAt": "2024-08-23T06:53:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.1.2-123-94176b9-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.1.2/Tricky-Store-v1.1.2-123-94176b9-release.zip",
+          "size": 4507154,
+          "downloadCount": 7244
+        }
+      ]
+    },
+    {
+      "name": "1.1.1",
+      "tagName": "1.1.1",
+      "publishedAt": "2024-08-21T07:19:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.1.1-118-7c164d3-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.1.1/Tricky-Store-v1.1.1-118-7c164d3-release.zip",
+          "size": 3381216,
+          "downloadCount": 6314
+        }
+      ]
+    },
+    {
+      "name": "1.1.0",
+      "tagName": "1.1.0",
+      "publishedAt": "2024-08-18T00:18:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.1.0-108-9bf78c0-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.1.0/Tricky-Store-v1.1.0-108-9bf78c0-release.zip",
+          "size": 3633938,
+          "downloadCount": 4803
+        }
+      ]
+    },
+    {
+      "name": "1.0.3",
+      "tagName": "1.0.3",
+      "publishedAt": "2024-07-28T14:16:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.0.3-72-6f82e40-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.0.3/Tricky-Store-v1.0.3-72-6f82e40-release.zip",
+          "size": 1048982,
+          "downloadCount": 10963
+        }
+      ]
+    },
+    {
+      "name": "1.0.2",
+      "tagName": "1.0.2",
+      "publishedAt": "2024-07-18T09:46:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1.0.2-57-62ae132-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.0.2/Tricky-Store-v1.0.2-57-62ae132-release.zip",
+          "size": 1010018,
+          "downloadCount": 2794
+        }
+      ]
+    },
+    {
+      "name": "1.0",
+      "tagName": "1.0",
+      "publishedAt": "2024-07-16T11:56:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Tricky-Store-v1-26-7e7be3f-release.zip",
+          "downloadUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.0/Tricky-Store-v1-26-7e7be3f-release.zip",
+          "size": 997979,
+          "downloadCount": 2697
+        }
+      ]
+    }
+  ]
+}
