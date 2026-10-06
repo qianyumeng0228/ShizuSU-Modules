@@ -387,12 +387,14 @@ def main():
     print(f"开始生成 {len(modules)} 个模块...")
     catalog = []
     errors = []
+    skipped_ids = set()
     for i, mod in enumerate(modules, 1):
         module_id = mod["moduleId"]
         spec = mod.get("repo", "")
         print(f"[{i}/{len(modules)}] {module_id} <- {spec or '(未配置 repo)'}")
         if not spec:
             errors.append(f"{module_id}: 未配置 repo")
+            skipped_ids.add(module_id)
             continue
         try:
             entry = build_catalog_entry(mod, token)
@@ -415,7 +417,10 @@ def main():
         print("\n失败项：")
         for e in errors:
             print("  - " + e)
-        sys.exit(2)
+        # 预期跳过（未配置 repo）不算失败：CI 中这些模块本来就缺，不应导致任务失败
+        real_errors = [e for e in errors if not any(e.startswith(f"{mid}: 未配置 repo") for mid in skipped_ids)]
+        if real_errors:
+            sys.exit(2)
 
 
 if __name__ == "__main__":
