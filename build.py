@@ -260,7 +260,8 @@ def _naive_md_to_html(md):
         elif re.match(r"^[-*] ", line):
             out.append(f"<li>{line[2:]}</li>")
         elif re.match(r"^\d+\. ", line):
-            out.append(f"<li>{re.sub(r'^\\d+\\. ', '', line)}</li>")
+            item = re.sub(r"^\d+\. ", "", line)
+            out.append(f"<li>{item}</li>")
         else:
             text = re.sub(r"`([^`]+)`", r"<code>\1</code>", line)
             text = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", text)
