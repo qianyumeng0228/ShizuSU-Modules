@@ -205,7 +205,28 @@ def pick_asset(release):
 # ---------------------------------------------------------------------------
 
 def build_catalog_entry(mod, token):
-    spec = mod["repo"]
+    spec = mod.get("repo", "")
+    # 手动模块（无公开仓库）：直接用 config 信息，不调 API
+    if not spec:
+        authors = mod.get("authors") or []
+        latest = mod.get("latestRelease") or {}
+        return {
+            "moduleId": mod["moduleId"],
+            "moduleName": mod.get("moduleName") or mod["moduleId"],
+            "authors": authors,
+            "summary": mod.get("summaryZh") or mod.get("summary") or "",
+            "metamodule": bool(mod.get("metamodule", False)),
+            "zygisk": bool(mod.get("zygisk", False)),
+            "stargazerCount": 0,
+            "updatedAt": mod.get("updatedAt") or "",
+            "createdAt": mod.get("createdAt") or "",
+            "latestRelease": {
+                "name": latest.get("name") or "",
+                "time": latest.get("time") or "",
+                "versionCode": latest.get("versionCode") or mod.get("versionCodeOverride") or 0,
+                "downloadUrl": latest.get("downloadUrl") or "",
+            },
+        }
     repo = fetch_repo(spec, token)
     releases = fetch_releases(spec, token)
     latest = pick_latest_release(releases)
@@ -281,7 +302,35 @@ def _naive_md_to_html(md):
 
 
 def build_detail(mod, token):
-    spec = mod["repo"]
+    spec = mod.get("repo", "")
+    # 手动模块：readme 用 readmeZh，release 用 config
+    if not spec:
+        latest = mod.get("latestRelease") or {}
+        return {
+            "readme": mod.get("readmeZh") or mod.get("summaryZh") or "",
+            "readmeHTML": _naive_md_to_html(mod.get("readmeZh") or mod.get("summaryZh") or ""),
+            "homepageUrl": mod.get("homepageUrl") or "",
+            "sourceUrl": mod.get("sourceUrl") or "",
+            "url": mod.get("url") or "",
+            "latestRelease": {
+                "name": latest.get("name") or "",
+                "version": latest.get("version") or latest.get("name") or "",
+                "time": latest.get("time") or "",
+                "downloadUrl": latest.get("downloadUrl") or "",
+            },
+            "releases": [{
+                "name": latest.get("name") or "",
+                "tagName": latest.get("name") or "",
+                "publishedAt": latest.get("time") or "",
+                "descriptionHTML": "",
+                "releaseAssets": [{
+                    "name": (latest.get("downloadUrl") or "").rsplit("/", 1)[-1],
+                    "downloadUrl": latest.get("downloadUrl") or "",
+                    "size": latest.get("size") or 0,
+                    "downloadCount": 0,
+                }] if latest.get("downloadUrl") else [],
+            }] if latest.get("name") else [],
+        }
     repo = fetch_repo(spec, token)
     releases = fetch_releases(spec, token)
     readme = fetch_readme(spec, token)
@@ -401,9 +450,9 @@ def main():
     for i, mod in enumerate(modules, 1):
         module_id = mod["moduleId"]
         spec = mod.get("repo", "")
-        print(f"[{i}/{len(modules)}] {module_id} <- {spec or '(未配置 repo)'}")
-        if not spec:
-            errors.append(f"{module_id}: 未配置 repo")
+        print(f"[{i}/{len(modules)}] {module_id} <- {spec or '(手动模块)'}")
+        if not spec and not mod.get("latestRelease"):
+            errors.append(f"{module_id}: 未配置 repo 且无手动 release")
             skipped_ids.add(module_id)
             continue
         try:
