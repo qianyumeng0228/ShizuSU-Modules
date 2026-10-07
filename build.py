@@ -24,6 +24,7 @@ ShizuSU / SukiSU-Ultra 管理器「模块仓库」生成器
 """
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -162,7 +163,14 @@ def fetch_releases(spec, token):
 
 
 def fetch_readme(spec, token):
+    """优先 GitHub readme API（自动解析大小写变体/重定向），raw 回退。"""
     owner, name = spec.split("/", 1)
+    try:
+        data = api_get(f"repos/{owner}/{name}/readme", token=token)
+        if data and data.get("content"):
+            return base64.b64decode(data["content"]).decode("utf-8", errors="replace")
+    except ApiError:
+        pass
     for candidate in ("README.md", "readme.md", "README"):
         text = raw_get(owner, name, candidate, token=token)
         if text is not None:
@@ -212,7 +220,7 @@ def build_catalog_entry(mod, token):
         "moduleId": mod["moduleId"],
         "moduleName": mod.get("moduleName") or repo.get("name") or mod["moduleId"],
         "authors": authors,
-        "summary": mod.get("summary") or repo.get("description") or "",
+        "summary": mod.get("summaryZh") or mod.get("summary") or repo.get("description") or "",
         "metamodule": bool(mod.get("metamodule", False)),
         "zygisk": bool(mod.get("zygisk", False)),
         "stargazerCount": repo.get("stargazers_count", 0),
@@ -277,6 +285,8 @@ def build_detail(mod, token):
     repo = fetch_repo(spec, token)
     releases = fetch_releases(spec, token)
     readme = fetch_readme(spec, token)
+    if not readme:
+        readme = mod.get("readmeZh") or ""  # 拉取失败时用中文简介兜底
 
     latest = pick_latest_release(releases)
     asset = pick_asset(latest) if latest else None

@@ -1,0 +1,249 @@
+{
+  "readme": "<div align=\"center\">\n\n# Vector Framework\n\n**A high-performance ART hooking framework for modern Android**\n\n[![Build](https://img.shields.io/github/actions/workflow/status/JingMatrix/Vector/core.yml?branch=master&event=push&logo=github&label=Build)](https://github.com/JingMatrix/Vector/actions/workflows/core.yml?query=event%3Apush+branch%3Amaster+is%3Acompleted)\n[![Crowdin](https://img.shields.io/badge/Localization-Crowdin-blueviolet?logo=Crowdin)](https://crowdin.com/project/lsposed_jingmatrix)\n[![Download](https://img.shields.io/github/v/release/JingMatrix/Vector?color=orange&logoColor=orange&label=Download&logo=DocuSign)](https://github.com/JingMatrix/Vector/releases/latest)\n[![Total](https://shields.io/github/downloads/JingMatrix/Vector/total?logo=Bookmeter&label=Counts&logoColor=yellow&color=yellow)](https://github.com/JingMatrix/Vector/releases)\n\n</div>\n\n---\n\n### Introduction\n\nVector is a Zygisk module providing an ART hooking framework that maintains API consistency with the original Xposed. It is engineered on top of [LSPlant](https://github.com/JingMatrix/LSPlant) to deliver a stable, native-level instrumentation environment.\n\nThe framework allows modules to modify system and application behavior in-memory. Because no APK files are modified, changes are non-destructive, easily reversible via reboot, and compatible across various ROMs and Android versions.\n\n---\n\n### Compatibility\n\nVector supports devices running **Android 8.1 through Android 17 Beta**.\n\n> [!TIP]\n> This framework requires a recent installation of Magisk or KernelSU with Zygisk enabled.\n\n---\n\n### Installation\n\n1. Download the latest release as a system module.\n2. Install the module via your root manager (Magisk/KernelSU).\n3. Ensure a Zygisk environment (e.g., [NeoZygisk](https://github.com/JingMatrix/NeoZygisk)).\n4. Reboot the device.\n5. Access management settings via the system notification.\n\n---\n\n### Downloads\n\n| Channel | Source |\n| :--- | :--- |\n| **Stable Releases** | [GitHub Releases](https://github.com/JingMatrix/Vector/releases) |\n| **Canary (CI) Builds** | [GitHub Actions](https://github.com/JingMatrix/Vector/actions/workflows/core.yml?query=branch%3Amaster) |\n\n> [!NOTE]\n> Debug builds are recommended for users encountering issues or performing troubleshooting.\n> We encourage users to test CI builds to help us identify bugs and accelerate development.\n\n> [!CAUTION]\n> GitHub requires users to be **logged in** to download CI artifacts.\n>\n> The link above is filtered to show only `master` branch builds.\n> Please note that builds from Pull Requests (PRs) are often unstable and potentially unsafe (depending on the authors); we recommend staying on the `master` branch for verified builds, unless you are asked to help our debugging sessions.\n\n---\n\n### Support and Contribution\n\nIf you encounter issues or wish to help improve the project, please refer to the resources below.\n\n*   **Troubleshooting:** Consult the [guide](https://github.com/JingMatrix/Vector/issues/123) before reporting bugs.\n*   **Discussions:** Join our community on [GitHub Discussions](https://github.com/JingMatrix/Vector/discussions).\n*   **Localization:** Help translate the project via [Crowdin](https://crowdin.com/project/lsposed_jingmatrix).\n\n> [!IMPORTANT]\n> Bug reports are only accepted if they are based on the **latest debug build**.\n>\n> *Notice for Chinese speakers:*\n>\n> 为了提高沟通效率，本项目仅接受英文 Issue。请使用 [DeepL](https://www.deepl.com/zh/translator) 或其他翻译工具提交您的反馈。\n\n---\n\n### Developer Resources\n\nVector supports both legacy and modern hooking standards to ensure broad module compatibility.\n\n*   [Legacy Xposed API](https://api.xposed.info/)\n*   [Modern libxposed API](https://github.com/JingMatrix/libxposed-api)\n*   [Xposed Module Repository](https://github.com/Xposed-Modules-Repo)\n\n> [!NOTE]\n> Vector supports the `libxposed` API via two git submodules: the [module API](./xposed/) and the [service API](./services/).\n>\n> A successful GitHub Actions build of the [master](https://github.com/JingMatrix/Vector/tree/master) branch indicates that Vector fully supports these APIs at those specific commits.\n> Developers are suggested to check out the same commits as Vector.\n\n---\n\n### Credits\n\nThis project is made possible by the following open-source contributions:\n\n*   [Magisk](https://github.com/topjohnwu/Magisk/): The foundation of Android customization.\n*   [LSPlant](https://github.com/JingMatrix/LSPlant): The core ART hooking engine.\n*   [XposedBridge](https://github.com/rovo89/XposedBridge): The standard Xposed APIs.\n*   [Dobby](https://github.com/JingMatrix/Dobby): Inline hooking implementation.\n*   [LSPosed](https://github.com/LSPosed/LSPosed): Upstream source.\n*   [EdXposed](https://github.com/ElderDrivers/EdXposed): Upstream source, before LSPosed.\n*   [xz-embedded](https://github.com/tukaani-project/xz-embedded): Library decompression utilities.\n\n<details>\n<summary>Legacy and Historical Dependencies</summary>\n\n- ~~[Riru](https://github.com/RikkaApps/Riru)~~\n- ~~[SandHook](https://github.com/ganyao114/SandHook/)~~\n- ~~[YAHFA](https://github.com/rk700/YAHFA)~~\n- ~~[dexmaker](https://github.com/linkedin/dexmaker)~~\n- ~~[DexBuilder](https://github.com/LSPosed/DexBuilder)~~\n</details>\n\n---\n\n### License\n\nVector is licensed under the [GNU General Public License v3](http://www.gnu.org/copyleft/gpl.html).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>Vector Framework</h1>\n\n<p><b>A high-performance ART hooking framework for modern Android</b></p>\n\n<p><a href=\"https://img.shields.io/github/actions/workflow/status/JingMatrix/Vector/core.yml?branch=master&event=push&logo=github&label=Build\">![Build</a>](https://github.com/JingMatrix/Vector/actions/workflows/core.yml?query=event%3Apush+branch%3Amaster+is%3Acompleted)</p>\n<p><a href=\"https://img.shields.io/badge/Localization-Crowdin-blueviolet?logo=Crowdin\">![Crowdin</a>](https://crowdin.com/project/lsposed_jingmatrix)</p>\n<p><a href=\"https://img.shields.io/github/v/release/JingMatrix/Vector?color=orange&logoColor=orange&label=Download&logo=DocuSign\">![Download</a>](https://github.com/JingMatrix/Vector/releases/latest)</p>\n<p><a href=\"https://shields.io/github/downloads/JingMatrix/Vector/total?logo=Bookmeter&label=Counts&logoColor=yellow&color=yellow\">![Total</a>](https://github.com/JingMatrix/Vector/releases)</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h3>Introduction</h3>\n\n<p>Vector is a Zygisk module providing an ART hooking framework that maintains API consistency with the original Xposed. It is engineered on top of <a href=\"https://github.com/JingMatrix/LSPlant\">LSPlant</a> to deliver a stable, native-level instrumentation environment.</p>\n\n<p>The framework allows modules to modify system and application behavior in-memory. Because no APK files are modified, changes are non-destructive, easily reversible via reboot, and compatible across various ROMs and Android versions.</p>\n\n<p>---</p>\n\n<h3>Compatibility</h3>\n\n<p>Vector supports devices running <b>Android 8.1 through Android 17 Beta</b>.</p>\n\n<p>> [!TIP]</p>\n<p>> This framework requires a recent installation of Magisk or KernelSU with Zygisk enabled.</p>\n\n<p>---</p>\n\n<h3>Installation</h3>\n\n<li>Download the latest release as a system module.</li>\n<li>Install the module via your root manager (Magisk/KernelSU).</li>\n<li>Ensure a Zygisk environment (e.g., [NeoZygisk](https://github.com/JingMatrix/NeoZygisk)).</li>\n<li>Reboot the device.</li>\n<li>Access management settings via the system notification.</li>\n\n<p>---</p>\n\n<h3>Downloads</h3>\n\n<p>| Channel | Source |</p>\n<p>| :--- | :--- |</p>\n<p>| <b>Stable Releases</b> | <a href=\"https://github.com/JingMatrix/Vector/releases\">GitHub Releases</a> |</p>\n<p>| <b>Canary (CI) Builds</b> | <a href=\"https://github.com/JingMatrix/Vector/actions/workflows/core.yml?query=branch%3Amaster\">GitHub Actions</a> |</p>\n\n<p>> [!NOTE]</p>\n<p>> Debug builds are recommended for users encountering issues or performing troubleshooting.</p>\n<p>> We encourage users to test CI builds to help us identify bugs and accelerate development.</p>\n\n<p>> [!CAUTION]</p>\n<p>> GitHub requires users to be <b>logged in</b> to download CI artifacts.</p>\n<p>></p>\n<p>> The link above is filtered to show only <code>master</code> branch builds.</p>\n<p>> Please note that builds from Pull Requests (PRs) are often unstable and potentially unsafe (depending on the authors); we recommend staying on the <code>master</code> branch for verified builds, unless you are asked to help our debugging sessions.</p>\n\n<p>---</p>\n\n<h3>Support and Contribution</h3>\n\n<p>If you encounter issues or wish to help improve the project, please refer to the resources below.</p>\n\n<li>  **Troubleshooting:** Consult the [guide](https://github.com/JingMatrix/Vector/issues/123) before reporting bugs.</li>\n<li>  **Discussions:** Join our community on [GitHub Discussions](https://github.com/JingMatrix/Vector/discussions).</li>\n<li>  **Localization:** Help translate the project via [Crowdin](https://crowdin.com/project/lsposed_jingmatrix).</li>\n\n<p>> [!IMPORTANT]</p>\n<p>> Bug reports are only accepted if they are based on the <b>latest debug build</b>.</p>\n<p>></p>\n<p>> *Notice for Chinese speakers:*</p>\n<p>></p>\n<p>> 为了提高沟通效率，本项目仅接受英文 Issue。请使用 <a href=\"https://www.deepl.com/zh/translator\">DeepL</a> 或其他翻译工具提交您的反馈。</p>\n\n<p>---</p>\n\n<h3>Developer Resources</h3>\n\n<p>Vector supports both legacy and modern hooking standards to ensure broad module compatibility.</p>\n\n<li>  [Legacy Xposed API](https://api.xposed.info/)</li>\n<li>  [Modern libxposed API](https://github.com/JingMatrix/libxposed-api)</li>\n<li>  [Xposed Module Repository](https://github.com/Xposed-Modules-Repo)</li>\n\n<p>> [!NOTE]</p>\n<p>> Vector supports the <code>libxposed</code> API via two git submodules: the <a href=\"./xposed/\">module API</a> and the <a href=\"./services/\">service API</a>.</p>\n<p>></p>\n<p>> A successful GitHub Actions build of the <a href=\"https://github.com/JingMatrix/Vector/tree/master\">master</a> branch indicates that Vector fully supports these APIs at those specific commits.</p>\n<p>> Developers are suggested to check out the same commits as Vector.</p>\n\n<p>---</p>\n\n<h3>Credits</h3>\n\n<p>This project is made possible by the following open-source contributions:</p>\n\n<li>  [Magisk](https://github.com/topjohnwu/Magisk/): The foundation of Android customization.</li>\n<li>  [LSPlant](https://github.com/JingMatrix/LSPlant): The core ART hooking engine.</li>\n<li>  [XposedBridge](https://github.com/rovo89/XposedBridge): The standard Xposed APIs.</li>\n<li>  [Dobby](https://github.com/JingMatrix/Dobby): Inline hooking implementation.</li>\n<li>  [LSPosed](https://github.com/LSPosed/LSPosed): Upstream source.</li>\n<li>  [EdXposed](https://github.com/ElderDrivers/EdXposed): Upstream source, before LSPosed.</li>\n<li>  [xz-embedded](https://github.com/tukaani-project/xz-embedded): Library decompression utilities.</li>\n\n<p><details></p>\n<p><summary>Legacy and Historical Dependencies</summary></p>\n\n<li>~~[Riru](https://github.com/RikkaApps/Riru)~~</li>\n<li>~~[SandHook](https://github.com/ganyao114/SandHook/)~~</li>\n<li>~~[YAHFA](https://github.com/rk700/YAHFA)~~</li>\n<li>~~[dexmaker](https://github.com/linkedin/dexmaker)~~</li>\n<li>~~[DexBuilder](https://github.com/LSPosed/DexBuilder)~~</li>\n<p></details></p>\n\n<p>---</p>\n\n<h3>License</h3>\n\n<p>Vector is licensed under the <a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General Public License v3</a>.</p>",
+  "homepageUrl": "https://modules.lsposed.org/",
+  "sourceUrl": "https://github.com/JingMatrix/Vector",
+  "url": "https://github.com/JingMatrix/Vector",
+  "latestRelease": {
+    "name": "v2.2",
+    "version": "v2.2",
+    "time": "2026-08-04T09:38:29Z",
+    "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.2/Vector-v2.2-3080-Debug.zip"
+  },
+  "releases": [
+    {
+      "name": "canary-3112",
+      "tagName": "canary-3112",
+      "publishedAt": "2026-10-01T12:54:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3112-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3112/Vector-v2.2-3112-Debug.zip",
+          "size": 34607520,
+          "downloadCount": 551
+        },
+        {
+          "name": "Vector-v2.2-3112-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3112/Vector-v2.2-3112-Release.zip",
+          "size": 7457613,
+          "downloadCount": 4178
+        }
+      ]
+    },
+    {
+      "name": "canary-3111",
+      "tagName": "canary-3111",
+      "publishedAt": "2026-09-07T06:18:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3111-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3111/Vector-v2.2-3111-Debug.zip",
+          "size": 37354194,
+          "downloadCount": 1889
+        },
+        {
+          "name": "Vector-v2.2-3111-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3111/Vector-v2.2-3111-Release.zip",
+          "size": 9403029,
+          "downloadCount": 13535
+        }
+      ]
+    },
+    {
+      "name": "canary-3110",
+      "tagName": "canary-3110",
+      "publishedAt": "2026-09-02T21:26:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3110-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3110/Vector-v2.2-3110-Debug.zip",
+          "size": 37346783,
+          "downloadCount": 526
+        },
+        {
+          "name": "Vector-v2.2-3110-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3110/Vector-v2.2-3110-Release.zip",
+          "size": 9395184,
+          "downloadCount": 3261
+        }
+      ]
+    },
+    {
+      "name": "canary-3109",
+      "tagName": "canary-3109",
+      "publishedAt": "2026-09-02T21:04:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3109-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3109/Vector-v2.2-3109-Debug.zip",
+          "size": 37345941,
+          "downloadCount": 61
+        },
+        {
+          "name": "Vector-v2.2-3109-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3109/Vector-v2.2-3109-Release.zip",
+          "size": 9395308,
+          "downloadCount": 286
+        }
+      ]
+    },
+    {
+      "name": "canary-3108",
+      "tagName": "canary-3108",
+      "publishedAt": "2026-09-01T11:48:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3108-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3108/Vector-v2.2-3108-Debug.zip",
+          "size": 37339297,
+          "downloadCount": 184
+        },
+        {
+          "name": "Vector-v2.2-3108-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/canary-3108/Vector-v2.2-3108-Release.zip",
+          "size": 9391970,
+          "downloadCount": 1114
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-08-04T09:38:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.2-3080-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.2/Vector-v2.2-3080-Debug.zip",
+          "size": 36944715,
+          "downloadCount": 60398
+        },
+        {
+          "name": "Vector-v2.2-3080-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.2/Vector-v2.2-3080-Release.zip",
+          "size": 9316843,
+          "downloadCount": 150312
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-08-02T06:02:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.1-3073-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.1/Vector-v2.1-3073-Debug.zip",
+          "size": 36829107,
+          "downloadCount": 4355
+        },
+        {
+          "name": "Vector-v2.1-3073-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.1/Vector-v2.1-3073-Release.zip",
+          "size": 9260925,
+          "downloadCount": 13479
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-03-22T19:28:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Vector-v2.0-3021-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.0/Vector-v2.0-3021-Debug.zip",
+          "size": 21253182,
+          "downloadCount": 427599
+        },
+        {
+          "name": "Vector-v2.0-3021-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.0/Vector-v2.0-3021-Release.zip",
+          "size": 8434264,
+          "downloadCount": 539777
+        }
+      ]
+    },
+    {
+      "name": "v1.11.0",
+      "tagName": "v1.11.0",
+      "publishedAt": "2026-01-31T22:54:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.11.0-7209-zygisk-debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.11.0/LSPosed-v1.11.0-7209-zygisk-debug.zip",
+          "size": 18029283,
+          "downloadCount": 808523
+        },
+        {
+          "name": "LSPosed-v1.11.0-7209-zygisk-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.11.0/LSPosed-v1.11.0-7209-zygisk-release.zip",
+          "size": 6785684,
+          "downloadCount": 839831
+        }
+      ]
+    },
+    {
+      "name": "v1.10.2",
+      "tagName": "v1.10.2",
+      "publishedAt": "2025-07-12T09:43:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.10.2-7182-zygisk-debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.10.2/LSPosed-v1.10.2-7182-zygisk-debug.zip",
+          "size": 15049029,
+          "downloadCount": 4337283
+        },
+        {
+          "name": "LSPosed-v1.10.2-7182-zygisk-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.10.2/LSPosed-v1.10.2-7182-zygisk-release.zip",
+          "size": 6507377,
+          "downloadCount": 4208177
+        }
+      ]
+    },
+    {
+      "name": "v1.10.1",
+      "tagName": "v1.10.1",
+      "publishedAt": "2024-10-16T09:13:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.10.1-7115-zygisk-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.10.1/LSPosed-v1.10.1-7115-zygisk-release.zip",
+          "size": 2608607,
+          "downloadCount": 1512116
+        }
+      ]
+    },
+    {
+      "name": "v1.10.0",
+      "tagName": "v1.10.0",
+      "publishedAt": "2024-07-23T23:45:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.10.0-7068-riru-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.10.0/LSPosed-v1.10.0-7068-riru-release.zip",
+          "size": 2551530,
+          "downloadCount": 9121
+        },
+        {
+          "name": "LSPosed-v1.10.0-7068-zygisk-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/Vector/releases/download/v1.10.0/LSPosed-v1.10.0-7068-zygisk-release.zip",
+          "size": 2550309,
+          "downloadCount": 89423
+        }
+      ]
+    }
+  ]
+}
