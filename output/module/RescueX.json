@@ -1,0 +1,494 @@
+{
+  "readme": "# RescueX - 自动救砖守护\n\n> **维护状态：活跃**。当前版本 **v3.5.11**（versionCode 350204）。\n> 安装时可选择是否安装 WebUI；原版 Magisk 可配合 KsuWebUIStandalone 查看 WebUI。\n> 代码开源（MIT），欢迎 fork、Issue 与 PR。\n\nAndroid 自动救砖模块，兼容 Magisk / KernelSU / APatch。\n\n模块启动后监控开机状态：连续重启达到阈值、开机超时未完成时，自动禁用问题模块并恢复系统。\n\n## 功能\n\n- **连续重启救砖**：达到阈值（默认 3 次）自动禁用所有非白名单模块\n- **开机超时看门狗**：开机超过指定时长未完成，自动救砖并重启\n- **三级渐进式救砖**：嫌疑模块禁用 → 全量禁用 → 人工复核\n- **跨厂商 OTA / 大版本升级识别**：以最近一次确认成功启动的系统构建基线为主，厂商更新信号只认易失的 `sys.*` 状态与近期更新痕迹作兜底（常驻属性与常驻 `update_engine` 不再误判为更新中）；可设置一次性手动 OTA 保护\n- **嫌疑模块追踪**：启动成功后记录已知良好模块列表，下次失败时对比差异精确定位\n- **模块快照管理**：手动拍快照记录当前模块启用状态，出问题可一键回滚\n- **跨 Root 救砖事务恢复**：记录 RescueX 实际写入的模块路径与禁用标记；只恢复本事务拥有的标记，避免跨 Magisk / KernelSU / SukiSU / APatch 误启用同名或用户手动禁用的模块\n- **自适应启动超时**：基于历史启动耗时移动平均动态调整超时，减少低配设备误报\n- **WebUI 与 CLI 管理**：在 KernelSU 管理器 / MMRL 中使用完整 WebUI；Magisk 可通过 `action.sh --cli` 查看诊断、快照、安全模式与救援预览\n- **轻量完整性自检**：启动成功后建立 RescueX 核心文件 SHA-256 基线，独立守护进程检查\n- **一次性安全模式**：预禁用非白名单模块，下次启动进入安全模式，成功后按事务清单精确恢复\n- **诊断包导出**：一键生成脱敏诊断包（zip/tar.gz/txt 自动适配），可选打开 GitHub Issue 草稿\n- **安装交互选择 WebUI**：安装/更新时按音量键选择是否安装 WebUI（60 秒无操作自动安装）；确认偏好后升级自动沿用，不再每次询问，误按音量下也不会删除已有 WebUI；原版 Magisk 会提示配合 [KsuWebUIStandalone](https://github.com/5ec1cff/KsuWebUIStandalone) 使用\n- **可切换 WebUI 外观**：保留 MIUI X 默认界面，另提供 Material Design 3；可选莫奈取色通过 root 读取系统已生成的 Material You 色阶（读不到时降级为近似配色并明确标注）\n- **无 WebUI 模式**：选择后自动移除 WebUI 页面（保留配置与原生看门狗），所有参数可直接修改 `/data/adb/rescuex_data/config.conf` 后重启生效\n- **可选原生看门狗**：arm64 设备可启用 C 编写的单调时钟看门狗，Shell 回退始终可用\n\n## 安装\n\n在 Magisk / KernelSU / APatch 管理器中刷入 [Releases](https://github.com/jiayuxuan123/RescueX/releases) 页面下载的 zip 包。\n\n安装过程中会显示 **WebUI 安装选择**：\n\n- `[音量+]` 安装 WebUI（推荐）\n- `[音量-]` 不安装（无 WebUI 模式，可手动修改 `/data/adb/rescuex_data/config.conf`）\n- **60 秒无操作自动安装 WebUI**\n\n> **原版 Magisk 用户**：官方 Magisk 不支持模块 WebUI。如需使用 WebUI，\n> 请安装开源应用 [KsuWebUIStandalone](https://github.com/5ec1cff/KsuWebUIStandalone)\n> （下载地址见其 Releases 页面），安装后即可在应用内查看本模块 WebUI。\n\n安装完成后重启设备生效。\n\n## 开源仓库\n\n- 仓库地址：https://github.com/jiayuxuan123/RescueX\n- 在线更新：模块已内置 `updateJson`，发布新版 Release 后可直接从管理器检查更新\n- **开发者 / 交接文档**：[DEVELOPER.md](DEVELOPER.md)——项目架构、关键设计决策（含历史修复教训）、版本号规则、发布流程、测试方法与已知边界；后续维护者与 AI Agent 请先阅读此文档\n\n### CLI（Magisk 与自动化诊断）\n\n无原生 WebUI 的环境可在 root shell 中运行：\n\n```sh\nsh /data/adb/modules/RescueX/action.sh --cli help\n```\n\n默认诊断命令均为只读；会改动状态的命令必须显式附带 `--apply`。支持 `status`、`health`、`timeline`、`module-changes`、`snapshots`、`safe-mode status`、`ota status` 和 `simulate`；其中 `simulate` 只预览基于当前状态可能执行的救援策略。`rescue restore --apply`、`ota arm --apply`、`ota clear --apply` 是唯一会写入模块或 OTA 手动保护状态的 CLI 路径。\n\n### 兼容性\n\n| Root 方案 | 状态 | 备注 |\n|---|---|---|\n| Magisk v27+ | 完全兼容 | 安装器使用标准 `update-binary` |\n| KernelSU | 兼容 | 安装器兼容 KSU 模块安装 |\n| SukiSU Ultra | 兼容 | 同 KernelSU |\n| APatch | 实验性 | 安装入口未全面验证，如遇问题请提 Issue |\n| MMRL v34242+ | 兼容 | 旧版有 Compose 崩溃，建议升级 |\n\n## 配置参数\n\n| 参数 | 默认值 | 范围 | 说明 |\n|---|---|---|---|\n| 连续重启阈值 | 3 次 | 1-10 | 达到此次数后触发全量救砖 |\n| 开机超时 | 90 秒 | 30-600 | 超时未完成开机则判定失败 |\n| OTA 升级超时 | 900 秒 | 60-1800 | 检测到 OTA 时使用此超时 |\n| 自适应超时 | 开启 | 开启/关闭 | 基于历史启动耗时动态调整 |\n| 用户重启宽限期 | 30 秒 | 5-300 | 短时间内重启不计入失败次数 |\n| 补丁更新超时 | 180 秒 | 60-600 | 补丁更新时的超时时间 |\n| 轻量完整性自检 | 开启 | 开启/关闭 | 检查核心文件是否缺失或被替换 |\n| 看门狗引擎 | Shell | Shell/Native | Native 仅 arm64 且需自检通过 |\n\n## 隐私协议\n\n- RescueX **不联网**、不上传任何数据，所有状态文件仅存储在设备本地\n- 诊断包导出是用户主动操作，包含设备型号、系统版本、模块列表、配置和日志\n- 诊断包导出前会进行脱敏处理，用户自行决定是否分享\n- GitHub Issue 草稿功能仅打开预填页面，不自动上传文件或代管 Token\n\n## 使用须知\n\n- 首次安装默认 `DRY_RUN=true`（仅记录日志不实际禁用模块），验证逻辑无误后再关闭\n- 白名单中的模块在救砖时不会被禁用，请将关键模块（字体、音效等）加入白名单\n- 一次性安全模式会立即写入禁用标记，下次启动生效，请确认后再布防\n- 无法自动识别的系统更新可在 WebUI 或 CLI 通过 `ota arm --apply` 设置一次性 OTA 手动保护；确认成功启动后会自动清除\n- 覆盖更新后如遇异常，可先卸载模块（会彻底清理状态和持久化目录）再重新安装\n\n## 致谢 Credits\n\nRescueX 的兼容适配与 WebUI 能力离不开以下开源项目，在此一并致谢：\n\n| 项目 | 作者 / 组织 | 说明 |\n|---|---|---|\n| [Magisk](https://github.com/topjohnwu/Magisk) | topjohnwu | 通用 Root 方案与模块框架 |\n| [KernelSU](https://github.com/tiann/KernelSU) | tiann | 内核级 Root 方案，模块 WebUI 规范 |\n| [SukiSU Ultra](https://github.com/sukisu-ultra/sukisu-ultra) | SukiSU-Ultra | 基于 KernelSU 的分支，支持 KPM |\n| [APatch](https://github.com/bmax121/APatch) | bmax121 | 内核级 Root 方案（基于 KernelPatch） |\n| [MMRL](https://github.com/DerGoogler/MMRL) | DerGoogler | 支持 WebUI 的模块管理器 |\n| [FoxMagiskModuleManager (FoxMMM)](https://github.com/Fox2Code/FoxMagiskModuleManager) | Fox2Code / Androidacy | 开源 Magisk 模块管理器 |\n| [KsuWebUIStandalone](https://github.com/5ec1cff/KsuWebUIStandalone) | 5ec1cff | 让原版 Magisk 查看模块 WebUI 的独立应用 |\n\n## 许可证\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<h1>RescueX - 自动救砖守护</h1>\n\n<p>> <b>维护状态：活跃</b>。当前版本 <b>v3.5.11</b>（versionCode 350204）。</p>\n<p>> 安装时可选择是否安装 WebUI；原版 Magisk 可配合 KsuWebUIStandalone 查看 WebUI。</p>\n<p>> 代码开源（MIT），欢迎 fork、Issue 与 PR。</p>\n\n<p>Android 自动救砖模块，兼容 Magisk / KernelSU / APatch。</p>\n\n<p>模块启动后监控开机状态：连续重启达到阈值、开机超时未完成时，自动禁用问题模块并恢复系统。</p>\n\n<h2>功能</h2>\n\n<li>**连续重启救砖**：达到阈值（默认 3 次）自动禁用所有非白名单模块</li>\n<li>**开机超时看门狗**：开机超过指定时长未完成，自动救砖并重启</li>\n<li>**三级渐进式救砖**：嫌疑模块禁用 → 全量禁用 → 人工复核</li>\n<li>**跨厂商 OTA / 大版本升级识别**：以最近一次确认成功启动的系统构建基线为主，厂商更新信号只认易失的 `sys.*` 状态与近期更新痕迹作兜底（常驻属性与常驻 `update_engine` 不再误判为更新中）；可设置一次性手动 OTA 保护</li>\n<li>**嫌疑模块追踪**：启动成功后记录已知良好模块列表，下次失败时对比差异精确定位</li>\n<li>**模块快照管理**：手动拍快照记录当前模块启用状态，出问题可一键回滚</li>\n<li>**跨 Root 救砖事务恢复**：记录 RescueX 实际写入的模块路径与禁用标记；只恢复本事务拥有的标记，避免跨 Magisk / KernelSU / SukiSU / APatch 误启用同名或用户手动禁用的模块</li>\n<li>**自适应启动超时**：基于历史启动耗时移动平均动态调整超时，减少低配设备误报</li>\n<li>**WebUI 与 CLI 管理**：在 KernelSU 管理器 / MMRL 中使用完整 WebUI；Magisk 可通过 `action.sh --cli` 查看诊断、快照、安全模式与救援预览</li>\n<li>**轻量完整性自检**：启动成功后建立 RescueX 核心文件 SHA-256 基线，独立守护进程检查</li>\n<li>**一次性安全模式**：预禁用非白名单模块，下次启动进入安全模式，成功后按事务清单精确恢复</li>\n<li>**诊断包导出**：一键生成脱敏诊断包（zip/tar.gz/txt 自动适配），可选打开 GitHub Issue 草稿</li>\n<li>**安装交互选择 WebUI**：安装/更新时按音量键选择是否安装 WebUI（60 秒无操作自动安装）；确认偏好后升级自动沿用，不再每次询问，误按音量下也不会删除已有 WebUI；原版 Magisk 会提示配合 [KsuWebUIStandalone](https://github.com/5ec1cff/KsuWebUIStandalone) 使用</li>\n<li>**可切换 WebUI 外观**：保留 MIUI X 默认界面，另提供 Material Design 3；可选莫奈取色通过 root 读取系统已生成的 Material You 色阶（读不到时降级为近似配色并明确标注）</li>\n<li>**无 WebUI 模式**：选择后自动移除 WebUI 页面（保留配置与原生看门狗），所有参数可直接修改 `/data/adb/rescuex_data/config.conf` 后重启生效</li>\n<li>**可选原生看门狗**：arm64 设备可启用 C 编写的单调时钟看门狗，Shell 回退始终可用</li>\n\n<h2>安装</h2>\n\n<p>在 Magisk / KernelSU / APatch 管理器中刷入 <a href=\"https://github.com/jiayuxuan123/RescueX/releases\">Releases</a> 页面下载的 zip 包。</p>\n\n<p>安装过程中会显示 <b>WebUI 安装选择</b>：</p>\n\n<li>`[音量+]` 安装 WebUI（推荐）</li>\n<li>`[音量-]` 不安装（无 WebUI 模式，可手动修改 `/data/adb/rescuex_data/config.conf`）</li>\n<li>**60 秒无操作自动安装 WebUI**</li>\n\n<p>> <b>原版 Magisk 用户</b>：官方 Magisk 不支持模块 WebUI。如需使用 WebUI，</p>\n<p>> 请安装开源应用 <a href=\"https://github.com/5ec1cff/KsuWebUIStandalone\">KsuWebUIStandalone</a></p>\n<p>> （下载地址见其 Releases 页面），安装后即可在应用内查看本模块 WebUI。</p>\n\n<p>安装完成后重启设备生效。</p>\n\n<h2>开源仓库</h2>\n\n<li>仓库地址：https://github.com/jiayuxuan123/RescueX</li>\n<li>在线更新：模块已内置 `updateJson`，发布新版 Release 后可直接从管理器检查更新</li>\n<li>**开发者 / 交接文档**：[DEVELOPER.md](DEVELOPER.md)——项目架构、关键设计决策（含历史修复教训）、版本号规则、发布流程、测试方法与已知边界；后续维护者与 AI Agent 请先阅读此文档</li>\n\n<h3>CLI（Magisk 与自动化诊断）</h3>\n\n<p>无原生 WebUI 的环境可在 root shell 中运行：</p>\n\n<pre>sh /data/adb/modules/RescueX/action.sh --cli help</pre>\n\n<p>默认诊断命令均为只读；会改动状态的命令必须显式附带 <code>--apply</code>。支持 <code>status</code>、<code>health</code>、<code>timeline</code>、<code>module-changes</code>、<code>snapshots</code>、<code>safe-mode status</code>、<code>ota status</code> 和 <code>simulate</code>；其中 <code>simulate</code> 只预览基于当前状态可能执行的救援策略。<code>rescue restore --apply</code>、<code>ota arm --apply</code>、<code>ota clear --apply</code> 是唯一会写入模块或 OTA 手动保护状态的 CLI 路径。</p>\n\n<h3>兼容性</h3>\n\n<p>| Root 方案 | 状态 | 备注 |</p>\n<p>|---|---|---|</p>\n<p>| Magisk v27+ | 完全兼容 | 安装器使用标准 <code>update-binary</code> |</p>\n<p>| KernelSU | 兼容 | 安装器兼容 KSU 模块安装 |</p>\n<p>| SukiSU Ultra | 兼容 | 同 KernelSU |</p>\n<p>| APatch | 实验性 | 安装入口未全面验证，如遇问题请提 Issue |</p>\n<p>| MMRL v34242+ | 兼容 | 旧版有 Compose 崩溃，建议升级 |</p>\n\n<h2>配置参数</h2>\n\n<p>| 参数 | 默认值 | 范围 | 说明 |</p>\n<p>|---|---|---|---|</p>\n<p>| 连续重启阈值 | 3 次 | 1-10 | 达到此次数后触发全量救砖 |</p>\n<p>| 开机超时 | 90 秒 | 30-600 | 超时未完成开机则判定失败 |</p>\n<p>| OTA 升级超时 | 900 秒 | 60-1800 | 检测到 OTA 时使用此超时 |</p>\n<p>| 自适应超时 | 开启 | 开启/关闭 | 基于历史启动耗时动态调整 |</p>\n<p>| 用户重启宽限期 | 30 秒 | 5-300 | 短时间内重启不计入失败次数 |</p>\n<p>| 补丁更新超时 | 180 秒 | 60-600 | 补丁更新时的超时时间 |</p>\n<p>| 轻量完整性自检 | 开启 | 开启/关闭 | 检查核心文件是否缺失或被替换 |</p>\n<p>| 看门狗引擎 | Shell | Shell/Native | Native 仅 arm64 且需自检通过 |</p>\n\n<h2>隐私协议</h2>\n\n<li>RescueX **不联网**、不上传任何数据，所有状态文件仅存储在设备本地</li>\n<li>诊断包导出是用户主动操作，包含设备型号、系统版本、模块列表、配置和日志</li>\n<li>诊断包导出前会进行脱敏处理，用户自行决定是否分享</li>\n<li>GitHub Issue 草稿功能仅打开预填页面，不自动上传文件或代管 Token</li>\n\n<h2>使用须知</h2>\n\n<li>首次安装默认 `DRY_RUN=true`（仅记录日志不实际禁用模块），验证逻辑无误后再关闭</li>\n<li>白名单中的模块在救砖时不会被禁用，请将关键模块（字体、音效等）加入白名单</li>\n<li>一次性安全模式会立即写入禁用标记，下次启动生效，请确认后再布防</li>\n<li>无法自动识别的系统更新可在 WebUI 或 CLI 通过 `ota arm --apply` 设置一次性 OTA 手动保护；确认成功启动后会自动清除</li>\n<li>覆盖更新后如遇异常，可先卸载模块（会彻底清理状态和持久化目录）再重新安装</li>\n\n<h2>致谢 Credits</h2>\n\n<p>RescueX 的兼容适配与 WebUI 能力离不开以下开源项目，在此一并致谢：</p>\n\n<p>| 项目 | 作者 / 组织 | 说明 |</p>\n<p>|---|---|---|</p>\n<p>| <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a> | topjohnwu | 通用 Root 方案与模块框架 |</p>\n<p>| <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a> | tiann | 内核级 Root 方案，模块 WebUI 规范 |</p>\n<p>| <a href=\"https://github.com/sukisu-ultra/sukisu-ultra\">SukiSU Ultra</a> | SukiSU-Ultra | 基于 KernelSU 的分支，支持 KPM |</p>\n<p>| <a href=\"https://github.com/bmax121/APatch\">APatch</a> | bmax121 | 内核级 Root 方案（基于 KernelPatch） |</p>\n<p>| <a href=\"https://github.com/DerGoogler/MMRL\">MMRL</a> | DerGoogler | 支持 WebUI 的模块管理器 |</p>\n<p>| <a href=\"https://github.com/Fox2Code/FoxMagiskModuleManager\">FoxMagiskModuleManager (FoxMMM)</a> | Fox2Code / Androidacy | 开源 Magisk 模块管理器 |</p>\n<p>| <a href=\"https://github.com/5ec1cff/KsuWebUIStandalone\">KsuWebUIStandalone</a> | 5ec1cff | 让原版 Magisk 查看模块 WebUI 的独立应用 |</p>\n\n<h2>许可证</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/jiayuxuan123/RescueX",
+  "sourceUrl": "https://github.com/jiayuxuan123/RescueX",
+  "url": "https://github.com/jiayuxuan123/RescueX",
+  "latestRelease": {
+    "name": "v3.5.11",
+    "version": "v3.5.11",
+    "time": "2026-08-24T08:07:31Z",
+    "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.11/RescueX-v3.5.11.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.5.11",
+      "tagName": "v3.5.11",
+      "publishedAt": "2026-08-24T08:07:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.11.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.11/RescueX-v3.5.11.zip",
+          "size": 187679,
+          "downloadCount": 1106
+        }
+      ]
+    },
+    {
+      "name": "v3.5.10-r3",
+      "tagName": "v3.5.10-r3",
+      "publishedAt": "2026-08-22T05:46:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.10-r3.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.10-r3/RescueX-v3.5.10-r3.zip",
+          "size": 163618,
+          "downloadCount": 132
+        }
+      ]
+    },
+    {
+      "name": "v3.5.10-r2",
+      "tagName": "v3.5.10-r2",
+      "publishedAt": "2026-08-13T05:41:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.10-r2.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.10-r2/RescueX-v3.5.10-r2.zip",
+          "size": 163960,
+          "downloadCount": 289
+        }
+      ]
+    },
+    {
+      "name": "v3.5.10-r1",
+      "tagName": "v3.5.10-r1",
+      "publishedAt": "2026-08-13T04:14:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.10-r1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.10-r1/RescueX-v3.5.10-r1.zip",
+          "size": 161473,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v3.5.10",
+      "tagName": "v3.5.10",
+      "publishedAt": "2026-08-13T03:51:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.10.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.10/RescueX-v3.5.10.zip",
+          "size": 159557,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v3.5.9-r2",
+      "tagName": "v3.5.9-r2",
+      "publishedAt": "2026-08-13T03:25:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.9-r2.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.9-r2/RescueX-v3.5.9-r2.zip",
+          "size": 152721,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v3.5.9-r1",
+      "tagName": "v3.5.9-r1",
+      "publishedAt": "2026-08-12T07:35:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.9-r1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.9-r1/RescueX-v3.5.9-r1.zip",
+          "size": 152363,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.2.8-r1",
+      "tagName": "v3.2.8-r1",
+      "publishedAt": "2026-08-12T07:35:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.2.8-r1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.2.8-r1/RescueX-v3.2.8-r1.zip",
+          "size": 104713,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.5.9",
+      "tagName": "v3.5.9",
+      "publishedAt": "2026-08-07T03:51:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.9.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.9/RescueX-v3.5.9.zip",
+          "size": 152457,
+          "downloadCount": 424
+        },
+        {
+          "name": "RescueX-v3.5.9.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.9/RescueX-v3.5.9.zip.sha256",
+          "size": 96,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.5.8",
+      "tagName": "v3.5.8",
+      "publishedAt": "2026-08-06T03:02:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.8.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.8/RescueX-v3.5.8.zip",
+          "size": 156168,
+          "downloadCount": 76
+        },
+        {
+          "name": "RescueX-v3.5.8.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.8/RescueX-v3.5.8.zip.sha256",
+          "size": 85,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.5.7",
+      "tagName": "v3.5.7",
+      "publishedAt": "2026-08-04T09:24:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.7.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.7/RescueX-v3.5.7.zip",
+          "size": 160326,
+          "downloadCount": 75
+        }
+      ]
+    },
+    {
+      "name": "v3.5.6",
+      "tagName": "v3.5.6",
+      "publishedAt": "2026-08-03T10:09:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.6.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.6/RescueX-v3.5.6.zip",
+          "size": 157145,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v3.5.5",
+      "tagName": "v3.5.5",
+      "publishedAt": "2026-08-03T09:43:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.5.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.5/RescueX-v3.5.5.zip",
+          "size": 156694,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.5.4",
+      "tagName": "v3.5.4",
+      "publishedAt": "2026-08-03T08:44:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.4.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.4/RescueX-v3.5.4.zip",
+          "size": 155282,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.5.3",
+      "tagName": "v3.5.3",
+      "publishedAt": "2026-08-03T08:09:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.3.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.3/RescueX-v3.5.3.zip",
+          "size": 153531,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.5.2",
+      "tagName": "v3.5.2",
+      "publishedAt": "2026-08-03T06:53:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v3.5.1",
+      "tagName": "v3.5.1",
+      "publishedAt": "2026-08-03T05:55:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.1/RescueX-v3.5.1.zip",
+          "size": 145943,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.5.0",
+      "tagName": "v3.5.0",
+      "publishedAt": "2026-07-26T15:26:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.5.0.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.0/RescueX-v3.5.0.zip",
+          "size": 128429,
+          "downloadCount": 113
+        },
+        {
+          "name": "RescueX-v3.5.0.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.0/RescueX-v3.5.0.zip.sha256",
+          "size": 85,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.4.3",
+      "tagName": "v3.4.3",
+      "publishedAt": "2026-07-26T06:25:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.4.3.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.3/RescueX-v3.4.3.zip",
+          "size": 121651,
+          "downloadCount": 93
+        },
+        {
+          "name": "RescueX-v3.4.3.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.3/RescueX-v3.4.3.zip.sha256",
+          "size": 85,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.1",
+      "tagName": "v3.4.1",
+      "publishedAt": "2026-07-23T03:59:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.4.1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.1/RescueX-v3.4.1.zip",
+          "size": 118362,
+          "downloadCount": 60
+        },
+        {
+          "name": "RescueX-v3.4.1.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.1/RescueX-v3.4.1.zip.sha256",
+          "size": 85,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.0",
+      "tagName": "v3.4.0",
+      "publishedAt": "2026-07-22T13:39:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.4.0.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.0/RescueX-v3.4.0.zip",
+          "size": 117260,
+          "downloadCount": 21
+        },
+        {
+          "name": "RescueX-v3.4.0.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.4.0/RescueX-v3.4.0.zip.sha256",
+          "size": 96,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r7",
+      "tagName": "v3.3.0-r7",
+      "publishedAt": "2026-07-22T05:50:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r7.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r7/RescueX-v3.3.0-r7.zip",
+          "size": 117398,
+          "downloadCount": 4
+        },
+        {
+          "name": "RescueX-v3.3.0-r7.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r7/RescueX-v3.3.0-r7.zip.sha256",
+          "size": 88,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r6",
+      "tagName": "v3.3.0-r6",
+      "publishedAt": "2026-07-22T05:32:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r6.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r6/RescueX-v3.3.0-r6.zip",
+          "size": 117051,
+          "downloadCount": 3
+        },
+        {
+          "name": "RescueX-v3.3.0-r6.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r6/RescueX-v3.3.0-r6.zip.sha256",
+          "size": 88,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r5",
+      "tagName": "v3.3.0-r5",
+      "publishedAt": "2026-07-22T05:28:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r5.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r5/RescueX-v3.3.0-r5.zip",
+          "size": 116707,
+          "downloadCount": 0
+        },
+        {
+          "name": "RescueX-v3.3.0-r5.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r5/RescueX-v3.3.0-r5.zip.sha256",
+          "size": 88,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r4",
+      "tagName": "v3.3.0-r4",
+      "publishedAt": "2026-07-22T05:18:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r4.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r4/RescueX-v3.3.0-r4.zip",
+          "size": 115943,
+          "downloadCount": 1
+        },
+        {
+          "name": "RescueX-v3.3.0-r4.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r4/RescueX-v3.3.0-r4.zip.sha256",
+          "size": 88,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r3",
+      "tagName": "v3.3.0-r3",
+      "publishedAt": "2026-07-22T04:37:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r3.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r3/RescueX-v3.3.0-r3.zip",
+          "size": 115570,
+          "downloadCount": 3
+        },
+        {
+          "name": "RescueX-v3.3.0-r3.zip.sha256",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r3/RescueX-v3.3.0-r3.zip.sha256",
+          "size": 88,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r2",
+      "tagName": "v3.3.0-r2",
+      "publishedAt": "2026-07-22T04:19:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r2.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r2/RescueX-v3.3.0-r2.zip",
+          "size": 114002,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0-r1",
+      "tagName": "v3.3.0-r1",
+      "publishedAt": "2026-07-22T04:09:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0-r1.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0-r1/RescueX-v3.3.0-r1.zip",
+          "size": 113891,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0",
+      "tagName": "v3.3.0",
+      "publishedAt": "2026-07-22T03:47:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.3.0.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.3.0/RescueX-v3.3.0.zip",
+          "size": 113729,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.2.9",
+      "tagName": "v3.2.9",
+      "publishedAt": "2026-07-19T04:02:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "RescueX-v3.2.9.zip",
+          "downloadUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.2.9/RescueX-v3.2.9.zip",
+          "size": 109229,
+          "downloadCount": 55
+        }
+      ]
+    }
+  ]
+}

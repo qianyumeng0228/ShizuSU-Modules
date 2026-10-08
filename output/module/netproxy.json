@@ -1,0 +1,603 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"docs/public/N.svg\" alt=\"NetProxy Logo\" width=\"120\" />\n</p>\n\n<h1 align=\"center\">NetProxy</h1>\n\n<p align=\"center\">\n  <strong>Android 系统级 sing-box 透明代理模块</strong><br>\n  eBPF / TUN · 节点与订阅 · 分应用代理 · 共享网络\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\">\n    <img src=\"https://img.shields.io/github/v/release/Fanju6/NetProxy-Magisk?style=flat-square&label=Release&color=blue\" alt=\"Latest Release\" />\n  </a>\n  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\">\n    <img src=\"https://img.shields.io/github/downloads/Fanju6/NetProxy-Magisk/total?style=flat-square&color=green\" alt=\"Downloads\" />\n  </a>\n  <img src=\"https://img.shields.io/badge/Core-sing--box-blueviolet?style=flat-square\" alt=\"sing-box Core\" />\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\">下载模块与管理器</a> ·\n  <a href=\"https://www.netproxy.store/\">使用文档</a> ·\n  <a href=\"src/android/\">管理器源码</a> ·\n  <a href=\"https://t.me/NetProxy_Magisk\">Telegram</a>\n</p>\n\n<p align=\"center\">\n  中文 | <a href=\"README_EN.md\">English</a>\n</p>\n\n---\n\n## 项目简介\n\nNetProxy 是面向已 Root Android 设备的系统级透明代理模块，支持 **Magisk、KernelSU 与 APatch**。使用 sing-box，通过 eBPF 或 TUN + auto_redirect 接管流量。\n\n日常操作可使用随模块提供的 Android 管理器，也可通过终端式模块 WebUI、CLI 或 sing-box Dashboard 管理。节点与订阅在服务停止时仍可浏览和编辑。\n\n## 界面预览\n\n<div align=\"center\">\n  <img src=\"docs/public/Screenshot.jpg\" width=\"60%\" alt=\"NetProxy Android 管理器界面预览\" />\n</div>\n\n## 主要功能\n\n- **透明代理**：eBPF 或 TUN 接管 TCP、UDP 与 DNS，支持热点和 USB 共享网络。\n- **节点与订阅**：导入节点链接、节点文本、Clash YAML 和 sing-box JSON；支持订阅筛选、请求头、流量信息与自动更新。\n- **节点选择与测速**：手动选择或自动优选，服务停止时也可测速。\n- **分应用代理**：黑名单 / 白名单，按 Android 用户分别配置，支持应用分身。\n- **网络策略**：规则、全局、直连与允许广告模式，按 Wi-Fi 名称和实际出口自动切换。\n- **配置与诊断**：编辑 sing-box 配置、本地规则，查看运行时配置与日志，导出脱敏诊断包。\n\n## 安装与开始使用\n\n运行环境为 `arm64-v8a` Android 设备与 Magisk、KernelSU 或 APatch，使用 Root 权限接管流量。\n\n默认使用 eBPF，可在“设置 → 入站设置”中选择 TUN。设备能力要求与安装选项见[安装与升级](https://www.netproxy.store/guide/installation)。\n\n1. 从 [Releases](https://github.com/Fanju6/NetProxy-Magisk/releases) 下载 `NetProxy_<版本>_<构建号>.zip`，内含模块和 Android 管理器。\n2. 在 Root 管理器中刷入，按提示选择数据保留方式及是否安装管理器；等待安装完成。\n3. 打开 Android 管理器并授予 Root 权限，在“节点”页导入节点，或在“订阅”页添加订阅。\n4. 在“节点”页选择分组与自动 / 手动节点，返回“仪表盘”开启服务。\n\n服务默认手动启动，开机自启可在“设置”中开启。首次配置参阅[快速开始](https://www.netproxy.store/guide/quick-start)。\n\n## 使用文档\n\n| 内容 | 文档 |\n|---|---|\n| 安装与首次配置 | [安装与升级](https://www.netproxy.store/guide/installation) · [快速开始](https://www.netproxy.store/guide/quick-start) |\n| 节点、订阅与测速 | [节点与订阅](https://www.netproxy.store/guide/nodes-subscriptions) |\n| 入站、分应用与共享网络 | [入站配置](https://www.netproxy.store/config/inbound) · [eBPF](https://www.netproxy.store/config/ebpf) · [TUN](https://www.netproxy.store/config/tun) |\n| 网络自动切换 | [Wi-Fi 自动策略](https://www.netproxy.store/guide/wifi-policy) |\n| 路由、DNS 与策略组 | [配置参考](https://www.netproxy.store/config/singbox) · [策略分组](https://www.netproxy.store/config/policy-groups) |\n| 终端、面板与第三方客户端 | [CLI](https://www.netproxy.store/guide/cli) · [控制面板与 API](https://www.netproxy.store/guide/control-panel) |\n| 故障排查与问题反馈 | [常见问题与诊断](https://www.netproxy.store/guide/faq) |\n\n[更新日志](https://www.netproxy.store/changelog) · [隐私政策](https://www.netproxy.store/privacy)\n\n## 奶屁伙伴\n\n<p align=\"center\">\n  <a href=\"https://www.netproxy.store/mascot/dragon\"><img src=\"docs/public/mascots/dragon/base.svg\" width=\"144\" alt=\"薄荷色像素奶屁龙\" /></a>\n  <a href=\"https://www.netproxy.store/mascot/niang\"><img src=\"docs/public/mascots/niang/stickers/16-leave-it.png\" width=\"144\" alt=\"长发蓝蝴蝶结的奶屁娘：交给我\" /></a>\n</p>\n\n**奶屁龙**，通路工坊的开路员。爱挖洞，也爱打盹，偶尔会把出口挖到饼干柜里。\n\n**奶屁娘**，通路工坊的主人。讲究、有点傲娇，嘴上问着“日志呢？”，手里已经递来一杯热饮。\n\n[工坊故事](https://www.netproxy.store/mascot/) · [表情包](https://www.netproxy.store/mascot/stickers) · [股东名册](https://www.netproxy.store/mascot/supporters)\n\n## 源码结构\n\n```text\nsrc/module/          模块安装与运行文件\nsrc/native/netproxy/ Go 原生组件\nsrc/webui/           终端式模块 WebUI\nsrc/android/         Android 管理器\ndocs/                用户文档站\ntests/               契约与回归测试\n```\n\n开发流程与验证方法见[贡献指南](CONTRIBUTING.md)，架构和跨组件契约见 [AGENTS.md](AGENTS.md)，管理器构建见 [Android 说明](src/android/README.md)。\n\n## 鸣谢\n\n| 项目 | 用途 |\n|------|------|\n| [reF1nd/sing-box](https://github.com/reF1nd/sing-box) | 当前代理核心 |\n| [SagerNet/sing-box](https://github.com/SagerNet/sing-box) | 上游 sing-box 项目 |\n| [Proxylink](https://github.com/Fanju6/Proxylink) | NetProxy 内部节点转换能力的原始项目 |\n| [AsteriskNG](https://github.com/Asterisk4Magisk/AsteriskNG) | Android eBPF 实现参考 |\n| [v2rayNG](https://github.com/2dust/v2rayNG) | 节点解析实现参考 |\n\n同时感谢曾为早期版本提供核心能力或实现参考的 [CHIZI-0618/sing-box](https://github.com/CHIZI-0618/sing-box)、[Xray-core](https://github.com/XTLS/Xray-core)、[AndroidTProxyShell](https://github.com/CHIZI-0618/AndroidTProxyShell)、[IPSET_LKM](https://github.com/TanakaLun/IPSET_LKM) 与 [KsuWebUIStandalone](https://github.com/KOWX712/KsuWebUIStandalone)。\n\n## 交流与贡献\n\n- [Telegram 群组](https://t.me/NetProxy_Magisk)\n- [提交 Issue](https://github.com/Fanju6/NetProxy-Magisk/issues)\n- [提交 Pull Request](https://github.com/Fanju6/NetProxy-Magisk/pulls)\n\n## 许可证\n\n[GPL-3.0 License](LICENSE)\n\n## Star\n\n[![Star History Chart](https://star-history.dera.page/svg?repos=Fanju6/NetProxy-Magisk&type=date&legend=top-left)](https://star-history.dera.page/#Fanju6/NetProxy-Magisk&type=date&legend=top-left)\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"docs/public/N.svg\" alt=\"NetProxy Logo\" width=\"120\" /></p>\n<p></p></p>\n\n<p><h1 align=\"center\">NetProxy</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <strong>Android 系统级 sing-box 透明代理模块</strong><br></p>\n<p>  eBPF / TUN · 节点与订阅 · 分应用代理 · 共享网络</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\"></p>\n<p>    <img src=\"https://img.shields.io/github/v/release/Fanju6/NetProxy-Magisk?style=flat-square&label=Release&color=blue\" alt=\"Latest Release\" /></p>\n<p>  </a></p>\n<p>  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\"></p>\n<p>    <img src=\"https://img.shields.io/github/downloads/Fanju6/NetProxy-Magisk/total?style=flat-square&color=green\" alt=\"Downloads\" /></p>\n<p>  </a></p>\n<p>  <img src=\"https://img.shields.io/badge/Core-sing--box-blueviolet?style=flat-square\" alt=\"sing-box Core\" /></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/Fanju6/NetProxy-Magisk/releases\">下载模块与管理器</a> ·</p>\n<p>  <a href=\"https://www.netproxy.store/\">使用文档</a> ·</p>\n<p>  <a href=\"src/android/\">管理器源码</a> ·</p>\n<p>  <a href=\"https://t.me/NetProxy_Magisk\">Telegram</a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  中文 | <a href=\"README_EN.md\">English</a></p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>项目简介</h2>\n\n<p>NetProxy 是面向已 Root Android 设备的系统级透明代理模块，支持 <b>Magisk、KernelSU 与 APatch</b>。使用 sing-box，通过 eBPF 或 TUN + auto_redirect 接管流量。</p>\n\n<p>日常操作可使用随模块提供的 Android 管理器，也可通过终端式模块 WebUI、CLI 或 sing-box Dashboard 管理。节点与订阅在服务停止时仍可浏览和编辑。</p>\n\n<h2>界面预览</h2>\n\n<p><div align=\"center\"></p>\n<p>  <img src=\"docs/public/Screenshot.jpg\" width=\"60%\" alt=\"NetProxy Android 管理器界面预览\" /></p>\n<p></div></p>\n\n<h2>主要功能</h2>\n\n<li>**透明代理**：eBPF 或 TUN 接管 TCP、UDP 与 DNS，支持热点和 USB 共享网络。</li>\n<li>**节点与订阅**：导入节点链接、节点文本、Clash YAML 和 sing-box JSON；支持订阅筛选、请求头、流量信息与自动更新。</li>\n<li>**节点选择与测速**：手动选择或自动优选，服务停止时也可测速。</li>\n<li>**分应用代理**：黑名单 / 白名单，按 Android 用户分别配置，支持应用分身。</li>\n<li>**网络策略**：规则、全局、直连与允许广告模式，按 Wi-Fi 名称和实际出口自动切换。</li>\n<li>**配置与诊断**：编辑 sing-box 配置、本地规则，查看运行时配置与日志，导出脱敏诊断包。</li>\n\n<h2>安装与开始使用</h2>\n\n<p>运行环境为 <code>arm64-v8a</code> Android 设备与 Magisk、KernelSU 或 APatch，使用 Root 权限接管流量。</p>\n\n<p>默认使用 eBPF，可在“设置 → 入站设置”中选择 TUN。设备能力要求与安装选项见<a href=\"https://www.netproxy.store/guide/installation\">安装与升级</a>。</p>\n\n<li>从 [Releases](https://github.com/Fanju6/NetProxy-Magisk/releases) 下载 `NetProxy_<版本>_<构建号>.zip`，内含模块和 Android 管理器。</li>\n<li>在 Root 管理器中刷入，按提示选择数据保留方式及是否安装管理器；等待安装完成。</li>\n<li>打开 Android 管理器并授予 Root 权限，在“节点”页导入节点，或在“订阅”页添加订阅。</li>\n<li>在“节点”页选择分组与自动 / 手动节点，返回“仪表盘”开启服务。</li>\n\n<p>服务默认手动启动，开机自启可在“设置”中开启。首次配置参阅<a href=\"https://www.netproxy.store/guide/quick-start\">快速开始</a>。</p>\n\n<h2>使用文档</h2>\n\n<p>| 内容 | 文档 |</p>\n<p>|---|---|</p>\n<p>| 安装与首次配置 | <a href=\"https://www.netproxy.store/guide/installation\">安装与升级</a> · <a href=\"https://www.netproxy.store/guide/quick-start\">快速开始</a> |</p>\n<p>| 节点、订阅与测速 | <a href=\"https://www.netproxy.store/guide/nodes-subscriptions\">节点与订阅</a> |</p>\n<p>| 入站、分应用与共享网络 | <a href=\"https://www.netproxy.store/config/inbound\">入站配置</a> · <a href=\"https://www.netproxy.store/config/ebpf\">eBPF</a> · <a href=\"https://www.netproxy.store/config/tun\">TUN</a> |</p>\n<p>| 网络自动切换 | <a href=\"https://www.netproxy.store/guide/wifi-policy\">Wi-Fi 自动策略</a> |</p>\n<p>| 路由、DNS 与策略组 | <a href=\"https://www.netproxy.store/config/singbox\">配置参考</a> · <a href=\"https://www.netproxy.store/config/policy-groups\">策略分组</a> |</p>\n<p>| 终端、面板与第三方客户端 | <a href=\"https://www.netproxy.store/guide/cli\">CLI</a> · <a href=\"https://www.netproxy.store/guide/control-panel\">控制面板与 API</a> |</p>\n<p>| 故障排查与问题反馈 | <a href=\"https://www.netproxy.store/guide/faq\">常见问题与诊断</a> |</p>\n\n<p><a href=\"https://www.netproxy.store/changelog\">更新日志</a> · <a href=\"https://www.netproxy.store/privacy\">隐私政策</a></p>\n\n<h2>奶屁伙伴</h2>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://www.netproxy.store/mascot/dragon\"><img src=\"docs/public/mascots/dragon/base.svg\" width=\"144\" alt=\"薄荷色像素奶屁龙\" /></a></p>\n<p>  <a href=\"https://www.netproxy.store/mascot/niang\"><img src=\"docs/public/mascots/niang/stickers/16-leave-it.png\" width=\"144\" alt=\"长发蓝蝴蝶结的奶屁娘：交给我\" /></a></p>\n<p></p></p>\n\n<p><b>奶屁龙</b>，通路工坊的开路员。爱挖洞，也爱打盹，偶尔会把出口挖到饼干柜里。</p>\n\n<p><b>奶屁娘</b>，通路工坊的主人。讲究、有点傲娇，嘴上问着“日志呢？”，手里已经递来一杯热饮。</p>\n\n<p><a href=\"https://www.netproxy.store/mascot/\">工坊故事</a> · <a href=\"https://www.netproxy.store/mascot/stickers\">表情包</a> · <a href=\"https://www.netproxy.store/mascot/supporters\">股东名册</a></p>\n\n<h2>源码结构</h2>\n\n<pre>src/module/          模块安装与运行文件\nsrc/native/netproxy/ Go 原生组件\nsrc/webui/           终端式模块 WebUI\nsrc/android/         Android 管理器\ndocs/                用户文档站\ntests/               契约与回归测试</pre>\n\n<p>开发流程与验证方法见<a href=\"CONTRIBUTING.md\">贡献指南</a>，架构和跨组件契约见 <a href=\"AGENTS.md\">AGENTS.md</a>，管理器构建见 <a href=\"src/android/README.md\">Android 说明</a>。</p>\n\n<h2>鸣谢</h2>\n\n<p>| 项目 | 用途 |</p>\n<p>|------|------|</p>\n<p>| <a href=\"https://github.com/reF1nd/sing-box\">reF1nd/sing-box</a> | 当前代理核心 |</p>\n<p>| <a href=\"https://github.com/SagerNet/sing-box\">SagerNet/sing-box</a> | 上游 sing-box 项目 |</p>\n<p>| <a href=\"https://github.com/Fanju6/Proxylink\">Proxylink</a> | NetProxy 内部节点转换能力的原始项目 |</p>\n<p>| <a href=\"https://github.com/Asterisk4Magisk/AsteriskNG\">AsteriskNG</a> | Android eBPF 实现参考 |</p>\n<p>| <a href=\"https://github.com/2dust/v2rayNG\">v2rayNG</a> | 节点解析实现参考 |</p>\n\n<p>同时感谢曾为早期版本提供核心能力或实现参考的 <a href=\"https://github.com/CHIZI-0618/sing-box\">CHIZI-0618/sing-box</a>、<a href=\"https://github.com/XTLS/Xray-core\">Xray-core</a>、<a href=\"https://github.com/CHIZI-0618/AndroidTProxyShell\">AndroidTProxyShell</a>、<a href=\"https://github.com/TanakaLun/IPSET_LKM\">IPSET_LKM</a> 与 <a href=\"https://github.com/KOWX712/KsuWebUIStandalone\">KsuWebUIStandalone</a>。</p>\n\n<h2>交流与贡献</h2>\n\n<li>[Telegram 群组](https://t.me/NetProxy_Magisk)</li>\n<li>[提交 Issue](https://github.com/Fanju6/NetProxy-Magisk/issues)</li>\n<li>[提交 Pull Request](https://github.com/Fanju6/NetProxy-Magisk/pulls)</li>\n\n<h2>许可证</h2>\n\n<p><a href=\"LICENSE\">GPL-3.0 License</a></p>\n\n<h2>Star</h2>\n\n<p><a href=\"https://star-history.dera.page/svg?repos=Fanju6/NetProxy-Magisk&type=date&legend=top-left\">![Star History Chart</a>](https://star-history.dera.page/#Fanju6/NetProxy-Magisk&type=date&legend=top-left)</p>",
+  "homepageUrl": "https://t.me/NetProxy_Magisk",
+  "sourceUrl": "https://github.com/Fanju6/NetProxy-Magisk",
+  "url": "https://github.com/Fanju6/NetProxy-Magisk",
+  "latestRelease": {
+    "name": "v8.3.0",
+    "version": "v8.3.0",
+    "time": "2026-10-07T13:11:04Z",
+    "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.3.0/NetProxy_v8.3.0_1018.zip"
+  },
+  "releases": [
+    {
+      "name": "nightly",
+      "tagName": "nightly",
+      "publishedAt": "2026-10-08T06:12:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.3.0_1036.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/nightly/NetProxy_v8.3.0_1036.zip",
+          "size": 27571136,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v8.3.0",
+      "tagName": "v8.3.0",
+      "publishedAt": "2026-10-07T13:11:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.3.0_1018.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.3.0/NetProxy_v8.3.0_1018.zip",
+          "size": 27234732,
+          "downloadCount": 339
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.3.0/update.json",
+          "size": 272,
+          "downloadCount": 1513
+        }
+      ]
+    },
+    {
+      "name": "v8.2.4",
+      "tagName": "v8.2.4",
+      "publishedAt": "2026-10-07T07:43:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.2.4_1013.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.4/NetProxy_v8.2.4_1013.zip",
+          "size": 27150226,
+          "downloadCount": 189
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.4/update.json",
+          "size": 272,
+          "downloadCount": 743
+        }
+      ]
+    },
+    {
+      "name": "v8.2.3",
+      "tagName": "v8.2.3",
+      "publishedAt": "2026-10-06T22:13:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.2.3_1000.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.3/NetProxy_v8.2.3_1000.zip",
+          "size": 27146150,
+          "downloadCount": 242
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.3/update.json",
+          "size": 272,
+          "downloadCount": 1046
+        }
+      ]
+    },
+    {
+      "name": "v8.2.2",
+      "tagName": "v8.2.2",
+      "publishedAt": "2026-10-06T05:35:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.2.2_989.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.2/NetProxy_v8.2.2_989.zip",
+          "size": 27267945,
+          "downloadCount": 402
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.2/update.json",
+          "size": 270,
+          "downloadCount": 1763
+        }
+      ]
+    },
+    {
+      "name": "v8.2.1",
+      "tagName": "v8.2.1",
+      "publishedAt": "2026-10-05T10:51:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.2.1_977.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.1/NetProxy_v8.2.1_977.zip",
+          "size": 25127620,
+          "downloadCount": 331
+        },
+        {
+          "name": "NetProxy_v8.2.1_977_with-manager.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.1/NetProxy_v8.2.1_977_with-manager.zip",
+          "size": 27263332,
+          "downloadCount": 153
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.1/update.json",
+          "size": 270,
+          "downloadCount": 1819
+        }
+      ]
+    },
+    {
+      "name": "v8.2.0",
+      "tagName": "v8.2.0",
+      "publishedAt": "2026-09-27T07:17:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.2.0_964.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.0/NetProxy_v8.2.0_964.zip",
+          "size": 32800397,
+          "downloadCount": 1172
+        },
+        {
+          "name": "NetProxy_v8.2.0_964_with-manager.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.0/NetProxy_v8.2.0_964_with-manager.zip",
+          "size": 34936109,
+          "downloadCount": 561
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.2.0/update.json",
+          "size": 270,
+          "downloadCount": 17509
+        }
+      ]
+    },
+    {
+      "name": "v8.1.1",
+      "tagName": "v8.1.1",
+      "publishedAt": "2026-08-26T23:20:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.1.1_924.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.1/NetProxy_v8.1.1_924.zip",
+          "size": 34801340,
+          "downloadCount": 2748
+        },
+        {
+          "name": "NetProxy_v8.1.1_924_with-manager.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.1/NetProxy_v8.1.1_924_with-manager.zip",
+          "size": 38705836,
+          "downloadCount": 1262
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.1/update.json",
+          "size": 270,
+          "downloadCount": 64908
+        }
+      ]
+    },
+    {
+      "name": "v8.1.0",
+      "tagName": "v8.1.0",
+      "publishedAt": "2026-08-26T11:36:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.1.0_921.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.0/NetProxy_v8.1.0_921.zip",
+          "size": 34346748,
+          "downloadCount": 334
+        },
+        {
+          "name": "NetProxy_v8.1.0_921_with-manager.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.0/NetProxy_v8.1.0_921_with-manager.zip",
+          "size": 38251244,
+          "downloadCount": 153
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.1.0/update.json",
+          "size": 270,
+          "downloadCount": 1153
+        }
+      ]
+    },
+    {
+      "name": "v8.0.0",
+      "tagName": "v8.0.0",
+      "publishedAt": "2026-08-14T15:00:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v8.0.0_882.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.0.0/NetProxy_v8.0.0_882.zip",
+          "size": 33094378,
+          "downloadCount": 1103
+        },
+        {
+          "name": "NetProxy_v8.0.0_882_with-manager.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.0.0/NetProxy_v8.0.0_882_with-manager.zip",
+          "size": 36998874,
+          "downloadCount": 787
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.0.0/update.json",
+          "size": 270,
+          "downloadCount": 22289
+        }
+      ]
+    },
+    {
+      "name": "v7.2.0",
+      "tagName": "v7.2.0",
+      "publishedAt": "2026-06-27T04:11:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.2.0_668.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.2.0/NetProxy_v7.2.0_668.zip",
+          "size": 48650727,
+          "downloadCount": 2283
+        },
+        {
+          "name": "NetProxy_v7.2.0_668_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.2.0/NetProxy_v7.2.0_668_lite.zip",
+          "size": 26597954,
+          "downloadCount": 225
+        },
+        {
+          "name": "NetProxy_v7.2.0_668_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.2.0/NetProxy_v7.2.0_668_mini.zip",
+          "size": 6275848,
+          "downloadCount": 126
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.2.0/update.json",
+          "size": 270,
+          "downloadCount": 65327
+        }
+      ]
+    },
+    {
+      "name": "v7.1.0",
+      "tagName": "v7.1.0",
+      "publishedAt": "2026-06-10T10:26:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.1.0_638.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.1.0/NetProxy_v7.1.0_638.zip",
+          "size": 47650826,
+          "downloadCount": 1290
+        },
+        {
+          "name": "NetProxy_v7.1.0_638_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.1.0/NetProxy_v7.1.0_638_lite.zip",
+          "size": 25598053,
+          "downloadCount": 117
+        },
+        {
+          "name": "NetProxy_v7.1.0_638_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.1.0/NetProxy_v7.1.0_638_mini.zip",
+          "size": 6260843,
+          "downloadCount": 104
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.1.0/update.json",
+          "size": 270,
+          "downloadCount": 20160
+        }
+      ]
+    },
+    {
+      "name": "v7.0.5",
+      "tagName": "v7.0.5",
+      "publishedAt": "2026-06-06T08:52:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.0.5_604.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.5/NetProxy_v7.0.5_604.zip",
+          "size": 47821673,
+          "downloadCount": 1302
+        },
+        {
+          "name": "NetProxy_v7.0.5_604_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.5/NetProxy_v7.0.5_604_lite.zip",
+          "size": 25718244,
+          "downloadCount": 76
+        },
+        {
+          "name": "NetProxy_v7.0.5_604_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.5/NetProxy_v7.0.5_604_mini.zip",
+          "size": 6137693,
+          "downloadCount": 67
+        }
+      ]
+    },
+    {
+      "name": "v7.0.4",
+      "tagName": "v7.0.4",
+      "publishedAt": "2026-06-05T01:50:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.0.4_599.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.4/NetProxy_v7.0.4_599.zip",
+          "size": 44153091,
+          "downloadCount": 200
+        },
+        {
+          "name": "NetProxy_v7.0.4_599_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.4/NetProxy_v7.0.4_599_lite.zip",
+          "size": 22049662,
+          "downloadCount": 29
+        },
+        {
+          "name": "NetProxy_v7.0.4_599_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.4/NetProxy_v7.0.4_599_mini.zip",
+          "size": 2469111,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v7.0.3",
+      "tagName": "v7.0.3",
+      "publishedAt": "2026-06-03T10:57:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.0.3_586.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.3/NetProxy_v7.0.3_586.zip",
+          "size": 44151965,
+          "downloadCount": 242
+        },
+        {
+          "name": "NetProxy_v7.0.3_586_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.3/NetProxy_v7.0.3_586_lite.zip",
+          "size": 22048536,
+          "downloadCount": 32
+        },
+        {
+          "name": "NetProxy_v7.0.3_586_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.3/NetProxy_v7.0.3_586_mini.zip",
+          "size": 2468588,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "v7.0.2",
+      "tagName": "v7.0.2",
+      "publishedAt": "2026-05-28T07:52:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy_v7.0.2_573.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.2/NetProxy_v7.0.2_573.zip",
+          "size": 44020727,
+          "downloadCount": 445
+        },
+        {
+          "name": "NetProxy_v7.0.2_573_lite.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.2/NetProxy_v7.0.2_573_lite.zip",
+          "size": 21917298,
+          "downloadCount": 65
+        },
+        {
+          "name": "NetProxy_v7.0.2_573_mini.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.2/NetProxy_v7.0.2_573_mini.zip",
+          "size": 2465185,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "v7.0.1",
+      "tagName": "v7.0.1",
+      "publishedAt": "2026-05-06T04:02:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.1/NetProxy-Module.zip",
+          "size": 46933765,
+          "downloadCount": 1438
+        }
+      ]
+    },
+    {
+      "name": "v7.0.0",
+      "tagName": "v7.0.0",
+      "publishedAt": "2026-05-03T07:13:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v7.0.0/NetProxy-Module.zip",
+          "size": 51259556,
+          "downloadCount": 424
+        }
+      ]
+    },
+    {
+      "name": "v6.0.1",
+      "tagName": "v6.0.1",
+      "publishedAt": "2026-04-11T02:31:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v6.0.1/NetProxy-Module.zip",
+          "size": 25670008,
+          "downloadCount": 2533
+        }
+      ]
+    },
+    {
+      "name": "v6.0.0",
+      "tagName": "v6.0.0",
+      "publishedAt": "2026-02-27T06:35:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v6.0.0/NetProxy-Module.zip",
+          "size": 22620754,
+          "downloadCount": 1458
+        }
+      ]
+    },
+    {
+      "name": "v5.0.1",
+      "tagName": "v5.0.1",
+      "publishedAt": "2026-02-20T13:44:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v5.0.1/NetProxy-Module.zip",
+          "size": 24044065,
+          "downloadCount": 561
+        }
+      ]
+    },
+    {
+      "name": "v5.0.0",
+      "tagName": "v5.0.0",
+      "publishedAt": "2026-02-19T03:15:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v5.0.0/NetProxy-Module.zip",
+          "size": 23836231,
+          "downloadCount": 220
+        }
+      ]
+    },
+    {
+      "name": "v4.0.6",
+      "tagName": "v4.0.6",
+      "publishedAt": "2026-01-11T10:16:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.6/NetProxy-Module.zip",
+          "size": 23159240,
+          "downloadCount": 1078
+        }
+      ]
+    },
+    {
+      "name": "v4.0.5",
+      "tagName": "v4.0.5",
+      "publishedAt": "2026-01-06T07:28:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.5/NetProxy-Module.zip",
+          "size": 22955904,
+          "downloadCount": 356
+        }
+      ]
+    },
+    {
+      "name": "v4.0.4",
+      "tagName": "v4.0.4",
+      "publishedAt": "2026-01-04T12:45:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.4/NetProxy-Module.zip",
+          "size": 22918256,
+          "downloadCount": 175
+        }
+      ]
+    },
+    {
+      "name": "v4.0.3",
+      "tagName": "v4.0.3",
+      "publishedAt": "2026-01-03T03:16:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.3/NetProxy-Module.zip",
+          "size": 22903940,
+          "downloadCount": 208
+        }
+      ]
+    },
+    {
+      "name": "v4.0.2",
+      "tagName": "v4.0.2",
+      "publishedAt": "2026-01-01T08:35:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.2/NetProxy-Module.zip",
+          "size": 21166938,
+          "downloadCount": 143
+        }
+      ]
+    },
+    {
+      "name": "v4.0.1",
+      "tagName": "v4.0.1",
+      "publishedAt": "2025-12-31T07:36:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.1/NetProxy-Module.zip",
+          "size": 21159992,
+          "downloadCount": 144
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2025-12-30T11:35:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v4.0.0/NetProxy-Module.zip",
+          "size": 21159797,
+          "downloadCount": 89
+        }
+      ]
+    },
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2025-12-28T00:26:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetProxy-Module.zip",
+          "downloadUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v3.0.1/NetProxy-Module.zip",
+          "size": 19808249,
+          "downloadCount": 136
+        }
+      ]
+    }
+  ]
+}

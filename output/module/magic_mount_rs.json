@@ -1,0 +1,501 @@
+{
+  "readme": "<div align=\"center\">\n\n![An implementation of a metamodule](./mmrs.svg)\n\n# Magic Mount Metamodule\n\n[![Telegram][telegram-badge]][telegram-url]\n\n[![Version][version-badge]][version-url]\n[![GitHub Downloads][download-badge]][download-url]\n\n\n[English](README_en.md) [Русский](README_ru.md)\n\n</div>\n\n[telegram-badge]: https://img.shields.io/badge/Group-blue?style=for-the-badge&logo=telegram&label=Telegram\n[telegram-url]: https://t.me/mmrs_ci\n[version-badge]: https://img.shields.io/github/v/release/Tools-cx-app/meta-magic_mount-rs?logo=github\n[version-url]: https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/latest\n[download-badge]: https://img.shields.io/github/downloads/Tools-cx-app/meta-magic_mount-rs/total?logo=github&logoColor=green\n[download-url]: https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/\n\n为 KernelSU/APatch 提供 Systemless 修改功能。\n\n作者由于学业原因，更新会放缓\n\n---\n\n## 配置\n\n配置文件路径：\n\n`/data/adb/magic_mount/config.toml`\n\n```toml\nmountsource = \"KSU\"\numount = false\npartitions = []\nextra_mount = []\n```\n\n| 字段 | 说明 |\n| ------------- | -------------- |\n| mountsource | Systemless 挂载来源标识。默认值 \"KSU\" 与 KernelSU 行为保持一致。 |\n| umount | 是否尝试卸载（依赖 KernelSU umount ）。 |\n| partitions | 指定需要进行 Systemless 操作的特定分区列表，例如 \"mi_ext\",\"my_stock\" 等。 |\n\n`extra_mount` 默认 `[]`。例如 `extra_mount = [\"my_product\"]` 将 `<模块>/my_product/` 内容合并挂载到 `/my_product/`，不从 `<模块>/system/my_product/` 读取。要求目标目录已存在，且 `/system/my_product` 完全没有目录项（包括悬空符号链接）。只填写单级分区名，不填写路径；无效条目记录日志并跳过。没有 `system/` 的模块也受支持，仍遵循 `disable`、`remove` 和 `skip_mount` 标记。编辑配置后重启生效。\n\n也可通过 WEBUI 配置页修改（推荐）；MiuiX 和 MD3 均提供“额外挂载分区（模块顶层）”编辑控件，支持添加和删除 `extra_mount` 分区名。保存后重启生效。\n\n---\n\n## 自定义规则\n\n规则文件：`/data/adb/magic_mount/custom`\n\n```text\n# 忽略某个模块来源文件\nignore /data/adb/modules/example/system/app/Example.apk\n\n# 将来源只读 bind 到目标\nbind \"/data/local/tmp/source file\" \"/system/etc/target file\"\n\n# 递归包含其他规则文件；add 与 file 语义相同\nfile /data/adb/magic_mount/extra.rules\nadd /data/adb/magic_mount/more.rules\n```\n\n规则支持单引号、双引号、包含空白的路径和行尾注释。控制字符会被过滤；递归 include\n使用独立 visited 集合，因此循环引用不会无限递归。\n\n自定义 bind 的目标必须是绝对路径，不能包含 `..`。目标不存在时，程序会从最近存在的\n非根祖先构造临时镜像；任意 remount 或登记失败都会 detach 回滚。\n\n## 开发\n\n依赖：\n\n* Rust nightly toolchain\n\n* Android NDK\n\n* cargo-ndk\n\n* Node.js / npm\n\n* `pnpm` and `vite` as dependency and frontend for webui\n\n环境变量：\n```shell\nexport ANDROID_NDK_HOME=<path/to/ndk>\nexport ANDROID_NDK_ROOT=$ANDROID_NDK_HOME\n\n```\n\n构建：\n```shell\ncargo xtask build\n```\n\n构建产物将位于：\n\n* output/magic_mount_rs-*.zip\n\n## 致谢\n\n*  [5ec1cff/KernelSU](https://github.com/5ec1cff/KernelSU/blob/52f1f575ce2bd0ca46ebf644fd00a838af9f344e/userspace/ksud/src/magic_mount.rs)：原始实现\n* [YuzakiKokuban](https://github.com/YuzakiKokuban) Webui修改\n\n## 许可证\n\n[GPL-v3 许可证](http://www.gnu.org/licenses/gpl.html)\n\n## Star History\n\n<a href=\"https://star-history.dera.page/#Tools-cx-app/meta-magic_mount-rs\">\n <picture>\n   <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs&theme=dark\" />\n   <source media=\"(prefers-color-scheme: light)\" srcset=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs\" />\n   <img alt=\"Star History Chart\" src=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs\" />\n </picture>\n</a>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p>!<a href=\"./mmrs.svg\">An implementation of a metamodule</a></p>\n\n<h1>Magic Mount Metamodule</h1>\n\n<p>[![Telegram][telegram-badge]][telegram-url]</p>\n\n<p>[![Version][version-badge]][version-url]</p>\n<p>[![GitHub Downloads][download-badge]][download-url]</p>\n\n\n<p><a href=\"README_en.md\">English</a> <a href=\"README_ru.md\">Русский</a></p>\n\n<p></div></p>\n\n<p>[telegram-badge]: https://img.shields.io/badge/Group-blue?style=for-the-badge&logo=telegram&label=Telegram</p>\n<p>[telegram-url]: https://t.me/mmrs_ci</p>\n<p>[version-badge]: https://img.shields.io/github/v/release/Tools-cx-app/meta-magic_mount-rs?logo=github</p>\n<p>[version-url]: https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/latest</p>\n<p>[download-badge]: https://img.shields.io/github/downloads/Tools-cx-app/meta-magic_mount-rs/total?logo=github&logoColor=green</p>\n<p>[download-url]: https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/</p>\n\n<p>为 KernelSU/APatch 提供 Systemless 修改功能。</p>\n\n<p>作者由于学业原因，更新会放缓</p>\n\n<p>---</p>\n\n<h2>配置</h2>\n\n<p>配置文件路径：</p>\n\n<p><code>/data/adb/magic_mount/config.toml</code></p>\n\n<pre>mountsource = \"KSU\"\numount = false\npartitions = []\nextra_mount = []</pre>\n\n<p>| 字段 | 说明 |</p>\n<p>| ------------- | -------------- |</p>\n<p>| mountsource | Systemless 挂载来源标识。默认值 \"KSU\" 与 KernelSU 行为保持一致。 |</p>\n<p>| umount | 是否尝试卸载（依赖 KernelSU umount ）。 |</p>\n<p>| partitions | 指定需要进行 Systemless 操作的特定分区列表，例如 \"mi_ext\",\"my_stock\" 等。 |</p>\n\n<p><code>extra_mount</code> 默认 <code>[]</code>。例如 <code>extra_mount = [\"my_product\"]</code> 将 <code><模块>/my_product/</code> 内容合并挂载到 <code>/my_product/</code>，不从 <code><模块>/system/my_product/</code> 读取。要求目标目录已存在，且 <code>/system/my_product</code> 完全没有目录项（包括悬空符号链接）。只填写单级分区名，不填写路径；无效条目记录日志并跳过。没有 <code>system/</code> 的模块也受支持，仍遵循 <code>disable</code>、<code>remove</code> 和 <code>skip_mount</code> 标记。编辑配置后重启生效。</p>\n\n<p>也可通过 WEBUI 配置页修改（推荐）；MiuiX 和 MD3 均提供“额外挂载分区（模块顶层）”编辑控件，支持添加和删除 <code>extra_mount</code> 分区名。保存后重启生效。</p>\n\n<p>---</p>\n\n<h2>自定义规则</h2>\n\n<p>规则文件：<code>/data/adb/magic_mount/custom</code></p>\n\n<pre># 忽略某个模块来源文件\nignore /data/adb/modules/example/system/app/Example.apk\n\n# 将来源只读 bind 到目标\nbind \"/data/local/tmp/source file\" \"/system/etc/target file\"\n\n# 递归包含其他规则文件；add 与 file 语义相同\nfile /data/adb/magic_mount/extra.rules\nadd /data/adb/magic_mount/more.rules</pre>\n\n<p>规则支持单引号、双引号、包含空白的路径和行尾注释。控制字符会被过滤；递归 include</p>\n<p>使用独立 visited 集合，因此循环引用不会无限递归。</p>\n\n<p>自定义 bind 的目标必须是绝对路径，不能包含 <code>..</code>。目标不存在时，程序会从最近存在的</p>\n<p>非根祖先构造临时镜像；任意 remount 或登记失败都会 detach 回滚。</p>\n\n<h2>开发</h2>\n\n<p>依赖：</p>\n\n<li>Rust nightly toolchain</li>\n\n<li>Android NDK</li>\n\n<li>cargo-ndk</li>\n\n<li>Node.js / npm</li>\n\n<li>`pnpm` and `vite` as dependency and frontend for webui</li>\n\n<p>环境变量：</p>\n<pre>export ANDROID_NDK_HOME=&lt;path/to/ndk&gt;\nexport ANDROID_NDK_ROOT=$ANDROID_NDK_HOME\n</pre>\n\n<p>构建：</p>\n<pre>cargo xtask build</pre>\n\n<p>构建产物将位于：</p>\n\n<li>output/magic_mount_rs-*.zip</li>\n\n<h2>致谢</h2>\n\n<li> [5ec1cff/KernelSU](https://github.com/5ec1cff/KernelSU/blob/52f1f575ce2bd0ca46ebf644fd00a838af9f344e/userspace/ksud/src/magic_mount.rs)：原始实现</li>\n<li>[YuzakiKokuban](https://github.com/YuzakiKokuban) Webui修改</li>\n\n<h2>许可证</h2>\n\n<p><a href=\"http://www.gnu.org/licenses/gpl.html\">GPL-v3 许可证</a></p>\n\n<h2>Star History</h2>\n\n<p><a href=\"https://star-history.dera.page/#Tools-cx-app/meta-magic_mount-rs\"></p>\n<p> <picture></p>\n<p>   <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs&theme=dark\" /></p>\n<p>   <source media=\"(prefers-color-scheme: light)\" srcset=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs\" /></p>\n<p>   <img alt=\"Star History Chart\" src=\"https://star-history.dera.page/svg?repos=Tools-cx-app/meta-magic_mount-rs\" /></p>\n<p> </picture></p>\n<p></a></p>",
+  "homepageUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs",
+  "sourceUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs",
+  "url": "https://github.com/Tools-cx-app/meta-magic_mount-rs",
+  "latestRelease": {
+    "name": "v4.0.11",
+    "version": "v4.0.11",
+    "time": "2026-10-02T23:27:44Z",
+    "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.0.11",
+      "tagName": "v4.0.11",
+      "publishedAt": "2026-10-02T23:27:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.11-930-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-arm64.zip",
+          "size": 1510723,
+          "downloadCount": 1029
+        },
+        {
+          "name": "magic_mount_rs-4.0.11-930-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-armv7.zip",
+          "size": 1393168,
+          "downloadCount": 17
+        },
+        {
+          "name": "magic_mount_rs-4.0.11-930-riscv64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-riscv64.zip",
+          "size": 1537678,
+          "downloadCount": 9
+        },
+        {
+          "name": "magic_mount_rs-4.0.11-930-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-universal.zip",
+          "size": 5157914,
+          "downloadCount": 3677
+        },
+        {
+          "name": "magic_mount_rs-4.0.11-930-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.11/magic_mount_rs-4.0.11-930-x86_64.zip",
+          "size": 1612029,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v4.0.10",
+      "tagName": "v4.0.10",
+      "publishedAt": "2026-09-25T07:46:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.10-918-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.10/magic_mount_rs-4.0.10-918-arm64.zip",
+          "size": 1365781,
+          "downloadCount": 1412
+        },
+        {
+          "name": "magic_mount_rs-4.0.10-918-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.10/magic_mount_rs-4.0.10-918-armv7.zip",
+          "size": 1264378,
+          "downloadCount": 20
+        },
+        {
+          "name": "magic_mount_rs-4.0.10-918-riscv64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.10/magic_mount_rs-4.0.10-918-riscv64.zip",
+          "size": 1385459,
+          "downloadCount": 9
+        },
+        {
+          "name": "magic_mount_rs-4.0.10-918-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.10/magic_mount_rs-4.0.10-918-universal.zip",
+          "size": 4576598,
+          "downloadCount": 4323
+        },
+        {
+          "name": "magic_mount_rs-4.0.10-918-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.10/magic_mount_rs-4.0.10-918-x86_64.zip",
+          "size": 1450757,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v4.0.8",
+      "tagName": "v4.0.8",
+      "publishedAt": "2026-08-18T09:21:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.8-900-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.8/magic_mount_rs-4.0.8-900-arm64.zip",
+          "size": 1248606,
+          "downloadCount": 4536
+        },
+        {
+          "name": "magic_mount_rs-4.0.8-900-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.8/magic_mount_rs-4.0.8-900-armv7.zip",
+          "size": 1146641,
+          "downloadCount": 208
+        },
+        {
+          "name": "magic_mount_rs-4.0.8-900-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.8/magic_mount_rs-4.0.8-900-universal.zip",
+          "size": 3140333,
+          "downloadCount": 11056
+        },
+        {
+          "name": "magic_mount_rs-4.0.8-900-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.8/magic_mount_rs-4.0.8-900-x86_64.zip",
+          "size": 1319252,
+          "downloadCount": 132
+        }
+      ]
+    },
+    {
+      "name": "v4.0.7",
+      "tagName": "v4.0.7",
+      "publishedAt": "2026-08-12T00:48:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.7-876-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.7/magic_mount_rs-4.0.7-876-arm64.zip",
+          "size": 1244954,
+          "downloadCount": 1174
+        },
+        {
+          "name": "magic_mount_rs-4.0.7-876-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.7/magic_mount_rs-4.0.7-876-armv7.zip",
+          "size": 1143712,
+          "downloadCount": 87
+        },
+        {
+          "name": "magic_mount_rs-4.0.7-876-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.7/magic_mount_rs-4.0.7-876-universal.zip",
+          "size": 3136243,
+          "downloadCount": 4439
+        },
+        {
+          "name": "magic_mount_rs-4.0.7-876-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.7/magic_mount_rs-4.0.7-876-x86_64.zip",
+          "size": 1316418,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v4.0.6",
+      "tagName": "v4.0.6",
+      "publishedAt": "2026-07-19T11:16:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.6-845-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.6/magic_mount_rs-4.0.6-845-arm64.zip",
+          "size": 1217708,
+          "downloadCount": 3445
+        },
+        {
+          "name": "magic_mount_rs-4.0.6-845-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.6/magic_mount_rs-4.0.6-845-armv7.zip",
+          "size": 1113428,
+          "downloadCount": 247
+        },
+        {
+          "name": "magic_mount_rs-4.0.6-845-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.6/magic_mount_rs-4.0.6-845-universal.zip",
+          "size": 3063549,
+          "downloadCount": 7174
+        },
+        {
+          "name": "magic_mount_rs-4.0.6-845-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.6/magic_mount_rs-4.0.6-845-x86_64.zip",
+          "size": 1283379,
+          "downloadCount": 143
+        }
+      ]
+    },
+    {
+      "name": "v4.0.5",
+      "tagName": "v4.0.5",
+      "publishedAt": "2026-07-13T10:44:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.5-821-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.5/magic_mount_rs-4.0.5-821-arm64.zip",
+          "size": 1194032,
+          "downloadCount": 1034
+        },
+        {
+          "name": "magic_mount_rs-4.0.5-821-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.5/magic_mount_rs-4.0.5-821-armv7.zip",
+          "size": 1090544,
+          "downloadCount": 103
+        },
+        {
+          "name": "magic_mount_rs-4.0.5-821-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.5/magic_mount_rs-4.0.5-821-universal.zip",
+          "size": 3037245,
+          "downloadCount": 3168
+        },
+        {
+          "name": "magic_mount_rs-4.0.5-821-x86_64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.5/magic_mount_rs-4.0.5-821-x86_64.zip",
+          "size": 1259689,
+          "downloadCount": 51
+        }
+      ]
+    },
+    {
+      "name": "v4.0.4",
+      "tagName": "v4.0.4",
+      "publishedAt": "2026-06-28T06:42:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.4-798-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.4/magic_mount_rs-4.0.4-798-arm64.zip",
+          "size": 1194465,
+          "downloadCount": 2004
+        },
+        {
+          "name": "magic_mount_rs-4.0.4-798-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.4/magic_mount_rs-4.0.4-798-armv7.zip",
+          "size": 1088016,
+          "downloadCount": 176
+        },
+        {
+          "name": "magic_mount_rs-4.0.4-798-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.4/magic_mount_rs-4.0.4-798-universal.zip",
+          "size": 2029051,
+          "downloadCount": 5327
+        }
+      ]
+    },
+    {
+      "name": "v4.0.3",
+      "tagName": "v4.0.3",
+      "publishedAt": "2026-06-21T01:00:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.3-773-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.3/magic_mount_rs-4.0.3-773-arm64.zip",
+          "size": 2106821,
+          "downloadCount": 1086
+        },
+        {
+          "name": "magic_mount_rs-4.0.3-773-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.3/magic_mount_rs-4.0.3-773-armv7.zip",
+          "size": 2038521,
+          "downloadCount": 108
+        },
+        {
+          "name": "magic_mount_rs-4.0.3-773-universal.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.3/magic_mount_rs-4.0.3-773-universal.zip",
+          "size": 3897649,
+          "downloadCount": 3834
+        }
+      ]
+    },
+    {
+      "name": "v4.0.2",
+      "tagName": "v4.0.2",
+      "publishedAt": "2026-06-15T10:07:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.2-747-arm64.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.2/magic_mount_rs-4.0.2-747-arm64.zip",
+          "size": 1998628,
+          "downloadCount": 2073
+        },
+        {
+          "name": "magic_mount_rs-4.0.2-747-armv7.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.2/magic_mount_rs-4.0.2-747-armv7.zip",
+          "size": 1930229,
+          "downloadCount": 304
+        }
+      ]
+    },
+    {
+      "name": "v4.0.1",
+      "tagName": "v4.0.1",
+      "publishedAt": "2026-06-06T05:40:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.1-736.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.1/magic_mount_rs-4.0.1-736.zip",
+          "size": 3772975,
+          "downloadCount": 4940
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-05-04T08:43:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-4.0.0-709.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.0.0/magic_mount_rs-4.0.0-709.zip",
+          "size": 1894659,
+          "downloadCount": 9321
+        }
+      ]
+    },
+    {
+      "name": "v3.1.5",
+      "tagName": "v3.1.5",
+      "publishedAt": "2026-05-01T09:54:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.5-701.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.5/magic_mount_rs-3.1.5-701.zip",
+          "size": 1878652,
+          "downloadCount": 2232
+        }
+      ]
+    },
+    {
+      "name": "v3.1.4",
+      "tagName": "v3.1.4",
+      "publishedAt": "2026-04-24T22:12:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.4-690.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.4/magic_mount_rs-3.1.4-690.zip",
+          "size": 1876651,
+          "downloadCount": 3288
+        }
+      ]
+    },
+    {
+      "name": "v3.1.3",
+      "tagName": "v3.1.3",
+      "publishedAt": "2026-04-19T05:41:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.3-678.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.3/magic_mount_rs-3.1.3-678.zip",
+          "size": 2200782,
+          "downloadCount": 2917
+        }
+      ]
+    },
+    {
+      "name": "v3.1.2",
+      "tagName": "v3.1.2",
+      "publishedAt": "2026-04-17T13:41:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.2-661.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.2/magic_mount_rs-3.1.2-661.zip",
+          "size": 2194557,
+          "downloadCount": 1142
+        }
+      ]
+    },
+    {
+      "name": "v3.1.1",
+      "tagName": "v3.1.1",
+      "publishedAt": "2026-04-11T01:06:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.1-640.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.1/magic_mount_rs-3.1.1-640.zip",
+          "size": 2193071,
+          "downloadCount": 3033
+        }
+      ]
+    },
+    {
+      "name": "v3.1.0",
+      "tagName": "v3.1.0",
+      "publishedAt": "2026-04-03T13:06:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.1.0-608.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.1.0/magic_mount_rs-3.1.0-608.zip",
+          "size": 3335218,
+          "downloadCount": 3217
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-03-28T12:16:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-3.0.0-588.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v3.0.0/magic_mount_rs-3.0.0-588.zip",
+          "size": 3180521,
+          "downloadCount": 2997
+        }
+      ]
+    },
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2026-03-27T23:18:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.3.1-569.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.3.1/magic_mount_rs-2.3.1-569.zip",
+          "size": 3173686,
+          "downloadCount": 661
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2026-03-27T23:09:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.3.0-566.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.3.0/magic_mount_rs-2.3.0-566.zip",
+          "size": 3173652,
+          "downloadCount": 63
+        }
+      ]
+    },
+    {
+      "name": "v2.2.6",
+      "tagName": "v2.2.6",
+      "publishedAt": "2026-03-20T19:32:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.2.6-547.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.2.6/magic_mount_rs-2.2.6-547.zip",
+          "size": 1416776,
+          "downloadCount": 207
+        }
+      ]
+    },
+    {
+      "name": "v2.2.51",
+      "tagName": "v2.2.51",
+      "publishedAt": "2026-03-15T05:04:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.2.51-534.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.2.51/magic_mount_rs-2.2.51-534.zip",
+          "size": 1432066,
+          "downloadCount": 82
+        }
+      ]
+    },
+    {
+      "name": "v2.2.5",
+      "tagName": "v2.2.5",
+      "publishedAt": "2026-03-14T11:13:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.2.5-528.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.2.5/magic_mount_rs-2.2.5-528.zip",
+          "size": 1434521,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "v2.2.4",
+      "tagName": "v2.2.4",
+      "publishedAt": "2026-02-18T03:19:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic_mount_rs-2.2.4-490.zip",
+          "downloadUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v2.2.4/magic_mount_rs-2.2.4-490.zip",
+          "size": 1361891,
+          "downloadCount": 893
+        }
+      ]
+    }
+  ]
+}
