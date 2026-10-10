@@ -102,18 +102,17 @@ def sign(private_key_path=None):
     out_sig = OUT_DIR / "signatures"
     out_sig.mkdir(parents=True, exist_ok=True)
 
-    # 1) 索引签名：canonical JSON
+    # 1) 索引签名：对 modules.json 原始文件字节签名（跨端零歧义，Android 端直接验下载字节）
     catalog_path = OUT_DIR / "modules.json"
     if not catalog_path.exists():
         print(f"缺少 {catalog_path}，先运行 build.py", file=sys.stderr)
         return 1
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    payload = _canonical_bytes(catalog)
+    payload = catalog_path.read_bytes()
     meta = {
         "signedAt": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "target": "modules.json",
-        "canonical": "json.dumps(modules, ensure_ascii=False, sort_keys=True, separators=(',',':'))",
-        "moduleCount": len(catalog),
+        "payload": "raw file bytes（modules.json 文件原样字节，Android 端对下载字节直接验签）",
+        "moduleCount": len(json.loads(payload)),
         "publicKey": (PUBLIC_KEY_FILE.read_text(encoding="utf-8") if PUBLIC_KEY_FILE.exists() else ""),
     }
     (out_sig / "modules.sig").write_text(_sign_file(key, payload), encoding="utf-8")
@@ -145,9 +144,9 @@ def verify(public_key_path=None):
 
     sig_file = sig_dir / "modules.sig"
     if sig_file.exists() and catalog_path.exists():
-        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        catalog_bytes = catalog_path.read_bytes()
         try:
-            key.verify(base64.b64decode(sig_file.read_text().strip()), _canonical_bytes(catalog))
+            key.verify(base64.b64decode(sig_file.read_text().strip()), catalog_bytes)
             print("modules.json 签名: 有效")
         except Exception as e:
             print(f"modules.json 签名: 无效 ({e})")
