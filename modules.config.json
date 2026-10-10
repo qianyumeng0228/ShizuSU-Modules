@@ -1,1 +1,1314 @@
-{"modules":[{"moduleId":"zygisksu","moduleName":"Zygisk Next","repo":"LSPosed\/ZygiskNext","license":"GPL-3.0","authors":[{"name":"Nullptr","link":""},{"name":"5ec1cff","link":""},{"name":"Dr-TSNG","link":""}],"summary":"Standalone implementation of Zygisk","summaryZh":"独立 Zygisk 实现，为 KernelSU 提供 Zygisk API，可替代 Magisk 内置 Zygisk","zygisk":true,"versionCodeOverride":0,"note":"官方仓库已迁至 LSPosed 组织（原 Dr-TSNG\/ZygiskNext）"},{"moduleId":"playintegrityfix","moduleName":"Play Integrity Fork","repo":"osm0sis\/PlayIntegrityFork","authors":[{"name":"osm0sis","link":""},{"name":"chiteroman","link":""}],"summary":"Fix Play Integrity (and SafetyNet) verdicts, allowing custom fields and props","summaryZh":"修复 Play Integrity \/ SafetyNet 检测结果，支持自定义字段与属性","versionCodeOverride":0,"note":"原 chiteroman\/PlayIntegrityFork 随作者账号受限，改用活跃的 osm0sis fork"},{"moduleId":"tricky_store","moduleName":"TrickyStore","repo":"5ec1cff\/TrickyStore","license":"GPL-3.0","authors":[{"name":"5ec1cff","link":""},{"name":"aviraxp","link":""},{"name":"Cyberenchanter","link":""}],"summary":"Spoofing keystore to pass Play Integrity and device certifications","summaryZh":"模拟硬件密钥库，通过 Play Integrity 与设备认证（Key Attestation）","versionCodeOverride":0},{"moduleId":"bindhosts","moduleName":"bindhosts","repo":"bindhosts\/bindhosts","authors":[{"name":"backslashxx","link":""},{"name":"KOWX712","link":""}],"summary":"Systemless hosts for APatch \/ KernelSU \/ Magisk","summaryZh":"无系统挂载的 hosts 广告屏蔽模块，支持 APatch \/ KernelSU \/ Magisk","versionCodeOverride":0,"note":"已迁移至 bindhosts 组织（原 backslashxx\/bindhosts）"},{"moduleId":"device_faker","moduleName":"Device Faker","repo":"Seyud\/device_faker","authors":[{"name":"Seyud","link":""}],"summary":"自定义配置Zygisk机型伪装","summaryZh":"可自定义配置的 Zygisk 机型伪装模块","readmeZh":"基于 Zygisk 的机型伪装模块，可自定义配置伪装设备型号、厂商等信息，用于绕过应用的设备指纹检测。","zygisk":true,"versionCodeOverride":0},{"moduleId":"meta-hybrid","moduleName":"Hybrid Mount","repo":"Hybrid-Mount\/meta-hybrid_mount","authors":[{"name":"由崎黑板","link":"https:\/\/github.com\/YuzakiKokuban"},{"name":"Tools-cx-app","link":"https:\/\/github.com\/Tools-cx-app"}],"summary":"Next Generation Mounting Metamodule with OverlayFS, Magic Mount and HymoFS.","summaryZh":"新一代挂载元模块，支持 OverlayFS、Magic Mount 与 HymoFS","metamodule":true,"versionCodeOverride":0,"note":"已迁至 Hybrid-Mount 组织（原 meta-hybrid）"},{"moduleId":"netproxy","moduleName":"NetProxy","repo":"Fanju6\/NetProxy-Magisk","authors":[{"name":"Fanju","link":""}],"summary":"Based on the sing-box core, this Android proxy module supports one-click start\/stop of transparent proxy","summaryZh":"基于 sing-box 内核的 Android 透明代理模块，支持一键启停","versionCodeOverride":0},{"moduleId":"MagicNet","moduleName":"MagicNet","repo":"LIghtJUNction\/MagicNet","authors":[{"name":"LIghtJUNction","link":""}],"summary":"Let Android use mihomo in tun mode.","summaryZh":"让 Android 以 tun 模式使用 mihomo 内核","versionCodeOverride":0},{"moduleId":"magic_mount_rs","moduleName":"Magic Mount-rs","repo":"Tools-cx-app\/meta-magic_mount-rs","authors":[{"name":"生于生时 亡于亡刻","link":""},{"name":"7a72","link":""},{"name":"YuzakiKokuban","link":""}],"summary":"An implementation of a metamodule using Magic Mount, Based on MKSU","summaryZh":"基于 MKSU 的 Magic Mount 元模块实现（Rust 版）","readmeZh":"基于 MKSU 使用 Magic Mount 方式实现的元模块（Rust 版），模板源自 meta-overlay。","metamodule":true,"versionCodeOverride":0},{"moduleId":"FreePPS","moduleName":"FreePPS","repo":"Seyud\/FreePPS","authors":[{"name":"Seyud","link":""}],"summary":"启用搭载米系设备的公版 PPS 支持","summaryZh":"启用米系设备的公版 PPS 快充支持","readmeZh":"启用搭载米系设备的公版 PPS 快充协议支持，让设备获得公版 PPS 快速充电能力。","versionCodeOverride":0},{"moduleId":"Mediatek_Mali_GPU_Governor","moduleName":"天玑GPU调速器","repo":"Seyud\/Mediatek_Mali_GPU_Governor","authors":[{"name":"Seyud","link":""},{"name":"Tools-cx-app","link":""}],"summary":"适用于Mediatek_Mali_GPU的GPU动态调速器，优化全场景下的功耗与性能平衡","summaryZh":"联发科 Mali GPU 动态调速器，优化全场景功耗与性能平衡","readmeZh":"适用于联发科 Mali GPU 的动态调速器，通过调节 GPU 频率策略优化全场景下的功耗与性能平衡。","versionCodeOverride":0},{"moduleId":"deviceidchanger","moduleName":"DeviceID\/SSAID Changer","repo":"sidex15\/deviceidchanger","authors":[{"name":"sidex15","link":""}],"summary":"A simple WebUI Module to change SSAID\/DeviceID on Rooted Android Devices","summaryZh":"WebUI 模块，修改已 Root 安卓设备的 SSAID \/ 设备 ID","readmeZh":"通过 WebUI 修改已 Root 安卓设备的 SSAID \/ 设备 ID，支持 APatch、KernelSU（含分支）与 Magisk。","versionCodeOverride":0},{"moduleId":"HyperUnlocked","moduleName":"HyperUnlocked","repo":"ukriu\/HyperUnlocked","authors":[{"name":"ukriu","link":""}],"summary":"A Magisk\/KernelSU\/APatch module to unlock high-end features on all Xiaomi devices","summaryZh":"解锁小米设备高端功能的模块，支持 Magisk \/ KernelSU \/ APatch","versionCodeOverride":0},{"moduleId":"AZenith","moduleName":"AZenith","repo":"Liliya2727\/AZenith","authors":[{"name":"Liliya","link":""},{"name":"Zexshia","link":""},{"name":"Kanaochar","link":""}],"summary":"Universal perf modules","summaryZh":"通用性能调优模块","versionCodeOverride":0},{"moduleId":"zygisk_lsposed","moduleName":"LSPosed","repo":"JingMatrix\/LSPosed","authors":[{"name":"LSPosed Developers","link":""}],"summary":"Another enhanced implementation of Xposed Framework. Supports Android 9 ~ 17. Requires Zygisk enabled.","summaryZh":"增强版 Xposed 框架，支持 Android 9~17，需启用 Zygisk","zygisk":true,"versionCodeOverride":0,"note":"KernelSU\/APatch 分支（活跃维护），对应手机模块 zygisk_lsposed"},{"moduleId":"hma_oss_zygisk","moduleName":"HMA-OSS","repo":"frknkrc44\/HMA-OSS","authors":[{"name":"frknkrc44","link":""}],"summary":"A Zygisk module to hide your app list, settings, package installers and more from system","summaryZh":"隐藏应用列表、设置、包安装器等信息的 Zygisk 模块（开源版）","zygisk":true,"versionCodeOverride":0,"note":"对应手机模块 hma_oss_zygisk"},{"moduleId":"zygisk-assistant","moduleName":"Zygisk-Assistant","repo":"snake-4\/Zygisk-Assistant","authors":[{"name":"snake-4","link":""}],"summary":"A Zygisk module to hide root for KernelSU, Magisk and APatch, designed to work similarly to Shamiko","summaryZh":"为 KernelSU \/ Magisk \/ APatch 隐藏 root 的 Zygisk 模块，用法类似 Shamiko","zygisk":true,"versionCodeOverride":0},{"moduleId":"ksuwebui","moduleName":"KsuWebUI","repo":"5ec1cff\/KsuWebUIStandalone","authors":[{"name":"5ec1cff","link":""}],"summary":"Standalone WebUI app for KernelSU forks without built-in WebUI support","summaryZh":"独立的 WebUI 面板应用（供无内置 WebUI 的 KernelSU 系使用）","versionCodeOverride":0},{"moduleId":"busybox-ndk","moduleName":"Busybox for Android NDK","repo":"Magisk-Modules-Repo\/busybox-ndk","license":"GPL-2.0","authors":[{"name":"Magisk-Modules-Repo","link":""}],"summary":"busybox-ndk - a universal busybox binary for Android","summaryZh":"为 Android 提供 Busybox 命令集（NDK 编译版）","versionCodeOverride":0},{"moduleId":"Automatic_brick_rescue","moduleName":"自动神仙救砖","authors":[{"name":"奋斗的小青年","link":""}],"summary":"自动救砖：系统连续重启3次或卡开机界面2分钟时自动禁用所有模块","summaryZh":"自动救砖：系统连续重启3次或卡开机界面2分钟时自动禁用所有模块，支持白名单","readmeZh":"自动救砖模块（OTA 稳定白名单版 v4）：\n- 系统连续重启 3 次或卡在开机界面 2 分钟（OTA 升级时自动延时至 30 分钟）→ 自动禁用所有模块\n- 仍无法开机时执行 APP 解冻救砖模式再开机\n- 模块目录\/白名单.conf 可添加救砖跳过白名单\n- 作者：奋斗的小青年（原作者 Han | 情非得已c）\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版","latestRelease":{"name":"v221204","version":"v221204","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/Automatic_brick_rescue.zip","size":4218},"versionCodeOverride":35,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"Eclipse","moduleName":"定制温控","authors":[{"name":"苏疫杆菌","link":""}],"summary":"小米机型定制温控（多档位 thermal 配置）","summaryZh":"小米机型定制温控（多档位 thermal 配置）","readmeZh":"定制温控模块（v5.7）：\n- 为小米机型提供多档位温控配置（cool \/ danger \/ extreme \/ pro 等档位）\n- 作者：苏疫杆菌\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版；配置针对当前机型，换机需调整","latestRelease":{"name":"v5.7","version":"v5.7","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/Eclipse.zip","size":94781},"versionCodeOverride":260717,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"Violet","moduleName":"紫罗兰附加模块","authors":[{"name":"泡菜","link":""}],"summary":"紫罗兰工具箱核心自动化功能插件（配合 LSPosed）","summaryZh":"紫罗兰工具箱核心自动化功能插件（配合 LSPosed）","readmeZh":"紫罗兰附加模块（v1.4）：\n- 紫罗兰工具箱的核心自动化功能插件（配合 LSPosed 使用）\n- 交流群：1104158965\n- 作者：泡菜\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版","latestRelease":{"name":"v1.4","version":"v1.4","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/Violet.zip","size":34982},"versionCodeOverride":20260620,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"WorkSettingPro","moduleName":"爱玩机工具箱拓展","authors":[{"name":"小白杨","link":""}],"summary":"爱玩机工具箱应用核心功能拓展（OTA 后免解锁 system 修改）","summaryZh":"爱玩机工具箱应用核心功能拓展（OTA 后免解锁 system 修改）","readmeZh":"爱玩机工具箱（应用核心功能拓展）19.02：\n- 扩展爱玩机工具箱功能，OTA 后无需挂载解锁系统 system 即可修改\n- 非 MIUI 设备不会刷入 MIUI 高级设置核心文件；内含 adb 与 fastboot 工具包\n- 作者：小白杨\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版","latestRelease":{"name":"19.02","version":"19.02","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/WorkSettingPro.zip","size":2025},"versionCodeOverride":1901,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"YHGames","moduleName":"月虹游戏助手","authors":[{"name":"月虹","link":""}],"summary":"基于 Zygisk 的游戏增强：机型伪装、CPU 属性伪装、环境清理、安卓 ID 管理","summaryZh":"基于 Zygisk 的游戏增强：机型伪装、CPU 属性伪装、环境清理、安卓 ID 管理","readmeZh":"月虹游戏助手（v1.4.2）：\n- 基于 Zygisk 的机型伪装、CPU 属性伪装、游戏环境清理、安卓 ID 管理、设备标记保护\n- 作者：月虹\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版","zygisk":true,"latestRelease":{"name":"v1.4.2","version":"v1.4.2","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/YHGames.zip","size":952572},"versionCodeOverride":142,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"YH_YC","moduleName":"月虹一键隐藏","authors":[{"name":"酷安@月虹yh","link":""}],"summary":"一键隐藏模块（支持 Kernel \/ APatch \/ Magisk 全分支）","summaryZh":"一键隐藏模块（支持 Kernel \/ APatch \/ Magisk 全分支）","readmeZh":"月虹一键隐藏模块（v5.5.0）：\n- 支持 Kernel、APatch、Magisk 所有分支，支持越狱、免解锁等特殊 ROOT 方式\n- 作者：酷安@月虹yh\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版","zygisk":true,"latestRelease":{"name":"v5.5.0","version":"v5.5.0","time":"2026-10-07T00:00:00Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/YH_YC.zip","size":627925},"versionCodeOverride":550,"note":"私有模块（无公开仓库），从已装设备打包备份"},{"moduleId":"RescueX","repo":"jiayuxuan123\/RescueX","summaryZh":"自动救砖守护：连续重启\/开机超时自动禁用问题模块，支持白名单、模块快照回滚、一次性安全模式与 WebUI","note":"开源 MIT，兼容 Magisk \/ KernelSU \/ APatch"},{"moduleId":"funbox","moduleName":"FunBox","repo":"","authors":[{"name":"Hicores","link":""}],"summary":"QQ 工具箱模块","versionCodeOverride":0,"note":"作者 Hicores 名下无公开模块仓库（模块随 QTool 分发），暂缺，需手动补充"},{"moduleId":"asl","moduleName":"AndroidSubSystem4GNU\/Linux","repo":"","authors":[{"name":"Moe Hakozaki (Aka. 沨鸾)","link":""},{"name":"LIghtJUNction","link":""},{"name":"Moe-hacker","link":""},{"name":"Lin1328","link":""}],"summary":"Android 子系统（GNU\/Linux 环境）","versionCodeOverride":0,"note":"原作者仓库暂不可定位，需手动补充"},{"moduleId":"meta-mm","moduleName":"Magic Mount Metamodule","repo":"","authors":[{"name":"7a72","link":""}],"summary":"Magic Mount Metamodule（原版 C 实现）","metamodule":true,"versionCodeOverride":0,"note":"原仓库不可定位；功能上可由 magic_mount_rs（meta-magic_mount-rs）替代，需手动补充"},{"moduleId":"meta-overlayfs","moduleName":"OverlayFS MetaModule","repo":"","authors":[{"name":"KernelSU-Modules-Repo","link":""}],"summary":"官方参考实现的 OverlayFS 元模块，支持读写系统分区（ext4）","metamodule":true,"versionCodeOverride":0,"note":"托管 org（KernelSU-Modules-Repo）现被封禁，原仓库 404，待解封或迁移后补充"},{"moduleId":"MFGA","moduleName":"MFGA","repo":"","authors":[{"name":"咿云冷雨","link":""},{"name":"Numbersf","link":""}],"summary":"MFGA 模块","versionCodeOverride":0,"note":"作者 Numbersf 名下无对应仓库（仅有 Xposed 变体），需手动补充"},{"moduleId":"shizu-test-20261007","moduleName":"ShizuSUTestModule","authors":[{"name":"qianyumeng0228","link":""}],"summary":"ShizuSU module store e2e integration test","summaryZh":"ShizuSU module store e2e integration test","readmeZh":"ShizuSU module store e2e integration test","zygisk":true,"latestRelease":{"name":"v1.0.0","version":"v1.0.0","time":"2026-10-07T13:31:39.393886Z","downloadUrl":"https:\/\/github.com\/qianyumeng0228\/ShizuSU-Modules\/raw\/main\/private\/shizu-test-20261007.zip","size":388},"versionCodeOverride":1,"note":"由手机端 ShizuSU 模块上传工具新增"}],"outputDir":"output","cacheDir":"cache","cacheTtlSeconds":3600}
+{
+  "modules": [
+    {
+      "moduleId": "zygisksu",
+      "moduleName": "Zygisk Next",
+      "repo": "LSPosed/ZygiskNext",
+      "license": "GPL-3.0",
+      "authors": [
+        {
+          "name": "Nullptr",
+          "link": ""
+        },
+        {
+          "name": "5ec1cff",
+          "link": ""
+        },
+        {
+          "name": "Dr-TSNG",
+          "link": ""
+        }
+      ],
+      "summary": "Standalone implementation of Zygisk",
+      "summaryZh": "独立 Zygisk 实现，为 KernelSU 提供 Zygisk API，可替代 Magisk 内置 Zygisk",
+      "zygisk": true,
+      "versionCodeOverride": 0,
+      "note": "官方仓库已迁至 LSPosed 组织（原 Dr-TSNG/ZygiskNext）"
+    },
+    {
+      "moduleId": "playintegrityfix",
+      "moduleName": "Play Integrity Fork",
+      "repo": "osm0sis/PlayIntegrityFork",
+      "authors": [
+        {
+          "name": "osm0sis",
+          "link": ""
+        },
+        {
+          "name": "chiteroman",
+          "link": ""
+        }
+      ],
+      "summary": "Fix Play Integrity (and SafetyNet) verdicts, allowing custom fields and props",
+      "summaryZh": "修复 Play Integrity / SafetyNet 检测结果，支持自定义字段与属性",
+      "versionCodeOverride": 0,
+      "note": "原 chiteroman/PlayIntegrityFork 随作者账号受限，改用活跃的 osm0sis fork"
+    },
+    {
+      "moduleId": "tricky_store",
+      "moduleName": "TrickyStore",
+      "repo": "5ec1cff/TrickyStore",
+      "license": "GPL-3.0",
+      "authors": [
+        {
+          "name": "5ec1cff",
+          "link": ""
+        },
+        {
+          "name": "aviraxp",
+          "link": ""
+        },
+        {
+          "name": "Cyberenchanter",
+          "link": ""
+        }
+      ],
+      "summary": "Spoofing keystore to pass Play Integrity and device certifications",
+      "summaryZh": "模拟硬件密钥库，通过 Play Integrity 与设备认证（Key Attestation）",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "bindhosts",
+      "moduleName": "bindhosts",
+      "repo": "bindhosts/bindhosts",
+      "authors": [
+        {
+          "name": "backslashxx",
+          "link": ""
+        },
+        {
+          "name": "KOWX712",
+          "link": ""
+        }
+      ],
+      "summary": "Systemless hosts for APatch / KernelSU / Magisk",
+      "summaryZh": "无系统挂载的 hosts 广告屏蔽模块，支持 APatch / KernelSU / Magisk",
+      "versionCodeOverride": 0,
+      "note": "已迁移至 bindhosts 组织（原 backslashxx/bindhosts）"
+    },
+    {
+      "moduleId": "device_faker",
+      "moduleName": "Device Faker",
+      "repo": "Seyud/device_faker",
+      "authors": [
+        {
+          "name": "Seyud",
+          "link": ""
+        }
+      ],
+      "summary": "自定义配置Zygisk机型伪装",
+      "summaryZh": "可自定义配置的 Zygisk 机型伪装模块",
+      "readmeZh": "基于 Zygisk 的机型伪装模块，可自定义配置伪装设备型号、厂商等信息，用于绕过应用的设备指纹检测。",
+      "zygisk": true,
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "meta-hybrid",
+      "moduleName": "Hybrid Mount",
+      "repo": "Hybrid-Mount/meta-hybrid_mount",
+      "authors": [
+        {
+          "name": "由崎黑板",
+          "link": "https://github.com/YuzakiKokuban"
+        },
+        {
+          "name": "Tools-cx-app",
+          "link": "https://github.com/Tools-cx-app"
+        }
+      ],
+      "summary": "Next Generation Mounting Metamodule with OverlayFS, Magic Mount and HymoFS.",
+      "summaryZh": "新一代挂载元模块，支持 OverlayFS、Magic Mount 与 HymoFS",
+      "metamodule": true,
+      "versionCodeOverride": 0,
+      "note": "已迁至 Hybrid-Mount 组织（原 meta-hybrid）"
+    },
+    {
+      "moduleId": "netproxy",
+      "moduleName": "NetProxy",
+      "repo": "Fanju6/NetProxy-Magisk",
+      "authors": [
+        {
+          "name": "Fanju",
+          "link": ""
+        }
+      ],
+      "summary": "Based on the sing-box core, this Android proxy module supports one-click start/stop of transparent proxy",
+      "summaryZh": "基于 sing-box 内核的 Android 透明代理模块，支持一键启停",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "MagicNet",
+      "moduleName": "MagicNet",
+      "repo": "LIghtJUNction/MagicNet",
+      "authors": [
+        {
+          "name": "LIghtJUNction",
+          "link": ""
+        }
+      ],
+      "summary": "Let Android use mihomo in tun mode.",
+      "summaryZh": "让 Android 以 tun 模式使用 mihomo 内核",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "magic_mount_rs",
+      "moduleName": "Magic Mount-rs",
+      "repo": "Tools-cx-app/meta-magic_mount-rs",
+      "authors": [
+        {
+          "name": "生于生时 亡于亡刻",
+          "link": ""
+        },
+        {
+          "name": "7a72",
+          "link": ""
+        },
+        {
+          "name": "YuzakiKokuban",
+          "link": ""
+        }
+      ],
+      "summary": "An implementation of a metamodule using Magic Mount, Based on MKSU",
+      "summaryZh": "基于 MKSU 的 Magic Mount 元模块实现（Rust 版）",
+      "readmeZh": "基于 MKSU 使用 Magic Mount 方式实现的元模块（Rust 版），模板源自 meta-overlay。",
+      "metamodule": true,
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "FreePPS",
+      "moduleName": "FreePPS",
+      "repo": "Seyud/FreePPS",
+      "authors": [
+        {
+          "name": "Seyud",
+          "link": ""
+        }
+      ],
+      "summary": "启用搭载米系设备的公版 PPS 支持",
+      "summaryZh": "启用米系设备的公版 PPS 快充支持",
+      "readmeZh": "启用搭载米系设备的公版 PPS 快充协议支持，让设备获得公版 PPS 快速充电能力。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "Mediatek_Mali_GPU_Governor",
+      "moduleName": "天玑GPU调速器",
+      "repo": "Seyud/Mediatek_Mali_GPU_Governor",
+      "authors": [
+        {
+          "name": "Seyud",
+          "link": ""
+        },
+        {
+          "name": "Tools-cx-app",
+          "link": ""
+        }
+      ],
+      "summary": "适用于Mediatek_Mali_GPU的GPU动态调速器，优化全场景下的功耗与性能平衡",
+      "summaryZh": "联发科 Mali GPU 动态调速器，优化全场景功耗与性能平衡",
+      "readmeZh": "适用于联发科 Mali GPU 的动态调速器，通过调节 GPU 频率策略优化全场景下的功耗与性能平衡。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "deviceidchanger",
+      "moduleName": "DeviceID/SSAID Changer",
+      "repo": "sidex15/deviceidchanger",
+      "authors": [
+        {
+          "name": "sidex15",
+          "link": ""
+        }
+      ],
+      "summary": "A simple WebUI Module to change SSAID/DeviceID on Rooted Android Devices",
+      "summaryZh": "WebUI 模块，修改已 Root 安卓设备的 SSAID / 设备 ID",
+      "readmeZh": "通过 WebUI 修改已 Root 安卓设备的 SSAID / 设备 ID，支持 APatch、KernelSU（含分支）与 Magisk。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "HyperUnlocked",
+      "moduleName": "HyperUnlocked",
+      "repo": "ukriu/HyperUnlocked",
+      "authors": [
+        {
+          "name": "ukriu",
+          "link": ""
+        }
+      ],
+      "summary": "A Magisk/KernelSU/APatch module to unlock high-end features on all Xiaomi devices",
+      "summaryZh": "解锁小米设备高端功能的模块，支持 Magisk / KernelSU / APatch",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "AZenith",
+      "moduleName": "AZenith",
+      "repo": "Liliya2727/AZenith",
+      "authors": [
+        {
+          "name": "Liliya",
+          "link": ""
+        },
+        {
+          "name": "Zexshia",
+          "link": ""
+        },
+        {
+          "name": "Kanaochar",
+          "link": ""
+        }
+      ],
+      "summary": "Universal perf modules",
+      "summaryZh": "通用性能调优模块",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zygisk_lsposed",
+      "moduleName": "LSPosed",
+      "repo": "JingMatrix/LSPosed",
+      "authors": [
+        {
+          "name": "LSPosed Developers",
+          "link": ""
+        }
+      ],
+      "summary": "Another enhanced implementation of Xposed Framework. Supports Android 9 ~ 17. Requires Zygisk enabled.",
+      "summaryZh": "增强版 Xposed 框架，支持 Android 9~17，需启用 Zygisk",
+      "zygisk": true,
+      "versionCodeOverride": 0,
+      "note": "KernelSU/APatch 分支（活跃维护），对应手机模块 zygisk_lsposed"
+    },
+    {
+      "moduleId": "hma_oss_zygisk",
+      "moduleName": "HMA-OSS",
+      "repo": "frknkrc44/HMA-OSS",
+      "authors": [
+        {
+          "name": "frknkrc44",
+          "link": ""
+        }
+      ],
+      "summary": "A Zygisk module to hide your app list, settings, package installers and more from system",
+      "summaryZh": "隐藏应用列表、设置、包安装器等信息的 Zygisk 模块（开源版）",
+      "zygisk": true,
+      "versionCodeOverride": 0,
+      "note": "对应手机模块 hma_oss_zygisk"
+    },
+    {
+      "moduleId": "zygisk-assistant",
+      "moduleName": "Zygisk-Assistant",
+      "repo": "snake-4/Zygisk-Assistant",
+      "authors": [
+        {
+          "name": "snake-4",
+          "link": ""
+        }
+      ],
+      "summary": "A Zygisk module to hide root for KernelSU, Magisk and APatch, designed to work similarly to Shamiko",
+      "summaryZh": "为 KernelSU / Magisk / APatch 隐藏 root 的 Zygisk 模块，用法类似 Shamiko",
+      "zygisk": true,
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "ksuwebui",
+      "moduleName": "KsuWebUI",
+      "repo": "5ec1cff/KsuWebUIStandalone",
+      "authors": [
+        {
+          "name": "5ec1cff",
+          "link": ""
+        }
+      ],
+      "summary": "Standalone WebUI app for KernelSU forks without built-in WebUI support",
+      "summaryZh": "独立的 WebUI 面板应用（供无内置 WebUI 的 KernelSU 系使用）",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "busybox-ndk",
+      "moduleName": "Busybox for Android NDK",
+      "repo": "Magisk-Modules-Repo/busybox-ndk",
+      "license": "GPL-2.0",
+      "authors": [
+        {
+          "name": "Magisk-Modules-Repo",
+          "link": ""
+        }
+      ],
+      "summary": "busybox-ndk - a universal busybox binary for Android",
+      "summaryZh": "为 Android 提供 Busybox 命令集（NDK 编译版）",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "Automatic_brick_rescue",
+      "moduleName": "自动神仙救砖",
+      "authors": [
+        {
+          "name": "奋斗的小青年",
+          "link": ""
+        }
+      ],
+      "summary": "自动救砖：系统连续重启3次或卡开机界面2分钟时自动禁用所有模块",
+      "summaryZh": "自动救砖：系统连续重启3次或卡开机界面2分钟时自动禁用所有模块，支持白名单",
+      "readmeZh": "自动救砖模块（OTA 稳定白名单版 v4）：\n- 系统连续重启 3 次或卡在开机界面 2 分钟（OTA 升级时自动延时至 30 分钟）→ 自动禁用所有模块\n- 仍无法开机时执行 APP 解冻救砖模式再开机\n- 模块目录/白名单.conf 可添加救砖跳过白名单\n- 作者：奋斗的小青年（原作者 Han | 情非得已c）\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版",
+      "latestRelease": {
+        "name": "v221204",
+        "version": "v221204",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Automatic_brick_rescue.zip",
+        "size": 4218
+      },
+      "versionCodeOverride": 35,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "Eclipse",
+      "moduleName": "定制温控",
+      "authors": [
+        {
+          "name": "苏疫杆菌",
+          "link": ""
+        }
+      ],
+      "summary": "小米机型定制温控（多档位 thermal 配置）",
+      "summaryZh": "小米机型定制温控（多档位 thermal 配置）",
+      "readmeZh": "定制温控模块（v5.7）：\n- 为小米机型提供多档位温控配置（cool / danger / extreme / pro 等档位）\n- 作者：苏疫杆菌\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版；配置针对当前机型，换机需调整",
+      "latestRelease": {
+        "name": "v5.7",
+        "version": "v5.7",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Eclipse.zip",
+        "size": 94781
+      },
+      "versionCodeOverride": 260717,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "Violet",
+      "moduleName": "紫罗兰附加模块",
+      "authors": [
+        {
+          "name": "泡菜",
+          "link": ""
+        }
+      ],
+      "summary": "紫罗兰工具箱核心自动化功能插件（配合 LSPosed）",
+      "summaryZh": "紫罗兰工具箱核心自动化功能插件（配合 LSPosed）",
+      "readmeZh": "紫罗兰附加模块（v1.4）：\n- 紫罗兰工具箱的核心自动化功能插件（配合 LSPosed 使用）\n- 交流群：1104158965\n- 作者：泡菜\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版",
+      "latestRelease": {
+        "name": "v1.4",
+        "version": "v1.4",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Violet.zip",
+        "size": 34982
+      },
+      "versionCodeOverride": 20260620,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "WorkSettingPro",
+      "moduleName": "爱玩机工具箱拓展",
+      "authors": [
+        {
+          "name": "小白杨",
+          "link": ""
+        }
+      ],
+      "summary": "爱玩机工具箱应用核心功能拓展（OTA 后免解锁 system 修改）",
+      "summaryZh": "爱玩机工具箱应用核心功能拓展（OTA 后免解锁 system 修改）",
+      "readmeZh": "爱玩机工具箱（应用核心功能拓展）19.02：\n- 扩展爱玩机工具箱功能，OTA 后无需挂载解锁系统 system 即可修改\n- 非 MIUI 设备不会刷入 MIUI 高级设置核心文件；内含 adb 与 fastboot 工具包\n- 作者：小白杨\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版",
+      "latestRelease": {
+        "name": "19.02",
+        "version": "19.02",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/WorkSettingPro.zip",
+        "size": 2025
+      },
+      "versionCodeOverride": 1901,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "YHGames",
+      "moduleName": "月虹游戏助手",
+      "authors": [
+        {
+          "name": "月虹",
+          "link": ""
+        }
+      ],
+      "summary": "基于 Zygisk 的游戏增强：机型伪装、CPU 属性伪装、环境清理、安卓 ID 管理",
+      "summaryZh": "基于 Zygisk 的游戏增强：机型伪装、CPU 属性伪装、环境清理、安卓 ID 管理",
+      "readmeZh": "月虹游戏助手（v1.4.2）：\n- 基于 Zygisk 的机型伪装、CPU 属性伪装、游戏环境清理、安卓 ID 管理、设备标记保护\n- 作者：月虹\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版",
+      "zygisk": true,
+      "latestRelease": {
+        "name": "v1.4.2",
+        "version": "v1.4.2",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/YHGames.zip",
+        "size": 952572
+      },
+      "versionCodeOverride": 142,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "YH_YC",
+      "moduleName": "月虹一键隐藏",
+      "authors": [
+        {
+          "name": "酷安@月虹yh",
+          "link": ""
+        }
+      ],
+      "summary": "一键隐藏模块（支持 Kernel / APatch / Magisk 全分支）",
+      "summaryZh": "一键隐藏模块（支持 Kernel / APatch / Magisk 全分支）",
+      "readmeZh": "月虹一键隐藏模块（v5.5.0）：\n- 支持 Kernel、APatch、Magisk 所有分支，支持越狱、免解锁等特殊 ROOT 方式\n- 作者：酷安@月虹yh\n- 注：此模块无公开 GitHub 仓库，为私有模块备份版",
+      "zygisk": true,
+      "latestRelease": {
+        "name": "v5.5.0",
+        "version": "v5.5.0",
+        "time": "2026-10-07T00:00:00Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/YH_YC.zip",
+        "size": 627925
+      },
+      "versionCodeOverride": 550,
+      "note": "私有模块（无公开仓库），从已装设备打包备份"
+    },
+    {
+      "moduleId": "RescueX",
+      "repo": "jiayuxuan123/RescueX",
+      "summaryZh": "自动救砖守护：连续重启/开机超时自动禁用问题模块，支持白名单、模块快照回滚、一次性安全模式与 WebUI",
+      "note": "开源 MIT，兼容 Magisk / KernelSU / APatch"
+    },
+    {
+      "moduleId": "funbox",
+      "moduleName": "FunBox",
+      "repo": "",
+      "authors": [
+        {
+          "name": "Hicores",
+          "link": ""
+        }
+      ],
+      "summary": "QQ 工具箱模块",
+      "versionCodeOverride": 0,
+      "note": "作者 Hicores 名下无公开模块仓库（模块随 QTool 分发），暂缺，需手动补充"
+    },
+    {
+      "moduleId": "asl",
+      "moduleName": "asl",
+      "repo": "RuriOSS/asl",
+      "authors": [
+        {
+          "name": "Moe Hakozaki (Aka. 沨鸾)",
+          "link": ""
+        },
+        {
+          "name": "LIghtJUNction",
+          "link": ""
+        },
+        {
+          "name": "Moe-hacker",
+          "link": ""
+        },
+        {
+          "name": "Lin1328",
+          "link": ""
+        }
+      ],
+      "summary": "Android Subsystem for GNU/Linux (magisk/ksu/Apatch module)",
+      "versionCodeOverride": 0,
+      "note": "原作者仓库暂不可定位，需手动补充"
+    },
+    {
+      "moduleId": "meta-mm",
+      "moduleName": "Magic Mount Metamodule",
+      "repo": "",
+      "authors": [
+        {
+          "name": "7a72",
+          "link": ""
+        }
+      ],
+      "summary": "Magic Mount Metamodule（原版 C 实现）",
+      "metamodule": true,
+      "versionCodeOverride": 0,
+      "note": "原仓库不可定位；功能上可由 magic_mount_rs（meta-magic_mount-rs）替代，需手动补充"
+    },
+    {
+      "moduleId": "meta-overlayfs",
+      "moduleName": "OverlayFS MetaModule",
+      "repo": "",
+      "authors": [
+        {
+          "name": "KernelSU-Modules-Repo",
+          "link": ""
+        }
+      ],
+      "summary": "官方参考实现的 OverlayFS 元模块，支持读写系统分区（ext4）",
+      "metamodule": true,
+      "versionCodeOverride": 0,
+      "note": "托管 org（KernelSU-Modules-Repo）现被封禁，原仓库 404，待解封或迁移后补充"
+    },
+    {
+      "moduleId": "MFGA",
+      "moduleName": "MFGA",
+      "repo": "",
+      "authors": [
+        {
+          "name": "咿云冷雨",
+          "link": ""
+        },
+        {
+          "name": "Numbersf",
+          "link": ""
+        }
+      ],
+      "summary": "MFGA 模块",
+      "versionCodeOverride": 0,
+      "note": "作者 Numbersf 名下无对应仓库（仅有 Xposed 变体），需手动补充"
+    },
+    {
+      "moduleId": "shizu-test-20261007",
+      "moduleName": "ShizuSUTestModule",
+      "authors": [
+        {
+          "name": "qianyumeng0228",
+          "link": ""
+        }
+      ],
+      "summary": "ShizuSU module store e2e integration test",
+      "summaryZh": "ShizuSU module store e2e integration test",
+      "readmeZh": "ShizuSU module store e2e integration test",
+      "zygisk": true,
+      "latestRelease": {
+        "name": "v1.0.0",
+        "version": "v1.0.0",
+        "time": "2026-10-07T13:31:39.393886Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/shizu-test-20261007.zip",
+        "size": 388
+      },
+      "versionCodeOverride": 1,
+      "note": "由手机端 ShizuSU 模块上传工具新增"
+    },
+    {
+      "moduleId": "custompinyindictionary",
+      "moduleName": "CustomPinyinDictionary",
+      "repo": "wuhgit/CustomPinyinDictionary",
+      "summary": "自建拼音输入法词库，百万常用词汇量，适配 Fcitx5 (Linux / Android) 及 Gboard (Android + Magisk or KernelSU) 。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "integrity_box",
+      "moduleName": "Integrity-Box",
+      "repo": "MeowDump/Integrity-Box",
+      "summary": "A toolkit for managing Play Integrity & System Environment",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "box4magisk",
+      "moduleName": "box4magisk",
+      "repo": "CHIZI-0618/box4magisk",
+      "summary": "Use sing-box, clash, v2ray, xray tunnel proxy on Android devices.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "alwaysstrong",
+      "moduleName": "AlwaysStrong",
+      "repo": "evoker0/AlwaysStrong",
+      "summary": "Always Strong: Strong Play Integrity in one drop in module TEESimulator-RS + PlayIntegrityFork bundled.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "magisk_ad_blocking_module",
+      "moduleName": "Magisk-Ad-Blocking-Module",
+      "repo": "pantsufan/Magisk-Ad-Blocking-Module",
+      "summary": "Magisk module to block ads on android",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "youtube_revanced_extended",
+      "moduleName": "YouTube-ReVanced-Extended",
+      "repo": "MANCrimSon/YouTube-ReVanced-Extended",
+      "summary": "Auto-built YouTube & YT Music (RVX/Morphe + VoT) with in-app updates. NonRoot APKs (Obtainium) and Root modules (Magisk/KernelSU/APatch).",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "encore",
+      "moduleName": "encore",
+      "repo": "Rem01Gaming/encore",
+      "summary": "Special performance module for your device",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "adguardcert",
+      "moduleName": "adguardcert",
+      "repo": "AdguardTeam/adguardcert",
+      "summary": "Magisk module that allows using AdGuard's HTTPS filtering for all apps",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "copg",
+      "moduleName": "COPG",
+      "repo": "AlirezaParsi/COPG",
+      "summary": "Advanced per-app device / CPU / GPU spoofer for rooted Android — device profiles, per-app CPU models, prop & Android-ID spoofing, all driven by a full on-device WebUI. Zygisk module for KernelSU / Mag",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "rvb",
+      "moduleName": "rvb",
+      "repo": "nullcpy/rvb",
+      "summary": "Automatically builds APKs and Magisk/KernelSU Modules with ReVanced, Revanced Extended, MorpheApp, RVX Morphed and Revanced Advanced patches whenever new patches are released. Updating 24/7...",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zdt_d",
+      "moduleName": "ZDT-D",
+      "repo": "GAME-OVER-op/ZDT-D",
+      "summary": "ZDT-D, Bypassing Internet blocks.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "sam",
+      "moduleName": "SAM",
+      "repo": "5MayRain/SAM",
+      "summary": "SmartDNS、AdGuardHome 和 mihomo 三种结合的模块，适用于Magisk 和 KernelSU ",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "fluttertap",
+      "moduleName": "FlutterTap",
+      "repo": "script-or-script/FlutterTap",
+      "summary": "Zygisk module that intercepts Flutter app traffic — redirects to a proxy and bypasses BoringSSL TLS pinning. Persistent, no Frida session. Installable via MMRL.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zygisk_loader",
+      "moduleName": "Zygisk-Loader",
+      "repo": "HanSoBored/Zygisk-Loader",
+      "summary": "A dynamic, Zygisk module for hot-swapping native libraries into Android applications without rebooting.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "stellar_tweaks",
+      "moduleName": "Stellar-Tweaks",
+      "repo": "kanaodnd/Stellar-Tweaks",
+      "summary": "Intelligent Android performance daemon written in Rust. Fast-paced hybrid scheduler and real-time telemetry for Root and Non-Root environments.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "perfmtk",
+      "moduleName": "PerfMTK",
+      "repo": "JUANIMAN/PerfMTK",
+      "summary": "A Magisk module for MediaTek devices with Mali GPUs.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "pixelxpert_next",
+      "moduleName": "PixelXpert-Next",
+      "repo": "anirudhgupta109/PixelXpert-Next",
+      "summary": "mixed Xposed+Magisk module for customization of Google Pixel rom of Android 12+",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "anxcamerat",
+      "moduleName": "ANXCameraT",
+      "repo": "h1toru/ANXCameraT",
+      "summary": "ANXCamera Magisk module for Android 12+",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "py2droid",
+      "moduleName": "py2droid",
+      "repo": "Mrakorez/py2droid",
+      "summary": "Magisk/KernelSU/APatch module to install Python 3 on Android.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "greenify4magisk_ksu_reborn",
+      "moduleName": "Greenify4Magisk-KSU-Reborn",
+      "repo": "Drsexo/Greenify4Magisk-KSU-Reborn",
+      "summary": "Integrate Greenify as a privileged system app to enable boost mode™, with automatic bulk app list generation and multi-user support. Works seamlessly with Magisk, KernelSU, and APatch.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zerotierforksu",
+      "moduleName": "ZeroTierForKSU",
+      "repo": "powerAn2020/ZeroTierForKSU",
+      "summary": "给KernelSU、Apatch用的zerotier，提供UI界面，集成zerotier网络管理功能。magisk需要搭配ksu独立面板使用",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "targetedhide",
+      "moduleName": "TargetedHide",
+      "repo": "VisionR1/TargetedHide",
+      "summary": "Ηide files, folders, and packages from specific target apps.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zygisknextnext",
+      "moduleName": "ZygiskNextNext",
+      "repo": "VeryBaaad/ZygiskNextNext",
+      "summary": "A from-scratch, standalone implementation of the Zygisk Next module",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "wpd",
+      "moduleName": "wpd",
+      "repo": "Googlers-Repo/wpd",
+      "summary": "WiFi Password Viewer for MMRL. This module is part for experimental tests of WebUI X.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "crond4android",
+      "moduleName": "crond4android",
+      "repo": "powerAn2020/crond4android",
+      "summary": "支持 KernelSU、APatch、Magisk下运行的Crond。带UI界面/The Crond program that supports running on KernelSU, APatch and Magisk.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "youtube_revanced",
+      "moduleName": "YouTube-Revanced",
+      "repo": "Zy0x/YouTube-Revanced",
+      "summary": "YouTube Revanced patching with Revancify Tools (Root & Non-Root)",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "resusfs",
+      "moduleName": "ReSuSFS",
+      "repo": "ahmed-alnassif/ReSuSFS",
+      "summary": "ReSuSFS - The easiest way to use SuSFS on KernelSU. Strong hiding by default with built-in spoofing and hiding scripts, config files and toggle switches for everyday use, a built-in script manager for",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "komodo_build_prop",
+      "moduleName": "Komodo-Build-Prop",
+      "repo": "Elcapitanoe/Komodo-Build-Prop",
+      "summary": "Magisk and KernelSU module that spoofs your Android device as Google Pixel 9 Pro XL.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "patched_magiskssh",
+      "moduleName": "Patched-MagiskSSH",
+      "repo": "powerAn2020/Patched-MagiskSSH",
+      "summary": "修补过的MagiskSSH，添加了ui，启用了日志功能。适用于KernelSU,Apatch,Magisk",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "pingpimp",
+      "moduleName": "PingPimp",
+      "repo": "fuckyoustan/PingPimp",
+      "summary": "Stop blaming lag. It's time to take absolute control of your connection",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "best_root_apps_for_android",
+      "moduleName": "best-root-apps-for-android",
+      "repo": "krishna3163/best-root-apps-for-android",
+      "summary": "Curated directory of Android root apps, Magisk, KernelSU, LSPosed modules, system tools, privacy utilities, and no-root Shizuku apps.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "auriya",
+      "moduleName": "auriya",
+      "repo": "pavelc4/auriya",
+      "summary": "Yet another universal Magisk/KSU module. This repository experimental project.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "reconbridge",
+      "moduleName": "reconbridge",
+      "repo": "lm060719/reconbridge",
+      "summary": "通用逆向分析 KernelSU 模块：手机侧只做原子能力，智能全在 PC 侧（Claude Code + MCP）。仅限授权安全研究与教育用途。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "evilfont",
+      "moduleName": "EvilFont",
+      "repo": "dedeadend/EvilFont",
+      "summary": "A systemless module to change default Arabic/Persian font + Apple emojis.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "sound_unleashed",
+      "moduleName": "Sound-Unleashed",
+      "repo": "DEMONNICA/Sound-Unleashed",
+      "summary": "Advanced audio tuner for superior sound experience",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "gameenhancer",
+      "moduleName": "GameEnhancer",
+      "repo": "RAAJK20Pro/GameEnhancer",
+      "summary": "Real Performance Starts Here.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "sound_and_emoji_ios",
+      "moduleName": "Sound_And_Emoji_IOS",
+      "repo": "antoniomalheirs/Sound_And_Emoji_IOS",
+      "summary": "A KernelSU / KernelSU Next and Magisk-compatible module that replaces default Android system sounds and emojis with custom or iOS-style assets. Designed for full compatibility across rooted devices wi",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "clear_optimization",
+      "moduleName": "Clear-Optimization",
+      "repo": "DEMONNICA/Clear-Optimization",
+      "summary": "This module is designed to optimize the Android system by deleting unnecessary garbage files (junk).",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "certbridge",
+      "moduleName": "CertBridge",
+      "repo": "Eikeitsu/CertBridge",
+      "summary": "将 Reqable / ProxyPin / 自定义 CA 安装到 Android 系统信任库的 Magisk 模块，支持 KernelSU WebUI。Android 14+ 自动 APEX Conscrypt 注入。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "sqlite3_for_android",
+      "moduleName": "SQLite3-for-Android",
+      "repo": "DEMONNICA/SQLite3-for-Android",
+      "summary": "Replaces system SQLite3 with an optimized build and auto-optimizes all system databases.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "adaway_helper",
+      "moduleName": "AdAway-Helper",
+      "repo": "DEMONNICA/AdAway-Helper",
+      "summary": "Enables AdAway to write a custom hosts file to /system/etc/hosts on KernelSU, SukiSU, APatch, Magisk, and their variants.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "lynx",
+      "moduleName": "Lynx",
+      "repo": "Zy0x/Lynx",
+      "summary": "Experience the perfect balance of gaming optimization and battery efficiency with Lynx, a Magisk module tailored for root users. Gamers can enjoy lag-free gameplay while maximizing battery life, ensur",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "aapt_for_plugin",
+      "moduleName": "Aapt-for-Plugin",
+      "repo": "DEMONNICA/Aapt-for-Plugin",
+      "summary": "AAPT and AAPT2 binaries with multi-architecture support for arm64-v8a, armeabi-v7a, x86, and x86_64 platforms.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "kill_needless_thermal_limits",
+      "moduleName": "Kill-Needless-Thermal-Limits",
+      "repo": "DEMONNICA/Kill-Needless-Thermal-Limits",
+      "summary": "Eliminates restrictive thermal throttling on Snapdragon, MediaTek, and other chipsets for maximum sustained performance.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "bootanimation_module",
+      "moduleName": "bootanimation-module",
+      "repo": "readonlynux/bootanimation-module",
+      "summary": "This module allows you to modify bootanimation without requiring meta-overlayfs or Magisk Magic Mount",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zygisk_il2cppdumper",
+      "moduleName": "Zygisk-Il2CppDumper",
+      "repo": "codehasan/Zygisk-Il2CppDumper",
+      "summary": "🎮 Dump il2cpp game data at runtime with Zygisk",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "android_performance_optimizer",
+      "moduleName": "Android-Performance-Optimizer",
+      "repo": "DEMONNICA/Android-Performance-Optimizer",
+      "summary": "Improve the speed and smoothness of your Android experience.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "libsqlite_for_sdmaid",
+      "moduleName": "Libsqlite-for-SDmaid",
+      "repo": "DEMONNICA/Libsqlite-for-SDmaid",
+      "summary": "Replaces SD Maid's built-in SQLite library with the latest official build.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "mtk_bwmod",
+      "moduleName": "mtk-bwmod",
+      "repo": "Elvandito/mtk-bwmod",
+      "summary": "Universal Magisk module for network optimization on **all MediaTek devices** — Helio G/P/X, Dimensity, MT6xxx, MT8xxx.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "kasumi_proxy",
+      "moduleName": "Kasumi-Proxy",
+      "repo": "loss-and-quick/Kasumi-Proxy",
+      "summary": "System-level transparent proxy for rooted Android (Magisk/KernelSU/APatch module) and Linux/Windows desktop (Tauri 2) — Xray-core and sing-box driven by one shared Rust backend and a React UI.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "nomount_suite",
+      "moduleName": "NoMount-Suite",
+      "repo": "Bouteillepleine/NoMount-Suite",
+      "summary": "NoMount Suite, mountless module loading for Android on the Prism VFS engine",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "svchub",
+      "moduleName": "SvcHub",
+      "repo": "LimpidMo/SvcHub",
+      "summary": "一个开机启动和保活 Termux 服务和二进制服务的 KernelSU / Magisk /APatch 模块，并提供 WebUI 聚合管理",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "android17_lhdc_a2dp_universal",
+      "moduleName": "android17-lhdc-a2dp-universal",
+      "repo": "Makuro-Arisaka/android17-lhdc-a2dp-universal",
+      "summary": "A Magisk module that makes Android 17's native LHDC actually produce sound.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zygisk_updguard",
+      "moduleName": "zygisk-updguard",
+      "repo": "ZQZCC/zygisk-updguard",
+      "summary": "阻止所选应用的商店更新",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "ksu_webui_module_template",
+      "moduleName": "ksu-webui-module-template",
+      "repo": "barsikus007/ksu-webui-module-template",
+      "summary": "This is a template for creating KernelSU/Apatch/Magisk modules with WebUI. It includes a basic structure and a build script",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "droidbridge",
+      "moduleName": "DroidBridge",
+      "repo": "zephyr7030/DroidBridge",
+      "summary": "On-device MCP server for Android — let ChatGPT and local AI agents operate your phone. App edition (Accessibility/Shizuku) or root edition (Magisk/KernelSU/APatch). No PC, no ADB.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "limit_avoidance_handler",
+      "moduleName": "Limit-Avoidance-Handler",
+      "repo": "DEMONNICA/Limit-Avoidance-Handler",
+      "summary": "Disables Android's thermal throttling and locks it off so the system can't turn it back on.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "qsc_stopcharging",
+      "moduleName": "QSC-StopCharging",
+      "repo": "L0NE-6/QSC-StopCharging",
+      "summary": "🔋 QSC 定量停充 · Magisk/KernelSU/APatch 充电阈值控制模块 · 到达指定电量或温度自动停止充电、自动恢复充电 · 安卓 5-17 适配版 + 安卓 1-5 遗留 root 实验版 · 纯本地脚本，无联网",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "xiaomiautomation",
+      "moduleName": "XiaomiAutomation",
+      "repo": "Petittux1/XiaomiAutomation",
+      "summary": "澎湃自动化—XiaomiAutomation：Xiaomi 17 Pro / HyperOS 4 root 自动化模块 —— 多 Profile 定时、任意 App 录制回放、内置工行每日浇水，纯 root 直控。WebUI 支持 KernelSU / APatch；Magisk 请配 KsuWebUI 或 MMRL。 | Root automation for Xiaomi 17 Pro / H",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "driver_ginkgo",
+      "moduleName": "Driver-Ginkgo",
+      "repo": "DEMONNICA/Driver-Ginkgo",
+      "summary": "Change your `Redmi note 8` driver to Optimize GPU performance.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "magisk_devicespoofer",
+      "moduleName": "Magisk-DeviceSpoofer",
+      "repo": "L0NE-6/Magisk-DeviceSpoofer",
+      "summary": "📱 全机型机型伪装 Magisk 模块合集 · 3554 机型 / 26 品牌 · Android 1-17 适配 · 每日自动同步上游机型数据 · 纯本地脚本，无联网",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "thermal_breaker_miyabi_core",
+      "moduleName": "thermal-breaker-miyabi-core",
+      "repo": "Rama-X2/thermal-breaker-miyabi-core",
+      "summary": "Advanced Magisk thermal optimizer focused on reducing aggressive throttling while preserving hardware protection.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "xtherm",
+      "moduleName": "XTherm",
+      "repo": "clsxkyyra404/XTherm",
+      "summary": "\"Advanced Disable Thermal for Root (Magisk/KernelSU). Bypass thermal throttling to maximize gaming performance.\"",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "dns_accelerator",
+      "moduleName": "DNS-Accelerator",
+      "repo": "DEMONNICA/DNS-Accelerator",
+      "summary": "Improves DNS resolution and internet speed with automatic configuration and network optimization.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "ksu_volume_steps",
+      "moduleName": "ksu-volume-steps",
+      "repo": "alextecplayz/ksu-volume-steps",
+      "summary": "A KernelSU-compatible volume steps changer for the system build.prop",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "magisk_desktop",
+      "moduleName": "Magisk-Desktop",
+      "repo": "magiskdesktop/Magisk-Desktop",
+      "summary": "Magisk Desktop - Windows zip for v31.0. Zygisk, DenyList, modules, boot patch, Material 3, Android 17. Point at an apk or image, flash, manage from the window. Windows 10/11, extract and run. Official",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "advanced_hosts_manager",
+      "moduleName": "Advanced-Hosts-Manager",
+      "repo": "DEMONNICA/Advanced-Hosts-Manager",
+      "summary": "Advanced system-level hosts management with real-time ad blocking, privacy protection, and automatic updates from trusted sources.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "gps_optimization",
+      "moduleName": "GPS-Optimization",
+      "repo": "DEMONNICA/GPS-Optimization",
+      "summary": "Optimizes GPS configuration and location permissions on every reboot.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "faa_ydl",
+      "moduleName": "Faa-YDL",
+      "repo": "FaaRamadhann/Faa-YDL",
+      "summary": "Download MP3 & MP4 dari YouTube + scan QR. Web UI Termux, APK standalone, modul Magisk/KernelSU/APatch + CLI fdl. Hasil ke /sdcard/Download/FaaDL.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "adb_notify",
+      "moduleName": "adb-notify",
+      "repo": "darren-you/adb-notify",
+      "summary": "Magisk 模块，用于切换 Android USB 调试与 USB 充电/连接通知",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "hyperos_boot_animation_module",
+      "moduleName": "HyperOS-Boot-Animation-Module",
+      "repo": "disbishxb/HyperOS-Boot-Animation-Module",
+      "summary": "免改分区替换开机动画 | Replace boot animation without repartition",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "crocus_vernus",
+      "moduleName": "Crocus-Vernus",
+      "repo": "DEMONNICA/Crocus-Vernus",
+      "summary": "Enjoy a more responsive gaming and multitasking experience through intelligent adjustment of system parameters in the kernel and memory.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "faa_app_freeze",
+      "moduleName": "Faa-App-Freeze",
+      "repo": "FaaRamadhann/Faa-App-Freeze",
+      "summary": "Pembeku aplikasi root ala Hail — modul Magisk/KernelSU/APatch + CLI faf + FAF Manager, dengan auto-freeze daemon",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "yuki_bootanim",
+      "moduleName": "Yuki-Bootanim",
+      "repo": "OhMyDitzzy/Yuki-Bootanim",
+      "summary": "Allows you to use custom boot animation through on Direct-Write or Overlay",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "nextsusfs",
+      "moduleName": "NextSUSFS",
+      "repo": "ifoknr/NextSUSFS",
+      "summary": "Kernel-level root hiding with SuSFS for the NEXT stack (NextWheel + NextZygisk). KernelSU module with a full WebUI, for any CPU.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "katifetch_for_android_shell_magisk_module",
+      "moduleName": "katifetch-for-android-shell-Magisk-Module",
+      "repo": "ximimoments/katifetch-for-android-shell-Magisk-Module",
+      "summary": "A lightweight system fetch tool for Android (Magisk & KSU & Root)",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "bs_thermal",
+      "moduleName": "BS-THERMAL",
+      "repo": "BS1388/BS-THERMAL",
+      "summary": "Disables Thermal Zone and Disable [PPM/GPU limits]",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "sl8541e_heshuicheng_device_optimization_module",
+      "moduleName": "SL8541E-Heshuicheng-Device-Optimization-Module",
+      "repo": "Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module",
+      "summary": "SL8541E Heshuicheng Device Optimization Module For Unisoc SL8541E / SC9832E + Heshuicheng (HSC) smartwatches, Android 8.1.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "dex2oat_optimizer",
+      "moduleName": "Dex2OAT-Optimizer",
+      "repo": "DEMONNICA/Dex2OAT-Optimizer",
+      "summary": "A lightweight module that automatically tunes Dalvik/ART properties and recompiles your installed apps at boot to help improve app startup and responsiveness.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "miatoll_stereo_mod",
+      "moduleName": "miatoll-stereo-mod",
+      "repo": "EtoKomu/miatoll-stereo-mod",
+      "summary": "Dual Speaker (Stereo Audio) Magisk/KernelSU module for Redmi Note 9 Pro / 9S (miatoll) on AOSP",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "rosemary_susfs_kernel",
+      "moduleName": "rosemary-susfs-kernel",
+      "repo": "OctopusAssem/rosemary-susfs-kernel",
+      "summary": "Custom KernelSU (ReSukiSU) + SUSFS kernel for Redmi Note 10S (rosemary) - MIUI 14 / Android 13. Flashable kernel, root-hiding patches, spoofed hidden manager, complete KIT.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "system_cert_installer",
+      "moduleName": "System-Cert-Installer",
+      "repo": "RattlesHyper/System-Cert-Installer",
+      "summary": "Install Multiple CA Certificate to System CA Store. APEX Bypass for Android 14+. Installing to User not required.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "hyperos_flclash_vpn_fix",
+      "moduleName": "hyperos-flclash-vpn-fix",
+      "repo": "fouc3-mirror/hyperos-flclash-vpn-fix",
+      "summary": "KernelSU/Magisk module: fix FlClash VPN on HyperOS/MIUI. MIUI sets the FOREGROUND_SERVICE_SPECIAL_USE appop to \"ignore\"; Android 14+ validates FGS types via appop rather than permission, so VpnService",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "android_persian_font_switcher",
+      "moduleName": "android-persian-font-switcher",
+      "repo": "ggYasin/android-persian-font-switcher",
+      "summary": "Open-source KernelSU font switcher with WebUI for changing Android Persian/Arabic fallback fonts while preserving the selected Latin font.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "ivanna_omega_supreme",
+      "moduleName": "IVANNA-OMEGA-SUPREME",
+      "repo": "luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME",
+      "summary": "Advanced Android neural audio engine combining DSP, adaptive processing, binaural HRTF, AI audio enhancement and Magisk integration.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "boot_studio_module",
+      "moduleName": "boot_studio_module",
+      "repo": "lumii55/boot_studio_module",
+      "summary": "Boot animation studio module repo",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "mffmv14",
+      "moduleName": "MFFMv14",
+      "repo": "mistu01/MFFMv14",
+      "summary": "Advanced android font module tool.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "rclonemagiskmanage",
+      "moduleName": "RcloneMagiskManage",
+      "repo": "powerAn2020/RcloneMagiskManage",
+      "summary": "Rclone Root Manager 是一个专为 Root（Magisk / KernelSU / APatch）打造的一体化云存储管理系统，通过原生 Android 界面与高性能 Rust 安全网关，实现对 Rclone 多网盘挂载（FUSE3）、文件传输、加解密及定时任务的零系统分区侵入式可视化管控。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "return_roboto",
+      "moduleName": "return-roboto",
+      "repo": "reddxae/return-roboto",
+      "summary": "Bring back the Android default font.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "iosx69",
+      "moduleName": "iOSx69",
+      "repo": "sabbirafat96/iOSx69",
+      "summary": "🍎 iOS Emojis & Kohinoor Bangla Font system-wide! 🚀 Auto-update enabled, zero bloat, and no background daemon. Seamlessly transforms your rooted Android. Magisk / KernelSU / APatch ready. 🇧🇩",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "td2tdr",
+      "moduleName": "td2tdr",
+      "repo": "sansej8989/td2tdr",
+      "summary": "Модуль Magisk/KernelSU для Top Drives: автосинхронізація Garage.dat у Download/td2tdr_sync. WebUI-панель зі статистикою гаража.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "mountguard",
+      "moduleName": "MountGuard",
+      "repo": "waterblue-sea/MountGuard",
+      "summary": "专治临时 Root 软重启后 各种检测器报“发现 Magisk”以及诸如学信网等 App 报 Root 环境。自动扫描并清除第三方模块裸 mount --bind 引发的 VFS shared 跨命名空间反向挂载传染与指数级叠罗汉，内置安全软重启与在线热修复按钮。",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "droidspaces_lan_ip",
+      "moduleName": "droidspaces-lan-ip",
+      "repo": "yashoswalyo/droidspaces-lan-ip",
+      "summary": "Assign Droidspaces NAT container its own IPv4 address on the phone's Wi-Fi LAN.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "magisk_sysutils",
+      "moduleName": "magisk-sysutils",
+      "repo": "AlexDev404/magisk-sysutils",
+      "summary": "Turn your rooted device into a much more capable Unix-like environment without needing a chroot",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "ringmapper",
+      "moduleName": "Ringmapper",
+      "repo": "Deulfi/Ringmapper",
+      "summary": "Remap swipe events to something actual useful on cheap AliExpress Bluetooth multipurpose rings.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "trustmedarling",
+      "moduleName": "TrustMeDarling",
+      "repo": "TheKimi7/TrustMeDarling",
+      "summary": "Makes user-installed CA certificates part of the system trust store, and reports which apps will not see them.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "unlock_core_for_dex2oat",
+      "moduleName": "unlock_core_for_dex2oat",
+      "repo": "fnyoat/unlock_core_for_dex2oat",
+      "summary": "MIUI/HyperOS dex2oat 全核+全线程解锁模块",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "emoji_flag_restore",
+      "moduleName": "Emoji-Flag-Restore",
+      "repo": "hayatehinata/Emoji-Flag-Restore",
+      "summary": "Restores flag emoji that a ROM renders as missing or transparent, including the Taiwan flag (TW, U+1F1F9 U+1F1FC).",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "codex_android",
+      "moduleName": "codex-android",
+      "repo": "masitankitavim-ux/codex-android",
+      "summary": "Run OpenAI Codex CLI on Android as a Magisk/KernelSU module, with a built-in local gateway (Responses -> chat/completions) and a web console. Fill in your own API endpoint and model after install.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "shark8_damon_reclaim_off",
+      "moduleName": "shark8-damon-reclaim-off",
+      "repo": "nalbe/shark8-damon-reclaim-off",
+      "summary": "KernelSU module for Blackview Shark 8: disables the damon_reclaim kernel thread that was page-ing anonymous app memory into zram with no memory pressure",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "watchdog",
+      "moduleName": "watchdog",
+      "repo": "radito/watchdog",
+      "summary": "A KernelSU module that reboots your phone after a set duration of screen-off inactivity.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "cts_on_lineage",
+      "moduleName": "cts-on-lineage",
+      "repo": "reddxae/cts-on-lineage",
+      "summary": "Enable Circle to Search support on LineageOS without GApps.",
+      "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "zapret_ksu",
+      "moduleName": "zapret-ksu",
+      "repo": "soufied/zapret-ksu",
+      "summary": "KernelSU / KernelSU-Next module that runs zapret (nfqws and nfqws2) for DPI bypass on Android, with a WebUI, Blockcheck and automatic Wi-Fi/mobile profiles.",
+      "versionCodeOverride": 0
+    }
+  ],
+  "outputDir": "output",
+  "cacheDir": "cache",
+  "cacheTtlSeconds": 3600
+}

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ShizuSU 模块自动发现（进阶1）
+ShizuSU 模块自动发现 + 自动审核（进阶1）
 
-按 GitHub topic 定时扫描候选模块仓库，输出到根目录 catalog/candidates.json，
-供人工审批后加入 modules.config.json 正式收录。
+按 GitHub topic 定时扫描候选模块仓库。两种模式：
+  - 默认 / --write：输出 catalog/candidates.json（候选记录）
+  - --auto-approve：检测到模块性合格（有 module.prop 或 release zip）的候选
+    直接自动审批通过，写入 modules.config.json 正式收录（去重 + moduleId 唯一化
+    + 缺源条目更新），随后输出 catalog/candidates.json 供留痕。
 
 默认 topics：shizusu-module, sukisu-module, kernelsu-module, ksu-module,
 magisk-module, apatch-module, zygisk-module
@@ -12,11 +15,11 @@ magisk-module, apatch-module, zygisk-module
 过滤规则：
   - 排除 fork / archived / 已收录（modules.config.json 中已有 repo 或 moduleId）
   - 需存在 module.prop（或仓库内有 release zip）
-  - 需可检测到许可证（open source 门槛预筛）
 
 用法：
-  python tools/discover.py --dry-run     # 打印候选（不写文件）
-  python tools/discover.py --write       # 写入 catalog/candidates.json
+  python tools/discover.py --dry-run            # 打印候选（不写文件）
+  python tools/discover.py --write              # 写入 catalog/candidates.json
+  python tools/discover.py --auto-approve       # 自动审批并写入 modules.config.json
 环境变量：GITHUB_TOKEN（强烈建议）
 """
 import argparse
@@ -102,9 +105,51 @@ def has_release_zip(full_name, token):
     return False
 
 
+def auto_approve(config, candidates):
+    """把候选直接写入 modules.config.json（自动审核）。
+    返回 (added, updated) 列表供输出。
+    """
+    modules = config.setdefault("modules", [])
+    existing_repos = {m.get("repo", "").lower() for m in modules if m.get("repo")}
+    existing_ids = {m.get("moduleId", "").lower() for m in modules}
+    added, updated = [], []
+    for c in candidates:
+        full = c["fullName"]
+        if full.lower() in existing_repos:
+            continue
+        sid = c.get("suggestedModuleId") or full.split("/")[-1].lower().replace("-", "_").replace(".", "_")
+        # 缺源条目更新：moduleId 相同且原 repo 为空
+        hit = next((m for m in modules if m.get("moduleId", "").lower() == sid.lower() and not m.get("repo")), None)
+        if hit:
+            hit["repo"] = full
+            hit["moduleName"] = c.get("suggestedConfig", {}).get("moduleName", sid)
+            hit["summary"] = (c.get("description") or "")[:200]
+            existing_repos.add(full.lower())
+            updated.append((full, sid))
+            continue
+        # moduleId 唯一化
+        uid = sid
+        n = 2
+        while uid.lower() in existing_ids:
+            uid = f"{sid}_{n}"
+            n += 1
+        existing_ids.add(uid.lower())
+        existing_repos.add(full.lower())
+        modules.append({
+            "moduleId": uid,
+            "moduleName": c.get("suggestedConfig", {}).get("moduleName", uid),
+            "repo": full,
+            "summary": (c.get("description") or "")[:200],
+            "versionCodeOverride": 0,
+        })
+        added.append((full, uid))
+    return added, updated
+
+
 def main():
     parser = argparse.ArgumentParser(description="ShizuSU 模块自动发现")
     parser.add_argument("--write", action="store_true", help="写入 catalog/candidates.json（默认只打印）")
+    parser.add_argument("--auto-approve", action="store_true", help="自动审核：检测到候选直接写入 modules.config.json")
     parser.add_argument("--topics", default=",".join(DEFAULT_TOPICS), help="逗号分隔的 topic 列表")
     args = parser.parse_args()
 
@@ -175,6 +220,27 @@ def main():
         "candidateCount": len(candidates),
         "candidates": candidates,
     }
+
+    if args.auto_approve:
+        added, updated = auto_approve(config, candidates)
+        if added or updated:
+            CONFIG_PATH.write_text(
+                json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        approved_ids = {m["moduleId"].lower() for m in config.get("modules", [])}
+        for c in candidates:
+            if c.get("suggestedModuleId", "").lower() in approved_ids:
+                c["status"] = "auto-approved"
+        CATALOG_DIR.mkdir(parents=True, exist_ok=True)
+        (CATALOG_DIR / "candidates.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"自动审核完成：新增 {len(added)}，更新缺源 {len(updated)}，候选共 {len(candidates)}")
+        for full, uid in added:
+            print(f"  + {full} -> {uid}")
+        for full, uid in updated:
+            print(f"  ~ {full} -> 更新缺源 moduleId={uid}")
+        return 0 if added or updated else 1
 
     if args.write:
         CATALOG_DIR.mkdir(parents=True, exist_ok=True)

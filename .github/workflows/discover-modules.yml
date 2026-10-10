@@ -22,34 +22,49 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Scan GitHub topics for candidate modules (进阶1)
+      - name: Scan topics and auto-approve new modules (自动审核)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python tools/discover.py --write
+        id: discover
+        run: |
+          set +e
+          out=$(python tools/discover.py --auto-approve 2>&1)
+          rc=$?
+          echo "$out"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          # rc=0 表示有新增/更新，rc=1 表示无变化
+          if [ $rc -ne 0 ] && [ $rc -ne 1 ]; then
+            exit $rc
+          fi
+          echo "changed=$([ $rc -eq 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
-      - name: Commit candidates if changed
+      - name: Commit auto-approved modules if changed
+        if: steps.discover.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add catalog/candidates.json
+          git add modules.config.json catalog/candidates.json
           if git diff --cached --quiet; then
-            echo "No new candidates"
+            echo "No changes to commit"
           else
-            git commit -m "chore: 自动发现模块候选 $(date -u +%Y-%m-%d)"
+            git commit -m "chore: 自动审核收录新模块 $(date -u +%Y-%m-%d)"
             git push
           fi
 
-      - name: Open review issue when candidates exist
+      - name: Trigger build pipeline (构建+签名+上线)
+        if: steps.discover.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          count=$(python -c "import json;print(json.load(open('catalog/candidates.json',encoding='utf-8')).get('candidateCount',0))" 2>/dev/null || echo 0)
-          if [ "$count" -gt 0 ]; then
-            existing=$(gh issue list --label discovery --state open --limit 5 --json number -q '.[0].number' 2>/dev/null || echo "")
-            if [ -z "$existing" ]; then
-              gh issue create \
-                --title "模块收录候选待审阅（自动发现 ${count} 个）" \
-                --label discovery \
-                --body "GitHub topic 自动扫描发现 ${count} 个候选模块，见 [catalog/candidates.json](https://github.com/qianyumeng0228/ShizuSU-Modules/blob/main/catalog/candidates.json)。请审阅后挑选加入 modules.config.json 正式收录。"
-            fi
-          fi
+          gh workflow run update-modules.yml
+          echo "已触发 update-modules.yml 构建管线"
+
+      - name: Open alert issue when discovery fails
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "自动发现失败（$(date -u +%Y-%m-%d)）" \
+            --label discovery \
+            --body "topic 自动扫描或自动审核流程失败，请检查 Actions 日志。"
