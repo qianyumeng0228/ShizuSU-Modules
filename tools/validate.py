@@ -60,7 +60,7 @@ def _api_json(path, token):
         return None
 
 
-def check_repo(repo, token):
+def check_repo(repo, token, mod=None, skip_head=False):
     """检查一个开源模块仓库：license / module.prop / release 下载可达性。"""
     owner, name = repo.split("/", 1)
     issues = []
@@ -68,26 +68,41 @@ def check_repo(repo, token):
     if repo_info is None:
         return {"status": "unverified", "issues": ["仓库元数据获取失败（不存在或被封禁？）"]}
 
+    # --- license：尽力检测（license API -> LICENSE 文件 -> 配置人工标注），软性信息不阻塞收录 ---
     license_spdx = ""
     lic = repo_info.get("license")
     if lic and lic.get("spdx_id") and lic["spdx_id"] != "NOASSERTION":
         license_spdx = lic["spdx_id"]
     if not license_spdx:
-        issues.append("未检测到开源许可证（LICENSE 缺失或非标准 SPDX）")
+        contents = _api_json(f"repos/{owner}/{name}/contents", token)
+        has_license_file = False
+        if isinstance(contents, list):
+            for f in contents:
+                fname = (f.get("name") or "").upper()
+                if fname.startswith("LICENSE") or fname.startswith("COPYING") or fname == "LICENCE":
+                    has_license_file = True
+                    break
+        manual_license = (mod or {}).get("license", "")
+        if has_license_file:
+            license_spdx = "SEE LICENSE FILE"
+        elif manual_license:
+            license_spdx = manual_license
+        else:
+            license_spdx = "unknown"  # 常见于 README 声明许可证的仓库，人工补录
 
     source_url = repo_info.get("html_url", f"https://github.com/{repo}")
 
-    # module.prop 存在性（KernelSU/Magisk 模块标志）
+    # --- module.prop：git trees API 递归查找（软性信息，不作为硬门槛——很多模块在 release 构建时才生成） ---
     module_prop = False
-    for candidate in ("module.prop", "module.prop.new"):
-        status, _ = _http(f"{RAW_BASE}/{owner}/{name}/HEAD/{candidate}", token=token, timeout=15)
-        if status in (200, 302):
-            module_prop = True
-            break
-    if not module_prop:
-        issues.append("仓库根目录未发现 module.prop（可能不是标准模块仓库）")
+    tree = _api_json(f"repos/{owner}/{name}/git/trees/HEAD?recursive=1", token)
+    if tree and isinstance(tree.get("tree"), list):
+        for t in tree["tree"]:
+            path = t.get("path") or ""
+            if t.get("type") == "blob" and path.rsplit("/", 1)[-1] == "module.prop":
+                module_prop = True
+                break
 
-    # 最新 release 下载 URL 可达性
+    # --- 最新 release 下载 URL 可达性 ---
     releases = _api_json(f"repos/{owner}/{name}/releases", token)
     release_ok = False
     latest_url = ""
@@ -102,8 +117,11 @@ def check_repo(repo, token):
             target = (zips or assets)[0] if (zips or assets) else None
             if target:
                 latest_url = target.get("browser_download_url", "")
-                status, _ = _http(latest_url, timeout=30, method="HEAD")
-                release_ok = status in (200, 302)
+                if skip_head:
+                    release_ok = True  # 本地快速验证：跳过 HEAD 可达性
+                else:
+                    status, _ = _http(latest_url, timeout=30, method="HEAD")
+                    release_ok = status in (200, 302)
     if not release_ok:
         issues.append("最新 release 无可下载 zip 资产（或下载地址不可达）")
 
@@ -122,6 +140,7 @@ def main():
     parser = argparse.ArgumentParser(description="ShizuSU 模块收录审核")
     parser.add_argument("--strict", action="store_true", help="存在 unverified 时退出码 1")
     parser.add_argument("--json", action="store_true", help="只输出审计 JSON")
+    parser.add_argument("--skip-head", action="store_true", help="跳过 release HEAD 可达性检查（本地快速验证用）")
     args = parser.parse_args()
 
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
@@ -157,7 +176,7 @@ def main():
             }
             continue
         print(f"[{mid}] checking {repo} ...", file=sys.stderr)
-        result = check_repo(repo, token)
+        result = check_repo(repo, token, mod=mod, skip_head=args.skip_head)
         audit["modules"][mid] = result
         if result["status"] == "unverified":
             unverified.append(mid)
