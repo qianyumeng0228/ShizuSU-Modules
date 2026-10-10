@@ -205,6 +205,21 @@ def pick_asset(release):
     return assets[0]
 
 
+def pick_fallback_zip(releases):
+    """最新 release 无 zip asset 时，从新到旧找最近一个有 zip asset 的 release。
+    返回 (release, asset) 或 (None, None)。只认 zip（任意非 zip asset 兜底质量太差）。"""
+    ordered = sorted(
+        releases,
+        key=lambda r: r.get("published_at") or r.get("created_at") or "",
+        reverse=True,
+    )
+    for r in ordered:
+        for a in (r.get("assets") or []):
+            if (a.get("name") or "").lower().endswith(".zip"):
+                return r, a
+    return None, None
+
+
 # ---------------------------------------------------------------------------
 # 输出 schema（对齐管理器解析代码）
 # ---------------------------------------------------------------------------
@@ -236,6 +251,12 @@ def build_catalog_entry(mod, token):
     releases = fetch_releases(spec, token)
     latest = pick_latest_release(releases)
     asset = pick_asset(latest) if latest else None
+    fallback_note = ""
+    if latest and not (asset and (asset.get("name") or "").lower().endswith(".zip")):
+        fb_rel, fb_asset = pick_fallback_zip(releases)
+        if fb_asset:
+            asset = fb_asset
+            fallback_note = f"最新版 {(latest or {}).get('tag_name') or ''} 未打包 zip，回退至 {(fb_rel or {}).get('tag_name') or ''} 下载"
 
     authors = mod.get("authors")
     if not authors:
@@ -259,6 +280,8 @@ def build_catalog_entry(mod, token):
             "downloadUrl": (asset or {}).get("browser_download_url") or "",
         },
     }
+    if fallback_note:
+        entry["latestRelease"]["note"] = fallback_note
     return entry
 
 
@@ -344,6 +367,12 @@ def build_detail(mod, token):
 
     latest = pick_latest_release(releases)
     asset = pick_asset(latest) if latest else None
+    fallback_note = ""
+    if latest and not (asset and (asset.get("name") or "").lower().endswith(".zip")):
+        fb_rel, fb_asset = pick_fallback_zip(releases)
+        if fb_asset:
+            asset = fb_asset
+            fallback_note = f"最新版 {(latest or {}).get('tag_name') or ''} 未打包 zip，回退至 {(fb_rel or {}).get('tag_name') or ''} 下载"
 
     releases_out = []
     for r in releases:
@@ -364,7 +393,7 @@ def build_detail(mod, token):
         })
 
     html_url = repo.get("html_url") or f"https://github.com/{spec}"
-    return {
+    detail = {
         "readme": readme or "",
         "readmeHTML": _naive_md_to_html(readme) if readme else "",
         "homepageUrl": mod.get("homepageUrl") or repo.get("homepage") or html_url,
@@ -378,6 +407,9 @@ def build_detail(mod, token):
         },
         "releases": releases_out,
     }
+    if fallback_note:
+        detail["latestRelease"]["note"] = fallback_note
+    return detail
 
 
 # ---------------------------------------------------------------------------
@@ -412,6 +444,11 @@ def cmd_repo(spec, token):
         latest = pick_latest_release(releases)
         asset = pick_asset(latest) if latest else None
         print(f"latest : {latest.get('tag_name') if latest else None}")
+        if latest and not (asset and (asset.get("name") or "").lower().endswith(".zip")):
+            fb_rel, fb_asset = pick_fallback_zip(releases)
+            if fb_asset:
+                print(f"fallback: {(fb_rel or {}).get('tag_name')} -> {(fb_asset or {}).get('browser_download_url')}")
+                asset = fb_asset
         print(f"zip    : {(asset or {}).get('browser_download_url') or '(none)'}")
     except ApiError as e:
         print(f"FAIL {spec}: {e}")
