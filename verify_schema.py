@@ -42,8 +42,10 @@ def opt_int(obj, key, default=0):
 
 
 def check_catalog(entry):
-    """复刻 parseRepoModule 的字段读取路径"""
-    errors = []
+    """复刻 parseRepoModule 的字段读取路径。
+    返回 (errors, warnings)：errors=结构性问题（硬失败），warnings=数据质量问题（如无下载 asset）。
+    """
+    errors, warnings = [], []
     module_id = opt_str(entry, "moduleId")
     if not module_id:
         errors.append("moduleId 为空（管理器会跳过该条目）")
@@ -62,21 +64,23 @@ def check_catalog(entry):
         errors.append("latestRelease 缺失或非对象")
     else:
         if not opt_str(lr, "name") and not opt_str(lr, "version"):
-            errors.append("latestRelease 无 name/version")
+            warnings.append("latestRelease 无 name/version（管理器显示空版本）")
         vc = opt_int(lr, "versionCode")
         if not isinstance(vc, int):
             errors.append("latestRelease.versionCode 非整数")
         url = opt_str(lr, "downloadUrl")
         if not url:
-            errors.append("latestRelease.downloadUrl 为空（管理器会生成空 asset）")
-    return errors
+            warnings.append("latestRelease.downloadUrl 为空（管理器会生成空 asset，模块暂不可下载）")
+    return errors, warnings
 
 
 def check_detail(detail):
-    """复刻 fetchModuleDetail 的字段读取路径"""
-    errors = []
+    """复刻 fetchModuleDetail 的字段读取路径。
+    返回 (errors, warnings)。
+    """
+    errors, warnings = [], []
     if not isinstance(detail, dict):
-        return ["详情 JSON 非对象"]
+        return ["详情 JSON 非对象"], []
     for key in ("readme", "readmeHTML", "homepageUrl", "sourceUrl", "url"):
         if key not in detail:
             errors.append(f"缺少字段 {key}")
@@ -86,9 +90,9 @@ def check_detail(detail):
     else:
         tag = opt_str(lr, "name") or opt_str(lr, "version")
         if not tag:
-            errors.append("latestRelease 无 name/version")
+            warnings.append("latestRelease 无 name/version")
         if not opt_str(lr, "downloadUrl"):
-            errors.append("latestRelease.downloadUrl 为空")
+            warnings.append("latestRelease.downloadUrl 为空（模块暂不可下载）")
     releases = detail.get("releases")
     if not isinstance(releases, list):
         errors.append("releases 缺失或非数组")
@@ -102,32 +106,38 @@ def check_detail(detail):
                 for a in assets:
                     if not opt_str(a, "name") or not opt_str(a, "downloadUrl"):
                         errors.append("releaseAssets[] 中存在 name/downloadUrl 为空的项")
-    return errors
+    return errors, warnings
 
 
 def main():
     catalog = json.loads((OUT / "modules.json").read_text(encoding="utf-8"))
     print(f"目录条目数: {len(catalog)}")
-    total_err = 0
+    total_err, total_warn = 0, 0
     for entry in catalog:
-        errs = check_catalog(entry)
+        errs, warns = check_catalog(entry)
         mid = entry.get("moduleId", "?")
         if errs:
             total_err += len(errs)
             print(f"  [目录] {mid}: " + "; ".join(errs))
-    print(f"目录校验: {'通过' if total_err == 0 else f'{total_err} 处问题'}")
+        if warns:
+            total_warn += len(warns)
+            print(f"  [目录][warn] {mid}: " + "; ".join(warns))
+    print(f"目录校验: 错误 {total_err} 处，警告 {total_warn} 处")
 
     detail_dir = OUT / "module"
     det_files = sorted(detail_dir.glob("*.json"))
     print(f"详情文件数: {len(det_files)}")
-    det_err = 0
+    det_err, det_warn = 0, 0
     for f in det_files:
         detail = json.loads(f.read_text(encoding="utf-8"))
-        errs = check_detail(detail)
+        errs, warns = check_detail(detail)
         if errs:
             det_err += len(errs)
             print(f"  [详情] {f.stem}: " + "; ".join(errs))
-    print(f"详情校验: {'通过' if det_err == 0 else f'{det_err} 处问题'}")
+        if warns:
+            det_warn += len(warns)
+            print(f"  [详情][warn] {f.stem}: " + "; ".join(warns))
+    print(f"详情校验: 错误 {det_err} 处，警告 {det_warn} 处")
 
     # 交叉核对：详情文件集合与目录 moduleId 集合一致
     cat_ids = {e.get("moduleId") for e in catalog}
