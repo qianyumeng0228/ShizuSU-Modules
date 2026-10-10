@@ -1,0 +1,435 @@
+{
+  "readme": "<div align=\"center\">\n\n<img src=\"https://raw.githubusercontent.com/AlirezaParsi/COPG/refs/heads/JSON/module/banner.png\" width=\"560\" alt=\"COPG banner\" />\n\n# 🎮 COPG — Advanced Android Customization & Spoofing\n\n**A powerful platform for device & app spoofing, system-level control, and advanced ROM capabilities.**\n\n<br>\n\n[![Version](https://img.shields.io/badge/version-7.3.0-818cf8?style=for-the-badge)](https://github.com/AlirezaParsi/COPG/releases)\n[![Zygisk](https://img.shields.io/badge/Zygisk-Compatible-34d399?style=for-the-badge)](https://github.com/topjohnwu/Magisk)\n[![Android](https://img.shields.io/badge/Android-9.0%2B-3ddc84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)\n[![Downloads](https://img.shields.io/github/downloads/AlirezaParsi/COPG/total?style=for-the-badge&color=f59e0b)](https://github.com/AlirezaParsi/COPG/releases)\n[![License](https://img.shields.io/github/license/AlirezaParsi/COPG?style=for-the-badge&color=a78bfa)](LICENSE)\n\n<a href=\"#-installation\"><img src=\"https://img.shields.io/badge/⬇_Install-818cf8?style=for-the-badge\" alt=\"Install\" /></a>\n<a href=\"#-webui\"><img src=\"https://img.shields.io/badge/🖥_WebUI-1f2937?style=for-the-badge\" alt=\"WebUI\" /></a>\n<a href=\"#-faq\"><img src=\"https://img.shields.io/badge/❓_FAQ-1f2937?style=for-the-badge\" alt=\"FAQ\" /></a>\n<a href=\"https://t.me/COPG_module\"><img src=\"https://img.shields.io/badge/💬_Telegram-2CA5E0?style=for-the-badge\" alt=\"Telegram\" /></a>\n<a href=\"https://vendors.copg.my\"><img src=\"https://img.shields.io/badge/🌐_Website-6d28d9?style=for-the-badge\" alt=\"COPG Website\" /></a>\n<a href=\"#-support-copg\"><img src=\"https://img.shields.io/badge/Support-f59e0b?style=for-the-badge&logo=bitcoin&logoColor=white\" alt=\"Support\" /></a>\n\n**🌐 Official website — download COPG free & buy COPG PRO: [vendors.copg.my](https://vendors.copg.my)**\n\n🌐 Languages / 语言：**English** · [简体中文](README.zh.md)\n\n</div>\n\n---\n\n## ✨ Why COPG?\n\nCOPG is a **Zygisk module** that makes most games and apps believe they are running on a different,\nfully‑featured flagship device — unlocking the high‑FPS modes, HD graphics and premium tiers that\nare otherwise gated to specific hardware. It pairs that with a **CPU spoofer**, a userspace\n**comfort‑tweak controller**, and a beautiful on‑device **WebUI** to manage everything — all\n**without rebooting**.\n\n<table>\n<tr>\n<td width=\"50%\" valign=\"top\">\n\n#### 🎯 Device Spoofing\nPer‑app device profiles (brand, model, fingerprint, SDK, **baseband**, **per‑app serial** and 12\nextra Build fields) so each game sees the exact flagship it rewards.\n\n#### 👥 Per‑User Spoofing *(new)*\nGive the **same app a different device per Android user** — dual‑apps / app clones (HyperOS, One UI),\nwork profiles, second users. The main copy reads one phone, the clone reads another; each clone even\ngets its own derived Android ID / serial / advertising ID / IMEI. The app picker's **\"Apps for\"**\ndrawer finds your clones automatically.\n\n#### ⚙️ CPU Spoofing\nSpoof the CPU to flagship‑class silicon for apps that gate features on the chipset.\n\n#### 🎨 GPU Spoofing *(PRO · opt‑in)*\nSpoof the **GPU** — OpenGL renderer/vendor &amp; Vulkan device name — per app for games that gate\ngraphics on the chip. **GPU spoofing is a PRO feature** (unlocked with a license). It's a **resident**\nhook, so it sits behind a clear *use‑at‑your‑own‑risk* gate — **never enable it for anti‑cheat games.**\n\n#### 🖥️ Refresh‑Rate Spoof *(free)*\nMake an app read a **custom display refresh rate** (e.g. 120 / 144 / 165 Hz) — the current rate **and**\nthe full supported‑modes list — for device‑info apps and games that show or gate on the panel's Hz.\nResident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.\n\n#### 📡 IMEI &amp; Device ID *(PRO)*\nFake the **IMEI / device ID** — **per app**, or **device‑wide** with the new **Global IMEI** (hooks the\nphone service so Settings, `*#06#` and every app read it; runs in a separate process apps can't scan, so\n**no risk gate**).\n\n#### 🔒 DRM / Widevine *(PRO)*\nReport a higher **Widevine security level** (L1 / L2 / L3) and spoof the DRM **device &amp; system ID**\nfor apps that gate or display it.\n\n#### 🌍 Timezone &amp; Language *(free)*\nGive each app its own **timezone** and its own **language / region** (BCP‑47) — apps read and even\n**render** in the fake locale. Applied the stealth, system‑side way, so nothing loads into the app.\n\n#### ⏱️ Fake Uptime *(PRO)*\nMake an app think the device has been running for **days** — shifts both the Java and native uptime\nreaders, useful against anti‑fraud / referral flows that distrust a freshly‑reset device.\n\n#### 🌐 WebView User‑Agent *(PRO)*\nGive any WebView‑based app its own **browser User‑Agent** — from a reusable named profile — for sites\nand in‑app pages that gate content, layout or pricing on the browser identity.\n\n#### 📸 Screenshot &amp; Storage Unlocks *(free)*\n**Disable FLAG_SECURE** device‑wide to screenshot / screen‑record apps that block it (banking, chat,\nwallets) — done in the system, invisible to the app · **No Storage Restrict** re‑enables picking\nAndroid/data, obb, the SD‑card root and Download in the system file picker. Both toggle with no reboot.\n\n#### 🎟️ Play Source &amp; PairIP Bypass *(PRO)*\nMake an app look **Play‑installed** (installer → Google Play) and **block Google's PairIP license\ncheck** so paid / locked apps open normally. Both run in the system, out of the app — nothing loads\ninto the app's process, so they're **not detectable**.\n\n</td>\n<td width=\"50%\" valign=\"top\">\n\n#### 🧬 Prop Spoofing &amp; Android ID\nStealth **copy‑on‑write** prop spoof (fingerprint, build props &amp; more) *(PRO)* and per‑app\n**Android ID** *(PRO)* — both are stealth: the module unloads before the game runs, so nothing of\nCOPG stays mapped in memory — safe even for anti‑cheat games. (CPU spoof, device profiles, Build/serial\nfields and block‑CPU stay free.)\n\n#### 📶 SIM / Carrier Spoofing *(PRO)*\nMake an app read a different **network carrier** — name, operator code (MCC/MNC) &amp; country — per\napp, even a **different carrier per SIM slot**. Also spoof the per‑app, per‑slot **IMSI** and **ICCID**\n(SIM serial). **Safe** mode is fully stealth (anti‑cheat safe); **Aggressive** mode also covers the\nnewer subscription API but is resident (opt‑in, never for anti‑cheat games).\n\n#### 🆔 Per‑App Advertising ID *(PRO)*\nGive each app its **own Google Advertising ID** — automatic per‑app, or pin an exact UUID — for ad /\nreward / referral / multi‑account apps where each install should look like a different device.\n\n#### 🧩 Per‑App App Set ID *(PRO)*\nGive each app its **own Google App Set ID** — the resettable fingerprint signal ad / analytics SDKs\nread via Play Services — automatic per‑app, or pin an exact UUID, so each looks like a separate device.\nIt's a **resident** hook behind a *use‑at‑your‑own‑risk* gate — **never for anti‑cheat games.**\n\n#### 🌐 Per‑App Proxy *(PRO)*\nRoute a single app through your own **SOCKS5 / HTTP / SOCKS4** proxy so its traffic exits from that IP\nand country — no VPN, no interface the app can see, nothing runs inside the app (kernel‑level, ban‑safe).\nSave proxies and assign one per app; pair with a matching SIM/region so device, SIM and IP all agree.\n\n#### 📍 GPS Location Spoof *(PRO)*\nPut an app **anywhere on the map** — pick a country/city from the built‑in list (135 places) or drop in\nyour own latitude/longitude. Covers the normal location APIs **and** Google's Fused/GMS provider; only\nlat/lng change (accuracy/altitude stay real). Resident hook behind a *use‑at‑your‑own‑risk* gate —\nnever for anti‑cheat games.\n\n#### 🗼 Cell Tower Spoof *(PRO)*\nReport a **fake serving cell** to an app — set the area code (LAC/TAC), cell ID (CID/CI/NCI) and\noptional **MCC/MNC** (network operator), so apps reading the cell towers (including `getAllCellInfo`)\nsee a consistent fake location **and** carrier instead of your real one. Pairs with GPS + SIM so\nlocation, coordinates and network all agree. Resident hook behind a *use‑at‑your‑own‑risk* gate.\n\n#### 🧭 Sensor Spoof *(PRO · new)*\nGive each app its **own sensor fingerprint**. Anti‑fraud SDKs hash the device's sensor list\n(accelerometer, gyroscope, magnetometer…) into a stable ID — and a build that says one phone while the\nsensors say another is a red flag. COPG rewrites each sensor's **name *and* vendor** with a per‑app,\nstable‑but‑unique value. Resident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.\n\n#### 🖼️ WebView Canvas Spoof *(PRO · new)*\nBreak **canvas fingerprinting** in WebView apps. Sites hash a hidden `<canvas>` to identify you; COPG adds\ntiny, per‑app, *stable* noise so every WebView app reads a different but consistent canvas fingerprint,\nincluding inside iframes. (WebGL is already covered by GPU spoof.) Resident hook, risk‑gated.\n\n#### 🧠 Tensor Feature Unlock *(PRO · new)*\nMake chosen apps see Google's Pixel **Tensor** system features — so Google apps expose their Tensor‑gated\n**AI / exclusive functionality**. Runs **out‑of‑process in `system_server`**, so nothing loads into the\napp and it's undetectable (under the System‑Server Spoofs master switch — enable + reboot).\n\n#### 👤 Google Account Spoof *(PRO · new)*\nMake a chosen app read a **different Google‑account list** than the rest of your phone — **Hide** all\naccounts, or show one **fake email** per persona. Anti‑fraud SDKs (DoorDash / Forter) use the signed‑in\naccounts and a hidden per‑account ID to tie \"different\" accounts back to one device across data‑clears;\nthis breaks that link. Out‑of‑process in `system_server` — stealth, pairip / anti‑cheat‑safe.\n\n#### 🏞️ Wallpaper ID Spoof *(PRO · new)*\nReport a **per‑app wallpaper ID** — a number Android bumps on every wallpaper change that survives\ndata‑clear / reinstall, which fraud SDKs use as a device‑link signal. Set a normal‑looking value per\npersona so each looks like a different, real phone. Out‑of‑process (`system_server`), stealth, pairip‑safe.\n\n#### ⌨️ getprop Consistency *(PRO · new)*\nSome apps don't trust the Android APIs — they shell out to the **`getprop`** command and compare it\nagainst what the app reads directly, and a mismatch exposes the spoof. This makes a chosen app's child\n`getprop` return the **same spoofed values** as the API, so the cross‑check lines up. Pair it with the\nCOW Prop Spoof. Resident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.\n\n#### 🛡️ Privacy Hides\n**Hide VPN** — covers both the Java (network‑interface / capabilities) and native interface checks,\npairip‑safe *(free)* · **Mock‑Location hide** *(PRO)* · **Hide Developer Options + USB\ndebugging** (free) — pass the checks that banking &amp; privacy‑sensitive apps run.\n\n#### 🎛️ Per‑App Comfort Tweaks\nAuto **Do‑Not‑Disturb**, **disable auto‑brightness**, **keep screen on**, **stop logging** and a\nper‑app **screen DPI** — applied only while a tagged game is active, then restored.\n\n#### 📦 Install Patches *(free)*\nDevice‑wide package‑installer patches so you can install **modified, re‑signed or downgraded APKs**:\ndisable **signature verification** (and force signature‑match checks to pass), **allow downgrade**,\n**disable the install verifier** (Play Protect scan) and **allow compressed `resources.arsc`**. It patches\nAndroid's installer inside `system_server`, so nothing loads into any app. Under the System‑Server Spoofs\nmaster switch (enable + reboot). This lowers a real security boundary for every install — only install\nAPKs you trust.\n\n#### 🎙️ Concurrent Mic *(free · new)*\nLet **two apps use the microphone at once** — a game's in‑voice **plus** a screen recorder, or a call\napp while another app records. Android normally silences one capturer for privacy; COPG stops that\nsilencing device‑wide while enabled. It works **out‑of‑process in the audio server** (nothing loads\ninto the app), and toggles from the WebUI with **no reboot**.\n\n</td>\n</tr>\n</table>\n\n> 🔁 **Add or remove devices, games &amp; apps without a reboot.** ✨ Fully customizable. 🌍 10‑language\n> WebUI with Light / Dark / AMOLED themes.\n\n---\n\n## 🚀 Maximize Your Gaming\n\n<div align=\"center\">\n\n| Game | Unlock |\n|------|--------|\n| **Call of Duty Mobile** | 120 FPS (BR / MP) |\n| **PUBG Mobile / BGMI** | 120 FPS · Haptic Feedback |\n| **Delta Force** | 120 FPS · HD Graphics |\n| **Free Fire / Free Fire MAX** | 144 FPS |\n| **Mobile Legends: Bang Bang** | 144 FPS |\n| **Fortnite** | 120 FPS |\n| **Asphalt 9** | 120 FPS |\n| **Farlight 84** | Max Graphics |\n| **Arena Breakout** | 90 / 120 FPS |\n| **Honor of Kings** | High‑FPS mode |\n| _…and 69+ more_ | Premium tiers unlocked |\n\n</div>\n\n#### 📱 App Enhancements\n- **TikTok** — stream in full 1080p\n\n---\n\n## 🖼️ Screenshots\n\n<div align=\"center\">\n<table>\n  <tr>\n    <td align=\"center\" width=\"25%\">\n      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260703-114658_WebUI%20X.png?raw=true\" alt=\"Dashboard\" />\n      <br><sub><b>Dashboard</b> · System info</sub>\n    </td>\n    <td align=\"center\" width=\"25%\">\n      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260712-032329_WebUI%20X.png?raw=true\" alt=\"Library packages\" />\n      <br><sub><b>Library</b> · Packages</sub>\n    </td>\n    <td align=\"center\" width=\"25%\">\n      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260711-113747_WebUI%20X.png?raw=true\" alt=\"Per-app spoof toggles\" />\n      <br><sub><b>Per-App</b> · Spoof toggles</sub>\n    </td>\n    <td align=\"center\" width=\"25%\">\n      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260702-162602_WebUI%20X.png?raw=true\" alt=\"GPU profile editor\" />\n      <br><sub><b>GPU</b> · Profile editor</sub>\n    </td>\n  </tr>\n</table>\n</div>\n\n---\n\n## 📦 Installation\n\n### Requirements\n\n- A **rooted** Android device (**9.0+**)\n- One root solution **+ a Zygisk implementation**:\n\n| Root | Min&nbsp;version | Zygisk |\n|------|:------:|--------|\n| ![Magisk](https://img.shields.io/badge/Magisk-v24%2B-00B39B?style=flat&logo=android&logoColor=white) | 24 | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) · [ReZygisk](https://github.com/PerformanC/ReZygisk) · [NeoZygisk](https://github.com/JingMatrix/NeoZygisk) |\n| ![KernelSU](https://img.shields.io/badge/KernelSU-0.6.6%2B-7D4698?style=flat) | 0.6.6 | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) · [ReZygisk](https://github.com/PerformanC/ReZygisk) · [NeoZygisk](https://github.com/JingMatrix/NeoZygisk) |\n| ![APatch](https://img.shields.io/badge/APatch-0.10%2B-4285F4?style=flat) | 0.10 | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) · [ReZygisk](https://github.com/PerformanC/ReZygisk) · [NeoZygisk](https://github.com/JingMatrix/NeoZygisk) |\n\n> [!IMPORTANT]\n> Standard / built‑in **Magisk Zygisk is _not_ supported** (not safe). Use one of the Zygisk\n> implementations above.\n\n### Get the module\n\n[![MMRL](https://mmrl.dev/assets/badge.svg)](https://mmrl.dev/repository/zguectZGR/COPG)\n[![Magisk Alt Repo](https://img.shields.io/badge/Magisk_Alt_Repo-COPG-00B39B?style=for-the-badge&logo=magisk&logoColor=white)](https://github.com/Magisk-Modules-Alt-Repo/COPG)\n[![KernelSU Repo](https://img.shields.io/badge/KernelSU_Repo-COPG-7D4698?style=for-the-badge)](https://github.com/KernelSU-Modules-Repo/COPG)\n\nInstall from **[MMRL](https://mmrl.dev/repository/zguectZGR/COPG)** (auto‑updates), from the\n**[Magisk Alt Repo](https://github.com/Magisk-Modules-Alt-Repo/COPG)** or the\n**[KernelSU Modules Repo](https://github.com/KernelSU-Modules-Repo/COPG)**, or grab the latest\n`COPG.zip` from **[Releases](https://github.com/AlirezaParsi/COPG/releases)**.\n\n### Steps\n\n1. Download the latest **`COPG.zip`** from [Releases](https://github.com/AlirezaParsi/COPG/releases).\n2. Install via your root manager → **Modules → Install from storage → select the ZIP**.\n3. **Reboot.**\n4. Verify it shows up in your root manager (look for **✨ COPG spoof ✨**).\n5. Open the module's **WebUI** to manage devices, games and tweaks.\n\n---\n\n## 🖥️ WebUI\n\nA no‑reboot, on‑device control panel built into the module. On **KernelSU** and **APatch** it opens\nstraight from the manager. On **Magisk**, install the **KSU WebUI** app and open COPG from there.\n\n- 📋 **Library** — add &amp; manage **device profiles** and **per‑app spoof lists** with search,\n  sort &amp; filters\n- ➕ **Add Package** — pick any installed app, choose a device profile, toggle **CPU / GPU / SIM /\n  Prop / Android ID / Advertising ID (GAID) / App Set ID / DRM / IMEI / Sensor / Canvas / Tensor /\n  GPS / Proxy / Timezone / Language / WebView User‑Agent / Fake Uptime / Mock‑Location / Hide VPN /\n  Hide Developer Options** and the **DND / Auto‑Brightness / Keep‑Screen‑On / Screen‑DPI** tweaks\n- 📊 **Dashboard** — live system info: Android, ABI, Zygisk variant, root &amp; kernel\n- ✅ **Hook Status** — device‑wide board (Settings) showing the spoof values COPG has actually served\n  recently (model, CPU, Android ID, sensors, carrier…) with which app and when\n- 🆔 **Advertising ID** — view, randomize, set a custom one or restore your real ID (Settings · free)\n- 📡 **Global Hooks** — device‑wide **Global IMEI** (Settings): one fake IMEI for every app, `*#06#`\n  and the dialer\n- 💾 **Backup / Restore** &amp; **Sync from GitHub**\n- 🎨 **Light / Dark / AMOLED** themes · 🌍 **10 languages** (EN, FA, AR, DE, ES, PT‑BR, ID, TH, TR, ZH)\n\n<details>\n<summary><b>⚙️ Advanced — edit profiles by hand</b></summary>\n\n<br>\n\nThe WebUI is the recommended way to manage profiles, but you can also edit\n`/data/adb/modules/COPG/COPG.json` directly:\n\n```json\n{\n  \"PACKAGES_REDMAGIC_9_PRO\": [\n    \"com.mobilelegends.mi\",\n    \"com.supercell.brawlstars:with_cpu\"\n  ],\n  \"PACKAGES_REDMAGIC_9_PRO_DEVICE\": {\n    \"BRAND\": \"ZTE\",\n    \"MODEL\": \"NX769J\",\n    \"FINGERPRINT\": \"ZTE/NX769J/...\"\n  }\n}\n```\n\nPackage **tags** are colon suffixes — e.g. `:cpu=<model>` (CPU spoof + pick the chip),\n`:gpu=<model>` (GPU spoof + pick the GPU), `:cow` (prop spoof), `:aid` (Android ID),\n`:serial` (per‑app serial), `:gaid` (Advertising ID), `:appset` (App Set ID), `:drm` (Widevine),\n`:imei` (IMEI), `:sim=<carrier>` / `:simx=<carrier>` (SIM · safe / aggressive), `:tz=<zone>` (timezone),\n`:lang=<bcp47>` (language / region), `:ua=<profile>` (WebView User‑Agent), `:uptime=<sec>` (fake uptime),\n`:sensor` (sensor‑roster spoof), `:webfp` (WebView canvas spoof), `:tensorfeat` (Pixel Tensor features),\n`:gps=<lat>,<lng>` (GPS location), `:proxy` (per‑app proxy),\n`:mock` (mock‑location hide), `:vpn` / `:vpns` (VPN hide), `:hidedev` (hide developer options),\n`:blocked` (force real CPU), `:dnd` / `:dab` / `:kso` / `:nolog` / `:dpi=<n>` (comfort tweaks).\n\n</details>\n\n---\n\n## ❓ FAQ\n\n<details>\n<summary><b>🤔 What does COPG stand for?</b></summary>\n<br>\nOriginally <b>CO</b> (Call of Duty) + <b>PG</b> (PUBG) — the two games it was first built for. It\nnow supports most games and apps, but the name is kept for its history.\n</details>\n\n<details>\n<summary><b>📌 Will this get me banned?</b></summary>\n<br>\nCOPG is designed to be undetectable, but safety can't be guaranteed. <b>Use at your own risk.</b>\n</details>\n\n<details>\n<summary><b>⚡ Does it affect performance?</b></summary>\n<br>\nMinimal. The spoof runs only at app launch and doesn't touch in‑game performance.\n</details>\n\n<details>\n<summary><b>🔧 How do I open the WebUI?</b></summary>\n<br>\nOn <b>KernelSU</b> and <b>APatch</b>, open it straight from the manager. On <b>Magisk</b>, install\nthe <b>KSU WebUI</b> app and open COPG from there.\n</details>\n\n---\n\n## 💬 Community\n\n<div align=\"center\">\n\n[![Telegram Channel](https://img.shields.io/badge/Telegram_Channel-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/COPG_module)\n[![Telegram Group](https://img.shields.io/badge/Telegram_Group-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/TheAOSP)\n[![Email](https://img.shields.io/badge/Email-support@copg.my-EA4335?style=for-the-badge&logo=maildotru&logoColor=white)](mailto:support@copg.my)\n\n**📧 Support email: [support@copg.my](mailto:support@copg.my)**\n\n</div>\n\n> 🌐 **Translations are community‑driven.** Only English &amp; Persian are maintained by the author —\n> PRs for the other languages are very welcome!\n\n---\n\n## ₿ Support COPG\n\nCOPG is developed in my spare time and given away free. If it leveled up your games or apps, please consider\nsupporting with **any amount you wish** — every bit is real motivation for stronger, continued\ndevelopment. And a ⭐ on GitHub helps a lot too!\n\n| Network | Address |\n| --- | --- |\n| ![USDT ERC20](https://img.shields.io/badge/USDT-ERC20-627EEA?style=flat-square&logo=ethereum&logoColor=white) | `0xB8eb7Ea033823C9aA4616B0648B89CDbC931BAAd` |\n| ![USDT BEP20](https://img.shields.io/badge/USDT-BEP20-F0B90B?style=flat-square&logo=binance&logoColor=white) | `0xB8eb7Ea033823C9aA4616B0648B89CDbC931BAAd` |\n| ![GRAM TON](https://img.shields.io/badge/GRAM-TON-0098EA?style=flat-square&logo=ton&logoColor=white) | `UQAOHoREeGeJ0_kzJpSW3m-6Dlb_lzdHpT1a-gA7NkbuCM8N` |\n\n> ⚠️ Double‑check the **network** before sending — funds sent on the wrong chain can be lost.\n\n---\n\n## 📈 Activity\n\n<div align=\"center\">\n\n![Repobeats analytics](https://repobeats.axiom.co/api/embed/83b280d0986b3c023ed5f1fdf3f00f77288e3da3.svg \"Repobeats analytics image\")\n\n</div>\n\n---\n\n<div align=\"center\">\n\n**If COPG leveled up your games or apps, drop a ⭐ — it really helps!**\n\nMade with ❤️ by **Alireza Parsi** · © 2026 COPG Project\n\n</div>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"https://raw.githubusercontent.com/AlirezaParsi/COPG/refs/heads/JSON/module/banner.png\" width=\"560\" alt=\"COPG banner\" /></p>\n\n<h1>🎮 COPG — Advanced Android Customization & Spoofing</h1>\n\n<p><b>A powerful platform for device & app spoofing, system-level control, and advanced ROM capabilities.</b></p>\n\n<p><br></p>\n\n<p><a href=\"https://img.shields.io/badge/version-7.3.0-818cf8?style=for-the-badge\">![Version</a>](https://github.com/AlirezaParsi/COPG/releases)</p>\n<p><a href=\"https://img.shields.io/badge/Zygisk-Compatible-34d399?style=for-the-badge\">![Zygisk</a>](https://github.com/topjohnwu/Magisk)</p>\n<p><a href=\"https://img.shields.io/badge/Android-9.0%2B-3ddc84?style=for-the-badge&logo=android&logoColor=white\">![Android</a>](https://www.android.com/)</p>\n<p><a href=\"https://img.shields.io/github/downloads/AlirezaParsi/COPG/total?style=for-the-badge&color=f59e0b\">![Downloads</a>](https://github.com/AlirezaParsi/COPG/releases)</p>\n<p><a href=\"https://img.shields.io/github/license/AlirezaParsi/COPG?style=for-the-badge&color=a78bfa\">![License</a>](LICENSE)</p>\n\n<p><a href=\"#-installation\"><img src=\"https://img.shields.io/badge/⬇_Install-818cf8?style=for-the-badge\" alt=\"Install\" /></a></p>\n<p><a href=\"#-webui\"><img src=\"https://img.shields.io/badge/🖥_WebUI-1f2937?style=for-the-badge\" alt=\"WebUI\" /></a></p>\n<p><a href=\"#-faq\"><img src=\"https://img.shields.io/badge/❓_FAQ-1f2937?style=for-the-badge\" alt=\"FAQ\" /></a></p>\n<p><a href=\"https://t.me/COPG_module\"><img src=\"https://img.shields.io/badge/💬_Telegram-2CA5E0?style=for-the-badge\" alt=\"Telegram\" /></a></p>\n<p><a href=\"https://vendors.copg.my\"><img src=\"https://img.shields.io/badge/🌐_Website-6d28d9?style=for-the-badge\" alt=\"COPG Website\" /></a></p>\n<p><a href=\"#-support-copg\"><img src=\"https://img.shields.io/badge/Support-f59e0b?style=for-the-badge&logo=bitcoin&logoColor=white\" alt=\"Support\" /></a></p>\n\n<p><b>🌐 Official website — download COPG free & buy COPG PRO: <a href=\"https://vendors.copg.my\">vendors.copg.my</a></b></p>\n\n<p>🌐 Languages / 语言：<b>English</b> · <a href=\"README.zh.md\">简体中文</a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>✨ Why COPG?</h2>\n\n<p>COPG is a <b>Zygisk module</b> that makes most games and apps believe they are running on a different,</p>\n<p>fully‑featured flagship device — unlocking the high‑FPS modes, HD graphics and premium tiers that</p>\n<p>are otherwise gated to specific hardware. It pairs that with a <b>CPU spoofer</b>, a userspace</p>\n<p><b>comfort‑tweak controller</b>, and a beautiful on‑device <b>WebUI</b> to manage everything — all</p>\n<p><b>without rebooting</b>.</p>\n\n<p><table></p>\n<p><tr></p>\n<p><td width=\"50%\" valign=\"top\"></p>\n\n<p>#### 🎯 Device Spoofing</p>\n<p>Per‑app device profiles (brand, model, fingerprint, SDK, <b>baseband</b>, <b>per‑app serial</b> and 12</p>\n<p>extra Build fields) so each game sees the exact flagship it rewards.</p>\n\n<p>#### 👥 Per‑User Spoofing *(new)*</p>\n<p>Give the <b>same app a different device per Android user</b> — dual‑apps / app clones (HyperOS, One UI),</p>\n<p>work profiles, second users. The main copy reads one phone, the clone reads another; each clone even</p>\n<p>gets its own derived Android ID / serial / advertising ID / IMEI. The app picker's <b>\"Apps for\"</b></p>\n<p>drawer finds your clones automatically.</p>\n\n<p>#### ⚙️ CPU Spoofing</p>\n<p>Spoof the CPU to flagship‑class silicon for apps that gate features on the chipset.</p>\n\n<p>#### 🎨 GPU Spoofing *(PRO · opt‑in)*</p>\n<p>Spoof the <b>GPU</b> — OpenGL renderer/vendor &amp; Vulkan device name — per app for games that gate</p>\n<p>graphics on the chip. <b>GPU spoofing is a PRO feature</b> (unlocked with a license). It's a <b>resident</b></p>\n<p>hook, so it sits behind a clear *use‑at‑your‑own‑risk* gate — <b>never enable it for anti‑cheat games.</b></p>\n\n<p>#### 🖥️ Refresh‑Rate Spoof *(free)*</p>\n<p>Make an app read a <b>custom display refresh rate</b> (e.g. 120 / 144 / 165 Hz) — the current rate <b>and</b></p>\n<p>the full supported‑modes list — for device‑info apps and games that show or gate on the panel's Hz.</p>\n<p>Resident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.</p>\n\n<p>#### 📡 IMEI &amp; Device ID *(PRO)*</p>\n<p>Fake the <b>IMEI / device ID</b> — <b>per app</b>, or <b>device‑wide</b> with the new <b>Global IMEI</b> (hooks the</p>\n<p>phone service so Settings, <code>*#06#</code> and every app read it; runs in a separate process apps can't scan, so</p>\n<p><b>no risk gate</b>).</p>\n\n<p>#### 🔒 DRM / Widevine *(PRO)*</p>\n<p>Report a higher <b>Widevine security level</b> (L1 / L2 / L3) and spoof the DRM <b>device &amp; system ID</b></p>\n<p>for apps that gate or display it.</p>\n\n<p>#### 🌍 Timezone &amp; Language *(free)*</p>\n<p>Give each app its own <b>timezone</b> and its own <b>language / region</b> (BCP‑47) — apps read and even</p>\n<p><b>render</b> in the fake locale. Applied the stealth, system‑side way, so nothing loads into the app.</p>\n\n<p>#### ⏱️ Fake Uptime *(PRO)*</p>\n<p>Make an app think the device has been running for <b>days</b> — shifts both the Java and native uptime</p>\n<p>readers, useful against anti‑fraud / referral flows that distrust a freshly‑reset device.</p>\n\n<p>#### 🌐 WebView User‑Agent *(PRO)*</p>\n<p>Give any WebView‑based app its own <b>browser User‑Agent</b> — from a reusable named profile — for sites</p>\n<p>and in‑app pages that gate content, layout or pricing on the browser identity.</p>\n\n<p>#### 📸 Screenshot &amp; Storage Unlocks *(free)*</p>\n<p><b>Disable FLAG_SECURE</b> device‑wide to screenshot / screen‑record apps that block it (banking, chat,</p>\n<p>wallets) — done in the system, invisible to the app · <b>No Storage Restrict</b> re‑enables picking</p>\n<p>Android/data, obb, the SD‑card root and Download in the system file picker. Both toggle with no reboot.</p>\n\n<p>#### 🎟️ Play Source &amp; PairIP Bypass *(PRO)*</p>\n<p>Make an app look <b>Play‑installed</b> (installer → Google Play) and **block Google's PairIP license</p>\n<p>check** so paid / locked apps open normally. Both run in the system, out of the app — nothing loads</p>\n<p>into the app's process, so they're <b>not detectable</b>.</p>\n\n<p></td></p>\n<p><td width=\"50%\" valign=\"top\"></p>\n\n<p>#### 🧬 Prop Spoofing &amp; Android ID</p>\n<p>Stealth <b>copy‑on‑write</b> prop spoof (fingerprint, build props &amp; more) *(PRO)* and per‑app</p>\n<p><b>Android ID</b> *(PRO)* — both are stealth: the module unloads before the game runs, so nothing of</p>\n<p>COPG stays mapped in memory — safe even for anti‑cheat games. (CPU spoof, device profiles, Build/serial</p>\n<p>fields and block‑CPU stay free.)</p>\n\n<p>#### 📶 SIM / Carrier Spoofing *(PRO)*</p>\n<p>Make an app read a different <b>network carrier</b> — name, operator code (MCC/MNC) &amp; country — per</p>\n<p>app, even a <b>different carrier per SIM slot</b>. Also spoof the per‑app, per‑slot <b>IMSI</b> and <b>ICCID</b></p>\n<p>(SIM serial). <b>Safe</b> mode is fully stealth (anti‑cheat safe); <b>Aggressive</b> mode also covers the</p>\n<p>newer subscription API but is resident (opt‑in, never for anti‑cheat games).</p>\n\n<p>#### 🆔 Per‑App Advertising ID *(PRO)*</p>\n<p>Give each app its <b>own Google Advertising ID</b> — automatic per‑app, or pin an exact UUID — for ad /</p>\n<p>reward / referral / multi‑account apps where each install should look like a different device.</p>\n\n<p>#### 🧩 Per‑App App Set ID *(PRO)*</p>\n<p>Give each app its <b>own Google App Set ID</b> — the resettable fingerprint signal ad / analytics SDKs</p>\n<p>read via Play Services — automatic per‑app, or pin an exact UUID, so each looks like a separate device.</p>\n<p>It's a <b>resident</b> hook behind a *use‑at‑your‑own‑risk* gate — <b>never for anti‑cheat games.</b></p>\n\n<p>#### 🌐 Per‑App Proxy *(PRO)*</p>\n<p>Route a single app through your own <b>SOCKS5 / HTTP / SOCKS4</b> proxy so its traffic exits from that IP</p>\n<p>and country — no VPN, no interface the app can see, nothing runs inside the app (kernel‑level, ban‑safe).</p>\n<p>Save proxies and assign one per app; pair with a matching SIM/region so device, SIM and IP all agree.</p>\n\n<p>#### 📍 GPS Location Spoof *(PRO)*</p>\n<p>Put an app <b>anywhere on the map</b> — pick a country/city from the built‑in list (135 places) or drop in</p>\n<p>your own latitude/longitude. Covers the normal location APIs <b>and</b> Google's Fused/GMS provider; only</p>\n<p>lat/lng change (accuracy/altitude stay real). Resident hook behind a *use‑at‑your‑own‑risk* gate —</p>\n<p>never for anti‑cheat games.</p>\n\n<p>#### 🗼 Cell Tower Spoof *(PRO)*</p>\n<p>Report a <b>fake serving cell</b> to an app — set the area code (LAC/TAC), cell ID (CID/CI/NCI) and</p>\n<p>optional <b>MCC/MNC</b> (network operator), so apps reading the cell towers (including <code>getAllCellInfo</code>)</p>\n<p>see a consistent fake location <b>and</b> carrier instead of your real one. Pairs with GPS + SIM so</p>\n<p>location, coordinates and network all agree. Resident hook behind a *use‑at‑your‑own‑risk* gate.</p>\n\n<p>#### 🧭 Sensor Spoof *(PRO · new)*</p>\n<p>Give each app its <b>own sensor fingerprint</b>. Anti‑fraud SDKs hash the device's sensor list</p>\n<p>(accelerometer, gyroscope, magnetometer…) into a stable ID — and a build that says one phone while the</p>\n<p>sensors say another is a red flag. COPG rewrites each sensor's **name *and* vendor** with a per‑app,</p>\n<p>stable‑but‑unique value. Resident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.</p>\n\n<p>#### 🖼️ WebView Canvas Spoof *(PRO · new)*</p>\n<p>Break <b>canvas fingerprinting</b> in WebView apps. Sites hash a hidden <code><canvas></code> to identify you; COPG adds</p>\n<p>tiny, per‑app, *stable* noise so every WebView app reads a different but consistent canvas fingerprint,</p>\n<p>including inside iframes. (WebGL is already covered by GPU spoof.) Resident hook, risk‑gated.</p>\n\n<p>#### 🧠 Tensor Feature Unlock *(PRO · new)*</p>\n<p>Make chosen apps see Google's Pixel <b>Tensor</b> system features — so Google apps expose their Tensor‑gated</p>\n<p><b>AI / exclusive functionality</b>. Runs <b>out‑of‑process in <code>system_server</code></b>, so nothing loads into the</p>\n<p>app and it's undetectable (under the System‑Server Spoofs master switch — enable + reboot).</p>\n\n<p>#### 👤 Google Account Spoof *(PRO · new)*</p>\n<p>Make a chosen app read a <b>different Google‑account list</b> than the rest of your phone — <b>Hide</b> all</p>\n<p>accounts, or show one <b>fake email</b> per persona. Anti‑fraud SDKs (DoorDash / Forter) use the signed‑in</p>\n<p>accounts and a hidden per‑account ID to tie \"different\" accounts back to one device across data‑clears;</p>\n<p>this breaks that link. Out‑of‑process in <code>system_server</code> — stealth, pairip / anti‑cheat‑safe.</p>\n\n<p>#### 🏞️ Wallpaper ID Spoof *(PRO · new)*</p>\n<p>Report a <b>per‑app wallpaper ID</b> — a number Android bumps on every wallpaper change that survives</p>\n<p>data‑clear / reinstall, which fraud SDKs use as a device‑link signal. Set a normal‑looking value per</p>\n<p>persona so each looks like a different, real phone. Out‑of‑process (<code>system_server</code>), stealth, pairip‑safe.</p>\n\n<p>#### ⌨️ getprop Consistency *(PRO · new)*</p>\n<p>Some apps don't trust the Android APIs — they shell out to the <b><code>getprop</code></b> command and compare it</p>\n<p>against what the app reads directly, and a mismatch exposes the spoof. This makes a chosen app's child</p>\n<p><code>getprop</code> return the <b>same spoofed values</b> as the API, so the cross‑check lines up. Pair it with the</p>\n<p>COW Prop Spoof. Resident hook behind a *use‑at‑your‑own‑risk* gate — never for anti‑cheat games.</p>\n\n<p>#### 🛡️ Privacy Hides</p>\n<p><b>Hide VPN</b> — covers both the Java (network‑interface / capabilities) and native interface checks,</p>\n<p>pairip‑safe *(free)* · <b>Mock‑Location hide</b> *(PRO)* · **Hide Developer Options + USB</p>\n<p>debugging** (free) — pass the checks that banking &amp; privacy‑sensitive apps run.</p>\n\n<p>#### 🎛️ Per‑App Comfort Tweaks</p>\n<p>Auto <b>Do‑Not‑Disturb</b>, <b>disable auto‑brightness</b>, <b>keep screen on</b>, <b>stop logging</b> and a</p>\n<p>per‑app <b>screen DPI</b> — applied only while a tagged game is active, then restored.</p>\n\n<p>#### 📦 Install Patches *(free)*</p>\n<p>Device‑wide package‑installer patches so you can install <b>modified, re‑signed or downgraded APKs</b>:</p>\n<p>disable <b>signature verification</b> (and force signature‑match checks to pass), <b>allow downgrade</b>,</p>\n<p><b>disable the install verifier</b> (Play Protect scan) and <b>allow compressed <code>resources.arsc</code></b>. It patches</p>\n<p>Android's installer inside <code>system_server</code>, so nothing loads into any app. Under the System‑Server Spoofs</p>\n<p>master switch (enable + reboot). This lowers a real security boundary for every install — only install</p>\n<p>APKs you trust.</p>\n\n<p>#### 🎙️ Concurrent Mic *(free · new)*</p>\n<p>Let <b>two apps use the microphone at once</b> — a game's in‑voice <b>plus</b> a screen recorder, or a call</p>\n<p>app while another app records. Android normally silences one capturer for privacy; COPG stops that</p>\n<p>silencing device‑wide while enabled. It works <b>out‑of‑process in the audio server</b> (nothing loads</p>\n<p>into the app), and toggles from the WebUI with <b>no reboot</b>.</p>\n\n<p></td></p>\n<p></tr></p>\n<p></table></p>\n\n<p>> 🔁 <b>Add or remove devices, games &amp; apps without a reboot.</b> ✨ Fully customizable. 🌍 10‑language</p>\n<p>> WebUI with Light / Dark / AMOLED themes.</p>\n\n<p>---</p>\n\n<h2>🚀 Maximize Your Gaming</h2>\n\n<p><div align=\"center\"></p>\n\n<p>| Game | Unlock |</p>\n<p>|------|--------|</p>\n<p>| <b>Call of Duty Mobile</b> | 120 FPS (BR / MP) |</p>\n<p>| <b>PUBG Mobile / BGMI</b> | 120 FPS · Haptic Feedback |</p>\n<p>| <b>Delta Force</b> | 120 FPS · HD Graphics |</p>\n<p>| <b>Free Fire / Free Fire MAX</b> | 144 FPS |</p>\n<p>| <b>Mobile Legends: Bang Bang</b> | 144 FPS |</p>\n<p>| <b>Fortnite</b> | 120 FPS |</p>\n<p>| <b>Asphalt 9</b> | 120 FPS |</p>\n<p>| <b>Farlight 84</b> | Max Graphics |</p>\n<p>| <b>Arena Breakout</b> | 90 / 120 FPS |</p>\n<p>| <b>Honor of Kings</b> | High‑FPS mode |</p>\n<p>| _…and 69+ more_ | Premium tiers unlocked |</p>\n\n<p></div></p>\n\n<p>#### 📱 App Enhancements</p>\n<li>**TikTok** — stream in full 1080p</li>\n\n<p>---</p>\n\n<h2>🖼️ Screenshots</h2>\n\n<p><div align=\"center\"></p>\n<p><table></p>\n<p>  <tr></p>\n<p>    <td align=\"center\" width=\"25%\"></p>\n<p>      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260703-114658_WebUI%20X.png?raw=true\" alt=\"Dashboard\" /></p>\n<p>      <br><sub><b>Dashboard</b> · System info</sub></p>\n<p>    </td></p>\n<p>    <td align=\"center\" width=\"25%\"></p>\n<p>      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260712-032329_WebUI%20X.png?raw=true\" alt=\"Library packages\" /></p>\n<p>      <br><sub><b>Library</b> · Packages</sub></p>\n<p>    </td></p>\n<p>    <td align=\"center\" width=\"25%\"></p>\n<p>      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260711-113747_WebUI%20X.png?raw=true\" alt=\"Per-app spoof toggles\" /></p>\n<p>      <br><sub><b>Per-App</b> · Spoof toggles</sub></p>\n<p>    </td></p>\n<p>    <td align=\"center\" width=\"25%\"></p>\n<p>      <img src=\"https://github.com/AlirezaParsi/COPG/blob/screenshots/Screenshot_20260702-162602_WebUI%20X.png?raw=true\" alt=\"GPU profile editor\" /></p>\n<p>      <br><sub><b>GPU</b> · Profile editor</sub></p>\n<p>    </td></p>\n<p>  </tr></p>\n<p></table></p>\n<p></div></p>\n\n<p>---</p>\n\n<h2>📦 Installation</h2>\n\n<h3>Requirements</h3>\n\n<li>A **rooted** Android device (**9.0+**)</li>\n<li>One root solution **+ a Zygisk implementation**:</li>\n\n<p>| Root | Min&nbsp;version | Zygisk |</p>\n<p>|------|:------:|--------|</p>\n<p>| !<a href=\"https://img.shields.io/badge/Magisk-v24%2B-00B39B?style=flat&logo=android&logoColor=white\">Magisk</a> | 24 | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> · <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> · <a href=\"https://github.com/JingMatrix/NeoZygisk\">NeoZygisk</a> |</p>\n<p>| !<a href=\"https://img.shields.io/badge/KernelSU-0.6.6%2B-7D4698?style=flat\">KernelSU</a> | 0.6.6 | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> · <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> · <a href=\"https://github.com/JingMatrix/NeoZygisk\">NeoZygisk</a> |</p>\n<p>| !<a href=\"https://img.shields.io/badge/APatch-0.10%2B-4285F4?style=flat\">APatch</a> | 0.10 | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> · <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> · <a href=\"https://github.com/JingMatrix/NeoZygisk\">NeoZygisk</a> |</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> Standard / built‑in <b>Magisk Zygisk is _not_ supported</b> (not safe). Use one of the Zygisk</p>\n<p>> implementations above.</p>\n\n<h3>Get the module</h3>\n\n<p><a href=\"https://mmrl.dev/assets/badge.svg\">![MMRL</a>](https://mmrl.dev/repository/zguectZGR/COPG)</p>\n<p><a href=\"https://img.shields.io/badge/Magisk_Alt_Repo-COPG-00B39B?style=for-the-badge&logo=magisk&logoColor=white\">![Magisk Alt Repo</a>](https://github.com/Magisk-Modules-Alt-Repo/COPG)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU_Repo-COPG-7D4698?style=for-the-badge\">![KernelSU Repo</a>](https://github.com/KernelSU-Modules-Repo/COPG)</p>\n\n<p>Install from <b><a href=\"https://mmrl.dev/repository/zguectZGR/COPG\">MMRL</a></b> (auto‑updates), from the</p>\n<p><b><a href=\"https://github.com/Magisk-Modules-Alt-Repo/COPG\">Magisk Alt Repo</a></b> or the</p>\n<p><b><a href=\"https://github.com/KernelSU-Modules-Repo/COPG\">KernelSU Modules Repo</a></b>, or grab the latest</p>\n<p><code>COPG.zip</code> from <b><a href=\"https://github.com/AlirezaParsi/COPG/releases\">Releases</a></b>.</p>\n\n<h3>Steps</h3>\n\n<li>Download the latest **`COPG.zip`** from [Releases](https://github.com/AlirezaParsi/COPG/releases).</li>\n<li>Install via your root manager → **Modules → Install from storage → select the ZIP**.</li>\n<li>**Reboot.**</li>\n<li>Verify it shows up in your root manager (look for **✨ COPG spoof ✨**).</li>\n<li>Open the module's **WebUI** to manage devices, games and tweaks.</li>\n\n<p>---</p>\n\n<h2>🖥️ WebUI</h2>\n\n<p>A no‑reboot, on‑device control panel built into the module. On <b>KernelSU</b> and <b>APatch</b> it opens</p>\n<p>straight from the manager. On <b>Magisk</b>, install the <b>KSU WebUI</b> app and open COPG from there.</p>\n\n<li>📋 **Library** — add &amp; manage **device profiles** and **per‑app spoof lists** with search,</li>\n<p>  sort &amp; filters</p>\n<li>➕ **Add Package** — pick any installed app, choose a device profile, toggle **CPU / GPU / SIM /</li>\n<p>  Prop / Android ID / Advertising ID (GAID) / App Set ID / DRM / IMEI / Sensor / Canvas / Tensor /</p>\n<p>  GPS / Proxy / Timezone / Language / WebView User‑Agent / Fake Uptime / Mock‑Location / Hide VPN /</p>\n<p>  Hide Developer Options<b> and the </b>DND / Auto‑Brightness / Keep‑Screen‑On / Screen‑DPI** tweaks</p>\n<li>📊 **Dashboard** — live system info: Android, ABI, Zygisk variant, root &amp; kernel</li>\n<li>✅ **Hook Status** — device‑wide board (Settings) showing the spoof values COPG has actually served</li>\n<p>  recently (model, CPU, Android ID, sensors, carrier…) with which app and when</p>\n<li>🆔 **Advertising ID** — view, randomize, set a custom one or restore your real ID (Settings · free)</li>\n<li>📡 **Global Hooks** — device‑wide **Global IMEI** (Settings): one fake IMEI for every app, `*#06#`</li>\n<p>  and the dialer</p>\n<li>💾 **Backup / Restore** &amp; **Sync from GitHub**</li>\n<li>🎨 **Light / Dark / AMOLED** themes · 🌍 **10 languages** (EN, FA, AR, DE, ES, PT‑BR, ID, TH, TR, ZH)</li>\n\n<p><details></p>\n<p><summary><b>⚙️ Advanced — edit profiles by hand</b></summary></p>\n\n<p><br></p>\n\n<p>The WebUI is the recommended way to manage profiles, but you can also edit</p>\n<p><code>/data/adb/modules/COPG/COPG.json</code> directly:</p>\n\n<pre>{\n  \"PACKAGES_REDMAGIC_9_PRO\": [\n    \"com.mobilelegends.mi\",\n    \"com.supercell.brawlstars:with_cpu\"\n  ],\n  \"PACKAGES_REDMAGIC_9_PRO_DEVICE\": {\n    \"BRAND\": \"ZTE\",\n    \"MODEL\": \"NX769J\",\n    \"FINGERPRINT\": \"ZTE/NX769J/...\"\n  }\n}</pre>\n\n<p>Package <b>tags</b> are colon suffixes — e.g. <code>:cpu=<model></code> (CPU spoof + pick the chip),</p>\n<p><code>:gpu=<model></code> (GPU spoof + pick the GPU), <code>:cow</code> (prop spoof), <code>:aid</code> (Android ID),</p>\n<p><code>:serial</code> (per‑app serial), <code>:gaid</code> (Advertising ID), <code>:appset</code> (App Set ID), <code>:drm</code> (Widevine),</p>\n<p><code>:imei</code> (IMEI), <code>:sim=<carrier></code> / <code>:simx=<carrier></code> (SIM · safe / aggressive), <code>:tz=<zone></code> (timezone),</p>\n<p><code>:lang=<bcp47></code> (language / region), <code>:ua=<profile></code> (WebView User‑Agent), <code>:uptime=<sec></code> (fake uptime),</p>\n<p><code>:sensor</code> (sensor‑roster spoof), <code>:webfp</code> (WebView canvas spoof), <code>:tensorfeat</code> (Pixel Tensor features),</p>\n<p><code>:gps=<lat>,<lng></code> (GPS location), <code>:proxy</code> (per‑app proxy),</p>\n<p><code>:mock</code> (mock‑location hide), <code>:vpn</code> / <code>:vpns</code> (VPN hide), <code>:hidedev</code> (hide developer options),</p>\n<p><code>:blocked</code> (force real CPU), <code>:dnd</code> / <code>:dab</code> / <code>:kso</code> / <code>:nolog</code> / <code>:dpi=<n></code> (comfort tweaks).</p>\n\n<p></details></p>\n\n<p>---</p>\n\n<h2>❓ FAQ</h2>\n\n<p><details></p>\n<p><summary><b>🤔 What does COPG stand for?</b></summary></p>\n<p><br></p>\n<p>Originally <b>CO</b> (Call of Duty) + <b>PG</b> (PUBG) — the two games it was first built for. It</p>\n<p>now supports most games and apps, but the name is kept for its history.</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>📌 Will this get me banned?</b></summary></p>\n<p><br></p>\n<p>COPG is designed to be undetectable, but safety can't be guaranteed. <b>Use at your own risk.</b></p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>⚡ Does it affect performance?</b></summary></p>\n<p><br></p>\n<p>Minimal. The spoof runs only at app launch and doesn't touch in‑game performance.</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>🔧 How do I open the WebUI?</b></summary></p>\n<p><br></p>\n<p>On <b>KernelSU</b> and <b>APatch</b>, open it straight from the manager. On <b>Magisk</b>, install</p>\n<p>the <b>KSU WebUI</b> app and open COPG from there.</p>\n<p></details></p>\n\n<p>---</p>\n\n<h2>💬 Community</h2>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/Telegram_Channel-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram Channel</a>](https://t.me/COPG_module)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram_Group-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram Group</a>](https://t.me/TheAOSP)</p>\n<p><a href=\"https://img.shields.io/badge/Email-support@copg.my-EA4335?style=for-the-badge&logo=maildotru&logoColor=white\">![Email</a>](mailto:support@copg.my)</p>\n\n<p><b>📧 Support email: <a href=\"mailto:support@copg.my\">support@copg.my</a></b></p>\n\n<p></div></p>\n\n<p>> 🌐 <b>Translations are community‑driven.</b> Only English &amp; Persian are maintained by the author —</p>\n<p>> PRs for the other languages are very welcome!</p>\n\n<p>---</p>\n\n<h2>₿ Support COPG</h2>\n\n<p>COPG is developed in my spare time and given away free. If it leveled up your games or apps, please consider</p>\n<p>supporting with <b>any amount you wish</b> — every bit is real motivation for stronger, continued</p>\n<p>development. And a ⭐ on GitHub helps a lot too!</p>\n\n<p>| Network | Address |</p>\n<p>| --- | --- |</p>\n<p>| !<a href=\"https://img.shields.io/badge/USDT-ERC20-627EEA?style=flat-square&logo=ethereum&logoColor=white\">USDT ERC20</a> | <code>0xB8eb7Ea033823C9aA4616B0648B89CDbC931BAAd</code> |</p>\n<p>| !<a href=\"https://img.shields.io/badge/USDT-BEP20-F0B90B?style=flat-square&logo=binance&logoColor=white\">USDT BEP20</a> | <code>0xB8eb7Ea033823C9aA4616B0648B89CDbC931BAAd</code> |</p>\n<p>| !<a href=\"https://img.shields.io/badge/GRAM-TON-0098EA?style=flat-square&logo=ton&logoColor=white\">GRAM TON</a> | <code>UQAOHoREeGeJ0_kzJpSW3m-6Dlb_lzdHpT1a-gA7NkbuCM8N</code> |</p>\n\n<p>> ⚠️ Double‑check the <b>network</b> before sending — funds sent on the wrong chain can be lost.</p>\n\n<p>---</p>\n\n<h2>📈 Activity</h2>\n\n<p><div align=\"center\"></p>\n\n<p>!<a href=\"https://repobeats.axiom.co/api/embed/83b280d0986b3c023ed5f1fdf3f00f77288e3da3.svg \"Repobeats analytics image\"\">Repobeats analytics</a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n\n<p><b>If COPG leveled up your games or apps, drop a ⭐ — it really helps!</b></p>\n\n<p>Made with ❤️ by <b>Alireza Parsi</b> · © 2026 COPG Project</p>\n\n<p></div></p>",
+  "homepageUrl": "http://vendors.copg.my",
+  "sourceUrl": "https://github.com/AlirezaParsi/COPG",
+  "url": "https://github.com/AlirezaParsi/COPG",
+  "latestRelease": {
+    "name": "v7.5.1",
+    "version": "v7.5.1",
+    "time": "2026-10-09T05:58:02Z",
+    "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.5.1/COPG-v7.5.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v7.5.1",
+      "tagName": "v7.5.1",
+      "publishedAt": "2026-10-09T05:58:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v7.5.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.5.1/COPG-v7.5.1.zip",
+          "size": 9083199,
+          "downloadCount": 997
+        }
+      ]
+    },
+    {
+      "name": "v7.5.0",
+      "tagName": "v7.5.0",
+      "publishedAt": "2026-10-08T18:08:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v7.5.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.5.0/COPG-v7.5.0.zip",
+          "size": 9082458,
+          "downloadCount": 339
+        }
+      ]
+    },
+    {
+      "name": "v7.3.0",
+      "tagName": "v7.3.0",
+      "publishedAt": "2026-09-29T14:16:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v7.3.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.3.0/COPG-v7.3.0.zip",
+          "size": 8234942,
+          "downloadCount": 4124
+        }
+      ]
+    },
+    {
+      "name": "v7.0.0",
+      "tagName": "v7.0.0",
+      "publishedAt": "2026-09-12T11:23:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v7.0.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.0.0/COPG-v7.0.0.zip",
+          "size": 7508083,
+          "downloadCount": 6422
+        }
+      ]
+    },
+    {
+      "name": "v6.9.8",
+      "tagName": "v6.9.8",
+      "publishedAt": "2026-09-11T07:47:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.9.8.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.9.8/COPG-v6.9.8.zip",
+          "size": 7421468,
+          "downloadCount": 770
+        }
+      ]
+    },
+    {
+      "name": "v6.8.0",
+      "tagName": "v6.8.0",
+      "publishedAt": "2026-09-03T21:46:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.8.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.8.0/COPG-v6.8.0.zip",
+          "size": 11504499,
+          "downloadCount": 3012
+        }
+      ]
+    },
+    {
+      "name": "v6.7.0",
+      "tagName": "v6.7.0",
+      "publishedAt": "2026-08-31T10:45:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.7.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.7.0/COPG-v6.7.0.zip",
+          "size": 11435525,
+          "downloadCount": 1675
+        }
+      ]
+    },
+    {
+      "name": "v6.6.0",
+      "tagName": "v6.6.0",
+      "publishedAt": "2026-08-25T17:39:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.6.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.6.0/COPG-v6.6.0.zip",
+          "size": 9565421,
+          "downloadCount": 2537
+        }
+      ]
+    },
+    {
+      "name": "v6.5.0",
+      "tagName": "v6.5.0",
+      "publishedAt": "2026-08-18T13:22:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.5.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.5.0/COPG-v6.5.0.zip",
+          "size": 8787344,
+          "downloadCount": 2984
+        }
+      ]
+    },
+    {
+      "name": "v6.4.0",
+      "tagName": "v6.4.0",
+      "publishedAt": "2026-08-13T06:11:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.4.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.4.0/COPG-v6.4.0.zip",
+          "size": 8645825,
+          "downloadCount": 2492
+        }
+      ]
+    },
+    {
+      "name": "v6.3.1",
+      "tagName": "v6.3.1",
+      "publishedAt": "2026-08-10T09:36:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.3.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.3.1/COPG-v6.3.1.zip",
+          "size": 8027287,
+          "downloadCount": 1574
+        }
+      ]
+    },
+    {
+      "name": "v6.3.0",
+      "tagName": "v6.3.0",
+      "publishedAt": "2026-08-07T10:12:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.3.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.3.0/COPG-v6.3.0.zip",
+          "size": 8027601,
+          "downloadCount": 1606
+        }
+      ]
+    },
+    {
+      "name": "v6.2.5",
+      "tagName": "v6.2.5",
+      "publishedAt": "2026-08-03T09:10:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.2.5.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.2.5/COPG-v6.2.5.zip",
+          "size": 7090677,
+          "downloadCount": 1750
+        }
+      ]
+    },
+    {
+      "name": "v6.1.2",
+      "tagName": "v6.1.2",
+      "publishedAt": "2026-07-29T03:06:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.1.2.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.1.2/COPG-v6.1.2.zip",
+          "size": 2480827,
+          "downloadCount": 2204
+        }
+      ]
+    },
+    {
+      "name": "v6.1.1",
+      "tagName": "v6.1.1",
+      "publishedAt": "2026-07-29T02:52:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.1.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.1.1/COPG-v6.1.1.zip",
+          "size": 2480687,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v6.1.0",
+      "tagName": "v6.1.0",
+      "publishedAt": "2026-07-29T02:22:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.1.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.1.0/COPG-v6.1.0.zip",
+          "size": 2480687,
+          "downloadCount": 45
+        }
+      ]
+    },
+    {
+      "name": "v6.0.0",
+      "tagName": "v6.0.0",
+      "publishedAt": "2026-07-24T17:58:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v6.0.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v6.0.0/COPG-v6.0.0.zip",
+          "size": 2465557,
+          "downloadCount": 1585
+        }
+      ]
+    },
+    {
+      "name": "v5.9.0",
+      "tagName": "v5.9.0",
+      "publishedAt": "2026-07-20T21:11:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.9.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.9.0/COPG-v5.9.0.zip",
+          "size": 2431691,
+          "downloadCount": 1637
+        }
+      ]
+    },
+    {
+      "name": "v5.8.0",
+      "tagName": "v5.8.0",
+      "publishedAt": "2026-07-14T06:23:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.8.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.8.0/COPG-v5.8.0.zip",
+          "size": 2431691,
+          "downloadCount": 50
+        }
+      ]
+    },
+    {
+      "name": "v5.7.1",
+      "tagName": "v5.7.1",
+      "publishedAt": "2026-07-07T19:54:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.7.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.7.1/COPG-v5.7.1.zip",
+          "size": 1631908,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v5.7.0",
+      "tagName": "v5.7.0",
+      "publishedAt": "2026-07-07T19:26:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.7.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.7.0/COPG-v5.7.0.zip",
+          "size": 2022871,
+          "downloadCount": 57
+        }
+      ]
+    },
+    {
+      "name": "v5.6.1",
+      "tagName": "v5.6.1",
+      "publishedAt": "2026-07-05T13:52:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.6.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.6.1/COPG-v5.6.1.zip",
+          "size": 1858517,
+          "downloadCount": 1113
+        }
+      ]
+    },
+    {
+      "name": "v5.6.0",
+      "tagName": "v5.6.0",
+      "publishedAt": "2026-07-05T12:59:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v5.6.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v5.6.0/COPG-v5.6.0.zip",
+          "size": 1858348,
+          "downloadCount": 143
+        }
+      ]
+    },
+    {
+      "name": "v4.7.3",
+      "tagName": "v4.7.3",
+      "publishedAt": "2025-12-31T13:40:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.7.3.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.7.3/COPG-v4.7.3.zip",
+          "size": 1544943,
+          "downloadCount": 19538
+        }
+      ]
+    },
+    {
+      "name": "v4.7.1",
+      "tagName": "v4.7.1",
+      "publishedAt": "2025-12-11T15:08:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.7.1.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.7.1/COPG-v4.7.1.zip",
+          "size": 1553640,
+          "downloadCount": 2306
+        }
+      ]
+    },
+    {
+      "name": "v4.7.0",
+      "tagName": "v4.7.0",
+      "publishedAt": "2025-12-11T10:24:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.7.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.7.0/COPG-v4.7.0.zip",
+          "size": 1553606,
+          "downloadCount": 198
+        }
+      ]
+    },
+    {
+      "name": "v4.6.0",
+      "tagName": "v4.6.0",
+      "publishedAt": "2025-11-17T06:43:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.6.0.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.6.0/COPG-v4.6.0.zip",
+          "size": 1517690,
+          "downloadCount": 1746
+        }
+      ]
+    },
+    {
+      "name": "v4.5.5",
+      "tagName": "v4.5.5",
+      "publishedAt": "2025-09-20T17:15:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.5.5.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.5.5/COPG-v4.5.5.zip",
+          "size": 1537893,
+          "downloadCount": 2718
+        }
+      ]
+    },
+    {
+      "name": "v4.5.4",
+      "tagName": "v4.5.4",
+      "publishedAt": "2025-09-20T13:34:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.5.4.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.5.4/COPG-v4.5.4.zip",
+          "size": 1537814,
+          "downloadCount": 84
+        }
+      ]
+    },
+    {
+      "name": "v4.5.3",
+      "tagName": "v4.5.3",
+      "publishedAt": "2025-09-16T07:33:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "COPG-v4.5.3.zip",
+          "downloadUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v4.5.3/COPG-v4.5.3.zip",
+          "size": 2859755,
+          "downloadCount": 528
+        }
+      ]
+    }
+  ]
+}

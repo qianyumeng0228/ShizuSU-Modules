@@ -1,0 +1,211 @@
+{
+  "readme": "# MTK Extreme Bandwidth Mod\n\n> **v1.0** — Universal Magisk module for **all MediaTek devices**  \n> Helio G / P / X · Dimensity · MT6xxx · MT8xxx\n\nPure network optimization — WiFi, LTE, NR/5G, TCP, VoLTE, data connectivity.  \nNo GPU/audio/memory tweaks. Network only.\n\n---\n\n## Features\n\n### `system.prop` — 14 Sections (~270 props)\n\n| # | Section | What it does |\n|---|---------|-------------|\n| 01 | LTE Carrier Aggregation | Forces CA on uplink + downlink, increases LTE.lteca cap |\n| 02 | MTK Baseband & RIL | Baseband optimization, AMR wideband, HSDPA cat 24 |\n| 03 | Fast Dormancy Disabled | Disables modem sleep for lower latency/ping |\n| 04 | WiFi Power Save Off | Disables all WiFi power limits, 2.4+5GHz aggregation, WiFi 6/6E (HE/TWT/MBO/OCE/SAE) |\n| 05 | TCP Buffer Sizes | Buffers up to 64MB for NR, 32MB for WiFi |\n| 06 | HW Offloading | GRO hardware offload, disables modem/WiFi debug logging |\n| 07 | DNS Cloudflare | Forces 1.1.1.1 on rmnet0, rmnet1, and base |\n| 08 | Network Hints & QoS | iWLAN, QoS, high-bandwidth preference, netmgrd |\n| 09 | NR/5G Force | SA + NSA, all global bands, default network mode 26 |\n| 10 | MTK Universal Stack | ConnSys auto-detect, multi-RAT, IMS/VoLTE/WFC/ViLTE full stack, DSDS |\n| 11 | LTE-A + NR Extended | EN-DC, MIMO, 256QAM, HARQ, beam management, PDCP ROHC, BWP timer |\n| 12 | VoLTE / VoNR | HD Voice + 5G calling, WFC, debug override |\n| 13 | Connectivity & Stall Recovery | Data stall detection, PDCP/RLC aggregation, RRC timers, keepalive |\n| 14 | Mobile Data Optimization | MTU 1500, DL/UL batch 64/32 packets, packet scheduler, signal threshold |\n| 15 | Unlock Network Features in Settings UI | Shows 5G/VoLTE/WFC/ViLTE toggles, full network mode selector, APN editor, signal dBm — works on AOSP, MIUI, HyperOS, ColorOS, Origins, and all custom ROMs |\n\n### `service.sh` — 10 Sections (runs every boot)\n\n| # | Section | What it does |\n|---|---------|-------------|\n| 1 | Radio props | Re-applies NR/CA/MIMO/EN-DC after modem init |\n| 2 | IMS/VoLTE/WFC | Re-applies full IMS stack props after boot |\n| 3 | TCP/BBR | BBR congestion control, 32MB buffers, fastopen, keepalive |\n| 4 | UDP/QUIC | UDP buffer 64K min, QUIC-ready |\n| 5 | WiFi runtime | Power save off, 5GHz preferred, roaming trigger -75dBm |\n| 6 | DNS override | Cloudflare 1.1.1.1 on all active interfaces (overrides DHCP) |\n| 7 | Network IRQ affinity | Binds wlan/modem IRQs to big CPU cores (adaptive mask per core count) |\n| 8 | Data stall recovery | Runtime keepalive + PSM disabled |\n| 9 | txqueuelen + RPS | Sets txqueuelen=3000 on all interfaces, RPS on rmnet |\n| 10 | eSIM runtime | Forces eUICC, LPA, GSMA RSP, hot-swap props after modem init |\n\n### New sections added\n\n| # | Section | What it does |\n|---|---------|-------------|\n| 16 | MTK CCCI | Cross Chip Communication Interface — modem↔AP handshake, bypass FSD |\n| 17 | Antenna Switch & RX Diversity | 4RX diversity for LTE + NR, antenna impedance, SAR switch |\n| 18 | CA Scheduler | Up to 4 LTE CA components, BW class A-D, NR intra+inter band CA |\n| 19 | ConnAC WiFi Chip | MT663x/MT665x — A-MPDU/A-MSDU, OFDMA DL+UL, SU/MU beamformee, WPA3 |\n| 20 | IMS Stack Extended | AMR-WB, EVS, Opus codecs, RTCP-XR, emergency VoWiFi, bearer persist |\n| 21 | Network Search | Fast camp, RAT priority NR>LTE>WCDMA>GSM, PLMN scan interval |\n| 22 | Signal Processing & Uplink | AFC, ULFD, MCS boost UL/DL, 4-rank MIMO, CQI/CSI period tuning |\n| 23 | PS/CS Fallback + SRVCC | SRVCC type 3, CSFB timeout, ECBM, PS2 RAT scan |\n| 24 | Data Throttle & QoS | Throttle=0, QoS scheduler, 5G network slicing, URSP |\n| 25 | Modem Power & Sleep | Fast wakeup, sleep threshold -100dBm, PMIC ctrl, plmn wakelock off |\n| 26 | ConnSys Coexistence | WiFi priority over BT/GPS, PTA enable, BT coex mode 2 |\n| 27 | WiFi AP Communication | WMM/EDCA, Block ACK 64-frame window, ADDTS QoS Traffic Stream, SU/MU beamforming CSI feedback to AP, 802.11k Neighbor Report, 802.11v BSS Transition, 802.11r Fast Roaming, 2×2 MIMO spatial streams, rate adaptation |\n\n---\n\n## Device Support\n\nAutomatically detected at install. **Aborts on non-MTK hardware.**\n\n| Detection Method | Property / Path |\n|-----------------|-----------------|\n| Platform string | `ro.board.platform` starts with `mt` |\n| Vendor platform | `ro.vendor.mediatek.platform` starts with `mt` |\n| Hardware | `ro.hardware` starts with `mt` |\n| SoC model | `ro.soc.model` starts with `MT` |\n| Dimensity | `ro.soc.model` contains `Dimensity` |\n| MTK battery | `/proc/mtk_battery_cmd` exists |\n| MTK sysfs | `/sys/devices/platform/mediatek` exists |\n| BT debug node | `/sys/kernel/debug/mtk_btcvsd` exists |\n| MTK namespace | Any prop matching `*.mtk.*` |\n\nAny **one** match → installation proceeds.\n\n---\n\n## Requirements\n\n| | |\n|---|---|\n| **SoC** | Any MediaTek (Helio, Dimensity, MT-series) |\n| **Root** | Magisk v24+ or KernelSU |\n| **Android** | 10 and above |\n| **ROM** | Any — AOSP, MIUI, HyperOS, ColorOS, custom |\n\n---\n\n## Installation\n\n1. Download `mtk_bwmod.zip`\n2. Magisk → Modules → Install from storage\n3. Select the zip\n4. Installer checks your SoC — aborts if not MTK\n5. Reboot\n\n---\n\n## File Structure\n\n```\nmtk_bwmod/\n├── META-INF/\n│   └── com/google/android/\n│       ├── update-binary\n│       └── updater-script\n├── module.prop\n├── system.prop       ← 14 sections, ~270 props\n├── customize.sh      ← 9-method MTK detection + install\n├── service.sh        ← 9-section runtime boot service\n└── README.md\n```\n\n---\n\n## Log\n\n```bash\nadb shell cat /data/local/tmp/mtk_bwmod.log\n```\n\n---\n\n## Disclaimer\n\nThese props and sysctl tweaks target MTK-specific modem/radio/WiFi firmware interfaces. Results vary by carrier, ROM, and chipset generation. No hardware is modified. Safe to remove by disabling/deleting the module.\n\n---\n\n## License\n\nMIT — free to use, modify, and redistribute.\n",
+  "readmeHTML": "<h1>MTK Extreme Bandwidth Mod</h1>\n\n<p>> <b>v1.0</b> — Universal Magisk module for <b>all MediaTek devices</b></p>\n<p>> Helio G / P / X · Dimensity · MT6xxx · MT8xxx</p>\n\n<p>Pure network optimization — WiFi, LTE, NR/5G, TCP, VoLTE, data connectivity.</p>\n<p>No GPU/audio/memory tweaks. Network only.</p>\n\n<p>---</p>\n\n<h2>Features</h2>\n\n<h3>`system.prop` — 14 Sections (~270 props)</h3>\n\n<p>| # | Section | What it does |</p>\n<p>|---|---------|-------------|</p>\n<p>| 01 | LTE Carrier Aggregation | Forces CA on uplink + downlink, increases LTE.lteca cap |</p>\n<p>| 02 | MTK Baseband & RIL | Baseband optimization, AMR wideband, HSDPA cat 24 |</p>\n<p>| 03 | Fast Dormancy Disabled | Disables modem sleep for lower latency/ping |</p>\n<p>| 04 | WiFi Power Save Off | Disables all WiFi power limits, 2.4+5GHz aggregation, WiFi 6/6E (HE/TWT/MBO/OCE/SAE) |</p>\n<p>| 05 | TCP Buffer Sizes | Buffers up to 64MB for NR, 32MB for WiFi |</p>\n<p>| 06 | HW Offloading | GRO hardware offload, disables modem/WiFi debug logging |</p>\n<p>| 07 | DNS Cloudflare | Forces 1.1.1.1 on rmnet0, rmnet1, and base |</p>\n<p>| 08 | Network Hints & QoS | iWLAN, QoS, high-bandwidth preference, netmgrd |</p>\n<p>| 09 | NR/5G Force | SA + NSA, all global bands, default network mode 26 |</p>\n<p>| 10 | MTK Universal Stack | ConnSys auto-detect, multi-RAT, IMS/VoLTE/WFC/ViLTE full stack, DSDS |</p>\n<p>| 11 | LTE-A + NR Extended | EN-DC, MIMO, 256QAM, HARQ, beam management, PDCP ROHC, BWP timer |</p>\n<p>| 12 | VoLTE / VoNR | HD Voice + 5G calling, WFC, debug override |</p>\n<p>| 13 | Connectivity & Stall Recovery | Data stall detection, PDCP/RLC aggregation, RRC timers, keepalive |</p>\n<p>| 14 | Mobile Data Optimization | MTU 1500, DL/UL batch 64/32 packets, packet scheduler, signal threshold |</p>\n<p>| 15 | Unlock Network Features in Settings UI | Shows 5G/VoLTE/WFC/ViLTE toggles, full network mode selector, APN editor, signal dBm — works on AOSP, MIUI, HyperOS, ColorOS, Origins, and all custom ROMs |</p>\n\n<h3>`service.sh` — 10 Sections (runs every boot)</h3>\n\n<p>| # | Section | What it does |</p>\n<p>|---|---------|-------------|</p>\n<p>| 1 | Radio props | Re-applies NR/CA/MIMO/EN-DC after modem init |</p>\n<p>| 2 | IMS/VoLTE/WFC | Re-applies full IMS stack props after boot |</p>\n<p>| 3 | TCP/BBR | BBR congestion control, 32MB buffers, fastopen, keepalive |</p>\n<p>| 4 | UDP/QUIC | UDP buffer 64K min, QUIC-ready |</p>\n<p>| 5 | WiFi runtime | Power save off, 5GHz preferred, roaming trigger -75dBm |</p>\n<p>| 6 | DNS override | Cloudflare 1.1.1.1 on all active interfaces (overrides DHCP) |</p>\n<p>| 7 | Network IRQ affinity | Binds wlan/modem IRQs to big CPU cores (adaptive mask per core count) |</p>\n<p>| 8 | Data stall recovery | Runtime keepalive + PSM disabled |</p>\n<p>| 9 | txqueuelen + RPS | Sets txqueuelen=3000 on all interfaces, RPS on rmnet |</p>\n<p>| 10 | eSIM runtime | Forces eUICC, LPA, GSMA RSP, hot-swap props after modem init |</p>\n\n<h3>New sections added</h3>\n\n<p>| # | Section | What it does |</p>\n<p>|---|---------|-------------|</p>\n<p>| 16 | MTK CCCI | Cross Chip Communication Interface — modem↔AP handshake, bypass FSD |</p>\n<p>| 17 | Antenna Switch & RX Diversity | 4RX diversity for LTE + NR, antenna impedance, SAR switch |</p>\n<p>| 18 | CA Scheduler | Up to 4 LTE CA components, BW class A-D, NR intra+inter band CA |</p>\n<p>| 19 | ConnAC WiFi Chip | MT663x/MT665x — A-MPDU/A-MSDU, OFDMA DL+UL, SU/MU beamformee, WPA3 |</p>\n<p>| 20 | IMS Stack Extended | AMR-WB, EVS, Opus codecs, RTCP-XR, emergency VoWiFi, bearer persist |</p>\n<p>| 21 | Network Search | Fast camp, RAT priority NR>LTE>WCDMA>GSM, PLMN scan interval |</p>\n<p>| 22 | Signal Processing & Uplink | AFC, ULFD, MCS boost UL/DL, 4-rank MIMO, CQI/CSI period tuning |</p>\n<p>| 23 | PS/CS Fallback + SRVCC | SRVCC type 3, CSFB timeout, ECBM, PS2 RAT scan |</p>\n<p>| 24 | Data Throttle & QoS | Throttle=0, QoS scheduler, 5G network slicing, URSP |</p>\n<p>| 25 | Modem Power & Sleep | Fast wakeup, sleep threshold -100dBm, PMIC ctrl, plmn wakelock off |</p>\n<p>| 26 | ConnSys Coexistence | WiFi priority over BT/GPS, PTA enable, BT coex mode 2 |</p>\n<p>| 27 | WiFi AP Communication | WMM/EDCA, Block ACK 64-frame window, ADDTS QoS Traffic Stream, SU/MU beamforming CSI feedback to AP, 802.11k Neighbor Report, 802.11v BSS Transition, 802.11r Fast Roaming, 2×2 MIMO spatial streams, rate adaptation |</p>\n\n<p>---</p>\n\n<h2>Device Support</h2>\n\n<p>Automatically detected at install. <b>Aborts on non-MTK hardware.</b></p>\n\n<p>| Detection Method | Property / Path |</p>\n<p>|-----------------|-----------------|</p>\n<p>| Platform string | <code>ro.board.platform</code> starts with <code>mt</code> |</p>\n<p>| Vendor platform | <code>ro.vendor.mediatek.platform</code> starts with <code>mt</code> |</p>\n<p>| Hardware | <code>ro.hardware</code> starts with <code>mt</code> |</p>\n<p>| SoC model | <code>ro.soc.model</code> starts with <code>MT</code> |</p>\n<p>| Dimensity | <code>ro.soc.model</code> contains <code>Dimensity</code> |</p>\n<p>| MTK battery | <code>/proc/mtk_battery_cmd</code> exists |</p>\n<p>| MTK sysfs | <code>/sys/devices/platform/mediatek</code> exists |</p>\n<p>| BT debug node | <code>/sys/kernel/debug/mtk_btcvsd</code> exists |</p>\n<p>| MTK namespace | Any prop matching <code>*.mtk.*</code> |</p>\n\n<p>Any <b>one</b> match → installation proceeds.</p>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| <b>SoC</b> | Any MediaTek (Helio, Dimensity, MT-series) |</p>\n<p>| <b>Root</b> | Magisk v24+ or KernelSU |</p>\n<p>| <b>Android</b> | 10 and above |</p>\n<p>| <b>ROM</b> | Any — AOSP, MIUI, HyperOS, ColorOS, custom |</p>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>Download `mtk_bwmod.zip`</li>\n<li>Magisk → Modules → Install from storage</li>\n<li>Select the zip</li>\n<li>Installer checks your SoC — aborts if not MTK</li>\n<li>Reboot</li>\n\n<p>---</p>\n\n<h2>File Structure</h2>\n\n<pre>mtk_bwmod/\n├── META-INF/\n│   └── com/google/android/\n│       ├── update-binary\n│       └── updater-script\n├── module.prop\n├── system.prop       ← 14 sections, ~270 props\n├── customize.sh      ← 9-method MTK detection + install\n├── service.sh        ← 9-section runtime boot service\n└── README.md</pre>\n\n<p>---</p>\n\n<h2>Log</h2>\n\n<pre>adb shell cat /data/local/tmp/mtk_bwmod.log</pre>\n\n<p>---</p>\n\n<h2>Disclaimer</h2>\n\n<p>These props and sysctl tweaks target MTK-specific modem/radio/WiFi firmware interfaces. Results vary by carrier, ROM, and chipset generation. No hardware is modified. Safe to remove by disabling/deleting the module.</p>\n\n<p>---</p>\n\n<h2>License</h2>\n\n<p>MIT — free to use, modify, and redistribute.</p>",
+  "homepageUrl": "https://mtk-bwmod.vercel.app",
+  "sourceUrl": "https://github.com/Elvandito/mtk-bwmod",
+  "url": "https://github.com/Elvandito/mtk-bwmod",
+  "latestRelease": {
+    "name": "v2.3",
+    "version": "v2.3",
+    "time": "2026-09-25T10:12:44Z",
+    "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.3/mtk-bwmod-v2.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-09-25T10:12:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v2.3.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.3/mtk-bwmod-v2.3.zip",
+          "size": 10842,
+          "downloadCount": 298
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-08-18T06:14:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod_v2.2.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.2/mtk_bwmod_v2.2.zip",
+          "size": 18437,
+          "downloadCount": 465
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-06-13T14:36:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod_v2.1.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.1/mtk_bwmod_v2.1.zip",
+          "size": 29050,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-06-13T05:51:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod_v2.0.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.0/mtk_bwmod_v2.0.zip",
+          "size": 26643,
+          "downloadCount": 222
+        }
+      ]
+    },
+    {
+      "name": "v1.9",
+      "tagName": "v1.9",
+      "publishedAt": "2026-06-12T23:18:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod_v1.9.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.9/mtk_bwmod_v1.9.zip",
+          "size": 25087,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2026-06-11T11:28:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.8.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.8/mtk-bwmod-v1.8.zip",
+          "size": 25029,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2026-06-11T05:23:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.7.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.7/mtk-bwmod-v1.7.zip",
+          "size": 20845,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-06-11T00:08:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.6.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.6/mtk-bwmod-v1.6.zip",
+          "size": 21105,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-06-09T01:02:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.5.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.5/mtk-bwmod-v1.5.zip",
+          "size": 18728,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-06-03T23:29:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod.v1.4.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.4/mtk_bwmod.v1.4.zip",
+          "size": 17938,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-06-03T05:41:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.3/mtk_bwmod.zip",
+          "size": 16308,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-05-31T12:04:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.2.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.2/mtk-bwmod-v1.2.zip",
+          "size": 15033,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-05-31T12:00:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk-bwmod-v1.1.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.1/mtk-bwmod-v1.1.zip",
+          "size": 14743,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-05-29T23:12:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mtk_bwmod_v1.0.zip",
+          "downloadUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v1.0/mtk_bwmod_v1.0.zip",
+          "size": 11352,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "readme": "# Dual Speaker Mod for Redmi Note 9 Pro / 9S [miatoll]\n\nA Magisk / KernelSU module that enables the earpiece as a secondary speaker (pseudo-stereo) for multimedia playback on Snapdragon 720G (`miatoll`).\n\n---\n\n## 📱 Compatibility\n\n* **Target Device:** Redmi Note 9 Pro / 9S / Pro Max / POCO M2 Pro (`miatoll` / SM7125)\n* **ROMs:** AOSP-based custom ROMs (crDroid, LineageOS, PixelOS, EvolutionX, etc.)\n* **Android Versions:** 14 / 15 / 16\n* **Root Solution:** Magisk / KernelSU / APatch\n\n### Test Status\n* **crDroid v12 (Android 16):** Fully tested & 100% stable.\n* **Other AOSP ROMs:** Compatible (unified vendor audio tree).\n* **MIUI / HyperOS:** Untested (backup recommended before testing).\n\n---\n\n## ⚙️ Technical Details\n\nOn Snapdragon 720G, the bottom speaker (SmartPA on `TERT_MI2S_RX`) and the earpiece (WCD937x on `RX_CDC_DMA_RX_0`) run on separate hardware buses. \n\nDirect edits to `mixer_paths` previously triggered a Qualcomm Hexagon DSP crash: q6asm_open_write failed (-61)\n\nThis resulted in complete audio failure until reboot.\n\n### Solution implemented:\n1. **ACDB Hack:** Set ACDB ID to `10` in `audio_platform_info_intcodec.xml` for simultaneous dual-bus output, bypassing the DSP crash.\n2. **Codec Routing:** Routed both interpolators (`RX0 + RX1`) in WCD937x directly to the earpiece DAC (`RDAC3`).\n3. **Gain Compensation:** Raised digital gain on the earpiece to balance volume with the bottom speaker.\n\n---\n\n## 🔊 What Works\n\n| Feature | Status | Notes |\n| :--- | :---: | :--- |\n| **Multimedia Audio** | ✅ | Dual speaker output (YouTube, Spotify, games, etc.) |\n| **Earpiece Calls** | ✅ | Stock volume levels (ear-safe) |\n| **Speakerphone** | ✅ | Plays via bottom speaker only (no echo / mic feedback) |\n| **3.5mm & Bluetooth** | ✅ | Unaffected, stock routing preserved |\n\n---\n\n## 📥 Installation\n\n1. Download the latest `.zip` from **[Releases](https://github.com/EtoKomu/miatoll-stereo-mod/releases)**.\n2. Flash via Magisk / KernelSU / APatch.\n3. Reboot.\n\n### Uninstallation\nDisable or remove the module in your root manager and reboot.\n\n---\n\n## ⚠️ Disclaimer\nThe earpiece speaker has a physically smaller coil than the bottom speaker. Do not use extreme software bass boosters or excessive digital clipping to prevent hardware wear. Flash at your own risk.\n",
+  "readmeHTML": "<h1>Dual Speaker Mod for Redmi Note 9 Pro / 9S [miatoll]</h1>\n\n<p>A Magisk / KernelSU module that enables the earpiece as a secondary speaker (pseudo-stereo) for multimedia playback on Snapdragon 720G (<code>miatoll</code>).</p>\n\n<p>---</p>\n\n<h2>📱 Compatibility</h2>\n\n<li>**Target Device:** Redmi Note 9 Pro / 9S / Pro Max / POCO M2 Pro (`miatoll` / SM7125)</li>\n<li>**ROMs:** AOSP-based custom ROMs (crDroid, LineageOS, PixelOS, EvolutionX, etc.)</li>\n<li>**Android Versions:** 14 / 15 / 16</li>\n<li>**Root Solution:** Magisk / KernelSU / APatch</li>\n\n<h3>Test Status</h3>\n<li>**crDroid v12 (Android 16):** Fully tested & 100% stable.</li>\n<li>**Other AOSP ROMs:** Compatible (unified vendor audio tree).</li>\n<li>**MIUI / HyperOS:** Untested (backup recommended before testing).</li>\n\n<p>---</p>\n\n<h2>⚙️ Technical Details</h2>\n\n<p>On Snapdragon 720G, the bottom speaker (SmartPA on <code>TERT_MI2S_RX</code>) and the earpiece (WCD937x on <code>RX_CDC_DMA_RX_0</code>) run on separate hardware buses.</p>\n\n<p>Direct edits to <code>mixer_paths</code> previously triggered a Qualcomm Hexagon DSP crash: q6asm_open_write failed (-61)</p>\n\n<p>This resulted in complete audio failure until reboot.</p>\n\n<h3>Solution implemented:</h3>\n<li>**ACDB Hack:** Set ACDB ID to `10` in `audio_platform_info_intcodec.xml` for simultaneous dual-bus output, bypassing the DSP crash.</li>\n<li>**Codec Routing:** Routed both interpolators (`RX0 + RX1`) in WCD937x directly to the earpiece DAC (`RDAC3`).</li>\n<li>**Gain Compensation:** Raised digital gain on the earpiece to balance volume with the bottom speaker.</li>\n\n<p>---</p>\n\n<h2>🔊 What Works</h2>\n\n<p>| Feature | Status | Notes |</p>\n<p>| :--- | :---: | :--- |</p>\n<p>| <b>Multimedia Audio</b> | ✅ | Dual speaker output (YouTube, Spotify, games, etc.) |</p>\n<p>| <b>Earpiece Calls</b> | ✅ | Stock volume levels (ear-safe) |</p>\n<p>| <b>Speakerphone</b> | ✅ | Plays via bottom speaker only (no echo / mic feedback) |</p>\n<p>| <b>3.5mm & Bluetooth</b> | ✅ | Unaffected, stock routing preserved |</p>\n\n<p>---</p>\n\n<h2>📥 Installation</h2>\n\n<li>Download the latest `.zip` from **[Releases](https://github.com/EtoKomu/miatoll-stereo-mod/releases)**.</li>\n<li>Flash via Magisk / KernelSU / APatch.</li>\n<li>Reboot.</li>\n\n<h3>Uninstallation</h3>\n<p>Disable or remove the module in your root manager and reboot.</p>\n\n<p>---</p>\n\n<h2>⚠️ Disclaimer</h2>\n<p>The earpiece speaker has a physically smaller coil than the bottom speaker. Do not use extreme software bass boosters or excessive digital clipping to prevent hardware wear. Flash at your own risk.</p>",
+  "homepageUrl": "https://github.com/EtoKomu/miatoll-stereo-mod",
+  "sourceUrl": "https://github.com/EtoKomu/miatoll-stereo-mod",
+  "url": "https://github.com/EtoKomu/miatoll-stereo-mod",
+  "latestRelease": {
+    "name": "v1.0",
+    "version": "v1.0",
+    "time": "2026-10-07T13:06:46Z",
+    "downloadUrl": "https://github.com/EtoKomu/miatoll-stereo-mod/releases/download/v1.0/Miatoll_Stereo_Mod.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-10-07T13:06:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Miatoll_Stereo_Mod.zip",
+          "downloadUrl": "https://github.com/EtoKomu/miatoll-stereo-mod/releases/download/v1.0/Miatoll_Stereo_Mod.zip",
+          "size": 15994,
+          "downloadCount": 10
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "readme": "# Redmi Note 10S (rosemary) — KernelSU + SUSFS Kernel\n### كيرنل مخصص لـ Redmi Note 10S (MIUI 14 / Android 13) مع إخفاء روت متقدّم\n\n<p align=\"center\">\n  <b>Linux 4.14.186</b> · <b>ReSukiSU 4.2.0-rc3</b> · <b>SUSFS v2.3.0 (9/9)</b> · <b>AlwaysStrong</b> · <b>FlagSecure</b> · <b>AnyKernel3</b>\n</p>\n\n> **أحدث تنزيلات موصى بها:** ملف التفليش `rosemary-miui_a13-v5-managerfix-AnyKernel3.zip` مع مدير ReSukiSU المتوافق `systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk`. [صفحة التنزيل الموحدة](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v5-verified-pair-2026-09-30).\n\n---\n\n## ما هذا المشروع؟ | What is this?\n\n**[العربية]**\nكيرنل مخصص لجهاز **Xiaomi Redmi Note 10S** (`rosemary`) بنسخة **MIUI 14 / Android 13**، مبني من المصدر مع دمج **ReSukiSU** (مدير روت KernelSU) و **SUSFS v2.3.0**، بالإضافة إلى تعديلات تخفي نسخة الكيرنل وبصمته عن أدوات الكشف.\n\nالمشروع كامل ومفتوح: الباتشات، ملف البناء (GitHub Actions)، ملفات الكيرنل الجاهزة للفلاش، وطريقة إخفاء مدير الروت.\n\n**[English]**\nA custom kernel for the **Xiaomi Redmi Note 10S** (`rosemary`) running **MIUI 14 / Android 13**, built from source with **ReSukiSU** (KernelSU-based root manager) and **SUSFS v2.3.0**, plus patches that hide the kernel version/fingerprint from root-detection apps.\n\nEverything is included: the patches, the GitHub Actions build workflow, ready-to-flash kernel images, and a guide to hiding the root manager app.\n\n---\n\n## المميزات | Features\n\n| | |\n|---|---|\n| **Root** | ReSukiSU 4.2.0-rc3 (KernelSU fork) — kernel-level, no Magisk |\n| **SUSFS** | v2.3.0 — NON-GKI, **9/9** features enabled |\n| **SELinux Hide** | `selinux_hide` ميزة runtime تُنقّي استعلامات `/sys/fs/selinux` — تلزم لتطبيقات الشبكة (WE/Vodafone) |\n| **إخفاء النسخة** | `uname` / `/proc/version` / f2fs reporting all spoofed to stock values |\n| **المدير المخفي** | manager renamed + re-signed, registered via Dynamic Manager Configuration |\n| **Play Integrity** | AlwaysStrong v1.0.4 (TEE-Simulator-RS + PlayIntegrityFork) — مضمَّن في الملف الشامل |\n| **تصوير الشاشة** | Simple Flag Secure v7.7 — إلغاء `FLAG_SECURE` في كل التطبيقات |\n| **التعبئة** | AnyKernel3 — فلاش من أي ريكافري مخصص |\n| **النوع** | NON-GKI, MediaTek MT6785 (Helio G95) |\n\nالقيم الستوك المستخدمة في الإخفاء | Stock values used for spoofing:\n\n* `release` = `4.14.186-perf-g079d9bd73b14`\n* `version` = `#1 SMP PREEMPT Sun Apr 14 03:38:02 UTC 2024`\n\n---\n\n## نتائج الفحص | Detection results\n\nبعد تقفيل كل الحاجات (المدير مخفي + التطبيقات المكشوفة مش مثبّتة):\n\n| الأداة | النتيجة |\n|---|---|\n| **Native Detector 7.7.0** | Environment is normal ✅ |\n| **Momo 4.4.1** | normal ✅ |\n| **TB Checker** | Basic / Device / **Strong** Pass ✅ |\n| **Hunter 5.5.0** | لا كشوفات ✅ |\n| **kknd Root Detector 3.3** | 2 بند فقط، وكلاهما خصائص ROM أصلية — **صفر أثر روت** ✅ |\n| **تطبيق WE / Vodafone** | يعمل ✅ (بعد `selinux_hide`) |\n\n> **حالة اختبار حقيقية:** تطبيق **WE / Vodafone** (`com.emeint.android.myservices`) كان يقفل بسبب\n> فحص سياسة SELinux الحيّة من `app_zygote`. الحلّ لم يكن أي موديول Zygisk، بل تفعيل ميزة\n> **`selinux_hide`** في الكيرنل. تفاصيل السبب الجذري في [`docs/ROOT-CAUSE-SELINUX.md`](docs/ROOT-CAUSE-SELINUX.md).\n\n> ملاحظة مهمة ومُجرّبة: **معظم أدوات الكشف لا ترصد المدير أصلاً**. أهم سبب للكشف كان تطبيقات مساعدة مثل `KsuWebUI` (`io.github.a13e300.ksuwebui`) — شيلها فورًا لو عايز رسالة نظيفة.\n> تفاصيل كاملة في [`detection-report.md`](detection-report.md).\n\n> **Important, verified note:** most detectors never flag the manager itself. The biggest false lead was helper apps such as `KsuWebUI` (`io.github.a13e300.ksuwebui`) — uninstall it for a clean result. Full details in [`detection-report.md`](detection-report.md).\n\n---\n\n## التنزيل | Download\n\n### الإصدار الحالي — ملف التفليش والمدير المتوافق\n\nالملفان التاليان موجودان في **صفحة إصدار واحدة** حتى يسهل تنزيل الملف المطلوب:\n\n* **ملف التفليش:** [`rosemary-miui_a13-v5-managerfix-AnyKernel3.zip`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/rosemary-miui_a13-v5-managerfix-AnyKernel3.zip) — كيرنل v5 فقط مع إصلاح توافق توقيع المدير.\n  * SHA-256: `531d9c0c4f2cd3c427268c277dd2b94a8994b2b0cd35fb7ad8ecd80d8e175b38`\n* **مدير ReSukiSU المتوافق:** [`systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk) — يظهر باسم **SystemUI**.\n  * SHA-256: `d0da2ba944c25d89b9591da82000ebf0be6eddd6f4734616ba333147ff719222`\n  * Package: `com.miui.system.components`; التوقيع v2-only وبصمة الشهادة مسجلة في كيرنل v5.\n\n> مخصص لـ Redmi Note 10S (`rosemary`) على MIUI 14 / Android 13 فقط. خذ نسخة احتياطية من `boot` قبل الفلاش. ملف ZIP يحتوي الكيرنل فقط.\n\nالإصدارات الأقدم والحزم الشاملة ما زالت محفوظة في صفحة الإصدارات كأرشيف. للمستخدم الجديد، استخدم الملفين المرتبطين أعلاه.\n\n---\n\n## البناء من المصدر | Building\n\nالمشروع يعتمد على قالب البناء [`JackA1ltman/NonGKI_Kernel_Build_2nd`](https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd).\n\n1. اعمل Fork للقالب (أو استخدم نسختك منه).\n2. انسخ محتوى هذا المستودع فوقه بنفس المسارات:\n   * `rosemary_susfs_fixed.patch` → جذر المستودع باسم `rosemary_susfs_fixed.patch`\n   * `.github/workflows/build-rosemary-a13.yml` → نفس المسار\n3. من تبويب **Actions** شغّل الـ workflow يدويًا (`workflow_dispatch`).\n4. الناتج: `rosemary-miui_a13-v4-f2fs-fixed-AnyKernel3.zip`.\n\nالشرح المفصّل خطوة بخطوة في [`build.md`](build.md).\n\n---\n\n## الفلاش | Flashing\n\n1. اعمل نسخة احتياطية لـ **boot** (اختياري لكن مستحسن).\n2. من ريكافري مخصص (TWRP / OrangeFox) → **Install** → اختر ملف الـ zip.\n3. بعد الفلاش، ثبّت [`systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk) وافتحه مرة.\n4. تفاصيل أكثر + خطوات التحقق في [`docs/FLASH.md`](docs/FLASH.md).\n\n---\n\n## ريكافري PBRP 4.14 — الطريقة المُثبتة 100% | Verified PBRP recovery\n\nدليل كامل لمَن يريد تثبيت **ريكافري PBRP 4.0 متوافق مع كيرنل 4.14** ثم الكيرنل المعدّل،\nبالترتيب الذي **نجح فعليًا 100%** على Redmi Note 10S (rosemary / MT6785 / UFS / MIUI 14):\n\n> 🧩 **مهم:** ريكافري rosemary لازم يكون بعائلة الكيرنل **4.14**. النسخ المبنية على 4.19\n> تسبب بوت لوب وقد تختفي شاشة fastboot.\n\n**ملخص الترتيب:** ستوك boot → تعطيل vbmeta → فلاش `PBRP-rosemary-4.0-4.14.img` → الإقلاع للريكافري →\n(من داخل PBRP **بنفس الجلسة بدون ريستارت**) فلاش vbmeta الستوك + أقسام B → فلاش PBRP zip →\nفلاش الكيرنل → Reboot.\n\nالدليل الكامل بالخطوات والأوامر وبصمات SHA-256: [`docs/RECOVERY-PBRP.md`](docs/RECOVERY-PBRP.md)\n\n---\n\n## إخفاء مدير الروت | Hiding the manager\n\nReSukiSU **لا يملك** خيار «Hide manager» مثل Magisk. البديل: إعادة تسمية الباكدج + توقيع جديد + تسجيل البصمة في الكيرنل عبر `dynamic-manager`.\n\nالدليل الكامل (مُجرّب ويعمل): [`hide-manager.md`](hide-manager.md)\nالسكربت الجاهز: [`hide-manager-wsl.sh`](hide-manager-wsl.sh)\n\n> `ReSukiSU has no \"Hide manager\" option.` The equivalent is package rename + re-sign + `ksud kernel dynamic-manager set`.\n\n---\n\n## هيكل المستودع | Repository layout\n\n```\n.\n├── README.md\n├── LICENSE\n├── rosemary-v5-ALLINONE-AnyKernel3.zip       # ⭐ kernel + AlwaysStrong + FlagSecure\n├── rosemary-miui_a13-v5-managerfix-AnyKernel3.zip\n├── build-rosemary-a13-PATCHED.yml            # GitHub Actions workflow (v5)\n├── apply_manager_signature_patch.py          # v5 manager-signature patch\n├── docs/\n│   ├── BUILD.md\n│   ├── FLASH.md\n│   ├── HIDE-MANAGER.md\n│   ├── DETECTION-REPORT.md\n│   ├── ALL-IN-ONE.md                         # 🆕 الملف الشامل\n│   ├── FLAG-SECURE.md                        # 🆕 إلغاء FLAG_SECURE\n│   ├── ROOT-CAUSE-SELINUX.md                 # 🆕 سبب قفل تطبيقات الشبكة\n│   └── RECOVERY-PBRP.md                      # 🆕 ريكافري PBRP 4.14 (الطريقة المثبتة 100%)\n├── patch/\n│   └── rosemary_susfs_fixed.patch\n└── scripts/\n    ├── manager_fingerprint.py                # compute dynamic-manager size/hash\n    └── preload-post-fs-data.sh               # سكربت تثبيت الموديولات المضمَّنة\n```\n\n---\n\n## شكر وتقدير | Credits\n\n* **Assem_Husein:** Octopus\n* **Kernel source:** [gabutgadungan/android_kernel_xiaomi_rosemary](https://github.com/gabutgadungan/android_kernel_xiaomi_rosemary) (`rosemary-13`)\n* **Root manager:** [ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)\n* **SUSFS:** [simonpunk/susfs4ksu](https://github.com/simonpunk/susfs4ksu)\n* **Build template:** [JackA1ltman/NonGKI_Kernel_Build_2nd](https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd) & [NonGKI_Kernel_Patches](https://github.com/JackA1ltman/NonGKI_Kernel_Patches)\n* **Packing:** [osm0sis/AnyKernel3](https://github.com/osm0sis/AnyKernel3)\n* **Toolchain:** [Neutron-Toolchains/antman](https://github.com/Neutron-Toolchains/antman)\n* **Play Integrity:** [evoker0/AlwaysStrong](https://github.com/evoker0/AlwaysStrong)\n* **FlagSecure:** [ShivamXD6/Simple-Flag-Secure](https://github.com/ShivamXD6/Simple-Flag-Secure)\n\n---\n\n## تنبيه | Disclaimer\n\n**[العربية]** الفلاش على مسؤوليتك. تأكد من مطابقة النسخة (MIUI 14 / Android 13) قبل الفلاش، واحتفظ دائمًا بنسخة من الـ boot الأصلي للرجوع. المشروع تعليمي/شخصي ولا يضمن أي نتيجة.\n\n**[English]** Flash at your own risk. Verify your ROM matches (MIUI 14 / Android 13) before flashing and always keep a backup of your stock boot image. Provided as-is, no warranty.\n\nLicensed under **GPL-2.0** (kernel source).\n\n## الإصدارات السابقة | Previous releases\n\nالإصدارات الشاملة ونسخ الفلاش السابقة محفوظة في [أرشيف الإصدارات](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v6-allinone). للحصول على الملفين الحاليين المتوافقين، استخدم [صفحة التنزيل الموحدة](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v5-verified-pair-2026-09-30).\n",
+  "readmeHTML": "<h1>Redmi Note 10S (rosemary) — KernelSU + SUSFS Kernel</h1>\n<h3>كيرنل مخصص لـ Redmi Note 10S (MIUI 14 / Android 13) مع إخفاء روت متقدّم</h3>\n\n<p><p align=\"center\"></p>\n<p>  <b>Linux 4.14.186</b> · <b>ReSukiSU 4.2.0-rc3</b> · <b>SUSFS v2.3.0 (9/9)</b> · <b>AlwaysStrong</b> · <b>FlagSecure</b> · <b>AnyKernel3</b></p>\n<p></p></p>\n\n<p>> <b>أحدث تنزيلات موصى بها:</b> ملف التفليش <code>rosemary-miui_a13-v5-managerfix-AnyKernel3.zip</code> مع مدير ReSukiSU المتوافق <code>systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk</code>. <a href=\"https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v5-verified-pair-2026-09-30\">صفحة التنزيل الموحدة</a>.</p>\n\n<p>---</p>\n\n<h2>ما هذا المشروع؟ | What is this?</h2>\n\n<p><b>[العربية]</b></p>\n<p>كيرنل مخصص لجهاز <b>Xiaomi Redmi Note 10S</b> (<code>rosemary</code>) بنسخة <b>MIUI 14 / Android 13</b>، مبني من المصدر مع دمج <b>ReSukiSU</b> (مدير روت KernelSU) و <b>SUSFS v2.3.0</b>، بالإضافة إلى تعديلات تخفي نسخة الكيرنل وبصمته عن أدوات الكشف.</p>\n\n<p>المشروع كامل ومفتوح: الباتشات، ملف البناء (GitHub Actions)، ملفات الكيرنل الجاهزة للفلاش، وطريقة إخفاء مدير الروت.</p>\n\n<p><b>[English]</b></p>\n<p>A custom kernel for the <b>Xiaomi Redmi Note 10S</b> (<code>rosemary</code>) running <b>MIUI 14 / Android 13</b>, built from source with <b>ReSukiSU</b> (KernelSU-based root manager) and <b>SUSFS v2.3.0</b>, plus patches that hide the kernel version/fingerprint from root-detection apps.</p>\n\n<p>Everything is included: the patches, the GitHub Actions build workflow, ready-to-flash kernel images, and a guide to hiding the root manager app.</p>\n\n<p>---</p>\n\n<h2>المميزات | Features</h2>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| <b>Root</b> | ReSukiSU 4.2.0-rc3 (KernelSU fork) — kernel-level, no Magisk |</p>\n<p>| <b>SUSFS</b> | v2.3.0 — NON-GKI, <b>9/9</b> features enabled |</p>\n<p>| <b>SELinux Hide</b> | <code>selinux_hide</code> ميزة runtime تُنقّي استعلامات <code>/sys/fs/selinux</code> — تلزم لتطبيقات الشبكة (WE/Vodafone) |</p>\n<p>| <b>إخفاء النسخة</b> | <code>uname</code> / <code>/proc/version</code> / f2fs reporting all spoofed to stock values |</p>\n<p>| <b>المدير المخفي</b> | manager renamed + re-signed, registered via Dynamic Manager Configuration |</p>\n<p>| <b>Play Integrity</b> | AlwaysStrong v1.0.4 (TEE-Simulator-RS + PlayIntegrityFork) — مضمَّن في الملف الشامل |</p>\n<p>| <b>تصوير الشاشة</b> | Simple Flag Secure v7.7 — إلغاء <code>FLAG_SECURE</code> في كل التطبيقات |</p>\n<p>| <b>التعبئة</b> | AnyKernel3 — فلاش من أي ريكافري مخصص |</p>\n<p>| <b>النوع</b> | NON-GKI, MediaTek MT6785 (Helio G95) |</p>\n\n<p>القيم الستوك المستخدمة في الإخفاء | Stock values used for spoofing:</p>\n\n<li>`release` = `4.14.186-perf-g079d9bd73b14`</li>\n<li>`version` = `#1 SMP PREEMPT Sun Apr 14 03:38:02 UTC 2024`</li>\n\n<p>---</p>\n\n<h2>نتائج الفحص | Detection results</h2>\n\n<p>بعد تقفيل كل الحاجات (المدير مخفي + التطبيقات المكشوفة مش مثبّتة):</p>\n\n<p>| الأداة | النتيجة |</p>\n<p>|---|---|</p>\n<p>| <b>Native Detector 7.7.0</b> | Environment is normal ✅ |</p>\n<p>| <b>Momo 4.4.1</b> | normal ✅ |</p>\n<p>| <b>TB Checker</b> | Basic / Device / <b>Strong</b> Pass ✅ |</p>\n<p>| <b>Hunter 5.5.0</b> | لا كشوفات ✅ |</p>\n<p>| <b>kknd Root Detector 3.3</b> | 2 بند فقط، وكلاهما خصائص ROM أصلية — <b>صفر أثر روت</b> ✅ |</p>\n<p>| <b>تطبيق WE / Vodafone</b> | يعمل ✅ (بعد <code>selinux_hide</code>) |</p>\n\n<p>> <b>حالة اختبار حقيقية:</b> تطبيق <b>WE / Vodafone</b> (<code>com.emeint.android.myservices</code>) كان يقفل بسبب</p>\n<p>> فحص سياسة SELinux الحيّة من <code>app_zygote</code>. الحلّ لم يكن أي موديول Zygisk، بل تفعيل ميزة</p>\n<p>> <b><code>selinux_hide</code></b> في الكيرنل. تفاصيل السبب الجذري في <a href=\"docs/ROOT-CAUSE-SELINUX.md\"><code>docs/ROOT-CAUSE-SELINUX.md</code></a>.</p>\n\n<p>> ملاحظة مهمة ومُجرّبة: <b>معظم أدوات الكشف لا ترصد المدير أصلاً</b>. أهم سبب للكشف كان تطبيقات مساعدة مثل <code>KsuWebUI</code> (<code>io.github.a13e300.ksuwebui</code>) — شيلها فورًا لو عايز رسالة نظيفة.</p>\n<p>> تفاصيل كاملة في <a href=\"detection-report.md\"><code>detection-report.md</code></a>.</p>\n\n<p>> <b>Important, verified note:</b> most detectors never flag the manager itself. The biggest false lead was helper apps such as <code>KsuWebUI</code> (<code>io.github.a13e300.ksuwebui</code>) — uninstall it for a clean result. Full details in <a href=\"detection-report.md\"><code>detection-report.md</code></a>.</p>\n\n<p>---</p>\n\n<h2>التنزيل | Download</h2>\n\n<h3>الإصدار الحالي — ملف التفليش والمدير المتوافق</h3>\n\n<p>الملفان التاليان موجودان في <b>صفحة إصدار واحدة</b> حتى يسهل تنزيل الملف المطلوب:</p>\n\n<li>**ملف التفليش:** [`rosemary-miui_a13-v5-managerfix-AnyKernel3.zip`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/rosemary-miui_a13-v5-managerfix-AnyKernel3.zip) — كيرنل v5 فقط مع إصلاح توافق توقيع المدير.</li>\n<p>  * SHA-256: <code>531d9c0c4f2cd3c427268c277dd2b94a8994b2b0cd35fb7ad8ecd80d8e175b38</code></p>\n<li>**مدير ReSukiSU المتوافق:** [`systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk) — يظهر باسم **SystemUI**.</li>\n<p>  * SHA-256: <code>d0da2ba944c25d89b9591da82000ebf0be6eddd6f4734616ba333147ff719222</code></p>\n<p>  * Package: <code>com.miui.system.components</code>; التوقيع v2-only وبصمة الشهادة مسجلة في كيرنل v5.</p>\n\n<p>> مخصص لـ Redmi Note 10S (<code>rosemary</code>) على MIUI 14 / Android 13 فقط. خذ نسخة احتياطية من <code>boot</code> قبل الفلاش. ملف ZIP يحتوي الكيرنل فقط.</p>\n\n<p>الإصدارات الأقدم والحزم الشاملة ما زالت محفوظة في صفحة الإصدارات كأرشيف. للمستخدم الجديد، استخدم الملفين المرتبطين أعلاه.</p>\n\n<p>---</p>\n\n<h2>البناء من المصدر | Building</h2>\n\n<p>المشروع يعتمد على قالب البناء <a href=\"https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd\"><code>JackA1ltman/NonGKI_Kernel_Build_2nd</code></a>.</p>\n\n<li>اعمل Fork للقالب (أو استخدم نسختك منه).</li>\n<li>انسخ محتوى هذا المستودع فوقه بنفس المسارات:</li>\n<p>   * <code>rosemary_susfs_fixed.patch</code> → جذر المستودع باسم <code>rosemary_susfs_fixed.patch</code></p>\n<p>   * <code>.github/workflows/build-rosemary-a13.yml</code> → نفس المسار</p>\n<li>من تبويب **Actions** شغّل الـ workflow يدويًا (`workflow_dispatch`).</li>\n<li>الناتج: `rosemary-miui_a13-v4-f2fs-fixed-AnyKernel3.zip`.</li>\n\n<p>الشرح المفصّل خطوة بخطوة في <a href=\"build.md\"><code>build.md</code></a>.</p>\n\n<p>---</p>\n\n<h2>الفلاش | Flashing</h2>\n\n<li>اعمل نسخة احتياطية لـ **boot** (اختياري لكن مستحسن).</li>\n<li>من ريكافري مخصص (TWRP / OrangeFox) → **Install** → اختر ملف الـ zip.</li>\n<li>بعد الفلاش، ثبّت [`systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk`](https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk) وافتحه مرة.</li>\n<li>تفاصيل أكثر + خطوات التحقق في [`docs/FLASH.md`](docs/FLASH.md).</li>\n\n<p>---</p>\n\n<h2>ريكافري PBRP 4.14 — الطريقة المُثبتة 100% | Verified PBRP recovery</h2>\n\n<p>دليل كامل لمَن يريد تثبيت <b>ريكافري PBRP 4.0 متوافق مع كيرنل 4.14</b> ثم الكيرنل المعدّل،</p>\n<p>بالترتيب الذي <b>نجح فعليًا 100%</b> على Redmi Note 10S (rosemary / MT6785 / UFS / MIUI 14):</p>\n\n<p>> 🧩 <b>مهم:</b> ريكافري rosemary لازم يكون بعائلة الكيرنل <b>4.14</b>. النسخ المبنية على 4.19</p>\n<p>> تسبب بوت لوب وقد تختفي شاشة fastboot.</p>\n\n<p><b>ملخص الترتيب:</b> ستوك boot → تعطيل vbmeta → فلاش <code>PBRP-rosemary-4.0-4.14.img</code> → الإقلاع للريكافري →</p>\n<p>(من داخل PBRP <b>بنفس الجلسة بدون ريستارت</b>) فلاش vbmeta الستوك + أقسام B → فلاش PBRP zip →</p>\n<p>فلاش الكيرنل → Reboot.</p>\n\n<p>الدليل الكامل بالخطوات والأوامر وبصمات SHA-256: <a href=\"docs/RECOVERY-PBRP.md\"><code>docs/RECOVERY-PBRP.md</code></a></p>\n\n<p>---</p>\n\n<h2>إخفاء مدير الروت | Hiding the manager</h2>\n\n<p>ReSukiSU <b>لا يملك</b> خيار «Hide manager» مثل Magisk. البديل: إعادة تسمية الباكدج + توقيع جديد + تسجيل البصمة في الكيرنل عبر <code>dynamic-manager</code>.</p>\n\n<p>الدليل الكامل (مُجرّب ويعمل): <a href=\"hide-manager.md\"><code>hide-manager.md</code></a></p>\n<p>السكربت الجاهز: <a href=\"hide-manager-wsl.sh\"><code>hide-manager-wsl.sh</code></a></p>\n\n<p>> <code>ReSukiSU has no \"Hide manager\" option.</code> The equivalent is package rename + re-sign + <code>ksud kernel dynamic-manager set</code>.</p>\n\n<p>---</p>\n\n<h2>هيكل المستودع | Repository layout</h2>\n\n<pre>.\n├── README.md\n├── LICENSE\n├── rosemary-v5-ALLINONE-AnyKernel3.zip       # ⭐ kernel + AlwaysStrong + FlagSecure\n├── rosemary-miui_a13-v5-managerfix-AnyKernel3.zip\n├── build-rosemary-a13-PATCHED.yml            # GitHub Actions workflow (v5)\n├── apply_manager_signature_patch.py          # v5 manager-signature patch\n├── docs/\n│   ├── BUILD.md\n│   ├── FLASH.md\n│   ├── HIDE-MANAGER.md\n│   ├── DETECTION-REPORT.md\n│   ├── ALL-IN-ONE.md                         # 🆕 الملف الشامل\n│   ├── FLAG-SECURE.md                        # 🆕 إلغاء FLAG_SECURE\n│   ├── ROOT-CAUSE-SELINUX.md                 # 🆕 سبب قفل تطبيقات الشبكة\n│   └── RECOVERY-PBRP.md                      # 🆕 ريكافري PBRP 4.14 (الطريقة المثبتة 100%)\n├── patch/\n│   └── rosemary_susfs_fixed.patch\n└── scripts/\n    ├── manager_fingerprint.py                # compute dynamic-manager size/hash\n    └── preload-post-fs-data.sh               # سكربت تثبيت الموديولات المضمَّنة</pre>\n\n<p>---</p>\n\n<h2>شكر وتقدير | Credits</h2>\n\n<li>**Assem_Husein:** Octopus</li>\n<li>**Kernel source:** [gabutgadungan/android_kernel_xiaomi_rosemary](https://github.com/gabutgadungan/android_kernel_xiaomi_rosemary) (`rosemary-13`)</li>\n<li>**Root manager:** [ReSukiSU](https://github.com/ReSukiSU/ReSukiSU)</li>\n<li>**SUSFS:** [simonpunk/susfs4ksu](https://github.com/simonpunk/susfs4ksu)</li>\n<li>**Build template:** [JackA1ltman/NonGKI_Kernel_Build_2nd](https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd) & [NonGKI_Kernel_Patches](https://github.com/JackA1ltman/NonGKI_Kernel_Patches)</li>\n<li>**Packing:** [osm0sis/AnyKernel3](https://github.com/osm0sis/AnyKernel3)</li>\n<li>**Toolchain:** [Neutron-Toolchains/antman](https://github.com/Neutron-Toolchains/antman)</li>\n<li>**Play Integrity:** [evoker0/AlwaysStrong](https://github.com/evoker0/AlwaysStrong)</li>\n<li>**FlagSecure:** [ShivamXD6/Simple-Flag-Secure](https://github.com/ShivamXD6/Simple-Flag-Secure)</li>\n\n<p>---</p>\n\n<h2>تنبيه | Disclaimer</h2>\n\n<p><b>[العربية]</b> الفلاش على مسؤوليتك. تأكد من مطابقة النسخة (MIUI 14 / Android 13) قبل الفلاش، واحتفظ دائمًا بنسخة من الـ boot الأصلي للرجوع. المشروع تعليمي/شخصي ولا يضمن أي نتيجة.</p>\n\n<p><b>[English]</b> Flash at your own risk. Verify your ROM matches (MIUI 14 / Android 13) before flashing and always keep a backup of your stock boot image. Provided as-is, no warranty.</p>\n\n<p>Licensed under <b>GPL-2.0</b> (kernel source).</p>\n\n<h2>الإصدارات السابقة | Previous releases</h2>\n\n<p>الإصدارات الشاملة ونسخ الفلاش السابقة محفوظة في <a href=\"https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v6-allinone\">أرشيف الإصدارات</a>. للحصول على الملفين الحاليين المتوافقين، استخدم <a href=\"https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/tag/v5-verified-pair-2026-09-30\">صفحة التنزيل الموحدة</a>.</p>",
+  "homepageUrl": "https://rosemary-susfs-kernel.pages.bu.app/",
+  "sourceUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel",
+  "url": "https://github.com/OctopusAssem/rosemary-susfs-kernel",
+  "latestRelease": {
+    "name": "recovery-pbrp-4.14",
+    "version": "recovery-pbrp-4.14",
+    "time": "2026-10-07T17:25:41Z",
+    "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/recovery-pbrp-4.14/PBRP-rosemary-4.0-20240324-UNOFFICIAL.zip"
+  },
+  "releases": [
+    {
+      "name": "recovery-pbrp-4.14",
+      "tagName": "recovery-pbrp-4.14",
+      "publishedAt": "2026-10-07T17:25:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PBRP-rosemary-4.0-20240324-UNOFFICIAL.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/recovery-pbrp-4.14/PBRP-rosemary-4.0-20240324-UNOFFICIAL.zip",
+          "size": 55355602,
+          "downloadCount": 1
+        },
+        {
+          "name": "PBRP-rosemary-4.0-4.14.img",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/recovery-pbrp-4.14/PBRP-rosemary-4.0-4.14.img",
+          "size": 67108864,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v5-verified-pair-2026-09-30",
+      "tagName": "v5-verified-pair-2026-09-30",
+      "publishedAt": "2026-09-30T11:16:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "size": 15109045,
+          "downloadCount": 3
+        },
+        {
+          "name": "systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5-verified-pair-2026-09-30/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk",
+          "size": 9781008,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "manager-ui-35194-2026-09-30",
+      "tagName": "manager-ui-35194-2026-09-30",
+      "publishedAt": "2026-09-30T14:34:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemui-manager-v4.2.0-rc3-35194-v2only.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-ui-35194-2026-09-30/systemui-manager-v4.2.0-rc3-35194-v2only.apk",
+          "size": 9371170,
+          "downloadCount": 1
+        },
+        {
+          "name": "systemupdate-manager-v4.2.0-rc3-35194-v2only.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-ui-35194-2026-09-30/systemupdate-manager-v4.2.0-rc3-35194-v2only.apk",
+          "size": 9371170,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v7-miui-framework",
+      "tagName": "v7-miui-framework",
+      "publishedAt": "2026-09-29T14:07:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MIUI-Framework-Patch.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v7-miui-framework/MIUI-Framework-Patch.zip",
+          "size": 287101,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v6-metamodule",
+      "tagName": "v6-metamodule",
+      "publishedAt": "2026-09-29T09:59:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-mount-rs-arm64.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-metamodule/magic-mount-rs-arm64.zip",
+          "size": 1365781,
+          "downloadCount": 2
+        },
+        {
+          "name": "Simple_Flag_Secure_v7.7.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-metamodule/Simple_Flag_Secure_v7.7.zip",
+          "size": 293005,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v6-allinone",
+      "tagName": "v6-allinone",
+      "publishedAt": "2026-09-29T06:33:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-allinone/rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "size": 15109045,
+          "downloadCount": 1
+        },
+        {
+          "name": "rosemary-v5-ALLINONE-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-allinone/rosemary-v5-ALLINONE-AnyKernel3.zip",
+          "size": 20422635,
+          "downloadCount": 4
+        },
+        {
+          "name": "rosemary-v5-KERNEL-ONLY.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-allinone/rosemary-v5-KERNEL-ONLY.zip",
+          "size": 15217949,
+          "downloadCount": 2
+        },
+        {
+          "name": "rosemary-v5-SAFE-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v6-allinone/rosemary-v5-SAFE-AnyKernel3.zip",
+          "size": 18747317,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "manager-v4-v2only",
+      "tagName": "manager-v4-v2only",
+      "publishedAt": "2026-09-30T06:37:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-v4-v2only/systemui-manager-v4.2.0-rc3-spoofed-v4-v2only.apk",
+          "size": 9781008,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "manager-spoofed-v3",
+      "tagName": "manager-spoofed-v3",
+      "publishedAt": "2026-09-30T06:20:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemui-manager-v4.2.0-rc3-spoofed-v3.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-spoofed-v3/systemui-manager-v4.2.0-rc3-spoofed-v3.apk",
+          "size": 9813965,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "manager-spoofed-v2",
+      "tagName": "manager-spoofed-v2",
+      "publishedAt": "2026-09-30T06:02:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemui-manager-v4.2.0-rc3-spoofed.apk",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-spoofed-v2/systemui-manager-v4.2.0-rc3-spoofed.apk",
+          "size": 9831396,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2026-09-28T17:19:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v5/rosemary-miui_a13-v5-managerfix-AnyKernel3.zip",
+          "size": 15109045,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2026-09-28T12:57:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "rosemary-miui_a13-v4-f2fs-fixed-anykernel3.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/v4/rosemary-miui_a13-v4-f2fs-fixed-anykernel3.zip",
+          "size": 15110688,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "manager-kit",
+      "tagName": "manager-kit",
+      "publishedAt": "2026-09-28T13:42:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "rosemary-complete-kit.zip",
+          "downloadUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/manager-kit/rosemary-complete-kit.zip",
+          "size": 23727482,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

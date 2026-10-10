@@ -1,0 +1,141 @@
+{
+  "readme": "<div align=\"center\">\n\n# PingPimp\n**The Ultimate Android Network Alchemist for Gamers & Power Users.**\n\n<a href=\"https://github.com/fuckyoustan/PingPimp/blob/main/LICENSE\"><img src=\"https://img.shields.io/badge/Apache-white?style=for-the-badge&logo=andela&logoColor=white&label=License&labelColor=222\" alt=\"License\"></a>\n\n*Stop blaming lag. It's time to take absolute control of your connection.*\n\n---\n\n</div>\n\n## 🤔 Why PingPimp?\nLet's be honest: 90% of Android \"network optimizer\" modules out there are just placebo scripts that blindly inject random values into your `sysctl.conf` and hope for the best. \n\n**PingPimp is different.** We don't believe in blind tweaks. We believe in giving *you* the wheel. PingPimp bridges the gap between hardcore Linux networking commands (`iptables`, `ip6tables`, DSCP/TOS routing) and a gorgeous, user-friendly interface. Whether you are a hardcore gamer experiencing sudden ping spikes or a power user trying to save battery and data, PingPimp molds your network exactly how you want it.\n\n## ✨ Key Features\n\nPingPimp is packed with real, measurable network manipulation tools accessible via a clean **Material You 3 WebUI**:\n\n* 🎮 **Turbo Boost (Packet Prioritization)**\n    Give your favorite games the VIP lane. PingPimp uses `iptables` to tag your game's traffic (DSCP/TOS), ensuring your router and kernel process your game packets before anything else. Say goodbye to ping drops during a clutch.\n* 🚫 **App Jail (Isolate Mode)**\n    Sneaky background apps eating your bandwidth? Not anymore. Cut off internet access to specific user or system apps entirely with a single toggle. \n* 🎛️ **TCP & Network Wizards**\n    Easily switch your TCP Congestion Control algorithms to match your current needs. Comes with curated presets (Game, Streaming, Download, Browsing) that actually work.\n* 🛡️ **Private DNS Lounge**\n    Secure your queries and bypass restrictions. Choose from our massive, built-in list of top-tier encrypted DNS providers (Cloudflare, AdGuard, Quad9, etc.), or easily set up your own Custom DNS.\n* 🚀 **IPv6 Nuke & Netstat Optimizer**\n    Force IPv4 routing to prevent IPv6 DNS leaks and routing overheads that cause latency spikes in-game.\n* ⚡ **Extreme QoS Application Boost**\n    Prioritizes selected apps using a smart DSCP/MARK packet tagging system. A dynamic background daemon applies traffic control (tc) to create a zero-delay VIP lane, instantly bypassing background network hogs.\n\n## 🥊 PingPimp vs The Rest\n\n| Feature | PingPimp ⚡ | Other Modules 🐢 |\n| :--- | :--- | :--- |\n| **Interface** | Gorgeous Material You WebUI | Terminal / Volume Keys only |\n| **App Targeting** | Yes (Select specific apps to boost/isolate) | No (Applies globally, causing instability) |\n| **Mechanism** | Real `iptables` & Kernel-level routing | Placebo `build.prop` edits |\n| **Flexibility** | Change tweaks on the fly | Requires rebooting every time |\n\n## 📸 Sneak Peek (WebUI)\n\n<p align=\"center\">\n  <img src=\"screenshot/1.png\" alt=\"Home Screen\" width=\"45%\">\n  <img src=\"screenshot/2.png\" alt=\"Config Screen\" width=\"45%\">\n</p>\n<p align=\"center\">\n  <img src=\"screenshot/3.png\" alt=\"Isolate Screen\" width=\"45%\">\n  <img src=\"screenshot/7.png\" alt=\"Boost Screen\" width=\"45%\">\n</p>\n<p align=\"center\">\n  <img src=\"screenshot/5.png\" alt=\"Isolate Screen\" width=\"45%\">\n  <img src=\"screenshot/6.png\" alt=\"Boost Screen\" width=\"45%\">\n</p>\n\n## ⚙️ Installation\n\nPingPimp requires a rooted Android device (Android 10+).\n\n1. Download the latest `PingPimp-vX.X.zip` from the [Releases](../../releases) page.\n2. Open your Root Manager (**KernelSU**, **Magisk**, or **APatch**).\n3. Go to the Modules tab and select `Install from storage`.\n4. Flash the `.zip` file and reboot your device.\n5. **How to use:** Open your Root Manager app, go to the Modules section, and tap on **PingPimp** to open the WebUI dashboard.\n\n## 🛠️ Compatibility\n* **Root:** KernelSU (Recommended for WebUI), Magisk, or APatch.\n* **OS:** Android 10 and above.\n* **Architecture:** ARM64\n\n## 💬 Community & Support\nGot a question, bug report, or just want to hang out with fellow flashaholics? Join our community:\n\n[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-2CA5E0.svg?style=for-the-badge&logo=telegram)](https://t.me/EverythingAboutArchive)\n[![Telegram Group](https://img.shields.io/badge/Telegram-Group-2CA5E0.svg?style=for-the-badge&logo=telegram)](https://t.me/EverythingAboutArchiveGroup)\n\n## ⚠️ Disclaimer & Credits\nPingPimp messes with core Linux networking tables. While it is designed to be completely safe and reversible (just uncheck a toggle or uninstall the module), I am not responsible for thermonuclear wars, missed alarms, or you getting banned from your favorite game (though you won't, because we don't touch game files).\n\n---\n<div align=\"center\">\n  <b>If PingPimp helped you win your matches, don't forget to drop a ⭐ on this repository!</b>\n</div>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>PingPimp</h1>\n<p><b>The Ultimate Android Network Alchemist for Gamers & Power Users.</b></p>\n\n<p><a href=\"https://github.com/fuckyoustan/PingPimp/blob/main/LICENSE\"><img src=\"https://img.shields.io/badge/Apache-white?style=for-the-badge&logo=andela&logoColor=white&label=License&labelColor=222\" alt=\"License\"></a></p>\n\n<p>*Stop blaming lag. It's time to take absolute control of your connection.*</p>\n\n<p>---</p>\n\n<p></div></p>\n\n<h2>🤔 Why PingPimp?</h2>\n<p>Let's be honest: 90% of Android \"network optimizer\" modules out there are just placebo scripts that blindly inject random values into your <code>sysctl.conf</code> and hope for the best.</p>\n\n<p><b>PingPimp is different.</b> We don't believe in blind tweaks. We believe in giving *you* the wheel. PingPimp bridges the gap between hardcore Linux networking commands (<code>iptables</code>, <code>ip6tables</code>, DSCP/TOS routing) and a gorgeous, user-friendly interface. Whether you are a hardcore gamer experiencing sudden ping spikes or a power user trying to save battery and data, PingPimp molds your network exactly how you want it.</p>\n\n<h2>✨ Key Features</h2>\n\n<p>PingPimp is packed with real, measurable network manipulation tools accessible via a clean <b>Material You 3 WebUI</b>:</p>\n\n<li>🎮 **Turbo Boost (Packet Prioritization)**</li>\n<p>    Give your favorite games the VIP lane. PingPimp uses <code>iptables</code> to tag your game's traffic (DSCP/TOS), ensuring your router and kernel process your game packets before anything else. Say goodbye to ping drops during a clutch.</p>\n<li>🚫 **App Jail (Isolate Mode)**</li>\n<p>    Sneaky background apps eating your bandwidth? Not anymore. Cut off internet access to specific user or system apps entirely with a single toggle.</p>\n<li>🎛️ **TCP & Network Wizards**</li>\n<p>    Easily switch your TCP Congestion Control algorithms to match your current needs. Comes with curated presets (Game, Streaming, Download, Browsing) that actually work.</p>\n<li>🛡️ **Private DNS Lounge**</li>\n<p>    Secure your queries and bypass restrictions. Choose from our massive, built-in list of top-tier encrypted DNS providers (Cloudflare, AdGuard, Quad9, etc.), or easily set up your own Custom DNS.</p>\n<li>🚀 **IPv6 Nuke & Netstat Optimizer**</li>\n<p>    Force IPv4 routing to prevent IPv6 DNS leaks and routing overheads that cause latency spikes in-game.</p>\n<li>⚡ **Extreme QoS Application Boost**</li>\n<p>    Prioritizes selected apps using a smart DSCP/MARK packet tagging system. A dynamic background daemon applies traffic control (tc) to create a zero-delay VIP lane, instantly bypassing background network hogs.</p>\n\n<h2>🥊 PingPimp vs The Rest</h2>\n\n<p>| Feature | PingPimp ⚡ | Other Modules 🐢 |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <b>Interface</b> | Gorgeous Material You WebUI | Terminal / Volume Keys only |</p>\n<p>| <b>App Targeting</b> | Yes (Select specific apps to boost/isolate) | No (Applies globally, causing instability) |</p>\n<p>| <b>Mechanism</b> | Real <code>iptables</code> & Kernel-level routing | Placebo <code>build.prop</code> edits |</p>\n<p>| <b>Flexibility</b> | Change tweaks on the fly | Requires rebooting every time |</p>\n\n<h2>📸 Sneak Peek (WebUI)</h2>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"screenshot/1.png\" alt=\"Home Screen\" width=\"45%\"></p>\n<p>  <img src=\"screenshot/2.png\" alt=\"Config Screen\" width=\"45%\"></p>\n<p></p></p>\n<p><p align=\"center\"></p>\n<p>  <img src=\"screenshot/3.png\" alt=\"Isolate Screen\" width=\"45%\"></p>\n<p>  <img src=\"screenshot/7.png\" alt=\"Boost Screen\" width=\"45%\"></p>\n<p></p></p>\n<p><p align=\"center\"></p>\n<p>  <img src=\"screenshot/5.png\" alt=\"Isolate Screen\" width=\"45%\"></p>\n<p>  <img src=\"screenshot/6.png\" alt=\"Boost Screen\" width=\"45%\"></p>\n<p></p></p>\n\n<h2>⚙️ Installation</h2>\n\n<p>PingPimp requires a rooted Android device (Android 10+).</p>\n\n<li>Download the latest `PingPimp-vX.X.zip` from the [Releases](../../releases) page.</li>\n<li>Open your Root Manager (**KernelSU**, **Magisk**, or **APatch**).</li>\n<li>Go to the Modules tab and select `Install from storage`.</li>\n<li>Flash the `.zip` file and reboot your device.</li>\n<li>**How to use:** Open your Root Manager app, go to the Modules section, and tap on **PingPimp** to open the WebUI dashboard.</li>\n\n<h2>🛠️ Compatibility</h2>\n<li>**Root:** KernelSU (Recommended for WebUI), Magisk, or APatch.</li>\n<li>**OS:** Android 10 and above.</li>\n<li>**Architecture:** ARM64</li>\n\n<h2>💬 Community & Support</h2>\n<p>Got a question, bug report, or just want to hang out with fellow flashaholics? Join our community:</p>\n\n<p><a href=\"https://img.shields.io/badge/Telegram-Channel-2CA5E0.svg?style=for-the-badge&logo=telegram\">![Telegram Channel</a>](https://t.me/EverythingAboutArchive)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-Group-2CA5E0.svg?style=for-the-badge&logo=telegram\">![Telegram Group</a>](https://t.me/EverythingAboutArchiveGroup)</p>\n\n<h2>⚠️ Disclaimer & Credits</h2>\n<p>PingPimp messes with core Linux networking tables. While it is designed to be completely safe and reversible (just uncheck a toggle or uninstall the module), I am not responsible for thermonuclear wars, missed alarms, or you getting banned from your favorite game (though you won't, because we don't touch game files).</p>\n\n<p>---</p>\n<p><div align=\"center\"></p>\n<p>  <b>If PingPimp helped you win your matches, don't forget to drop a ⭐ on this repository!</b></p>\n<p></div></p>",
+  "homepageUrl": "https://github.com/fuckyoustan/PingPimp",
+  "sourceUrl": "https://github.com/fuckyoustan/PingPimp",
+  "url": "https://github.com/fuckyoustan/PingPimp",
+  "latestRelease": {
+    "name": "v11.0",
+    "version": "v11.0",
+    "time": "2026-10-08T14:23:13Z",
+    "downloadUrl": ""
+  },
+  "releases": [
+    {
+      "name": "v11.0",
+      "tagName": "v11.0",
+      "publishedAt": "2026-10-08T14:23:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v10.0",
+      "tagName": "v10.0",
+      "publishedAt": "2026-08-24T06:03:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v9.1",
+      "tagName": "v9.1",
+      "publishedAt": "2026-04-17T05:37:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v9.0",
+      "tagName": "v9.0",
+      "publishedAt": "2026-03-02T16:40:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v8.0",
+      "tagName": "v8.0",
+      "publishedAt": "2026-02-20T22:48:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v7.1",
+      "tagName": "v7.1",
+      "publishedAt": "2026-01-27T13:25:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v7.0",
+      "tagName": "v7.0",
+      "publishedAt": "2025-12-15T11:33:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v6.0",
+      "tagName": "v6.0",
+      "publishedAt": "2025-10-25T03:23:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v5.1",
+      "tagName": "v5.1",
+      "publishedAt": "2025-10-05T13:47:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v5.0",
+      "tagName": "v5.0",
+      "publishedAt": "2025-09-09T22:09:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v4.0",
+      "tagName": "v4.0",
+      "publishedAt": "2025-08-15T07:08:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v3.0",
+      "tagName": "v3.0",
+      "publishedAt": "2025-07-23T17:26:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2025-07-22T09:45:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PingPimp_v2.1.zip",
+          "downloadUrl": "https://github.com/fuckyoustan/PingPimp/releases/download/v2.1/PingPimp_v2.1.zip",
+          "size": 19949,
+          "downloadCount": 420
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2025-07-20T10:37:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PingPimpv2.0.zip",
+          "downloadUrl": "https://github.com/fuckyoustan/PingPimp/releases/download/v2.0/PingPimpv2.0.zip",
+          "size": 17528,
+          "downloadCount": 469
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-07-18T04:44:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PingPimp.zip",
+          "downloadUrl": "https://github.com/fuckyoustan/PingPimp/releases/download/v1.0/PingPimp.zip",
+          "size": 4106,
+          "downloadCount": 25
+        }
+      ]
+    }
+  ]
+}

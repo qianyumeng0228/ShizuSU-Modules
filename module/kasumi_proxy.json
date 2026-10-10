@@ -1,0 +1,629 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\".github/logo.png\" width=\"160\" alt=\"Kasumi Proxy\" />\n</p>\n\n<h1 align=\"center\">Kasumi Proxy</h1>\n\n<p align=\"center\">\n  System-wide transparent proxy on Xray-core / sing-box for <b>rooted Android</b>, <b>Linux</b> and <b>Windows</b>.\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/actions/workflows/ci.yml\"><img src=\"https://github.com/loss-and-quick/Kasumi-Proxy/actions/workflows/ci.yml/badge.svg\" alt=\"CI\" /></a>\n  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/releases/latest\"><img src=\"https://img.shields.io/github/v/release/loss-and-quick/Kasumi-Proxy?sort=semver\" alt=\"Latest release\" /></a>\n  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/issues\"><img src=\"https://img.shields.io/github/issues/loss-and-quick/Kasumi-Proxy\" alt=\"Open issues\" /></a>\n  <a href=\"LICENSE\"><img src=\"https://img.shields.io/github/license/loss-and-quick/Kasumi-Proxy\" alt=\"License: GPL v3\" /></a>\n</p>\n\n- **Android:** a Magisk / KernelSU / APatch module. It runs the core as a root daemon and routes\n  traffic with `iptables` / `ip rule`, not through `VpnService`.\n- **Desktop:** a Tauri 2 app that brings up a real TUN. Proxy-only, system-proxy and PAC modes\n  are also available.\n\nBoth run the same Rust backend and the same React UI.\n\n<p align=\"center\">\n  <img src=\"docs/screenshots/hero.webp\" width=\"900\" alt=\"Kasumi Proxy on the desktop and on an Android phone\" />\n</p>\n\n> [!NOTE]\n> This is a fork of [vincentng295/Magic_V2Ray](https://github.com/vincentng295/Magic_V2Ray). Most\n> of the code was written by AI, so review it before you trust it.\n\n## Features\n\n- **Two cores.** Xray-core and sing-box, picked per profile. Supported protocols are VLESS, VMess,\n  Trojan, Shadowsocks, SOCKS, HTTP, WireGuard, Hysteria2, TUIC, AnyTLS, Naive and ShadowTLS.\n- **Import.** Subscription URLs, share links, mixed text and QR codes.\n- **Subscriptions.** Groups of servers that can be updated in one tap, or in the background\n  with no UI open.\n- **Honest status.** An end-to-end probe tells *connected* apart from *no internet* and *failed*.\n- **Diagnostics.** TCP ping, real ping and a speed test for each profile.\n- **Per-app routing** on Android, plus a choice of TUN engine: tun2socks, hev-socks5-tunnel or\n  sing-box.\n\n### Why a root module rather than a VPN app?\n\n- The root daemon is not killed by the low-memory killer, so the tunnel does not drop and leak\n  your IP.\n- Traffic is intercepted in the kernel (Netfilter) and never passes through a user-space\n  `tun0`.\n- Switching between Wi-Fi and mobile data reapplies the routing rules on the fly.\n\n> [!TIP]\n> No root? Use an ordinary client from the\n> [Xray-core GUI list](https://github.com/XTLS/Xray-core#gui-clients).\n\n## Screenshots\n\n<p align=\"center\">\n  <img src=\"docs/screenshots/android.webp\" width=\"900\" alt=\"Overview, profiles, subscriptions and routing screens on Android\" />\n</p>\n\n## Install\n\nDownload the file for your platform from the\n[latest release](https://github.com/loss-and-quick/Kasumi-Proxy/releases/latest).\n\n| Platform | File | Notes |\n| --- | --- | --- |\n| Android (root) | `kasumi-proxy-module-vX.Y.Z.zip` | Flash it in Magisk / KernelSU / APatch, then reboot. Open the UI with the module's **Action** button or its WebUI entry. |\n| Linux | `.deb`, `.AppImage` | Asks for `pkexec` / `sudo` to set up the TUN and routes. |\n| Linux, portable | `kasumi-proxy-linux-portable-vX.Y.Z.zip` | Unzip and run `./kasumi-desktop`. All state stays next to the binary. |\n| Windows | `-setup.exe`, `.msi` | Needs administrator rights (UAC) for the TUN. |\n| Windows, portable | `kasumi-proxy-windows-portable-vX.Y.Z.zip` | Unzip and run `kasumi-desktop.exe`. |\n| Nix / NixOS | — | See [docs/nix.md](docs/nix.md). |\n\nOn Android, state and logs live in `/data/adb/kasumi-proxy/`.\n\n<details>\n<summary><b>Verifying the AppImage signature</b></summary>\n\nAppImages are signed with the key in [`release-signing-key.asc`](release-signing-key.asc)\n(`2AA0 03A9 D670 653C FAA8  F7B0 88BE 4761 6D49 65E9`):\n\n```sh\ngpg --import release-signing-key.asc\n./Kasumi*.AppImage --appimage-extract '.appimage_signature'\ngpg --verify squashfs-root/.appimage_signature Kasumi*.AppImage\n```\n\n</details>\n\n## Development\n\nBuild steps, checks and the repository layout are in [CONTRIBUTING.md](CONTRIBUTING.md). Nix is\noptional: plain `cargo` and `bun` are enough.\n\n## Acknowledgments\n\nKasumi Proxy ships prebuilt binaries from\n[Xray-core](https://github.com/XTLS/Xray-core), [sing-box](https://github.com/SagerNet/sing-box),\n[tun2socks](https://github.com/xjasonlyu/tun2socks) and\n[hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel). See\n[module/bin/README.md](module/bin/README.md) for their licenses.\n\n## License\n\n[GPL-3.0](LICENSE)\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\".github/logo.png\" width=\"160\" alt=\"Kasumi Proxy\" /></p>\n<p></p></p>\n\n<p><h1 align=\"center\">Kasumi Proxy</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  System-wide transparent proxy on Xray-core / sing-box for <b>rooted Android</b>, <b>Linux</b> and <b>Windows</b>.</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/actions/workflows/ci.yml\"><img src=\"https://github.com/loss-and-quick/Kasumi-Proxy/actions/workflows/ci.yml/badge.svg\" alt=\"CI\" /></a></p>\n<p>  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/releases/latest\"><img src=\"https://img.shields.io/github/v/release/loss-and-quick/Kasumi-Proxy?sort=semver\" alt=\"Latest release\" /></a></p>\n<p>  <a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/issues\"><img src=\"https://img.shields.io/github/issues/loss-and-quick/Kasumi-Proxy\" alt=\"Open issues\" /></a></p>\n<p>  <a href=\"LICENSE\"><img src=\"https://img.shields.io/github/license/loss-and-quick/Kasumi-Proxy\" alt=\"License: GPL v3\" /></a></p>\n<p></p></p>\n\n<li>**Android:** a Magisk / KernelSU / APatch module. It runs the core as a root daemon and routes</li>\n<p>  traffic with <code>iptables</code> / <code>ip rule</code>, not through <code>VpnService</code>.</p>\n<li>**Desktop:** a Tauri 2 app that brings up a real TUN. Proxy-only, system-proxy and PAC modes</li>\n<p>  are also available.</p>\n\n<p>Both run the same Rust backend and the same React UI.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/screenshots/hero.webp\" width=\"900\" alt=\"Kasumi Proxy on the desktop and on an Android phone\" /></p>\n<p></p></p>\n\n<p>> [!NOTE]</p>\n<p>> This is a fork of <a href=\"https://github.com/vincentng295/Magic_V2Ray\">vincentng295/Magic_V2Ray</a>. Most</p>\n<p>> of the code was written by AI, so review it before you trust it.</p>\n\n<h2>Features</h2>\n\n<li>**Two cores.** Xray-core and sing-box, picked per profile. Supported protocols are VLESS, VMess,</li>\n<p>  Trojan, Shadowsocks, SOCKS, HTTP, WireGuard, Hysteria2, TUIC, AnyTLS, Naive and ShadowTLS.</p>\n<li>**Import.** Subscription URLs, share links, mixed text and QR codes.</li>\n<li>**Subscriptions.** Groups of servers that can be updated in one tap, or in the background</li>\n<p>  with no UI open.</p>\n<li>**Honest status.** An end-to-end probe tells *connected* apart from *no internet* and *failed*.</li>\n<li>**Diagnostics.** TCP ping, real ping and a speed test for each profile.</li>\n<li>**Per-app routing** on Android, plus a choice of TUN engine: tun2socks, hev-socks5-tunnel or</li>\n<p>  sing-box.</p>\n\n<h3>Why a root module rather than a VPN app?</h3>\n\n<li>The root daemon is not killed by the low-memory killer, so the tunnel does not drop and leak</li>\n<p>  your IP.</p>\n<li>Traffic is intercepted in the kernel (Netfilter) and never passes through a user-space</li>\n<p>  <code>tun0</code>.</p>\n<li>Switching between Wi-Fi and mobile data reapplies the routing rules on the fly.</li>\n\n<p>> [!TIP]</p>\n<p>> No root? Use an ordinary client from the</p>\n<p>> <a href=\"https://github.com/XTLS/Xray-core#gui-clients\">Xray-core GUI list</a>.</p>\n\n<h2>Screenshots</h2>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/screenshots/android.webp\" width=\"900\" alt=\"Overview, profiles, subscriptions and routing screens on Android\" /></p>\n<p></p></p>\n\n<h2>Install</h2>\n\n<p>Download the file for your platform from the</p>\n<p><a href=\"https://github.com/loss-and-quick/Kasumi-Proxy/releases/latest\">latest release</a>.</p>\n\n<p>| Platform | File | Notes |</p>\n<p>| --- | --- | --- |</p>\n<p>| Android (root) | <code>kasumi-proxy-module-vX.Y.Z.zip</code> | Flash it in Magisk / KernelSU / APatch, then reboot. Open the UI with the module's <b>Action</b> button or its WebUI entry. |</p>\n<p>| Linux | <code>.deb</code>, <code>.AppImage</code> | Asks for <code>pkexec</code> / <code>sudo</code> to set up the TUN and routes. |</p>\n<p>| Linux, portable | <code>kasumi-proxy-linux-portable-vX.Y.Z.zip</code> | Unzip and run <code>./kasumi-desktop</code>. All state stays next to the binary. |</p>\n<p>| Windows | <code>-setup.exe</code>, <code>.msi</code> | Needs administrator rights (UAC) for the TUN. |</p>\n<p>| Windows, portable | <code>kasumi-proxy-windows-portable-vX.Y.Z.zip</code> | Unzip and run <code>kasumi-desktop.exe</code>. |</p>\n<p>| Nix / NixOS | — | See <a href=\"docs/nix.md\">docs/nix.md</a>. |</p>\n\n<p>On Android, state and logs live in <code>/data/adb/kasumi-proxy/</code>.</p>\n\n<p><details></p>\n<p><summary><b>Verifying the AppImage signature</b></summary></p>\n\n<p>AppImages are signed with the key in <a href=\"release-signing-key.asc\"><code>release-signing-key.asc</code></a></p>\n<p>(<code>2AA0 03A9 D670 653C FAA8  F7B0 88BE 4761 6D49 65E9</code>):</p>\n\n<pre>gpg --import release-signing-key.asc\n./Kasumi*.AppImage --appimage-extract '.appimage_signature'\ngpg --verify squashfs-root/.appimage_signature Kasumi*.AppImage</pre>\n\n<p></details></p>\n\n<h2>Development</h2>\n\n<p>Build steps, checks and the repository layout are in <a href=\"CONTRIBUTING.md\">CONTRIBUTING.md</a>. Nix is</p>\n<p>optional: plain <code>cargo</code> and <code>bun</code> are enough.</p>\n\n<h2>Acknowledgments</h2>\n\n<p>Kasumi Proxy ships prebuilt binaries from</p>\n<p><a href=\"https://github.com/XTLS/Xray-core\">Xray-core</a>, <a href=\"https://github.com/SagerNet/sing-box\">sing-box</a>,</p>\n<p><a href=\"https://github.com/xjasonlyu/tun2socks\">tun2socks</a> and</p>\n<p><a href=\"https://github.com/heiher/hev-socks5-tunnel\">hev-socks5-tunnel</a>. See</p>\n<p><a href=\"module/bin/README.md\">module/bin/README.md</a> for their licenses.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">GPL-3.0</a></p>",
+  "homepageUrl": "https://github.com/loss-and-quick/Kasumi-Proxy",
+  "sourceUrl": "https://github.com/loss-and-quick/Kasumi-Proxy",
+  "url": "https://github.com/loss-and-quick/Kasumi-Proxy",
+  "latestRelease": {
+    "name": "v0.4.7",
+    "version": "v0.4.7",
+    "time": "2026-09-29T19:08:27Z",
+    "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/kasumi-proxy-linux-portable-v0.4.7.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.4.7",
+      "tagName": "v0.4.7",
+      "publishedAt": "2026-09-29T19:08:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-linux-portable-v0.4.7.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/kasumi-proxy-linux-portable-v0.4.7.zip",
+          "size": 56886154,
+          "downloadCount": 1
+        },
+        {
+          "name": "kasumi-proxy-module-v0.4.7.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/kasumi-proxy-module-v0.4.7.zip",
+          "size": 111401932,
+          "downloadCount": 18
+        },
+        {
+          "name": "kasumi-proxy-windows-portable-v0.4.7.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/kasumi-proxy-windows-portable-v0.4.7.zip",
+          "size": 55505874,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.7-1.x86_64.rpm",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy-0.4.7-1.x86_64.rpm",
+          "size": 64691936,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.7-1.x86_64.rpm.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy-0.4.7-1.x86_64.rpm.sig",
+          "size": 440,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_amd64.AppImage",
+          "size": 137136632,
+          "downloadCount": 11
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_amd64.AppImage.sig",
+          "size": 444,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_amd64.deb",
+          "size": 64695482,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_amd64.deb.sig",
+          "size": 436,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_x64-setup.exe",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_x64-setup.exe",
+          "size": 47445374,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_x64-setup.exe.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_x64-setup.exe.sig",
+          "size": 444,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_x64_en-US.msi",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_x64_en-US.msi",
+          "size": 64114688,
+          "downloadCount": 2
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.7_x64_en-US.msi.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/Kasumi.Proxy_0.4.7_x64_en-US.msi.sig",
+          "size": 444,
+          "downloadCount": 0
+        },
+        {
+          "name": "latest.json",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.7/latest.json",
+          "size": 1319,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v0.4.6",
+      "tagName": "v0.4.6",
+      "publishedAt": "2026-09-29T17:05:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-linux-portable-v0.4.6.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/kasumi-proxy-linux-portable-v0.4.6.zip",
+          "size": 56886345,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-module-v0.4.6.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/kasumi-proxy-module-v0.4.6.zip",
+          "size": 111401780,
+          "downloadCount": 3
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.6-1.x86_64.rpm",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy-0.4.6-1.x86_64.rpm",
+          "size": 67754525,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.6-1.x86_64.rpm.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy-0.4.6-1.x86_64.rpm.sig",
+          "size": 440,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.6_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy_0.4.6_amd64.AppImage",
+          "size": 139885048,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.6_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy_0.4.6_amd64.AppImage.sig",
+          "size": 444,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.6_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy_0.4.6_amd64.deb",
+          "size": 67777058,
+          "downloadCount": 2
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.6_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.6/Kasumi.Proxy_0.4.6_amd64.deb.sig",
+          "size": 436,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.4.4",
+      "tagName": "v0.4.4",
+      "publishedAt": "2026-08-03T06:30:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-linux-portable-v0.4.4.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/kasumi-proxy-linux-portable-v0.4.4.zip",
+          "size": 48973340,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-module-v0.4.4.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/kasumi-proxy-module-v0.4.4.zip",
+          "size": 95231252,
+          "downloadCount": 5
+        },
+        {
+          "name": "kasumi-proxy-windows-portable-v0.4.4.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/kasumi-proxy-windows-portable-v0.4.4.zip",
+          "size": 44213509,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.4-1.x86_64.rpm",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy-0.4.4-1.x86_64.rpm",
+          "size": 56820751,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.4-1.x86_64.rpm.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy-0.4.4-1.x86_64.rpm.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_amd64.AppImage",
+          "size": 126151160,
+          "downloadCount": 4
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_amd64.AppImage.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_amd64.deb",
+          "size": 56844502,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_amd64.deb.sig",
+          "size": 420,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_x64-setup.exe",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_x64-setup.exe",
+          "size": 41703088,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_x64-setup.exe.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_x64-setup.exe.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_x64_en-US.msi",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_x64_en-US.msi",
+          "size": 55439360,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.4_x64_en-US.msi.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/Kasumi.Proxy_0.4.4_x64_en-US.msi.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "latest.json",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.4/latest.json",
+          "size": 1279,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v0.4.3",
+      "tagName": "v0.4.3",
+      "publishedAt": "2026-07-13T06:26:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-linux-portable-v0.4.3.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/kasumi-proxy-linux-portable-v0.4.3.zip",
+          "size": 48846473,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-module-v0.4.3.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/kasumi-proxy-module-v0.4.3.zip",
+          "size": 95166484,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-windows-portable-v0.4.3.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/kasumi-proxy-windows-portable-v0.4.3.zip",
+          "size": 44131574,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.3-1.x86_64.rpm",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy-0.4.3-1.x86_64.rpm",
+          "size": 59621882,
+          "downloadCount": 3
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.3-1.x86_64.rpm.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy-0.4.3-1.x86_64.rpm.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_amd64.AppImage",
+          "size": 128629240,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_amd64.AppImage.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_amd64.deb",
+          "size": 59625934,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_amd64.deb.sig",
+          "size": 420,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_x64-setup.exe",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_x64-setup.exe",
+          "size": 41630646,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_x64-setup.exe.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_x64-setup.exe.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_x64_en-US.msi",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_x64_en-US.msi",
+          "size": 55361536,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.3_x64_en-US.msi.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/Kasumi.Proxy_0.4.3_x64_en-US.msi.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "latest.json",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.3/latest.json",
+          "size": 1279,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v0.4.2",
+      "tagName": "v0.4.2",
+      "publishedAt": "2026-06-29T08:22:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-linux-portable-v0.4.2.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/kasumi-proxy-linux-portable-v0.4.2.zip",
+          "size": 48057621,
+          "downloadCount": 1
+        },
+        {
+          "name": "kasumi-proxy-module-v0.4.2.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/kasumi-proxy-module-v0.4.2.zip",
+          "size": 93843299,
+          "downloadCount": 1
+        },
+        {
+          "name": "kasumi-proxy-windows-portable-v0.4.2.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/kasumi-proxy-windows-portable-v0.4.2.zip",
+          "size": 42173473,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.2-1.x86_64.rpm",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy-0.4.2-1.x86_64.rpm",
+          "size": 58777202,
+          "downloadCount": 2
+        },
+        {
+          "name": "Kasumi.Proxy-0.4.2-1.x86_64.rpm.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy-0.4.2-1.x86_64.rpm.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_amd64.AppImage",
+          "size": 127891960,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_amd64.AppImage.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_amd64.deb",
+          "size": 58780776,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_amd64.deb.sig",
+          "size": 420,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_x64-setup.exe",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_x64-setup.exe",
+          "size": 39957051,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_x64-setup.exe.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_x64-setup.exe.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_x64_en-US.msi",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_x64_en-US.msi",
+          "size": 53317632,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.2_x64_en-US.msi.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/Kasumi.Proxy_0.4.2_x64_en-US.msi.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "latest.json",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.2/latest.json",
+          "size": 1279,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "v0.4.1",
+      "tagName": "v0.4.1",
+      "publishedAt": "2026-06-22T09:16:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-0.4.1-linux-portable.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/kasumi-proxy-0.4.1-linux-portable.zip",
+          "size": 41997742,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-0.4.1-windows-portable.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/kasumi-proxy-0.4.1-windows-portable.zip",
+          "size": 36495832,
+          "downloadCount": 0
+        },
+        {
+          "name": "kasumi-proxy-v0.4.1.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/kasumi-proxy-v0.4.1.zip",
+          "size": 94073345,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_amd64.AppImage",
+          "size": 115767800,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_amd64.AppImage.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_amd64.AppImage.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_amd64.deb",
+          "size": 45666930,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_amd64.deb.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_amd64.deb.sig",
+          "size": 420,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_x64-setup.exe",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_x64-setup.exe",
+          "size": 29546899,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_x64-setup.exe.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_x64-setup.exe.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_x64_en-US.msi",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_x64_en-US.msi",
+          "size": 40574976,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.1_x64_en-US.msi.sig",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/Kasumi.Proxy_0.4.1_x64_en-US.msi.sig",
+          "size": 424,
+          "downloadCount": 0
+        },
+        {
+          "name": "latest.json",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.1/latest.json",
+          "size": 1279,
+          "downloadCount": 91
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-06-20T17:10:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.4.0.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.0/kasumi-proxy-v0.4.0.zip",
+          "size": 94050519,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.0_amd64.AppImage",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.0/Kasumi.Proxy_0.4.0_amd64.AppImage",
+          "size": 111639032,
+          "downloadCount": 0
+        },
+        {
+          "name": "Kasumi.Proxy_0.4.0_amd64.deb",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.0/Kasumi.Proxy_0.4.0_amd64.deb",
+          "size": 41065510,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.3.4",
+      "tagName": "v0.3.4",
+      "publishedAt": "2026-06-10T21:00:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.3.4.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.3.4/kasumi-proxy-v0.3.4.zip",
+          "size": 88896565,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.3",
+      "tagName": "v0.3.3",
+      "publishedAt": "2026-06-08T21:01:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.3.3.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.3.3/kasumi-proxy-v0.3.3.zip",
+          "size": 88884807,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.3.2",
+      "tagName": "v0.3.2",
+      "publishedAt": "2026-06-07T19:18:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.3.2.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.3.2/kasumi-proxy-v0.3.2.zip",
+          "size": 88878511,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.1",
+      "tagName": "v0.3.1",
+      "publishedAt": "2026-06-07T18:34:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.3.1.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.3.1/kasumi-proxy-v0.3.1.zip",
+          "size": 88875974,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-06-07T16:48:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.3.0.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.3.0/kasumi-proxy-v0.3.0.zip",
+          "size": 88875192,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-06-07T14:27:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kasumi-proxy-v0.2.0.zip",
+          "downloadUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.2.0/kasumi-proxy-v0.2.0.zip",
+          "size": 88882202,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

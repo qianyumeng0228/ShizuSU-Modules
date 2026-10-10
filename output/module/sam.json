@@ -1,0 +1,383 @@
+{
+  "readme": "# SAM\r\nSAM 是 SmartDNS、AdGuardHome 和 Mihomo 三合一的 Magisk 模块。每一个服务都可以单独使用，或者两两组合，或者全部启用。\r\n\r\n## 📖说明\r\n- SmartDNS 的优先级最低，在无启用其它服务的情况下，才会作为本机的 DNS 转发服务，在有两种和三种服务启用，只会作为上游 DNS。\r\n- AdGuardHome 在单独启用和 SmartDNS 一起使用，都会作为本机的 DNS 转发服务，再和 Mihomo 三种一起用，就根据设置文件的配置，来选择使用哪种结构。\r\n- Mihomo 在单独使用，或者和另一种服务使用，都会作为本机的 DNS 转发服务。 \r\n\r\n## ⚙️功能\r\n- 两种服务结构:\r\n  - `SmartDNS > Mihomo > AdGuardHome`\r\n  - `SmartDNS > AdGuardHome > Mihomo`\r\n- 监听:\r\n  - 模块:\r\n    - 启用即运行，禁用即停止\r\n    - 卸载备份配置，恢复拦截广告\r\n  - hosts:\r\n    - 修改实时生效\r\n- 黑名单 WIFI 配置\r\n- 黑白名单代理 App 配置\r\n- 定时执行\r\n\r\n## 📢注意\r\n- 禁止和其它同类型模块使用\r\n- 模块所有服务的账号和密码都是 `root`\r\n- 禁止该文件随意修改\r\n  - /data/adb/modules/SAM/etc/mihomo/base.yaml\r\n\r\n## ⚠️无网络\r\n- 检查手机网络，开关飞行模式\r\n- 排查 Mihomo 和 AdGuardHome 的拦截日志，手动添加规则放行\r\n\r\n## 🤝使用项目\r\n- [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)\r\n- [vernesong/mihomo](https://github.com/vernesong/mihomo)\r\n- [AdguardTeam/AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)\r\n- [pymumu/smartdns](https://github.com/pymumu/smartdns)\r\n\r\n## 🙏感谢\r\n- [twoone-3/AdGuardHomeForRoot](https://github.com/twoone-3/AdGuardHomeForRoot)\r\n- [GitMetaio/Surfing](https://github.com/GitMetaio/Surfing)\r\n- Kisaratan",
+  "readmeHTML": "<h1>SAM</h1>\n<p>SAM 是 SmartDNS、AdGuardHome 和 Mihomo 三合一的 Magisk 模块。每一个服务都可以单独使用，或者两两组合，或者全部启用。</p>\n\n<h2>📖说明</h2>\n<li>SmartDNS 的优先级最低，在无启用其它服务的情况下，才会作为本机的 DNS 转发服务，在有两种和三种服务启用，只会作为上游 DNS。</li>\n<li>AdGuardHome 在单独启用和 SmartDNS 一起使用，都会作为本机的 DNS 转发服务，再和 Mihomo 三种一起用，就根据设置文件的配置，来选择使用哪种结构。</li>\n<li>Mihomo 在单独使用，或者和另一种服务使用，都会作为本机的 DNS 转发服务。</li>\n\n<h2>⚙️功能</h2>\n<li>两种服务结构:</li>\n<p>  - <code>SmartDNS > Mihomo > AdGuardHome</code></p>\n<p>  - <code>SmartDNS > AdGuardHome > Mihomo</code></p>\n<li>监听:</li>\n<p>  - 模块:</p>\n<p>    - 启用即运行，禁用即停止</p>\n<p>    - 卸载备份配置，恢复拦截广告</p>\n<p>  - hosts:</p>\n<p>    - 修改实时生效</p>\n<li>黑名单 WIFI 配置</li>\n<li>黑白名单代理 App 配置</li>\n<li>定时执行</li>\n\n<h2>📢注意</h2>\n<li>禁止和其它同类型模块使用</li>\n<li>模块所有服务的账号和密码都是 `root`</li>\n<li>禁止该文件随意修改</li>\n<p>  - /data/adb/modules/SAM/etc/mihomo/base.yaml</p>\n\n<h2>⚠️无网络</h2>\n<li>检查手机网络，开关飞行模式</li>\n<li>排查 Mihomo 和 AdGuardHome 的拦截日志，手动添加规则放行</li>\n\n<h2>🤝使用项目</h2>\n<li>[MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)</li>\n<li>[vernesong/mihomo](https://github.com/vernesong/mihomo)</li>\n<li>[AdguardTeam/AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)</li>\n<li>[pymumu/smartdns](https://github.com/pymumu/smartdns)</li>\n\n<h2>🙏感谢</h2>\n<li>[twoone-3/AdGuardHomeForRoot](https://github.com/twoone-3/AdGuardHomeForRoot)</li>\n<li>[GitMetaio/Surfing](https://github.com/GitMetaio/Surfing)</li>\n<li>Kisaratan</li>",
+  "homepageUrl": "https://github.com/5MayRain/SAM",
+  "sourceUrl": "https://github.com/5MayRain/SAM",
+  "url": "https://github.com/5MayRain/SAM",
+  "latestRelease": {
+    "name": "20260907",
+    "version": "20260907",
+    "time": "2026-09-07T11:48:00Z",
+    "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260907/SAM_20260907_release.zip"
+  },
+  "releases": [
+    {
+      "name": "20260907",
+      "tagName": "20260907",
+      "publishedAt": "2026-09-07T11:48:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260907_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260907/SAM_20260907_release.zip",
+          "size": 58075930,
+          "downloadCount": 111
+        },
+        {
+          "name": "SAM_Smart_20260907_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260907/SAM_Smart_20260907_release.zip",
+          "size": 62220840,
+          "downloadCount": 45
+        }
+      ]
+    },
+    {
+      "name": "20260830",
+      "tagName": "20260830",
+      "publishedAt": "2026-08-30T07:25:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260830_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260830/SAM_20260830_release.zip",
+          "size": 54173522,
+          "downloadCount": 55
+        },
+        {
+          "name": "SAM_Smart_20260830_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260830/SAM_Smart_20260830_release.zip",
+          "size": 57797481,
+          "downloadCount": 161
+        }
+      ]
+    },
+    {
+      "name": "20260822",
+      "tagName": "20260822",
+      "publishedAt": "2026-08-22T11:13:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260822_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260822/SAM_20260822_release.zip",
+          "size": 53854016,
+          "downloadCount": 11
+        },
+        {
+          "name": "SAM_Smart_20260822_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260822/SAM_Smart_20260822_release.zip",
+          "size": 57458107,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "20260630",
+      "tagName": "20260630",
+      "publishedAt": "2026-06-30T15:47:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260630_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260630/SAM_20260630_release.zip",
+          "size": 50939245,
+          "downloadCount": 94
+        },
+        {
+          "name": "SAM_Smart_20260630_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260630/SAM_Smart_20260630_release.zip",
+          "size": 53196376,
+          "downloadCount": 97
+        }
+      ]
+    },
+    {
+      "name": "20260611",
+      "tagName": "20260611",
+      "publishedAt": "2026-06-11T10:28:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260611_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260611/SAM_20260611_release.zip",
+          "size": 51326822,
+          "downloadCount": 45
+        },
+        {
+          "name": "SAM_Smart_20260611_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260611/SAM_Smart_20260611_release.zip",
+          "size": 53415628,
+          "downloadCount": 50
+        }
+      ]
+    },
+    {
+      "name": "20260530",
+      "tagName": "20260530",
+      "publishedAt": "2026-05-30T11:02:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260530_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260530/SAM_20260530_release.zip",
+          "size": 50914452,
+          "downloadCount": 60
+        },
+        {
+          "name": "SAM_Smart_20260530_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260530/SAM_Smart_20260530_release.zip",
+          "size": 53091612,
+          "downloadCount": 81
+        }
+      ]
+    },
+    {
+      "name": "20260502",
+      "tagName": "20260502",
+      "publishedAt": "2026-05-02T12:07:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260502_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260502/SAM_20260502_release.zip",
+          "size": 47481297,
+          "downloadCount": 44
+        },
+        {
+          "name": "SAM_Smart_20260502_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260502/SAM_Smart_20260502_release.zip",
+          "size": 52889601,
+          "downloadCount": 64
+        }
+      ]
+    },
+    {
+      "name": "20260328",
+      "tagName": "20260328",
+      "publishedAt": "2026-03-27T16:51:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260328_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260328/SAM_20260328_release.zip",
+          "size": 47228402,
+          "downloadCount": 98
+        },
+        {
+          "name": "SAM_Smart_20260328_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260328/SAM_Smart_20260328_release.zip",
+          "size": 49310145,
+          "downloadCount": 111
+        }
+      ]
+    },
+    {
+      "name": "20260318",
+      "tagName": "20260318",
+      "publishedAt": "2026-03-18T15:56:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260318_fix_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260318/SAM_20260318_fix_release.zip",
+          "size": 46902841,
+          "downloadCount": 14
+        },
+        {
+          "name": "SAM_Smart_20260318_fix_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260318/SAM_Smart_20260318_fix_release.zip",
+          "size": 48985717,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "20260309",
+      "tagName": "20260309",
+      "publishedAt": "2026-03-09T08:16:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260309_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260309/SAM_20260309_release.zip",
+          "size": 46391966,
+          "downloadCount": 14
+        },
+        {
+          "name": "SAM_Smart_20260309_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260309/SAM_Smart_20260309_release.zip",
+          "size": 48466543,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "20260211",
+      "tagName": "20260211",
+      "publishedAt": "2026-02-11T06:52:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260211_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260211/SAM_20260211_release.zip",
+          "size": 43846522,
+          "downloadCount": 109
+        }
+      ]
+    },
+    {
+      "name": "20260206",
+      "tagName": "20260206",
+      "publishedAt": "2026-02-06T12:37:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260206_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260206/SAM_20260206_release.zip",
+          "size": 50010656,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "20260202",
+      "tagName": "20260202",
+      "publishedAt": "2026-02-02T03:21:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20260202_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20260202/SAM_20260202_release.zip",
+          "size": 50010478,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "20251226",
+      "tagName": "20251226",
+      "publishedAt": "2025-12-26T14:19:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251226_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251226/SAM_20251226_release.zip",
+          "size": 49549958,
+          "downloadCount": 98
+        }
+      ]
+    },
+    {
+      "name": "20251223",
+      "tagName": "20251223",
+      "publishedAt": "2025-12-23T13:01:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251223_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251223/SAM_20251223_release.zip",
+          "size": 49541497,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "20251216",
+      "tagName": "20251216",
+      "publishedAt": "2025-12-16T11:52:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251216_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251216/SAM_20251216_release.zip",
+          "size": 46918427,
+          "downloadCount": 50
+        }
+      ]
+    },
+    {
+      "name": "20251201",
+      "tagName": "20251201",
+      "publishedAt": "2025-12-01T10:15:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251201_fix_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251201/SAM_20251201_fix_release.zip",
+          "size": 48338646,
+          "downloadCount": 103
+        }
+      ]
+    },
+    {
+      "name": "20251129",
+      "tagName": "20251129",
+      "publishedAt": "2025-11-29T09:57:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251129_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251129/SAM_20251129_release.zip",
+          "size": 48298245,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "20251128",
+      "tagName": "20251128",
+      "publishedAt": "2025-11-27T17:58:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251128_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251128/SAM_20251128_release.zip",
+          "size": 48295507,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "20251120",
+      "tagName": "20251120",
+      "publishedAt": "2025-11-20T15:42:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251120_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251120/SAM_20251120_release.zip",
+          "size": 38732137,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "20251119",
+      "tagName": "20251119",
+      "publishedAt": "2025-11-19T05:37:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251119_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251119/SAM_20251119_release.zip",
+          "size": 31693733,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "20251117",
+      "tagName": "20251117",
+      "publishedAt": "2025-11-17T16:46:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAM_20251117_release.zip",
+          "downloadUrl": "https://github.com/5MayRain/SAM/releases/download/20251117/SAM_20251117_release.zip",
+          "size": 38372544,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ]
+}

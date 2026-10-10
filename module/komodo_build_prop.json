@@ -1,0 +1,441 @@
+{
+  "readme": "<div align=\"center\">\n\n# Komodo Pixel Props\n\n**Spoof your device fingerprint to Google Pixel 9 Pro XL (`komodo`) effortlessly.**\n\n<br>\n\n![Total Downloads](https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads)\n![Latest Stable](https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version)\n![Release Date](https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released)\n![Last Commit](https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update)\n\n<br>\n\n</div>\n\n## Overview\nKomodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (`komodo`). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.\n\n## Features\n- **System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).\n- **Attestation & Integrity Integration:**\n  - **PlayIntegrityFix (PIF):** Automatically generates or syncs `pif.json` targeting the Pixel 9 Pro XL fingerprint.\n  - **TrickyStore:** Generates and maintains `/data/adb/tricky_store/target.txt`, with automatic broken-TEE detection fallback (`teeBroken=true`).\n  - **PropImitationHooks (PIHooks):** Automatic internal property spoofing when standalone PIF is not present.\n- **Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).\n- **Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).\n- **Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.\n\n## Prerequisites\n- **Supported Root Managers:**\n  - Magisk v26.3 or newer\n  - KernelSU v0.9.3 (daemon 10818) or newer\n  - APatch v10763 or newer\n- **Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**\n\n## Installation & Interactive Setup\n1. Download the latest release `.zip` from GitHub Releases:\n   `https://github.com/Elcapitanoe/Komodo-Build-Prop/releases`\n2. Open Magisk, KernelSU, or APatch.\n3. Go to **Modules** -> **Install from storage** and select the downloaded archive.\n4. **Hardware Key Configuration:**\n   During installation, the script requests user input to configure sensitive property checks (`SAFE_DEVICE`, `SAFE_SECURITY_PATCH`, `SAFE_SOC`, `SAFE_SDK`):\n   - `Volume Up (+)` : **Yes (Enable safe check)**\n   - `Volume Down (-)` : **No (Disable check)**\n   - `Power Button` : **Cancel installation**\n   *(Note: Users without physical volume keys can pre-configure these values in `config.prop` inside the zip).*\n5. The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.\n6. Reboot your device.\n\n## Action Script & WebUI\n- In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:\n  - Regenerate `pif.json` for PlayIntegrityFix.\n  - Refresh target packages for TrickyStore (`target.txt`).\n- On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.\n\n## Troubleshooting\nIf your device experiences boot issues after installation:\n1. Boot into Safe Mode or access your device storage via custom recovery / ADB root.\n2. Disable or remove the module directory:\n   - Remove `/data/adb/modules/Komodo_beta_Props` (or `/data/adb/modules/Komodo_Props`).\n   - Alternatively, create an empty file at `/data/adb/modules/Komodo_beta_Props/disable`.\n3. Reboot to system.\n\n## Verification\nConfirm spoofing is active via terminal or ADB:\n\n```bash\ngetprop ro.product.model\n```\nExpected output: `Pixel 9 Pro XL`\n\nCheck fingerprint status:\n```bash\ngetprop ro.product.build.fingerprint\n```\n\n## Developer CLI & Automation\nThis repository includes a Python CLI toolchain (`komodo-tools`) for automated OTA release tracking, checksum operations, and Telegram distribution.\n\n### Setup\n```bash\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\n```\n\n### Usage\n```bash\n# Scan upstream Google OTA releases\nkomodo-tools ota scan --devices komodo\n\n# Generate SHA-256 checksums\nkomodo-tools checksum generate file.zip\n\n# Verify SHA-256 checksum\nkomodo-tools checksum verify file.zip\n\n# Run test suite and linter\npytest\nruff check .\n```\n\n## Changelog\nSee `CHANGELOG.md` for release history, build IDs, and property updates.\n\n## Credits\n- **Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)\n- **Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)\n\n## Support & Feedback\n- Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`\n- Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>Komodo Pixel Props</h1>\n\n<p><b>Spoof your device fingerprint to Google Pixel 9 Pro XL (<code>komodo</code>) effortlessly.</b></p>\n\n<p><br></p>\n\n<p>!<a href=\"https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads\">Total Downloads</a></p>\n<p>!<a href=\"https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version\">Latest Stable</a></p>\n<p>!<a href=\"https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released\">Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update\">Last Commit</a></p>\n\n<p><br></p>\n\n<p></div></p>\n\n<h2>Overview</h2>\n<p>Komodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (<code>komodo</code>). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.</p>\n\n<h2>Features</h2>\n<li>**System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).</li>\n<li>**Attestation & Integrity Integration:**</li>\n<p>  - <b>PlayIntegrityFix (PIF):</b> Automatically generates or syncs <code>pif.json</code> targeting the Pixel 9 Pro XL fingerprint.</p>\n<p>  - <b>TrickyStore:</b> Generates and maintains <code>/data/adb/tricky_store/target.txt</code>, with automatic broken-TEE detection fallback (<code>teeBroken=true</code>).</p>\n<p>  - <b>PropImitationHooks (PIHooks):</b> Automatic internal property spoofing when standalone PIF is not present.</p>\n<li>**Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).</li>\n<li>**Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).</li>\n<li>**Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.</li>\n\n<h2>Prerequisites</h2>\n<li>**Supported Root Managers:**</li>\n<p>  - Magisk v26.3 or newer</p>\n<p>  - KernelSU v0.9.3 (daemon 10818) or newer</p>\n<p>  - APatch v10763 or newer</p>\n<li>**Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**</li>\n\n<h2>Installation & Interactive Setup</h2>\n<li>Download the latest release `.zip` from GitHub Releases:</li>\n<p>   <code>https://github.com/Elcapitanoe/Komodo-Build-Prop/releases</code></p>\n<li>Open Magisk, KernelSU, or APatch.</li>\n<li>Go to **Modules** -> **Install from storage** and select the downloaded archive.</li>\n<li>**Hardware Key Configuration:**</li>\n<p>   During installation, the script requests user input to configure sensitive property checks (<code>SAFE_DEVICE</code>, <code>SAFE_SECURITY_PATCH</code>, <code>SAFE_SOC</code>, <code>SAFE_SDK</code>):</p>\n<p>   - <code>Volume Up (+)</code> : <b>Yes (Enable safe check)</b></p>\n<p>   - <code>Volume Down (-)</code> : <b>No (Disable check)</b></p>\n<p>   - <code>Power Button</code> : <b>Cancel installation</b></p>\n<p>   *(Note: Users without physical volume keys can pre-configure these values in <code>config.prop</code> inside the zip).*</p>\n<li>The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.</li>\n<li>Reboot your device.</li>\n\n<h2>Action Script & WebUI</h2>\n<li>In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:</li>\n<p>  - Regenerate <code>pif.json</code> for PlayIntegrityFix.</p>\n<p>  - Refresh target packages for TrickyStore (<code>target.txt</code>).</p>\n<li>On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.</li>\n\n<h2>Troubleshooting</h2>\n<p>If your device experiences boot issues after installation:</p>\n<li>Boot into Safe Mode or access your device storage via custom recovery / ADB root.</li>\n<li>Disable or remove the module directory:</li>\n<p>   - Remove <code>/data/adb/modules/Komodo_beta_Props</code> (or <code>/data/adb/modules/Komodo_Props</code>).</p>\n<p>   - Alternatively, create an empty file at <code>/data/adb/modules/Komodo_beta_Props/disable</code>.</p>\n<li>Reboot to system.</li>\n\n<h2>Verification</h2>\n<p>Confirm spoofing is active via terminal or ADB:</p>\n\n<pre>getprop ro.product.model</pre>\n<p>Expected output: <code>Pixel 9 Pro XL</code></p>\n\n<p>Check fingerprint status:</p>\n<pre>getprop ro.product.build.fingerprint</pre>\n\n<h2>Developer CLI & Automation</h2>\n<p>This repository includes a Python CLI toolchain (<code>komodo-tools</code>) for automated OTA release tracking, checksum operations, and Telegram distribution.</p>\n\n<h3>Setup</h3>\n<pre>python3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"</pre>\n\n<h3>Usage</h3>\n<pre># Scan upstream Google OTA releases\nkomodo-tools ota scan --devices komodo\n\n# Generate SHA-256 checksums\nkomodo-tools checksum generate file.zip\n\n# Verify SHA-256 checksum\nkomodo-tools checksum verify file.zip\n\n# Run test suite and linter\npytest\nruff check .</pre>\n\n<h2>Changelog</h2>\n<p>See <code>CHANGELOG.md</code> for release history, build IDs, and property updates.</p>\n\n<h2>Credits</h2>\n<li>**Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)</li>\n<li>**Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)</li>\n\n<h2>Support & Feedback</h2>\n<li>Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`</li>\n<li>Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`</li>",
+  "homepageUrl": "https://pixelprop.pages.dev",
+  "sourceUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop",
+  "url": "https://github.com/Elcapitanoe/Komodo-Build-Prop",
+  "latestRelease": {
+    "name": "20261003",
+    "version": "20261003",
+    "time": "2026-10-03T01:51:10Z",
+    "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20261003/Komodo_beta_DP11.260918.006.zip"
+  },
+  "releases": [
+    {
+      "name": "20261003",
+      "tagName": "20261003",
+      "publishedAt": "2026-10-03T01:51:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_DP11.260918.006.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20261003/Komodo_beta_DP11.260918.006.zip",
+          "size": 70913,
+          "downloadCount": 102
+        }
+      ]
+    },
+    {
+      "name": "20260930",
+      "tagName": "20260930",
+      "publishedAt": "2026-09-30T03:23:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260831.007.A3.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260930/Komodo_beta_CP41.260831.007.A3.zip",
+          "size": 70882,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "20260925",
+      "tagName": "20260925",
+      "publishedAt": "2026-09-25T02:03:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260831.007.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260925/Komodo_beta_CP41.260831.007.zip",
+          "size": 70880,
+          "downloadCount": 70
+        }
+      ]
+    },
+    {
+      "name": "20260918",
+      "tagName": "20260918",
+      "publishedAt": "2026-09-18T13:23:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260828.004.A8.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260918/Komodo_beta_CP41.260828.004.A8.zip",
+          "size": 65399,
+          "downloadCount": 55
+        }
+      ]
+    },
+    {
+      "name": "20260901",
+      "tagName": "20260901",
+      "publishedAt": "2026-09-01T02:04:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260814.003.B1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260901/Komodo_beta_CP41.260814.003.B1.zip",
+          "size": 64953,
+          "downloadCount": 38
+        },
+        {
+          "name": "Komodo_CP2A.260805.005.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260901/Komodo_CP2A.260805.005.zip",
+          "size": 67634,
+          "downloadCount": 61
+        }
+      ]
+    },
+    {
+      "name": "20260817",
+      "tagName": "20260817",
+      "publishedAt": "2026-08-17T02:52:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260731.005.B1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260817/Komodo_beta_CP41.260731.005.B1.zip",
+          "size": 64884,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "20260815",
+      "tagName": "20260815",
+      "publishedAt": "2026-08-15T12:15:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260717.006.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260815/Komodo_beta_CP41.260717.006.zip",
+          "size": 64860,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "20260805",
+      "tagName": "20260805",
+      "publishedAt": "2026-08-05T07:58:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260717.006.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260805/Komodo_beta_CP41.260717.006.zip",
+          "size": 64911,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v260804",
+      "tagName": "v260804",
+      "publishedAt": "2026-08-04T14:53:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260717.006.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260804/Komodo_beta_CP41.260717.006.zip",
+          "size": 64898,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v260725",
+      "tagName": "v260725",
+      "publishedAt": "2026-07-25T02:22:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP41.260701.005.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260725/Komodo_beta_CP41.260701.005.zip",
+          "size": 64902,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "v260716",
+      "tagName": "v260716",
+      "publishedAt": "2026-07-16T12:18:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP31.260623.005.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260716/Komodo_beta_CP31.260623.005.zip",
+          "size": 64894,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v260702",
+      "tagName": "v260702",
+      "publishedAt": "2026-07-02T07:57:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP31.260618.005.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260702/Komodo_beta_CP31.260618.005.zip",
+          "size": 64892,
+          "downloadCount": 52
+        }
+      ]
+    },
+    {
+      "name": "v260625",
+      "tagName": "v260625",
+      "publishedAt": "2026-06-25T01:44:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP31.260608.007.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260625/Komodo_beta_CP31.260608.007.zip",
+          "size": 64900,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v260607",
+      "tagName": "v260607",
+      "publishedAt": "2026-06-07T14:31:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP31.260508.005.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260607/Komodo_beta_CP31.260508.005.zip",
+          "size": 38959,
+          "downloadCount": 70
+        }
+      ]
+    },
+    {
+      "name": "v260516",
+      "tagName": "v260516",
+      "publishedAt": "2026-05-16T07:02:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP31.260423.012.A1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260516/Komodo_beta_CP31.260423.012.A1.zip",
+          "size": 41329,
+          "downloadCount": 87
+        }
+      ]
+    },
+    {
+      "name": "V260421",
+      "tagName": "V260421",
+      "publishedAt": "2026-04-21T02:03:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP21.260330.008.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/V260421/Komodo_beta_CP21.260330.008.zip",
+          "size": 41281,
+          "downloadCount": 1301
+        }
+      ]
+    },
+    {
+      "name": "v260402",
+      "tagName": "v260402",
+      "publishedAt": "2026-04-02T01:31:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP21.260306.017.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260402/Komodo_beta_CP21.260306.017.zip",
+          "size": 40985,
+          "downloadCount": 5520
+        }
+      ]
+    },
+    {
+      "name": "v260307",
+      "tagName": "v260307",
+      "publishedAt": "2026-03-07T13:59:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP21.260206.011.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260307/Komodo_beta_CP21.260206.011.zip",
+          "size": 41472,
+          "downloadCount": 3056
+        }
+      ]
+    },
+    {
+      "name": "v260222",
+      "tagName": "v260222",
+      "publishedAt": "2026-02-22T15:52:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP21.260116.011.B1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260222/Komodo_beta_CP21.260116.011.B1.zip",
+          "size": 40693,
+          "downloadCount": 3053
+        }
+      ]
+    },
+    {
+      "name": "v260211",
+      "tagName": "v260211",
+      "publishedAt": "2026-02-11T01:02:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP11.251209.009.A1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260211/Komodo_beta_CP11.251209.009.A1.zip",
+          "size": 40555,
+          "downloadCount": 2246
+        }
+      ]
+    },
+    {
+      "name": "v260202",
+      "tagName": "v260202",
+      "publishedAt": "2026-02-02T01:57:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_CP11.251209.007.A1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260202/Komodo_beta_CP11.251209.007.A1.zip",
+          "size": 40554,
+          "downloadCount": 165
+        }
+      ]
+    },
+    {
+      "name": "v260110",
+      "tagName": "v260110",
+      "publishedAt": "2026-01-10T08:52:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP41.250916.015.A1.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260110/Komodo_beta_BP41.250916.015.A1.zip",
+          "size": 40278,
+          "downloadCount": 164
+        }
+      ]
+    },
+    {
+      "name": "v250819",
+      "tagName": "v250819",
+      "publishedAt": "2025-08-19T05:43:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP31.250610.009.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250819/Komodo_beta_BP31.250610.009.zip",
+          "size": 40086,
+          "downloadCount": 1166
+        }
+      ]
+    },
+    {
+      "name": "v250718",
+      "tagName": "v250718",
+      "publishedAt": "2025-07-18T15:22:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP31.250610.004.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250718/Komodo_beta_BP31.250610.004.zip",
+          "size": 40080,
+          "downloadCount": 501
+        }
+      ]
+    },
+    {
+      "name": "v250708",
+      "tagName": "v250708",
+      "publishedAt": "2025-07-08T02:34:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP31.250523.010.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250708/Komodo_beta_BP31.250523.010.zip",
+          "size": 39200,
+          "downloadCount": 201
+        }
+      ]
+    },
+    {
+      "name": "v250610",
+      "tagName": "v250610",
+      "publishedAt": "2025-06-10T05:59:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP11.241210.004.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250610/Komodo_beta_BP11.241210.004.zip",
+          "size": 38482,
+          "downloadCount": 244
+        }
+      ]
+    },
+    {
+      "name": "v250309",
+      "tagName": "v250309",
+      "publishedAt": "2025-03-09T06:13:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_BP1A.250305.020.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250309/Komodo_BP1A.250305.020.zip",
+          "size": 38460,
+          "downloadCount": 781
+        }
+      ]
+    },
+    {
+      "name": "v250306",
+      "tagName": "v250306",
+      "publishedAt": "2025-03-06T03:29:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_BP1A.250305.020-beta-test.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250306/Komodo_BP1A.250305.020-beta-test.zip",
+          "size": 19614710,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v250305",
+      "tagName": "v250305",
+      "publishedAt": "2025-03-05T02:50:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP11.241210.004.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250305/Komodo_beta_BP11.241210.004.zip",
+          "size": 38482,
+          "downloadCount": 54
+        }
+      ]
+    },
+    {
+      "name": "v250228",
+      "tagName": "v250228",
+      "publishedAt": "2025-02-28T08:48:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_BP11.241210.004.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250228/Komodo_beta_BP11.241210.004.zip",
+          "size": 22557,
+          "downloadCount": 71
+        }
+      ]
+    }
+  ]
+}

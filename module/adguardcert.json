@@ -1,0 +1,169 @@
+{
+  "readme": "# AdGuard Certificate\n\nBased on [Move Certificates](https://github.com/Magisk-Modules-Repo/movecert).\n\nThis Magisk module supplements [AdGuard for Android][agandroid] and allows installing\nAdGuard's CA certificate to the System store on rooted devices.\n\n**Attention**\n[Current version](https://github.com/AdguardTeam/adguardcert/releases/latest)\nof this module is designed for Adguard for Android 4.2 and newer.\n\nIf you're using AdGuard for Android v4.1 or older, please use the earlier version of\nthis magisk module: https://github.com/AdguardTeam/adguardcert/releases/tag/v1.2.\n\n## Explanation\n\nChrome (and subsequently many other Chromium-based browsers)\nhas recently started requiring Certificate Transparency logs\nfor CA certs found in the **system certificate store**.\n\nIf your device is rooted, and you want AdGuard's CA certificate to be installed\nin the **system store** , then AdGuard will generate two CA certificates and ask you\nto install both of them in the **user store**. This module moves one of them to the\n**system store**. The certificate that is left in the **user store** is cross-signed\nwith the one that goes into the **system store**. This allows apps that don't trust\nuser certificates to still accept AdGuard's certificate, while apps that do trust\nuser certificates (like Chrome or other browsers) will construct a shorter validation\npath to the certificate stored in the **user store**. And since it is stored in the\n**user store**, they won't require CT logs.\n\n## Why would I want AdGuard's certificate in the system store?\n\nAdGuard for Android provides a feature called [HTTPS filtering][httpsfiltering]. It allows\nfiltering of encrypted HTTPS traffic on your Android device. This feature requires\nadding the AdGuard's CA certificate to the list of trusted certificates.\n\nBy default, on a non-rooted device only a limited subset of apps (mostly, browsers)\ntrust the CA certificates installed to the **user store**. The only option to allow\nfiltering of all other apps' traffic is to install the certificate to the **system store**.\nUnfortunately, this is only possible on rooted devices.\n\n[agandroid]: https://adguard.com/adguard-android/overview.html\n[httpsfiltering]: https://kb.adguard.com/general/https-filtering\n\n## Usage\n\n1. Enable HTTPS filtering in AdGuard for Android and save AdGuard's certificate(s) to the User store\n2. Download the `.zip` file from the [latest release][latestrelease].\n3. Go to *Magisk -> Modules -> Install from storage* and select the downloaded `.zip` file.\n4. Reboot.\n\nIf a new version comes out, repeat steps 2-4 to update the module.\n\nThe module does its work during the system boot. If your AdGuard certificate(s) change,\nyou'll have to reboot the device for the new certificate to be copied to the system store.\n\n<details>\n    <summary>Illustrated instruction</summary>\n\n![Open Magisk modules](https://user-images.githubusercontent.com/5947035/161061277-1ada3a87-d0cb-44c0-9edd-77b00669759c.png)\n\n![Install from storage](https://user-images.githubusercontent.com/5947035/161061283-8e3d6ed2-ca36-4825-bca4-fbb9f9185f68.png)\n\n![Select AdGuard certificate module](https://user-images.githubusercontent.com/5947035/161061285-4ea302ad-99ec-4619-be05-3b83f64b9e4f.png)\n\n![Reboot the device](https://user-images.githubusercontent.com/5947035/161061291-54ad008f-4c76-4ee3-975d-307fd0fe7220.png)\n\n</details>\n\nPlease note that in order for **Bromite** browser to work properly, you need to set the \"Allow user certificates\" flag in `chrome://flags` to \"Enabled\".\n\n<details>\n    <summary>Bromite setup</summary>\n    \n![Allow user certificates flag](https://user-images.githubusercontent.com/47204/161606690-0e44211a-abd6-4e89-91b0-f012e68294df.png)\n\n</details>\n\n[latestrelease]: https://github.com/AdguardTeam/adguardcert/releases/latest/\n\n## Building\n```shell\n./dist.sh\n```\n\nHow to release a new version:\n1. Push a new tag with a name like `v*`.\n2. A new release will be automatically created.\n",
+  "readmeHTML": "<h1>AdGuard Certificate</h1>\n\n<p>Based on <a href=\"https://github.com/Magisk-Modules-Repo/movecert\">Move Certificates</a>.</p>\n\n<p>This Magisk module supplements [AdGuard for Android][agandroid] and allows installing</p>\n<p>AdGuard's CA certificate to the System store on rooted devices.</p>\n\n<p><b>Attention</b></p>\n<p><a href=\"https://github.com/AdguardTeam/adguardcert/releases/latest\">Current version</a></p>\n<p>of this module is designed for Adguard for Android 4.2 and newer.</p>\n\n<p>If you're using AdGuard for Android v4.1 or older, please use the earlier version of</p>\n<p>this magisk module: https://github.com/AdguardTeam/adguardcert/releases/tag/v1.2.</p>\n\n<h2>Explanation</h2>\n\n<p>Chrome (and subsequently many other Chromium-based browsers)</p>\n<p>has recently started requiring Certificate Transparency logs</p>\n<p>for CA certs found in the <b>system certificate store</b>.</p>\n\n<p>If your device is rooted, and you want AdGuard's CA certificate to be installed</p>\n<p>in the <b>system store</b> , then AdGuard will generate two CA certificates and ask you</p>\n<p>to install both of them in the <b>user store</b>. This module moves one of them to the</p>\n<p><b>system store</b>. The certificate that is left in the <b>user store</b> is cross-signed</p>\n<p>with the one that goes into the <b>system store</b>. This allows apps that don't trust</p>\n<p>user certificates to still accept AdGuard's certificate, while apps that do trust</p>\n<p>user certificates (like Chrome or other browsers) will construct a shorter validation</p>\n<p>path to the certificate stored in the <b>user store</b>. And since it is stored in the</p>\n<p><b>user store</b>, they won't require CT logs.</p>\n\n<h2>Why would I want AdGuard's certificate in the system store?</h2>\n\n<p>AdGuard for Android provides a feature called [HTTPS filtering][httpsfiltering]. It allows</p>\n<p>filtering of encrypted HTTPS traffic on your Android device. This feature requires</p>\n<p>adding the AdGuard's CA certificate to the list of trusted certificates.</p>\n\n<p>By default, on a non-rooted device only a limited subset of apps (mostly, browsers)</p>\n<p>trust the CA certificates installed to the <b>user store</b>. The only option to allow</p>\n<p>filtering of all other apps' traffic is to install the certificate to the <b>system store</b>.</p>\n<p>Unfortunately, this is only possible on rooted devices.</p>\n\n<p>[agandroid]: https://adguard.com/adguard-android/overview.html</p>\n<p>[httpsfiltering]: https://kb.adguard.com/general/https-filtering</p>\n\n<h2>Usage</h2>\n\n<li>Enable HTTPS filtering in AdGuard for Android and save AdGuard's certificate(s) to the User store</li>\n<li>Download the `.zip` file from the [latest release][latestrelease].</li>\n<li>Go to *Magisk -> Modules -> Install from storage* and select the downloaded `.zip` file.</li>\n<li>Reboot.</li>\n\n<p>If a new version comes out, repeat steps 2-4 to update the module.</p>\n\n<p>The module does its work during the system boot. If your AdGuard certificate(s) change,</p>\n<p>you'll have to reboot the device for the new certificate to be copied to the system store.</p>\n\n<p><details></p>\n<p>    <summary>Illustrated instruction</summary></p>\n\n<p>!<a href=\"https://user-images.githubusercontent.com/5947035/161061277-1ada3a87-d0cb-44c0-9edd-77b00669759c.png\">Open Magisk modules</a></p>\n\n<p>!<a href=\"https://user-images.githubusercontent.com/5947035/161061283-8e3d6ed2-ca36-4825-bca4-fbb9f9185f68.png\">Install from storage</a></p>\n\n<p>!<a href=\"https://user-images.githubusercontent.com/5947035/161061285-4ea302ad-99ec-4619-be05-3b83f64b9e4f.png\">Select AdGuard certificate module</a></p>\n\n<p>!<a href=\"https://user-images.githubusercontent.com/5947035/161061291-54ad008f-4c76-4ee3-975d-307fd0fe7220.png\">Reboot the device</a></p>\n\n<p></details></p>\n\n<p>Please note that in order for <b>Bromite</b> browser to work properly, you need to set the \"Allow user certificates\" flag in <code>chrome://flags</code> to \"Enabled\".</p>\n\n<p><details></p>\n<p>    <summary>Bromite setup</summary></p>\n\n<p>!<a href=\"https://user-images.githubusercontent.com/47204/161606690-0e44211a-abd6-4e89-91b0-f012e68294df.png\">Allow user certificates flag</a></p>\n\n<p></details></p>\n\n<p>[latestrelease]: https://github.com/AdguardTeam/adguardcert/releases/latest/</p>\n\n<h2>Building</h2>\n<pre>./dist.sh</pre>\n\n<p>How to release a new version:</p>\n<li>Push a new tag with a name like `v*`.</li>\n<li>A new release will be automatically created.</li>",
+  "homepageUrl": "https://adguard.com/",
+  "sourceUrl": "https://github.com/AdguardTeam/adguardcert",
+  "url": "https://github.com/AdguardTeam/adguardcert",
+  "latestRelease": {
+    "name": "v2.1",
+    "version": "v2.1",
+    "time": "2024-01-23T08:28:25Z",
+    "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.1/adguardcert-v2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2024-01-23T08:28:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.1.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.1/adguardcert-v2.1.zip",
+          "size": 3829,
+          "downloadCount": 28334
+        }
+      ]
+    },
+    {
+      "name": "v2.1-beta1",
+      "tagName": "v2.1-beta1",
+      "publishedAt": "2024-01-18T17:05:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.1-beta1.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.1-beta1/adguardcert-v2.1-beta1.zip",
+          "size": 3834,
+          "downloadCount": 232
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2023-10-23T13:00:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0/adguardcert-v2.0.zip",
+          "size": 3698,
+          "downloadCount": 4231
+        }
+      ]
+    },
+    {
+      "name": "v2.0-beta5",
+      "tagName": "v2.0-beta5",
+      "publishedAt": "2023-09-25T11:31:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0-beta5.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0-beta5/adguardcert-v2.0-beta5.zip",
+          "size": 3703,
+          "downloadCount": 592
+        }
+      ]
+    },
+    {
+      "name": "v2.0-beta4",
+      "tagName": "v2.0-beta4",
+      "publishedAt": "2023-07-26T13:04:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0-beta4.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0-beta4/adguardcert-v2.0-beta4.zip",
+          "size": 3326,
+          "downloadCount": 686
+        }
+      ]
+    },
+    {
+      "name": "v2.0-beta3",
+      "tagName": "v2.0-beta3",
+      "publishedAt": "2023-07-17T16:41:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0-beta3.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0-beta3/adguardcert-v2.0-beta3.zip",
+          "size": 3458,
+          "downloadCount": 104
+        }
+      ]
+    },
+    {
+      "name": "v2.0-beta2",
+      "tagName": "v2.0-beta2",
+      "publishedAt": "2023-07-11T16:11:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0-beta2.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0-beta2/adguardcert-v2.0-beta2.zip",
+          "size": 3410,
+          "downloadCount": 60
+        }
+      ]
+    },
+    {
+      "name": "v2.0-beta",
+      "tagName": "v2.0-beta",
+      "publishedAt": "2023-07-10T12:26:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v2.0-beta.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.0-beta/adguardcert-v2.0-beta.zip",
+          "size": 3254,
+          "downloadCount": 58
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2022-04-11T13:23:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v1.2.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v1.2/adguardcert-v1.2.zip",
+          "size": 139747,
+          "downloadCount": 13307
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2022-04-01T12:36:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v1.1.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v1.1/adguardcert-v1.1.zip",
+          "size": 139291,
+          "downloadCount": 133
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2022-03-30T20:19:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguardcert-v1.0.zip",
+          "downloadUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v1.0/adguardcert-v1.0.zip",
+          "size": 132800,
+          "downloadCount": 93
+        }
+      ]
+    }
+  ]
+}

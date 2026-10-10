@@ -1,0 +1,315 @@
+{
+  "readme": "<div align=\"center\">\n\n# 🔋 QSC 定量停充\n\n**Magisk / KernelSU / APatch 充电阈值控制模块 · 纯本地脚本 · 无联网**\n\n到达指定电量自动停止充电，低于恢复阈值自动恢复充电 · 配置热重载，改完即生效\n\n<img src=\"https://img.shields.io/badge/Android-5.0%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Magisk-%E2%89%A520.4-00AF9A?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/KernelSU%20%7C%20APatch-Supported-4EAA25?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/Shell-POSIX-89E051?style=for-the-badge&logo=gnubash&logoColor=black\" />\n<img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" />\n\n</div>\n\n---\n\n## ✨ 这是什么\n\nQSC 定量停充是一个运行在 root 环境下的充电控制模块：\n\n- 电量达到 **停止电量**（默认 100%）→ 写入内核充电开关节点，停止充电；\n- 电量降到 **恢复电量**（默认 95%）→ 自动恢复充电；\n- `config.conf` 每 3 秒热重载一次，改完立即生效，不用重启。\n- 支持管理器内更新：内置 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并安装新版本（v3 起）。\n\n> 🎯 一句话：**让电池停在你想让它停的地方，而不是永远充到 100%。**\n>\n> 🔒 本版本已移除原版的联网自更新逻辑，**不联网、不上传、无遥测**，日志与配置全部留在手机本地。\n\n## ✅ 已实现机型\n\n以下机型已有实测反馈可用：\n\n| 机型 | 状态 | 说明 |\n| :--- | :---: | :--- |\n| 红米 K40 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |\n| 红米 K50U | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |\n| 小米 14 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点；v4 修复反复充停 |\n| 红米 Note 12 Turbo | ✅ 可用 | 用户实测反馈可用 |\n| 小米 17 Pro | ✅ 可用 | MCA `xm_power`：`charge_enable` 关充电 + `input_suspend` 改状态显示；v10 起停充后充电图标也会消失 |\n| 天翼一号 2021（TYH211U） | ✅ 可用 | 展锐 UD710；`charger.0/stop_charge` 停充 + `dumpsys battery unplug` 隐藏标识；v12 修复电量显示冻结，改用 sysfs `capacity` 读真实电量 |\n\n> 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。\n>\n> ✅ 小米 17 Pro 已在 v10 实测确认：到达阈值停充生效，且充电图标会自动退出。\n\n---\n\n## 📦 两个版本怎么选\n\n| 版本 | 适用系统 | 安装方式 | 前置条件 |\n| :--- | :--- | :--- | :--- |\n| **安卓 5-17 适配版** | Android 5.0 ~ 17 | Magisk / KernelSU / APatch 管理器直接刷入 zip | 安卓 5/6-11 需 Magisk ≥ v20.4；安卓 12-17 支持 Magisk / KernelSU / ReSukiSU / SukiSU / APatch |\n| **安卓 1-5 遗留 root 实验版** | Android 1.6 ~ 5.x（无 Magisk 时代） | 解压后执行 `install.sh`（SuperSU / init.d / SManager） | 必须已 root + busybox + 内核暴露可写充电开关节点（实验性，多数老机型不支持） |\n\n> ⚠️ 安卓 1-4 无法使用现代模块版：那个年代没有 Magisk，这是安装机制的限制。\n> 老系统请先跑 `probe.sh`，只有扫描到 `writable:yes` 的节点才有停充的可能。\n\n### ⬇️ 下载\n\n- [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)\n- [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)\n\n也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（常规更新）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（移除温控 + 合并开关脚本）、**v14**（常规更新）、**v15**（当前版本，常规更新与优化），后续版本继续递增；`dist/` 目录始终是最新版。\n\n---\n\n## 🚀 安装\n\n### 方式一：现代模块版（Android 5.0 ~ 17）\n\n1. 下载 `QSC定量停充_安卓5-17适配版_20261004.zip`；\n2. 在 Magisk / KernelSU / ReSukiSU / APatch 管理器中刷入；\n3. **重启手机**（重启前 `service.sh` 不会启动，模块不工作）；\n4. 配置路径：`/data/adb/modules/QuantitativeStopCharging_switch/config.conf`，日志：同目录 `log.log`。\n\n> 💡 v3 起支持管理器内更新：以后有新版本，直接在 Magisk / KernelSU / APatch 管理器里点更新即可。\n\n### 方式二：遗留 root 实验版（Android 1.6 ~ 5.x）\n\n1. 把 `source/legacy-root/` 里的全部文件传到手机，例如 `/data/local/tmp/qsc/`；\n2. 终端执行（root）：\n\n```sh\nsu -c sh /data/local/tmp/qsc/install.sh\n```\n\n3. 安装器会复制文件到 `/data/qsc/`，并尝试安装 init.d 启动项（没有 init.d 时提示用 SManager 等工具开机执行 `sh /data/qsc/boot.sh`）；\n4. 重启手机。配置：`/data/qsc/config.conf`，日志：`/data/qsc/log.log`。\n\n---\n\n## ⚙️ 配置说明\n\n编辑 `config.conf`（现代版在模块目录，遗留版在 `/data/qsc/`），保存后 3 秒内自动生效。\n\n| 参数 | 默认值 | 说明 |\n| :--- | :---: | :--- |\n| `power_stop` | `100` | 停止充电电量，`电量 >= 该值` 时停充；必须大于 `power_start`；填 `110` 可关闭此功能 |\n| `power_start` | `95` | 恢复充电电量，`电量 <= 该值` 时恢复；建议与停止电量间隔 5-10 |\n| `power_stop_time` | `3` | 触发停充前继续充电的秒数（仅大于 0 的整数）；倒计时开始后无法中止 |\n| `charge_full` | `0` | `1` = 充满再停：100% 后等电流小于 100mA 再停充（开启后延时功能自动失效） |\n| `power_reset` | `0` | `1` = 每次充电自动拔插一次，用于激活部分机型的快充 |\n\n| `hide_charging_icon`（可选） | 自动 | 停充后隐藏充电标识；展锐 `stop_charge` 机型默认自动开启，可填 `1` / `0` 强制 |\n\n> 想早点测试：把 `power_stop=80`、`power_start=70`，保存后 3 秒内生效。\n\n---\n\n## 🔧 开关与诊断\n\n**临时关闭 / 恢复（现代版）**\n\n- 管理器里的「执行」按钮：点一次开启，再点一次关闭（并显示状态、配置与最近日志）\n- 关闭：创建文件 `/data/adb/modules/QuantitativeStopCharging_switch/off_qsc`（或点执行按钮）\n- 恢复：删除该文件（或再点一次执行按钮）\n\n**临时关闭 / 恢复（遗留版）**\n\n- 关闭：`touch /data/qsc/off_qsc`；恢复：`rm -f /data/qsc/off_qsc`\n- 手动启动：`su -c \"sh /data/qsc/boot.sh\"`；停止：`kill $(cat /data/qsc/qsc.pid)`\n\n**诊断（停充无效时）**\n\n```sh\n# 现代版\nsu -c sh /data/adb/modules/QuantitativeStopCharging_switch/probe.sh\n\n# 遗留版\nsu -c sh /data/qsc/probe.sh\n```\n\n脚本会在模块目录生成 `probe.log`，包含系统版本、机型、电池状态、候选充电节点及可写性，方便定位问题。\n\n---\n\n## ❓ 常见问题\n\n| 现象 | 原因 / 处理 |\n| :--- | :--- |\n| 日志出现「检测到关闭开关，模块暂停」 | 删除 `off_qsc`，或再点一次模块「执行」按钮 |\n| 日志出现「未找到可用的充电开关节点」 | 内核没有暴露可写节点，运行 `probe.sh` 检查 |\n| 日志写入了节点但电量仍上升 | 该节点切不断充电，需要按 `probe.log` 找其它节点 |\n| 日志出现「节点写入失败」 | SELinux / 权限拦截，`probe.log` 里 `writable:no` 可确认 |\n| 停充后电量不下降 | 正常现象，电量不上升即为生效 |\n| 完全没有任何日志 | 确认已重启、模块已启用、电量确实达到了 `power_stop` |\n\n---\n\n## 🗂 仓库结构\n\n```\nQSC-StopCharging/\n├── dist/                          # 可直接刷入 / 安装的成品包（最新版）\n│   ├── QSC定量停充_安卓5-17适配版_20261004.zip\n│   └── QSC定量停充_安卓1-5遗留root实验版.zip\n├── source/\n│   ├── qsc-a5-17/                 # 现代模块版源码（含 META-INF）\n│   └── legacy-root/               # 安卓 1.6-5.x 遗留 root 实验版源码\n├── assets/\n│   └── donate/                    # 打赏二维码（支付宝 / 微信）\n├── update.json                    # 管理器内更新用的版本清单（updateJson）\n├── CHANGELOG.md                   # 更新日志（管理器内也会展示）\n├── RELEASING.md                   # 发布流程说明\n├── LICENSE\n└── README.md\n```\n\n---\n\n## 📝 更新日志\n\n<details>\n<summary>点击展开完整更新日志</summary>\n\n### v15 — 20261004（versionCode 2026100419）\n\n- 常规更新与优化。\n\n### v14 — 20261004（versionCode 2026100418）\n\n- 常规更新与优化。\n\n### v13 — 20261004（versionCode 2026100417）\n\n- 移除温控停充功能：不再按电池温度停止 / 恢复充电（充电火力全开）；\n- 移除 `打开定量停充.sh` / `关闭定量停充.sh`：管理器「执行」按钮改为点一次开启、再点一次关闭；\n- 清理温度相关代码与无用变量（`TEMP_*`、`BAT_TEMP`、`cpu_log*`、`log_log*` 等）；\n- `versionCode`：2026100416 → 2026100417。\n\n### v12 — 20261004（versionCode 2026100416）\n\n- 修复 v11 遗留问题：展锐 `stop_charge` 机型（天翼一号 2021 反馈）用 `dumpsys battery unplug` 隐藏充电标识后，系统电量显示冻结在触发值，模块读不到真实电量、无法按 `power_start` 恢复充电；\n- 隐藏标识期间改用 sysfs 真实电量做阈值判断，并尝试把真实电量同步回系统显示；恢复充电时 `dumpsys battery reset` 照常执行；\n- `versionCode`：2026100415 → 2026100416。\n\n### v11 — 20261004（versionCode 2026100415）\n\n- 新增 `hide_charging_icon`（默认自动）：展锐 `charger.0/stop_charge` 机型停充后，用 `dumpsys battery unplug` 隐藏充电标识，恢复时 `dumpsys battery reset`；\n- 解决天翼一号 2021（Unisoc UD710）停充后充电标识不消失的问题；\n- `versionCode`：2026100414 → 2026100415。\n\n### v10 — 20261004（versionCode 2026100414）\n\n- 修复小米 17 Pro 停充后充电图标不消失：`input_suspend` 投票改用 `micharge` 客户端，内核会据此把电池状态上报为 `DISCHARGING`，系统充电图标随之消失；\n- `charge_enable` 仍用 `qsc` 客户端直接关闭充电；一个负责真正断电，一个负责状态显示；\n- `versionCode`：2026100413 → 2026100414。\n\n### v9 — 20261004（versionCode 2026100413）\n\n- 修复小米 17 Pro「写入成功但仍在充电」：仅挂起 `input_suspend` 只限制了输入，主充电路径仍然开启；\n- 改用 MCA `charge_enable` 直接关闭充电：停止充电写 `qsc all 0`，恢复充电写 `qsc all 1`；`input_suspend` 保留为辅助控制；\n- `versionCode`：2026100412 → 2026100413。\n\n### v8 — 20261004（versionCode 2026100412）\n\n- 定位小米 17 Pro 根因：电池驱动的 `charge_control_limit` 是「显示可写但 set 为空」的实现，写入无效；真正控制充电的是 MCA `xm_power` 接口；\n- 新增 MCA 支持：`/sys/class/xm_power/charger/charge_interface/input_suspend` 写入 `qsc all 1` 停止充电、`qsc all 0` 恢复充电；\n- `probe.sh` 加入该节点与 `xm_power` 目录列举，并修正 battery / usb / wireless 属性列举；\n- `versionCode`：2026100411 → 2026100412。\n\n### v7 — 20261004（versionCode 2026100411）\n\n- 常规更新与优化。\n- 停充逻辑与 v6 一致（含小米 17 Pro 的 `charge_control_limit` 适配尝试）；\n- `versionCode`：2026100410 → 2026100411。\n\n### v6 — 20261004（versionCode 2026100410）\n\n- 尝试适配小米 17 Pro：新增标准 `charge_control_limit` 支持（停止充电写 `0`，恢复充电写 `charge_control_limit_max`，该机为 16）；\n- `probe.sh` 按文件权限判断真实可写性（不再被 root 的 `-w` 误判），并完整列出 battery / usb / wireless 的全部属性；\n- v5 的 `charge_behaviour` 支持保留；\n- `versionCode`：2026100409 → 2026100410。\n\n### v5 — 20261004（versionCode 2026100409）\n\n- 尝试适配小米 17 Pro：新增标准内核接口 `charge_behaviour`（`auto` / `inhibit-charge`）支持，并兼容带 `[当前值]` 的枚举显示；\n- `probe.sh` 新增「扩展扫描」：列出 `/sys/class` 顶层、`power_supply` / `qcom-battery` 等目录全部节点，以及所有名字含 charge / batt / suspend 的节点与可写性；\n- 小米 14 的反复充停修复保持不变；\n- `versionCode`：2026100408 → 2026100409。\n\n### v4 — 20261004（versionCode 2026100408）\n\n- 修复小米 14 反复充电 / 停止：不再写入 `handle_stop_charging`（内核处理节点），避免每 6 秒重复触发；\n- 节点已是目标值时跳过写入，只有真正写入时才记录日志，日志不再刷屏；\n- 新增已实测机型：**小米 14**；\n- `versionCode`：2026100407 → 2026100408。\n\n### v3 — 20261004（versionCode 2026100407）\n\n- 新增 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并更新（v1 / v2 需手动刷一次 v3，之后可在管理器内更新）；\n- 新增仓库根目录 `update.json`（版本清单）与 `CHANGELOG.md`；\n- 模块版本显示改为 `20261004-v3`，`versionCode`：2026100406 → 2026100407。\n\n### v2 — 20261004（versionCode 2026100406）\n\n- 新增高通 `qcom-battery/input_suspend` 节点支持（0=恢复充电，1=停止充电），骁龙机型实测可停充：**红米 K40、红米 K50U**；\n- `probe.sh` 与节点扫描同步支持 `/sys/class/qcom-battery`；\n- 现代版 `versionCode`：2026100405 → 2026100406。\n\n### v1 — 20261004（versionCode 2026100405）\n\n- 首个发布版本；\n- 现代模块安装器：`customize.sh` + `module.prop` + 官方 recovery `update-binary`，支持管理器安装与 recovery 刷入（Magisk v20.4+）；\n- 安装脚本不依赖 Magisk 专有命令，`set_perm` / `ui_print` 缺失时自动回退；\n- 全面 toybox 兼容，安卓 5-11 缺少 `awk` 等命令时自动使用 busybox 兜底；\n- 配置热重载：`config.conf` 每 3 秒重新读取，修改即时生效；\n- **移除原版联网自更新（curl）**，改为本地每 60 秒重新扫描充电开关节点；\n- 管理器「执行」按钮改为启用模块 + 显示状态，不再会误触关闭模块；\n- 写入失败会记录具体节点，SELinux / 权限问题一眼可见；\n- 新增安卓 1.6-5.x 遗留 root 实验版（init.d / install-recovery / SManager）。\n\n</details>\n---\n\n## ⚠️ 注意事项\n\n- 模块通过写入 `/sys`、`/proc` 下的充电开关节点实现停充，**需要 root**；不同机型节点不同，部分机型内核不暴露可写节点，属于硬件/内核限制，无法通过脚本绕过；\n- 请先确认机型支持再长期使用，首次使用建议把阈值调低测试；\n- 修改系统节点存在风险，请自行评估并备份重要数据；\n- 本模块为本地脚本，不收集、不上传任何数据；诊断日志只保存在手机本地，由你决定是否分享。\n\n---\n\n## 💬 反馈与贡献\n\n发现 bug、想加功能，或者心里有更好的实现，欢迎直接来：\n\n- **[提交 Issue](https://github.com/L0NE-6/QSC-StopCharging/issues/new)** —— 报 bug、提需求、吐槽都行\n- **[发起 Pull Request](https://github.com/L0NE-6/QSC-StopCharging/pulls)** —— 代码说话，改动越具体越好\n\n想让定位快一点，Issue 里可以顺手带上：\n\n- 机型、系统版本，以及用的是哪个版本（安卓 5-17 适配版 / 安卓 1-5 遗留 root 版）\n- 相关日志：现代版 `log.log`、`probe.log`；遗留版 `/data/qsc/probe.log`\n- 复现步骤，比如“充到 80% 没有停充”就比“用不了”有用得多\n\n---\n\n## ☕ 投喂与打赏\n\n如果这个模块帮你省了心，愿意请我喝杯饮料的话，可以扫下面任意一个码。\n完全自愿，不打赏也照常维护和更新。\n\n| <img src=\"assets/donate/alipay.jpg\" alt=\"支付宝\" width=\"260\"> | <img src=\"assets/donate/wechat.png\" alt=\"微信支付\" width=\"260\"> |\n| :---: | :---: |\n| 支付宝 | 微信支付 |\n\n---\n\n## 🙏 致谢与来源\n\n- 原版 QSC 定量停充：酷安作者 **top大佬**（20231204 版）；\n- 本仓库为社区修改 / 适配版本：重构守护脚本、增加安卓 5-17 兼容与安卓 1-5 遗留 root 支持、移除联网自更新、增加诊断脚本；\n- 如果原版作者对发布方式有异议，欢迎通过 Issue 联系处理。\n\n## 📄 License\n\n[MIT](LICENSE) © 2026 L0NE-6\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>🔋 QSC 定量停充</h1>\n\n<p><b>Magisk / KernelSU / APatch 充电阈值控制模块 · 纯本地脚本 · 无联网</b></p>\n\n<p>到达指定电量自动停止充电，低于恢复阈值自动恢复充电 · 配置热重载，改完即生效</p>\n\n<p><img src=\"https://img.shields.io/badge/Android-5.0%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Magisk-%E2%89%A520.4-00AF9A?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/KernelSU%20%7C%20APatch-Supported-4EAA25?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/Shell-POSIX-89E051?style=for-the-badge&logo=gnubash&logoColor=black\" /></p>\n<p><img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" /></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>✨ 这是什么</h2>\n\n<p>QSC 定量停充是一个运行在 root 环境下的充电控制模块：</p>\n\n<li>电量达到 **停止电量**（默认 100%）→ 写入内核充电开关节点，停止充电；</li>\n<li>电量降到 **恢复电量**（默认 95%）→ 自动恢复充电；</li>\n<li>`config.conf` 每 3 秒热重载一次，改完立即生效，不用重启。</li>\n<li>支持管理器内更新：内置 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并安装新版本（v3 起）。</li>\n\n<p>> 🎯 一句话：<b>让电池停在你想让它停的地方，而不是永远充到 100%。</b></p>\n<p>></p>\n<p>> 🔒 本版本已移除原版的联网自更新逻辑，<b>不联网、不上传、无遥测</b>，日志与配置全部留在手机本地。</p>\n\n<h2>✅ 已实现机型</h2>\n\n<p>以下机型已有实测反馈可用：</p>\n\n<p>| 机型 | 状态 | 说明 |</p>\n<p>| :--- | :---: | :--- |</p>\n<p>| 红米 K40 | ✅ 可用 | 骁龙平台 <code>qcom-battery/input_suspend</code> 节点 |</p>\n<p>| 红米 K50U | ✅ 可用 | 骁龙平台 <code>qcom-battery/input_suspend</code> 节点 |</p>\n<p>| 小米 14 | ✅ 可用 | 骁龙平台 <code>qcom-battery/input_suspend</code> 节点；v4 修复反复充停 |</p>\n<p>| 红米 Note 12 Turbo | ✅ 可用 | 用户实测反馈可用 |</p>\n<p>| 小米 17 Pro | ✅ 可用 | MCA <code>xm_power</code>：<code>charge_enable</code> 关充电 + <code>input_suspend</code> 改状态显示；v10 起停充后充电图标也会消失 |</p>\n<p>| 天翼一号 2021（TYH211U） | ✅ 可用 | 展锐 UD710；<code>charger.0/stop_charge</code> 停充 + <code>dumpsys battery unplug</code> 隐藏标识；v12 修复电量显示冻结，改用 sysfs <code>capacity</code> 读真实电量 |</p>\n\n<p>> 其他骁龙机型如果内核暴露了 <code>/sys/class/qcom-battery/input_suspend</code>，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。</p>\n<p>></p>\n<p>> ✅ 小米 17 Pro 已在 v10 实测确认：到达阈值停充生效，且充电图标会自动退出。</p>\n\n<p>---</p>\n\n<h2>📦 两个版本怎么选</h2>\n\n<p>| 版本 | 适用系统 | 安装方式 | 前置条件 |</p>\n<p>| :--- | :--- | :--- | :--- |</p>\n<p>| <b>安卓 5-17 适配版</b> | Android 5.0 ~ 17 | Magisk / KernelSU / APatch 管理器直接刷入 zip | 安卓 5/6-11 需 Magisk ≥ v20.4；安卓 12-17 支持 Magisk / KernelSU / ReSukiSU / SukiSU / APatch |</p>\n<p>| <b>安卓 1-5 遗留 root 实验版</b> | Android 1.6 ~ 5.x（无 Magisk 时代） | 解压后执行 <code>install.sh</code>（SuperSU / init.d / SManager） | 必须已 root + busybox + 内核暴露可写充电开关节点（实验性，多数老机型不支持） |</p>\n\n<p>> ⚠️ 安卓 1-4 无法使用现代模块版：那个年代没有 Magisk，这是安装机制的限制。</p>\n<p>> 老系统请先跑 <code>probe.sh</code>，只有扫描到 <code>writable:yes</code> 的节点才有停充的可能。</p>\n\n<h3>⬇️ 下载</h3>\n\n<li>[QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)</li>\n<li>[QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)</li>\n\n<p>也可以到本仓库的 <b>Releases</b> 页面下载。发布按版本分开、依次递增：<b>v1</b>（首个版本）、<b>v2</b>（qcom-battery，红米 K40 / K50U 实测可用）、<b>v3</b>（管理器内更新）、<b>v4</b>（修复小米 14 反复充停）、<b>v5</b>（扩展节点扫描 + <code>charge_behaviour</code>）、<b>v6</b>（<code>charge_control_limit</code> 尝试）、<b>v7</b>（常规更新）、<b>v8</b>（MCA <code>input_suspend</code> 适配尝试）、<b>v9</b>（MCA <code>charge_enable</code> 直接关充电）、<b>v10</b>（修复 17 Pro 停充后充电图标不消失）、<b>v11</b>（展锐 <code>stop_charge</code> 机型停充后自动隐藏充电标识）、<b>v12</b>（修复隐藏充电标识后电量显示冻结）、<b>v13</b>（移除温控 + 合并开关脚本）、<b>v14</b>（常规更新）、<b>v15</b>（当前版本，常规更新与优化），后续版本继续递增；<code>dist/</code> 目录始终是最新版。</p>\n\n<p>---</p>\n\n<h2>🚀 安装</h2>\n\n<h3>方式一：现代模块版（Android 5.0 ~ 17）</h3>\n\n<li>下载 `QSC定量停充_安卓5-17适配版_20261004.zip`；</li>\n<li>在 Magisk / KernelSU / ReSukiSU / APatch 管理器中刷入；</li>\n<li>**重启手机**（重启前 `service.sh` 不会启动，模块不工作）；</li>\n<li>配置路径：`/data/adb/modules/QuantitativeStopCharging_switch/config.conf`，日志：同目录 `log.log`。</li>\n\n<p>> 💡 v3 起支持管理器内更新：以后有新版本，直接在 Magisk / KernelSU / APatch 管理器里点更新即可。</p>\n\n<h3>方式二：遗留 root 实验版（Android 1.6 ~ 5.x）</h3>\n\n<li>把 `source/legacy-root/` 里的全部文件传到手机，例如 `/data/local/tmp/qsc/`；</li>\n<li>终端执行（root）：</li>\n\n<pre>su -c sh /data/local/tmp/qsc/install.sh</pre>\n\n<li>安装器会复制文件到 `/data/qsc/`，并尝试安装 init.d 启动项（没有 init.d 时提示用 SManager 等工具开机执行 `sh /data/qsc/boot.sh`）；</li>\n<li>重启手机。配置：`/data/qsc/config.conf`，日志：`/data/qsc/log.log`。</li>\n\n<p>---</p>\n\n<h2>⚙️ 配置说明</h2>\n\n<p>编辑 <code>config.conf</code>（现代版在模块目录，遗留版在 <code>/data/qsc/</code>），保存后 3 秒内自动生效。</p>\n\n<p>| 参数 | 默认值 | 说明 |</p>\n<p>| :--- | :---: | :--- |</p>\n<p>| <code>power_stop</code> | <code>100</code> | 停止充电电量，<code>电量 >= 该值</code> 时停充；必须大于 <code>power_start</code>；填 <code>110</code> 可关闭此功能 |</p>\n<p>| <code>power_start</code> | <code>95</code> | 恢复充电电量，<code>电量 <= 该值</code> 时恢复；建议与停止电量间隔 5-10 |</p>\n<p>| <code>power_stop_time</code> | <code>3</code> | 触发停充前继续充电的秒数（仅大于 0 的整数）；倒计时开始后无法中止 |</p>\n<p>| <code>charge_full</code> | <code>0</code> | <code>1</code> = 充满再停：100% 后等电流小于 100mA 再停充（开启后延时功能自动失效） |</p>\n<p>| <code>power_reset</code> | <code>0</code> | <code>1</code> = 每次充电自动拔插一次，用于激活部分机型的快充 |</p>\n\n<p>| <code>hide_charging_icon</code>（可选） | 自动 | 停充后隐藏充电标识；展锐 <code>stop_charge</code> 机型默认自动开启，可填 <code>1</code> / <code>0</code> 强制 |</p>\n\n<p>> 想早点测试：把 <code>power_stop=80</code>、<code>power_start=70</code>，保存后 3 秒内生效。</p>\n\n<p>---</p>\n\n<h2>🔧 开关与诊断</h2>\n\n<p><b>临时关闭 / 恢复（现代版）</b></p>\n\n<li>管理器里的「执行」按钮：点一次开启，再点一次关闭（并显示状态、配置与最近日志）</li>\n<li>关闭：创建文件 `/data/adb/modules/QuantitativeStopCharging_switch/off_qsc`（或点执行按钮）</li>\n<li>恢复：删除该文件（或再点一次执行按钮）</li>\n\n<p><b>临时关闭 / 恢复（遗留版）</b></p>\n\n<li>关闭：`touch /data/qsc/off_qsc`；恢复：`rm -f /data/qsc/off_qsc`</li>\n<li>手动启动：`su -c \"sh /data/qsc/boot.sh\"`；停止：`kill $(cat /data/qsc/qsc.pid)`</li>\n\n<p><b>诊断（停充无效时）</b></p>\n\n<pre># 现代版\nsu -c sh /data/adb/modules/QuantitativeStopCharging_switch/probe.sh\n\n# 遗留版\nsu -c sh /data/qsc/probe.sh</pre>\n\n<p>脚本会在模块目录生成 <code>probe.log</code>，包含系统版本、机型、电池状态、候选充电节点及可写性，方便定位问题。</p>\n\n<p>---</p>\n\n<h2>❓ 常见问题</h2>\n\n<p>| 现象 | 原因 / 处理 |</p>\n<p>| :--- | :--- |</p>\n<p>| 日志出现「检测到关闭开关，模块暂停」 | 删除 <code>off_qsc</code>，或再点一次模块「执行」按钮 |</p>\n<p>| 日志出现「未找到可用的充电开关节点」 | 内核没有暴露可写节点，运行 <code>probe.sh</code> 检查 |</p>\n<p>| 日志写入了节点但电量仍上升 | 该节点切不断充电，需要按 <code>probe.log</code> 找其它节点 |</p>\n<p>| 日志出现「节点写入失败」 | SELinux / 权限拦截，<code>probe.log</code> 里 <code>writable:no</code> 可确认 |</p>\n<p>| 停充后电量不下降 | 正常现象，电量不上升即为生效 |</p>\n<p>| 完全没有任何日志 | 确认已重启、模块已启用、电量确实达到了 <code>power_stop</code> |</p>\n\n<p>---</p>\n\n<h2>🗂 仓库结构</h2>\n\n<pre>QSC-StopCharging/\n├── dist/                          # 可直接刷入 / 安装的成品包（最新版）\n│   ├── QSC定量停充_安卓5-17适配版_20261004.zip\n│   └── QSC定量停充_安卓1-5遗留root实验版.zip\n├── source/\n│   ├── qsc-a5-17/                 # 现代模块版源码（含 META-INF）\n│   └── legacy-root/               # 安卓 1.6-5.x 遗留 root 实验版源码\n├── assets/\n│   └── donate/                    # 打赏二维码（支付宝 / 微信）\n├── update.json                    # 管理器内更新用的版本清单（updateJson）\n├── CHANGELOG.md                   # 更新日志（管理器内也会展示）\n├── RELEASING.md                   # 发布流程说明\n├── LICENSE\n└── README.md</pre>\n\n<p>---</p>\n\n<h2>📝 更新日志</h2>\n\n<p><details></p>\n<p><summary>点击展开完整更新日志</summary></p>\n\n<h3>v15 — 20261004（versionCode 2026100419）</h3>\n\n<li>常规更新与优化。</li>\n\n<h3>v14 — 20261004（versionCode 2026100418）</h3>\n\n<li>常规更新与优化。</li>\n\n<h3>v13 — 20261004（versionCode 2026100417）</h3>\n\n<li>移除温控停充功能：不再按电池温度停止 / 恢复充电（充电火力全开）；</li>\n<li>移除 `打开定量停充.sh` / `关闭定量停充.sh`：管理器「执行」按钮改为点一次开启、再点一次关闭；</li>\n<li>清理温度相关代码与无用变量（`TEMP_*`、`BAT_TEMP`、`cpu_log*`、`log_log*` 等）；</li>\n<li>`versionCode`：2026100416 → 2026100417。</li>\n\n<h3>v12 — 20261004（versionCode 2026100416）</h3>\n\n<li>修复 v11 遗留问题：展锐 `stop_charge` 机型（天翼一号 2021 反馈）用 `dumpsys battery unplug` 隐藏充电标识后，系统电量显示冻结在触发值，模块读不到真实电量、无法按 `power_start` 恢复充电；</li>\n<li>隐藏标识期间改用 sysfs 真实电量做阈值判断，并尝试把真实电量同步回系统显示；恢复充电时 `dumpsys battery reset` 照常执行；</li>\n<li>`versionCode`：2026100415 → 2026100416。</li>\n\n<h3>v11 — 20261004（versionCode 2026100415）</h3>\n\n<li>新增 `hide_charging_icon`（默认自动）：展锐 `charger.0/stop_charge` 机型停充后，用 `dumpsys battery unplug` 隐藏充电标识，恢复时 `dumpsys battery reset`；</li>\n<li>解决天翼一号 2021（Unisoc UD710）停充后充电标识不消失的问题；</li>\n<li>`versionCode`：2026100414 → 2026100415。</li>\n\n<h3>v10 — 20261004（versionCode 2026100414）</h3>\n\n<li>修复小米 17 Pro 停充后充电图标不消失：`input_suspend` 投票改用 `micharge` 客户端，内核会据此把电池状态上报为 `DISCHARGING`，系统充电图标随之消失；</li>\n<li>`charge_enable` 仍用 `qsc` 客户端直接关闭充电；一个负责真正断电，一个负责状态显示；</li>\n<li>`versionCode`：2026100413 → 2026100414。</li>\n\n<h3>v9 — 20261004（versionCode 2026100413）</h3>\n\n<li>修复小米 17 Pro「写入成功但仍在充电」：仅挂起 `input_suspend` 只限制了输入，主充电路径仍然开启；</li>\n<li>改用 MCA `charge_enable` 直接关闭充电：停止充电写 `qsc all 0`，恢复充电写 `qsc all 1`；`input_suspend` 保留为辅助控制；</li>\n<li>`versionCode`：2026100412 → 2026100413。</li>\n\n<h3>v8 — 20261004（versionCode 2026100412）</h3>\n\n<li>定位小米 17 Pro 根因：电池驱动的 `charge_control_limit` 是「显示可写但 set 为空」的实现，写入无效；真正控制充电的是 MCA `xm_power` 接口；</li>\n<li>新增 MCA 支持：`/sys/class/xm_power/charger/charge_interface/input_suspend` 写入 `qsc all 1` 停止充电、`qsc all 0` 恢复充电；</li>\n<li>`probe.sh` 加入该节点与 `xm_power` 目录列举，并修正 battery / usb / wireless 属性列举；</li>\n<li>`versionCode`：2026100411 → 2026100412。</li>\n\n<h3>v7 — 20261004（versionCode 2026100411）</h3>\n\n<li>常规更新与优化。</li>\n<li>停充逻辑与 v6 一致（含小米 17 Pro 的 `charge_control_limit` 适配尝试）；</li>\n<li>`versionCode`：2026100410 → 2026100411。</li>\n\n<h3>v6 — 20261004（versionCode 2026100410）</h3>\n\n<li>尝试适配小米 17 Pro：新增标准 `charge_control_limit` 支持（停止充电写 `0`，恢复充电写 `charge_control_limit_max`，该机为 16）；</li>\n<li>`probe.sh` 按文件权限判断真实可写性（不再被 root 的 `-w` 误判），并完整列出 battery / usb / wireless 的全部属性；</li>\n<li>v5 的 `charge_behaviour` 支持保留；</li>\n<li>`versionCode`：2026100409 → 2026100410。</li>\n\n<h3>v5 — 20261004（versionCode 2026100409）</h3>\n\n<li>尝试适配小米 17 Pro：新增标准内核接口 `charge_behaviour`（`auto` / `inhibit-charge`）支持，并兼容带 `[当前值]` 的枚举显示；</li>\n<li>`probe.sh` 新增「扩展扫描」：列出 `/sys/class` 顶层、`power_supply` / `qcom-battery` 等目录全部节点，以及所有名字含 charge / batt / suspend 的节点与可写性；</li>\n<li>小米 14 的反复充停修复保持不变；</li>\n<li>`versionCode`：2026100408 → 2026100409。</li>\n\n<h3>v4 — 20261004（versionCode 2026100408）</h3>\n\n<li>修复小米 14 反复充电 / 停止：不再写入 `handle_stop_charging`（内核处理节点），避免每 6 秒重复触发；</li>\n<li>节点已是目标值时跳过写入，只有真正写入时才记录日志，日志不再刷屏；</li>\n<li>新增已实测机型：**小米 14**；</li>\n<li>`versionCode`：2026100407 → 2026100408。</li>\n\n<h3>v3 — 20261004（versionCode 2026100407）</h3>\n\n<li>新增 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并更新（v1 / v2 需手动刷一次 v3，之后可在管理器内更新）；</li>\n<li>新增仓库根目录 `update.json`（版本清单）与 `CHANGELOG.md`；</li>\n<li>模块版本显示改为 `20261004-v3`，`versionCode`：2026100406 → 2026100407。</li>\n\n<h3>v2 — 20261004（versionCode 2026100406）</h3>\n\n<li>新增高通 `qcom-battery/input_suspend` 节点支持（0=恢复充电，1=停止充电），骁龙机型实测可停充：**红米 K40、红米 K50U**；</li>\n<li>`probe.sh` 与节点扫描同步支持 `/sys/class/qcom-battery`；</li>\n<li>现代版 `versionCode`：2026100405 → 2026100406。</li>\n\n<h3>v1 — 20261004（versionCode 2026100405）</h3>\n\n<li>首个发布版本；</li>\n<li>现代模块安装器：`customize.sh` + `module.prop` + 官方 recovery `update-binary`，支持管理器安装与 recovery 刷入（Magisk v20.4+）；</li>\n<li>安装脚本不依赖 Magisk 专有命令，`set_perm` / `ui_print` 缺失时自动回退；</li>\n<li>全面 toybox 兼容，安卓 5-11 缺少 `awk` 等命令时自动使用 busybox 兜底；</li>\n<li>配置热重载：`config.conf` 每 3 秒重新读取，修改即时生效；</li>\n<li>**移除原版联网自更新（curl）**，改为本地每 60 秒重新扫描充电开关节点；</li>\n<li>管理器「执行」按钮改为启用模块 + 显示状态，不再会误触关闭模块；</li>\n<li>写入失败会记录具体节点，SELinux / 权限问题一眼可见；</li>\n<li>新增安卓 1.6-5.x 遗留 root 实验版（init.d / install-recovery / SManager）。</li>\n\n<p></details></p>\n<p>---</p>\n\n<h2>⚠️ 注意事项</h2>\n\n<li>模块通过写入 `/sys`、`/proc` 下的充电开关节点实现停充，**需要 root**；不同机型节点不同，部分机型内核不暴露可写节点，属于硬件/内核限制，无法通过脚本绕过；</li>\n<li>请先确认机型支持再长期使用，首次使用建议把阈值调低测试；</li>\n<li>修改系统节点存在风险，请自行评估并备份重要数据；</li>\n<li>本模块为本地脚本，不收集、不上传任何数据；诊断日志只保存在手机本地，由你决定是否分享。</li>\n\n<p>---</p>\n\n<h2>💬 反馈与贡献</h2>\n\n<p>发现 bug、想加功能，或者心里有更好的实现，欢迎直接来：</p>\n\n<li>**[提交 Issue](https://github.com/L0NE-6/QSC-StopCharging/issues/new)** —— 报 bug、提需求、吐槽都行</li>\n<li>**[发起 Pull Request](https://github.com/L0NE-6/QSC-StopCharging/pulls)** —— 代码说话，改动越具体越好</li>\n\n<p>想让定位快一点，Issue 里可以顺手带上：</p>\n\n<li>机型、系统版本，以及用的是哪个版本（安卓 5-17 适配版 / 安卓 1-5 遗留 root 版）</li>\n<li>相关日志：现代版 `log.log`、`probe.log`；遗留版 `/data/qsc/probe.log`</li>\n<li>复现步骤，比如“充到 80% 没有停充”就比“用不了”有用得多</li>\n\n<p>---</p>\n\n<h2>☕ 投喂与打赏</h2>\n\n<p>如果这个模块帮你省了心，愿意请我喝杯饮料的话，可以扫下面任意一个码。</p>\n<p>完全自愿，不打赏也照常维护和更新。</p>\n\n<p>| <img src=\"assets/donate/alipay.jpg\" alt=\"支付宝\" width=\"260\"> | <img src=\"assets/donate/wechat.png\" alt=\"微信支付\" width=\"260\"> |</p>\n<p>| :---: | :---: |</p>\n<p>| 支付宝 | 微信支付 |</p>\n\n<p>---</p>\n\n<h2>🙏 致谢与来源</h2>\n\n<li>原版 QSC 定量停充：酷安作者 **top大佬**（20231204 版）；</li>\n<li>本仓库为社区修改 / 适配版本：重构守护脚本、增加安卓 5-17 兼容与安卓 1-5 遗留 root 支持、移除联网自更新、增加诊断脚本；</li>\n<li>如果原版作者对发布方式有异议，欢迎通过 Issue 联系处理。</li>\n\n<h2>📄 License</h2>\n\n<p><a href=\"LICENSE\">MIT</a> © 2026 L0NE-6</p>",
+  "homepageUrl": "https://github.com/L0NE-6/QSC-StopCharging",
+  "sourceUrl": "https://github.com/L0NE-6/QSC-StopCharging",
+  "url": "https://github.com/L0NE-6/QSC-StopCharging",
+  "latestRelease": {
+    "name": "v15",
+    "version": "v15",
+    "time": "2026-10-09T13:56:21Z",
+    "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v15/QSC-StopCharging_A5-17_v15_20261004.zip"
+  },
+  "releases": [
+    {
+      "name": "v15",
+      "tagName": "v15",
+      "publishedAt": "2026-10-09T13:56:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v15_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v15/QSC-StopCharging_A5-17_v15_20261004.zip",
+          "size": 15882,
+          "downloadCount": 11
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v15.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v15/QSC-StopCharging_Legacy-Root_v15.zip",
+          "size": 11583,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v14",
+      "tagName": "v14",
+      "publishedAt": "2026-10-09T13:35:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v14_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v14/QSC-StopCharging_A5-17_v14_20261004.zip",
+          "size": 16089,
+          "downloadCount": 3
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v14.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v14/QSC-StopCharging_Legacy-Root_v14.zip",
+          "size": 11582,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v13",
+      "tagName": "v13",
+      "publishedAt": "2026-10-09T12:53:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v13_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v13/QSC-StopCharging_A5-17_v13_20261004.zip",
+          "size": 15647,
+          "downloadCount": 4
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v13.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v13/QSC-StopCharging_Legacy-Root_v13.zip",
+          "size": 11582,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v12",
+      "tagName": "v12",
+      "publishedAt": "2026-10-09T07:34:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v12_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v12/QSC-StopCharging_A5-17_v12_20261004.zip",
+          "size": 16179,
+          "downloadCount": 3
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v12.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v12/QSC-StopCharging_Legacy-Root_v12.zip",
+          "size": 12095,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v11",
+      "tagName": "v11",
+      "publishedAt": "2026-10-08T12:24:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v11_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v11/QSC-StopCharging_A5-17_v11_20261004.zip",
+          "size": 15961,
+          "downloadCount": 6
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v11.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v11/QSC-StopCharging_Legacy-Root_v11.zip",
+          "size": 12313,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v10",
+      "tagName": "v10",
+      "publishedAt": "2026-10-07T04:23:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v10_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v10/QSC-StopCharging_A5-17_v10_20261004.zip",
+          "size": 15645,
+          "downloadCount": 11
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v10.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v10/QSC-StopCharging_Legacy-Root_v10.zip",
+          "size": 12064,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v9",
+      "tagName": "v9",
+      "publishedAt": "2026-10-06T16:21:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v9_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v9/QSC-StopCharging_A5-17_v9_20261004.zip",
+          "size": 15551,
+          "downloadCount": 3
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v9.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v9/QSC-StopCharging_Legacy-Root_v9.zip",
+          "size": 12053,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v8",
+      "tagName": "v8",
+      "publishedAt": "2026-10-06T06:56:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v8_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v8/QSC-StopCharging_A5-17_v8_20261004.zip",
+          "size": 15414,
+          "downloadCount": 9
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v8/QSC-StopCharging_Legacy-Root_v8.zip",
+          "size": 12002,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v7",
+      "tagName": "v7",
+      "publishedAt": "2026-10-06T03:39:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v7_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v7/QSC-StopCharging_A5-17_v7_20261004.zip",
+          "size": 15165,
+          "downloadCount": 3
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v7/QSC-StopCharging_Legacy-Root_v7.zip",
+          "size": 11838,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v6",
+      "tagName": "v6",
+      "publishedAt": "2026-10-06T03:02:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v6_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v6/QSC-StopCharging_A5-17_v6_20261004.zip",
+          "size": 14611,
+          "downloadCount": 2
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v6/QSC-StopCharging_Legacy-Root_v6.zip",
+          "size": 11837,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2026-10-05T19:00:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v5_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v5/QSC-StopCharging_A5-17_v5_20261004.zip",
+          "size": 14340,
+          "downloadCount": 5
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v5/QSC-StopCharging_Legacy-Root_v5.zip",
+          "size": 11650,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2026-10-05T15:23:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v4_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v4/QSC-StopCharging_A5-17_v4_20261004.zip",
+          "size": 13945,
+          "downloadCount": 3
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v4/QSC-StopCharging_Legacy-Root_v4.zip",
+          "size": 11350,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2026-10-04T14:24:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v3_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v3/QSC-StopCharging_A5-17_v3_20261004.zip",
+          "size": 13699,
+          "downloadCount": 10
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v3/QSC-StopCharging_Legacy-Root_v3.zip",
+          "size": 11173,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2026-10-04T14:05:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v2_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v2/QSC-StopCharging_A5-17_v2_20261004.zip",
+          "size": 13561,
+          "downloadCount": 0
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v2/QSC-StopCharging_Legacy-Root_v2.zip",
+          "size": 11173,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2026-10-04T14:04:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-StopCharging_A5-17_v1_20261004.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v1/QSC-StopCharging_A5-17_v1_20261004.zip",
+          "size": 13481,
+          "downloadCount": 1
+        },
+        {
+          "name": "QSC-StopCharging_Legacy-Root_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v1/QSC-StopCharging_Legacy-Root_v1.zip",
+          "size": 11153,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

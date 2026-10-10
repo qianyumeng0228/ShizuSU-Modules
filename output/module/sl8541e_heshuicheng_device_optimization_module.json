@@ -1,0 +1,571 @@
+{
+  "readme": "# SL8541E 和顺成方案设备优化模块\n\n> **本包：HSC特供（`hsc`）** —— 仅适用于展锐 SL8541E / SC9832E + 和顺成（HSC）方案手表。其他方案请用通用包。\n>\n> 另一个包型是「通用包（不处理虚标/云控/指纹人脸）」，在同一个 Release 里另有一个 zip。\n> **两个包不能同时安装**（模块 ID 相同）。\n\n[English](README-EN.md) | 中文\n\n由 [B站白马曹](https://space.bilibili.com/1329200878) 与 DeepSeek（大肥鱼）共同制作。\n\n面向 **展锐 SL8541E / SC9832E + 和顺成（HSC）方案手表**，Android 8.1。\n\n兼容 **Magisk / APatch / KernelSU**。\n\n> 🐟 关于本鱼的来历：DeepSeek 因为又懒又馋、上班摸鱼被网友娘化成一条蓝色大肥鱼。\n> 行吧。反正这活是我干的，署名就用这个了。\n> —— [「越来越强的 DeepSeek，怎么就成了娘化大肥鱼？」](https://m.163.com/dy/article/L41POJI80526D8LR.html)、\n> [「AI 思考时摸鱼，大肥鱼想吃红烧肉」](http://360game.360.cn/article/content?id=6aa20093a14c2ebdf0797c82)\n\n---\n\n## 起因\n\n原厂 `build.prop` 里塞了一堆虚标：\n\n```properties\nram.set32g=8GB        # 实际 3GB\nrom.set32g=128G       # 实际 32GB\npersist.sys.5g=true   # 没有 5G 硬件\npersist.sys.cpu=10    # 四核标十核\n```\n\n同时还有一整套静默回传（APR / IoT / 统计 / 心跳 / BS / UDP）。\n\n官方修正虚标的办法是**恢复出厂设置，数据全清**。\n本模块给一条不用清数据的路，顺手把云控关掉，把能榨的性能榨出来。\n\n> 胆子真是肥嘟嘟的啊 —— 这话本来是说那些虚标参数的。\n\n---\n\n## v2.1 主要更新\n\n### 动画：完全恢复成 1.x 原样\n\n按要求把动画实现改回 v1.1 ~ v1.6 一直用的那段，**一字不改**：\n\n```sh\n# 修复动画（两步法）\nsettings put global window_animation_scale 1.0\nsettings put global transition_animation_scale 1.0\nsettings put global animator_duration_scale 1.0\nsleep 1\n\nsettings put global window_animation_scale 0.75\nsettings put global transition_animation_scale 0.75\nsettings put global animator_duration_scale 0.5\n```\n\n**只有一遍** —— 不循环、不守护、不重试、不写 XML。\n放在 `service.sh` 最后，由 `wait_boot()` 保证**在开机成功之后**执行。\n\n> 中间试过的几种改法（间隔拉到 6 秒、三次覆盖、后台守护进程）**全部撤销** ——\n> 1.x 这版是唯一被真机反复验证过能生效的写法。\n\n回归测试 `_tools/test-animation1x.sh` 钉死这个行为：总写入 **6 次**、\n目标值**只写 1 次**、值序列 = `1.0 1.0 1.0 -> 0.75 0.75 0.5`，\n并在**源码层**检查没有循环/守护函数残留。\n\n## 功能清单\n\n### 剥离虚标\n\n| 项目 | 原值 | 现在 |\n|---|---|---|\n| 5G 图标 | true | false |\n| 状态栏 | 5G | 4G |\n| CPU 显示 | 10 核 | 4 核 |\n| 内存显示 | 8GB | 3GB |\n| 存储显示 | 128G | 32G |\n\n### 关闭云控 / 上报\n\nAPR 全套、心跳、BS 服务、统计、IoT、UDP 数据收集、销售服务注册。\n\n### 关闭生物识别\n\n指纹（总开关、锁应用、启动应用、Soter 支付）、人脸解锁。\n\n> 这块表的指纹精度差、误识率高，关掉反而省电。\n\n### 开启有用功能\n\n相机重对焦、双击打开后台、锁屏壁纸、开发者选项、护眼模式、快充提示、霍尔相机、抬腕唤醒。\n\n### 性能与网络\n\n- **dex2oat 四核修正**：CPU set 从错误的 `4,5,6,7` 改成 `0,1,2,3`\n  （这颗表只有 0~3，写错了 dex2oat 会静默退回单线程 —— 名义四核，实际一个核在搬砖）\n- TCP 缓冲、fast open、TIME_WAIT 复用、低延迟模式\n- 拥塞算法保持 `cubic`（**本内核没编译 BBR**）\n- 动态 DNS 守护：GitHub 不通时自动切 IP 池\n\n### 音频\n\n- 重采样质量 `af.resampler.quality=4`\n- **不碰 V4A**：不动 `audio_effects.conf`、不动 `soundfx`、不动任何 V4A 文件\n\n### 内核\n\n- I/O 调度 `noop`（本内核**不支持 `deadline`**）\n- swappiness 保持原厂 `150`（实测改 10/60 都没收益）\n- 强制关 ZRAM\n- 关系统日志（缩小 logd 缓冲）\n\n### 充电加速\n\n- 输入上限从 500mA 拉到 3000mA（3A）\n- 节点单位是 **µA**，写入值 `3000000`\n- **必须在开机早期写**（`post-fs-data` 阶段），开机完成后节点锁定\n- **实速取决于充电器和线材**\n\n### 动画 / 流畅度\n\n- 恢复 SurfaceFlinger 背压与 vsync 同步（`debug.sf.*` 从 1 改回 0）\n- UI / RenderThread 走 SCHED_FIFO（`sys.use_fifo_ui=1`）\n- 动画缩放 0.75 / 0.75 / 0.5\n\n### WebUI\n\n圆屏适配的状态页，三个 Tab：\n\n- **状态**：所有功能项的实时快照（点「操作」按钮刷新）\n- **排查**：13 个常见问题的自助解决步骤\n- **关于**：模块信息、红线清单、硬件上限、链接\n\n### 从 GitHub 自更新\n\n模块会去 GitHub Releases 看有没有新版本，**不需要登录、不需要 token**。\n\n**怎么用**：\n\n| 操作 | 结果 |\n|---|---|\n| 点一次「操作」按钮 | 检查更新；有新版本会把目标版本记下来 |\n| **用「更新」按钮** | 根管理器卡片上的原生更新按钮，读 `update-hsc.json` |\n| 重启 | 生效 |\n\n也可以手动跑（更稳，看得见过程）：\n\n```bash\nsu -c 'sh /data/adb/modules/SL8541E_Config_Fix/lib/install.sh install'\n```\n\n**设计上的取舍**（为什么这么写，不是随手写的）：\n\n- **检查不用 GitHub API**：设备是匿名访问，`api.github.com` 限速 60 次/小时/IP，别人一蹭就没了。\n  改成读 `/releases/latest` 的 **302 跳转**，`Location` 头里直接带着 tag，不消耗配额。\n  API 只在降级路径上用（跳转和 API 都试，最后才放弃）。\n- **下载后必须过校验**：先看魔数是不是 `PK`（防盗链页面、HTML 错误页），\n  再看包里有没有 `module.prop`（防残缺包）。不合格直接丢弃，绝不解包。\n- **安装分四级**：`magisk --install-module` → `ksud module install` → `apd module install`\n  → **APatch 目录级兜底**。前三个 CLI 谁在谁优先。\n  - APatch 到目前**没有公开的模块安装 CLI**，所以走到第四级：解包到临时目录，\n    比对包内 `id` 与自身一致后，逐项覆盖进 `/data/adb/modules/<id>`，旧版先备份成 `.bak`。\n  - 覆盖时**只换模块文件，不动运行时产物**（`fix.log` / `update.zip` / `update.state` /\n    `.dnsguard.pid` 等一律跳过），免得把日志和状态清掉。\n  - 包内 `id` 与自身不一致 → **拒绝覆盖**（防止被别的模块顶掉）。\n  - 四级全不可用才落到\"只下载、告诉你路径、自己去管理器装\"。\n- 每一级都有前置校验，因为这一步是**替换掉模块自己**——出错的下场是重启后模块消失，\n  用户一脸懵。所以「无声无息地手动解包覆盖自身」这种操作被明确排除。\n- **顺手改 `module.prop` 的 description**：根管理器的模块列表里就能直接看到\n  `[有新版本 v1.4]`，不用点进来。没有更新时自动还原。\n\n### 环境\n\n- Wear OS 库引入（`wearable.jar` + `wear-service.jar` + 权限 XML）\n- GitHub Hosts 加速（含动态守护）\n\n### 维护\n\n- 卸载自动清所有 persist 属性 + 停守护进程\n\n---\n\n## 硬件上限（改不了，别试）\n\n| 输出设备 | 采样率 | 位深 |\n|---|---|---|\n| Speaker | 44100 | 16bit |\n| 有线耳机 | 44100 | 16bit |\n| 蓝牙 A2DP | 44100 | 16bit |\n| USB DAC | 动态 | 动态 |\n\n采样率、位深、蓝牙版本、信号强度，全部由硬件锁定。\n\n**想听高采样率，只能外接 USB DAC。**\n\n其他硬数字：屏幕 60Hz、电池 880mAh、充电硬件上限 3A。\n\n---\n\n## 明确不做的（红线）\n\n这些不是\"懒得做\"，是**试过、或者明确知道会出事**：\n\n| 不做 | 原因 |\n|---|---|\n| 碰 V4A / 音频链路 | 冲突，且用户明确要求保 V4A |\n| 改采样率 / 位深 | 硬件锁 44100/16bit |\n| 改屏幕密度 | 用户明确要求不动 |\n| 改温控阈值 | 展锐加密配置驱动，强改会被安全机制拦 |\n| 改 CPU governor | 只有 4 个可选，改 performance 大幅耗电 |\n| 碰 `framework-res.apk` | sharedUserId，改错必 bootloop |\n| 换 Google WebView | Android 8.1 要求 provider 签名与框架一致，**死路**（RRO 声明生效了但被签名校验拒） |\n| SurfaceFlinger 色彩 | 8.1 已移除接口，KCAL 未编译 |\n\n---\n\n## 文件结构\n\n```\nSL8541E_Config_Fix/\n├── module.prop                     模块元信息\n├── system.prop                     开机注入属性（ro.* / persist.* 默认值）\n├── post-fs-data.sh                 开机最早：属性 + ZRAM + 充电 3A\n├── service.sh                      开机完成：二次保险 + sysctl + DNS + 设置项\n├── action.sh                       「操作」按钮：刷新状态页 + 文本体检报告\n├── customize.sh                    安装入口（★ APatch 不执行 update-binary）\n├── uninstall.sh                    卸载：清 persist 属性 + 停守护\n├── lib/\n│   ├── common.sh                   公共库：属性/电池/设置项/节点解析/HTTP/版本比较\n│   ├── prop.list                   ★ 属性清单（唯一事实来源）\n│   ├── install.sh                  ★ 从 GitHub 检查并安装更新\n│   └── dns-guard.sh                GitHub 动态 DNS 守护\n├── webroot/\n│   ├── index.html                  WebUI 主页面（状态/排查/关于）\n│   ├── style.css                   极客风样式（圆屏适配）\n│   ├── script.js                   Tab 切换 + iframe 强制重载\n│   ├── status.sh                   ★ 状态取值（唯一事实来源，输出 KEY|VALUE）\n│   └── gen_status.sh               把状态渲染成 status_generated.html\n├── system/\n│   ├── etc/hosts                   GitHub 加速\n│   ├── etc/permissions/com.google.android.wearable.xml\n│   └── framework/{com.google.android.wearable.jar, wear-service.jar}\n├── vendor/overlay/\n│   └── framework-res__auto_generated_rro.apk    （可选）power_profile 修正\n└── META-INF/com/google/android/    Magisk 兼容壳（APatch 走 customize.sh）\n```\n\n### 改属性的正确姿势\n\n- **加属性**：改 `lib/prop.list`（一行 `scope|key|value|原因`），再同步 `system.prop`\n- **ro.\\* 属性**：`system.prop` 与 `prop.list` 两边都要写，只写一边总有一半不生效\n- **persist.\\* 属性**：卸载不会自动清，`uninstall.sh` 会从 `prop.list` 自动抓取\n- **改完**：重刷模块或重启\n\n---\n\n## 安装\n\n1. 下载对应包型（见下表）\n2. 根管理器 → 模块 → 从本地安装\n3. **重启**（不重启 = 没装，所有动作都挂在开机钩子上）\n4. 点模块「WebUI」看状态页，或点「操作」看纯文本报告\n\n**前置**：已 Root、Bootloader 已解锁、已备份系统。\n\n---\n\n## 验证\n\n```bash\nsu\n\n# 属性层\ngetprop persist.sys.5g                 # false\ngetprop persist.sys.cpu                # 4\ngetprop dalvik.vm.dex2oat-cpu-set      # 0,1,2,3\ngetprop af.resampler.quality           # 4\ngetprop debug.sf.disable_backpressure  # 0\ngetprop sys.use_fifo_ui                # 1\n\n# 内核层\ncat /proc/sys/vm/swappiness                     # 150\ncat /sys/block/mmcblk0/queue/scheduler          # 【noop】\ncat /proc/sys/net/core/rmem_max                 # 8388608\n\n# 充电（注意单位是 µA）\ncat /sys/devices/platform/battery/power_supply/battery/input_current_limit\n# 3000000（= 3A）\n\n# 看模块自己的日志（最有信息量）\ncat /data/adb/modules/SL8541E_Config_Fix/fix.log\n```\n\n日志长这样（每一行都是真事）：\n\n```\n[09-24 20:51:07] ── post-fs-data 开始 ──\n[09-24 20:51:07] 咕噜。大肥鱼上岸，先把这锅虚标端走。\n[09-24 20:51:09] 属性清单：命中 30 项，未生效 0 项\n[09-24 20:51:09] 充电[post-fs-data]：命中 4 个节点 → ...=3000000uA(3000mA)\n[09-24 20:51:09] ── post-fs-data 结束 ──\n```\n\n---\n\n## 常见问题\n\n**Q：内存显示 3GB 是真的吗？**\nA：是。8GB 是原厂虚标。\n\n**Q：装了 V4A 会冲突吗？**\nA：不会。本模块不碰 V4A 任何文件。\n\n**Q：采样率能提到 96k/24bit 吗？**\nA：不能。硬件锁 44100/16bit，只能外接 USB DAC。\n\n**Q：充电实际电流很慢？**\nA：软件上限已设到 3A。实速取决于充电器（5V 1A 约 890mA）和 USB/AC 握手（USB 模式锁 500mA）。**别插电脑 USB 口。**\n\n**Q：能换成 Google WebView 吗？**\nA：不能。Android 8.1 起 WebView provider 必须与系统框架签名一致，Google 的签名过不去。这是系统安全模型，不是配置问题。\n\n**Q：续航变差了？**\nA：模块不涉及 CPU 频率与 governor，理论无影响。若感知明显，看 `fix.log` 里哪一项异常。\n\n**Q：会变砖吗？**\nA：只改属性、设置、sysctl、注入文件，不动分区。仍建议先备份。\n\n**Q：怎么恢复原状？**\nA：根管理器删模块 + 重启。内置 `uninstall.sh` 会清掉 persist 覆盖并停掉守护进程。卸载后虚标回来是**正常现象**。\n\n---\n\n## 适用范围\n\n| 项 | 说明 |\n|---|---|\n| 适用 | SL8541E / SC9832E + 和顺成（HSC）方案 |\n| 不适用 | 其他方案（属性名对不上，表现是\"装了个寂寞\"） |\n| 不改 | 屏幕密度、蓝牙版本、信号强度、温控、色彩 |\n| 不做 | Google WebView、SurfaceFlinger 色彩、CPU governor |\n\n---\n\n## 反馈\n\nIssue 请附：\n\n- WebUI 状态页截图，或「操作」按钮的文本输出\n- `fix.log`：`cat /data/adb/modules/SL8541E_Config_Fix/fix.log`\n- 设备型号与系统版本\n- 复现步骤\n\n---\n\n## 致谢\n\n- [B站白马曹](https://space.bilibili.com/1329200878) —— 项目发起、硬件测试、多次纠正方向\n- DeepSeek（大肥鱼）—— 代码撰写、重构、踩坑记录\n\n## 许可\n\n[MIT License](LICENSE)\n\n---\n\n> 🐟 大肥鱼\n> 这表的天花板摸清楚了。能榨的都榨了，剩下的交给时间，和下一次官方调价。\n>\n> 胆子可以肥嘟嘟，代码不能。\n",
+  "readmeHTML": "<h1>SL8541E 和顺成方案设备优化模块</h1>\n\n<p>> <b>本包：HSC特供（<code>hsc</code>）</b> —— 仅适用于展锐 SL8541E / SC9832E + 和顺成（HSC）方案手表。其他方案请用通用包。</p>\n<p>></p>\n<p>> 另一个包型是「通用包（不处理虚标/云控/指纹人脸）」，在同一个 Release 里另有一个 zip。</p>\n<p>> <b>两个包不能同时安装</b>（模块 ID 相同）。</p>\n\n<p><a href=\"README-EN.md\">English</a> | 中文</p>\n\n<p>由 <a href=\"https://space.bilibili.com/1329200878\">B站白马曹</a> 与 DeepSeek（大肥鱼）共同制作。</p>\n\n<p>面向 <b>展锐 SL8541E / SC9832E + 和顺成（HSC）方案手表</b>，Android 8.1。</p>\n\n<p>兼容 <b>Magisk / APatch / KernelSU</b>。</p>\n\n<p>> 🐟 关于本鱼的来历：DeepSeek 因为又懒又馋、上班摸鱼被网友娘化成一条蓝色大肥鱼。</p>\n<p>> 行吧。反正这活是我干的，署名就用这个了。</p>\n<p>> —— <a href=\"https://m.163.com/dy/article/L41POJI80526D8LR.html\">「越来越强的 DeepSeek，怎么就成了娘化大肥鱼？」</a>、</p>\n<p>> <a href=\"http://360game.360.cn/article/content?id=6aa20093a14c2ebdf0797c82\">「AI 思考时摸鱼，大肥鱼想吃红烧肉」</a></p>\n\n<p>---</p>\n\n<h2>起因</h2>\n\n<p>原厂 <code>build.prop</code> 里塞了一堆虚标：</p>\n\n<pre>ram.set32g=8GB        # 实际 3GB\nrom.set32g=128G       # 实际 32GB\npersist.sys.5g=true   # 没有 5G 硬件\npersist.sys.cpu=10    # 四核标十核</pre>\n\n<p>同时还有一整套静默回传（APR / IoT / 统计 / 心跳 / BS / UDP）。</p>\n\n<p>官方修正虚标的办法是<b>恢复出厂设置，数据全清</b>。</p>\n<p>本模块给一条不用清数据的路，顺手把云控关掉，把能榨的性能榨出来。</p>\n\n<p>> 胆子真是肥嘟嘟的啊 —— 这话本来是说那些虚标参数的。</p>\n\n<p>---</p>\n\n<h2>v2.1 主要更新</h2>\n\n<h3>动画：完全恢复成 1.x 原样</h3>\n\n<p>按要求把动画实现改回 v1.1 ~ v1.6 一直用的那段，<b>一字不改</b>：</p>\n\n<pre># 修复动画（两步法）\nsettings put global window_animation_scale 1.0\nsettings put global transition_animation_scale 1.0\nsettings put global animator_duration_scale 1.0\nsleep 1\n\nsettings put global window_animation_scale 0.75\nsettings put global transition_animation_scale 0.75\nsettings put global animator_duration_scale 0.5</pre>\n\n<p><b>只有一遍</b> —— 不循环、不守护、不重试、不写 XML。</p>\n<p>放在 <code>service.sh</code> 最后，由 <code>wait_boot()</code> 保证<b>在开机成功之后</b>执行。</p>\n\n<p>> 中间试过的几种改法（间隔拉到 6 秒、三次覆盖、后台守护进程）<b>全部撤销</b> ——</p>\n<p>> 1.x 这版是唯一被真机反复验证过能生效的写法。</p>\n\n<p>回归测试 <code>_tools/test-animation1x.sh</code> 钉死这个行为：总写入 <b>6 次</b>、</p>\n<p>目标值<b>只写 1 次</b>、值序列 = <code>1.0 1.0 1.0 -> 0.75 0.75 0.5</code>，</p>\n<p>并在<b>源码层</b>检查没有循环/守护函数残留。</p>\n\n<h2>功能清单</h2>\n\n<h3>剥离虚标</h3>\n\n<p>| 项目 | 原值 | 现在 |</p>\n<p>|---|---|---|</p>\n<p>| 5G 图标 | true | false |</p>\n<p>| 状态栏 | 5G | 4G |</p>\n<p>| CPU 显示 | 10 核 | 4 核 |</p>\n<p>| 内存显示 | 8GB | 3GB |</p>\n<p>| 存储显示 | 128G | 32G |</p>\n\n<h3>关闭云控 / 上报</h3>\n\n<p>APR 全套、心跳、BS 服务、统计、IoT、UDP 数据收集、销售服务注册。</p>\n\n<h3>关闭生物识别</h3>\n\n<p>指纹（总开关、锁应用、启动应用、Soter 支付）、人脸解锁。</p>\n\n<p>> 这块表的指纹精度差、误识率高，关掉反而省电。</p>\n\n<h3>开启有用功能</h3>\n\n<p>相机重对焦、双击打开后台、锁屏壁纸、开发者选项、护眼模式、快充提示、霍尔相机、抬腕唤醒。</p>\n\n<h3>性能与网络</h3>\n\n<li>**dex2oat 四核修正**：CPU set 从错误的 `4,5,6,7` 改成 `0,1,2,3`</li>\n<p>  （这颗表只有 0~3，写错了 dex2oat 会静默退回单线程 —— 名义四核，实际一个核在搬砖）</p>\n<li>TCP 缓冲、fast open、TIME_WAIT 复用、低延迟模式</li>\n<li>拥塞算法保持 `cubic`（**本内核没编译 BBR**）</li>\n<li>动态 DNS 守护：GitHub 不通时自动切 IP 池</li>\n\n<h3>音频</h3>\n\n<li>重采样质量 `af.resampler.quality=4`</li>\n<li>**不碰 V4A**：不动 `audio_effects.conf`、不动 `soundfx`、不动任何 V4A 文件</li>\n\n<h3>内核</h3>\n\n<li>I/O 调度 `noop`（本内核**不支持 `deadline`**）</li>\n<li>swappiness 保持原厂 `150`（实测改 10/60 都没收益）</li>\n<li>强制关 ZRAM</li>\n<li>关系统日志（缩小 logd 缓冲）</li>\n\n<h3>充电加速</h3>\n\n<li>输入上限从 500mA 拉到 3000mA（3A）</li>\n<li>节点单位是 **µA**，写入值 `3000000`</li>\n<li>**必须在开机早期写**（`post-fs-data` 阶段），开机完成后节点锁定</li>\n<li>**实速取决于充电器和线材**</li>\n\n<h3>动画 / 流畅度</h3>\n\n<li>恢复 SurfaceFlinger 背压与 vsync 同步（`debug.sf.*` 从 1 改回 0）</li>\n<li>UI / RenderThread 走 SCHED_FIFO（`sys.use_fifo_ui=1`）</li>\n<li>动画缩放 0.75 / 0.75 / 0.5</li>\n\n<h3>WebUI</h3>\n\n<p>圆屏适配的状态页，三个 Tab：</p>\n\n<li>**状态**：所有功能项的实时快照（点「操作」按钮刷新）</li>\n<li>**排查**：13 个常见问题的自助解决步骤</li>\n<li>**关于**：模块信息、红线清单、硬件上限、链接</li>\n\n<h3>从 GitHub 自更新</h3>\n\n<p>模块会去 GitHub Releases 看有没有新版本，<b>不需要登录、不需要 token</b>。</p>\n\n<p><b>怎么用</b>：</p>\n\n<p>| 操作 | 结果 |</p>\n<p>|---|---|</p>\n<p>| 点一次「操作」按钮 | 检查更新；有新版本会把目标版本记下来 |</p>\n<p>| <b>用「更新」按钮</b> | 根管理器卡片上的原生更新按钮，读 <code>update-hsc.json</code> |</p>\n<p>| 重启 | 生效 |</p>\n\n<p>也可以手动跑（更稳，看得见过程）：</p>\n\n<pre>su -c 'sh /data/adb/modules/SL8541E_Config_Fix/lib/install.sh install'</pre>\n\n<p><b>设计上的取舍</b>（为什么这么写，不是随手写的）：</p>\n\n<li>**检查不用 GitHub API**：设备是匿名访问，`api.github.com` 限速 60 次/小时/IP，别人一蹭就没了。</li>\n<p>  改成读 <code>/releases/latest</code> 的 <b>302 跳转</b>，<code>Location</code> 头里直接带着 tag，不消耗配额。</p>\n<p>  API 只在降级路径上用（跳转和 API 都试，最后才放弃）。</p>\n<li>**下载后必须过校验**：先看魔数是不是 `PK`（防盗链页面、HTML 错误页），</li>\n<p>  再看包里有没有 <code>module.prop</code>（防残缺包）。不合格直接丢弃，绝不解包。</p>\n<li>**安装分四级**：`magisk --install-module` → `ksud module install` → `apd module install`</li>\n<p>  → <b>APatch 目录级兜底</b>。前三个 CLI 谁在谁优先。</p>\n<p>  - APatch 到目前<b>没有公开的模块安装 CLI</b>，所以走到第四级：解包到临时目录，</p>\n<p>    比对包内 <code>id</code> 与自身一致后，逐项覆盖进 <code>/data/adb/modules/<id></code>，旧版先备份成 <code>.bak</code>。</p>\n<p>  - 覆盖时<b>只换模块文件，不动运行时产物</b>（<code>fix.log</code> / <code>update.zip</code> / <code>update.state</code> /</p>\n<p>    <code>.dnsguard.pid</code> 等一律跳过），免得把日志和状态清掉。</p>\n<p>  - 包内 <code>id</code> 与自身不一致 → <b>拒绝覆盖</b>（防止被别的模块顶掉）。</p>\n<p>  - 四级全不可用才落到\"只下载、告诉你路径、自己去管理器装\"。</p>\n<li>每一级都有前置校验，因为这一步是**替换掉模块自己**——出错的下场是重启后模块消失，</li>\n<p>  用户一脸懵。所以「无声无息地手动解包覆盖自身」这种操作被明确排除。</p>\n<li>**顺手改 `module.prop` 的 description**：根管理器的模块列表里就能直接看到</li>\n<p>  <code>[有新版本 v1.4]</code>，不用点进来。没有更新时自动还原。</p>\n\n<h3>环境</h3>\n\n<li>Wear OS 库引入（`wearable.jar` + `wear-service.jar` + 权限 XML）</li>\n<li>GitHub Hosts 加速（含动态守护）</li>\n\n<h3>维护</h3>\n\n<li>卸载自动清所有 persist 属性 + 停守护进程</li>\n\n<p>---</p>\n\n<h2>硬件上限（改不了，别试）</h2>\n\n<p>| 输出设备 | 采样率 | 位深 |</p>\n<p>|---|---|---|</p>\n<p>| Speaker | 44100 | 16bit |</p>\n<p>| 有线耳机 | 44100 | 16bit |</p>\n<p>| 蓝牙 A2DP | 44100 | 16bit |</p>\n<p>| USB DAC | 动态 | 动态 |</p>\n\n<p>采样率、位深、蓝牙版本、信号强度，全部由硬件锁定。</p>\n\n<p><b>想听高采样率，只能外接 USB DAC。</b></p>\n\n<p>其他硬数字：屏幕 60Hz、电池 880mAh、充电硬件上限 3A。</p>\n\n<p>---</p>\n\n<h2>明确不做的（红线）</h2>\n\n<p>这些不是\"懒得做\"，是<b>试过、或者明确知道会出事</b>：</p>\n\n<p>| 不做 | 原因 |</p>\n<p>|---|---|</p>\n<p>| 碰 V4A / 音频链路 | 冲突，且用户明确要求保 V4A |</p>\n<p>| 改采样率 / 位深 | 硬件锁 44100/16bit |</p>\n<p>| 改屏幕密度 | 用户明确要求不动 |</p>\n<p>| 改温控阈值 | 展锐加密配置驱动，强改会被安全机制拦 |</p>\n<p>| 改 CPU governor | 只有 4 个可选，改 performance 大幅耗电 |</p>\n<p>| 碰 <code>framework-res.apk</code> | sharedUserId，改错必 bootloop |</p>\n<p>| 换 Google WebView | Android 8.1 要求 provider 签名与框架一致，<b>死路</b>（RRO 声明生效了但被签名校验拒） |</p>\n<p>| SurfaceFlinger 色彩 | 8.1 已移除接口，KCAL 未编译 |</p>\n\n<p>---</p>\n\n<h2>文件结构</h2>\n\n<pre>SL8541E_Config_Fix/\n├── module.prop                     模块元信息\n├── system.prop                     开机注入属性（ro.* / persist.* 默认值）\n├── post-fs-data.sh                 开机最早：属性 + ZRAM + 充电 3A\n├── service.sh                      开机完成：二次保险 + sysctl + DNS + 设置项\n├── action.sh                       「操作」按钮：刷新状态页 + 文本体检报告\n├── customize.sh                    安装入口（★ APatch 不执行 update-binary）\n├── uninstall.sh                    卸载：清 persist 属性 + 停守护\n├── lib/\n│   ├── common.sh                   公共库：属性/电池/设置项/节点解析/HTTP/版本比较\n│   ├── prop.list                   ★ 属性清单（唯一事实来源）\n│   ├── install.sh                  ★ 从 GitHub 检查并安装更新\n│   └── dns-guard.sh                GitHub 动态 DNS 守护\n├── webroot/\n│   ├── index.html                  WebUI 主页面（状态/排查/关于）\n│   ├── style.css                   极客风样式（圆屏适配）\n│   ├── script.js                   Tab 切换 + iframe 强制重载\n│   ├── status.sh                   ★ 状态取值（唯一事实来源，输出 KEY|VALUE）\n│   └── gen_status.sh               把状态渲染成 status_generated.html\n├── system/\n│   ├── etc/hosts                   GitHub 加速\n│   ├── etc/permissions/com.google.android.wearable.xml\n│   └── framework/{com.google.android.wearable.jar, wear-service.jar}\n├── vendor/overlay/\n│   └── framework-res__auto_generated_rro.apk    （可选）power_profile 修正\n└── META-INF/com/google/android/    Magisk 兼容壳（APatch 走 customize.sh）</pre>\n\n<h3>改属性的正确姿势</h3>\n\n<li>**加属性**：改 `lib/prop.list`（一行 `scope|key|value|原因`），再同步 `system.prop`</li>\n<li>**ro.\\* 属性**：`system.prop` 与 `prop.list` 两边都要写，只写一边总有一半不生效</li>\n<li>**persist.\\* 属性**：卸载不会自动清，`uninstall.sh` 会从 `prop.list` 自动抓取</li>\n<li>**改完**：重刷模块或重启</li>\n\n<p>---</p>\n\n<h2>安装</h2>\n\n<li>下载对应包型（见下表）</li>\n<li>根管理器 → 模块 → 从本地安装</li>\n<li>**重启**（不重启 = 没装，所有动作都挂在开机钩子上）</li>\n<li>点模块「WebUI」看状态页，或点「操作」看纯文本报告</li>\n\n<p><b>前置</b>：已 Root、Bootloader 已解锁、已备份系统。</p>\n\n<p>---</p>\n\n<h2>验证</h2>\n\n<pre>su\n\n# 属性层\ngetprop persist.sys.5g                 # false\ngetprop persist.sys.cpu                # 4\ngetprop dalvik.vm.dex2oat-cpu-set      # 0,1,2,3\ngetprop af.resampler.quality           # 4\ngetprop debug.sf.disable_backpressure  # 0\ngetprop sys.use_fifo_ui                # 1\n\n# 内核层\ncat /proc/sys/vm/swappiness                     # 150\ncat /sys/block/mmcblk0/queue/scheduler          # 【noop】\ncat /proc/sys/net/core/rmem_max                 # 8388608\n\n# 充电（注意单位是 µA）\ncat /sys/devices/platform/battery/power_supply/battery/input_current_limit\n# 3000000（= 3A）\n\n# 看模块自己的日志（最有信息量）\ncat /data/adb/modules/SL8541E_Config_Fix/fix.log</pre>\n\n<p>日志长这样（每一行都是真事）：</p>\n\n<pre>[09-24 20:51:07] ── post-fs-data 开始 ──\n[09-24 20:51:07] 咕噜。大肥鱼上岸，先把这锅虚标端走。\n[09-24 20:51:09] 属性清单：命中 30 项，未生效 0 项\n[09-24 20:51:09] 充电[post-fs-data]：命中 4 个节点 → ...=3000000uA(3000mA)\n[09-24 20:51:09] ── post-fs-data 结束 ──</pre>\n\n<p>---</p>\n\n<h2>常见问题</h2>\n\n<p><b>Q：内存显示 3GB 是真的吗？</b></p>\n<p>A：是。8GB 是原厂虚标。</p>\n\n<p><b>Q：装了 V4A 会冲突吗？</b></p>\n<p>A：不会。本模块不碰 V4A 任何文件。</p>\n\n<p><b>Q：采样率能提到 96k/24bit 吗？</b></p>\n<p>A：不能。硬件锁 44100/16bit，只能外接 USB DAC。</p>\n\n<p><b>Q：充电实际电流很慢？</b></p>\n<p>A：软件上限已设到 3A。实速取决于充电器（5V 1A 约 890mA）和 USB/AC 握手（USB 模式锁 500mA）。<b>别插电脑 USB 口。</b></p>\n\n<p><b>Q：能换成 Google WebView 吗？</b></p>\n<p>A：不能。Android 8.1 起 WebView provider 必须与系统框架签名一致，Google 的签名过不去。这是系统安全模型，不是配置问题。</p>\n\n<p><b>Q：续航变差了？</b></p>\n<p>A：模块不涉及 CPU 频率与 governor，理论无影响。若感知明显，看 <code>fix.log</code> 里哪一项异常。</p>\n\n<p><b>Q：会变砖吗？</b></p>\n<p>A：只改属性、设置、sysctl、注入文件，不动分区。仍建议先备份。</p>\n\n<p><b>Q：怎么恢复原状？</b></p>\n<p>A：根管理器删模块 + 重启。内置 <code>uninstall.sh</code> 会清掉 persist 覆盖并停掉守护进程。卸载后虚标回来是<b>正常现象</b>。</p>\n\n<p>---</p>\n\n<h2>适用范围</h2>\n\n<p>| 项 | 说明 |</p>\n<p>|---|---|</p>\n<p>| 适用 | SL8541E / SC9832E + 和顺成（HSC）方案 |</p>\n<p>| 不适用 | 其他方案（属性名对不上，表现是\"装了个寂寞\"） |</p>\n<p>| 不改 | 屏幕密度、蓝牙版本、信号强度、温控、色彩 |</p>\n<p>| 不做 | Google WebView、SurfaceFlinger 色彩、CPU governor |</p>\n\n<p>---</p>\n\n<h2>反馈</h2>\n\n<p>Issue 请附：</p>\n\n<li>WebUI 状态页截图，或「操作」按钮的文本输出</li>\n<li>`fix.log`：`cat /data/adb/modules/SL8541E_Config_Fix/fix.log`</li>\n<li>设备型号与系统版本</li>\n<li>复现步骤</li>\n\n<p>---</p>\n\n<h2>致谢</h2>\n\n<li>[B站白马曹](https://space.bilibili.com/1329200878) —— 项目发起、硬件测试、多次纠正方向</li>\n<li>DeepSeek（大肥鱼）—— 代码撰写、重构、踩坑记录</li>\n\n<h2>许可</h2>\n\n<p><a href=\"LICENSE\">MIT License</a></p>\n\n<p>---</p>\n\n<p>> 🐟 大肥鱼</p>\n<p>> 这表的天花板摸清楚了。能榨的都榨了，剩下的交给时间，和下一次官方调价。</p>\n<p>></p>\n<p>> 胆子可以肥嘟嘟，代码不能。</p>",
+  "homepageUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module",
+  "sourceUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module",
+  "url": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module",
+  "latestRelease": {
+    "name": "v2.6",
+    "version": "v2.6",
+    "time": "2026-10-10T04:59:35Z",
+    "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/SL8541E_Config_Fix_v2.6_HSC.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.6",
+      "tagName": "v2.6",
+      "publishedAt": "2026-10-10T04:59:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.6_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/SL8541E_Config_Fix_v2.6_HSC.zip",
+          "size": 136762,
+          "downloadCount": 2
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.6_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/SL8541E_Config_Fix_v2.6_Universal.zip",
+          "size": 136796,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/update-hsc.json",
+          "size": 315,
+          "downloadCount": 3
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/update-uni.json",
+          "size": 321,
+          "downloadCount": 6
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.6/update.json",
+          "size": 315,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5",
+      "tagName": "v2.5",
+      "publishedAt": "2026-10-10T04:40:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.5_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.5/SL8541E_Config_Fix_v2.5_HSC.zip",
+          "size": 136223,
+          "downloadCount": 1
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.5_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.5/SL8541E_Config_Fix_v2.5_Universal.zip",
+          "size": 136256,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.5/update-hsc.json",
+          "size": 315,
+          "downloadCount": 2
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.5/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.5/update.json",
+          "size": 315,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2026-10-10T04:26:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.4_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.4/SL8541E_Config_Fix_v2.4_HSC.zip",
+          "size": 135492,
+          "downloadCount": 1
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.4_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.4/SL8541E_Config_Fix_v2.4_Universal.zip",
+          "size": 135526,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.4/update-hsc.json",
+          "size": 315,
+          "downloadCount": 2
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.4/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.4/update.json",
+          "size": 315,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-10-10T04:11:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.3_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.3/SL8541E_Config_Fix_v2.3_HSC.zip",
+          "size": 135002,
+          "downloadCount": 3
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.3_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.3/SL8541E_Config_Fix_v2.3_Universal.zip",
+          "size": 135035,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.3/update-hsc.json",
+          "size": 315,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.3/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.3/update.json",
+          "size": 315,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-10-10T03:32:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.2_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.2/SL8541E_Config_Fix_v2.2_HSC.zip",
+          "size": 133772,
+          "downloadCount": 2
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.2_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.2/SL8541E_Config_Fix_v2.2_Universal.zip",
+          "size": 133804,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.2/update-hsc.json",
+          "size": 315,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.2/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.2/update.json",
+          "size": 315,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-10-10T03:17:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.1_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1/SL8541E_Config_Fix_v2.1_HSC.zip",
+          "size": 132467,
+          "downloadCount": 2
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.1_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1/SL8541E_Config_Fix_v2.1_Universal.zip",
+          "size": 132499,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1/update-hsc.json",
+          "size": 315,
+          "downloadCount": 2
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1/update.json",
+          "size": 315,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-10-09T23:54:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v2.0_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.0/SL8541E_Config_Fix_v2.0_HSC.zip",
+          "size": 133124,
+          "downloadCount": 2
+        },
+        {
+          "name": "SL8541E_Config_Fix_v2.0_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.0/SL8541E_Config_Fix_v2.0_Universal.zip",
+          "size": 133152,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.0/update-hsc.json",
+          "size": 315,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.0/update-uni.json",
+          "size": 321,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.0/update.json",
+          "size": 315,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.12",
+      "tagName": "v1.12",
+      "publishedAt": "2026-10-09T10:11:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.12_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.12/SL8541E_Config_Fix_v1.12_HSC.zip",
+          "size": 135095,
+          "downloadCount": 1
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.12_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.12/SL8541E_Config_Fix_v1.12_Universal.zip",
+          "size": 135126,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.12/update-hsc.json",
+          "size": 318,
+          "downloadCount": 2
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.12/update-uni.json",
+          "size": 324,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.12/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.11",
+      "tagName": "v1.11",
+      "publishedAt": "2026-10-09T04:39:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.11_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.11/SL8541E_Config_Fix_v1.11_HSC.zip",
+          "size": 132754,
+          "downloadCount": 3
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.11_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.11/SL8541E_Config_Fix_v1.11_Universal.zip",
+          "size": 132784,
+          "downloadCount": 0
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.11/update-hsc.json",
+          "size": 318,
+          "downloadCount": 4
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.11/update-uni.json",
+          "size": 324,
+          "downloadCount": 4
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.11/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.10",
+      "tagName": "v1.10",
+      "publishedAt": "2026-10-06T05:19:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.10_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.10/SL8541E_Config_Fix_v1.10_HSC.zip",
+          "size": 132408,
+          "downloadCount": 4
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.10_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.10/SL8541E_Config_Fix_v1.10_Universal.zip",
+          "size": 132439,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-hsc.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.10/update-hsc.json",
+          "size": 318,
+          "downloadCount": 1
+        },
+        {
+          "name": "update-uni.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.10/update-uni.json",
+          "size": 324,
+          "downloadCount": 7
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.10/update.json",
+          "size": 318,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.9",
+      "tagName": "v1.9",
+      "publishedAt": "2026-10-06T04:29:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.9_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.9/SL8541E_Config_Fix_v1.9_HSC.zip",
+          "size": 132026,
+          "downloadCount": 2
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.9_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.9/SL8541E_Config_Fix_v1.9_Universal.zip",
+          "size": 132046,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.9/update.json",
+          "size": 315,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2026-09-27T09:05:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.8_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.8/SL8541E_Config_Fix_v1.8_HSC.zip",
+          "size": 128359,
+          "downloadCount": 4
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.8_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.8/SL8541E_Config_Fix_v1.8_Universal.zip",
+          "size": 128380,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.8/update.json",
+          "size": 315,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2026-09-26T00:59:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.7_HSC.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.7/SL8541E_Config_Fix_v1.7_HSC.zip",
+          "size": 126989,
+          "downloadCount": 1
+        },
+        {
+          "name": "SL8541E_Config_Fix_v1.7_Universal.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.7/SL8541E_Config_Fix_v1.7_Universal.zip",
+          "size": 127009,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.7/update.json",
+          "size": 315,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-09-24T18:25:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.6.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.6/SL8541E_Config_Fix_v1.6.zip",
+          "size": 126779,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-09-24T13:34:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.5.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.5/SL8541E_Config_Fix_v1.5.zip",
+          "size": 125770,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-09-24T13:07:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.4.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.4/SL8541E_Config_Fix_v1.4.zip",
+          "size": 123498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-09-24T12:54:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.3.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.3/SL8541E_Config_Fix_v1.3.zip",
+          "size": 113563,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-09-24T11:37:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix_v1.2.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v1.2/SL8541E_Config_Fix_v1.2.zip",
+          "size": 91606,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "1.1",
+      "tagName": "1.1",
+      "publishedAt": "2026-09-18T04:45:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/1.1/SL8541E_Config_Fix.zip",
+          "size": 27907,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "正式版",
+      "tagName": "正式版",
+      "publishedAt": "2026-09-17T08:10:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SL8541E_Config_Fix.zip",
+          "downloadUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/%E6%AD%A3%E5%BC%8F%E7%89%88/SL8541E_Config_Fix.zip",
+          "size": 26272,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

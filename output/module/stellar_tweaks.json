@@ -1,0 +1,211 @@
+{
+  "readme": "<div align=\"center\">\n  <img src=\"https://github.com/kanaodnd/kanaokturu/raw/main/a740af124b50737a86e4c4782ed9c4c7.jpg\" alt=\"Stellar Banner\" width=\"100%\" style=\"border-radius: 8px;\">\n  \n  <br>\n\n  <h1>Stellar Tweaks</h1>\n  <p><b>Intelligent Performance & Energy Orchestration Engine for Android</b></p>\n\n  <a href=\"https://github.com/kanaodnd/Stellar-Tweaks/releases\">\n    <img src=\"https://img.shields.io/github/v/release/kanaodnd/Stellar-Tweaks?style=flat-square&color=7050ff&label=Release\" alt=\"Release\">\n  </a>\n  &nbsp;\n  <a href=\"LICENSE\">\n    <img src=\"https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square&color=007bff\" alt=\"License\">\n  </a>\n  &nbsp;\n  <a href=\"https://t.me/hosshi_prjkt\">\n    <img src=\"https://img.shields.io/badge/Telegram-Channel-26A5E4?style=flat-square&logo=telegram&logoColor=white\" alt=\"Channel\">\n  </a>\n  &nbsp;\n  <a href=\"https://t.me/hosshi_chat\">\n    <img src=\"https://img.shields.io/badge/Telegram-Group-26A5E4?style=flat-square&logo=telegram&logoColor=white\" alt=\"Group\">\n  </a>\n\n</div>\n\n---\n\n## Overview\n\nMost traditional Android optimization tools rely on static shell scripts, aggressive throttling, or continuous `dumpsys` polling loops that consume CPU resources and introduce frame volatility.\n\n**Stellar Tweaks** is a deterministic orchestration engine engineered in **Rust** with native Android framework integration. It operates silently in userspace and kernelspace to dynamically align system resources, rendering pipelines, and hardware governors with real-time application demands across Qualcomm Snapdragon, MediaTek, Samsung Exynos, and Unisoc platforms.\n\n> [!WARNING]\n> Stellar directly orchestrates low-level kernel subsystems, CPU/GPU governors, and Dynamic Voltage and Frequency Scaling (DVFS). To prevent parameter collisions and ensure deterministic scheduling, avoid running concurrent third-party performance modules or conflicting optimizer scripts.\n\n---\n\n## Key Features\n\n<details open>\n<summary><b>1. Fast Energy Aware Scheduling (FEAS)</b></summary>\n<br>\n\n* **Dynamic Frame Awareness:** Monitors render thread throughput in real time, scaling hardware frequency curves to prevent frame drops during sudden rendering spikes.\n* **Cluster-Aware Thread Affinity:** Directs high-priority threads (such as `RenderThread` and game engine threads) to Prime and Big CPU cores, while offloading background tasks to efficiency clusters.\n* **Cooperative Idle Snapping:** Smoothly transitions hardware into low-power states during global inactivity without relying on evdev polling loops.\n</details>\n\n<details open>\n<summary><b>2. Hardware & Power Orchestration</b></summary>\n<br>\n\n* **Custom GPU Governors:** Independent GPU governor configuration per profile (`Powersaving`, `Balanced`, `Gaming`) across Adreno, Mali, Devfreq, and KGSL architectures.\n* **Dynamic I/O Scheduling:** Context-sensitive block I/O scheduling backed by cached hardware device mapping to eliminate storage hitching.\n* **Advanced DVFS & Power Management:** Granular userspace frequency limits that balance power draw and sustained performance during heavy workloads.\n* **Bypass Charging (Idle Battery State):** Allows supported hardware to draw power directly from the charger without routing current into the battery cell, significantly lowering thermal generation.\n* **Fast Charging Monitoring:** Maintains stable charging throughput while respecting safety boundaries.\n</details>\n\n<details open>\n<summary><b>3. Display & Visual Synchronization</b></summary>\n<br>\n\n* **Multi-Vendor Display Controller:** Integrated support for Xiaomi, Samsung, Transsion (Infinix/Tecno), BBK/Oplus, and generic AOSP display interfaces.\n* **Force Refresh Rate Mode:** Overrides vendor display lockouts when standard Android display managers fail to engage high refresh rates.\n* **Battery-Saver Refresh Limiter:** Automatically locks the display panel to 60Hz whenever the Android Battery Saver mode engages.\n</details>\n\n<details open>\n<summary><b>4. Framework Integration & Utilities</b></summary>\n<br>\n\n* **Device Identity Spoofing:** Built-in system-level device spoofing profiles to unlock 90/120 FPS configurations in supported titles.\n* **System Native Notifications:** Emits clean `<App Label> • Optimized` toast alerts natively without requiring overlay or floating window permissions.\n* **Modular Component Uninstaller:** Granular cleanup subroutines allowing users to selectively remove configuration directories (`clean config`) or revert hardware tweaks (`clean tweaks`).\n* **Self-Healing Boot Configuration:** Automatically detects panel refresh rates on initial startup and generates valid defaults without user intervention.\n</details>\n\n---\n\n## Operational Profiles\n\nStellar automatically transitions across three standard operational profiles based on your active usage:\n\n| Profile | Primary Use Case | System Behavior |\n| :--- | :--- | :--- |\n| **Gaming** | Active gameplay & heavy render workloads | Enforces consistent performance, sets gaming hardware governors, activates bypass charging, and minimizes background interruptions. |\n| **Balanced** | Daily usage, social media & multitasking | Delivers smooth responsiveness for everyday tasks while maintaining balanced power consumption and cooler device operation. |\n| **Powersaver** | Low battery & emergency endurance | Caps background power draw, locks the display refresh rate to 60Hz, and shifts hardware governors to maximize battery life. |\n\n---\n\n## Stellar Pro (Exclusive Tier)\n\nStellar provides an **Exclusive / Pro Tier** designed for users who want to actively support project research and continuous development.\n\n### Concept & Decision Intelligence\nThe Pro tier serves as an elevated decision intelligence layer within the daemon, offering refined automated decision-making and enhanced operational control. Supporting the project directly aids in testing across real hardware devices, maintaining kernel compatibility, and driving continuous development updates.\n\nFor tier activation details and donation options, visit the [Stellar Project Support Notice](https://t.me/hosshi_prjkt/644).\n\n---\n\n## User Interface Preview\n\nPowered by **Material You 3 (M3)** design principles, the Stellar WebUI provides an intuitive, dark-surface control interface. Compiled into a single-file distribution, it requires zero external downloads and functions completely offline.\n\n### Root Environment\n<div align=\"center\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184447_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Dashboard\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184139_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Settings\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184120_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Profiling\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184106_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Tools\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184058_WebUI%20X.jpg\" width=\"30%\" alt=\"Root About\" style=\"border-radius: 6px; margin: 3px;\">\n</div>\n\n<br>\n\n### Non-Root Environment\n<div align=\"center\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091656_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Dashboard\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091649_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Settings\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091706_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Tools\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091726_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Profiling\" style=\"border-radius: 6px; margin: 3px;\">\n  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091719_AxManager.jpg\" width=\"30%\" alt=\"NonRoot About\" style=\"border-radius: 6px; margin: 3px;\">\n</div>\n\n---\n\n## Supported Environments\n\n| Environment | Supported Managers | Capability Scope |\n| :--- | :--- | :--- |\n| **Root** | • KernelSU<br>• Magisk<br>• APatch | **Full Hardware & Framework Access**<br>Direct kernel tweaking, FEAS scheduling, CPU/GPU governors, I/O schedulers, display overrides, bypass charging, and hardware caches. |\n| **Non-Root** | • Axeron Manager | **Userspace Optimization**<br>Dynamic app profiling, system properties, userspace priority tuning, and visual dashboards. |\n\n> [!NOTE]\n> Root access grants complete control over sysfs nodes and hardware governors. On non-rooted environments via Axeron Manager, Stellar operates within userspace privilege boundaries without modifying low-level kernel nodes.\n\n---\n\n## Command-Line Interface\n\nThe `stellar-daemon` binary provides straightforward terminal commands:\n\n```bash\n# Start the orchestration daemon in foreground\nstellar-daemon start\n\n# Query runtime diagnostics and active operational mode\nstellar-daemon stats\n\n# Modular component cleanup\nstellar-daemon clean tweaks    # Revert kernel parameters and display locks to defaults\nstellar-daemon clean config    # Remove configuration and applist files\nstellar-daemon clean all       # Full rollback: revert tweaks, delete configs, stop daemon\n```\n\n---\n\n## Installation\n\n1. **Download** the latest release package from the [Releases](https://github.com/kanaodnd/Stellar-Tweaks/releases) page.\n2. **Install** via your preferred module manager:\n   * **Root:** Flash the `.zip` archive in KernelSU, Magisk, or APatch.\n   * **Non-Root:** Import the module through Axeron Manager.\n3. **Reboot** your device (Root only) to initialize the daemon and allow automated hardware mapping.\n4. **Launch** the WebUI dashboard from your manager to customize preferences.\n\n---\n\n## Credits & References\n\nAcknowledgement and appreciation to the following developers whose open-source tools, technical research, and concepts served as valuable references during the development of Stellar:\n\n* **Rem01Gaming**\n* **Notzeeta**\n* **HoyoSlave**\n* **Zesxhia**\n\n---\n\n## Community & Support\n\n* **Issue Tracking:** Submit bug reports or technical inquiries via [GitHub Issues](https://github.com/kanaodnd/Stellar-Tweaks/issues).\n* **Community Channels:** Join the [Telegram Channel](https://t.me/hosshi_prjkt) and [Telegram Group](https://t.me/hosshi_chat) for announcements, discussions, and release builds.\n\n<div align=\"center\">\n\n**If you find Stellar Tweaks useful, consider starring the repository.**\n\n</div>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/kanaokturu/raw/main/a740af124b50737a86e4c4782ed9c4c7.jpg\" alt=\"Stellar Banner\" width=\"100%\" style=\"border-radius: 8px;\"></p>\n\n<p>  <br></p>\n\n<p>  <h1>Stellar Tweaks</h1></p>\n<p>  <p><b>Intelligent Performance & Energy Orchestration Engine for Android</b></p></p>\n\n<p>  <a href=\"https://github.com/kanaodnd/Stellar-Tweaks/releases\"></p>\n<p>    <img src=\"https://img.shields.io/github/v/release/kanaodnd/Stellar-Tweaks?style=flat-square&color=7050ff&label=Release\" alt=\"Release\"></p>\n<p>  </a></p>\n<p>  &nbsp;</p>\n<p>  <a href=\"LICENSE\"></p>\n<p>    <img src=\"https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square&color=007bff\" alt=\"License\"></p>\n<p>  </a></p>\n<p>  &nbsp;</p>\n<p>  <a href=\"https://t.me/hosshi_prjkt\"></p>\n<p>    <img src=\"https://img.shields.io/badge/Telegram-Channel-26A5E4?style=flat-square&logo=telegram&logoColor=white\" alt=\"Channel\"></p>\n<p>  </a></p>\n<p>  &nbsp;</p>\n<p>  <a href=\"https://t.me/hosshi_chat\"></p>\n<p>    <img src=\"https://img.shields.io/badge/Telegram-Group-26A5E4?style=flat-square&logo=telegram&logoColor=white\" alt=\"Group\"></p>\n<p>  </a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>Overview</h2>\n\n<p>Most traditional Android optimization tools rely on static shell scripts, aggressive throttling, or continuous <code>dumpsys</code> polling loops that consume CPU resources and introduce frame volatility.</p>\n\n<p><b>Stellar Tweaks</b> is a deterministic orchestration engine engineered in <b>Rust</b> with native Android framework integration. It operates silently in userspace and kernelspace to dynamically align system resources, rendering pipelines, and hardware governors with real-time application demands across Qualcomm Snapdragon, MediaTek, Samsung Exynos, and Unisoc platforms.</p>\n\n<p>> [!WARNING]</p>\n<p>> Stellar directly orchestrates low-level kernel subsystems, CPU/GPU governors, and Dynamic Voltage and Frequency Scaling (DVFS). To prevent parameter collisions and ensure deterministic scheduling, avoid running concurrent third-party performance modules or conflicting optimizer scripts.</p>\n\n<p>---</p>\n\n<h2>Key Features</h2>\n\n<p><details open></p>\n<p><summary><b>1. Fast Energy Aware Scheduling (FEAS)</b></summary></p>\n<p><br></p>\n\n<li>**Dynamic Frame Awareness:** Monitors render thread throughput in real time, scaling hardware frequency curves to prevent frame drops during sudden rendering spikes.</li>\n<li>**Cluster-Aware Thread Affinity:** Directs high-priority threads (such as `RenderThread` and game engine threads) to Prime and Big CPU cores, while offloading background tasks to efficiency clusters.</li>\n<li>**Cooperative Idle Snapping:** Smoothly transitions hardware into low-power states during global inactivity without relying on evdev polling loops.</li>\n<p></details></p>\n\n<p><details open></p>\n<p><summary><b>2. Hardware & Power Orchestration</b></summary></p>\n<p><br></p>\n\n<li>**Custom GPU Governors:** Independent GPU governor configuration per profile (`Powersaving`, `Balanced`, `Gaming`) across Adreno, Mali, Devfreq, and KGSL architectures.</li>\n<li>**Dynamic I/O Scheduling:** Context-sensitive block I/O scheduling backed by cached hardware device mapping to eliminate storage hitching.</li>\n<li>**Advanced DVFS & Power Management:** Granular userspace frequency limits that balance power draw and sustained performance during heavy workloads.</li>\n<li>**Bypass Charging (Idle Battery State):** Allows supported hardware to draw power directly from the charger without routing current into the battery cell, significantly lowering thermal generation.</li>\n<li>**Fast Charging Monitoring:** Maintains stable charging throughput while respecting safety boundaries.</li>\n<p></details></p>\n\n<p><details open></p>\n<p><summary><b>3. Display & Visual Synchronization</b></summary></p>\n<p><br></p>\n\n<li>**Multi-Vendor Display Controller:** Integrated support for Xiaomi, Samsung, Transsion (Infinix/Tecno), BBK/Oplus, and generic AOSP display interfaces.</li>\n<li>**Force Refresh Rate Mode:** Overrides vendor display lockouts when standard Android display managers fail to engage high refresh rates.</li>\n<li>**Battery-Saver Refresh Limiter:** Automatically locks the display panel to 60Hz whenever the Android Battery Saver mode engages.</li>\n<p></details></p>\n\n<p><details open></p>\n<p><summary><b>4. Framework Integration & Utilities</b></summary></p>\n<p><br></p>\n\n<li>**Device Identity Spoofing:** Built-in system-level device spoofing profiles to unlock 90/120 FPS configurations in supported titles.</li>\n<li>**System Native Notifications:** Emits clean `<App Label> • Optimized` toast alerts natively without requiring overlay or floating window permissions.</li>\n<li>**Modular Component Uninstaller:** Granular cleanup subroutines allowing users to selectively remove configuration directories (`clean config`) or revert hardware tweaks (`clean tweaks`).</li>\n<li>**Self-Healing Boot Configuration:** Automatically detects panel refresh rates on initial startup and generates valid defaults without user intervention.</li>\n<p></details></p>\n\n<p>---</p>\n\n<h2>Operational Profiles</h2>\n\n<p>Stellar automatically transitions across three standard operational profiles based on your active usage:</p>\n\n<p>| Profile | Primary Use Case | System Behavior |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <b>Gaming</b> | Active gameplay & heavy render workloads | Enforces consistent performance, sets gaming hardware governors, activates bypass charging, and minimizes background interruptions. |</p>\n<p>| <b>Balanced</b> | Daily usage, social media & multitasking | Delivers smooth responsiveness for everyday tasks while maintaining balanced power consumption and cooler device operation. |</p>\n<p>| <b>Powersaver</b> | Low battery & emergency endurance | Caps background power draw, locks the display refresh rate to 60Hz, and shifts hardware governors to maximize battery life. |</p>\n\n<p>---</p>\n\n<h2>Stellar Pro (Exclusive Tier)</h2>\n\n<p>Stellar provides an <b>Exclusive / Pro Tier</b> designed for users who want to actively support project research and continuous development.</p>\n\n<h3>Concept & Decision Intelligence</h3>\n<p>The Pro tier serves as an elevated decision intelligence layer within the daemon, offering refined automated decision-making and enhanced operational control. Supporting the project directly aids in testing across real hardware devices, maintaining kernel compatibility, and driving continuous development updates.</p>\n\n<p>For tier activation details and donation options, visit the <a href=\"https://t.me/hosshi_prjkt/644\">Stellar Project Support Notice</a>.</p>\n\n<p>---</p>\n\n<h2>User Interface Preview</h2>\n\n<p>Powered by <b>Material You 3 (M3)</b> design principles, the Stellar WebUI provides an intuitive, dark-surface control interface. Compiled into a single-file distribution, it requires zero external downloads and functions completely offline.</p>\n\n<h3>Root Environment</h3>\n<p><div align=\"center\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184447_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Dashboard\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184139_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Settings\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184120_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Profiling\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184106_WebUI%20X.jpg\" width=\"30%\" alt=\"Root Tools\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/root/Screenshot_20260125_184058_WebUI%20X.jpg\" width=\"30%\" alt=\"Root About\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p></div></p>\n\n<p><br></p>\n\n<h3>Non-Root Environment</h3>\n<p><div align=\"center\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091656_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Dashboard\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091649_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Settings\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091706_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Tools\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091726_AxManager.jpg\" width=\"30%\" alt=\"NonRoot Profiling\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p>  <img src=\"https://github.com/kanaodnd/Stellar-Tweaks/raw/main/screenshot/nonroot/Screenshot_20260124_091719_AxManager.jpg\" width=\"30%\" alt=\"NonRoot About\" style=\"border-radius: 6px; margin: 3px;\"></p>\n<p></div></p>\n\n<p>---</p>\n\n<h2>Supported Environments</h2>\n\n<p>| Environment | Supported Managers | Capability Scope |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <b>Root</b> | • KernelSU<br>• Magisk<br>• APatch | <b>Full Hardware & Framework Access</b><br>Direct kernel tweaking, FEAS scheduling, CPU/GPU governors, I/O schedulers, display overrides, bypass charging, and hardware caches. |</p>\n<p>| <b>Non-Root</b> | • Axeron Manager | <b>Userspace Optimization</b><br>Dynamic app profiling, system properties, userspace priority tuning, and visual dashboards. |</p>\n\n<p>> [!NOTE]</p>\n<p>> Root access grants complete control over sysfs nodes and hardware governors. On non-rooted environments via Axeron Manager, Stellar operates within userspace privilege boundaries without modifying low-level kernel nodes.</p>\n\n<p>---</p>\n\n<h2>Command-Line Interface</h2>\n\n<p>The <code>stellar-daemon</code> binary provides straightforward terminal commands:</p>\n\n<pre># Start the orchestration daemon in foreground\nstellar-daemon start\n\n# Query runtime diagnostics and active operational mode\nstellar-daemon stats\n\n# Modular component cleanup\nstellar-daemon clean tweaks    # Revert kernel parameters and display locks to defaults\nstellar-daemon clean config    # Remove configuration and applist files\nstellar-daemon clean all       # Full rollback: revert tweaks, delete configs, stop daemon</pre>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>**Download** the latest release package from the [Releases](https://github.com/kanaodnd/Stellar-Tweaks/releases) page.</li>\n<li>**Install** via your preferred module manager:</li>\n<p>   * <b>Root:</b> Flash the <code>.zip</code> archive in KernelSU, Magisk, or APatch.</p>\n<p>   * <b>Non-Root:</b> Import the module through Axeron Manager.</p>\n<li>**Reboot** your device (Root only) to initialize the daemon and allow automated hardware mapping.</li>\n<li>**Launch** the WebUI dashboard from your manager to customize preferences.</li>\n\n<p>---</p>\n\n<h2>Credits & References</h2>\n\n<p>Acknowledgement and appreciation to the following developers whose open-source tools, technical research, and concepts served as valuable references during the development of Stellar:</p>\n\n<li>**Rem01Gaming**</li>\n<li>**Notzeeta**</li>\n<li>**HoyoSlave**</li>\n<li>**Zesxhia**</li>\n\n<p>---</p>\n\n<h2>Community & Support</h2>\n\n<li>**Issue Tracking:** Submit bug reports or technical inquiries via [GitHub Issues](https://github.com/kanaodnd/Stellar-Tweaks/issues).</li>\n<li>**Community Channels:** Join the [Telegram Channel](https://t.me/hosshi_prjkt) and [Telegram Group](https://t.me/hosshi_chat) for announcements, discussions, and release builds.</li>\n\n<p><div align=\"center\"></p>\n\n<p><b>If you find Stellar Tweaks useful, consider starring the repository.</b></p>\n\n<p></div></p>",
+  "homepageUrl": "https://github.com/kanaodnd/Stellar-Tweaks",
+  "sourceUrl": "https://github.com/kanaodnd/Stellar-Tweaks",
+  "url": "https://github.com/kanaodnd/Stellar-Tweaks",
+  "latestRelease": {
+    "name": "22.0",
+    "version": "22.0",
+    "time": "2026-09-19T15:58:50Z",
+    "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/22.0/Stellar-v22.0-release5.3-VoyagingAstralist-25926.zip"
+  },
+  "releases": [
+    {
+      "name": "22.0",
+      "tagName": "22.0",
+      "publishedAt": "2026-09-19T15:58:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-v22.0-release5.3-VoyagingAstralist-25926.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/22.0/Stellar-v22.0-release5.3-VoyagingAstralist-25926.zip",
+          "size": 2684589,
+          "downloadCount": 3618
+        }
+      ]
+    },
+    {
+      "name": "21.0",
+      "tagName": "21.0",
+      "publishedAt": "2026-04-26T06:02:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-release-.Orbitals-Desk.-30426.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/21.0/Stellar-release-.Orbitals-Desk.-30426.zip",
+          "size": 2598332,
+          "downloadCount": 32082
+        }
+      ]
+    },
+    {
+      "name": "20.2",
+      "tagName": "20.2",
+      "publishedAt": "2026-03-21T13:40:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-20.2-release-21326.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/20.2/Stellar-20.2-release-21326.zip",
+          "size": 2555740,
+          "downloadCount": 9512
+        }
+      ]
+    },
+    {
+      "name": "20.1",
+      "tagName": "20.1",
+      "publishedAt": "2026-03-21T01:40:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-20.1-release-21326.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/20.1/Stellar-20.1-release-21326.zip",
+          "size": 2556823,
+          "downloadCount": 261
+        }
+      ]
+    },
+    {
+      "name": "20.0",
+      "tagName": "20.0",
+      "publishedAt": "2026-03-15T19:10:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-20.0-release-16326.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/20.0/Stellar-20.0-release-16326.zip",
+          "size": 1864325,
+          "downloadCount": 679
+        }
+      ]
+    },
+    {
+      "name": "19.0",
+      "tagName": "19.0",
+      "publishedAt": "2026-01-23T13:05:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-19.0-release-hotfix2-24126.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/19.0/Stellar-19.0-release-hotfix2-24126.zip",
+          "size": 4458877,
+          "downloadCount": 3439
+        }
+      ]
+    },
+    {
+      "name": "18.6",
+      "tagName": "18.6",
+      "publishedAt": "2025-12-28T19:33:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-18.5-release-291225.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/18.6/Stellar-18.5-release-291225.zip",
+          "size": 4427653,
+          "downloadCount": 3571
+        }
+      ]
+    },
+    {
+      "name": "18.5",
+      "tagName": "18.5",
+      "publishedAt": "2025-12-27T15:43:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-18.0-release-.hotfix.-281225.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/18.5/Stellar-18.0-release-.hotfix.-281225.zip",
+          "size": 4430347,
+          "downloadCount": 981
+        }
+      ]
+    },
+    {
+      "name": "18.0",
+      "tagName": "18.0",
+      "publishedAt": "2025-12-27T14:26:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-18.0-release-281225.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/18.0/Stellar-18.0-release-281225.zip",
+          "size": 4404689,
+          "downloadCount": 208
+        }
+      ]
+    },
+    {
+      "name": "11",
+      "tagName": "11",
+      "publishedAt": "2025-07-31T08:37:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "9.0",
+      "tagName": "9.0",
+      "publishedAt": "2025-06-11T06:15:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "6.7",
+      "tagName": "6.7",
+      "publishedAt": "2025-03-30T17:00:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-Tweaks-6.7.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/6.7/Stellar-Tweaks-6.7.zip",
+          "size": 1110423,
+          "downloadCount": 244
+        }
+      ]
+    },
+    {
+      "name": "6.5",
+      "tagName": "6.5",
+      "publishedAt": "2025-03-28T22:50:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Stellar-Tweaks-6.5.Visoner.zip",
+          "downloadUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/6.5/Stellar-Tweaks-6.5.Visoner.zip",
+          "size": 1097832,
+          "downloadCount": 203
+        }
+      ]
+    },
+    {
+      "name": "6.1",
+      "tagName": "6.1",
+      "publishedAt": "2025-03-08T19:08:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "Notes",
+      "tagName": "Notes",
+      "publishedAt": "2025-04-28T04:36:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "#5.8",
+      "tagName": "#5.8",
+      "publishedAt": "2025-02-16T17:19:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "#5.7",
+      "tagName": "#5.7",
+      "publishedAt": "2025-02-16T07:44:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    }
+  ]
+}

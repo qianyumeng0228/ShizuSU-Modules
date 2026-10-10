@@ -1,0 +1,795 @@
+{
+  "readme": "> ## ⚠️ ВІДМОВА ВІД ВІДПОВІДАЛЬНОСТІ\n>\n> Цей модуль надається «ЯК Є», без жодних гарантій, явних чи неявних.\n> Автор **не несе жодної відповідальності** за пошкодження пристрою, втрату даних,\n> помилки системи чи будь-які інші наслідки, що можуть виникнути під час або після встановлення.\n>\n> Водночас модуль створено з турботою, протестовано та максимально безпечно для вашого пристрою —\n> він працює локально і не втручається в системні файли. Проте встановлення будь-яких модифікацій\n> завжди є відповідальним кроком, тому робіть його **на власний ризик**.\n>\n> Перед встановленням зробіть резервну копію важливих даних. Бережіть себе та свої пристрої! 🤍\n\n---\n\n# 🏁 td2tdr\n\n**td2tdr** — модуль для Magisk / KernelSU / KernelSU-Next, який автоматично синхронізує файл `Garage.dat` з гри **Top Drives** у папку `Download/td2tdr_sync` на вашому пристрої.\n\nМодуль працює у фоновому режимі без необхідності втручання і надає зручний WebUI для ручної синхронізації та перегляду статистики гаража.\n\n---\n\n## ✨ Можливості\n\n- 🔄 **Автосинхронізація** файлу `Garage.dat` у реальному часі\n- 📂 **Копіювання** у `Download/td2tdr_sync/Garage.dat`\n- 🌐 **WebUI-панель** для керування та перегляду статусу\n- 📊 **Підрахунок авто** та розподіл за типами прокачки\n- 🚀 **Автооновлення** через GitHub Releases\n- 🧹 **Локальна робота** — без інтернету\n\n---\n\n## 📋 Вимоги\n\n- **Пристрій:** Android 8.0 (API 26) або новіший\n- **Менеджер:** Magisk (≥ 24.0), KernelSU (≥ 1.0), або KernelSU-Next\n- **Гра:** Top Drives (обов'язково запущена хоча б раз для створення `Garage.dat`)\n\n---\n\n## 📥 Встановлення\n\n### Спосіб 1: Через менеджер модулів (рекомендовано)\n\n1. Завантажте ZIP-файл останнього релізу зі сторінки **Releases**.\n2. Відкрийте ваш менеджер модулів (Magisk / KernelSU / KernelSU-Next).\n3. Оберіть **Модулі → Встановити з файлу** і вкажіть завантажений ZIP.\n4. Перезавантажте пристрій.\n5. Після перезавантаження модуль автоматично синхронізує `Garage.dat` у `Download/td2tdr_sync`.\n\n### Спосіб 2: Через ADB\n\n```bash\nadb push td2tdr_v0.0.501.zip /data/local/tmp/\nadb shell su -c \"magisk --install-module /data/local/tmp/td2tdr_v0.0.501.zip\"\nadb reboot\n```\n\n---\n\n## 🔄 Автооновлення\n\nМодуль підтримує автоматичні оновлення через `update.json`, який розташований у репозиторії.\n\nПісля публікації нового релізу менеджер модулів побачить оновлення та запропонує його встановити:\n\n- У **Magisk**: пункт \"Оновлення\" у картці модуля.\n- У **KernelSU-Next**: так само — кнопка \"Оновлення\" з'явиться автоматично.\n\n> ⚠️ **Примітка:** переконайтеся, що в `module.prop` вказано правильний `updateJson` — він уже налаштований на цей репозиторій.\n\n---\n\n## 🌐 WebUI-панель\n\nWebUI відкривається через менеджер модулів:\n- **Magisk:** Картка модуля → значок WebUI\n- **KernelSU/KernelSU-Next:** Картка модуля → значок WebUI\n\n### Основні функції панелі\n\n| Функція | Опис |\n|--------|------|\n| **Синхронізувати та відкрити** | Копіює `Garage.dat` у `Download/td2tdr_sync` (у фоні) та одразу відкриває topdrivesrecords.com |\n| **Миттєвий статус із кешу** | Останній стан синхронізації зберігається локально й показується одразу при відкритті панелі; повторне копіювання — тільки за кнопкою |\n| **Статистика гаража** | Зайняті слоти з LED-попередженням (>95%), donut-діаграма прокачки, яскравий тег Held |\n| **Аналітика** | Щоденні знімки, прогнозний слайдер 3–90 днів, середньодобовий приріст (+X / день), індикатор точності прогнозу |\n| **Журнал** | Детальний лог кожного кроку синхронізації з фільтром рівнів |\n| **Налаштування** | Тема (auto/light/dark), мова інтерфейсу, шляхи джерела та копії |\n\nКнопка **«Синхронізувати та відкрити»** має динамічну анімацію в тон статусу: спокійне зелене «дихання» коли все готове, жовте пульсування під час очікування, швидкий червоний сигнал при помилці.\n\n---\n\n## 🗺️ Roadmap (наступний цикл — v0.1.0)\n\n- [ ] Розширення аналітики: графіки по рідкостях авто та типах прокачки в часі\n- [ ] Прогноз на основі ковзного середнього замість лінійної екстраполяції\n- [ ] Експорт/Імпорт історії аналітики (JSON) для переносу між пристроями\n- [ ] Віджет/швидка плитка для запуску синхронізації без відкриття WebUI\n- [ ] Локалізація WebUI додатковими мовами (en вже є; наступні — за запитами)\n- [ ] Автотест збірки: CI-перевірка узгодженості module.prop ↔ update.json ↔ changelog\n\n---\n\n## 🛠️ Для розробників\n\n### Версіонування\n\n```bash\n./scripts/bump_version.sh patch   # 0.0.001 → 0.0.002\n./scripts/bump_version.sh minor   # 0.0.002 → 0.1.000\n./scripts/bump_version.sh major   # 0.1.000 → 1.0.000\n./scripts/bump_version.sh 1.2.3   # конкретна версія\n```\n\nСкрипт оновлює `module.prop` та `update.json`.\n\n> 💡 **Windows:** скрипт потребує середовище **Git Bash** (входить у Git for Windows) та **Python** у `PATH`.\n> Запускайте з Git Bash, а не PowerShell: `./scripts/bump_version.sh patch`\n\n### Створення релізу\n\n1. Оновіть версію скриптом `bump_version.sh`.\n2. Оновіть `changelog.md` — додайте запис про нову версію.\n3. Закомітьте і запуште зміни:\n   ```bash\n   git add module.prop update.json changelog.md\n   git commit -m \"chore: bump to v0.0.002\"\n   git push origin master\n   ```\n4. Створіть тег:\n   ```bash\n   git tag v0.0.002\n   git push origin v0.0.002\n   ```\n5. **GitHub Actions** автоматично:\n   - Збере збірку в ZIP\n   - Порахує `sha256`\n   - Оновить `update.json`\n   - Створить GitHub Release з ZIP та changelog\n\n### Банер модуля\n\nБанер — зображення, яке відображається у картці модуля в менеджері (Magisk / KernelSU). Посилання на нього вказується у `module.prop` полем `banner=banner.png`.\n\n| Параметр | Значення |\n|---------|----------|\n| Формат | **PNG** |\n| Розмір | **1024×500 px** (пропорція ~2:1, рекомендація Magisk) |\n| Вага | до **100 КБ** (менше — швидший UI) |\n| Фон | темний або прозорий; текст — у центрі, не в кутах |\n| Шлях | корінь проєкту, поле `banner=` у `module.prop` |\n\n**AI-промт для генерації банера** (працює у Midjourney / DALL-E / Leonardo / Bing):\n\n```text\nWide Android module banner, 1024x500, landscape. Dark charcoal carbon-fiber\nbackground with subtle glow. Sleek dark sports car on a night highway, motion\nblur, neon light trails. Accent color bright green #1ECD97. Bold text \"TD2TDR\"\ncentered, small subtitle \"Top Drives Garage Sync\" below it. Clean tech\nminimalist style, sharp details, no watermark, no border.\n```\n\n> 💡 **Порада:** AI-генератори часто спотворюють текст. Якщо напис вийшов кривим — згенеруйте зображення без тексту (приберіть рядок `Bold text \"TD2TDR\"...`), а напис «td2tdr» додайте редактором (Canva / Figma / Photopea).\n\n### Структура проєкту\n\n```\ntd2tdr/\n├── .github/workflows/release.yml  # CI/CD: автореліз + оновлення update.json\n├── META-INF/com/google/android/   # Інсталятор (Magisk/KernelSU)\n├── scripts/bump_version.sh        # Скрипт підняття версій\n├── webroot/                       # WebUI панель\n├── banner.png                     # Банер модуля\n├── changelog.md                   # Історія змін\n├── customize.sh                   # Інсталяційний скрипт\n├── module.prop                    # Метадані модуля\n├── service.sh                     # Фоновий сервіс синхронізації\n└── update.json                    # JSON для автооновлення\n```\n\n---\n\n## 📬 Контакти\n\n- [@sansej89](https://t.me/sansej89) — автор модуля\n- [@topdrives_ua](https://t.me/topdrives_ua) — канал новин Top Drives\n\n---\n\n## 📜 Ліцензія\n\nЦей проєкт надається «як є», без гарантій будь-якого роду. Використовуйте на власний розсуд.\n\n---\n\n## ❓ FAQ\n\n### Як дізнатися, чи працює синхронізація?\n\nУ WebUI-панелі є індикатори статусу, а в `sync.log` (у папці модуля) ведеться повний журнал подій.\n\n### Чи можна змінити шлях призначення?\n\nТак — у налаштуваннях WebUI можна змінити обидва шляхи: джерело та призначення.\n\n### Чи потрібен інтернет?\n\nНі. Вся робота відбувається локально на пристрої.",
+  "readmeHTML": "<p>> ## ⚠️ ВІДМОВА ВІД ВІДПОВІДАЛЬНОСТІ</p>\n<p>></p>\n<p>> Цей модуль надається «ЯК Є», без жодних гарантій, явних чи неявних.</p>\n<p>> Автор <b>не несе жодної відповідальності</b> за пошкодження пристрою, втрату даних,</p>\n<p>> помилки системи чи будь-які інші наслідки, що можуть виникнути під час або після встановлення.</p>\n<p>></p>\n<p>> Водночас модуль створено з турботою, протестовано та максимально безпечно для вашого пристрою —</p>\n<p>> він працює локально і не втручається в системні файли. Проте встановлення будь-яких модифікацій</p>\n<p>> завжди є відповідальним кроком, тому робіть його <b>на власний ризик</b>.</p>\n<p>></p>\n<p>> Перед встановленням зробіть резервну копію важливих даних. Бережіть себе та свої пристрої! 🤍</p>\n\n<p>---</p>\n\n<h1>🏁 td2tdr</h1>\n\n<p><b>td2tdr</b> — модуль для Magisk / KernelSU / KernelSU-Next, який автоматично синхронізує файл <code>Garage.dat</code> з гри <b>Top Drives</b> у папку <code>Download/td2tdr_sync</code> на вашому пристрої.</p>\n\n<p>Модуль працює у фоновому режимі без необхідності втручання і надає зручний WebUI для ручної синхронізації та перегляду статистики гаража.</p>\n\n<p>---</p>\n\n<h2>✨ Можливості</h2>\n\n<li>🔄 **Автосинхронізація** файлу `Garage.dat` у реальному часі</li>\n<li>📂 **Копіювання** у `Download/td2tdr_sync/Garage.dat`</li>\n<li>🌐 **WebUI-панель** для керування та перегляду статусу</li>\n<li>📊 **Підрахунок авто** та розподіл за типами прокачки</li>\n<li>🚀 **Автооновлення** через GitHub Releases</li>\n<li>🧹 **Локальна робота** — без інтернету</li>\n\n<p>---</p>\n\n<h2>📋 Вимоги</h2>\n\n<li>**Пристрій:** Android 8.0 (API 26) або новіший</li>\n<li>**Менеджер:** Magisk (≥ 24.0), KernelSU (≥ 1.0), або KernelSU-Next</li>\n<li>**Гра:** Top Drives (обов'язково запущена хоча б раз для створення `Garage.dat`)</li>\n\n<p>---</p>\n\n<h2>📥 Встановлення</h2>\n\n<h3>Спосіб 1: Через менеджер модулів (рекомендовано)</h3>\n\n<li>Завантажте ZIP-файл останнього релізу зі сторінки **Releases**.</li>\n<li>Відкрийте ваш менеджер модулів (Magisk / KernelSU / KernelSU-Next).</li>\n<li>Оберіть **Модулі → Встановити з файлу** і вкажіть завантажений ZIP.</li>\n<li>Перезавантажте пристрій.</li>\n<li>Після перезавантаження модуль автоматично синхронізує `Garage.dat` у `Download/td2tdr_sync`.</li>\n\n<h3>Спосіб 2: Через ADB</h3>\n\n<pre>adb push td2tdr_v0.0.501.zip /data/local/tmp/\nadb shell su -c \"magisk --install-module /data/local/tmp/td2tdr_v0.0.501.zip\"\nadb reboot</pre>\n\n<p>---</p>\n\n<h2>🔄 Автооновлення</h2>\n\n<p>Модуль підтримує автоматичні оновлення через <code>update.json</code>, який розташований у репозиторії.</p>\n\n<p>Після публікації нового релізу менеджер модулів побачить оновлення та запропонує його встановити:</p>\n\n<li>У **Magisk**: пункт \"Оновлення\" у картці модуля.</li>\n<li>У **KernelSU-Next**: так само — кнопка \"Оновлення\" з'явиться автоматично.</li>\n\n<p>> ⚠️ <b>Примітка:</b> переконайтеся, що в <code>module.prop</code> вказано правильний <code>updateJson</code> — він уже налаштований на цей репозиторій.</p>\n\n<p>---</p>\n\n<h2>🌐 WebUI-панель</h2>\n\n<p>WebUI відкривається через менеджер модулів:</p>\n<li>**Magisk:** Картка модуля → значок WebUI</li>\n<li>**KernelSU/KernelSU-Next:** Картка модуля → значок WebUI</li>\n\n<h3>Основні функції панелі</h3>\n\n<p>| Функція | Опис |</p>\n<p>|--------|------|</p>\n<p>| <b>Синхронізувати та відкрити</b> | Копіює <code>Garage.dat</code> у <code>Download/td2tdr_sync</code> (у фоні) та одразу відкриває topdrivesrecords.com |</p>\n<p>| <b>Миттєвий статус із кешу</b> | Останній стан синхронізації зберігається локально й показується одразу при відкритті панелі; повторне копіювання — тільки за кнопкою |</p>\n<p>| <b>Статистика гаража</b> | Зайняті слоти з LED-попередженням (>95%), donut-діаграма прокачки, яскравий тег Held |</p>\n<p>| <b>Аналітика</b> | Щоденні знімки, прогнозний слайдер 3–90 днів, середньодобовий приріст (+X / день), індикатор точності прогнозу |</p>\n<p>| <b>Журнал</b> | Детальний лог кожного кроку синхронізації з фільтром рівнів |</p>\n<p>| <b>Налаштування</b> | Тема (auto/light/dark), мова інтерфейсу, шляхи джерела та копії |</p>\n\n<p>Кнопка <b>«Синхронізувати та відкрити»</b> має динамічну анімацію в тон статусу: спокійне зелене «дихання» коли все готове, жовте пульсування під час очікування, швидкий червоний сигнал при помилці.</p>\n\n<p>---</p>\n\n<h2>🗺️ Roadmap (наступний цикл — v0.1.0)</h2>\n\n<li>[ ] Розширення аналітики: графіки по рідкостях авто та типах прокачки в часі</li>\n<li>[ ] Прогноз на основі ковзного середнього замість лінійної екстраполяції</li>\n<li>[ ] Експорт/Імпорт історії аналітики (JSON) для переносу між пристроями</li>\n<li>[ ] Віджет/швидка плитка для запуску синхронізації без відкриття WebUI</li>\n<li>[ ] Локалізація WebUI додатковими мовами (en вже є; наступні — за запитами)</li>\n<li>[ ] Автотест збірки: CI-перевірка узгодженості module.prop ↔ update.json ↔ changelog</li>\n\n<p>---</p>\n\n<h2>🛠️ Для розробників</h2>\n\n<h3>Версіонування</h3>\n\n<pre>./scripts/bump_version.sh patch   # 0.0.001 → 0.0.002\n./scripts/bump_version.sh minor   # 0.0.002 → 0.1.000\n./scripts/bump_version.sh major   # 0.1.000 → 1.0.000\n./scripts/bump_version.sh 1.2.3   # конкретна версія</pre>\n\n<p>Скрипт оновлює <code>module.prop</code> та <code>update.json</code>.</p>\n\n<p>> 💡 <b>Windows:</b> скрипт потребує середовище <b>Git Bash</b> (входить у Git for Windows) та <b>Python</b> у <code>PATH</code>.</p>\n<p>> Запускайте з Git Bash, а не PowerShell: <code>./scripts/bump_version.sh patch</code></p>\n\n<h3>Створення релізу</h3>\n\n<li>Оновіть версію скриптом `bump_version.sh`.</li>\n<li>Оновіть `changelog.md` — додайте запис про нову версію.</li>\n<li>Закомітьте і запуште зміни:</li>\n<p>   ```bash</p>\n<p>   git add module.prop update.json changelog.md</p>\n<p>   git commit -m \"chore: bump to v0.0.002\"</p>\n<p>   git push origin master</p>\n<p>   ```</p>\n<li>Створіть тег:</li>\n<p>   ```bash</p>\n<p>   git tag v0.0.002</p>\n<p>   git push origin v0.0.002</p>\n<p>   ```</p>\n<li>**GitHub Actions** автоматично:</li>\n<p>   - Збере збірку в ZIP</p>\n<p>   - Порахує <code>sha256</code></p>\n<p>   - Оновить <code>update.json</code></p>\n<p>   - Створить GitHub Release з ZIP та changelog</p>\n\n<h3>Банер модуля</h3>\n\n<p>Банер — зображення, яке відображається у картці модуля в менеджері (Magisk / KernelSU). Посилання на нього вказується у <code>module.prop</code> полем <code>banner=banner.png</code>.</p>\n\n<p>| Параметр | Значення |</p>\n<p>|---------|----------|</p>\n<p>| Формат | <b>PNG</b> |</p>\n<p>| Розмір | <b>1024×500 px</b> (пропорція ~2:1, рекомендація Magisk) |</p>\n<p>| Вага | до <b>100 КБ</b> (менше — швидший UI) |</p>\n<p>| Фон | темний або прозорий; текст — у центрі, не в кутах |</p>\n<p>| Шлях | корінь проєкту, поле <code>banner=</code> у <code>module.prop</code> |</p>\n\n<p><b>AI-промт для генерації банера</b> (працює у Midjourney / DALL-E / Leonardo / Bing):</p>\n\n<pre>Wide Android module banner, 1024x500, landscape. Dark charcoal carbon-fiber\nbackground with subtle glow. Sleek dark sports car on a night highway, motion\nblur, neon light trails. Accent color bright green #1ECD97. Bold text \"TD2TDR\"\ncentered, small subtitle \"Top Drives Garage Sync\" below it. Clean tech\nminimalist style, sharp details, no watermark, no border.</pre>\n\n<p>> 💡 <b>Порада:</b> AI-генератори часто спотворюють текст. Якщо напис вийшов кривим — згенеруйте зображення без тексту (приберіть рядок <code>Bold text \"TD2TDR\"...</code>), а напис «td2tdr» додайте редактором (Canva / Figma / Photopea).</p>\n\n<h3>Структура проєкту</h3>\n\n<pre>td2tdr/\n├── .github/workflows/release.yml  # CI/CD: автореліз + оновлення update.json\n├── META-INF/com/google/android/   # Інсталятор (Magisk/KernelSU)\n├── scripts/bump_version.sh        # Скрипт підняття версій\n├── webroot/                       # WebUI панель\n├── banner.png                     # Банер модуля\n├── changelog.md                   # Історія змін\n├── customize.sh                   # Інсталяційний скрипт\n├── module.prop                    # Метадані модуля\n├── service.sh                     # Фоновий сервіс синхронізації\n└── update.json                    # JSON для автооновлення</pre>\n\n<p>---</p>\n\n<h2>📬 Контакти</h2>\n\n<li>[@sansej89](https://t.me/sansej89) — автор модуля</li>\n<li>[@topdrives_ua](https://t.me/topdrives_ua) — канал новин Top Drives</li>\n\n<p>---</p>\n\n<h2>📜 Ліцензія</h2>\n\n<p>Цей проєкт надається «як є», без гарантій будь-якого роду. Використовуйте на власний розсуд.</p>\n\n<p>---</p>\n\n<h2>❓ FAQ</h2>\n\n<h3>Як дізнатися, чи працює синхронізація?</h3>\n\n<p>У WebUI-панелі є індикатори статусу, а в <code>sync.log</code> (у папці модуля) ведеться повний журнал подій.</p>\n\n<h3>Чи можна змінити шлях призначення?</h3>\n\n<p>Так — у налаштуваннях WebUI можна змінити обидва шляхи: джерело та призначення.</p>\n\n<h3>Чи потрібен інтернет?</h3>\n\n<p>Ні. Вся робота відбувається локально на пристрої.</p>",
+  "homepageUrl": "https://t.me/topdrives_ua",
+  "sourceUrl": "https://github.com/sansej8989/td2tdr",
+  "url": "https://github.com/sansej8989/td2tdr",
+  "latestRelease": {
+    "name": "v0.0.636",
+    "version": "v0.0.636",
+    "time": "2026-10-01T14:11:22Z",
+    "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.636/td2tdr_v0.0.636.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.0.636",
+      "tagName": "v0.0.636",
+      "publishedAt": "2026-10-01T14:11:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.636.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.636/td2tdr_v0.0.636.zip",
+          "size": 146633,
+          "downloadCount": 18
+        },
+        {
+          "name": "td2tdr_v0.0.636.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.636/td2tdr_v0.0.636.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.636/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.635",
+      "tagName": "v0.0.635",
+      "publishedAt": "2026-10-01T13:20:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.635.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.635/td2tdr_v0.0.635.zip",
+          "size": 146341,
+          "downloadCount": 3
+        },
+        {
+          "name": "td2tdr_v0.0.635.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.635/td2tdr_v0.0.635.zip.sha256",
+          "size": 86,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.635/update.json",
+          "size": 318,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.0.634",
+      "tagName": "v0.0.634",
+      "publishedAt": "2026-10-01T12:14:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.634.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.634/td2tdr_v0.0.634.zip",
+          "size": 152568,
+          "downloadCount": 2
+        },
+        {
+          "name": "td2tdr_v0.0.634.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.634/td2tdr_v0.0.634.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.634/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.633",
+      "tagName": "v0.0.633",
+      "publishedAt": "2026-10-01T09:15:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.633.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.633/td2tdr_v0.0.633.zip",
+          "size": 148840,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.633.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.633/td2tdr_v0.0.633.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.633/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.632",
+      "tagName": "v0.0.632",
+      "publishedAt": "2026-09-29T01:37:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.632.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.632/td2tdr_v0.0.632.zip",
+          "size": 146692,
+          "downloadCount": 16
+        },
+        {
+          "name": "td2tdr_v0.0.632.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.632/td2tdr_v0.0.632.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.632/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.631",
+      "tagName": "v0.0.631",
+      "publishedAt": "2026-09-28T17:08:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.631.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.631/td2tdr_v0.0.631.zip",
+          "size": 144784,
+          "downloadCount": 3
+        },
+        {
+          "name": "td2tdr_v0.0.631.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.631/td2tdr_v0.0.631.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.631/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.630",
+      "tagName": "v0.0.630",
+      "publishedAt": "2026-09-28T16:06:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.630.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.630/td2tdr_v0.0.630.zip",
+          "size": 144374,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.630.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.630/td2tdr_v0.0.630.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.630/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.629",
+      "tagName": "v0.0.629",
+      "publishedAt": "2026-09-28T14:15:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.629.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.629/td2tdr_v0.0.629.zip",
+          "size": 143765,
+          "downloadCount": 2
+        },
+        {
+          "name": "td2tdr_v0.0.629.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.629/td2tdr_v0.0.629.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.629/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.628",
+      "tagName": "v0.0.628",
+      "publishedAt": "2026-09-28T12:59:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.628.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.628/td2tdr_v0.0.628.zip",
+          "size": 140512,
+          "downloadCount": 4
+        },
+        {
+          "name": "td2tdr_v0.0.628.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.628/td2tdr_v0.0.628.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.628/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.627",
+      "tagName": "v0.0.627",
+      "publishedAt": "2026-09-28T12:50:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.627.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.627/td2tdr_v0.0.627.zip",
+          "size": 140549,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.627.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.627/td2tdr_v0.0.627.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.627/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.626",
+      "tagName": "v0.0.626",
+      "publishedAt": "2026-09-28T12:20:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.626.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.626/td2tdr_v0.0.626.zip",
+          "size": 140521,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.626.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.626/td2tdr_v0.0.626.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.626/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.625",
+      "tagName": "v0.0.625",
+      "publishedAt": "2026-09-28T11:20:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.625.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.625/td2tdr_v0.0.625.zip",
+          "size": 140882,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.625.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.625/td2tdr_v0.0.625.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.625/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.621",
+      "tagName": "v0.0.621",
+      "publishedAt": "2026-09-28T07:59:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.621.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.621/td2tdr_v0.0.621.zip",
+          "size": 143084,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.621.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.621/td2tdr_v0.0.621.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.621/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.620",
+      "tagName": "v0.0.620",
+      "publishedAt": "2026-09-28T07:45:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.620.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.620/td2tdr_v0.0.620.zip",
+          "size": 140020,
+          "downloadCount": 0
+        },
+        {
+          "name": "td2tdr_v0.0.620.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.620/td2tdr_v0.0.620.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.620/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.619",
+      "tagName": "v0.0.619",
+      "publishedAt": "2026-09-28T07:06:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.619.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.619/td2tdr_v0.0.619.zip",
+          "size": 140669,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.619.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.619/td2tdr_v0.0.619.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.619/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.618",
+      "tagName": "v0.0.618",
+      "publishedAt": "2026-09-27T09:45:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.618.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.618/td2tdr_v0.0.618.zip",
+          "size": 137229,
+          "downloadCount": 6
+        },
+        {
+          "name": "td2tdr_v0.0.618.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.618/td2tdr_v0.0.618.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.618/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.617",
+      "tagName": "v0.0.617",
+      "publishedAt": "2026-09-27T09:30:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.617.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.617/td2tdr_v0.0.617.zip",
+          "size": 135367,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.617.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.617/td2tdr_v0.0.617.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.617/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.616",
+      "tagName": "v0.0.616",
+      "publishedAt": "2026-09-27T09:25:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.616.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.616/td2tdr_v0.0.616.zip",
+          "size": 136052,
+          "downloadCount": 0
+        },
+        {
+          "name": "td2tdr_v0.0.616.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.616/td2tdr_v0.0.616.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.616/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.615",
+      "tagName": "v0.0.615",
+      "publishedAt": "2026-09-27T09:15:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.615.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.615/td2tdr_v0.0.615.zip",
+          "size": 134261,
+          "downloadCount": 0
+        },
+        {
+          "name": "td2tdr_v0.0.615.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.615/td2tdr_v0.0.615.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.615/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.614",
+      "tagName": "v0.0.614",
+      "publishedAt": "2026-09-27T08:58:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.614.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.614/td2tdr_v0.0.614.zip",
+          "size": 130186,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.614.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.614/td2tdr_v0.0.614.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.614/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.613",
+      "tagName": "v0.0.613",
+      "publishedAt": "2026-09-27T08:43:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.613.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.613/td2tdr_v0.0.613.zip",
+          "size": 130293,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.613.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.613/td2tdr_v0.0.613.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.613/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.612",
+      "tagName": "v0.0.612",
+      "publishedAt": "2026-09-27T08:28:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.612.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.612/td2tdr_v0.0.612.zip",
+          "size": 127363,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.612.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.612/td2tdr_v0.0.612.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.612/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.611",
+      "tagName": "v0.0.611",
+      "publishedAt": "2026-09-27T08:07:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.611.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.611/td2tdr_v0.0.611.zip",
+          "size": 126448,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.611.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.611/td2tdr_v0.0.611.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.611/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.610",
+      "tagName": "v0.0.610",
+      "publishedAt": "2026-09-27T06:53:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.610.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.610/td2tdr_v0.0.610.zip",
+          "size": 124819,
+          "downloadCount": 3
+        },
+        {
+          "name": "td2tdr_v0.0.610.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.610/td2tdr_v0.0.610.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.610/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.605",
+      "tagName": "v0.0.605",
+      "publishedAt": "2026-09-11T06:20:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.605.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.605/td2tdr_v0.0.605.zip",
+          "size": 124554,
+          "downloadCount": 2
+        },
+        {
+          "name": "td2tdr_v0.0.605.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.605/td2tdr_v0.0.605.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.605/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.604",
+      "tagName": "v0.0.604",
+      "publishedAt": "2026-09-10T12:29:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.604.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.604/td2tdr_v0.0.604.zip",
+          "size": 118991,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.604.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.604/td2tdr_v0.0.604.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.604/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.601",
+      "tagName": "v0.0.601",
+      "publishedAt": "2026-09-09T16:48:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.601.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.601/td2tdr_v0.0.601.zip",
+          "size": 117655,
+          "downloadCount": 2
+        },
+        {
+          "name": "td2tdr_v0.0.601.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.601/td2tdr_v0.0.601.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.601/update.json",
+          "size": 318,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.600",
+      "tagName": "v0.0.600",
+      "publishedAt": "2026-09-08T10:25:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.600.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.600/td2tdr_v0.0.600.zip",
+          "size": 116797,
+          "downloadCount": 1
+        },
+        {
+          "name": "td2tdr_v0.0.600.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.600/td2tdr_v0.0.600.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.600/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.527",
+      "tagName": "v0.0.527",
+      "publishedAt": "2026-09-07T10:04:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.527.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.527/td2tdr_v0.0.527.zip",
+          "size": 116660,
+          "downloadCount": 0
+        },
+        {
+          "name": "td2tdr_v0.0.527.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.527/td2tdr_v0.0.527.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.527/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.526",
+      "tagName": "v0.0.526",
+      "publishedAt": "2026-09-07T09:27:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "td2tdr_v0.0.526.zip",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.526/td2tdr_v0.0.526.zip",
+          "size": 115983,
+          "downloadCount": 2
+        },
+        {
+          "name": "td2tdr_v0.0.526.zip.sha256",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.526/td2tdr_v0.0.526.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.526/update.json",
+          "size": 318,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

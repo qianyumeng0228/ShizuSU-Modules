@@ -1,0 +1,97 @@
+{
+  "readme": "# FaaDL — Faa YTDownloader\n\n[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)\n[![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](FaaDL-Standalone/REQUIREMENTS.md)\n[![Root](https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red)](FaaDL-Module/)\n[![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](FaaDL-Module/)\n[![yt-dlp](https://img.shields.io/github/v/release/yt-dlp/yt-dlp?label=yt-dlp&color=FF0000)](https://github.com/yt-dlp/yt-dlp)\n[![FFmpeg](https://img.shields.io/badge/FFmpeg-8.1-007808?logo=ffmpeg&logoColor=white)](FaaDL-Module/)\n[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](FaaDL-termux/REQUIREMENTS.md)\n[![Build](https://img.shields.io/badge/Build-JDK%2BSDK_(no_Gradle)-blue)](FaaDL-Standalone/REQUIREMENTS.md)\n[![Termux](https://img.shields.io/badge/Termux-F--Droid-000000?logo=android&logoColor=white)](FaaDL-termux/REQUIREMENTS.md)\n\nDownload audio (MP3) / video (MP4) dari YouTube, plus scan QR. Hasil selalu ke\n`/sdcard/Download/FaaDL/` layaknya hasil download biasa.\n\nTiga varian, satu repo:\n\n| Folder | Untuk siapa | Butuh root? |\n|---|---|---|\n| `FaaDL-termux/` | Versi pertama (Web UI, jalan di Termux) | Tidak |\n| `FaaDL-Win/` | Versi Windows/Linux (Web UI, jalan di PC) | Tidak |\n| `FaaDL-Standalone/` | APK langsung install (64-bit / 32-bit / universal) | Tidak (opsional, buat superpower) |\n| `FaaDL-Module/` | Modul Magisk/KernelSU/APatch + aplikasi FYDL + CLI `fdl` | **Ya** |\n\n## Download\n\nSemua file jadi ada di **1 release**:\n[https://github.com/FaaRamadhann/Faa-YDL/releases/tag/v1.2.1](https://github.com/FaaRamadhann/Faa-YDL/releases/tag/v1.2.1)\n\n| File | Buat apa |\n|---|---|\n| `faadl-v1.2.1.zip` | Modul Magisk/KernelSU/APatch (install dari aplikasi Magisk, lalu reboot) |\n| `faa-dl_v1.0.5_arm64.apk` | APK standalone HP 64-bit (kebanyakan HP baru) |\n| `faa-dl_v1.0.5_arm32.apk` | APK standalone HP 32-bit (HP lama) |\n| `faa-dl_v1.0.5_universal.apk` | APK standalone semua HP (lebih besar) |\n| `faa-ytdownloader-termux-v1.0.1.zip` | Web UI Termux (ekstrak, `npm install`, `node server.js`) |\n| `faa-ytdownloader-win-v1.0.1.zip` | Web UI Windows (ekstrak, `install.bat` Run as admin, ketik `fydl`) |\n\n## Clone\n\n```bash\ngit clone https://github.com/FaaRamadhann/Faa-YDL.git\ncd Faa-YDL\n```\n\n## 1. FaaDL-termux (versi awal)\n\nWeb UI (Manual / Scan QR / History), cocok untuk yang suka ngoprek.\n\nSyarat: Termux + Node.js + `yt-dlp` + `ffmpeg`:\n```bash\npkg install -y nodejs python ffmpeg\ntermux-setup-storage   # sekali saja, agar bisa tulis /sdcard\n```\n\nCara pakai:\n```bash\ncd FaaDL-termux\nnpm install\nnode server.js\n```\n\nBuka di browser HP: `http://localhost:2080` (atau URL HTTPS di log untuk scan QR\ndari kamera). Hasil: `/sdcard/Download/FaaDL/`.\n\n> Syarat lengkap + troubleshooting: [`FaaDL-termux/REQUIREMENTS.md`](FaaDL-termux/REQUIREMENTS.md).\n\n## 1b. FaaDL-Win (Windows / Linux)\n\nSama kayak versi Termux tapi jalan di PC. Hasil:\n`%USERPROFILE%\\Downloads\\FaaDL` (Windows) atau `~/Downloads/FaaDL` (Linux).\n\nSyarat: Node.js LTS + `yt-dlp` + `ffmpeg` (semuanya kebaca dari PATH).\nKlik 2x `FaaDL-Win/start.bat`, atau install permanen: klik kanan\n`FaaDL-Win/install.bat` → Run as administrator, lalu ketik `fydl` di cmd\nmana saja (`fydl mp3 URL`, `fydl mp4 URL`, `fydl --test`).\n\n> Syarat lengkap + troubleshooting: [`FaaDL-Win/REQUIREMENTS.md`](FaaDL-Win/REQUIREMENTS.md).\n\n## 2. FaaDL-Standalone (APK non-module)\n\nAPK `com.faa.faadl` yang bawa sendiri ffmpeg + python + yt-dlp di dalamnya.\nTanpa root bisa jalan; kalau ada root, exec yang ditolak sistem otomatis\ndiulang via `su`.\n\n> Syarat + troubleshooting build: [`FaaDL-Standalone/REQUIREMENTS.md`](FaaDL-Standalone/REQUIREMENTS.md).\n\nSyarat build (tanpa Android Studio / Gradle): JDK 17+ dan Android SDK\nbuild-tools + 1 platform (lihat `FaaDL-Standalone/`).\n\nCara build:\n```bat\ncd FaaDL-Standalone\npython tools\\prepare_bins.py      :: ffmpeg + yt-dlp (sekali saja)\npython tools\\prepare_python.py    :: runtime python (sekali saja)\npython build.py all               :: hasil: build\\faa-dl_v<ver>_{arm64,arm32,universal}.apk\n```\n\nInstall APK sesuai HP (kebanyakan `*_arm64.apk`), buka, download MP3/MP4 atau\nscan QR dari tab-nya. File built-in yang besar (`bins/`, hasil `build/`)\ntidak ikut repo — diambil/dibangun ulang lewat script di atas.\n\n## 3. FaaDL-Module (Magisk / KernelSU / APatch, arm64)\n\nPaket lengkap: binary system-wide (`/system/bin/faadl-*`), aplikasi manager\nFYDL (`com.faa.faadlmod`, otomatis terinstall), dan CLI `fdl`.\n\nSyarat: HP arm64 yang sudah root (Magisk/KernelSU/APatch).\n\nCara build zip modul:\n```bat\ncd FaaDL-Module\\manager && build.bat   :: hasilkan manager/build/manager.apk\ncd ..\\..\ncd FaaDL-Module\npython prepare_payload.py              :: rakit system/ dari FaaDL-Standalone/bins\npython zip.py                          :: hasil: build/faadl-v<ver>.zip\n```\n\nCara install: Magisk/KernelSU → Modul → Install dari penyimpanan → pilih\n`faadl-v<ver>.zip` → **reboot**.\n\nCara pakai:\n- Buka aplikasi **FYDL** (download MP3/MP4 + scan QR + tab Debug).\n- Atau dari terminal/adb shell:\n  ```sh\n  fdl --test [URL]   # diagnostik python/ffmpeg/yt-dlp/innertube\n  fdl mp3 <URL>      # download MP3\n  fdl mp4 <URL>      # download video\n  ```\n\n## Lisensi\n\n[MIT](LICENSE) — © 2026 Faa Ramadhan.\n",
+  "readmeHTML": "<h1>FaaDL — Faa YTDownloader</h1>\n\n<p><a href=\"https://img.shields.io/badge/License-MIT-yellow.svg\">![License: MIT</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white\">![Android</a>](FaaDL-Standalone/REQUIREMENTS.md)</p>\n<p><a href=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red\">![Root</a>](FaaDL-Module/)</p>\n<p><a href=\"https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white\">![Python</a>](FaaDL-Module/)</p>\n<p><a href=\"https://img.shields.io/github/v/release/yt-dlp/yt-dlp?label=yt-dlp&color=FF0000\">![yt-dlp</a>](https://github.com/yt-dlp/yt-dlp)</p>\n<p><a href=\"https://img.shields.io/badge/FFmpeg-8.1-007808?logo=ffmpeg&logoColor=white\">![FFmpeg</a>](FaaDL-Module/)</p>\n<p><a href=\"https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white\">![Node.js</a>](FaaDL-termux/REQUIREMENTS.md)</p>\n<p><a href=\"https://img.shields.io/badge/Build-JDK%2BSDK_(no_Gradle\">![Build</a>-blue)](FaaDL-Standalone/REQUIREMENTS.md)</p>\n<p><a href=\"https://img.shields.io/badge/Termux-F--Droid-000000?logo=android&logoColor=white\">![Termux</a>](FaaDL-termux/REQUIREMENTS.md)</p>\n\n<p>Download audio (MP3) / video (MP4) dari YouTube, plus scan QR. Hasil selalu ke</p>\n<p><code>/sdcard/Download/FaaDL/</code> layaknya hasil download biasa.</p>\n\n<p>Tiga varian, satu repo:</p>\n\n<p>| Folder | Untuk siapa | Butuh root? |</p>\n<p>|---|---|---|</p>\n<p>| <code>FaaDL-termux/</code> | Versi pertama (Web UI, jalan di Termux) | Tidak |</p>\n<p>| <code>FaaDL-Win/</code> | Versi Windows/Linux (Web UI, jalan di PC) | Tidak |</p>\n<p>| <code>FaaDL-Standalone/</code> | APK langsung install (64-bit / 32-bit / universal) | Tidak (opsional, buat superpower) |</p>\n<p>| <code>FaaDL-Module/</code> | Modul Magisk/KernelSU/APatch + aplikasi FYDL + CLI <code>fdl</code> | <b>Ya</b> |</p>\n\n<h2>Download</h2>\n\n<p>Semua file jadi ada di <b>1 release</b>:</p>\n<p><a href=\"https://github.com/FaaRamadhann/Faa-YDL/releases/tag/v1.2.1\">https://github.com/FaaRamadhann/Faa-YDL/releases/tag/v1.2.1</a></p>\n\n<p>| File | Buat apa |</p>\n<p>|---|---|</p>\n<p>| <code>faadl-v1.2.1.zip</code> | Modul Magisk/KernelSU/APatch (install dari aplikasi Magisk, lalu reboot) |</p>\n<p>| <code>faa-dl_v1.0.5_arm64.apk</code> | APK standalone HP 64-bit (kebanyakan HP baru) |</p>\n<p>| <code>faa-dl_v1.0.5_arm32.apk</code> | APK standalone HP 32-bit (HP lama) |</p>\n<p>| <code>faa-dl_v1.0.5_universal.apk</code> | APK standalone semua HP (lebih besar) |</p>\n<p>| <code>faa-ytdownloader-termux-v1.0.1.zip</code> | Web UI Termux (ekstrak, <code>npm install</code>, <code>node server.js</code>) |</p>\n<p>| <code>faa-ytdownloader-win-v1.0.1.zip</code> | Web UI Windows (ekstrak, <code>install.bat</code> Run as admin, ketik <code>fydl</code>) |</p>\n\n<h2>Clone</h2>\n\n<pre>git clone https://github.com/FaaRamadhann/Faa-YDL.git\ncd Faa-YDL</pre>\n\n<h2>1. FaaDL-termux (versi awal)</h2>\n\n<p>Web UI (Manual / Scan QR / History), cocok untuk yang suka ngoprek.</p>\n\n<p>Syarat: Termux + Node.js + <code>yt-dlp</code> + <code>ffmpeg</code>:</p>\n<pre>pkg install -y nodejs python ffmpeg\ntermux-setup-storage   # sekali saja, agar bisa tulis /sdcard</pre>\n\n<p>Cara pakai:</p>\n<pre>cd FaaDL-termux\nnpm install\nnode server.js</pre>\n\n<p>Buka di browser HP: <code>http://localhost:2080</code> (atau URL HTTPS di log untuk scan QR</p>\n<p>dari kamera). Hasil: <code>/sdcard/Download/FaaDL/</code>.</p>\n\n<p>> Syarat lengkap + troubleshooting: <a href=\"FaaDL-termux/REQUIREMENTS.md\"><code>FaaDL-termux/REQUIREMENTS.md</code></a>.</p>\n\n<h2>1b. FaaDL-Win (Windows / Linux)</h2>\n\n<p>Sama kayak versi Termux tapi jalan di PC. Hasil:</p>\n<p><code>%USERPROFILE%\\Downloads\\FaaDL</code> (Windows) atau <code>~/Downloads/FaaDL</code> (Linux).</p>\n\n<p>Syarat: Node.js LTS + <code>yt-dlp</code> + <code>ffmpeg</code> (semuanya kebaca dari PATH).</p>\n<p>Klik 2x <code>FaaDL-Win/start.bat</code>, atau install permanen: klik kanan</p>\n<p><code>FaaDL-Win/install.bat</code> → Run as administrator, lalu ketik <code>fydl</code> di cmd</p>\n<p>mana saja (<code>fydl mp3 URL</code>, <code>fydl mp4 URL</code>, <code>fydl --test</code>).</p>\n\n<p>> Syarat lengkap + troubleshooting: <a href=\"FaaDL-Win/REQUIREMENTS.md\"><code>FaaDL-Win/REQUIREMENTS.md</code></a>.</p>\n\n<h2>2. FaaDL-Standalone (APK non-module)</h2>\n\n<p>APK <code>com.faa.faadl</code> yang bawa sendiri ffmpeg + python + yt-dlp di dalamnya.</p>\n<p>Tanpa root bisa jalan; kalau ada root, exec yang ditolak sistem otomatis</p>\n<p>diulang via <code>su</code>.</p>\n\n<p>> Syarat + troubleshooting build: <a href=\"FaaDL-Standalone/REQUIREMENTS.md\"><code>FaaDL-Standalone/REQUIREMENTS.md</code></a>.</p>\n\n<p>Syarat build (tanpa Android Studio / Gradle): JDK 17+ dan Android SDK</p>\n<p>build-tools + 1 platform (lihat <code>FaaDL-Standalone/</code>).</p>\n\n<p>Cara build:</p>\n<pre>cd FaaDL-Standalone\npython tools\\prepare_bins.py      :: ffmpeg + yt-dlp (sekali saja)\npython tools\\prepare_python.py    :: runtime python (sekali saja)\npython build.py all               :: hasil: build\\faa-dl_v&lt;ver&gt;_{arm64,arm32,universal}.apk</pre>\n\n<p>Install APK sesuai HP (kebanyakan <code>*_arm64.apk</code>), buka, download MP3/MP4 atau</p>\n<p>scan QR dari tab-nya. File built-in yang besar (<code>bins/</code>, hasil <code>build/</code>)</p>\n<p>tidak ikut repo — diambil/dibangun ulang lewat script di atas.</p>\n\n<h2>3. FaaDL-Module (Magisk / KernelSU / APatch, arm64)</h2>\n\n<p>Paket lengkap: binary system-wide (<code>/system/bin/faadl-*</code>), aplikasi manager</p>\n<p>FYDL (<code>com.faa.faadlmod</code>, otomatis terinstall), dan CLI <code>fdl</code>.</p>\n\n<p>Syarat: HP arm64 yang sudah root (Magisk/KernelSU/APatch).</p>\n\n<p>Cara build zip modul:</p>\n<pre>cd FaaDL-Module\\manager &amp;&amp; build.bat   :: hasilkan manager/build/manager.apk\ncd ..\\..\ncd FaaDL-Module\npython prepare_payload.py              :: rakit system/ dari FaaDL-Standalone/bins\npython zip.py                          :: hasil: build/faadl-v&lt;ver&gt;.zip</pre>\n\n<p>Cara install: Magisk/KernelSU → Modul → Install dari penyimpanan → pilih</p>\n<p><code>faadl-v<ver>.zip</code> → <b>reboot</b>.</p>\n\n<p>Cara pakai:</p>\n<li>Buka aplikasi **FYDL** (download MP3/MP4 + scan QR + tab Debug).</li>\n<li>Atau dari terminal/adb shell:</li>\n<p>  ```sh</p>\n<p>  fdl --test [URL]   # diagnostik python/ffmpeg/yt-dlp/innertube</p>\n<p>  fdl mp3 <URL>      # download MP3</p>\n<p>  fdl mp4 <URL>      # download video</p>\n<p>  ```</p>\n\n<h2>Lisensi</h2>\n\n<p><a href=\"LICENSE\">MIT</a> — © 2026 Faa Ramadhan.</p>",
+  "homepageUrl": "https://faaydl.vercel.app/",
+  "sourceUrl": "https://github.com/FaaRamadhann/Faa-YDL",
+  "url": "https://github.com/FaaRamadhann/Faa-YDL",
+  "latestRelease": {
+    "name": "v1.2.1",
+    "version": "v1.2.1",
+    "time": "2026-10-05T21:25:25Z",
+    "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faa-ytdownloader-win-v1.0.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-10-05T21:25:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "faa-dl_v1.0.5_arm32.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faa-dl_v1.0.5_arm32.apk",
+          "size": 44773948,
+          "downloadCount": 0
+        },
+        {
+          "name": "faa-dl_v1.0.5_arm64.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faa-dl_v1.0.5_arm64.apk",
+          "size": 45270056,
+          "downloadCount": 0
+        },
+        {
+          "name": "faa-dl_v1.0.5_universal.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faa-dl_v1.0.5_universal.apk",
+          "size": 86725497,
+          "downloadCount": 2
+        },
+        {
+          "name": "faa-ytdownloader-win-v1.0.1.zip",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faa-ytdownloader-win-v1.0.1.zip",
+          "size": 17168,
+          "downloadCount": 1
+        },
+        {
+          "name": "faadl-v1.2.1.zip",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.1/faadl-v1.2.1.zip",
+          "size": 41028837,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-10-01T11:23:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "faa-dl_v1.0.4_arm32.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faa-dl_v1.0.4_arm32.apk",
+          "size": 44773948,
+          "downloadCount": 0
+        },
+        {
+          "name": "faa-dl_v1.0.4_arm64.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faa-dl_v1.0.4_arm64.apk",
+          "size": 45270056,
+          "downloadCount": 1
+        },
+        {
+          "name": "faa-dl_v1.0.4_universal.apk",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faa-dl_v1.0.4_universal.apk",
+          "size": 86725497,
+          "downloadCount": 0
+        },
+        {
+          "name": "faa-ytdownloader-termux-v1.0.1.zip",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faa-ytdownloader-termux-v1.0.1.zip",
+          "size": 23975,
+          "downloadCount": 3
+        },
+        {
+          "name": "faa-ytdownloader-win-v1.0.1.zip",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faa-ytdownloader-win-v1.0.1.zip",
+          "size": 14698,
+          "downloadCount": 1
+        },
+        {
+          "name": "faadl-v1.2.0.zip",
+          "downloadUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.0/faadl-v1.2.0.zip",
+          "size": 41028732,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

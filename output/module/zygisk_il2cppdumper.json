@@ -1,0 +1,69 @@
+{
+  "readme": "<div align=\"center\">\n\n![banner](https://raw.githubusercontent.com/codehasan/Zygisk-Il2CppDumper/master/images/banner.webp)\n\n# Zygisk‑Il2CppDumper\n\n**Dump Il2Cpp metadata from a running game — past encryption, obfuscation, and packing.**\n\n[![Platform](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)](#requirements)\n[![Zygisk](https://img.shields.io/badge/Zygisk-module-orange)](#requirements)\n[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)\n[![Release](https://img.shields.io/github/v/release/codehasan/Zygisk-Il2CppDumper?label=download)](https://github.com/codehasan/Zygisk-Il2CppDumper/releases/latest)\n\n</div>\n\n## Features\n\n**Original:** Runtime Il2Cpp metadata dumping to `dump.cs` on arm64/armeabi-v7a (and x86/x86_64 via houdini).\n\n**This fork adds:**\n\n- 🔧 **Dynamic target switching** — Change games via `persist.il2cppdumper.package` without rebuilding the module.\n- 🔢 **Const value dumping** — Extracts actual literal values for all primitives and strings, not just enums.\n- 🌊 **Streaming output** — Incremental writes for a low memory footprint on large games.\n- ⏱️ **Runtime polling** — Dynamically waits for the runtime instead of a fixed delay, fixing early-load failures.\n- 🛡️ **Hardened native path** — Fragile syscalls fail gracefully instead of crashing.\n- 🖥️ **WebUI** — Switch targets directly via KernelSU/APatch without ADB or shell.\n- 🖲️ **Root-manager integration** — Action button to view/set targets, with a seeded boot default.\n\n## Requirements\n\n- A Zygisk‑capable root solution with Zygisk **enabled**:\n  - **Magisk** (v24+), or\n  - **KernelSU** / **APatch** with **ZygiskNext**.\n- The target game must be an **Il2Cpp**‑built Unity app.\n\n> [!IMPORTANT]\n> **Game crashes on launch?** It likely detects root. Turn **Enforce DenyList OFF**, install [**Shamiko**](https://github.com/LSPosed/LSPosed.github.io/releases), and add the game to the DenyList — this hides root while keeping the module loaded.\n\n## Usage\n\n**1. Install the module**\n\nDownload the latest build from [Releases](https://github.com/codehasan/Zygisk-Il2CppDumper/releases/latest) (or [build it yourself](#building-from-source)), flash it in your root manager, and reboot.\n\n**2. Set the target game package**\n\nVia ADB:\n\n```bash\nadb shell \"setprop persist.il2cppdumper.package com.example.game\"\n```\n\n…from a root shell on the device:\n\n```bash\nsetprop persist.il2cppdumper.package com.example.game\n```\n\n…or, on **KernelSU / APatch**, open the module's **WebUI**, type the package name, and tap **Save** — the page also shows the current target.\n\n**3. Launch the game**\n\nStart the game and let it finish loading. The dump is written to:\n\n```\n/data/data/<GamePackageName>/files/dump.cs\n```\n\n> [!TIP]\n> **Changing the target is instant.** Set the property to a new package and restart that game — no rebuild, no reinstall.\n> ```bash\n> setprop persist.il2cppdumper.package com.new.game\n> ```\n\n## Building from source\n\n1. Clone or download the source.\n2. In Android Studio, run the Gradle task `:module:assembleRelease`.\n3. The flashable zip is produced in the `out/` folder.\n4. Flash it in your root manager and reboot.\n\n## Credits\n\nA fork of the original [Zygisk‑Il2CppDumper](https://github.com/Perfare/Zygisk-Il2CppDumper) by [Perfare](https://github.com/Perfare). All the original runtime‑dumping groundwork is theirs — this fork builds on it with the features listed above.\n\n## License\n\nReleased under the [MIT License](LICENSE).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p>!<a href=\"https://raw.githubusercontent.com/codehasan/Zygisk-Il2CppDumper/master/images/banner.webp\">banner</a></p>\n\n<h1>Zygisk‑Il2CppDumper</h1>\n\n<p><b>Dump Il2Cpp metadata from a running game — past encryption, obfuscation, and packing.</b></p>\n\n<p><a href=\"https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white\">![Platform</a>](#requirements)</p>\n<p><a href=\"https://img.shields.io/badge/Zygisk-module-orange\">![Zygisk</a>](#requirements)</p>\n<p><a href=\"https://img.shields.io/badge/license-MIT-blue\">![License</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/github/v/release/codehasan/Zygisk-Il2CppDumper?label=download\">![Release</a>](https://github.com/codehasan/Zygisk-Il2CppDumper/releases/latest)</p>\n\n<p></div></p>\n\n<h2>Features</h2>\n\n<p><b>Original:</b> Runtime Il2Cpp metadata dumping to <code>dump.cs</code> on arm64/armeabi-v7a (and x86/x86_64 via houdini).</p>\n\n<p><b>This fork adds:</b></p>\n\n<li>🔧 **Dynamic target switching** — Change games via `persist.il2cppdumper.package` without rebuilding the module.</li>\n<li>🔢 **Const value dumping** — Extracts actual literal values for all primitives and strings, not just enums.</li>\n<li>🌊 **Streaming output** — Incremental writes for a low memory footprint on large games.</li>\n<li>⏱️ **Runtime polling** — Dynamically waits for the runtime instead of a fixed delay, fixing early-load failures.</li>\n<li>🛡️ **Hardened native path** — Fragile syscalls fail gracefully instead of crashing.</li>\n<li>🖥️ **WebUI** — Switch targets directly via KernelSU/APatch without ADB or shell.</li>\n<li>🖲️ **Root-manager integration** — Action button to view/set targets, with a seeded boot default.</li>\n\n<h2>Requirements</h2>\n\n<li>A Zygisk‑capable root solution with Zygisk **enabled**:</li>\n<p>  - <b>Magisk</b> (v24+), or</p>\n<p>  - <b>KernelSU</b> / <b>APatch</b> with <b>ZygiskNext</b>.</p>\n<li>The target game must be an **Il2Cpp**‑built Unity app.</li>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>Game crashes on launch?</b> It likely detects root. Turn <b>Enforce DenyList OFF</b>, install <a href=\"https://github.com/LSPosed/LSPosed.github.io/releases\"><b>Shamiko</b></a>, and add the game to the DenyList — this hides root while keeping the module loaded.</p>\n\n<h2>Usage</h2>\n\n<p><b>1. Install the module</b></p>\n\n<p>Download the latest build from <a href=\"https://github.com/codehasan/Zygisk-Il2CppDumper/releases/latest\">Releases</a> (or <a href=\"#building-from-source\">build it yourself</a>), flash it in your root manager, and reboot.</p>\n\n<p><b>2. Set the target game package</b></p>\n\n<p>Via ADB:</p>\n\n<pre>adb shell \"setprop persist.il2cppdumper.package com.example.game\"</pre>\n\n<p>…from a root shell on the device:</p>\n\n<pre>setprop persist.il2cppdumper.package com.example.game</pre>\n\n<p>…or, on <b>KernelSU / APatch</b>, open the module's <b>WebUI</b>, type the package name, and tap <b>Save</b> — the page also shows the current target.</p>\n\n<p><b>3. Launch the game</b></p>\n\n<p>Start the game and let it finish loading. The dump is written to:</p>\n\n<pre>/data/data/&lt;GamePackageName&gt;/files/dump.cs</pre>\n\n<p>> [!TIP]</p>\n<p>> <b>Changing the target is instant.</b> Set the property to a new package and restart that game — no rebuild, no reinstall.</p>\n<p>> ```bash</p>\n<p>> setprop persist.il2cppdumper.package com.new.game</p>\n<p>> ```</p>\n\n<h2>Building from source</h2>\n\n<li>Clone or download the source.</li>\n<li>In Android Studio, run the Gradle task `:module:assembleRelease`.</li>\n<li>The flashable zip is produced in the `out/` folder.</li>\n<li>Flash it in your root manager and reboot.</li>\n\n<h2>Credits</h2>\n\n<p>A fork of the original <a href=\"https://github.com/Perfare/Zygisk-Il2CppDumper\">Zygisk‑Il2CppDumper</a> by <a href=\"https://github.com/Perfare\">Perfare</a>. All the original runtime‑dumping groundwork is theirs — this fork builds on it with the features listed above.</p>\n\n<h2>License</h2>\n\n<p>Released under the <a href=\"LICENSE\">MIT License</a>.</p>",
+  "homepageUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper",
+  "sourceUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper",
+  "url": "https://github.com/codehasan/Zygisk-Il2CppDumper",
+  "latestRelease": {
+    "name": "v1.6.1",
+    "version": "v1.6.1",
+    "time": "2026-09-19T03:26:15Z",
+    "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.6.1/Zygisk_-_Il2CppDumper-v1.6.1-6-debug.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.6.1",
+      "tagName": "v1.6.1",
+      "publishedAt": "2026-09-19T03:26:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk_-_Il2CppDumper-v1.6.1-6-debug.zip",
+          "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.6.1/Zygisk_-_Il2CppDumper-v1.6.1-6-debug.zip",
+          "size": 1242502,
+          "downloadCount": 187
+        },
+        {
+          "name": "Zygisk_-_Il2CppDumper-v1.6.1-6-release.zip",
+          "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.6.1/Zygisk_-_Il2CppDumper-v1.6.1-6-release.zip",
+          "size": 640610,
+          "downloadCount": 469
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2026-09-17T15:02:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk_-_Il2CppDumper-v1.6.0-5-release.zip",
+          "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.6.0/Zygisk_-_Il2CppDumper-v1.6.0-5-release.zip",
+          "size": 639904,
+          "downloadCount": 43
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-02-21T06:31:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk_-_Il2CppDumper-v1.5.0.4.-debug.zip",
+          "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.5.0/Zygisk_-_Il2CppDumper-v1.5.0.4.-debug.zip",
+          "size": 1228894,
+          "downloadCount": 289
+        },
+        {
+          "name": "Zygisk_-_Il2CppDumper-v1.5.0.4.-release.zip",
+          "downloadUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.5.0/Zygisk_-_Il2CppDumper-v1.5.0.4.-release.zip",
+          "size": 630789,
+          "downloadCount": 563
+        }
+      ]
+    }
+  ]
+}

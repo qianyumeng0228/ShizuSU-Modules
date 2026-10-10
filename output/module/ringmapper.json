@@ -1,0 +1,43 @@
+{
+  "readme": "# Ring Mapper\n\nRoot/Magisk/APatch module that remaps a cheap AliExpress BLE \"smart ring\" \nclicker (JX-11 and similar OEM variants) into proper Android input events — \nscroll wheel, D-pad, page-turn keys, or a synthetic touch swipe — instead of \nits default broken chapter-skip/gesture behavior.\n\n## Why\n\nBecause when you scroll on those rings you land at the ass-end of the chapter or webpage.\nThese rings send raw touchpad-style swipe coordinates rather than key events, \nso remapper apps (Key Mapper, Button Mapper, etc.) can't see them at all. \nThis module reads the ring's raw input device directly, decodes swipe \ndirection, and re-emits a real, configurable action.\n\n## Requirements\n\n- Magisk or APatch (duh)\n- Your ring must show up in `getevent -l` (You can test the name the device shows up as first\n  ;tested with JX-11; other \n  identically-designed AliExpress ring clickers likely share the same \n  protocol — check the device name matches or update it in the WebUI)\n\n## Install\n\n1. Download the ZIP from release (or build one yourself with the file from the repo)\n2. Flash/install the ZIP directly through Magisk Manager or APatch's \n   module installer (\"Install from storage\")\n3. Reboot\n\n## Configure\n\nOpen the module's page in Magisk/APatch's WebUI (or tap it in the module \nlist). You can set:\n- **Device name** — must match the name shown for your ring in \n  `getevent -l` (default: `JX-11`)\n- **Action per swipe direction** (up/down/left/right): scroll wheel, D-pad, \n  page-turn keys, chapter prev/next, a synthetic swipe, or none\n- **Multiplier per direction** — repeat count for key-based actions, or \n  swipe distance/direction for the `swipe` action (negative values reverse \n  swipe direction)\n- **Swipe speed/intensity (ms)** — affects fling behavior of the `swipe` \n  action; lower = faster/flingier, higher = slower/shorter\n\nHit **Apply** to save and restart the daemon with new settings.\n\n## How it works\n\nA small C binary finds the ring's input \ndevice by name, grabs it exclusively, decodes swipe \ndirection/distance, and re-emits either:\n- a virtual mouse device (`REL_WHEEL` for scroll, or cursor movement for \n  the `swipe` action — Android requires pointer capability for either, so \n  a cursor is unavoidable in both cases), or\n- a standard `input keyevent`/`input touchscreen swipe` call for \n  D-pad/page/chapter actions\n\nA supervising loop (`service.sh`) starts the binary at boot and relaunches \nit if the ring disconnects and reconnects later.\n\n## Known limitations\n\n- A cursor icon appears while `scroll_up`/`scroll_down`/`swipe` is active \n  on any direction — this is a hard Android input-classification \n  requirement, not a bug (the cursor should be moved to the left bottom\n  corner to 'hide' it, but it may be still on the screen on big displays)\n- `swipe` uses Android's own fling physics rather than raw distance-only\n  motion, so travel distance also depends on the configured speed/intensity\n- Rapid repeated swipes in quick succession may fire as separate, slightly \n  overlapping touch events rather than one merged motion\n## Picture of a JX-11 ring\n  <img width=\"360\" height=\"360\" alt=\"{C729AD66-909D-4715-BBBB-DB6F716C0E51}\" src=\"https://github.com/user-attachments/assets/48cfa59f-4ef1-4b41-a216-cbb417a7c481\" />\n",
+  "readmeHTML": "<h1>Ring Mapper</h1>\n\n<p>Root/Magisk/APatch module that remaps a cheap AliExpress BLE \"smart ring\"</p>\n<p>clicker (JX-11 and similar OEM variants) into proper Android input events —</p>\n<p>scroll wheel, D-pad, page-turn keys, or a synthetic touch swipe — instead of</p>\n<p>its default broken chapter-skip/gesture behavior.</p>\n\n<h2>Why</h2>\n\n<p>Because when you scroll on those rings you land at the ass-end of the chapter or webpage.</p>\n<p>These rings send raw touchpad-style swipe coordinates rather than key events,</p>\n<p>so remapper apps (Key Mapper, Button Mapper, etc.) can't see them at all.</p>\n<p>This module reads the ring's raw input device directly, decodes swipe</p>\n<p>direction, and re-emits a real, configurable action.</p>\n\n<h2>Requirements</h2>\n\n<li>Magisk or APatch (duh)</li>\n<li>Your ring must show up in `getevent -l` (You can test the name the device shows up as first</li>\n<p>  ;tested with JX-11; other</p>\n<p>  identically-designed AliExpress ring clickers likely share the same</p>\n<p>  protocol — check the device name matches or update it in the WebUI)</p>\n\n<h2>Install</h2>\n\n<li>Download the ZIP from release (or build one yourself with the file from the repo)</li>\n<li>Flash/install the ZIP directly through Magisk Manager or APatch's</li>\n<p>   module installer (\"Install from storage\")</p>\n<li>Reboot</li>\n\n<h2>Configure</h2>\n\n<p>Open the module's page in Magisk/APatch's WebUI (or tap it in the module</p>\n<p>list). You can set:</p>\n<li>**Device name** — must match the name shown for your ring in</li>\n<p>  <code>getevent -l</code> (default: <code>JX-11</code>)</p>\n<li>**Action per swipe direction** (up/down/left/right): scroll wheel, D-pad,</li>\n<p>  page-turn keys, chapter prev/next, a synthetic swipe, or none</p>\n<li>**Multiplier per direction** — repeat count for key-based actions, or</li>\n<p>  swipe distance/direction for the <code>swipe</code> action (negative values reverse</p>\n<p>  swipe direction)</p>\n<li>**Swipe speed/intensity (ms)** — affects fling behavior of the `swipe`</li>\n<p>  action; lower = faster/flingier, higher = slower/shorter</p>\n\n<p>Hit <b>Apply</b> to save and restart the daemon with new settings.</p>\n\n<h2>How it works</h2>\n\n<p>A small C binary finds the ring's input</p>\n<p>device by name, grabs it exclusively, decodes swipe</p>\n<p>direction/distance, and re-emits either:</p>\n<li>a virtual mouse device (`REL_WHEEL` for scroll, or cursor movement for</li>\n<p>  the <code>swipe</code> action — Android requires pointer capability for either, so</p>\n<p>  a cursor is unavoidable in both cases), or</p>\n<li>a standard `input keyevent`/`input touchscreen swipe` call for</li>\n<p>  D-pad/page/chapter actions</p>\n\n<p>A supervising loop (<code>service.sh</code>) starts the binary at boot and relaunches</p>\n<p>it if the ring disconnects and reconnects later.</p>\n\n<h2>Known limitations</h2>\n\n<li>A cursor icon appears while `scroll_up`/`scroll_down`/`swipe` is active</li>\n<p>  on any direction — this is a hard Android input-classification</p>\n<p>  requirement, not a bug (the cursor should be moved to the left bottom</p>\n<p>  corner to 'hide' it, but it may be still on the screen on big displays)</p>\n<li>`swipe` uses Android's own fling physics rather than raw distance-only</li>\n<p>  motion, so travel distance also depends on the configured speed/intensity</p>\n<li>Rapid repeated swipes in quick succession may fire as separate, slightly</li>\n<p>  overlapping touch events rather than one merged motion</p>\n<h2>Picture of a JX-11 ring</h2>\n<p>  <img width=\"360\" height=\"360\" alt=\"{C729AD66-909D-4715-BBBB-DB6F716C0E51}\" src=\"https://github.com/user-attachments/assets/48cfa59f-4ef1-4b41-a216-cbb417a7c481\" /></p>",
+  "homepageUrl": "https://github.com/Deulfi/Ringmapper",
+  "sourceUrl": "https://github.com/Deulfi/Ringmapper",
+  "url": "https://github.com/Deulfi/Ringmapper",
+  "latestRelease": {
+    "name": "v1.0.3",
+    "version": "v1.0.3",
+    "time": "2026-09-27T20:36:16Z",
+    "downloadUrl": "https://github.com/Deulfi/Ringmapper/releases/download/v1.0.3/Ringmapper-v1.0.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-09-27T20:36:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ringmapper-v1.0.3.zip",
+          "downloadUrl": "https://github.com/Deulfi/Ringmapper/releases/download/v1.0.3/Ringmapper-v1.0.3.zip",
+          "size": 2628845,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-09-27T19:03:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ringmapper_v1.0.0.zip",
+          "downloadUrl": "https://github.com/Deulfi/Ringmapper/releases/download/v1.0.0/ringmapper_v1.0.0.zip",
+          "size": 2628867,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

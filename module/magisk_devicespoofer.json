@@ -1,0 +1,1289 @@
+{
+  "readme": "<div align=\"center\">\n\n# 📱 全机型机型伪装 · Magisk 模块合集\n\n**全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据**\n\n一键把手机伪装成任意目标机型 —— `manufacturer / brand / model / name / marketname` 全分区覆盖\n\n<img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" />\n\n</div>\n\n---\n\n## ✨ 这是什么\n\n- **主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；\n- 刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；\n- `post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；\n- **Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；\n- 纯 shell 脚本，**无联网、无遥测、不上传任何数据**；\n- 每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。\n\n> 🎯 一句话：**找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。**\n\n---\n\n## 📦 仓库结构\n\n```\nMagisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）\n```\n\n- 目录名 = `品牌 / 机型 (代号)`；\n- zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；\n- 想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；\n- 部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。\n\n### 品牌与机型数量\n\n<!-- BRAND_STATS:BEGIN -->\n\n| 品牌 | 数量 | 品牌 | 数量 |\n| :--- | ---: | :--- | ---: |\n| vivo | 548 | 华硕 | 72 |\n| 三星 | 468 | 中兴 | 71 |\n| OPPO | 336 | 摩托罗拉 | 59 |\n| 华为 | 307 | 索尼 | 51 |\n| 荣耀 | 279 | 酷派 | 46 |\n| 红米 | 277 | 智选 | 42 |\n| realme | 229 | 谷歌 | 40 |\n| 小米 | 158 | 360 | 26 |\n| 努比亚 | 106 | 诺基亚 | 17 |\n| 联想 | 101 | 锤子 | 14 |\n| 一加 | 95 | 黑鲨 | 14 |\n| POCO | 87 | Nothing | 13 |\n| 魅族 | 86 | 乐视 | 12 |\n\n**合计：3554 个机型 / 26 个品牌**\n\n<!-- BRAND_STATS:END -->\n\n---\n\n## 🚀 安装\n\n### ⬇️ 下载\n\n- **[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；\n- 或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。\n\n### Android 6 ~ 17（推荐）\n\n1. 下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；\n2. Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；\n3. 重启，机型生效。\n\n> 如已装其它机型伪装模块，**先卸载旧的再刷新的**：同类模块只保留一个。\n\n### Android 2.2 ~ 5.x\n\n- CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。\n\n### Android 1.x ~ 5.x（手动）\n\n- 解压 zip，见 `legacy/` 目录：\n  - `xj_apply.sh`：应用伪装（自动备份 `build.prop.xj_bak`，重复执行安全）；\n  - `xj_restore.sh`：还原。\n\n### 校验\n\n```sh\ngetprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14\n```\n\n### 还原\n\n- 模块版：管理器里停用 / 卸载模块 → 重启；\n- 老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。\n\n---\n\n## 🔄 管理器内更新\n\n- 每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；\n- 版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；\n- 更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；\n- 注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。\n\n> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。\n\n---\n\n## ⚙️ 工作原理\n\n- 模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；\n- `post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；\n- `service.sh` 开机后再校验一次，防止 OEM 服务回写；\n- 老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。\n\n---\n\n## ⚠️ 注意事项\n\n- 需要 root（Magisk / KernelSU / APatch 任一）；\n- **一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；\n- 伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；\n- 不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；\n- 刷机有风险，操作前请备份重要数据，后果自行承担。\n\n---\n\n## 🙏 数据来源\n\n- 机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；\n- 本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；\n- 代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。\n\n---\n\n## 🤖 自动同步\n\n- GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；\n- 同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；\n- 每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；\n- 相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；\n- 手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。\n\n---\n\n## 💬 反馈与贡献\n\n- [提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；\n- [发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。\n\n---\n\n## ☕ 投喂支持\n\n全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——**完全自愿**，不影响任何功能的使用。\n\n| 支付宝 | 微信支付 |\n| :---: | :---: |\n| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |\n\n---\n\n## 📄 License\n\n代码部分 [MIT](LICENSE) © 2026 L0NE-6；机型数据部分 © [MobileModels](https://github.com/KHwang9883/MobileModels)（CC BY-NC-SA 4.0）。\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>📱 全机型机型伪装 · Magisk 模块合集</h1>\n\n<p><b>全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据</b></p>\n\n<p>一键把手机伪装成任意目标机型 —— <code>manufacturer / brand / model / name / marketname</code> 全分区覆盖</p>\n\n<p><img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" /></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>✨ 这是什么</h2>\n\n<li>**主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；</li>\n<li>刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；</li>\n<li>`post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；</li>\n<li>**Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；</li>\n<li>纯 shell 脚本，**无联网、无遥测、不上传任何数据**；</li>\n<li>每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。</li>\n\n<p>> 🎯 一句话：<b>找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。</b></p>\n\n<p>---</p>\n\n<h2>📦 仓库结构</h2>\n\n<pre>Magisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）</pre>\n\n<li>目录名 = `品牌 / 机型 (代号)`；</li>\n<li>zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；</li>\n<li>想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；</li>\n<li>部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。</li>\n\n<h3>品牌与机型数量</h3>\n\n<p><!-- BRAND_STATS:BEGIN --></p>\n\n<p>| 品牌 | 数量 | 品牌 | 数量 |</p>\n<p>| :--- | ---: | :--- | ---: |</p>\n<p>| vivo | 548 | 华硕 | 72 |</p>\n<p>| 三星 | 468 | 中兴 | 71 |</p>\n<p>| OPPO | 336 | 摩托罗拉 | 59 |</p>\n<p>| 华为 | 307 | 索尼 | 51 |</p>\n<p>| 荣耀 | 279 | 酷派 | 46 |</p>\n<p>| 红米 | 277 | 智选 | 42 |</p>\n<p>| realme | 229 | 谷歌 | 40 |</p>\n<p>| 小米 | 158 | 360 | 26 |</p>\n<p>| 努比亚 | 106 | 诺基亚 | 17 |</p>\n<p>| 联想 | 101 | 锤子 | 14 |</p>\n<p>| 一加 | 95 | 黑鲨 | 14 |</p>\n<p>| POCO | 87 | Nothing | 13 |</p>\n<p>| 魅族 | 86 | 乐视 | 12 |</p>\n\n<p><b>合计：3554 个机型 / 26 个品牌</b></p>\n\n<p><!-- BRAND_STATS:END --></p>\n\n<p>---</p>\n\n<h2>🚀 安装</h2>\n\n<h3>⬇️ 下载</h3>\n\n<li>**[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；</li>\n<li>或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。</li>\n\n<h3>Android 6 ~ 17（推荐）</h3>\n\n<li>下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；</li>\n<li>Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；</li>\n<li>重启，机型生效。</li>\n\n<p>> 如已装其它机型伪装模块，<b>先卸载旧的再刷新的</b>：同类模块只保留一个。</p>\n\n<h3>Android 2.2 ~ 5.x</h3>\n\n<li>CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。</li>\n\n<h3>Android 1.x ~ 5.x（手动）</h3>\n\n<li>解压 zip，见 `legacy/` 目录：</li>\n<p>  - <code>xj_apply.sh</code>：应用伪装（自动备份 <code>build.prop.xj_bak</code>，重复执行安全）；</p>\n<p>  - <code>xj_restore.sh</code>：还原。</p>\n\n<h3>校验</h3>\n\n<pre>getprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14</pre>\n\n<h3>还原</h3>\n\n<li>模块版：管理器里停用 / 卸载模块 → 重启；</li>\n<li>老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。</li>\n\n<p>---</p>\n\n<h2>🔄 管理器内更新</h2>\n\n<li>每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；</li>\n<li>版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；</li>\n<li>更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；</li>\n<li>注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。</li>\n\n<p>> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。</p>\n\n<p>---</p>\n\n<h2>⚙️ 工作原理</h2>\n\n<li>模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；</li>\n<li>`post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；</li>\n<li>`service.sh` 开机后再校验一次，防止 OEM 服务回写；</li>\n<li>老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。</li>\n\n<p>---</p>\n\n<h2>⚠️ 注意事项</h2>\n\n<li>需要 root（Magisk / KernelSU / APatch 任一）；</li>\n<li>**一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；</li>\n<li>伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；</li>\n<li>不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；</li>\n<li>刷机有风险，操作前请备份重要数据，后果自行承担。</li>\n\n<p>---</p>\n\n<h2>🙏 数据来源</h2>\n\n<li>机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；</li>\n<li>本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；</li>\n<li>代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。</li>\n\n<p>---</p>\n\n<h2>🤖 自动同步</h2>\n\n<li>GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；</li>\n<li>同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；</li>\n<li>每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；</li>\n<li>相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；</li>\n<li>手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。</li>\n\n<p>---</p>\n\n<h2>💬 反馈与贡献</h2>\n\n<li>[提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；</li>\n<li>[发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。</li>\n\n<p>---</p>\n\n<h2>☕ 投喂支持</h2>\n\n<p>全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——<b>完全自愿</b>，不影响任何功能的使用。</p>\n\n<p>| 支付宝 | 微信支付 |</p>\n<p>| :---: | :---: |</p>\n<p>| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |</p>\n\n<p>---</p>\n\n<h2>📄 License</h2>\n\n<p>代码部分 <a href=\"LICENSE\">MIT</a> © 2026 L0NE-6；机型数据部分 © <a href=\"https://github.com/KHwang9883/MobileModels\">MobileModels</a>（CC BY-NC-SA 4.0）。</p>",
+  "homepageUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
+  "sourceUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
+  "url": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
+  "latestRelease": {
+    "name": "v7",
+    "version": "v7",
+    "time": "2026-10-09T14:15:55Z",
+    "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_360_26_v7.zip"
+  },
+  "releases": [
+    {
+      "name": "v7",
+      "tagName": "v7",
+      "publishedAt": "2026-10-09T14:15:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_360_26_v7.zip",
+          "size": 179757,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3554_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_All_3554_v7.zip",
+          "size": 24612776,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_ASUS_72_v7.zip",
+          "size": 503301,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_BlackShark_14_v7.zip",
+          "size": 97488,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Coolpad_46_v7.zip",
+          "size": 318704,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Google_40_v7.zip",
+          "size": 274942,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_HONOR_279_v7.zip",
+          "size": 1939603,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Huawei_307_v7.zip",
+          "size": 2148432,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3554_v7.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Index_3554_v7.csv",
+          "size": 387145,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Lenovo_101_v7.zip",
+          "size": 706970,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Letv_12_v7.zip",
+          "size": 82343,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Meizu_86_v7.zip",
+          "size": 591426,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Motorola_59_v7.zip",
+          "size": 405625,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Nokia_17_v7.zip",
+          "size": 117293,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Nothing_13_v7.zip",
+          "size": 90040,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Nubia_106_v7.zip",
+          "size": 729195,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_OnePlus_95_v7.zip",
+          "size": 656391,
+          "downloadCount": 7
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_OPPO_336_v7.zip",
+          "size": 2302006,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_POCO_87_v7.zip",
+          "size": 602916,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_realme_229_v7.zip",
+          "size": 1575506,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Redmi_277_v7.zip",
+          "size": 1926975,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Samsung_468_v7.zip",
+          "size": 3238411,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Smartisan_14_v7.zip",
+          "size": 96147,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Sony_51_v7.zip",
+          "size": 353087,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_vivo_548_v7.zip",
+          "size": 3751170,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Xiaomi_158_v7.zip",
+          "size": 1093033,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_Zhixuan_42_v7.zip",
+          "size": 289565,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v7.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_ZTE_71_v7.zip",
+          "size": 495812,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v7.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/SHA256SUMS_v7.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v6",
+      "tagName": "v6",
+      "publishedAt": "2026-10-09T14:06:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_360_26_v6.zip",
+          "size": 191332,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3554_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_All_3554_v6.zip",
+          "size": 26200900,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_ASUS_72_v6.zip",
+          "size": 535637,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_BlackShark_14_v6.zip",
+          "size": 103774,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Coolpad_46_v6.zip",
+          "size": 339151,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Google_40_v6.zip",
+          "size": 292975,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_HONOR_279_v6.zip",
+          "size": 2064268,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Huawei_307_v6.zip",
+          "size": 2285921,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3554_v6.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Index_3554_v6.csv",
+          "size": 387145,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Lenovo_101_v6.zip",
+          "size": 752124,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Letv_12_v6.zip",
+          "size": 87725,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Meizu_86_v6.zip",
+          "size": 629888,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Motorola_59_v6.zip",
+          "size": 431874,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Nokia_17_v6.zip",
+          "size": 124862,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Nothing_13_v6.zip",
+          "size": 95833,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Nubia_106_v6.zip",
+          "size": 776295,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_OnePlus_95_v6.zip",
+          "size": 698947,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_OPPO_336_v6.zip",
+          "size": 2452103,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_POCO_87_v6.zip",
+          "size": 641862,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_realme_229_v6.zip",
+          "size": 1677324,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Redmi_277_v6.zip",
+          "size": 2050978,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Samsung_468_v6.zip",
+          "size": 3447458,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Smartisan_14_v6.zip",
+          "size": 102429,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Sony_51_v6.zip",
+          "size": 376034,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_vivo_548_v6.zip",
+          "size": 3995988,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Xiaomi_158_v6.zip",
+          "size": 1163774,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_Zhixuan_42_v6.zip",
+          "size": 308298,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v6.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/Magisk-DeviceSpoofer_ZTE_71_v6.zip",
+          "size": 527408,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v6.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v6/SHA256SUMS_v6.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2026-10-08T23:33:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_360_26_v5.zip",
+          "size": 188009,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3554_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_All_3554_v5.zip",
+          "size": 25749508,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_ASUS_72_v5.zip",
+          "size": 526546,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_BlackShark_14_v5.zip",
+          "size": 102020,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Coolpad_46_v5.zip",
+          "size": 333344,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Google_40_v5.zip",
+          "size": 287841,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_HONOR_279_v5.zip",
+          "size": 2028487,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Huawei_307_v5.zip",
+          "size": 2247234,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3554_v5.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Index_3554_v5.csv",
+          "size": 387145,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Lenovo_101_v5.zip",
+          "size": 739415,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Letv_12_v5.zip",
+          "size": 86191,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Meizu_86_v5.zip",
+          "size": 618916,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Motorola_59_v5.zip",
+          "size": 424398,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Nokia_17_v5.zip",
+          "size": 122721,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Nothing_13_v5.zip",
+          "size": 94186,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Nubia_106_v5.zip",
+          "size": 762753,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_OnePlus_95_v5.zip",
+          "size": 686986,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_OPPO_336_v5.zip",
+          "size": 2409120,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_POCO_87_v5.zip",
+          "size": 630725,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_realme_229_v5.zip",
+          "size": 1648450,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Redmi_277_v5.zip",
+          "size": 2015814,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Samsung_468_v5.zip",
+          "size": 3389055,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Smartisan_14_v5.zip",
+          "size": 100637,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Sony_51_v5.zip",
+          "size": 369549,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_vivo_548_v5.zip",
+          "size": 3925430,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Xiaomi_158_v5.zip",
+          "size": 1143703,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_Zhixuan_42_v5.zip",
+          "size": 302971,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v5.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/Magisk-DeviceSpoofer_ZTE_71_v5.zip",
+          "size": 518369,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v5.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v5/SHA256SUMS_v5.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2026-10-06T03:47:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_360_26_v4.zip",
+          "size": 188009,
+          "downloadCount": 4
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3554_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_All_3554_v4.zip",
+          "size": 25749508,
+          "downloadCount": 9
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_ASUS_72_v4.zip",
+          "size": 526546,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_BlackShark_14_v4.zip",
+          "size": 102020,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Coolpad_46_v4.zip",
+          "size": 333344,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Google_40_v4.zip",
+          "size": 287841,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_HONOR_279_v4.zip",
+          "size": 2028487,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Huawei_307_v4.zip",
+          "size": 2247234,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3554_v4.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Index_3554_v4.csv",
+          "size": 387145,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Lenovo_101_v4.zip",
+          "size": 739415,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Letv_12_v4.zip",
+          "size": 86191,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Meizu_86_v4.zip",
+          "size": 618916,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Motorola_59_v4.zip",
+          "size": 424398,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Nokia_17_v4.zip",
+          "size": 122721,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Nothing_13_v4.zip",
+          "size": 94186,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Nubia_106_v4.zip",
+          "size": 762753,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_OnePlus_95_v4.zip",
+          "size": 686986,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_OPPO_336_v4.zip",
+          "size": 2409120,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_POCO_87_v4.zip",
+          "size": 630725,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_realme_229_v4.zip",
+          "size": 1648450,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Redmi_277_v4.zip",
+          "size": 2015814,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Samsung_468_v4.zip",
+          "size": 3389055,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Smartisan_14_v4.zip",
+          "size": 100637,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Sony_51_v4.zip",
+          "size": 369549,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_vivo_548_v4.zip",
+          "size": 3925430,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Xiaomi_158_v4.zip",
+          "size": 1143703,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_Zhixuan_42_v4.zip",
+          "size": 302971,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v4.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/Magisk-DeviceSpoofer_ZTE_71_v4.zip",
+          "size": 518369,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v4.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v4/SHA256SUMS_v4.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2026-10-06T00:17:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_360_26_v3.zip",
+          "size": 167000,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3554_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_All_3554_v3.zip",
+          "size": 22876695,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_ASUS_72_v3.zip",
+          "size": 468157,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_BlackShark_14_v3.zip",
+          "size": 90642,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Coolpad_46_v3.zip",
+          "size": 296217,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Google_40_v3.zip",
+          "size": 255379,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_HONOR_279_v3.zip",
+          "size": 1802968,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Huawei_307_v3.zip",
+          "size": 1998789,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3554_v3.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Index_3554_v3.csv",
+          "size": 387145,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Lenovo_101_v3.zip",
+          "size": 657678,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Letv_12_v3.zip",
+          "size": 76483,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Meizu_86_v3.zip",
+          "size": 549354,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Motorola_59_v3.zip",
+          "size": 376883,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Nokia_17_v3.zip",
+          "size": 108955,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Nothing_13_v3.zip",
+          "size": 83712,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Nubia_106_v3.zip",
+          "size": 677397,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_OnePlus_95_v3.zip",
+          "size": 610014,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_OPPO_336_v3.zip",
+          "size": 2137613,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_POCO_87_v3.zip",
+          "size": 560368,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_realme_229_v3.zip",
+          "size": 1463751,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Redmi_277_v3.zip",
+          "size": 1791613,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Samsung_468_v3.zip",
+          "size": 3010007,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Smartisan_14_v3.zip",
+          "size": 89336,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Sony_51_v3.zip",
+          "size": 328181,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_vivo_548_v3.zip",
+          "size": 3483403,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Xiaomi_158_v3.zip",
+          "size": 1016056,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_Zhixuan_42_v3.zip",
+          "size": 269023,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v3.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/Magisk-DeviceSpoofer_ZTE_71_v3.zip",
+          "size": 461078,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v3.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v3/SHA256SUMS_v3.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2026-10-04T14:32:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_360_26_v2.zip",
+          "size": 167000,
+          "downloadCount": 3
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3548_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_All_3548_v2.zip",
+          "size": 22838441,
+          "downloadCount": 14
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_ASUS_72_v2.zip",
+          "size": 468157,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_BlackShark_14_v2.zip",
+          "size": 90642,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Coolpad_46_v2.zip",
+          "size": 296217,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Google_40_v2.zip",
+          "size": 255379,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_HONOR_279_v2.zip",
+          "size": 1802968,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Huawei_307_v2.zip",
+          "size": 1998789,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3548_v2.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Index_3548_v2.csv",
+          "size": 386539,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Lenovo_101_v2.zip",
+          "size": 657678,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Letv_12_v2.zip",
+          "size": 76483,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Meizu_86_v2.zip",
+          "size": 549354,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Motorola_59_v2.zip",
+          "size": 376883,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Nokia_17_v2.zip",
+          "size": 108955,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Nothing_13_v2.zip",
+          "size": 83712,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Nubia_106_v2.zip",
+          "size": 677397,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_OnePlus_95_v2.zip",
+          "size": 610014,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_330_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_OPPO_330_v2.zip",
+          "size": 2099419,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_POCO_87_v2.zip",
+          "size": 560368,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_realme_229_v2.zip",
+          "size": 1463751,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Redmi_277_v2.zip",
+          "size": 1791613,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Samsung_468_v2.zip",
+          "size": 3010007,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Smartisan_14_v2.zip",
+          "size": 89336,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Sony_51_v2.zip",
+          "size": 328181,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_vivo_548_v2.zip",
+          "size": 3483403,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Xiaomi_158_v2.zip",
+          "size": 1016056,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_Zhixuan_42_v2.zip",
+          "size": 269023,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v2.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/Magisk-DeviceSpoofer_ZTE_71_v2.zip",
+          "size": 461078,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v2.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v2/SHA256SUMS_v2.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2026-10-04T14:14:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_360_26_v1.zip",
+          "size": 163252,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3548_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_All_3548_v1.zip",
+          "size": 22325761,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_ASUS_72_v1.zip",
+          "size": 457675,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_BlackShark_14_v1.zip",
+          "size": 88606,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Coolpad_46_v1.zip",
+          "size": 289504,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Google_40_v1.zip",
+          "size": 249558,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_HONOR_279_v1.zip",
+          "size": 1763174,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Huawei_307_v1.zip",
+          "size": 1954765,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3548_v1.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Index_3548_v1.csv",
+          "size": 386539,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Lenovo_101_v1.zip",
+          "size": 643238,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Letv_12_v1.zip",
+          "size": 74786,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Meizu_86_v1.zip",
+          "size": 536724,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Motorola_59_v1.zip",
+          "size": 368396,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Nokia_17_v1.zip",
+          "size": 106529,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Nothing_13_v1.zip",
+          "size": 81901,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Nubia_106_v1.zip",
+          "size": 661928,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_95_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_OnePlus_95_v1.zip",
+          "size": 596388,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_330_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_OPPO_330_v1.zip",
+          "size": 2051190,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_POCO_87_v1.zip",
+          "size": 547765,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_realme_229_v1.zip",
+          "size": 1430465,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Redmi_277_v1.zip",
+          "size": 1752287,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Samsung_468_v1.zip",
+          "size": 2942236,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Smartisan_14_v1.zip",
+          "size": 87324,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Sony_51_v1.zip",
+          "size": 320761,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_548_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_vivo_548_v1.zip",
+          "size": 3403634,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Xiaomi_158_v1.zip",
+          "size": 993437,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_Zhixuan_42_v1.zip",
+          "size": 262927,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v1.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/Magisk-DeviceSpoofer_ZTE_71_v1.zip",
+          "size": 450733,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS_v1.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v1/SHA256SUMS_v1.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

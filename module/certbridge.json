@@ -1,0 +1,719 @@
+{
+  "readme": "<div align=\"center\">\n\n# CertBridge\n\n**System CA injection** for Magisk / KernelSU / APatch\n\nMerge Reqable, ProxyPin, and custom PEMs into the Android trust store — without rewriting the system partition.\n\n[简体中文](./README.zh-CN.md) · [Docs](https://eikeitsu.github.io/CertBridge/en/) · [Releases](https://github.com/Eikeitsu/CertBridge/releases)\n\n<br />\n\n[![Release](https://img.shields.io/github/v/release/Eikeitsu/CertBridge?style=for-the-badge&label=Release)](https://github.com/Eikeitsu/CertBridge/releases)\n[![Android](https://img.shields.io/badge/Android-7%E2%80%9316-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://eikeitsu.github.io/CertBridge/en/guide/install)\n[![Root](https://img.shields.io/badge/Root-Magisk%20%7C%20KSU%20%7C%20APatch-orange?style=for-the-badge)](https://eikeitsu.github.io/CertBridge/en/)\n[![License](https://img.shields.io/github/license/Eikeitsu/CertBridge?style=for-the-badge)](./LICENSE)\n\n<br />\n\n<img src=\"https://skillicons.dev/icons?i=react,typescript,vite,redux,sass,androidstudio,cpp,java,bash,nodejs,githubactions\" alt=\"Tech stack\" />\n\n</div>\n\n## Features\n\n| Component     | Role                                                              |\n| ------------- | ----------------------------------------------------------------- |\n| Magisk module | Boot inject via `post-fs-data` / `service` (optional late inject) |\n| WebUI         | Home · certs · logs · hide · settings                             |\n| Hot mount     | Temporary user / SD certs until reboot                            |\n| Hide assist   | `ksud` kernel umount / SuSFS / NoHello (bundled, off by default)  |\n| Zygisk filter | Hide this module’s mounts in target processes (opt-in)            |\n| CLI           | `cb` — status / set / cert helpers                                |\n\nUI language follows the system (`zh*` → Chinese, otherwise English). Change under **WebUI → Mount → Language**.\n\n## How it works\n\nOn each boot the module:\n\n1. Reads the live system / Conscrypt APEX trust store (no saved baseline)\n2. Merges enabled addons (Reqable from app, ProxyPin, custom PEMs, …)\n3. Bind-mounts the full set onto trust-store paths (compatible mode)\n\nCopy or validation failure skips injection — the stock store stays intact.\n\n## Quick start\n\n1. Download `CertBridge_v*_arm64.zip` from [Releases](https://github.com/Eikeitsu/CertBridge/releases) (most phones). Use `arm32` / `x86` / `x64` for other ABIs, or `*_lite.zip` for a smaller package without OpenSSL.\n2. Flash in your manager → within ~20s: **Vol+** default (recommended) / **Vol-** custom → **reboot**.\n3. Open the WebUI, or run `cb status --live`.\n\nOnline update (`updateJson`) tracks the **arm64 full** zip.\n\n📖 [Install](https://eikeitsu.github.io/CertBridge/en/guide/install) · [Features](https://eikeitsu.github.io/CertBridge/en/guide/features) · [FAQ](https://eikeitsu.github.io/CertBridge/en/guide/faq)\n\n## Mount modes\n\n| Mode                     | Notes                                                                                |\n| ------------------------ | ------------------------------------------------------------------------------------ |\n| **Compatible** (default) | Full merge + bind; no Magic Mount meta-module required                               |\n| **Magic**                | Overlay addons under `system/`; Magisk usually OK, KernelSU may need a correct stack |\n\nAndroid 14+: prefer binding the main APEX and skip system when `experimental_14_system=skip` (default). See the [config guide](https://eikeitsu.github.io/CertBridge/en/guide/config).\n\n## Tech stack\n\n| Area    | Stack                                                         |\n| ------- | ------------------------------------------------------------- |\n| WebUI   | React 18 · TypeScript · Vite · Redux Toolkit · Sass · i18next |\n| Module  | POSIX shell · Magisk module scripts                           |\n| Native  | Zygisk C++ (NDK) · optional `cbx509` (Java → dex)             |\n| Docs    | VitePress                                                     |\n| Tooling | Node.js · ESLint · ShellCheck · Prettier · GitHub Actions     |\n\nIcons above via [Skill Icons](https://skillicons.dev); badges via [Shields.io](https://shields.io).\n\n## Repository layout\n\n```text\nmodule/       Magisk module\nwebui/        React WebUI\ndocs/         VitePress (zh root + /en)\nlocales/      Shared i18n JSON\nscripts/      Build / release / i18n\ntools/        cbx509 and helpers\ndocs-dev/     Maintainer notes (BUILD / RELEASE)\nchangelog.md  Handwritten changelog (zh; release auto-translates EN)\nlegacy/       Archived WebUI sources\n```\n\nBuild & release: [docs-dev/BUILD.md](./docs-dev/BUILD.md) · [docs-dev/RELEASE.md](./docs-dev/RELEASE.md)\n\n## Links\n\n- **Repo**: [Eikeitsu/CertBridge](https://github.com/Eikeitsu/CertBridge)\n- **Docs**: [中文](https://eikeitsu.github.io/CertBridge/) · [English](https://eikeitsu.github.io/CertBridge/en/)\n- **ID**: `CertBridge`\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>CertBridge</h1>\n\n<p><b>System CA injection</b> for Magisk / KernelSU / APatch</p>\n\n<p>Merge Reqable, ProxyPin, and custom PEMs into the Android trust store — without rewriting the system partition.</p>\n\n<p><a href=\"./README.zh-CN.md\">简体中文</a> · <a href=\"https://eikeitsu.github.io/CertBridge/en/\">Docs</a> · <a href=\"https://github.com/Eikeitsu/CertBridge/releases\">Releases</a></p>\n\n<p><br /></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/Eikeitsu/CertBridge?style=for-the-badge&label=Release\">![Release</a>](https://github.com/Eikeitsu/CertBridge/releases)</p>\n<p><a href=\"https://img.shields.io/badge/Android-7%E2%80%9316-3DDC84?style=for-the-badge&logo=android&logoColor=white\">![Android</a>](https://eikeitsu.github.io/CertBridge/en/guide/install)</p>\n<p><a href=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KSU%20%7C%20APatch-orange?style=for-the-badge\">![Root</a>](https://eikeitsu.github.io/CertBridge/en/)</p>\n<p><a href=\"https://img.shields.io/github/license/Eikeitsu/CertBridge?style=for-the-badge\">![License</a>](./LICENSE)</p>\n\n<p><br /></p>\n\n<p><img src=\"https://skillicons.dev/icons?i=react,typescript,vite,redux,sass,androidstudio,cpp,java,bash,nodejs,githubactions\" alt=\"Tech stack\" /></p>\n\n<p></div></p>\n\n<h2>Features</h2>\n\n<p>| Component     | Role                                                              |</p>\n<p>| ------------- | ----------------------------------------------------------------- |</p>\n<p>| Magisk module | Boot inject via <code>post-fs-data</code> / <code>service</code> (optional late inject) |</p>\n<p>| WebUI         | Home · certs · logs · hide · settings                             |</p>\n<p>| Hot mount     | Temporary user / SD certs until reboot                            |</p>\n<p>| Hide assist   | <code>ksud</code> kernel umount / SuSFS / NoHello (bundled, off by default)  |</p>\n<p>| Zygisk filter | Hide this module’s mounts in target processes (opt-in)            |</p>\n<p>| CLI           | <code>cb</code> — status / set / cert helpers                                |</p>\n\n<p>UI language follows the system (<code>zh*</code> → Chinese, otherwise English). Change under <b>WebUI → Mount → Language</b>.</p>\n\n<h2>How it works</h2>\n\n<p>On each boot the module:</p>\n\n<li>Reads the live system / Conscrypt APEX trust store (no saved baseline)</li>\n<li>Merges enabled addons (Reqable from app, ProxyPin, custom PEMs, …)</li>\n<li>Bind-mounts the full set onto trust-store paths (compatible mode)</li>\n\n<p>Copy or validation failure skips injection — the stock store stays intact.</p>\n\n<h2>Quick start</h2>\n\n<li>Download `CertBridge_v*_arm64.zip` from [Releases](https://github.com/Eikeitsu/CertBridge/releases) (most phones). Use `arm32` / `x86` / `x64` for other ABIs, or `*_lite.zip` for a smaller package without OpenSSL.</li>\n<li>Flash in your manager → within ~20s: **Vol+** default (recommended) / **Vol-** custom → **reboot**.</li>\n<li>Open the WebUI, or run `cb status --live`.</li>\n\n<p>Online update (<code>updateJson</code>) tracks the <b>arm64 full</b> zip.</p>\n\n<p>📖 <a href=\"https://eikeitsu.github.io/CertBridge/en/guide/install\">Install</a> · <a href=\"https://eikeitsu.github.io/CertBridge/en/guide/features\">Features</a> · <a href=\"https://eikeitsu.github.io/CertBridge/en/guide/faq\">FAQ</a></p>\n\n<h2>Mount modes</h2>\n\n<p>| Mode                     | Notes                                                                                |</p>\n<p>| ------------------------ | ------------------------------------------------------------------------------------ |</p>\n<p>| <b>Compatible</b> (default) | Full merge + bind; no Magic Mount meta-module required                               |</p>\n<p>| <b>Magic</b>                | Overlay addons under <code>system/</code>; Magisk usually OK, KernelSU may need a correct stack |</p>\n\n<p>Android 14+: prefer binding the main APEX and skip system when <code>experimental_14_system=skip</code> (default). See the <a href=\"https://eikeitsu.github.io/CertBridge/en/guide/config\">config guide</a>.</p>\n\n<h2>Tech stack</h2>\n\n<p>| Area    | Stack                                                         |</p>\n<p>| ------- | ------------------------------------------------------------- |</p>\n<p>| WebUI   | React 18 · TypeScript · Vite · Redux Toolkit · Sass · i18next |</p>\n<p>| Module  | POSIX shell · Magisk module scripts                           |</p>\n<p>| Native  | Zygisk C++ (NDK) · optional <code>cbx509</code> (Java → dex)             |</p>\n<p>| Docs    | VitePress                                                     |</p>\n<p>| Tooling | Node.js · ESLint · ShellCheck · Prettier · GitHub Actions     |</p>\n\n<p>Icons above via <a href=\"https://skillicons.dev\">Skill Icons</a>; badges via <a href=\"https://shields.io\">Shields.io</a>.</p>\n\n<h2>Repository layout</h2>\n\n<pre>module/       Magisk module\nwebui/        React WebUI\ndocs/         VitePress (zh root + /en)\nlocales/      Shared i18n JSON\nscripts/      Build / release / i18n\ntools/        cbx509 and helpers\ndocs-dev/     Maintainer notes (BUILD / RELEASE)\nchangelog.md  Handwritten changelog (zh; release auto-translates EN)\nlegacy/       Archived WebUI sources</pre>\n\n<p>Build & release: <a href=\"./docs-dev/BUILD.md\">docs-dev/BUILD.md</a> · <a href=\"./docs-dev/RELEASE.md\">docs-dev/RELEASE.md</a></p>\n\n<h2>Links</h2>\n\n<li>**Repo**: [Eikeitsu/CertBridge](https://github.com/Eikeitsu/CertBridge)</li>\n<li>**Docs**: [中文](https://eikeitsu.github.io/CertBridge/) · [English](https://eikeitsu.github.io/CertBridge/en/)</li>\n<li>**ID**: `CertBridge`</li>",
+  "homepageUrl": "https://eikeitsu.github.io/CertBridge/",
+  "sourceUrl": "https://github.com/Eikeitsu/CertBridge",
+  "url": "https://github.com/Eikeitsu/CertBridge",
+  "latestRelease": {
+    "name": "v5.1.1",
+    "version": "v5.1.1",
+    "time": "2026-10-10T10:49:30Z",
+    "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_arm32.zip"
+  },
+  "releases": [
+    {
+      "name": "v5.1.1",
+      "tagName": "v5.1.1",
+      "publishedAt": "2026-10-10T10:49:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.1.1_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_arm32.zip",
+          "size": 4734331,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.1_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_arm64.zip",
+          "size": 4849881,
+          "downloadCount": 9
+        },
+        {
+          "name": "CertBridge_v5.1.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_lite.zip",
+          "size": 2058816,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.1_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_x64.zip",
+          "size": 4671185,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.1_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.1/CertBridge_v5.1.1_x86.zip",
+          "size": 4750472,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v5.1.0",
+      "tagName": "v5.1.0",
+      "publishedAt": "2026-10-10T08:40:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.1.0_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.0/CertBridge_v5.1.0_arm32.zip",
+          "size": 4724499,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.0_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.0/CertBridge_v5.1.0_arm64.zip",
+          "size": 4838145,
+          "downloadCount": 1
+        },
+        {
+          "name": "CertBridge_v5.1.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.0/CertBridge_v5.1.0_lite.zip",
+          "size": 2037275,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.0_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.0/CertBridge_v5.1.0_x64.zip",
+          "size": 4671157,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.1.0_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.0/CertBridge_v5.1.0_x86.zip",
+          "size": 4750444,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v5.0.3",
+      "tagName": "v5.0.3",
+      "publishedAt": "2026-10-08T10:38:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.0.3_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.3/CertBridge_v5.0.3_arm32.zip",
+          "size": 4700924,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v5.0.3_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.3/CertBridge_v5.0.3_arm64.zip",
+          "size": 4813586,
+          "downloadCount": 28
+        },
+        {
+          "name": "CertBridge_v5.0.3_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.3/CertBridge_v5.0.3_lite.zip",
+          "size": 2003340,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v5.0.3_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.3/CertBridge_v5.0.3_x64.zip",
+          "size": 4656958,
+          "downloadCount": 4
+        },
+        {
+          "name": "CertBridge_v5.0.3_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.3/CertBridge_v5.0.3_x86.zip",
+          "size": 4736245,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v5.0.2",
+      "tagName": "v5.0.2",
+      "publishedAt": "2026-09-26T15:12:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.0.2_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.2/CertBridge_v5.0.2_arm32.zip",
+          "size": 4693922,
+          "downloadCount": 17
+        },
+        {
+          "name": "CertBridge_v5.0.2_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.2/CertBridge_v5.0.2_arm64.zip",
+          "size": 4806584,
+          "downloadCount": 132
+        },
+        {
+          "name": "CertBridge_v5.0.2_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.2/CertBridge_v5.0.2_lite.zip",
+          "size": 1996338,
+          "downloadCount": 3
+        },
+        {
+          "name": "CertBridge_v5.0.2_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.2/CertBridge_v5.0.2_x64.zip",
+          "size": 4649956,
+          "downloadCount": 9
+        },
+        {
+          "name": "CertBridge_v5.0.2_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.2/CertBridge_v5.0.2_x86.zip",
+          "size": 4729242,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v5.0.1",
+      "tagName": "v5.0.1",
+      "publishedAt": "2026-09-25T06:38:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.0.1_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.1/CertBridge_v5.0.1_arm32.zip",
+          "size": 4691369,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.0.1_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.1/CertBridge_v5.0.1_arm64.zip",
+          "size": 4804031,
+          "downloadCount": 22
+        },
+        {
+          "name": "CertBridge_v5.0.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.1/CertBridge_v5.0.1_lite.zip",
+          "size": 1993785,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v5.0.1_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.1/CertBridge_v5.0.1_x64.zip",
+          "size": 4647403,
+          "downloadCount": 1
+        },
+        {
+          "name": "CertBridge_v5.0.1_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.1/CertBridge_v5.0.1_x86.zip",
+          "size": 4726690,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v5.0.0",
+      "tagName": "v5.0.0",
+      "publishedAt": "2026-09-25T02:32:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v5.0.0_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.0/CertBridge_v5.0.0_arm32.zip",
+          "size": 4688530,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.0.0_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.0/CertBridge_v5.0.0_arm64.zip",
+          "size": 4801192,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v5.0.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.0/CertBridge_v5.0.0_lite.zip",
+          "size": 1990947,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.0.0_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.0/CertBridge_v5.0.0_x64.zip",
+          "size": 4644564,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v5.0.0_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.0.0/CertBridge_v5.0.0_x86.zip",
+          "size": 4723851,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.3.1",
+      "tagName": "v4.3.1",
+      "publishedAt": "2026-09-23T12:41:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.3.1_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.1/CertBridge_v4.3.1_arm32.zip",
+          "size": 4457577,
+          "downloadCount": 5
+        },
+        {
+          "name": "CertBridge_v4.3.1_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.1/CertBridge_v4.3.1_arm64.zip",
+          "size": 4550408,
+          "downloadCount": 15
+        },
+        {
+          "name": "CertBridge_v4.3.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.1/CertBridge_v4.3.1_lite.zip",
+          "size": 1512653,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.3.1_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.1/CertBridge_v4.3.1_x64.zip",
+          "size": 4641121,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v4.3.1_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.1/CertBridge_v4.3.1_x86.zip",
+          "size": 4720408,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.3.0",
+      "tagName": "v4.3.0",
+      "publishedAt": "2026-09-22T13:57:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.3.0_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.0/CertBridge_v4.3.0_arm32.zip",
+          "size": 4453627,
+          "downloadCount": 3
+        },
+        {
+          "name": "CertBridge_v4.3.0_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.0/CertBridge_v4.3.0_arm64.zip",
+          "size": 4546458,
+          "downloadCount": 19
+        },
+        {
+          "name": "CertBridge_v4.3.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.0/CertBridge_v4.3.0_lite.zip",
+          "size": 1508703,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.3.0_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.0/CertBridge_v4.3.0_x64.zip",
+          "size": 4637171,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v4.3.0_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.3.0/CertBridge_v4.3.0_x86.zip",
+          "size": 4716458,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.2.2",
+      "tagName": "v4.2.2",
+      "publishedAt": "2026-09-22T05:34:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.2.2_arm32.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.2/CertBridge_v4.2.2_arm32.zip",
+          "size": 4421052,
+          "downloadCount": 2
+        },
+        {
+          "name": "CertBridge_v4.2.2_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.2/CertBridge_v4.2.2_arm64.zip",
+          "size": 4513883,
+          "downloadCount": 10
+        },
+        {
+          "name": "CertBridge_v4.2.2_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.2/CertBridge_v4.2.2_lite.zip",
+          "size": 1476129,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.2.2_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.2/CertBridge_v4.2.2_x64.zip",
+          "size": 4604596,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.2.2_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.2/CertBridge_v4.2.2_x86.zip",
+          "size": 4683883,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.2.1",
+      "tagName": "v4.2.1",
+      "publishedAt": "2026-09-21T16:58:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.2.1_arm.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.1/CertBridge_v4.2.1_arm.zip",
+          "size": 4420895,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.2.1_arm64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.1/CertBridge_v4.2.1_arm64.zip",
+          "size": 4513728,
+          "downloadCount": 3
+        },
+        {
+          "name": "CertBridge_v4.2.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.1/CertBridge_v4.2.1_lite.zip",
+          "size": 1475976,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.2.1_x64.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.1/CertBridge_v4.2.1_x64.zip",
+          "size": 4604441,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.2.1_x86.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.1/CertBridge_v4.2.1_x86.zip",
+          "size": 4683728,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.2.0",
+      "tagName": "v4.2.0",
+      "publishedAt": "2026-09-20T08:25:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.2.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.0/CertBridge_v4.2.0.zip",
+          "size": 7461115,
+          "downloadCount": 33
+        },
+        {
+          "name": "CertBridge_v4.2.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.2.0/CertBridge_v4.2.0_lite.zip",
+          "size": 1467318,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v4.1.2",
+      "tagName": "v4.1.2",
+      "publishedAt": "2026-09-20T02:50:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.1.2.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.2/CertBridge_v4.1.2.zip",
+          "size": 7451434,
+          "downloadCount": 0
+        },
+        {
+          "name": "CertBridge_v4.1.2_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.2/CertBridge_v4.1.2_lite.zip",
+          "size": 1457638,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.1.1",
+      "tagName": "v4.1.1",
+      "publishedAt": "2026-09-19T11:04:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.1.1.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.1/CertBridge_v4.1.1.zip",
+          "size": 7451311,
+          "downloadCount": 13
+        },
+        {
+          "name": "CertBridge_v4.1.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.1/CertBridge_v4.1.1_lite.zip",
+          "size": 1457515,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.1.0",
+      "tagName": "v4.1.0",
+      "publishedAt": "2026-09-19T10:32:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.1.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.0/CertBridge_v4.1.0.zip",
+          "size": 7450865,
+          "downloadCount": 4
+        },
+        {
+          "name": "CertBridge_v4.1.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.1.0/CertBridge_v4.1.0_lite.zip",
+          "size": 1457068,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-09-18T12:06:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v4.0.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.0.0/CertBridge_v4.0.0.zip",
+          "size": 7444838,
+          "downloadCount": 15
+        },
+        {
+          "name": "CertBridge_v4.0.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v4.0.0/CertBridge_v4.0.0_lite.zip",
+          "size": 1451042,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-09-18T06:36:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v3.0.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v3.0.0/CertBridge_v3.0.0.zip",
+          "size": 7437788,
+          "downloadCount": 5
+        },
+        {
+          "name": "CertBridge_v3.0.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v3.0.0/CertBridge_v3.0.0_lite.zip",
+          "size": 1443992,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2026-09-16T08:08:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.3.1.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.3.1/CertBridge_v2.3.1.zip",
+          "size": 7223859,
+          "downloadCount": 23
+        },
+        {
+          "name": "CertBridge_v2.3.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.3.1/CertBridge_v2.3.1_lite.zip",
+          "size": 1230063,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2026-09-15T11:00:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.3.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.3.0/CertBridge_v2.3.0.zip",
+          "size": 7221809,
+          "downloadCount": 20
+        },
+        {
+          "name": "CertBridge_v2.3.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.3.0/CertBridge_v2.3.0_lite.zip",
+          "size": 1228012,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2026-08-11T14:29:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.2.1.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.2.1/CertBridge_v2.2.1.zip",
+          "size": 6965528,
+          "downloadCount": 450
+        },
+        {
+          "name": "CertBridge_v2.2.1_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.2.1/CertBridge_v2.2.1_lite.zip",
+          "size": 1150852,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-08-11T06:22:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.2.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.2.0/CertBridge_v2.2.0.zip",
+          "size": 6964507,
+          "downloadCount": 14
+        },
+        {
+          "name": "CertBridge_v2.2.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.2.0/CertBridge_v2.2.0_lite.zip",
+          "size": 1149830,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-07-25T09:08:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.1.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.1.0/CertBridge_v2.1.0.zip",
+          "size": 6962487,
+          "downloadCount": 230
+        },
+        {
+          "name": "CertBridge_v2.1.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.1.0/CertBridge_v2.1.0_lite.zip",
+          "size": 1147811,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-07-24T06:53:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v2.0.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.0.0/CertBridge_v2.0.0.zip",
+          "size": 6958328,
+          "downloadCount": 26
+        },
+        {
+          "name": "CertBridge_v2.0.0_lite.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v2.0.0/CertBridge_v2.0.0_lite.zip",
+          "size": 1143652,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-07-23T13:50:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v1.2.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.2.0/CertBridge_v1.2.0.zip",
+          "size": 128912,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-07-22T06:33:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v1.1.1.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.1.1/CertBridge_v1.1.1.zip",
+          "size": 117623,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-07-22T04:40:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v1.1.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.1.0/CertBridge_v1.1.0.zip",
+          "size": 116237,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-07-21T07:11:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v1.0.2.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.0.2/CertBridge_v1.0.2.zip",
+          "size": 102691,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-07-21T04:42:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CertBridge_v1.0.1.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.0.1/CertBridge_v1.0.1.zip",
+          "size": 105375,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-07-20T10:36:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CACertStore_v1.0.0.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v1.0.0/CACertStore_v1.0.0.zip",
+          "size": 34611,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

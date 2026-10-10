@@ -1,0 +1,169 @@
+{
+  "readme": "<!-- Fix GitLab YAML -->\n---\n\n[![ShellCheck](https://github.com/readonlynux/bootanimation-module/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/readonlynux/bootanimation-module/actions/workflows/shellcheck.yml)\n\n#  🌌 • Bootanimation Module without OverlayFS\n\nEnglish | [Türkçe](README-tr.md)\n\n---\n\nThis module allows you to modify bootanimation without requiring [meta-overlayfs](https://github.com/KernelSU-Modules-Repo/meta-overlayfs) or [Magisk Magic Mount](https://topjohnwu.github.io/Magisk/details.html)\n\n>[!CAUTION]\n> I am not responsible for bricked devices, dead SD cards, or any damage caused by using this module. Use it at your own risk.\n\n> This module is compatible with [Magisk](https://github.com/topjohnwu/Magisk), [KernelSU](https://github.com/tiann/KernelSU) and [APatch](https://github.com/bmax121/APatch)\n\n### 📙 • This documentation includes;\n- [🌟 • Features](#--features)\n- [📸 • WebUI](#--webui)\n- [📱 • Tested On](#--tested-on)\n- [🖥️📲 • How to install module?](#%EF%B8%8F--how-to-install-module)\n- [🔧📲 • Setup](#--setup)\n- [📱 • Usage](#--usage)\n- [❓ • How does it work](#--how-does-it-work)\n- [🤝 • Credits](#--credits)\n\n\n---\n\n# 🌟 • Features\n\n- Lightweight (Shell-based)\n- No OverlayFS required\n- Supports Magisk\n- Supports KernelSU\n- Supports APatch\n- WebUI (Experimental)\n- Dynamic Partition Determination\n- Simple CLI\n\n---\n\n# 📸 • WebUI\n\n<details markdown='1'><summary>Show WebUI Screenshots</summary>\n\n| Home Page (enabled) | Home Page (disabled) |\n| :---: | :---: |\n| <img src=\"docs/assets/webui_homepage_enabled.png\" width=\"200\" /> | <img src=\"docs/assets/webui_homepage_disabled.png\" width=\"200\" /> |\n\n| Homepage (No custom) | File Picker |\n| :---: | :---: |\n| <img src=\"docs/assets/webui_homepage_nocustom.png\" width=\"200\" /> | <img src=\"docs/assets/webui_filepicker.png\" width=\"200\" /> |\n\n</details>\n\n---\n\n# 📱 • Tested On\n\n| Device | Android Ver | ROM | Module Ver | Supported Root Manager |\n| :---: | :---: | :---: | :---: |:---: |\n| Redmi Note 12 4G | 15 | EvoX 10.6 | v1.2.2-stable | KernelSU v3.3.0 (32601-2)|\n| Redmi Note 12 4G | 16 | LOS 23.2 | v1.2.1-stable | APatch 9a63e0f (112244)|\n| Redmi Note 12 4G | 16 | LOS 23.2 | v1.2.1-stable | Magisk v30.7 (30700)|\n\n[Other device reports](https://github.com/readonlynux/bootanimation-module/issues?q=label%3Aworks)\n\n---\n\n# 🖥️📲 • How to install module?\n\n- Download the latest from [releases](https://github.com/readonlynux/bootanimation-module/releases/latest)\n- Open your Root Manager app\n- Go to *Modules* section\n- Click *Install from storage*\n- Select the module\n- Reboot your device\n\n---\n\n# 🔧📲 • Setup\n\n- Download one Terminal emulator (for example [Termux](https://f-droid.org/en/packages/com.termux/)) \n- And type the `su` command on Terminal Emulator\n-  Accept the superuser request\n\t- If you are using KernelSU, grant superuser permission to the Terminal Emulator\n\n---\n\n# 📱 • Usage\n\n```bash\nbootanim -h\n```\n\n---\n\n# ❓ • How does it work\n\nThe `bootanim` command copies the selected boot animation to `/data/adb/bootanimation`.\n\nOn every reboot, `post-fs-data.sh` runs and bind-mounts `bootanimation.zip`.\n\n---\n\n# 🤝 • Credits\n\nMaterial Icons by Google are used in this project under the Apache License 2.0.\n",
+  "readmeHTML": "<p><!-- Fix GitLab YAML --></p>\n<p>---</p>\n\n<p><a href=\"https://github.com/readonlynux/bootanimation-module/actions/workflows/shellcheck.yml/badge.svg\">![ShellCheck</a>](https://github.com/readonlynux/bootanimation-module/actions/workflows/shellcheck.yml)</p>\n\n<h1> 🌌 • Bootanimation Module without OverlayFS</h1>\n\n<p>English | <a href=\"README-tr.md\">Türkçe</a></p>\n\n<p>---</p>\n\n<p>This module allows you to modify bootanimation without requiring <a href=\"https://github.com/KernelSU-Modules-Repo/meta-overlayfs\">meta-overlayfs</a> or <a href=\"https://topjohnwu.github.io/Magisk/details.html\">Magisk Magic Mount</a></p>\n\n<p>>[!CAUTION]</p>\n<p>> I am not responsible for bricked devices, dead SD cards, or any damage caused by using this module. Use it at your own risk.</p>\n\n<p>> This module is compatible with <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a>, <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a> and <a href=\"https://github.com/bmax121/APatch\">APatch</a></p>\n\n<h3>📙 • This documentation includes;</h3>\n<li>[🌟 • Features](#--features)</li>\n<li>[📸 • WebUI](#--webui)</li>\n<li>[📱 • Tested On](#--tested-on)</li>\n<li>[🖥️📲 • How to install module?](#%EF%B8%8F--how-to-install-module)</li>\n<li>[🔧📲 • Setup](#--setup)</li>\n<li>[📱 • Usage](#--usage)</li>\n<li>[❓ • How does it work](#--how-does-it-work)</li>\n<li>[🤝 • Credits](#--credits)</li>\n\n\n<p>---</p>\n\n<h1>🌟 • Features</h1>\n\n<li>Lightweight (Shell-based)</li>\n<li>No OverlayFS required</li>\n<li>Supports Magisk</li>\n<li>Supports KernelSU</li>\n<li>Supports APatch</li>\n<li>WebUI (Experimental)</li>\n<li>Dynamic Partition Determination</li>\n<li>Simple CLI</li>\n\n<p>---</p>\n\n<h1>📸 • WebUI</h1>\n\n<p><details markdown='1'><summary>Show WebUI Screenshots</summary></p>\n\n<p>| Home Page (enabled) | Home Page (disabled) |</p>\n<p>| :---: | :---: |</p>\n<p>| <img src=\"docs/assets/webui_homepage_enabled.png\" width=\"200\" /> | <img src=\"docs/assets/webui_homepage_disabled.png\" width=\"200\" /> |</p>\n\n<p>| Homepage (No custom) | File Picker |</p>\n<p>| :---: | :---: |</p>\n<p>| <img src=\"docs/assets/webui_homepage_nocustom.png\" width=\"200\" /> | <img src=\"docs/assets/webui_filepicker.png\" width=\"200\" /> |</p>\n\n<p></details></p>\n\n<p>---</p>\n\n<h1>📱 • Tested On</h1>\n\n<p>| Device | Android Ver | ROM | Module Ver | Supported Root Manager |</p>\n<p>| :---: | :---: | :---: | :---: |:---: |</p>\n<p>| Redmi Note 12 4G | 15 | EvoX 10.6 | v1.2.2-stable | KernelSU v3.3.0 (32601-2)|</p>\n<p>| Redmi Note 12 4G | 16 | LOS 23.2 | v1.2.1-stable | APatch 9a63e0f (112244)|</p>\n<p>| Redmi Note 12 4G | 16 | LOS 23.2 | v1.2.1-stable | Magisk v30.7 (30700)|</p>\n\n<p><a href=\"https://github.com/readonlynux/bootanimation-module/issues?q=label%3Aworks\">Other device reports</a></p>\n\n<p>---</p>\n\n<h1>🖥️📲 • How to install module?</h1>\n\n<li>Download the latest from [releases](https://github.com/readonlynux/bootanimation-module/releases/latest)</li>\n<li>Open your Root Manager app</li>\n<li>Go to *Modules* section</li>\n<li>Click *Install from storage*</li>\n<li>Select the module</li>\n<li>Reboot your device</li>\n\n<p>---</p>\n\n<h1>🔧📲 • Setup</h1>\n\n<li>Download one Terminal emulator (for example [Termux](https://f-droid.org/en/packages/com.termux/))</li>\n<li>And type the `su` command on Terminal Emulator</li>\n<li> Accept the superuser request</li>\n<p>\t- If you are using KernelSU, grant superuser permission to the Terminal Emulator</p>\n\n<p>---</p>\n\n<h1>📱 • Usage</h1>\n\n<pre>bootanim -h</pre>\n\n<p>---</p>\n\n<h1>❓ • How does it work</h1>\n\n<p>The <code>bootanim</code> command copies the selected boot animation to <code>/data/adb/bootanimation</code>.</p>\n\n<p>On every reboot, <code>post-fs-data.sh</code> runs and bind-mounts <code>bootanimation.zip</code>.</p>\n\n<p>---</p>\n\n<h1>🤝 • Credits</h1>\n\n<p>Material Icons by Google are used in this project under the Apache License 2.0.</p>",
+  "homepageUrl": "https://github.com/readonlynux/bootanimation-module",
+  "sourceUrl": "https://github.com/readonlynux/bootanimation-module",
+  "url": "https://github.com/readonlynux/bootanimation-module",
+  "latestRelease": {
+    "name": "v1.2.2-stable",
+    "version": "v1.2.2-stable",
+    "time": "2026-09-15T19:41:38Z",
+    "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.2.2-stable/bootanimation-module-v1.2.2-stable.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.2-stable",
+      "tagName": "v1.2.2-stable",
+      "publishedAt": "2026-09-15T19:41:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.2.2-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.2.2-stable/bootanimation-module-v1.2.2-stable.zip",
+          "size": 13952,
+          "downloadCount": 166
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1-stable",
+      "tagName": "v1.2.1-stable",
+      "publishedAt": "2026-08-30T10:24:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.2.1-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.2.1-stable/bootanimation-module-v1.2.1-stable.zip",
+          "size": 14040,
+          "downloadCount": 72
+        }
+      ]
+    },
+    {
+      "name": "v1.2-stable",
+      "tagName": "v1.2-stable",
+      "publishedAt": "2026-08-22T12:23:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.2-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.2-stable/bootanimation-module-v1.2-stable.zip",
+          "size": 14404,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2-stable",
+      "tagName": "v1.1.2-stable",
+      "publishedAt": "2026-08-15T20:32:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.1.2-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.1.2-stable/bootanimation-module-v1.1.2-stable.zip",
+          "size": 13698,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1-stable",
+      "tagName": "v1.1.1-stable",
+      "publishedAt": "2026-07-25T09:47:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.1.1-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.1.1-stable/bootanimation-module-v1.1.1-stable.zip",
+          "size": 13031,
+          "downloadCount": 91
+        }
+      ]
+    },
+    {
+      "name": "v1.1-stable",
+      "tagName": "v1.1-stable",
+      "publishedAt": "2026-07-18T09:59:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.1-stable.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.1-stable/bootanimation-module-v1.1-stable.zip",
+          "size": 12545,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v1.0-stable.1",
+      "tagName": "v1.0-stable.1",
+      "publishedAt": "2026-07-07T09:45:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.0-stable.1.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.0-stable.1/bootanimation-module-v1.0-stable.1.zip",
+          "size": 11259,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "v1.0-alpha",
+      "tagName": "v1.0-alpha",
+      "publishedAt": "2026-07-05T18:25:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v1.0-alpha.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.0-alpha/bootanimation-module-v1.0-alpha.zip",
+          "size": 9678,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.3-alpha",
+      "tagName": "v0.3-alpha",
+      "publishedAt": "2026-06-17T16:53:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-module-v0.3-alpha.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v0.3-alpha/bootanimation-module-v0.3-alpha.zip",
+          "size": 5904,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v0.2-alpha",
+      "tagName": "v0.2-alpha",
+      "publishedAt": "2026-05-29T14:12:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-without-overlayfs-v0.2-alpha.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v0.2-alpha/bootanimation-without-overlayfs-v0.2-alpha.zip",
+          "size": 8779,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v0.1-alpha",
+      "tagName": "v0.1-alpha",
+      "publishedAt": "2026-05-29T12:55:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bootanimation-without-overlayfs-v0.1-alpha.zip",
+          "downloadUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v0.1-alpha/bootanimation-without-overlayfs-v0.1-alpha.zip",
+          "size": 8746,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

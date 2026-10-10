@@ -1,0 +1,239 @@
+{
+  "readme": "# ⚡ Zygisk-Loader\n\n![Language](https://img.shields.io/badge/Language-C-blue)\n![API](https://img.shields.io/badge/Zygisk-API%20v5-green)\n[![Channel](https://img.shields.io/badge/Follow-Telegram-blue.svg?logo=telegram)](https://t.me/UnixPhoriaD)\n\n**Zygisk-Loader** is a stealthy, ultra-lightweight Zygisk module written in **Pure C**. It acts as a universal bridge that dynamically injects external shared libraries (`.so`) into specific Android application processes.\n\nRewritten from Rust to C, this module now boasts an incredibly small footprint (**< 20KB**) with zero runtime dependencies. Unlike traditional modules that require rebuilding and rebooting, **Zygisk-Loader** enables a **\"Hot-Swap\" workflow**. You can recompile your instrumentation library, push it to the device, and simply restart the target app to apply changes instantly.\n\n## Key Features\n\n*   **Hot-Swap Capable**: Update your payload (`.so`) and deploy instantly by just restarting the target app. No device reboot required.\n*   **Ultra-Lightweight**: Built with **Pure C** and standard Android NDK libraries. The module binary is microscopic (<20KB), ensuring minimal memory usage and maximum performance.\n*   **Multi-App Support**: JSON-based configuration allows targeting multiple apps with different payloads simultaneously.\n*   **Robust Injection**: Uses **memfd-based RAM injection** via `memfd_create` + `android_dlopen_ext`. The payload is loaded directly from anonymous memory into the target process — no disk writes at any point. This approach works across all Android 10+ SELinux domains including `untrusted_app`.\n*   **Stealthy (Zero-Forensic-Trace)**: The payload is written into an anonymous memory file (`memfd`), loaded directly from the file descriptor, and the memfd is closed. No file is ever written to disk — even temporarily. Zero forensic trace for file scanners.\n*   **Zygisk API v5**: Utilizes the latest Zygisk API for maximum compatibility with Magisk, KernelSU, and APatch.\n*   **Config-Driven**: Simple JSON-based configuration. No hardcoded package names.\n*   **Zero Dependencies**: Native lightweight JSON parser with no external library dependencies.\n\n## Architecture\n\nZygisk-Loader separates the **Injector** (The Module) from the **Payload** (Your Logic). It bridges the permission gap between the Zygote process (Root) and the App process (Untrusted).\n\n```mermaid\nflowchart TD\n    subgraph Storage [\" /data/adb/modules/zygisk-loader/config/ \"]\n        Config[(\"target.json\")]\n        PayloadBin[(\"payload_*.so\")]\n    end\n\n    subgraph Zygote [\" Zygote Process (Root) \"]\n        Step1[Parse JSON Config]\n        Step2[Match App Package]\n        Step3[Buffer Payload to RAM]\n    end\n\n    subgraph App [\" Target App Process (User UID) \"]\n        Fork((Fork))\n        Step4[memfd_create anonymous mem]\n        Step5[Write Payload to memfd]\n        Step6[android_dlopen_ext with ANDROID_DLEXT_USE_LIBRARY_FD]\n        Step7[\"close(memfd)\"]\n        Logic[Payload Active]\n    end\n\n    Config --> Step1\n    Step1 --> Step2\n    Step2 --> PayloadBin\n    PayloadBin --> Step3\n    Step3 --> Fork\n    Fork --> Step4\n    Step4 --> Step5\n    Step5 --> Step6\n    Step6 --> Logic\n    Step6 -.-> Step7\n```\n\n## Directory Structure\n\nAfter installation, the module creates a configuration directory:\n\n```text\n/data/adb/modules/zygisk-loader/\n├── module.prop\n├── zygisk/\n│   └── ...\n└── config/              <-- WORKSPACE\n    ├── target.json      (JSON configuration with app-package to payload mapping)\n    └── payload_*.so     (Your compiled libraries for each target)\n```\n\n## Usage\n\n### 1. Installation\n1. Download the latest release `.zip`.\n2. Flash via Magisk / KernelSU / APatch.\n3. Reboot device.\n\n### 2. Configuration (Multi-App Support)\n\nCreate or edit the JSON configuration file at `/data/adb/modules/zygisk-loader/config/target.json`:\n\n```bash\n# Create the config file with multiple app targets\ncat > /data/adb/modules/zygisk-loader/config/target.json << 'EOF'\n[\n  {\n    \"app\": \"com.instagram\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_ssl.so\"\n  },\n  {\n    \"app\": \"com.facebook\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_custom.so\"\n  },\n  {\n    \"app\": \"com.threads\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_research.so\"\n  }\n]\nEOF\n```\n\n**Features:**\n- **Multiple Targets**: Each app can have its own dedicated payload\n- **Sub-Process Coverage**: Base package name matching automatically handles processes like `com.app:remote` or `com.app:bg`\n- **Flexible Formatting**: JSON parser is whitespace-tolerant\n\n### 3. Deploy Payloads\n\nCopy your compiled libraries to the config folder:\n\n```bash\n# Copy payload libraries for each target\ncp libpayload_ssl.so /data/adb/modules/zygisk-loader/config/payload_ssl.so\ncp libpayload_custom.so /data/adb/modules/zygisk-loader/config/payload_custom.so\n\n# Set permissions (Important for Zygote to read them)\nchmod 644 /data/adb/modules/zygisk-loader/config/*.so\n```\n\n### 4. Apply (Hot-Swap)\n\nForce stop the target application. The next time it launches, the loader will inject the corresponding payload:\n\n```bash\nam force-stop com.instagram\nam force-stop com.facebook\n```\n\n## Developing a Payload\n\nYour payload does not need to know about Zygisk. It acts as a standard shared library. You can write your payload in **C, C++, or Rust**.\n\n### Option A: Using C/C++ (Constructor Attribute)\n\n```c\n#include <android/log.h>\n#include <unistd.h>\n\n// Choose a descriptive tag for your payload's log messages\n#define LOG_TAG \"ExamplePayload\"\n#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)\n\n// This function runs automatically when dlopen() is called\n__attribute__((constructor))\nvoid init() {\n    LOGI(\"Hello from inside the target application!\");\n    LOGI(\"I have been loaded and my file on disk is likely already gone.\");\n\n    // Your hooking logic (e.g., Dobby, And64InlineHook) goes here\n}\n```\n\n### Option B: Using Rust (ctor crate)\n\n`Cargo.toml`:\n```toml\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nctor = \"0.2\"\nandroid_logger = \"0.13\"\nlog = \"0.4\"\n```\n\n`src/lib.rs`:\n```rust\nuse ctor::ctor;\nuse log::LevelFilter;\nuse android_logger::Config;\n\n#[ctor]\nfn init() {\n    android_logger::init_once(\n        Config::default().with_max_level(LevelFilter::Info).with_tag(\"ExamplePayload\")\n    );\n\n    // logic hooking start here\n    log::info!(\"Hello from inside the target application!\");\n}\n```\n\n## Technical Constraints\n\n*   **SELinux Compatibility**: This module uses RAM-only injection via `memfd_create` + `android_dlopen_ext`. The payload is never written to disk, leaving no forensic trace. This approach works across all Android versions (10+) and SELinux domains including `untrusted_app`, as memfd pages have a dedicated SELinux context that permits executable mappings (per mo-jit project research).\n*   **Isolated Processes**: The loader automatically handles isolated processes (e.g., `:remote` services) by intelligently resolving the correct data directory path.\n\n## Disclaimer\n\nThis tool is for **educational purposes and security research only**. The author is not responsible for any misuse of this software.\n\n## License\n\nThis project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.\n",
+  "readmeHTML": "<h1>⚡ Zygisk-Loader</h1>\n\n<p>!<a href=\"https://img.shields.io/badge/Language-C-blue\">Language</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Zygisk-API%20v5-green\">API</a></p>\n<p><a href=\"https://img.shields.io/badge/Follow-Telegram-blue.svg?logo=telegram\">![Channel</a>](https://t.me/UnixPhoriaD)</p>\n\n<p><b>Zygisk-Loader</b> is a stealthy, ultra-lightweight Zygisk module written in <b>Pure C</b>. It acts as a universal bridge that dynamically injects external shared libraries (<code>.so</code>) into specific Android application processes.</p>\n\n<p>Rewritten from Rust to C, this module now boasts an incredibly small footprint (<b>< 20KB</b>) with zero runtime dependencies. Unlike traditional modules that require rebuilding and rebooting, <b>Zygisk-Loader</b> enables a <b>\"Hot-Swap\" workflow</b>. You can recompile your instrumentation library, push it to the device, and simply restart the target app to apply changes instantly.</p>\n\n<h2>Key Features</h2>\n\n<li>  **Hot-Swap Capable**: Update your payload (`.so`) and deploy instantly by just restarting the target app. No device reboot required.</li>\n<li>  **Ultra-Lightweight**: Built with **Pure C** and standard Android NDK libraries. The module binary is microscopic (<20KB), ensuring minimal memory usage and maximum performance.</li>\n<li>  **Multi-App Support**: JSON-based configuration allows targeting multiple apps with different payloads simultaneously.</li>\n<li>  **Robust Injection**: Uses **memfd-based RAM injection** via `memfd_create` + `android_dlopen_ext`. The payload is loaded directly from anonymous memory into the target process — no disk writes at any point. This approach works across all Android 10+ SELinux domains including `untrusted_app`.</li>\n<li>  **Stealthy (Zero-Forensic-Trace)**: The payload is written into an anonymous memory file (`memfd`), loaded directly from the file descriptor, and the memfd is closed. No file is ever written to disk — even temporarily. Zero forensic trace for file scanners.</li>\n<li>  **Zygisk API v5**: Utilizes the latest Zygisk API for maximum compatibility with Magisk, KernelSU, and APatch.</li>\n<li>  **Config-Driven**: Simple JSON-based configuration. No hardcoded package names.</li>\n<li>  **Zero Dependencies**: Native lightweight JSON parser with no external library dependencies.</li>\n\n<h2>Architecture</h2>\n\n<p>Zygisk-Loader separates the <b>Injector</b> (The Module) from the <b>Payload</b> (Your Logic). It bridges the permission gap between the Zygote process (Root) and the App process (Untrusted).</p>\n\n<pre>flowchart TD\n    subgraph Storage [\" /data/adb/modules/zygisk-loader/config/ \"]\n        Config[(\"target.json\")]\n        PayloadBin[(\"payload_*.so\")]\n    end\n\n    subgraph Zygote [\" Zygote Process (Root) \"]\n        Step1[Parse JSON Config]\n        Step2[Match App Package]\n        Step3[Buffer Payload to RAM]\n    end\n\n    subgraph App [\" Target App Process (User UID) \"]\n        Fork((Fork))\n        Step4[memfd_create anonymous mem]\n        Step5[Write Payload to memfd]\n        Step6[android_dlopen_ext with ANDROID_DLEXT_USE_LIBRARY_FD]\n        Step7[\"close(memfd)\"]\n        Logic[Payload Active]\n    end\n\n    Config --&gt; Step1\n    Step1 --&gt; Step2\n    Step2 --&gt; PayloadBin\n    PayloadBin --&gt; Step3\n    Step3 --&gt; Fork\n    Fork --&gt; Step4\n    Step4 --&gt; Step5\n    Step5 --&gt; Step6\n    Step6 --&gt; Logic\n    Step6 -.-&gt; Step7</pre>\n\n<h2>Directory Structure</h2>\n\n<p>After installation, the module creates a configuration directory:</p>\n\n<pre>/data/adb/modules/zygisk-loader/\n├── module.prop\n├── zygisk/\n│   └── ...\n└── config/              &lt;-- WORKSPACE\n    ├── target.json      (JSON configuration with app-package to payload mapping)\n    └── payload_*.so     (Your compiled libraries for each target)</pre>\n\n<h2>Usage</h2>\n\n<h3>1. Installation</h3>\n<li>Download the latest release `.zip`.</li>\n<li>Flash via Magisk / KernelSU / APatch.</li>\n<li>Reboot device.</li>\n\n<h3>2. Configuration (Multi-App Support)</h3>\n\n<p>Create or edit the JSON configuration file at <code>/data/adb/modules/zygisk-loader/config/target.json</code>:</p>\n\n<pre># Create the config file with multiple app targets\ncat &gt; /data/adb/modules/zygisk-loader/config/target.json &lt;&lt; 'EOF'\n[\n  {\n    \"app\": \"com.instagram\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_ssl.so\"\n  },\n  {\n    \"app\": \"com.facebook\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_custom.so\"\n  },\n  {\n    \"app\": \"com.threads\",\n    \"lib\": \"/data/adb/modules/zygisk-loader/config/payload_research.so\"\n  }\n]\nEOF</pre>\n\n<p><b>Features:</b></p>\n<li>**Multiple Targets**: Each app can have its own dedicated payload</li>\n<li>**Sub-Process Coverage**: Base package name matching automatically handles processes like `com.app:remote` or `com.app:bg`</li>\n<li>**Flexible Formatting**: JSON parser is whitespace-tolerant</li>\n\n<h3>3. Deploy Payloads</h3>\n\n<p>Copy your compiled libraries to the config folder:</p>\n\n<pre># Copy payload libraries for each target\ncp libpayload_ssl.so /data/adb/modules/zygisk-loader/config/payload_ssl.so\ncp libpayload_custom.so /data/adb/modules/zygisk-loader/config/payload_custom.so\n\n# Set permissions (Important for Zygote to read them)\nchmod 644 /data/adb/modules/zygisk-loader/config/*.so</pre>\n\n<h3>4. Apply (Hot-Swap)</h3>\n\n<p>Force stop the target application. The next time it launches, the loader will inject the corresponding payload:</p>\n\n<pre>am force-stop com.instagram\nam force-stop com.facebook</pre>\n\n<h2>Developing a Payload</h2>\n\n<p>Your payload does not need to know about Zygisk. It acts as a standard shared library. You can write your payload in <b>C, C++, or Rust</b>.</p>\n\n<h3>Option A: Using C/C++ (Constructor Attribute)</h3>\n\n<pre>#include &lt;android/log.h&gt;\n#include &lt;unistd.h&gt;\n\n// Choose a descriptive tag for your payload's log messages\n#define LOG_TAG \"ExamplePayload\"\n#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)\n\n// This function runs automatically when dlopen() is called\n__attribute__((constructor))\nvoid init() {\n    LOGI(\"Hello from inside the target application!\");\n    LOGI(\"I have been loaded and my file on disk is likely already gone.\");\n\n    // Your hooking logic (e.g., Dobby, And64InlineHook) goes here\n}</pre>\n\n<h3>Option B: Using Rust (ctor crate)</h3>\n\n<p><code>Cargo.toml</code>:</p>\n<pre>[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nctor = \"0.2\"\nandroid_logger = \"0.13\"\nlog = \"0.4\"</pre>\n\n<p><code>src/lib.rs</code>:</p>\n<pre>use ctor::ctor;\nuse log::LevelFilter;\nuse android_logger::Config;\n\n#[ctor]\nfn init() {\n    android_logger::init_once(\n        Config::default().with_max_level(LevelFilter::Info).with_tag(\"ExamplePayload\")\n    );\n\n    // logic hooking start here\n    log::info!(\"Hello from inside the target application!\");\n}</pre>\n\n<h2>Technical Constraints</h2>\n\n<li>  **SELinux Compatibility**: This module uses RAM-only injection via `memfd_create` + `android_dlopen_ext`. The payload is never written to disk, leaving no forensic trace. This approach works across all Android versions (10+) and SELinux domains including `untrusted_app`, as memfd pages have a dedicated SELinux context that permits executable mappings (per mo-jit project research).</li>\n<li>  **Isolated Processes**: The loader automatically handles isolated processes (e.g., `:remote` services) by intelligently resolving the correct data directory path.</li>\n\n<h2>Disclaimer</h2>\n\n<p>This tool is for <b>educational purposes and security research only</b>. The author is not responsible for any misuse of this software.</p>\n\n<h2>License</h2>\n\n<p>This project is licensed under the MIT License - see the <a href=\"LICENSE\">LICENSE</a> file for details.</p>",
+  "homepageUrl": "https://github.com/HanSoBored/Zygisk-Loader",
+  "sourceUrl": "https://github.com/HanSoBored/Zygisk-Loader",
+  "url": "https://github.com/HanSoBored/Zygisk-Loader",
+  "latestRelease": {
+    "name": "v2.0.2",
+    "version": "v2.0.2",
+    "time": "2026-08-16T06:01:45Z",
+    "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v2.0.2/zygisk-loader-v2.0.2-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.0.2",
+      "tagName": "v2.0.2",
+      "publishedAt": "2026-08-16T06:01:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v2.0.2-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v2.0.2/zygisk-loader-v2.0.2-release.zip",
+          "size": 35540,
+          "downloadCount": 589
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2026-06-06T14:58:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v2.0.1-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v2.0.1/zygisk-loader-v2.0.1-release.zip",
+          "size": 35626,
+          "downloadCount": 442
+        }
+      ]
+    },
+    {
+      "name": "v1.1.3",
+      "tagName": "v1.1.3",
+      "publishedAt": "2026-04-18T13:47:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v1.1.3-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v1.1.3/zygisk-loader-v1.1.3-release.zip",
+          "size": 25732,
+          "downloadCount": 174
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2026-04-18T13:12:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v1.1.2-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v1.1.2/zygisk-loader-v1.1.2-release.zip",
+          "size": 25725,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-03-19T14:16:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v1.1.0-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v1.1.0/zygisk-loader-v1.1.0-release.zip",
+          "size": 25724,
+          "downloadCount": 117
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-02-21T16:27:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v1.0.0-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v1.0.0/zygisk-loader-v1.0.0-release.zip",
+          "size": 23521,
+          "downloadCount": 107
+        }
+      ]
+    },
+    {
+      "name": "v0.3.3",
+      "tagName": "v0.3.3",
+      "publishedAt": "2026-02-17T15:48:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.3.3-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.3.3/zygisk-loader-v0.3.3-release.zip",
+          "size": 4327788,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v0.3.2",
+      "tagName": "v0.3.2",
+      "publishedAt": "2026-02-17T02:12:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.3.2-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.3.2/zygisk-loader-v0.3.2-release.zip",
+          "size": 5730494,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v0.3.1",
+      "tagName": "v0.3.1",
+      "publishedAt": "2025-12-26T09:55:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.3.1-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.3.1/zygisk-loader-v0.3.1-release.zip",
+          "size": 4898218,
+          "downloadCount": 128
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2025-12-26T05:19:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.3.0-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.3.0/zygisk-loader-v0.3.0-release.zip",
+          "size": 4898691,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v0.2.3",
+      "tagName": "v0.2.3",
+      "publishedAt": "2025-12-25T16:15:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.2.3-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.2.3/zygisk-loader-v0.2.3-release.zip",
+          "size": 4886993,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v0.2.2",
+      "tagName": "v0.2.2",
+      "publishedAt": "2025-12-25T12:39:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.2.2-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.2.2/zygisk-loader-v0.2.2-release.zip",
+          "size": 4880129,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v0.2.1",
+      "tagName": "v0.2.1",
+      "publishedAt": "2025-12-25T08:28:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.2.1-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.2.1/zygisk-loader-v0.2.1-release.zip",
+          "size": 4872900,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2025-12-23T14:45:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.2.0-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.2.0/zygisk-loader-v0.2.0-release.zip",
+          "size": 4914169,
+          "downloadCount": 31
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2025-12-23T06:57:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.1.1-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.1.1/zygisk-loader-v0.1.1-release.zip",
+          "size": 4901592,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2025-12-22T16:45:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-loader-v0.1.0-release.zip",
+          "downloadUrl": "https://github.com/HanSoBored/Zygisk-Loader/releases/download/v0.1.0/zygisk-loader-v0.1.0-release.zip",
+          "size": 4896372,
+          "downloadCount": 10
+        }
+      ]
+    }
+  ]
+}

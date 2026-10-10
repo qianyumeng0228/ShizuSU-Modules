@@ -1,0 +1,29 @@
+{
+  "readme": "# dex2oat 全核解锁 (unlock_core_for_dex2oat)\n\n让 MIUI / HyperOS 全核跑 dex2oat(KernelSU / Magisk 模块)。\n\n## 作用\n\nMIUI 的 ART 守护进程 `artd` 决定 dex2oat 能占哪些 CPU 核心时,**只在属性为空时**回退到编译进二进制的硬编码列表:\n\n```\n0,1,2,3      (以及 0,1,4,5)\n```\n\n也就是说：MIUI 里 dexopt 默认只有前 4 个核干活(一个大核集群 + 一个小核集群),剩下半个 8 核 SoC 全程围观。\n\n本模块做的事很朴素——开机时把这几个属性**主动填满**:\n\n```\ndalvik.vm.dex2oat-cpu-set            = 0,1,2,3,4,5,6,7\ndalvik.vm.boot-dex2oat-cpu-set       = 0,1,2,3,4,5,6,7\ndalvik.vm.background-dex2oat-cpu-set = 0,1,2,3,4,5,6,7\ndalvik.vm.restore-dex2oat-cpu-set    = 0,1,2,3,4,5,6,7\ndalvik.vm.default-dex2oat-cpu-set    = 0,1,2,3,4,5,6,7\n```\n\n`artd` 读到非空,就把 `--cpu-set=0,1,...,7` 原样透传给 dex2oat。\n\n## 性能\n\n- 仅在开机时运行一次，无任何占用。\n- 会加速开机状态下系统的dex2oat编译，比如手机放着熄屏充电的时候，它会全速编译，实测在Redmi k60上速度大约提升了100%。本模块适合长期不重启的手机，或者经常安装软件的手机。\n\n\n## 兼容性\n\n- **ROM**:超 MIUI/HyperOS 对症;AOSP/GSI 属性名本就存在,设了无害(纯惰性);其他魔改 ROM 至多无效果,不炸。\n- **ART 版本**:属性名从 Android N 沿用至今(早期 dex2oat 直接读,14+ 由 artd 读),跨版本稳定;未来改名则静默失效,无副作用。\n- **核心数**:脚本用 `nproc` 动态生成 `0..n-1`,不写死 8;`system.prop` 里的 `0-7` 只是 init 阶段瞬时备案,开机即被覆盖。",
+  "readmeHTML": "<h1>dex2oat 全核解锁 (unlock_core_for_dex2oat)</h1>\n\n<p>让 MIUI / HyperOS 全核跑 dex2oat(KernelSU / Magisk 模块)。</p>\n\n<h2>作用</h2>\n\n<p>MIUI 的 ART 守护进程 <code>artd</code> 决定 dex2oat 能占哪些 CPU 核心时,<b>只在属性为空时</b>回退到编译进二进制的硬编码列表:</p>\n\n<pre>0,1,2,3      (以及 0,1,4,5)</pre>\n\n<p>也就是说：MIUI 里 dexopt 默认只有前 4 个核干活(一个大核集群 + 一个小核集群),剩下半个 8 核 SoC 全程围观。</p>\n\n<p>本模块做的事很朴素——开机时把这几个属性<b>主动填满</b>:</p>\n\n<pre>dalvik.vm.dex2oat-cpu-set            = 0,1,2,3,4,5,6,7\ndalvik.vm.boot-dex2oat-cpu-set       = 0,1,2,3,4,5,6,7\ndalvik.vm.background-dex2oat-cpu-set = 0,1,2,3,4,5,6,7\ndalvik.vm.restore-dex2oat-cpu-set    = 0,1,2,3,4,5,6,7\ndalvik.vm.default-dex2oat-cpu-set    = 0,1,2,3,4,5,6,7</pre>\n\n<p><code>artd</code> 读到非空,就把 <code>--cpu-set=0,1,...,7</code> 原样透传给 dex2oat。</p>\n\n<h2>性能</h2>\n\n<li>仅在开机时运行一次，无任何占用。</li>\n<li>会加速开机状态下系统的dex2oat编译，比如手机放着熄屏充电的时候，它会全速编译，实测在Redmi k60上速度大约提升了100%。本模块适合长期不重启的手机，或者经常安装软件的手机。</li>\n\n\n<h2>兼容性</h2>\n\n<li>**ROM**:超 MIUI/HyperOS 对症;AOSP/GSI 属性名本就存在,设了无害(纯惰性);其他魔改 ROM 至多无效果,不炸。</li>\n<li>**ART 版本**:属性名从 Android N 沿用至今(早期 dex2oat 直接读,14+ 由 artd 读),跨版本稳定;未来改名则静默失效,无副作用。</li>\n<li>**核心数**:脚本用 `nproc` 动态生成 `0..n-1`,不写死 8;`system.prop` 里的 `0-7` 只是 init 阶段瞬时备案,开机即被覆盖。</li>",
+  "homepageUrl": "https://github.com/fnyoat/unlock_core_for_dex2oat",
+  "sourceUrl": "https://github.com/fnyoat/unlock_core_for_dex2oat",
+  "url": "https://github.com/fnyoat/unlock_core_for_dex2oat",
+  "latestRelease": {
+    "name": "v1.0",
+    "version": "v1.0",
+    "time": "2026-09-18T11:11:08Z",
+    "downloadUrl": "https://github.com/fnyoat/unlock_core_for_dex2oat/releases/download/v1.0/unlock_core_for_dex2oat-v1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-09-18T11:11:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock_core_for_dex2oat-v1.0.zip",
+          "downloadUrl": "https://github.com/fnyoat/unlock_core_for_dex2oat/releases/download/v1.0/unlock_core_for_dex2oat-v1.0.zip",
+          "size": 4019,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

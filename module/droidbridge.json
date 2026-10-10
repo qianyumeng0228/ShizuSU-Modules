@@ -1,0 +1,555 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\".github/assets/icon.png\" alt=\"DroidBridge icon\" width=\"120\">\n</p>\n\n<h1 align=\"center\">DroidBridge</h1>\n\n<p align=\"center\">\n  <b>An on-device MCP server for Android.</b><br>\n  Let ChatGPT and local AI agents actually operate your phone — no PC, no ADB.\n</p>\n\n<p align=\"center\">\n  <a href=\"LICENSE\"><img alt=\"License: Apache-2.0\" src=\"https://img.shields.io/badge/license-Apache--2.0-blue\"></a>\n  <img alt=\"Android 13–17\" src=\"https://img.shields.io/badge/Android-13%E2%80%9317-3DDC84\">\n  <img alt=\"arm64-v8a\" src=\"https://img.shields.io/badge/ABI-arm64--v8a-lightgrey\">\n  <img alt=\"MCP 2026-07-28\" src=\"https://img.shields.io/badge/MCP-2026--07--28-8A2BE2\">\n  <a href=\"https://github.com/zephyr7030/DroidBridge/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/zephyr7030/DroidBridge\"></a>\n  <a href=\"https://github.com/zephyr7030/DroidBridge/releases\"><img alt=\"Downloads\" src=\"https://img.shields.io/github/downloads/zephyr7030/DroidBridge/total?label=downloads\"></a>\n  <a href=\"https://t.me/anDroidBridge\"><img alt=\"Telegram group\" src=\"https://img.shields.io/badge/Telegram-group-26A5E4?logo=telegram&logoColor=white\"></a>\n  <a href=\"https://ko-fi.com/zephyr7030\"><img alt=\"Support on Ko-fi\" src=\"https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white\"></a>\n</p>\n\n<p align=\"center\">\n  <b>English</b> · <a href=\"README.zh-CN.md\">简体中文</a>\n</p>\n\n<p align=\"center\">\n  <img src=\".github/assets/preview-en.png\" alt=\"DroidBridge: AI that actually uses your phone\" width=\"560\">\n</p>\n\n## What it is\n\nDroidBridge runs a [Model Context Protocol](https://modelcontextprotocol.io) server **inside your phone**.\nAn AI agent connected to it can see the screen, tap and type, manage files, run commands, use the\nclipboard and notifications, diagnose the network and schedule automations — with exactly the\npermissions you granted on the device, and nothing more.\n\nTwo ways to connect, side by side:\n\n| Connection | For | How it reaches the phone |\n|---|---|---|\n| **ChatGPT** | ChatGPT on the web (developer mode) | OpenAI's Secure MCP Tunnel. The phone polls OpenAI over HTTPS; no port is opened and no public address is needed. |\n| **Local MCP** | Agents on the same device, or on a computer over `adb forward` | Streamable HTTP on `127.0.0.1:8765/mcp` (root edition: port 8766) with a bearer token. |\n\n## What an agent can do\n\n| Tool | What it covers |\n|---|---|\n| `context` | DroidBridge status, capabilities and the tool catalog |\n| `visual` | Observe the screen (image and UI hierarchy), tap, long-press, swipe, type text, press keys and key combinations |\n| `android` | Inspect packages, launch apps and intents, clipboard, notifications |\n| `filesystem` | Inspect, read, write, edit, move, delete, archive (ZIP) and download files |\n| `command` | Run shell commands as the app or shell (Shizuku) identity, or as root in the root edition |\n| `network` | Diagnose DNS, TCP and TLS; capture and inject traffic (root edition) |\n| `automation` | Create, update, enable and delete automations that run on a schedule |\n| `task_control` | List, inspect and cancel background tasks |\n\nEvery tool carries MCP safety annotations (`readOnlyHint`, `destructiveHint`, `openWorldHint`), so\nclients such as ChatGPT ask you to confirm actions that change things.\n\n## Choose your edition\n\nDroidBridge comes in two editions:\n\n- **DroidBridge** is an app that runs everything itself. It works on an ordinary phone and gains\n  the shell identity when [Shizuku](https://shizuku.rikka.app/) is running.\n- **The root edition** is a root module. Its backend runs as root on its own, starts at boot and\n  keeps running whatever happens to any app. It installs the **DroidBridge Root** app, which shows\n  the backend's state and settings but runs nothing itself.\n\nBoth editions can run on one phone: DroidBridge serves local MCP on port 8765 and the root edition\non port 8766.\n\n| | DroidBridge | DroidBridge + Shizuku | Root edition (Magisk / KernelSU / APatch) |\n|---|---|---|---|\n| Screen observe / tap / type | Accessibility service | Observe/tap; typing uses Accessibility | ✓ |\n| Screen capture | Screen-capture consent | ✓ | ✓ |\n| Notifications | Notification access | Notification access | ✓ |\n| Shell commands | App identity | App and shell identity | Root identity |\n| Network capture / injection | — | — | ✓ |\n| Stays alive in the background | Battery and autostart settings | Kept alive until the next reboot | Runs on its own, restored after reboot |\n\nIn DroidBridge, the **Execution & access** page walks you through each switch with a button that\nopens the right system page, and tells you when something is already covered by Shizuku.\n\n## Requirements\n\n- Android 13 to 17 on an **arm64-v8a** device.\n- For ChatGPT: a plan with web developer mode (Plus or higher), a Secure MCP Tunnel and a Runtime\n  API key from the OpenAI platform.\n- Optional: [Shizuku](https://shizuku.rikka.app/), [Magisk](https://github.com/topjohnwu/Magisk),\n  [KernelSU](https://github.com/tiann/KernelSU) or [APatch](https://github.com/bmax121/APatch) for\n  the root edition.\n\n## Install\n\n**DroidBridge**\n\n1. Download `droidbridge-<version>-arm64-v8a.apk` from the\n   [latest release](https://github.com/zephyr7030/DroidBridge/releases/latest) (tag `apk-v<version>`)\n   and install it.\n2. Open DroidBridge. The first-run guide asks which agent you use and walks through permissions.\n\nThe release ships a `SHA256SUMS.txt` and a signed `release.json`; the app's **Updates** page uses\nthe signature to verify its own updates.\n\n**Root edition**\n\n1. Download `droidbridge-magisk-<version>.zip` from the newest\n   [`magisk-v` release](https://github.com/zephyr7030/DroidBridge/releases?q=magisk-v&expanded=true).\n2. Install it in Magisk, KernelSU or APatch. Installing it also installs the DroidBridge Root app.\n3. Reboot, then open DroidBridge Root.\n\nModule updates are offered by your root manager.\n\n## Connect ChatGPT\n\n1. On [platform.openai.com](https://platform.openai.com/settings/organization/tunnels) create a\n   Secure MCP Tunnel, and an [API key](https://platform.openai.com/api-keys) allowed to use it.\n2. In DroidBridge open **Agent connection → ChatGPT connection**, paste the Tunnel ID and the key,\n   and turn the tunnel on. The key is never shown again: DroidBridge encrypts it with the Android\n   Keystore, and the root edition keeps it readable by root only.\n3. On a computer browser, turn on **Developer mode** in [ChatGPT security settings](https://chatgpt.com/settings/security)\n   (it is still rolling out to Plus accounts). Then on [ChatGPT plugins](https://chatgpt.com/plugins)\n   tap **Add → Create MCP app**, connect it through your tunnel with Authentication set to **None**.\n   The app page has links to both.\n4. Ask ChatGPT to use DroidBridge. The first call shows up in the app.\n\n## Connect a local agent\n\n1. In the app open **Agent connection → Local MCP**, turn it on and copy the token.\n2. Point your MCP client at `http://127.0.0.1:8765/mcp` (root edition: `8766`) with\n   `Authorization: Bearer <token>`.\n   From a computer, forward the port first:\n\n   ```bash\n   adb forward tcp:8765 tcp:8765\n   ```\n\n## Screenshots\n\n| Home | Execution & access | Agent connection | Settings |\n|---|---|---|---|\n| <img src=\".github/assets/screenshots/en/home.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/capabilities.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/agents.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/settings.png\" width=\"200\"> |\n\n## Security and privacy\n\n- Everything runs on the phone. DroidBridge has no server of its own and sends no telemetry.\n- An agent gets **exactly** the access you granted on the device; there is no extra remote\n  permission layer to misconfigure. Only connect agents you trust with that access.\n- The ChatGPT tunnel speaks only to `api.openai.com` over TLS with a pinned WebPKI root store.\n- The local MCP endpoint listens on loopback only and requires its bearer token.\n- Text that the system `input` command cannot type (for example Chinese or emoji) is pasted\n  through the clipboard: the clip is marked sensitive and your previous clipboard is restored.\n\nPlease report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).\n\n## Build from source\n\nThe build is pinned and currently scripted for Windows with PowerShell 7:\n\n- JDK 17, Android SDK platform 37, Build Tools 36.0.0, NDK 29.0.14206865, CMake 3.31.6\n- Rust 1.98.0 (`rust/rust-toolchain.toml`) and `cargo-ndk` 4.1.2\n- libpcap 1.10.6 for the root network tools: `pwsh tools/build-libpcap.ps1`\n\n```bash\n./gradlew :standalone:assembleDebug :root-frontend:assembleDebugMagiskModule\n```\n\n`pwsh tools/check-toolchain.ps1` verifies the toolchain. See [CONTRIBUTING.md](CONTRIBUTING.md).\n\n## Community\n\nQuestions, device reports and release news: join the [Telegram group](https://t.me/anDroidBridge).\nBugs are best filed as [GitHub issues](https://github.com/zephyr7030/DroidBridge/issues).\n\n## Support the project\n\nDroidBridge is built and maintained in spare time. If it is useful to you, you can support it on\n[Ko-fi](https://ko-fi.com/zephyr7030). Bug reports and device reports help just as much.\n\n## License\n\nDroidBridge is licensed under the [Apache License 2.0](LICENSE). Third-party components and their\nlicenses are listed in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).\n\nDroidBridge is an independent project and is not affiliated with or endorsed by OpenAI, Anthropic,\nGoogle, Magisk or Shizuku. Product names are trademarks of their respective owners.\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\".github/assets/icon.png\" alt=\"DroidBridge icon\" width=\"120\"></p>\n<p></p></p>\n\n<p><h1 align=\"center\">DroidBridge</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <b>An on-device MCP server for Android.</b><br></p>\n<p>  Let ChatGPT and local AI agents actually operate your phone — no PC, no ADB.</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"LICENSE\"><img alt=\"License: Apache-2.0\" src=\"https://img.shields.io/badge/license-Apache--2.0-blue\"></a></p>\n<p>  <img alt=\"Android 13–17\" src=\"https://img.shields.io/badge/Android-13%E2%80%9317-3DDC84\"></p>\n<p>  <img alt=\"arm64-v8a\" src=\"https://img.shields.io/badge/ABI-arm64--v8a-lightgrey\"></p>\n<p>  <img alt=\"MCP 2026-07-28\" src=\"https://img.shields.io/badge/MCP-2026--07--28-8A2BE2\"></p>\n<p>  <a href=\"https://github.com/zephyr7030/DroidBridge/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/zephyr7030/DroidBridge\"></a></p>\n<p>  <a href=\"https://github.com/zephyr7030/DroidBridge/releases\"><img alt=\"Downloads\" src=\"https://img.shields.io/github/downloads/zephyr7030/DroidBridge/total?label=downloads\"></a></p>\n<p>  <a href=\"https://t.me/anDroidBridge\"><img alt=\"Telegram group\" src=\"https://img.shields.io/badge/Telegram-group-26A5E4?logo=telegram&logoColor=white\"></a></p>\n<p>  <a href=\"https://ko-fi.com/zephyr7030\"><img alt=\"Support on Ko-fi\" src=\"https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white\"></a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <b>English</b> · <a href=\"README.zh-CN.md\">简体中文</a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\".github/assets/preview-en.png\" alt=\"DroidBridge: AI that actually uses your phone\" width=\"560\"></p>\n<p></p></p>\n\n<h2>What it is</h2>\n\n<p>DroidBridge runs a <a href=\"https://modelcontextprotocol.io\">Model Context Protocol</a> server <b>inside your phone</b>.</p>\n<p>An AI agent connected to it can see the screen, tap and type, manage files, run commands, use the</p>\n<p>clipboard and notifications, diagnose the network and schedule automations — with exactly the</p>\n<p>permissions you granted on the device, and nothing more.</p>\n\n<p>Two ways to connect, side by side:</p>\n\n<p>| Connection | For | How it reaches the phone |</p>\n<p>|---|---|---|</p>\n<p>| <b>ChatGPT</b> | ChatGPT on the web (developer mode) | OpenAI's Secure MCP Tunnel. The phone polls OpenAI over HTTPS; no port is opened and no public address is needed. |</p>\n<p>| <b>Local MCP</b> | Agents on the same device, or on a computer over <code>adb forward</code> | Streamable HTTP on <code>127.0.0.1:8765/mcp</code> (root edition: port 8766) with a bearer token. |</p>\n\n<h2>What an agent can do</h2>\n\n<p>| Tool | What it covers |</p>\n<p>|---|---|</p>\n<p>| <code>context</code> | DroidBridge status, capabilities and the tool catalog |</p>\n<p>| <code>visual</code> | Observe the screen (image and UI hierarchy), tap, long-press, swipe, type text, press keys and key combinations |</p>\n<p>| <code>android</code> | Inspect packages, launch apps and intents, clipboard, notifications |</p>\n<p>| <code>filesystem</code> | Inspect, read, write, edit, move, delete, archive (ZIP) and download files |</p>\n<p>| <code>command</code> | Run shell commands as the app or shell (Shizuku) identity, or as root in the root edition |</p>\n<p>| <code>network</code> | Diagnose DNS, TCP and TLS; capture and inject traffic (root edition) |</p>\n<p>| <code>automation</code> | Create, update, enable and delete automations that run on a schedule |</p>\n<p>| <code>task_control</code> | List, inspect and cancel background tasks |</p>\n\n<p>Every tool carries MCP safety annotations (<code>readOnlyHint</code>, <code>destructiveHint</code>, <code>openWorldHint</code>), so</p>\n<p>clients such as ChatGPT ask you to confirm actions that change things.</p>\n\n<h2>Choose your edition</h2>\n\n<p>DroidBridge comes in two editions:</p>\n\n<li>**DroidBridge** is an app that runs everything itself. It works on an ordinary phone and gains</li>\n<p>  the shell identity when <a href=\"https://shizuku.rikka.app/\">Shizuku</a> is running.</p>\n<li>**The root edition** is a root module. Its backend runs as root on its own, starts at boot and</li>\n<p>  keeps running whatever happens to any app. It installs the <b>DroidBridge Root</b> app, which shows</p>\n<p>  the backend's state and settings but runs nothing itself.</p>\n\n<p>Both editions can run on one phone: DroidBridge serves local MCP on port 8765 and the root edition</p>\n<p>on port 8766.</p>\n\n<p>| | DroidBridge | DroidBridge + Shizuku | Root edition (Magisk / KernelSU / APatch) |</p>\n<p>|---|---|---|---|</p>\n<p>| Screen observe / tap / type | Accessibility service | Observe/tap; typing uses Accessibility | ✓ |</p>\n<p>| Screen capture | Screen-capture consent | ✓ | ✓ |</p>\n<p>| Notifications | Notification access | Notification access | ✓ |</p>\n<p>| Shell commands | App identity | App and shell identity | Root identity |</p>\n<p>| Network capture / injection | — | — | ✓ |</p>\n<p>| Stays alive in the background | Battery and autostart settings | Kept alive until the next reboot | Runs on its own, restored after reboot |</p>\n\n<p>In DroidBridge, the <b>Execution & access</b> page walks you through each switch with a button that</p>\n<p>opens the right system page, and tells you when something is already covered by Shizuku.</p>\n\n<h2>Requirements</h2>\n\n<li>Android 13 to 17 on an **arm64-v8a** device.</li>\n<li>For ChatGPT: a plan with web developer mode (Plus or higher), a Secure MCP Tunnel and a Runtime</li>\n<p>  API key from the OpenAI platform.</p>\n<li>Optional: [Shizuku](https://shizuku.rikka.app/), [Magisk](https://github.com/topjohnwu/Magisk),</li>\n<p>  <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a> or <a href=\"https://github.com/bmax121/APatch\">APatch</a> for</p>\n<p>  the root edition.</p>\n\n<h2>Install</h2>\n\n<p><b>DroidBridge</b></p>\n\n<li>Download `droidbridge-<version>-arm64-v8a.apk` from the</li>\n<p>   <a href=\"https://github.com/zephyr7030/DroidBridge/releases/latest\">latest release</a> (tag <code>apk-v<version></code>)</p>\n<p>   and install it.</p>\n<li>Open DroidBridge. The first-run guide asks which agent you use and walks through permissions.</li>\n\n<p>The release ships a <code>SHA256SUMS.txt</code> and a signed <code>release.json</code>; the app's <b>Updates</b> page uses</p>\n<p>the signature to verify its own updates.</p>\n\n<p><b>Root edition</b></p>\n\n<li>Download `droidbridge-magisk-<version>.zip` from the newest</li>\n<p>   <a href=\"https://github.com/zephyr7030/DroidBridge/releases?q=magisk-v&expanded=true\"><code>magisk-v</code> release</a>.</p>\n<li>Install it in Magisk, KernelSU or APatch. Installing it also installs the DroidBridge Root app.</li>\n<li>Reboot, then open DroidBridge Root.</li>\n\n<p>Module updates are offered by your root manager.</p>\n\n<h2>Connect ChatGPT</h2>\n\n<li>On [platform.openai.com](https://platform.openai.com/settings/organization/tunnels) create a</li>\n<p>   Secure MCP Tunnel, and an <a href=\"https://platform.openai.com/api-keys\">API key</a> allowed to use it.</p>\n<li>In DroidBridge open **Agent connection → ChatGPT connection**, paste the Tunnel ID and the key,</li>\n<p>   and turn the tunnel on. The key is never shown again: DroidBridge encrypts it with the Android</p>\n<p>   Keystore, and the root edition keeps it readable by root only.</p>\n<li>On a computer browser, turn on **Developer mode** in [ChatGPT security settings](https://chatgpt.com/settings/security)</li>\n<p>   (it is still rolling out to Plus accounts). Then on <a href=\"https://chatgpt.com/plugins\">ChatGPT plugins</a></p>\n<p>   tap <b>Add → Create MCP app</b>, connect it through your tunnel with Authentication set to <b>None</b>.</p>\n<p>   The app page has links to both.</p>\n<li>Ask ChatGPT to use DroidBridge. The first call shows up in the app.</li>\n\n<h2>Connect a local agent</h2>\n\n<li>In the app open **Agent connection → Local MCP**, turn it on and copy the token.</li>\n<li>Point your MCP client at `http://127.0.0.1:8765/mcp` (root edition: `8766`) with</li>\n<p>   <code>Authorization: Bearer <token></code>.</p>\n<p>   From a computer, forward the port first:</p>\n\n<p>   ```bash</p>\n<p>   adb forward tcp:8765 tcp:8765</p>\n<p>   ```</p>\n\n<h2>Screenshots</h2>\n\n<p>| Home | Execution & access | Agent connection | Settings |</p>\n<p>|---|---|---|---|</p>\n<p>| <img src=\".github/assets/screenshots/en/home.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/capabilities.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/agents.png\" width=\"200\"> | <img src=\".github/assets/screenshots/en/settings.png\" width=\"200\"> |</p>\n\n<h2>Security and privacy</h2>\n\n<li>Everything runs on the phone. DroidBridge has no server of its own and sends no telemetry.</li>\n<li>An agent gets **exactly** the access you granted on the device; there is no extra remote</li>\n<p>  permission layer to misconfigure. Only connect agents you trust with that access.</p>\n<li>The ChatGPT tunnel speaks only to `api.openai.com` over TLS with a pinned WebPKI root store.</li>\n<li>The local MCP endpoint listens on loopback only and requires its bearer token.</li>\n<li>Text that the system `input` command cannot type (for example Chinese or emoji) is pasted</li>\n<p>  through the clipboard: the clip is marked sensitive and your previous clipboard is restored.</p>\n\n<p>Please report vulnerabilities privately as described in <a href=\"SECURITY.md\">SECURITY.md</a>.</p>\n\n<h2>Build from source</h2>\n\n<p>The build is pinned and currently scripted for Windows with PowerShell 7:</p>\n\n<li>JDK 17, Android SDK platform 37, Build Tools 36.0.0, NDK 29.0.14206865, CMake 3.31.6</li>\n<li>Rust 1.98.0 (`rust/rust-toolchain.toml`) and `cargo-ndk` 4.1.2</li>\n<li>libpcap 1.10.6 for the root network tools: `pwsh tools/build-libpcap.ps1`</li>\n\n<pre>./gradlew :standalone:assembleDebug :root-frontend:assembleDebugMagiskModule</pre>\n\n<p><code>pwsh tools/check-toolchain.ps1</code> verifies the toolchain. See <a href=\"CONTRIBUTING.md\">CONTRIBUTING.md</a>.</p>\n\n<h2>Community</h2>\n\n<p>Questions, device reports and release news: join the <a href=\"https://t.me/anDroidBridge\">Telegram group</a>.</p>\n<p>Bugs are best filed as <a href=\"https://github.com/zephyr7030/DroidBridge/issues\">GitHub issues</a>.</p>\n\n<h2>Support the project</h2>\n\n<p>DroidBridge is built and maintained in spare time. If it is useful to you, you can support it on</p>\n<p><a href=\"https://ko-fi.com/zephyr7030\">Ko-fi</a>. Bug reports and device reports help just as much.</p>\n\n<h2>License</h2>\n\n<p>DroidBridge is licensed under the <a href=\"LICENSE\">Apache License 2.0</a>. Third-party components and their</p>\n<p>licenses are listed in <a href=\"THIRD_PARTY_NOTICES.txt\">THIRD_PARTY_NOTICES.txt</a>.</p>\n\n<p>DroidBridge is an independent project and is not affiliated with or endorsed by OpenAI, Anthropic,</p>\n<p>Google, Magisk or Shizuku. Product names are trademarks of their respective owners.</p>",
+  "homepageUrl": "https://github.com/zephyr7030/DroidBridge",
+  "sourceUrl": "https://github.com/zephyr7030/DroidBridge",
+  "url": "https://github.com/zephyr7030/DroidBridge",
+  "latestRelease": {
+    "name": "apk-v0.5.4",
+    "version": "apk-v0.5.4",
+    "time": "2026-10-10T08:43:52Z",
+    "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/droidbridge-0.5.4-arm64-v8a.apk"
+  },
+  "releases": [
+    {
+      "name": "magisk-v0.5.4",
+      "tagName": "magisk-v0.5.4",
+      "publishedAt": "2026-10-10T08:41:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-magisk-0.5.4.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.4/droidbridge-magisk-0.5.4.zip",
+          "size": 32601386,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.4/SHA256SUMS.txt",
+          "size": 185,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.4/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "apk-v0.5.4",
+      "tagName": "apk-v0.5.4",
+      "publishedAt": "2026-10-10T08:43:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.5.4-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/droidbridge-0.5.4-arm64-v8a.apk",
+          "size": 40496576,
+          "downloadCount": 2
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/release.json",
+          "size": 1369,
+          "downloadCount": 2
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/release.json.sig",
+          "size": 71,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/SHA256SUMS.txt",
+          "size": 350,
+          "downloadCount": 2
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.4/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "magisk-v0.5.3",
+      "tagName": "magisk-v0.5.3",
+      "publishedAt": "2026-10-09T03:39:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-magisk-0.5.3.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.3/droidbridge-magisk-0.5.3.zip",
+          "size": 32595332,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.3/SHA256SUMS.txt",
+          "size": 185,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.3/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "apk-v0.5.3",
+      "tagName": "apk-v0.5.3",
+      "publishedAt": "2026-10-09T03:41:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.5.3-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.3/droidbridge-0.5.3-arm64-v8a.apk",
+          "size": 40422848,
+          "downloadCount": 22
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.3/release.json",
+          "size": 1369,
+          "downloadCount": 7
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.3/release.json.sig",
+          "size": 71,
+          "downloadCount": 6
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.3/SHA256SUMS.txt",
+          "size": 350,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.3/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "magisk-v0.5.2",
+      "tagName": "magisk-v0.5.2",
+      "publishedAt": "2026-10-08T09:35:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-magisk-0.5.2.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.2/droidbridge-magisk-0.5.2.zip",
+          "size": 32601938,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.2/SHA256SUMS.txt",
+          "size": 185,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.2/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "apk-v0.5.2",
+      "tagName": "apk-v0.5.2",
+      "publishedAt": "2026-10-08T09:37:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.5.2-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.2/droidbridge-0.5.2-arm64-v8a.apk",
+          "size": 33963126,
+          "downloadCount": 6
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.2/release.json",
+          "size": 1369,
+          "downloadCount": 8
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.2/release.json.sig",
+          "size": 71,
+          "downloadCount": 7
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.2/SHA256SUMS.txt",
+          "size": 350,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.2/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "magisk-v0.5.1",
+      "tagName": "magisk-v0.5.1",
+      "publishedAt": "2026-10-07T11:38:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-magisk-0.5.1.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.1/droidbridge-magisk-0.5.1.zip",
+          "size": 32539126,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.1/SHA256SUMS.txt",
+          "size": 185,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.1/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "magisk-v0.5.0",
+      "tagName": "magisk-v0.5.0",
+      "publishedAt": "2026-10-07T06:47:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-magisk-0.5.0.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.0/droidbridge-magisk-0.5.0.zip",
+          "size": 32497010,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.0/SHA256SUMS.txt",
+          "size": 185,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.0/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "apk-v0.5.1",
+      "tagName": "apk-v0.5.1",
+      "publishedAt": "2026-10-07T11:40:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.5.1-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.1/droidbridge-0.5.1-arm64-v8a.apk",
+          "size": 33934454,
+          "downloadCount": 6
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.1/release.json",
+          "size": 1369,
+          "downloadCount": 8
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.1/release.json.sig",
+          "size": 71,
+          "downloadCount": 7
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.1/SHA256SUMS.txt",
+          "size": 350,
+          "downloadCount": 4
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.1/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "apk-v0.5.0",
+      "tagName": "apk-v0.5.0",
+      "publishedAt": "2026-10-07T06:49:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.5.0-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.0/droidbridge-0.5.0-arm64-v8a.apk",
+          "size": 33901630,
+          "downloadCount": 5
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.0/release.json",
+          "size": 1369,
+          "downloadCount": 2
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.0/release.json.sig",
+          "size": 71,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.0/SHA256SUMS.txt",
+          "size": 350,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/apk-v0.5.0/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.4.3",
+      "tagName": "v0.4.3",
+      "publishedAt": "2026-10-06T07:19:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.4.3-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/droidbridge-0.4.3-arm64-v8a.apk",
+          "size": 41487665,
+          "downloadCount": 20
+        },
+        {
+          "name": "droidbridge-magisk-0.4.3.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/droidbridge-magisk-0.4.3.zip",
+          "size": 23092469,
+          "downloadCount": 5
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/release.json",
+          "size": 1606,
+          "downloadCount": 15
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/release.json.sig",
+          "size": 72,
+          "downloadCount": 14
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/SHA256SUMS.txt",
+          "size": 445,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.3/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.4.2",
+      "tagName": "v0.4.2",
+      "publishedAt": "2026-09-29T12:31:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.4.2-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/droidbridge-0.4.2-arm64-v8a.apk",
+          "size": 41442609,
+          "downloadCount": 78
+        },
+        {
+          "name": "droidbridge-magisk-0.4.2.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/droidbridge-magisk-0.4.2.zip",
+          "size": 23003749,
+          "downloadCount": 16
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/release.json",
+          "size": 1606,
+          "downloadCount": 22
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/release.json.sig",
+          "size": 72,
+          "downloadCount": 21
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/SHA256SUMS.txt",
+          "size": 445,
+          "downloadCount": 3
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.2/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.4.1",
+      "tagName": "v0.4.1",
+      "publishedAt": "2026-09-23T15:26:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.4.1-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/droidbridge-0.4.1-arm64-v8a.apk",
+          "size": 34053350,
+          "downloadCount": 27
+        },
+        {
+          "name": "droidbridge-magisk-0.4.1.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/droidbridge-magisk-0.4.1.zip",
+          "size": 23009277,
+          "downloadCount": 6
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/release.json",
+          "size": 1606,
+          "downloadCount": 5
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/release.json.sig",
+          "size": 72,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/SHA256SUMS.txt",
+          "size": 445,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.1/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-09-23T02:22:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.4.0-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/droidbridge-0.4.0-arm64-v8a.apk",
+          "size": 34012334,
+          "downloadCount": 3
+        },
+        {
+          "name": "droidbridge-magisk-0.4.0.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/droidbridge-magisk-0.4.0.zip",
+          "size": 23006725,
+          "downloadCount": 0
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/release.json",
+          "size": 1606,
+          "downloadCount": 3
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/release.json.sig",
+          "size": 70,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/SHA256SUMS.txt",
+          "size": 445,
+          "downloadCount": 0
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.4.0/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-09-17T02:10:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "droidbridge-0.3.0-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/droidbridge-0.3.0-arm64-v8a.apk",
+          "size": 33670211,
+          "downloadCount": 33
+        },
+        {
+          "name": "droidbridge-magisk-0.3.0.zip",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/droidbridge-magisk-0.3.0.zip",
+          "size": 22568880,
+          "downloadCount": 5
+        },
+        {
+          "name": "release.json",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/release.json",
+          "size": 1606,
+          "downloadCount": 1
+        },
+        {
+          "name": "release.json.sig",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/release.json.sig",
+          "size": 72,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/SHA256SUMS.txt",
+          "size": 445,
+          "downloadCount": 1
+        },
+        {
+          "name": "THIRD_PARTY_NOTICES.txt",
+          "downloadUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/v0.3.0/THIRD_PARTY_NOTICES.txt",
+          "size": 5773,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

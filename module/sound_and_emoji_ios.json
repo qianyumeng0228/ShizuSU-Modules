@@ -1,0 +1,337 @@
+{
+  "readme": "# 🍎 Sound & Emoji iOS — Magisk / KernelSU / KernelSu Next Module\n\n<p align=\"center\">\n  <img src=\"https://img.shields.io/badge/Version-2.0.4-blueviolet?style=for-the-badge\" alt=\"Version\"/>\n  <img src=\"https://img.shields.io/badge/Android-11%20~%2016-brightgreen?style=for-the-badge\" alt=\"Android\"/>\n  <img src=\"https://img.shields.io/badge/License-Open%20Source-blue?style=for-the-badge\" alt=\"License\"/>\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/topjohnwu/Magisk\"><img src=\"https://img.shields.io/badge/Root-Magisk-orange?style=for-the-badge&logo=android\" alt=\"Magisk\"/></a>\n  <a href=\"https://github.com/tiann/KernelSU\"><img src=\"https://img.shields.io/badge/Root-KernelSU-green?style=for-the-badge&logo=android\" alt=\"KernelSU\"/></a>\n  <a href=\"https://github.com/bmax121/APatch\"><img src=\"https://img.shields.io/badge/Root-KernelSU Next-blue?style=for-the-badge&logo=android\" alt=\"KernelSU Next\"/></a>\n</p>\n\n<p align=\"center\">\n  <b>A high-performance system-level module that brings the complete iOS auditory and visual experience to any rooted Android device.</b>\n</p>\n\n<p align=\"center\">\n  iOS Sounds • iOS Emojis • SF Pro Display Font • Multi-Root Support\n</p>\n\n---\n\n## 📋 Table of Contents\n\n- [Overview](#-overview)\n- [Features](#-features)\n- [What's Included](#-whats-included)\n- [Compatibility](#-compatibility)\n- [Installation](#-installation)\n- [Architecture & Boot Lifecycle](#-architecture--boot-lifecycle)\n- [Script Details](#-script-details)\n- [Project Structure](#-project-structure)\n- [OEM Emoji Support](#-oem-emoji-support)\n- [Meta / Facebook Emoji Fix](#-meta--facebook-emoji-fix)\n- [Known Limitations](#-known-limitations)\n- [OTA Updates](#-ota-updates)\n- [Troubleshooting](#-troubleshooting)\n- [Changelog](#-changelog)\n- [Credits](#-credits)\n\n---\n\n## 🔍 Overview\n\n**Sound_And_Emoji_IOS** is a comprehensive Android root module that systemlessly replaces:\n\n1. **All system sounds** (UI, ringtones, notifications, alarms) with authentic iOS audio\n2. **System-wide emojis** with the latest iOS emoji font (including OEM-specific replacements)\n3. **System typography** with Apple's **SF Pro Display** font family\n\nThe module uses an intelligent multi-stage boot pipeline to ensure 100% persistence across reboots, ROM updates, and aggressive Google Play Services font re-downloads.\n\n---\n\n## ✨ Features\n\n| Feature | Description |\n| :--- | :--- |\n| 🔊 **Complete iOS Sound Set** | 43 audio files covering UI, ringtones, notifications, alarms, camera, NFC, charging, and more |\n| 😀 **iOS Emoji Replacement** | System-wide emoji override with latest iOS emoji font (~30MB high-res) |\n| 🔤 **SF Pro Display Font** | 16 font weights (Regular to Ultralight, with Italic variants) |\n| 🏭 **OEM Detection** | Auto-detects Samsung, Xiaomi, LG, HTC, OnePlus, Huawei emoji fonts |\n| 📱 **Dual-Path Installation** | Installs to both `/system/product/` and `/system/media/` for max ROM compatibility |\n| 🔒 **SELinux Compliant** | Full `u:object_r:system_file:s0` context enforcement + custom SEPolicy rules |\n| 🔄 **Anti-Revert System** | Blocks Google Play Services from re-downloading stock emoji fonts |\n| 📘 **Meta App Fix** | Replaces Facebook, Instagram, and Messenger emoji with iOS versions |\n| 🪵 **Built-in Logging** | Detailed `service.log` for debugging |\n| ♻️ **OverlayFS Support** | Integrated support for `magisk_overlayfs` module |\n| 🔁 **Auto-Update** | In-app update support via `updateJson` |\n\n---\n\n## 📦 What's Included\n\n### 🔊 Sounds (43 files)\n\n<details>\n<summary><b>UI Sounds (30 files)</b></summary>\n\n| Sound | File |\n| :--- | :--- |\n| Lock Screen | `Lock.ogg` |\n| Unlock Screen | `Unlock.ogg` |\n| Keyboard Standard | `KeypressStandard.ogg` |\n| Keyboard Spacebar | `KeypressSpacebar.ogg` |\n| Keyboard Delete | `KeypressDelete.ogg` |\n| Keyboard Return | `KeypressReturn.ogg` |\n| Keyboard Invalid | `KeypressInvalid.ogg` |\n| Camera Click | `camera_click.ogg`, `CameraClick.ogg` |\n| Camera Focus | `camera_focus.ogg`, `CameraFocus.ogg` |\n| Screenshot | `screenshot.ogg` |\n| Video Record Start | `VideoRecord.ogg` |\n| Video Record Stop | `VideoStop.ogg` |\n| Charging Started | `ChargingStarted.ogg` |\n| Charging Stopped | `ChargingStopped.ogg` |\n| Wireless Charging | `WirelessChargingStarted.ogg` |\n| Low Battery | `LowBattery.ogg` |\n| NFC Success | `NFCSuccess.ogg` |\n| NFC Failure | `NFCFailure.ogg` |\n| NFC Transfer Complete | `NFCTransferComplete.ogg` |\n| NFC Transfer Initiated | `NFCTransferInitiated.ogg` |\n| NFC Initiated | `NFCInitiated.ogg` |\n| Smart Lock (Trusted) | `Trusted.ogg` |\n| Dock | `Dock.ogg` |\n| Undock | `Undock.ogg` |\n| Volume Incremental | `VolumeIncremental.ogg` |\n| Media Volume | `Media_Volume.ogg` |\n| Effect Tick | `Effect_Tick.ogg` |\n| In-Call Notification | `InCallNotification.ogg` |\n\n</details>\n\n<details>\n<summary><b>Notifications (7 files)</b></summary>\n\n| Sound | File |\n| :--- | :--- |\n| Default Message | `IOSDefaultMessageNotification.ogg` |\n| Calendar Alert | `IOSCalendarAlert.ogg` |\n| New Mail | `IOSNewMail.ogg` |\n| Reminder Alert | `IOSReminderAlert.ogg` |\n| Sent Message | `IOSSentMessage.ogg` |\n| iOS Notification 0 | `Ios Notification 0.ogg` |\n| iOS Notification 1 | `Ios Notification 1.ogg` |\n\n</details>\n\n<details>\n<summary><b>Ringtones (3 files)</b></summary>\n\n| Sound | File |\n| :--- | :--- |\n| Default (Reflection) | `IOSDefaultRingtone.ogg` |\n| Reflection | `IOSReflection.ogg` |\n| Sashimi | `IOSSashimi.ogg` |\n\n</details>\n\n<details>\n<summary><b>Alarms (3 files)</b></summary>\n\n| Sound | File |\n| :--- | :--- |\n| Default Alarm | `IOSDefaultAlarm.ogg` |\n| Bedtime | `IOSBedtimeAlarm.ogg` |\n| Nightstand | `IOSNightstandAlarm.ogg` |\n\n</details>\n\n### 😀 Emoji Fonts (2 files)\n\n| Font | Size | Purpose |\n| :--- | :--- | :--- |\n| `NotoColorEmoji.ttf` | ~30 MB | System-wide emoji replacement (AOSP/Pixel) |\n| `FacebookEmoji.ttf` | ~30 MB | Meta apps emoji replacement (FB, IG, Messenger) |\n\n### 🔤 SF Pro Display (16 font weights)\n\n| Weight | Regular | Italic |\n| :--- | :--- | :--- |\n| Ultralight | ✅ | ✅ |\n| Thin | ✅ | ✅ |\n| Light | ✅ | ✅ |\n| Regular | ✅ | ✅ |\n| Medium | ✅ | ✅ |\n| Semibold | ✅ | ✅ |\n| Bold | ✅ | ✅ |\n| Heavy | ✅ | ✅ |\n\n---\n\n## 🔧 Compatibility\n\n### Root Solutions\n\n| Platform | Version | Status |\n| :--- | :--- | :--- |\n| **Magisk** | 20.0+ | ✅ Full Support |\n| **KernelSU** | All | ✅ Full Support (requires metamodule) |\n| **KernelSU Next** | 20000+ | ✅ Full Support (requires metamodule) |\n| **APatch** | All | ✅ Full Support |\n\n### Android Versions\n\n| Android | API | Status | Notes |\n| :--- | :--- | :--- | :--- |\n| Android 11 | API 30 | ✅ | Legacy path (`/system/media/audio`) |\n| Android 12 | API 31 | ✅ | Product path (`/system/product/media/audio`) |\n| Android 12L | API 32 | ✅ | — |\n| Android 13 | API 33 | ✅ | — |\n| Android 14 | API 34 | ✅ | resetprop fallback for `ro.config.*` |\n| Android 15 | API 35 | ✅ | resetprop fallback for `ro.config.*` |\n| Android 16 | API 36 | ✅ | resetprop fallback for `ro.config.*` |\n\n### Tested ROMs\n\nWorks on AOSP, Pixel, LineageOS, crDroid, EvolutionX, AxionOS, MIUI, HyperOS, OneUI, OxygenOS, ColorOS, and more.\n\n> [!IMPORTANT]\n> **KernelSU / KernelSU Next users:** You **MUST** install a metamodule (e.g., `meta-overlayfs`) for the module to mount files into `/system/`. The installer will warn you if none is detected.\n\n---\n\n## 🚀 Installation\n\n1. Download the latest `Sound_And_Emoji_IOS.zip` from [Releases](https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases)\n2. Open your root manager (**Magisk Manager**, **KernelSU Manager**, or **APatch**)\n3. Flash the `.zip` via the **Modules** → **Install from storage** option\n4. **Reboot** your device\n5. Enjoy the iOS experience! 🎉\n\n> [!NOTE]\n> The module clears the Gboard emoji cache during installation. You may notice a brief delay on the first keyboard launch after reboot while Gboard rebuilds its emoji index.\n\n---\n\n## 🏗️ Architecture & Boot Lifecycle\n\nThe module uses a sophisticated multi-stage boot pipeline to ensure everything works across all root solutions and Android versions:\n\n```mermaid\ngraph TD\n    subgraph INSTALL[\"📥 Installation (customize.sh)\"]\n        I1[Detect Root Environment] --> I2[Detect Android Version]\n        I2 --> I3{API ≥ 31?}\n        I3 -- Yes --> I4[\"/system/product/media/audio\"]\n        I3 -- No --> I5[\"Mirror to /system/media/audio\"]\n        I4 --> I6[Detect OEM Fonts]\n        I5 --> I6\n        I6 --> I7[Clear Gboard Cache]\n        I7 --> I8[Set SELinux Contexts]\n        I8 --> I9[Apply Permissions]\n    end\n\n    subgraph BOOT1[\"🔒 post-fs-data.sh (Pre-Mount)\"]\n        B1[\"Nuke font caches:<br/>/data/fonts<br/>GMS fonts<br/>Gboard emoji<br/>Messenger fonts\"]\n    end\n\n    subgraph BOOT2[\"📁 post-mount.sh (After OverlayFS)\"]\n        B2[Replace ALL *emoji*.ttf in /data] --> B3[Lock Meta app emojis]\n        B3 --> B4[Block Messenger font downloads]\n        B4 --> B5[Clean GMS font caches]\n    end\n\n    subgraph BOOT3[\"⚙️ service.sh (Late Start)\"]\n        B6[Wait for boot_completed] --> B7[Clear Gboard cache]\n        B7 --> B8[\"Force resetprop ro.config.*\"]\n        B8 --> B9[Replace ALL emoji fonts globally]\n        B9 --> B10[Lock Meta emoji]\n        B10 --> B11[Disable GMS Font Provider]\n        B11 --> B12[\"Media Scanner (Magisk only)\"]\n    end\n\n    subgraph BOOT4[\"✅ boot-completed.sh (KSU/APatch)\"]\n        B13[\"Force resetprop ro.config.*\"] --> B14[Media Scanner broadcast]\n    end\n\n    INSTALL --> BOOT1\n    BOOT1 --> BOOT2\n    BOOT2 --> BOOT3\n    BOOT3 --> BOOT4\n\n    style INSTALL fill:#1a1a2e,stroke:#e94560,color:#fff\n    style BOOT1 fill:#16213e,stroke:#0f3460,color:#fff\n    style BOOT2 fill:#16213e,stroke:#533483,color:#fff\n    style BOOT3 fill:#16213e,stroke:#e94560,color:#fff\n    style BOOT4 fill:#0f3460,stroke:#00b4d8,color:#fff\n```\n\n### Why Multiple Stages?\n\n| Stage | Timing | Purpose |\n| :--- | :--- | :--- |\n| `post-fs-data.sh` | Before module mount | Clean caches BEFORE system reads them |\n| `post-mount.sh` | After OverlayFS mount | Replace app emoji files while apps haven't started |\n| `service.sh` | Late start (boot completed) | Force properties, disable GMS, media scan |\n| `boot-completed.sh` | After `sys.boot_completed=1` (KSU/APatch) | Re-apply properties that system may have overwritten |\n\n---\n\n## 📜 Script Details\n\n### `customize.sh` — Installation Engine\n\nThe installation script adapts to the device environment:\n\n- **Root Detection:** Identifies Magisk, KernelSU, KernelSU Next, or APatch\n- **Metamodule Check (KSU):** Warns if `meta-overlayfs` or similar is not installed\n- **API-Based Path Selection:** Uses `/system/product/` for Android 12+ or mirrors to `/system/media/` for Android 11\n- **OEM Emoji Detection:** Scans `/system/fonts/` for manufacturer-specific emoji fonts and creates replacements only for fonts that actually exist\n- **Gboard Cache Cleanup:** Removes cached emoji data so Gboard picks up the new font\n- **OverlayFS Integration:** Detects and supports `magisk_overlayfs` for restricted partitions\n- **SELinux Enforcement:** Applies `u:object_r:system_file:s0` context to all installed files\n\n### `post-fs-data.sh` — Pre-Mount Cache Nuker\n\nRuns BEFORE the module is mounted. Has a strict 10-second timeout.\n\n- Deletes `/data/fonts/` (system font updates)\n- Cleans GMS font provider caches\n- Clears Gboard emoji caches\n- Removes Messenger font download directories\n\n### `post-mount.sh` — Emoji Lock (KSU/APatch)\n\nRuns AFTER OverlayFS/MagicMount has mounted module files.\n\n- **Nuclear font replacement:** Finds ALL `*emoji*.ttf` files in `/data/data/` and `/data/user/0/` and replaces them with the iOS emoji font\n- **Meta app lock:** Creates/replaces `FacebookEmoji.ttf` in each Meta app's `app_ras_blobs/` directory with correct ownership and immutable flag\n- **Messenger block:** Sets `chmod 000` on Messenger's font download directory\n- **GMS cleanup:** Removes cached font files from Google Play Services\n\n### `service.sh` — Late Start Service (Universal)\n\nThe main runtime script. Waits for `sys.boot_completed=1` before executing.\n\n- **resetprop:** Force-sets 25+ `ro.config.*` sound properties that Android 14+ may overwrite during boot\n- **Global emoji replacement:** Scans ALL app directories for emoji font files and replaces them\n- **Meta emoji lock:** Replaces and locks emoji fonts in Facebook, Instagram, Messenger (+ Lite variants) with `chmod 444`\n- **GMS Font Provider disable:** Disables `FontsProvider` and `UpdateSchedulerService` in Google Play Services to prevent stock emoji re-download\n- **Media Scanner (Magisk):** Broadcasts `MEDIA_SCANNER_SCAN_FILE` intents for all audio files so they appear in Android's sound picker\n\n### `boot-completed.sh` — Post-Boot Hook (KSU/APatch)\n\nKernelSU and APatch support this hook natively. Provides a clean way to re-apply properties after the system is fully booted.\n\n- Re-applies all `ro.config.*` sound properties via `resetprop`\n- Triggers media scanner for ringtones, notifications, and alarms\n\n### `sepolicy.rule` — SELinux Policy\n\nCustom SEPolicy rules that allow:\n\n- `mediaserver` and `audioserver` to read module-mounted audio files\n- Untrusted apps (Facebook/Messenger) to read bind-mounted emoji fonts\n- Platform apps (Gboard) and GMS to read system emoji fonts\n\n### `system.prop` — System Properties\n\nDeclares default ringtone, notification, and alarm properties. Kept for backwards compatibility with older Android versions where `system.prop` is reliably applied during boot.\n\n### `uninstall.sh` — Clean Removal\n\nRemoves the module directory from `/data/adb/modules/` on uninstallation.\n\n---\n\n## 📂 Project Structure\n\n```\nSound_And_Emoji_IOS/\n├── META-INF/                          # Flashable ZIP metadata\n│   └── com/google/android/\n│       ├── update-binary             # Magisk module installer\n│       └── updater-script            # Required (empty marker)\n│\n├── system/\n│   ├── fonts/                         # Font replacements\n│   │   ├── NotoColorEmoji.ttf        # iOS emoji font (system-wide)\n│   │   ├── FacebookEmoji.ttf         # iOS emoji for Meta apps\n│   │   ├── SF-Pro-Display-Regular.ttf\n│   │   ├── SF-Pro-Display-Bold.ttf\n│   │   ├── SF-Pro-Display-Medium.ttf\n│   │   ├── SF-Pro-Display-Semibold.ttf\n│   │   ├── SF-Pro-Display-Light.ttf\n│   │   ├── SF-Pro-Display-Thin.ttf\n│   │   ├── SF-Pro-Display-Heavy.ttf\n│   │   ├── SF-Pro-Display-Ultralight.ttf\n│   │   └── ... (+ italic variants)\n│   │\n│   └── product/media/audio/          # iOS sound files\n│       ├── ui/                        # 30 UI sounds\n│       ├── notifications/             # 7 notification sounds\n│       ├── ringtones/                 # 3 ringtones\n│       └── alarms/                    # 3 alarm sounds\n│\n├── webroot/\n│   └── index.html                    # Module manager web UI redirect\n│\n├── update_metada/\n│   ├── update.json                   # OTA update manifest\n│   └── CHANGELOG.md                  # Full version history\n│\n├── customize.sh                      # Installation script\n├── post-fs-data.sh                   # Pre-mount cache cleaner\n├── post-mount.sh                     # Post-mount emoji lock (KSU/APatch)\n├── service.sh                        # Late start service (universal)\n├── boot-completed.sh                 # Post-boot hook (KSU/APatch)\n├── sepolicy.rule                     # Custom SELinux policies\n├── system.prop                       # Default sound properties\n├── uninstall.sh                      # Cleanup on removal\n└── module.prop                       # Module metadata\n```\n\n---\n\n## 🏭 OEM Emoji Support\n\nThe module automatically detects and replaces manufacturer-specific emoji fonts. It only creates replacement files for fonts that **actually exist** on your device:\n\n| OEM | Font File | Devices |\n| :--- | :--- | :--- |\n| Samsung | `SamsungColorEmoji.ttf` | Galaxy S, A, Note, Z series |\n| Xiaomi | `MiuiColorEmoji.ttf` | Mi, Redmi, POCO (MIUI/HyperOS) |\n| LG | `LGNotoColorEmoji.ttf` | LG V, G series |\n| HTC | `HTC_ColorEmoji.ttf` | HTC U, Desire series |\n| OnePlus | `OnePlusEmoji.ttf` | OnePlus, OPPO, Realme |\n| Huawei | `HuaweiColorEmoji.ttf` | Huawei, Honor |\n| AOSP/Pixel | `NotoColorEmoji.ttf` | Pixel, AOSP-based ROMs |\n\n---\n\n## 📘 Meta / Facebook Emoji Fix\n\nMeta apps (Facebook, Instagram, Messenger) use their own bundled emoji font (`FacebookEmoji.ttf`) instead of the system font. The module uses an **aggressive multi-layer approach** to force iOS emojis:\n\n```mermaid\ngraph LR\n    A[\"🔍 Find ALL *emoji*.ttf<br/>in /data/data/ & /data/user/0/\"] --> B[\"📝 Replace with<br/>iOS emoji font\"]\n    B --> C[\"🔒 Apply permissions<br/>(chmod 444)\"]\n    C --> D[\"🚫 Block Messenger<br/>font downloads<br/>(chmod 000)\"]\n    D --> E[\"⛔ Disable GMS<br/>FontsProvider\"]\n    E --> F[\"🔄 Force-stop<br/>Meta apps\"]\n\n    style A fill:#1877f2,stroke:#fff,color:#fff\n    style B fill:#e94560,stroke:#fff,color:#fff\n    style C fill:#533483,stroke:#fff,color:#fff\n    style D fill:#0f3460,stroke:#fff,color:#fff\n    style E fill:#16213e,stroke:#fff,color:#fff\n    style F fill:#1a1a2e,stroke:#fff,color:#fff\n```\n\n### Targeted Apps\n\n| App | Package | Status |\n| :--- | :--- | :--- |\n| Facebook | `com.facebook.katana` | ✅ iOS Emojis |\n| Messenger | `com.facebook.orca` | ✅ iOS Emojis |\n| Facebook Lite | `com.facebook.lite` | ✅ iOS Emojis |\n| Messenger Lite | `com.facebook.mlite` | ✅ iOS Emojis |\n| Instagram | `com.instagram.android` | ✅ iOS Emojis |\n| InstaPro | `com.instapro.android` | ✅ iOS Emojis |\n\n---\n\n## ⚠️ Known Limitations\n\n### WhatsApp Emojis\n\nWhatsApp **does not use the system emoji font** (`NotoColorEmoji.ttf`). Instead, WhatsApp bundles its own proprietary emoji set directly inside the APK to maintain visual consistency across Android, iOS, and Web platforms. This is a deliberate architectural decision by Meta.\n\n**What this means:**\n- ✅ System UI, Gboard, SMS, Chrome, and most apps → **iOS emojis work perfectly**\n- ✅ Facebook, Instagram, Messenger → **iOS emojis work** (replaced via module)\n- ❌ WhatsApp → **uses its own emojis** (cannot be changed without modifying the APK)\n\n> [!NOTE]\n> This is **not a bug in the module** — it is a WhatsApp limitation. The only way to change WhatsApp's emojis would be to use a modified APK (which violates WhatsApp's Terms of Service and may result in account suspension).\n\n### Telegram\n\nTelegram has its own emoji rendering system that can be configured in-app. Check **Settings → Chat Settings → Emoji** to use system emojis.\n\n---\n\n## 🔄 OTA Updates\n\nThe module supports in-app updates via the `updateJson` mechanism. Your root manager will automatically check for new versions.\n\n**Update URL:** `https://raw.githubusercontent.com/antoniomalheirs/Sound_And_Emoji_IOS/main/update_metada/update.json`\n\n---\n\n## 🔧 Troubleshooting\n\n<details>\n<summary><b>Sounds not changing after reboot</b></summary>\n\n1. Check if `service.log` exists in the module directory (`/data/adb/modules/Sound_And_Emoji_IOS/service.log`)\n2. Verify that `resetprop` is working: run `getprop ro.config.ringtone` — it should show `IOSDefaultRingtone.ogg`\n3. On Android 14+, the system may override `system.prop` — the module uses `resetprop` as fallback via `service.sh` and `boot-completed.sh`\n4. Clear your Settings app cache and check sound settings again\n\n</details>\n\n<details>\n<summary><b>Emojis not changing in Gboard</b></summary>\n\n1. Clear Gboard app data: **Settings → Apps → Gboard → Clear Data**\n2. Reboot the device\n3. Check if `/data/fonts/` directory was removed (it should not exist)\n4. Verify the module is enabled in your root manager\n\n</details>\n\n<details>\n<summary><b>Facebook/Instagram still showing old emojis</b></summary>\n\n1. Force-stop the app\n2. Check `service.log` for errors\n3. Verify that the emoji file has read-only permissions: `ls -l /data/data/com.facebook.katana/app_ras_blobs/FacebookEmoji.ttf` — should show `-r--r--r--`\n4. If not, reboot — the module re-applies on every boot\n\n</details>\n\n<details>\n<summary><b>Sounds/Ringtones not appearing in Settings picker</b></summary>\n\n1. The module triggers MediaScanner after boot — wait ~15 seconds after reboot\n2. If still not visible, check if your ROM reads from `/system/product/media/audio/` or `/system/media/audio/`\n3. Try clearing the MediaProvider cache: **Settings → Apps → Media Storage → Clear Data** → Reboot\n\n</details>\n\n<details>\n<summary><b>KernelSU: Nothing is working</b></summary>\n\n1. **You MUST install a metamodule** (e.g., `meta-overlayfs`) for KernelSU to mount files into `/system/`\n2. The installer will show a warning if no metamodule is detected\n3. Install `meta-overlayfs` → Reboot → Re-flash this module → Reboot again\n\n</details>\n\n---\n\n## 📝 Changelog\n\nSee the full changelog at [`update_metada/CHANGELOG.md`](update_metada/CHANGELOG.md).\n\n### Latest: v2.0.4\n\n- **Universal Android 11~16 & AOSP Support:** Full compatibility with Android 16 (Baklava), Axion AOSP, and custom ROMs without bootloop risks.\n- **Safe Pre-Boot & Audio Aliases:** Zero-mount safe `post-fs-data.sh` and `post-mount.sh` execution, complete lowercase keypress audio aliases, and dual-phase `SettingsProvider` and `resetprop` injection.\n- **Gboard & Font Protection:** Preserves keyboard preferences (including Sound on Keypress) while clearing dynamic emoji packs and preventing Google Play Services OTA font rollbacks.\n\n### Previous: v1.4.9\n\n### Previous: v1.4.8\n\n- **Absolute Keyboard Flicker Fix:** Replaced the Instagram `FacebookEmoji.ttf` with a standard text font (`Roboto-Regular`) to safely bypass a native `EmojiCompat` crash when replying to Stories, gracefully forcing the app to fall back to the system iOS emojis.\n\n### Previous: v1.4.7\n\n- **Keyboard Flicker Fix (AOSP/Custom ROMs):** Excluded keyboard apps (SwiftKey, Gboard) from internal font replacement. This stops the keyboard from crashing when opening the emoji panel to reply to an Instagram Story.\n\n### Previous: v1.4.6\n\n- **HyperOS Instagram Stories Crash Fix:** Changed permissions of `FacebookEmoji.ttf` to `644` to prevent an unhandled permission exception during Instagram's font validation checks.\n- **Meta Emoji Watcher Daemon:** Added an ultra-lightweight background daemon to `service.sh` that actively watches for Instagram's attempts to revert the iOS emojis and silently restores them.\n\n### Previous: v1.4.5\n\n- **Stories Keyboard Crash Fix:** Changed the SELinux context of the Instagram emoji font from `app_data_file` to `system_file`. This allows third-party keyboards (like SwiftKey/Gboard) to read the font when passed by the Instagram Stories editor, preventing the keyboard from crashing and flickering.\n- **HyperOS/Dual Apps Support:** Scans all user profiles (`/data/user/*`) to ensure Instagram and other Meta apps in Dual Apps have their emojis replaced correctly.\n- **Messenger font block:** Blocks the font download directory (`files/fonts`) for Messenger across all user profiles (`/data/user/*`) to prevent silent redownloads.\n- **Crash Fix:** Removed `chattr +i` (immutable flag) from emoji files to prevent Instagram from crashing.\n\n---\n\n## 👏 Credits\n\n| Contributor | Contribution |\n| :--- | :--- |\n| [**topjohnwu**](https://github.com/topjohnwu) | Creator of Magisk |\n| [**tiann**](https://github.com/tiann) | Creator of KernelSU |\n| [**TheGabrielHoward**](https://github.com/TheGabrielHoward/IOS-sounds/tree/master) | Original iOS sounds and module inspiration |\n| [**dtingley11**](https://github.com/dtingley11/KernelSU-iOS-Emoji) | OEM font replacement code |\n\n---\n\n<p align=\"center\">\n  <b>Sentinel Data Solutions</b> | <i>Mobile Experience Engineering</i><br/>\n  <b>Developed by Zeca</b>\n</p>\n\n<p align=\"center\">\n  ⭐ If this module improved your Android experience, consider giving the repo a star!\n</p>\n",
+  "readmeHTML": "<h1>🍎 Sound & Emoji iOS — Magisk / KernelSU / KernelSu Next Module</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Version-2.0.4-blueviolet?style=for-the-badge\" alt=\"Version\"/></p>\n<p>  <img src=\"https://img.shields.io/badge/Android-11%20~%2016-brightgreen?style=for-the-badge\" alt=\"Android\"/></p>\n<p>  <img src=\"https://img.shields.io/badge/License-Open%20Source-blue?style=for-the-badge\" alt=\"License\"/></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/topjohnwu/Magisk\"><img src=\"https://img.shields.io/badge/Root-Magisk-orange?style=for-the-badge&logo=android\" alt=\"Magisk\"/></a></p>\n<p>  <a href=\"https://github.com/tiann/KernelSU\"><img src=\"https://img.shields.io/badge/Root-KernelSU-green?style=for-the-badge&logo=android\" alt=\"KernelSU\"/></a></p>\n<p>  <a href=\"https://github.com/bmax121/APatch\"><img src=\"https://img.shields.io/badge/Root-KernelSU Next-blue?style=for-the-badge&logo=android\" alt=\"KernelSU Next\"/></a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <b>A high-performance system-level module that brings the complete iOS auditory and visual experience to any rooted Android device.</b></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  iOS Sounds • iOS Emojis • SF Pro Display Font • Multi-Root Support</p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>📋 Table of Contents</h2>\n\n<li>[Overview](#-overview)</li>\n<li>[Features](#-features)</li>\n<li>[What's Included](#-whats-included)</li>\n<li>[Compatibility](#-compatibility)</li>\n<li>[Installation](#-installation)</li>\n<li>[Architecture & Boot Lifecycle](#-architecture--boot-lifecycle)</li>\n<li>[Script Details](#-script-details)</li>\n<li>[Project Structure](#-project-structure)</li>\n<li>[OEM Emoji Support](#-oem-emoji-support)</li>\n<li>[Meta / Facebook Emoji Fix](#-meta--facebook-emoji-fix)</li>\n<li>[Known Limitations](#-known-limitations)</li>\n<li>[OTA Updates](#-ota-updates)</li>\n<li>[Troubleshooting](#-troubleshooting)</li>\n<li>[Changelog](#-changelog)</li>\n<li>[Credits](#-credits)</li>\n\n<p>---</p>\n\n<h2>🔍 Overview</h2>\n\n<p><b>Sound_And_Emoji_IOS</b> is a comprehensive Android root module that systemlessly replaces:</p>\n\n<li>**All system sounds** (UI, ringtones, notifications, alarms) with authentic iOS audio</li>\n<li>**System-wide emojis** with the latest iOS emoji font (including OEM-specific replacements)</li>\n<li>**System typography** with Apple's **SF Pro Display** font family</li>\n\n<p>The module uses an intelligent multi-stage boot pipeline to ensure 100% persistence across reboots, ROM updates, and aggressive Google Play Services font re-downloads.</p>\n\n<p>---</p>\n\n<h2>✨ Features</h2>\n\n<p>| Feature | Description |</p>\n<p>| :--- | :--- |</p>\n<p>| 🔊 <b>Complete iOS Sound Set</b> | 43 audio files covering UI, ringtones, notifications, alarms, camera, NFC, charging, and more |</p>\n<p>| 😀 <b>iOS Emoji Replacement</b> | System-wide emoji override with latest iOS emoji font (~30MB high-res) |</p>\n<p>| 🔤 <b>SF Pro Display Font</b> | 16 font weights (Regular to Ultralight, with Italic variants) |</p>\n<p>| 🏭 <b>OEM Detection</b> | Auto-detects Samsung, Xiaomi, LG, HTC, OnePlus, Huawei emoji fonts |</p>\n<p>| 📱 <b>Dual-Path Installation</b> | Installs to both <code>/system/product/</code> and <code>/system/media/</code> for max ROM compatibility |</p>\n<p>| 🔒 <b>SELinux Compliant</b> | Full <code>u:object_r:system_file:s0</code> context enforcement + custom SEPolicy rules |</p>\n<p>| 🔄 <b>Anti-Revert System</b> | Blocks Google Play Services from re-downloading stock emoji fonts |</p>\n<p>| 📘 <b>Meta App Fix</b> | Replaces Facebook, Instagram, and Messenger emoji with iOS versions |</p>\n<p>| 🪵 <b>Built-in Logging</b> | Detailed <code>service.log</code> for debugging |</p>\n<p>| ♻️ <b>OverlayFS Support</b> | Integrated support for <code>magisk_overlayfs</code> module |</p>\n<p>| 🔁 <b>Auto-Update</b> | In-app update support via <code>updateJson</code> |</p>\n\n<p>---</p>\n\n<h2>📦 What's Included</h2>\n\n<h3>🔊 Sounds (43 files)</h3>\n\n<p><details></p>\n<p><summary><b>UI Sounds (30 files)</b></summary></p>\n\n<p>| Sound | File |</p>\n<p>| :--- | :--- |</p>\n<p>| Lock Screen | <code>Lock.ogg</code> |</p>\n<p>| Unlock Screen | <code>Unlock.ogg</code> |</p>\n<p>| Keyboard Standard | <code>KeypressStandard.ogg</code> |</p>\n<p>| Keyboard Spacebar | <code>KeypressSpacebar.ogg</code> |</p>\n<p>| Keyboard Delete | <code>KeypressDelete.ogg</code> |</p>\n<p>| Keyboard Return | <code>KeypressReturn.ogg</code> |</p>\n<p>| Keyboard Invalid | <code>KeypressInvalid.ogg</code> |</p>\n<p>| Camera Click | <code>camera_click.ogg</code>, <code>CameraClick.ogg</code> |</p>\n<p>| Camera Focus | <code>camera_focus.ogg</code>, <code>CameraFocus.ogg</code> |</p>\n<p>| Screenshot | <code>screenshot.ogg</code> |</p>\n<p>| Video Record Start | <code>VideoRecord.ogg</code> |</p>\n<p>| Video Record Stop | <code>VideoStop.ogg</code> |</p>\n<p>| Charging Started | <code>ChargingStarted.ogg</code> |</p>\n<p>| Charging Stopped | <code>ChargingStopped.ogg</code> |</p>\n<p>| Wireless Charging | <code>WirelessChargingStarted.ogg</code> |</p>\n<p>| Low Battery | <code>LowBattery.ogg</code> |</p>\n<p>| NFC Success | <code>NFCSuccess.ogg</code> |</p>\n<p>| NFC Failure | <code>NFCFailure.ogg</code> |</p>\n<p>| NFC Transfer Complete | <code>NFCTransferComplete.ogg</code> |</p>\n<p>| NFC Transfer Initiated | <code>NFCTransferInitiated.ogg</code> |</p>\n<p>| NFC Initiated | <code>NFCInitiated.ogg</code> |</p>\n<p>| Smart Lock (Trusted) | <code>Trusted.ogg</code> |</p>\n<p>| Dock | <code>Dock.ogg</code> |</p>\n<p>| Undock | <code>Undock.ogg</code> |</p>\n<p>| Volume Incremental | <code>VolumeIncremental.ogg</code> |</p>\n<p>| Media Volume | <code>Media_Volume.ogg</code> |</p>\n<p>| Effect Tick | <code>Effect_Tick.ogg</code> |</p>\n<p>| In-Call Notification | <code>InCallNotification.ogg</code> |</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Notifications (7 files)</b></summary></p>\n\n<p>| Sound | File |</p>\n<p>| :--- | :--- |</p>\n<p>| Default Message | <code>IOSDefaultMessageNotification.ogg</code> |</p>\n<p>| Calendar Alert | <code>IOSCalendarAlert.ogg</code> |</p>\n<p>| New Mail | <code>IOSNewMail.ogg</code> |</p>\n<p>| Reminder Alert | <code>IOSReminderAlert.ogg</code> |</p>\n<p>| Sent Message | <code>IOSSentMessage.ogg</code> |</p>\n<p>| iOS Notification 0 | <code>Ios Notification 0.ogg</code> |</p>\n<p>| iOS Notification 1 | <code>Ios Notification 1.ogg</code> |</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Ringtones (3 files)</b></summary></p>\n\n<p>| Sound | File |</p>\n<p>| :--- | :--- |</p>\n<p>| Default (Reflection) | <code>IOSDefaultRingtone.ogg</code> |</p>\n<p>| Reflection | <code>IOSReflection.ogg</code> |</p>\n<p>| Sashimi | <code>IOSSashimi.ogg</code> |</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Alarms (3 files)</b></summary></p>\n\n<p>| Sound | File |</p>\n<p>| :--- | :--- |</p>\n<p>| Default Alarm | <code>IOSDefaultAlarm.ogg</code> |</p>\n<p>| Bedtime | <code>IOSBedtimeAlarm.ogg</code> |</p>\n<p>| Nightstand | <code>IOSNightstandAlarm.ogg</code> |</p>\n\n<p></details></p>\n\n<h3>😀 Emoji Fonts (2 files)</h3>\n\n<p>| Font | Size | Purpose |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <code>NotoColorEmoji.ttf</code> | ~30 MB | System-wide emoji replacement (AOSP/Pixel) |</p>\n<p>| <code>FacebookEmoji.ttf</code> | ~30 MB | Meta apps emoji replacement (FB, IG, Messenger) |</p>\n\n<h3>🔤 SF Pro Display (16 font weights)</h3>\n\n<p>| Weight | Regular | Italic |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| Ultralight | ✅ | ✅ |</p>\n<p>| Thin | ✅ | ✅ |</p>\n<p>| Light | ✅ | ✅ |</p>\n<p>| Regular | ✅ | ✅ |</p>\n<p>| Medium | ✅ | ✅ |</p>\n<p>| Semibold | ✅ | ✅ |</p>\n<p>| Bold | ✅ | ✅ |</p>\n<p>| Heavy | ✅ | ✅ |</p>\n\n<p>---</p>\n\n<h2>🔧 Compatibility</h2>\n\n<h3>Root Solutions</h3>\n\n<p>| Platform | Version | Status |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <b>Magisk</b> | 20.0+ | ✅ Full Support |</p>\n<p>| <b>KernelSU</b> | All | ✅ Full Support (requires metamodule) |</p>\n<p>| <b>KernelSU Next</b> | 20000+ | ✅ Full Support (requires metamodule) |</p>\n<p>| <b>APatch</b> | All | ✅ Full Support |</p>\n\n<h3>Android Versions</h3>\n\n<p>| Android | API | Status | Notes |</p>\n<p>| :--- | :--- | :--- | :--- |</p>\n<p>| Android 11 | API 30 | ✅ | Legacy path (<code>/system/media/audio</code>) |</p>\n<p>| Android 12 | API 31 | ✅ | Product path (<code>/system/product/media/audio</code>) |</p>\n<p>| Android 12L | API 32 | ✅ | — |</p>\n<p>| Android 13 | API 33 | ✅ | — |</p>\n<p>| Android 14 | API 34 | ✅ | resetprop fallback for <code>ro.config.*</code> |</p>\n<p>| Android 15 | API 35 | ✅ | resetprop fallback for <code>ro.config.*</code> |</p>\n<p>| Android 16 | API 36 | ✅ | resetprop fallback for <code>ro.config.*</code> |</p>\n\n<h3>Tested ROMs</h3>\n\n<p>Works on AOSP, Pixel, LineageOS, crDroid, EvolutionX, AxionOS, MIUI, HyperOS, OneUI, OxygenOS, ColorOS, and more.</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>KernelSU / KernelSU Next users:</b> You <b>MUST</b> install a metamodule (e.g., <code>meta-overlayfs</code>) for the module to mount files into <code>/system/</code>. The installer will warn you if none is detected.</p>\n\n<p>---</p>\n\n<h2>🚀 Installation</h2>\n\n<li>Download the latest `Sound_And_Emoji_IOS.zip` from [Releases](https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases)</li>\n<li>Open your root manager (**Magisk Manager**, **KernelSU Manager**, or **APatch**)</li>\n<li>Flash the `.zip` via the **Modules** → **Install from storage** option</li>\n<li>**Reboot** your device</li>\n<li>Enjoy the iOS experience! 🎉</li>\n\n<p>> [!NOTE]</p>\n<p>> The module clears the Gboard emoji cache during installation. You may notice a brief delay on the first keyboard launch after reboot while Gboard rebuilds its emoji index.</p>\n\n<p>---</p>\n\n<h2>🏗️ Architecture & Boot Lifecycle</h2>\n\n<p>The module uses a sophisticated multi-stage boot pipeline to ensure everything works across all root solutions and Android versions:</p>\n\n<pre>graph TD\n    subgraph INSTALL[\"📥 Installation (customize.sh)\"]\n        I1[Detect Root Environment] --&gt; I2[Detect Android Version]\n        I2 --&gt; I3{API ≥ 31?}\n        I3 -- Yes --&gt; I4[\"/system/product/media/audio\"]\n        I3 -- No --&gt; I5[\"Mirror to /system/media/audio\"]\n        I4 --&gt; I6[Detect OEM Fonts]\n        I5 --&gt; I6\n        I6 --&gt; I7[Clear Gboard Cache]\n        I7 --&gt; I8[Set SELinux Contexts]\n        I8 --&gt; I9[Apply Permissions]\n    end\n\n    subgraph BOOT1[\"🔒 post-fs-data.sh (Pre-Mount)\"]\n        B1[\"Nuke font caches:&lt;br/&gt;/data/fonts&lt;br/&gt;GMS fonts&lt;br/&gt;Gboard emoji&lt;br/&gt;Messenger fonts\"]\n    end\n\n    subgraph BOOT2[\"📁 post-mount.sh (After OverlayFS)\"]\n        B2[Replace ALL *emoji*.ttf in /data] --&gt; B3[Lock Meta app emojis]\n        B3 --&gt; B4[Block Messenger font downloads]\n        B4 --&gt; B5[Clean GMS font caches]\n    end\n\n    subgraph BOOT3[\"⚙️ service.sh (Late Start)\"]\n        B6[Wait for boot_completed] --&gt; B7[Clear Gboard cache]\n        B7 --&gt; B8[\"Force resetprop ro.config.*\"]\n        B8 --&gt; B9[Replace ALL emoji fonts globally]\n        B9 --&gt; B10[Lock Meta emoji]\n        B10 --&gt; B11[Disable GMS Font Provider]\n        B11 --&gt; B12[\"Media Scanner (Magisk only)\"]\n    end\n\n    subgraph BOOT4[\"✅ boot-completed.sh (KSU/APatch)\"]\n        B13[\"Force resetprop ro.config.*\"] --&gt; B14[Media Scanner broadcast]\n    end\n\n    INSTALL --&gt; BOOT1\n    BOOT1 --&gt; BOOT2\n    BOOT2 --&gt; BOOT3\n    BOOT3 --&gt; BOOT4\n\n    style INSTALL fill:#1a1a2e,stroke:#e94560,color:#fff\n    style BOOT1 fill:#16213e,stroke:#0f3460,color:#fff\n    style BOOT2 fill:#16213e,stroke:#533483,color:#fff\n    style BOOT3 fill:#16213e,stroke:#e94560,color:#fff\n    style BOOT4 fill:#0f3460,stroke:#00b4d8,color:#fff</pre>\n\n<h3>Why Multiple Stages?</h3>\n\n<p>| Stage | Timing | Purpose |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <code>post-fs-data.sh</code> | Before module mount | Clean caches BEFORE system reads them |</p>\n<p>| <code>post-mount.sh</code> | After OverlayFS mount | Replace app emoji files while apps haven't started |</p>\n<p>| <code>service.sh</code> | Late start (boot completed) | Force properties, disable GMS, media scan |</p>\n<p>| <code>boot-completed.sh</code> | After <code>sys.boot_completed=1</code> (KSU/APatch) | Re-apply properties that system may have overwritten |</p>\n\n<p>---</p>\n\n<h2>📜 Script Details</h2>\n\n<h3>`customize.sh` — Installation Engine</h3>\n\n<p>The installation script adapts to the device environment:</p>\n\n<li>**Root Detection:** Identifies Magisk, KernelSU, KernelSU Next, or APatch</li>\n<li>**Metamodule Check (KSU):** Warns if `meta-overlayfs` or similar is not installed</li>\n<li>**API-Based Path Selection:** Uses `/system/product/` for Android 12+ or mirrors to `/system/media/` for Android 11</li>\n<li>**OEM Emoji Detection:** Scans `/system/fonts/` for manufacturer-specific emoji fonts and creates replacements only for fonts that actually exist</li>\n<li>**Gboard Cache Cleanup:** Removes cached emoji data so Gboard picks up the new font</li>\n<li>**OverlayFS Integration:** Detects and supports `magisk_overlayfs` for restricted partitions</li>\n<li>**SELinux Enforcement:** Applies `u:object_r:system_file:s0` context to all installed files</li>\n\n<h3>`post-fs-data.sh` — Pre-Mount Cache Nuker</h3>\n\n<p>Runs BEFORE the module is mounted. Has a strict 10-second timeout.</p>\n\n<li>Deletes `/data/fonts/` (system font updates)</li>\n<li>Cleans GMS font provider caches</li>\n<li>Clears Gboard emoji caches</li>\n<li>Removes Messenger font download directories</li>\n\n<h3>`post-mount.sh` — Emoji Lock (KSU/APatch)</h3>\n\n<p>Runs AFTER OverlayFS/MagicMount has mounted module files.</p>\n\n<li>**Nuclear font replacement:** Finds ALL `*emoji*.ttf` files in `/data/data/` and `/data/user/0/` and replaces them with the iOS emoji font</li>\n<li>**Meta app lock:** Creates/replaces `FacebookEmoji.ttf` in each Meta app's `app_ras_blobs/` directory with correct ownership and immutable flag</li>\n<li>**Messenger block:** Sets `chmod 000` on Messenger's font download directory</li>\n<li>**GMS cleanup:** Removes cached font files from Google Play Services</li>\n\n<h3>`service.sh` — Late Start Service (Universal)</h3>\n\n<p>The main runtime script. Waits for <code>sys.boot_completed=1</code> before executing.</p>\n\n<li>**resetprop:** Force-sets 25+ `ro.config.*` sound properties that Android 14+ may overwrite during boot</li>\n<li>**Global emoji replacement:** Scans ALL app directories for emoji font files and replaces them</li>\n<li>**Meta emoji lock:** Replaces and locks emoji fonts in Facebook, Instagram, Messenger (+ Lite variants) with `chmod 444`</li>\n<li>**GMS Font Provider disable:** Disables `FontsProvider` and `UpdateSchedulerService` in Google Play Services to prevent stock emoji re-download</li>\n<li>**Media Scanner (Magisk):** Broadcasts `MEDIA_SCANNER_SCAN_FILE` intents for all audio files so they appear in Android's sound picker</li>\n\n<h3>`boot-completed.sh` — Post-Boot Hook (KSU/APatch)</h3>\n\n<p>KernelSU and APatch support this hook natively. Provides a clean way to re-apply properties after the system is fully booted.</p>\n\n<li>Re-applies all `ro.config.*` sound properties via `resetprop`</li>\n<li>Triggers media scanner for ringtones, notifications, and alarms</li>\n\n<h3>`sepolicy.rule` — SELinux Policy</h3>\n\n<p>Custom SEPolicy rules that allow:</p>\n\n<li>`mediaserver` and `audioserver` to read module-mounted audio files</li>\n<li>Untrusted apps (Facebook/Messenger) to read bind-mounted emoji fonts</li>\n<li>Platform apps (Gboard) and GMS to read system emoji fonts</li>\n\n<h3>`system.prop` — System Properties</h3>\n\n<p>Declares default ringtone, notification, and alarm properties. Kept for backwards compatibility with older Android versions where <code>system.prop</code> is reliably applied during boot.</p>\n\n<h3>`uninstall.sh` — Clean Removal</h3>\n\n<p>Removes the module directory from <code>/data/adb/modules/</code> on uninstallation.</p>\n\n<p>---</p>\n\n<h2>📂 Project Structure</h2>\n\n<pre>Sound_And_Emoji_IOS/\n├── META-INF/                          # Flashable ZIP metadata\n│   └── com/google/android/\n│       ├── update-binary             # Magisk module installer\n│       └── updater-script            # Required (empty marker)\n│\n├── system/\n│   ├── fonts/                         # Font replacements\n│   │   ├── NotoColorEmoji.ttf        # iOS emoji font (system-wide)\n│   │   ├── FacebookEmoji.ttf         # iOS emoji for Meta apps\n│   │   ├── SF-Pro-Display-Regular.ttf\n│   │   ├── SF-Pro-Display-Bold.ttf\n│   │   ├── SF-Pro-Display-Medium.ttf\n│   │   ├── SF-Pro-Display-Semibold.ttf\n│   │   ├── SF-Pro-Display-Light.ttf\n│   │   ├── SF-Pro-Display-Thin.ttf\n│   │   ├── SF-Pro-Display-Heavy.ttf\n│   │   ├── SF-Pro-Display-Ultralight.ttf\n│   │   └── ... (+ italic variants)\n│   │\n│   └── product/media/audio/          # iOS sound files\n│       ├── ui/                        # 30 UI sounds\n│       ├── notifications/             # 7 notification sounds\n│       ├── ringtones/                 # 3 ringtones\n│       └── alarms/                    # 3 alarm sounds\n│\n├── webroot/\n│   └── index.html                    # Module manager web UI redirect\n│\n├── update_metada/\n│   ├── update.json                   # OTA update manifest\n│   └── CHANGELOG.md                  # Full version history\n│\n├── customize.sh                      # Installation script\n├── post-fs-data.sh                   # Pre-mount cache cleaner\n├── post-mount.sh                     # Post-mount emoji lock (KSU/APatch)\n├── service.sh                        # Late start service (universal)\n├── boot-completed.sh                 # Post-boot hook (KSU/APatch)\n├── sepolicy.rule                     # Custom SELinux policies\n├── system.prop                       # Default sound properties\n├── uninstall.sh                      # Cleanup on removal\n└── module.prop                       # Module metadata</pre>\n\n<p>---</p>\n\n<h2>🏭 OEM Emoji Support</h2>\n\n<p>The module automatically detects and replaces manufacturer-specific emoji fonts. It only creates replacement files for fonts that <b>actually exist</b> on your device:</p>\n\n<p>| OEM | Font File | Devices |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| Samsung | <code>SamsungColorEmoji.ttf</code> | Galaxy S, A, Note, Z series |</p>\n<p>| Xiaomi | <code>MiuiColorEmoji.ttf</code> | Mi, Redmi, POCO (MIUI/HyperOS) |</p>\n<p>| LG | <code>LGNotoColorEmoji.ttf</code> | LG V, G series |</p>\n<p>| HTC | <code>HTC_ColorEmoji.ttf</code> | HTC U, Desire series |</p>\n<p>| OnePlus | <code>OnePlusEmoji.ttf</code> | OnePlus, OPPO, Realme |</p>\n<p>| Huawei | <code>HuaweiColorEmoji.ttf</code> | Huawei, Honor |</p>\n<p>| AOSP/Pixel | <code>NotoColorEmoji.ttf</code> | Pixel, AOSP-based ROMs |</p>\n\n<p>---</p>\n\n<h2>📘 Meta / Facebook Emoji Fix</h2>\n\n<p>Meta apps (Facebook, Instagram, Messenger) use their own bundled emoji font (<code>FacebookEmoji.ttf</code>) instead of the system font. The module uses an <b>aggressive multi-layer approach</b> to force iOS emojis:</p>\n\n<pre>graph LR\n    A[\"🔍 Find ALL *emoji*.ttf&lt;br/&gt;in /data/data/ &amp; /data/user/0/\"] --&gt; B[\"📝 Replace with&lt;br/&gt;iOS emoji font\"]\n    B --&gt; C[\"🔒 Apply permissions&lt;br/&gt;(chmod 444)\"]\n    C --&gt; D[\"🚫 Block Messenger&lt;br/&gt;font downloads&lt;br/&gt;(chmod 000)\"]\n    D --&gt; E[\"⛔ Disable GMS&lt;br/&gt;FontsProvider\"]\n    E --&gt; F[\"🔄 Force-stop&lt;br/&gt;Meta apps\"]\n\n    style A fill:#1877f2,stroke:#fff,color:#fff\n    style B fill:#e94560,stroke:#fff,color:#fff\n    style C fill:#533483,stroke:#fff,color:#fff\n    style D fill:#0f3460,stroke:#fff,color:#fff\n    style E fill:#16213e,stroke:#fff,color:#fff\n    style F fill:#1a1a2e,stroke:#fff,color:#fff</pre>\n\n<h3>Targeted Apps</h3>\n\n<p>| App | Package | Status |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| Facebook | <code>com.facebook.katana</code> | ✅ iOS Emojis |</p>\n<p>| Messenger | <code>com.facebook.orca</code> | ✅ iOS Emojis |</p>\n<p>| Facebook Lite | <code>com.facebook.lite</code> | ✅ iOS Emojis |</p>\n<p>| Messenger Lite | <code>com.facebook.mlite</code> | ✅ iOS Emojis |</p>\n<p>| Instagram | <code>com.instagram.android</code> | ✅ iOS Emojis |</p>\n<p>| InstaPro | <code>com.instapro.android</code> | ✅ iOS Emojis |</p>\n\n<p>---</p>\n\n<h2>⚠️ Known Limitations</h2>\n\n<h3>WhatsApp Emojis</h3>\n\n<p>WhatsApp <b>does not use the system emoji font</b> (<code>NotoColorEmoji.ttf</code>). Instead, WhatsApp bundles its own proprietary emoji set directly inside the APK to maintain visual consistency across Android, iOS, and Web platforms. This is a deliberate architectural decision by Meta.</p>\n\n<p><b>What this means:</b></p>\n<li>✅ System UI, Gboard, SMS, Chrome, and most apps → **iOS emojis work perfectly**</li>\n<li>✅ Facebook, Instagram, Messenger → **iOS emojis work** (replaced via module)</li>\n<li>❌ WhatsApp → **uses its own emojis** (cannot be changed without modifying the APK)</li>\n\n<p>> [!NOTE]</p>\n<p>> This is <b>not a bug in the module</b> — it is a WhatsApp limitation. The only way to change WhatsApp's emojis would be to use a modified APK (which violates WhatsApp's Terms of Service and may result in account suspension).</p>\n\n<h3>Telegram</h3>\n\n<p>Telegram has its own emoji rendering system that can be configured in-app. Check <b>Settings → Chat Settings → Emoji</b> to use system emojis.</p>\n\n<p>---</p>\n\n<h2>🔄 OTA Updates</h2>\n\n<p>The module supports in-app updates via the <code>updateJson</code> mechanism. Your root manager will automatically check for new versions.</p>\n\n<p><b>Update URL:</b> <code>https://raw.githubusercontent.com/antoniomalheirs/Sound_And_Emoji_IOS/main/update_metada/update.json</code></p>\n\n<p>---</p>\n\n<h2>🔧 Troubleshooting</h2>\n\n<p><details></p>\n<p><summary><b>Sounds not changing after reboot</b></summary></p>\n\n<li>Check if `service.log` exists in the module directory (`/data/adb/modules/Sound_And_Emoji_IOS/service.log`)</li>\n<li>Verify that `resetprop` is working: run `getprop ro.config.ringtone` — it should show `IOSDefaultRingtone.ogg`</li>\n<li>On Android 14+, the system may override `system.prop` — the module uses `resetprop` as fallback via `service.sh` and `boot-completed.sh`</li>\n<li>Clear your Settings app cache and check sound settings again</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Emojis not changing in Gboard</b></summary></p>\n\n<li>Clear Gboard app data: **Settings → Apps → Gboard → Clear Data**</li>\n<li>Reboot the device</li>\n<li>Check if `/data/fonts/` directory was removed (it should not exist)</li>\n<li>Verify the module is enabled in your root manager</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Facebook/Instagram still showing old emojis</b></summary></p>\n\n<li>Force-stop the app</li>\n<li>Check `service.log` for errors</li>\n<li>Verify that the emoji file has read-only permissions: `ls -l /data/data/com.facebook.katana/app_ras_blobs/FacebookEmoji.ttf` — should show `-r--r--r--`</li>\n<li>If not, reboot — the module re-applies on every boot</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Sounds/Ringtones not appearing in Settings picker</b></summary></p>\n\n<li>The module triggers MediaScanner after boot — wait ~15 seconds after reboot</li>\n<li>If still not visible, check if your ROM reads from `/system/product/media/audio/` or `/system/media/audio/`</li>\n<li>Try clearing the MediaProvider cache: **Settings → Apps → Media Storage → Clear Data** → Reboot</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>KernelSU: Nothing is working</b></summary></p>\n\n<li>**You MUST install a metamodule** (e.g., `meta-overlayfs`) for KernelSU to mount files into `/system/`</li>\n<li>The installer will show a warning if no metamodule is detected</li>\n<li>Install `meta-overlayfs` → Reboot → Re-flash this module → Reboot again</li>\n\n<p></details></p>\n\n<p>---</p>\n\n<h2>📝 Changelog</h2>\n\n<p>See the full changelog at <a href=\"update_metada/CHANGELOG.md\"><code>update_metada/CHANGELOG.md</code></a>.</p>\n\n<h3>Latest: v2.0.4</h3>\n\n<li>**Universal Android 11~16 & AOSP Support:** Full compatibility with Android 16 (Baklava), Axion AOSP, and custom ROMs without bootloop risks.</li>\n<li>**Safe Pre-Boot & Audio Aliases:** Zero-mount safe `post-fs-data.sh` and `post-mount.sh` execution, complete lowercase keypress audio aliases, and dual-phase `SettingsProvider` and `resetprop` injection.</li>\n<li>**Gboard & Font Protection:** Preserves keyboard preferences (including Sound on Keypress) while clearing dynamic emoji packs and preventing Google Play Services OTA font rollbacks.</li>\n\n<h3>Previous: v1.4.9</h3>\n\n<h3>Previous: v1.4.8</h3>\n\n<li>**Absolute Keyboard Flicker Fix:** Replaced the Instagram `FacebookEmoji.ttf` with a standard text font (`Roboto-Regular`) to safely bypass a native `EmojiCompat` crash when replying to Stories, gracefully forcing the app to fall back to the system iOS emojis.</li>\n\n<h3>Previous: v1.4.7</h3>\n\n<li>**Keyboard Flicker Fix (AOSP/Custom ROMs):** Excluded keyboard apps (SwiftKey, Gboard) from internal font replacement. This stops the keyboard from crashing when opening the emoji panel to reply to an Instagram Story.</li>\n\n<h3>Previous: v1.4.6</h3>\n\n<li>**HyperOS Instagram Stories Crash Fix:** Changed permissions of `FacebookEmoji.ttf` to `644` to prevent an unhandled permission exception during Instagram's font validation checks.</li>\n<li>**Meta Emoji Watcher Daemon:** Added an ultra-lightweight background daemon to `service.sh` that actively watches for Instagram's attempts to revert the iOS emojis and silently restores them.</li>\n\n<h3>Previous: v1.4.5</h3>\n\n<li>**Stories Keyboard Crash Fix:** Changed the SELinux context of the Instagram emoji font from `app_data_file` to `system_file`. This allows third-party keyboards (like SwiftKey/Gboard) to read the font when passed by the Instagram Stories editor, preventing the keyboard from crashing and flickering.</li>\n<li>**HyperOS/Dual Apps Support:** Scans all user profiles (`/data/user/*`) to ensure Instagram and other Meta apps in Dual Apps have their emojis replaced correctly.</li>\n<li>**Messenger font block:** Blocks the font download directory (`files/fonts`) for Messenger across all user profiles (`/data/user/*`) to prevent silent redownloads.</li>\n<li>**Crash Fix:** Removed `chattr +i` (immutable flag) from emoji files to prevent Instagram from crashing.</li>\n\n<p>---</p>\n\n<h2>👏 Credits</h2>\n\n<p>| Contributor | Contribution |</p>\n<p>| :--- | :--- |</p>\n<p>| <a href=\"https://github.com/topjohnwu\"><b>topjohnwu</b></a> | Creator of Magisk |</p>\n<p>| <a href=\"https://github.com/tiann\"><b>tiann</b></a> | Creator of KernelSU |</p>\n<p>| <a href=\"https://github.com/TheGabrielHoward/IOS-sounds/tree/master\"><b>TheGabrielHoward</b></a> | Original iOS sounds and module inspiration |</p>\n<p>| <a href=\"https://github.com/dtingley11/KernelSU-iOS-Emoji\"><b>dtingley11</b></a> | OEM font replacement code |</p>\n\n<p>---</p>\n\n<p><p align=\"center\"></p>\n<p>  <b>Sentinel Data Solutions</b> | <i>Mobile Experience Engineering</i><br/></p>\n<p>  <b>Developed by Zeca</b></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  ⭐ If this module improved your Android experience, consider giving the repo a star!</p>\n<p></p></p>",
+  "homepageUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS",
+  "sourceUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS",
+  "url": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS",
+  "latestRelease": {
+    "name": "V2.0.4",
+    "version": "V2.0.4",
+    "time": "2026-10-02T05:23:48Z",
+    "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V2.0.4/Sound_And_Emoji_IOS.zip"
+  },
+  "releases": [
+    {
+      "name": "V2.0.4",
+      "tagName": "V2.0.4",
+      "publishedAt": "2026-10-02T05:23:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V2.0.4/Sound_And_Emoji_IOS.zip",
+          "size": 71993065,
+          "downloadCount": 251
+        }
+      ]
+    },
+    {
+      "name": "V1.4.9",
+      "tagName": "V1.4.9",
+      "publishedAt": "2026-05-30T03:07:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.9/Sound_And_Emoji_IOS.zip",
+          "size": 102455256,
+          "downloadCount": 2260
+        }
+      ]
+    },
+    {
+      "name": "V1.4.8",
+      "tagName": "V1.4.8",
+      "publishedAt": "2026-05-30T02:58:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.8/Sound_And_Emoji_IOS.zip",
+          "size": 102455052,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "V2.0.1",
+      "tagName": "V2.0.1",
+      "publishedAt": "2026-05-31T00:39:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V2.0.1/Sound_And_Emoji_IOS.zip",
+          "size": 71700423,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "V1.4.7",
+      "tagName": "V1.4.7",
+      "publishedAt": "2026-05-30T02:47:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.7/Sound_And_Emoji_IOS.zip",
+          "size": 102454471,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "V1.4.5",
+      "tagName": "V1.4.5",
+      "publishedAt": "2026-05-29T22:23:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.5/Sound_And_Emoji_IOS.zip",
+          "size": 102453418,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "V1.4.4",
+      "tagName": "V1.4.4",
+      "publishedAt": "2026-05-29T17:43:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.4/Sound_And_Emoji_IOS.zip",
+          "size": 102453522,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "V1.4.3",
+      "tagName": "V1.4.3",
+      "publishedAt": "2026-05-29T17:25:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.3/Sound_And_Emoji_IOS.zip",
+          "size": 102453437,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "V1.4.2",
+      "tagName": "V1.4.2",
+      "publishedAt": "2026-05-28T21:12:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.2/Sound_And_Emoji_IOS.zip",
+          "size": 102461492,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "V1.4.1",
+      "tagName": "V1.4.1",
+      "publishedAt": "2026-04-09T20:40:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.1/Sound_And_Emoji_IOS.zip",
+          "size": 102452620,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "V1.4.0",
+      "tagName": "V1.4.0",
+      "publishedAt": "2026-04-09T19:18:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.4.0/Sound_And_Emoji_IOS.zip",
+          "size": 102451542,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "V1.3.1",
+      "tagName": "V1.3.1",
+      "publishedAt": "2026-03-23T18:08:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.3.1/Sound_And_Emoji_IOS.zip",
+          "size": 126109909,
+          "downloadCount": 172
+        }
+      ]
+    },
+    {
+      "name": "V1.1.1",
+      "tagName": "V1.1.1",
+      "publishedAt": "2025-08-05T21:32:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.1.1/Sound_And_Emoji_IOS.zip",
+          "size": 127950434,
+          "downloadCount": 356
+        }
+      ]
+    },
+    {
+      "name": "V1.1.0",
+      "tagName": "V1.1.0",
+      "publishedAt": "2024-10-31T07:37:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.1.0/Sound_And_Emoji_IOS.zip",
+          "size": 127973891,
+          "downloadCount": 116
+        }
+      ]
+    },
+    {
+      "name": "V1.0.9",
+      "tagName": "V1.0.9",
+      "publishedAt": "2024-10-31T03:14:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.9/Sound_And_Emoji_IOS.zip",
+          "size": 97668803,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "V1.0.8",
+      "tagName": "V1.0.8",
+      "publishedAt": "2024-10-28T01:25:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.8/Sound_And_Emoji_IOS.zip",
+          "size": 97667463,
+          "downloadCount": 41
+        }
+      ]
+    },
+    {
+      "name": "V1.0.7",
+      "tagName": "V1.0.7",
+      "publishedAt": "2024-10-14T02:21:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.7/Sound_And_Emoji_IOS.zip",
+          "size": 97670797,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "V1.0.6",
+      "tagName": "V1.0.6",
+      "publishedAt": "2024-10-14T02:14:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.6/Sound_And_Emoji_IOS.zip",
+          "size": 97670582,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "V1.0.5",
+      "tagName": "V1.0.5",
+      "publishedAt": "2024-10-14T02:10:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.5/Sound_And_Emoji_IOS.zip",
+          "size": 97668692,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "V1.0.4",
+      "tagName": "V1.0.4",
+      "publishedAt": "2024-10-14T01:35:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.4/Sound_And_Emoji_IOS.zip",
+          "size": 95920154,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "V1.0.3",
+      "tagName": "V1.0.3",
+      "publishedAt": "2024-10-14T01:09:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.3/Sound_And_Emoji_IOS.zip",
+          "size": 100494606,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "V1.0.2",
+      "tagName": "V1.0.2",
+      "publishedAt": "2024-10-14T00:53:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.2/Sound_And_Emoji_IOS.zip",
+          "size": 105068965,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "V1.0.1",
+      "tagName": "V1.0.1",
+      "publishedAt": "2024-10-14T00:38:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sound_And_Emoji_IOS.zip",
+          "downloadUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V1.0.1/Sound_And_Emoji_IOS.zip",
+          "size": 105068121,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ]
+}

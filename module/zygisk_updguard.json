@@ -1,0 +1,29 @@
+{
+  "readme": "# UpdGuard\nZygisk 模块，用于阻止所选应用的 Google Play 更新。\n\nZig 习作，聊供自用，不拟续修。疏拙之处，尚请见谅。\n\n## 原理\n仅在 Play Store 进程内拦截 Binder 调用，伪装高版本号并拦截安装会话。\n\n## 使用\n理论兼容 Android 11-17\n\n通过 WebUI 简单上手或使用 CLI 命令\n\n| 命令 | 作用 |\n| --- | --- |\n| `ugctl list` | 查看清单 |\n| `ugctl add <包名>...` | 添加守护 |\n| `ugctl remove <包名>...` | 解除守护 |\n| `ugctl set <包名>...` | 替换清单 |\n| `ugctl reset` | 清空清单 |\n| `ugctl reload` | 停止商店 |\n\n## 构建\n默认仅 arm64\n\n详见  [scripts/build.sh](scripts/build.sh)\n\n## 参考\n- [Zygisk module sample](https://github.com/topjohnwu/zygisk-module-sample)\n- [AOSP](https://android.googlesource.com/platform/frameworks/base/+/android17-release/core/java/android/content/pm/BaseParceledListSlice.java)\n",
+  "readmeHTML": "<h1>UpdGuard</h1>\n<p>Zygisk 模块，用于阻止所选应用的 Google Play 更新。</p>\n\n<p>Zig 习作，聊供自用，不拟续修。疏拙之处，尚请见谅。</p>\n\n<h2>原理</h2>\n<p>仅在 Play Store 进程内拦截 Binder 调用，伪装高版本号并拦截安装会话。</p>\n\n<h2>使用</h2>\n<p>理论兼容 Android 11-17</p>\n\n<p>通过 WebUI 简单上手或使用 CLI 命令</p>\n\n<p>| 命令 | 作用 |</p>\n<p>| --- | --- |</p>\n<p>| <code>ugctl list</code> | 查看清单 |</p>\n<p>| <code>ugctl add <包名>...</code> | 添加守护 |</p>\n<p>| <code>ugctl remove <包名>...</code> | 解除守护 |</p>\n<p>| <code>ugctl set <包名>...</code> | 替换清单 |</p>\n<p>| <code>ugctl reset</code> | 清空清单 |</p>\n<p>| <code>ugctl reload</code> | 停止商店 |</p>\n\n<h2>构建</h2>\n<p>默认仅 arm64</p>\n\n<p>详见  <a href=\"scripts/build.sh\">scripts/build.sh</a></p>\n\n<h2>参考</h2>\n<li>[Zygisk module sample](https://github.com/topjohnwu/zygisk-module-sample)</li>\n<li>[AOSP](https://android.googlesource.com/platform/frameworks/base/+/android17-release/core/java/android/content/pm/BaseParceledListSlice.java)</li>",
+  "homepageUrl": "https://github.com/ZQZCC/zygisk-updguard",
+  "sourceUrl": "https://github.com/ZQZCC/zygisk-updguard",
+  "url": "https://github.com/ZQZCC/zygisk-updguard",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-09-21T23:40:45Z",
+    "downloadUrl": "https://github.com/ZQZCC/zygisk-updguard/releases/download/v1.0.0/UpdGuard-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-09-21T23:40:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "UpdGuard-v1.0.0.zip",
+          "downloadUrl": "https://github.com/ZQZCC/zygisk-updguard/releases/download/v1.0.0/UpdGuard-v1.0.0.zip",
+          "size": 13626,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "readme": "# 🌸 Thermal Breaker Miyabi Core\n\nMiyabi Core thermal optimizer focused on reducing aggressive throttling and improving performance stability across all Android devices, chipsets, and ROMs, without disabling hardware safety protections.\n\n---\n\n## ✦ Key Features\n\n1. **Universal Chipset Support**: Fully compatible with Qualcomm Snapdragon, MediaTek, Exynos, Google Tensor, Unisoc, and other platforms.\n2. **GPU Throttling Bypass**: Supports Adreno (KGSL), Mali, and PowerVR graphics architectures.\n3. **Pure Dynamic Kernel Engine**: Dynamically scans `/sys/class/thermal/cooling_device*` and locks throttle levels of CPU/GPU to performance state (`0`), making them read-only to prevent user-space thermal services from capping clock speeds.\n4. **MediaTek GED Boost**: Injects performance parameters into the Graphics Execution Daemon (GED) to completely unleash Mali GPUs on Dimensity and Helio chipsets.\n5. **Advanced PMIC Bypass**: Prevents software-level screen dimming (random brightness drops) when the device gets warm while gaming, keeping hardware failsafes intact.\n6. **Supercharged system.prop**: Aggressively disables OEM throttling frameworks (bypassing Xiaomi Joyose, Samsung GOS, and Dynamic FPS drops).\n7. **Guardian Background Daemon**: Runs a battery-friendly monitor loop that ensures cooling states remain unlocked every 10 seconds **only when the screen is active** (saving battery when the phone is idle).\n8. **Safe Architecture**: Leaves battery charging thermal limits to the factory default to prevent battery swelling, and safely shuts down 13+ OEM thermal daemons without causing bootloops.\n9. **Detailed Diagnostics**: Logs device detection and tuning processes inside `/data/adb/modules/thermal-breaker-miyabi-core/thermal_breaker.log`.\n\n---\n\n## Compatibility\n\n- **Chipsets**: Snapdragon, MediaTek, Exynos, Google Tensor, Unisoc, etc.\n- **GPUs**: Adreno, Mali, Immortalis, PowerVR.\n- **Android Versions**: Android 10, 11, 12, 13, 14, 15 (and above).\n- **Architectures**: 64-bit (arm64-v8a) and 32-bit (armeabi-v7a).\n- **ROMs**: Support for all Custom ROMs (Superior OS, LineageOS, Evolution X, PixelOS, etc.) and OEM stock ROMs (HyperOS, OneUI, Pixel, ColorOS, OriginOS, etc.).\n- **Root Managers**: Magisk, KernelSU, APatch.\n\n---\n\n## How to Install\n\n1. Compress all files and directories in this folder (including `common`, `META-INF`, `install.sh`, `module.prop`, `LICENSE`, `README.md`, `changelog.txt`) into a standard `.zip` file.\n   > **Note**: Make sure `install.sh` and `module.prop` are at the root level of the archive, not nested inside another folder.\n2. Open your Root Manager (Magisk Manager, KernelSU, or APatch) and select **Install from storage**.\n3. Flash the `.zip` file and wait for the installer to finish detecting your device properties.\n4. **Reboot your device** to apply changes.\n5. (Optional) Verify operation by inspecting the log:\n   ```bash\n   cat /data/adb/modules/thermal-breaker-miyabi-core/thermal_breaker.log\n   ```\n\n---\n\n## Warning & Disclaimer\n\n* **Use at your own risk**: By removing software throttling limits, your device will run hotter than usual under sustained heavy loads (like 3D gaming or benchmarking).\n* **Cooling Recommendation**: It is **strongly recommended** to use an external fan cooler (phone cooler) when playing games for extended periods. This keeps your battery and SoC cool, preserving their long-term health.\n* **Failsafe**: Hardware-level emergency thermal shutdown remains intact. The device will automatically turn off safely if it reaches critical threshold temperatures (usually 100°C+).\n\n---\n\n## Credits & Source\n\n- **Developer**: Rama-X2 (Rama Armytha)\n- **Source Code**: [GitHub Repository](https://github.com/Rama-X2/thermal-breaker-miyabi-core)\n",
+  "readmeHTML": "<h1>🌸 Thermal Breaker Miyabi Core</h1>\n\n<p>Miyabi Core thermal optimizer focused on reducing aggressive throttling and improving performance stability across all Android devices, chipsets, and ROMs, without disabling hardware safety protections.</p>\n\n<p>---</p>\n\n<h2>✦ Key Features</h2>\n\n<li>**Universal Chipset Support**: Fully compatible with Qualcomm Snapdragon, MediaTek, Exynos, Google Tensor, Unisoc, and other platforms.</li>\n<li>**GPU Throttling Bypass**: Supports Adreno (KGSL), Mali, and PowerVR graphics architectures.</li>\n<li>**Pure Dynamic Kernel Engine**: Dynamically scans `/sys/class/thermal/cooling_device*` and locks throttle levels of CPU/GPU to performance state (`0`), making them read-only to prevent user-space thermal services from capping clock speeds.</li>\n<li>**MediaTek GED Boost**: Injects performance parameters into the Graphics Execution Daemon (GED) to completely unleash Mali GPUs on Dimensity and Helio chipsets.</li>\n<li>**Advanced PMIC Bypass**: Prevents software-level screen dimming (random brightness drops) when the device gets warm while gaming, keeping hardware failsafes intact.</li>\n<li>**Supercharged system.prop**: Aggressively disables OEM throttling frameworks (bypassing Xiaomi Joyose, Samsung GOS, and Dynamic FPS drops).</li>\n<li>**Guardian Background Daemon**: Runs a battery-friendly monitor loop that ensures cooling states remain unlocked every 10 seconds **only when the screen is active** (saving battery when the phone is idle).</li>\n<li>**Safe Architecture**: Leaves battery charging thermal limits to the factory default to prevent battery swelling, and safely shuts down 13+ OEM thermal daemons without causing bootloops.</li>\n<li>**Detailed Diagnostics**: Logs device detection and tuning processes inside `/data/adb/modules/thermal-breaker-miyabi-core/thermal_breaker.log`.</li>\n\n<p>---</p>\n\n<h2>Compatibility</h2>\n\n<li>**Chipsets**: Snapdragon, MediaTek, Exynos, Google Tensor, Unisoc, etc.</li>\n<li>**GPUs**: Adreno, Mali, Immortalis, PowerVR.</li>\n<li>**Android Versions**: Android 10, 11, 12, 13, 14, 15 (and above).</li>\n<li>**Architectures**: 64-bit (arm64-v8a) and 32-bit (armeabi-v7a).</li>\n<li>**ROMs**: Support for all Custom ROMs (Superior OS, LineageOS, Evolution X, PixelOS, etc.) and OEM stock ROMs (HyperOS, OneUI, Pixel, ColorOS, OriginOS, etc.).</li>\n<li>**Root Managers**: Magisk, KernelSU, APatch.</li>\n\n<p>---</p>\n\n<h2>How to Install</h2>\n\n<li>Compress all files and directories in this folder (including `common`, `META-INF`, `install.sh`, `module.prop`, `LICENSE`, `README.md`, `changelog.txt`) into a standard `.zip` file.</li>\n<p>   > <b>Note</b>: Make sure <code>install.sh</code> and <code>module.prop</code> are at the root level of the archive, not nested inside another folder.</p>\n<li>Open your Root Manager (Magisk Manager, KernelSU, or APatch) and select **Install from storage**.</li>\n<li>Flash the `.zip` file and wait for the installer to finish detecting your device properties.</li>\n<li>**Reboot your device** to apply changes.</li>\n<li>(Optional) Verify operation by inspecting the log:</li>\n<p>   ```bash</p>\n<p>   cat /data/adb/modules/thermal-breaker-miyabi-core/thermal_breaker.log</p>\n<p>   ```</p>\n\n<p>---</p>\n\n<h2>Warning & Disclaimer</h2>\n\n<li>**Use at your own risk**: By removing software throttling limits, your device will run hotter than usual under sustained heavy loads (like 3D gaming or benchmarking).</li>\n<li>**Cooling Recommendation**: It is **strongly recommended** to use an external fan cooler (phone cooler) when playing games for extended periods. This keeps your battery and SoC cool, preserving their long-term health.</li>\n<li>**Failsafe**: Hardware-level emergency thermal shutdown remains intact. The device will automatically turn off safely if it reaches critical threshold temperatures (usually 100°C+).</li>\n\n<p>---</p>\n\n<h2>Credits & Source</h2>\n\n<li>**Developer**: Rama-X2 (Rama Armytha)</li>\n<li>**Source Code**: [GitHub Repository](https://github.com/Rama-X2/thermal-breaker-miyabi-core)</li>",
+  "homepageUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases",
+  "sourceUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core",
+  "url": "https://github.com/Rama-X2/thermal-breaker-miyabi-core",
+  "latestRelease": {
+    "name": "v4.0.0",
+    "version": "v4.0.0",
+    "time": "2026-10-07T17:39:11Z",
+    "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v4.0.0/Thermal-Breaker-Miyabi-Core-v4.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-10-07T17:39:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v4.0.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v4.0.0/Thermal-Breaker-Miyabi-Core-v4.0.0.zip",
+          "size": 20213,
+          "downloadCount": 92
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-06-30T11:35:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v3.0.0/Thermal-Breaker-Miyabi-Core-v3.0.0.zip",
+          "size": 90222,
+          "downloadCount": 844
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-02-17T08:56:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v2.2.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v2.2.0/Thermal-Breaker-Miyabi-Core-v2.2.0.zip",
+          "size": 87556,
+          "downloadCount": 55
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-02-15T09:04:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v2.1.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v2.1.0/Thermal-Breaker-Miyabi-Core-v2.1.0.zip",
+          "size": 87519,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-02-13T19:22:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v2.0.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v2.0.0/Thermal-Breaker-Miyabi-Core-v2.0.0.zip",
+          "size": 87460,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2026-02-13T18:11:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.5.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.5/Thermal-Breaker-Miyabi-Core-v1.0.5.zip",
+          "size": 18831,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-02-13T18:00:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.4.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.4/Thermal-Breaker-Miyabi-Core-v1.0.4.zip",
+          "size": 18831,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-02-13T17:53:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.3.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.3/Thermal-Breaker-Miyabi-Core-v1.0.3.zip",
+          "size": 18831,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-02-13T17:20:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.2.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.2/Thermal-Breaker-Miyabi-Core-v1.0.2.zip",
+          "size": 18810,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-02-12T19:36:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.1.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.1/Thermal-Breaker-Miyabi-Core-v1.0.1.zip",
+          "size": 6877,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-02-12T18:39:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Thermal-Breaker-Miyabi-Core-v1.0.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v1.0.0/Thermal-Breaker-Miyabi-Core-v1.0.0.zip",
+          "size": 6928,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

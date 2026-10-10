@@ -1,0 +1,41 @@
+{
+  "readme": "# KernelSU/Apatch/Magisk WebUI Module Template\n\nThis is a template for creating KernelSU/Apatch/Magisk modules with WebUI. It includes a basic structure and a build script\n\n## How to use template\n\n1. Fork this template\n2. Modify `module/module.prop` with your module details.\n   1. Set your repo url in `updateJson`\n3. Develop you own module, lol\n4. Edit `CHANGELOG.md`\n5. Build the module using `nix build`\n   1. or just use GitHub Actions (`nix run nixpkgs#act -- -j build -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-24.04 --artifact-server-path ./artifacts` (choose Medium size image))\n6. Remove \"How to use template\" section from `README.md`\n\n### Module Structure\n\n- docs\n  - [KernelSU](https://kernelsu.org/guide/module.html)\n  - [Apatch](https://apatch.dev/apm-guide.html)\n  - [Magisk](https://topjohnwu.github.io/Magisk/guides.html)\n- `module/`: Module content\n  - `module.prop`: Module metadata\n  - `banner.{png,webp}`: Banner which will be shown in module managers\n    - [works in KSU-Next](https://github.com/KernelSU-Next/KernelSU-Next/blob/be141d05d03f37f67ae1505dbbe56cadbfcad130/manager/app/src/main/java/com/rifsxd/ksunext/ui/viewmodel/ModuleViewModel.kt#L48) and other new managers\n    - you could place it inside `webroot/` to use as WebUI media\n    - recommended size is `640*320`\n  - `webroot/`: WebUI assets\n  - `META-INF/` [From magisk docs](https://topjohnwu.github.io/Magisk/guides.html#magisk-module-installer)\n- `CHANGELOG.md`: Module changelog\n- `update.json`: Will be generated from `module.prop`\n\n### Development with Nix\n\nUse `nix develop` (or better, use `direnv`) to enter a development shell with necessary tools installed:\n\n## Install\n\n- Download zip from **[latest release](https://github.com/barsikus007/ksu-webui-module-template/releases/latest)**\n- Flash via your module manager of choice\n",
+  "readmeHTML": "<h1>KernelSU/Apatch/Magisk WebUI Module Template</h1>\n\n<p>This is a template for creating KernelSU/Apatch/Magisk modules with WebUI. It includes a basic structure and a build script</p>\n\n<h2>How to use template</h2>\n\n<li>Fork this template</li>\n<li>Modify `module/module.prop` with your module details.</li>\n<p>   1. Set your repo url in <code>updateJson</code></p>\n<li>Develop you own module, lol</li>\n<li>Edit `CHANGELOG.md`</li>\n<li>Build the module using `nix build`</li>\n<p>   1. or just use GitHub Actions (<code>nix run nixpkgs#act -- -j build -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-24.04 --artifact-server-path ./artifacts</code> (choose Medium size image))</p>\n<li>Remove \"How to use template\" section from `README.md`</li>\n\n<h3>Module Structure</h3>\n\n<li>docs</li>\n<p>  - <a href=\"https://kernelsu.org/guide/module.html\">KernelSU</a></p>\n<p>  - <a href=\"https://apatch.dev/apm-guide.html\">Apatch</a></p>\n<p>  - <a href=\"https://topjohnwu.github.io/Magisk/guides.html\">Magisk</a></p>\n<li>`module/`: Module content</li>\n<p>  - <code>module.prop</code>: Module metadata</p>\n<p>  - <code>banner.{png,webp}</code>: Banner which will be shown in module managers</p>\n<p>    - <a href=\"https://github.com/KernelSU-Next/KernelSU-Next/blob/be141d05d03f37f67ae1505dbbe56cadbfcad130/manager/app/src/main/java/com/rifsxd/ksunext/ui/viewmodel/ModuleViewModel.kt#L48\">works in KSU-Next</a> and other new managers</p>\n<p>    - you could place it inside <code>webroot/</code> to use as WebUI media</p>\n<p>    - recommended size is <code>640*320</code></p>\n<p>  - <code>webroot/</code>: WebUI assets</p>\n<p>  - <code>META-INF/</code> <a href=\"https://topjohnwu.github.io/Magisk/guides.html#magisk-module-installer\">From magisk docs</a></p>\n<li>`CHANGELOG.md`: Module changelog</li>\n<li>`update.json`: Will be generated from `module.prop`</li>\n\n<h3>Development with Nix</h3>\n\n<p>Use <code>nix develop</code> (or better, use <code>direnv</code>) to enter a development shell with necessary tools installed:</p>\n\n<h2>Install</h2>\n\n<li>Download zip from **[latest release](https://github.com/barsikus007/ksu-webui-module-template/releases/latest)**</li>\n<li>Flash via your module manager of choice</li>",
+  "homepageUrl": "https://github.com/barsikus007/ksu-webui-module-template",
+  "sourceUrl": "https://github.com/barsikus007/ksu-webui-module-template",
+  "url": "https://github.com/barsikus007/ksu-webui-module-template",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2025-12-18T15:47:35Z",
+    "downloadUrl": "https://github.com/barsikus007/ksu-webui-module-template/releases/download/v1.0.0/ksu-webui-module-template_v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2025-12-18T15:47:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/barsikus007/ksu-webui-module-template/releases/download/v1.0.0/CHANGELOG.md",
+          "size": 42,
+          "downloadCount": 0
+        },
+        {
+          "name": "ksu-webui-module-template_v1.0.0.zip",
+          "downloadUrl": "https://github.com/barsikus007/ksu-webui-module-template/releases/download/v1.0.0/ksu-webui-module-template_v1.0.0.zip",
+          "size": 11196,
+          "downloadCount": 7
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/barsikus007/ksu-webui-module-template/releases/download/v1.0.0/update.json",
+          "size": 293,
+          "downloadCount": 82
+        }
+      ]
+    }
+  ]
+}

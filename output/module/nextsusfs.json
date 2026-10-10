@@ -1,0 +1,95 @@
+{
+  "readme": "<div align=\"center\">\n\n<img src=\"docs/banner.png\" alt=\"NextSUSFS\" width=\"100%\">\n\n[![Release](https://img.shields.io/github/v/release/ifoknr/NextSUSFS?color=34d399&label=release)](https://github.com/ifoknr/NextSUSFS/releases/latest)\n[![Downloads](https://img.shields.io/github/downloads/ifoknr/NextSUSFS/total?color=34d399)](https://github.com/ifoknr/NextSUSFS/releases)\n[![License](https://img.shields.io/badge/license-AGPLv3-5b8cff)](LICENSE)\n\n</div>\n\n# NextSUSFS\n\nKernel-level root hiding with [SuSFS](https://gitlab.com/simonpunk/susfs4ksu) for KernelSU. NextSUSFS is the kernel layer of the NEXT stack: it hides paths, mounts, memory maps and properties from apps, and works alongside [NextWheel](https://github.com/ifoknr/NextWheel) (apps) and [NextZygisk](https://github.com/ifoknr/NexTZygisk) (Zygote).\n\n> [!WARNING]\n> **Personal project, use at your own risk.** NextSUSFS changes how the kernel shows files and system values to apps. Keep a way to boot without modules (safe mode) before you install it.\n\n## What it does\n\n- **Hides the NEXT stack automatically.** NextWheel, NextZygisk and NextSUSFS folders and Zygisk libraries are hidden at every boot, along with AlwaysStrong, Play Integrity Fix and HMA-OSS.\n- **Every option in one WebUI.** Over 40 settings across 7 pages: paths and files, custom ROM traces, kernel identity, system properties, KernelSU, developer options and display.\n- **Your own lists.** Add paths to hide, re-hide, remove from memory maps, unmount for apps, or redirect to another file, without editing files by hand.\n- **Clear status.** The WebUI shows whether SuSFS is working, which kernel features your kernel has, and the state of the NEXT stack. NextWheel and NextZygisk show NextSUSFS in their own dashboards.\n- **Detection apps built in.** Open Native Detector, TrustAttestor or KKND Detector straight from the Tools page to check the result.\n- **Logs, backup and reset.** Read what was hidden at boot, back up your settings, or go back to defaults.\n- **Any device.** arm64, arm, x86 and x86_64, English and Arabic, phones and tablets.\n\n## Requirements\n\n- KernelSU or a KernelSU fork (KernelSU Next, ReSukiSU, SukiSU Ultra)\n- A kernel patched with **SuSFS v2**. On a kernel without SuSFS the module still installs, and the WebUI tells you the kernel has no SuSFS.\n- Uninstall other SuSFS modules first (susfs4ksu, SuSFS Manager, BRENE). NextSUSFS disables them on install, because only one may run.\n\n## Install\n\n1. Download `NextSUSFS.zip` from [Releases](https://github.com/ifoknr/NextSUSFS/releases/latest).\n2. Install it from your root manager → Modules → Install from storage.\n3. Reboot, then open the module's WebUI.\n\n## The NEXT stack\n\n| Layer | Module | Role |\n| --- | --- | --- |\n| Apps | [NextWheel](https://github.com/ifoknr/NextWheel) | Hides the Zygisk and root environment inside apps |\n| Zygote | [NextZygisk](https://github.com/ifoknr/NexTZygisk) | Standalone Zygisk that loads NextWheel |\n| Kernel | **NextSUSFS** | Hides traces at the kernel level with SuSFS |\n\n## Credits\n\n- Developed by [**IFOKNR**](https://github.com/ifoknr).\n- [**susfs4ksu**](https://gitlab.com/simonpunk/susfs4ksu) by **simonpunk**: SuSFS itself and the `ksu_susfs` tool (built from source, GPLv3).\n- [**BRENE**](https://github.com/rrr333nnn333/BRENE) by rrr333nnn333 and [**KOWX712**](https://github.com/KOWX712): parts of the boot scripts are based on their work.\n\n## License\n\nGNU Affero General Public License v3.0. See [LICENSE](LICENSE).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"docs/banner.png\" alt=\"NextSUSFS\" width=\"100%\"></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/ifoknr/NextSUSFS?color=34d399&label=release\">![Release</a>](https://github.com/ifoknr/NextSUSFS/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/downloads/ifoknr/NextSUSFS/total?color=34d399\">![Downloads</a>](https://github.com/ifoknr/NextSUSFS/releases)</p>\n<p><a href=\"https://img.shields.io/badge/license-AGPLv3-5b8cff\">![License</a>](LICENSE)</p>\n\n<p></div></p>\n\n<h1>NextSUSFS</h1>\n\n<p>Kernel-level root hiding with <a href=\"https://gitlab.com/simonpunk/susfs4ksu\">SuSFS</a> for KernelSU. NextSUSFS is the kernel layer of the NEXT stack: it hides paths, mounts, memory maps and properties from apps, and works alongside <a href=\"https://github.com/ifoknr/NextWheel\">NextWheel</a> (apps) and <a href=\"https://github.com/ifoknr/NexTZygisk\">NextZygisk</a> (Zygote).</p>\n\n<p>> [!WARNING]</p>\n<p>> <b>Personal project, use at your own risk.</b> NextSUSFS changes how the kernel shows files and system values to apps. Keep a way to boot without modules (safe mode) before you install it.</p>\n\n<h2>What it does</h2>\n\n<li>**Hides the NEXT stack automatically.** NextWheel, NextZygisk and NextSUSFS folders and Zygisk libraries are hidden at every boot, along with AlwaysStrong, Play Integrity Fix and HMA-OSS.</li>\n<li>**Every option in one WebUI.** Over 40 settings across 7 pages: paths and files, custom ROM traces, kernel identity, system properties, KernelSU, developer options and display.</li>\n<li>**Your own lists.** Add paths to hide, re-hide, remove from memory maps, unmount for apps, or redirect to another file, without editing files by hand.</li>\n<li>**Clear status.** The WebUI shows whether SuSFS is working, which kernel features your kernel has, and the state of the NEXT stack. NextWheel and NextZygisk show NextSUSFS in their own dashboards.</li>\n<li>**Detection apps built in.** Open Native Detector, TrustAttestor or KKND Detector straight from the Tools page to check the result.</li>\n<li>**Logs, backup and reset.** Read what was hidden at boot, back up your settings, or go back to defaults.</li>\n<li>**Any device.** arm64, arm, x86 and x86_64, English and Arabic, phones and tablets.</li>\n\n<h2>Requirements</h2>\n\n<li>KernelSU or a KernelSU fork (KernelSU Next, ReSukiSU, SukiSU Ultra)</li>\n<li>A kernel patched with **SuSFS v2**. On a kernel without SuSFS the module still installs, and the WebUI tells you the kernel has no SuSFS.</li>\n<li>Uninstall other SuSFS modules first (susfs4ksu, SuSFS Manager, BRENE). NextSUSFS disables them on install, because only one may run.</li>\n\n<h2>Install</h2>\n\n<li>Download `NextSUSFS.zip` from [Releases](https://github.com/ifoknr/NextSUSFS/releases/latest).</li>\n<li>Install it from your root manager → Modules → Install from storage.</li>\n<li>Reboot, then open the module's WebUI.</li>\n\n<h2>The NEXT stack</h2>\n\n<p>| Layer | Module | Role |</p>\n<p>| --- | --- | --- |</p>\n<p>| Apps | <a href=\"https://github.com/ifoknr/NextWheel\">NextWheel</a> | Hides the Zygisk and root environment inside apps |</p>\n<p>| Zygote | <a href=\"https://github.com/ifoknr/NexTZygisk\">NextZygisk</a> | Standalone Zygisk that loads NextWheel |</p>\n<p>| Kernel | <b>NextSUSFS</b> | Hides traces at the kernel level with SuSFS |</p>\n\n<h2>Credits</h2>\n\n<li>Developed by [**IFOKNR**](https://github.com/ifoknr).</li>\n<li>[**susfs4ksu**](https://gitlab.com/simonpunk/susfs4ksu) by **simonpunk**: SuSFS itself and the `ksu_susfs` tool (built from source, GPLv3).</li>\n<li>[**BRENE**](https://github.com/rrr333nnn333/BRENE) by rrr333nnn333 and [**KOWX712**](https://github.com/KOWX712): parts of the boot scripts are based on their work.</li>\n\n<h2>License</h2>\n\n<p>GNU Affero General Public License v3.0. See <a href=\"LICENSE\">LICENSE</a>.</p>",
+  "homepageUrl": "https://github.com/ifoknr/NextSUSFS",
+  "sourceUrl": "https://github.com/ifoknr/NextSUSFS",
+  "url": "https://github.com/ifoknr/NextSUSFS",
+  "latestRelease": {
+    "name": "v0.0.7",
+    "version": "v0.0.7",
+    "time": "2026-10-08T15:09:22Z",
+    "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.7/NextSUSFS-v0.0.7.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.0.7",
+      "tagName": "v0.0.7",
+      "publishedAt": "2026-10-08T15:09:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NextSUSFS-v0.0.7.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.7/NextSUSFS-v0.0.7.zip",
+          "size": 571870,
+          "downloadCount": 4
+        },
+        {
+          "name": "NextSUSFS.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.7/NextSUSFS.zip",
+          "size": 571870,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v0.0.6",
+      "tagName": "v0.0.6",
+      "publishedAt": "2026-10-07T20:39:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NextSUSFS-v0.0.6.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.6/NextSUSFS-v0.0.6.zip",
+          "size": 566516,
+          "downloadCount": 1
+        },
+        {
+          "name": "NextSUSFS.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.6/NextSUSFS.zip",
+          "size": 566516,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.0.5",
+      "tagName": "v0.0.5",
+      "publishedAt": "2026-10-06T18:52:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NextSUSFS-v0.0.5.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.5/NextSUSFS-v0.0.5.zip",
+          "size": 565513,
+          "downloadCount": 2
+        },
+        {
+          "name": "NextSUSFS.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.5/NextSUSFS.zip",
+          "size": 565513,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v0.0.4",
+      "tagName": "v0.0.4",
+      "publishedAt": "2026-10-06T18:26:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NextSUSFS-v0.0.4.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.4/NextSUSFS-v0.0.4.zip",
+          "size": 565525,
+          "downloadCount": 0
+        },
+        {
+          "name": "NextSUSFS.zip",
+          "downloadUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.4/NextSUSFS.zip",
+          "size": 565525,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "readme": "# ⚡ LYNX [Codename: Deity] — Universal Hybrid Root Optimizer\n> **Versi**: 3.0.0 | **Author**: ɴᴏɪʀ | **Platform**: Android (KernelSU / APatch / Magisk)\n\n---\n\n## 📌 Ringkasan Proyek\n**Lynx Universal** adalah modul optimasi kernel hibrida tingkat lanjut yang menggabungkan kapabilitas Qualcomm Snapdragon dan MediaTek (Dimensity & Helio) dalam satu paket terpadu. Dilengkapi dengan deteksi chipset anti-spoofing otomatis, mesin adaptif AI (*Smart-AI Core*), WebUI modern berbasis touch-first, dan Aplikasi Native Android Companion (Kotlin + Jetpack Compose) dengan sinkronisasi 2 arah *real-time*.\n\n---\n\n## ⚡ Spektrum Profil Performa (5 Mode)\n\n| Profil | Deskripsi & Target Penggunaan | Karakteristik CPU / GPU | Batas Termal | Pengisian Daya (Charging) |\n| :--- | :--- | :--- | :--- | :--- |\n| **Auto (AI)** | Mode adaptif cerdas (default harian) | Otomatis beralih ke *Performance* saat game terbuka (0ms latency, 3s cooldown buffer) | Proteksi OEM aktif | Standar Dinamis |\n| **Balance** | Efisiensi baterai & stabilitas harian | EAS Schedutil / PPM seimbang, *idle downclock* aktif | Proteksi OEM aktif | Standar OEM |\n| **Performance** | Gaming kompetitif & beban kerja berat | Kunci frekuensi menengah-atas, prioritas *SurfaceFlinger*, rate limits agresif | Pembatasan moderat | Kontrol termal (1500–2000mA) |\n| **Extreme** 🔥 | Sesi gaming tanpa kompromi & benchmark | Kunci clock CPU & GPU maksimum, uclamp 100%, devfreq latency 0 | **Bypass Penuh** (Zone disable, override 150°C) | **Bypass Charging** / Unrestricted |\n| **Powersave** 🔋 | Daya tahan baterai maksimum | Skala frekuensi minimum, efisiensi kerja latar belakang | Proteksi OEM aktif | Pengisian hemat daya |\n\n> [!WARNING]\n> Mode **Extreme** menonaktifkan seluruh perlindungan termal OEM. **Sangat disarankan menggunakan pendingin eksternal (phone cooler)** guna menjaga kestabilan perangkat dan kesehatan baterai.\n\n---\n\n## 🏛️ Arsitektur & Keunggulan Utama\n\n1. **Hardware Abstraction Layer (HAL)**:\n   - `platforms/qcom/`: Optimalisasi Adreno KGSL, CPU-boost input boost suppression, WALT fast ramp, and DRM perf mode.\n   - `platforms/mtk/`: Penonaktifan logging modem CCCI, penekanan GED KPI, penonaktifan pembatasan MediaTek Syslimiter, dan Perf PMU.\n   - `platforms/generic/`: Fallback CPUFreq standar Linux tanpa intervensi vendor berisiko.\n2. **Universal Kernel Subsystems (`core/lib/`)**:\n   - `sched_features.sh`: Low-latency scheduler flags (`NO_GENTLE_FAIR_SLEEPERS`, `START_DEBIT`) dan prioritas otomatis untuk 23 mesin game ternama.\n   - `network.sh`: Dynamic TCP discovery (`bbr` / `cubic`), FQ-CoDel queue discipline, dan Wi-Fi low latency gaming lock.\n   - `uclamp.sh`, `ram.sh`, `display_touch.sh`, `audio_latency.sh`, `oem_neutralizer.sh`.\n3. **State Engine Terpusat Berbasis JSON (`config.json`)**:\n   - WebUI, Native Companion App, CLI (`Lxcore`), dan daemon latar belakang berkomunikasi melalui `config.json` yang sinkron secara real-time via `inotify`.\n4. **Keamanan Tanpa Kompromi**:\n   - Bebas dari operasi penghapusan `dalvik-cache` berbahaya di runtime.\n   - Semua operasi penulisan dilindungi wrapper validasi node `write_node()` yang mencegah kernel panic.\n\n---\n\n## 📱 Cara Penggunaan & Kontrol Modul\n\n### 1. Antarmuka Web (WebUI)\n- Pengguna **KernelSU** & **APatch**: Buka WebUI langsung melalui tombol antarmuka web pada manajer modul.\n- Pengguna **Magisk**: Akses melalui browser lokal atau jalankan micro-daemon lokal yang disediakan.\n\n### 2. Aplikasi Native Android Companion (`LynxCompanion`)\n- Pasang berkas `Lynx-3.0.0.apk` yang tersedia di direktori rilis atau flashable ZIP.\n- Menyediakan kendali penuh seluruh subsistem dengan tampilan Cyberpunk OLED Dark dan responsivitas sentuhan haptic.\n\n### 3. Command Line Interface (CLI) via Termux / Root Shell\n```bash\n# Menampilkan ringkasan status modul dan profil aktif\nsu -c Lxcore status\n\n# Beralih profil performa (auto | balance | performance | extreme | powersave)\nsu -c Lxcore profile auto\nsu -c Lxcore profile extreme\n\n# Mengatur konfigurasi state secara spesifik\nsu -c Lxcore state set uclamp.game_min_ratio 85 val\nsu -c Lxcore state set network.wifi_ping_stabilizer true bool\n\n# Menjalankan pemeliharaan memori dan cache (CCleaner)\nsu -c Lxcore ccleaner\n\n# Menjalankan pemeliharaan database SQLite & storage FSTRIM\nsu -c Lxcore maintenance\n\n# Mengekspor berkas diagnostik lengkap 1-klik (.zip di /sdcard/Lynx/)\nsu -c Lxcore log export\n\n# Menu TUI Interaktif Terminal\nsu -c lynx\n```\n\n---\n\n## 🛡️ Lisensi & Hak Cipta\nDikembangkan oleh **ɴᴏɪʀ** dengan kontribusi komunitas performa Android.\nDilarang keras menyalin atau mengemas ulang modul ini tanpa atribusi resmi.",
+  "readmeHTML": "<h1>⚡ LYNX [Codename: Deity] — Universal Hybrid Root Optimizer</h1>\n<p>> <b>Versi</b>: 3.0.0 | <b>Author</b>: ɴᴏɪʀ | <b>Platform</b>: Android (KernelSU / APatch / Magisk)</p>\n\n<p>---</p>\n\n<h2>📌 Ringkasan Proyek</h2>\n<p><b>Lynx Universal</b> adalah modul optimasi kernel hibrida tingkat lanjut yang menggabungkan kapabilitas Qualcomm Snapdragon dan MediaTek (Dimensity & Helio) dalam satu paket terpadu. Dilengkapi dengan deteksi chipset anti-spoofing otomatis, mesin adaptif AI (*Smart-AI Core*), WebUI modern berbasis touch-first, dan Aplikasi Native Android Companion (Kotlin + Jetpack Compose) dengan sinkronisasi 2 arah *real-time*.</p>\n\n<p>---</p>\n\n<h2>⚡ Spektrum Profil Performa (5 Mode)</h2>\n\n<p>| Profil | Deskripsi & Target Penggunaan | Karakteristik CPU / GPU | Batas Termal | Pengisian Daya (Charging) |</p>\n<p>| :--- | :--- | :--- | :--- | :--- |</p>\n<p>| <b>Auto (AI)</b> | Mode adaptif cerdas (default harian) | Otomatis beralih ke *Performance* saat game terbuka (0ms latency, 3s cooldown buffer) | Proteksi OEM aktif | Standar Dinamis |</p>\n<p>| <b>Balance</b> | Efisiensi baterai & stabilitas harian | EAS Schedutil / PPM seimbang, *idle downclock* aktif | Proteksi OEM aktif | Standar OEM |</p>\n<p>| <b>Performance</b> | Gaming kompetitif & beban kerja berat | Kunci frekuensi menengah-atas, prioritas *SurfaceFlinger*, rate limits agresif | Pembatasan moderat | Kontrol termal (1500–2000mA) |</p>\n<p>| <b>Extreme</b> 🔥 | Sesi gaming tanpa kompromi & benchmark | Kunci clock CPU & GPU maksimum, uclamp 100%, devfreq latency 0 | <b>Bypass Penuh</b> (Zone disable, override 150°C) | <b>Bypass Charging</b> / Unrestricted |</p>\n<p>| <b>Powersave</b> 🔋 | Daya tahan baterai maksimum | Skala frekuensi minimum, efisiensi kerja latar belakang | Proteksi OEM aktif | Pengisian hemat daya |</p>\n\n<p>> [!WARNING]</p>\n<p>> Mode <b>Extreme</b> menonaktifkan seluruh perlindungan termal OEM. <b>Sangat disarankan menggunakan pendingin eksternal (phone cooler)</b> guna menjaga kestabilan perangkat dan kesehatan baterai.</p>\n\n<p>---</p>\n\n<h2>🏛️ Arsitektur & Keunggulan Utama</h2>\n\n<li>**Hardware Abstraction Layer (HAL)**:</li>\n<p>   - <code>platforms/qcom/</code>: Optimalisasi Adreno KGSL, CPU-boost input boost suppression, WALT fast ramp, and DRM perf mode.</p>\n<p>   - <code>platforms/mtk/</code>: Penonaktifan logging modem CCCI, penekanan GED KPI, penonaktifan pembatasan MediaTek Syslimiter, dan Perf PMU.</p>\n<p>   - <code>platforms/generic/</code>: Fallback CPUFreq standar Linux tanpa intervensi vendor berisiko.</p>\n<li>**Universal Kernel Subsystems (`core/lib/`)**:</li>\n<p>   - <code>sched_features.sh</code>: Low-latency scheduler flags (<code>NO_GENTLE_FAIR_SLEEPERS</code>, <code>START_DEBIT</code>) dan prioritas otomatis untuk 23 mesin game ternama.</p>\n<p>   - <code>network.sh</code>: Dynamic TCP discovery (<code>bbr</code> / <code>cubic</code>), FQ-CoDel queue discipline, dan Wi-Fi low latency gaming lock.</p>\n<p>   - <code>uclamp.sh</code>, <code>ram.sh</code>, <code>display_touch.sh</code>, <code>audio_latency.sh</code>, <code>oem_neutralizer.sh</code>.</p>\n<li>**State Engine Terpusat Berbasis JSON (`config.json`)**:</li>\n<p>   - WebUI, Native Companion App, CLI (<code>Lxcore</code>), dan daemon latar belakang berkomunikasi melalui <code>config.json</code> yang sinkron secara real-time via <code>inotify</code>.</p>\n<li>**Keamanan Tanpa Kompromi**:</li>\n<p>   - Bebas dari operasi penghapusan <code>dalvik-cache</code> berbahaya di runtime.</p>\n<p>   - Semua operasi penulisan dilindungi wrapper validasi node <code>write_node()</code> yang mencegah kernel panic.</p>\n\n<p>---</p>\n\n<h2>📱 Cara Penggunaan & Kontrol Modul</h2>\n\n<h3>1. Antarmuka Web (WebUI)</h3>\n<li>Pengguna **KernelSU** & **APatch**: Buka WebUI langsung melalui tombol antarmuka web pada manajer modul.</li>\n<li>Pengguna **Magisk**: Akses melalui browser lokal atau jalankan micro-daemon lokal yang disediakan.</li>\n\n<h3>2. Aplikasi Native Android Companion (`LynxCompanion`)</h3>\n<li>Pasang berkas `Lynx-3.0.0.apk` yang tersedia di direktori rilis atau flashable ZIP.</li>\n<li>Menyediakan kendali penuh seluruh subsistem dengan tampilan Cyberpunk OLED Dark dan responsivitas sentuhan haptic.</li>\n\n<h3>3. Command Line Interface (CLI) via Termux / Root Shell</h3>\n<pre># Menampilkan ringkasan status modul dan profil aktif\nsu -c Lxcore status\n\n# Beralih profil performa (auto | balance | performance | extreme | powersave)\nsu -c Lxcore profile auto\nsu -c Lxcore profile extreme\n\n# Mengatur konfigurasi state secara spesifik\nsu -c Lxcore state set uclamp.game_min_ratio 85 val\nsu -c Lxcore state set network.wifi_ping_stabilizer true bool\n\n# Menjalankan pemeliharaan memori dan cache (CCleaner)\nsu -c Lxcore ccleaner\n\n# Menjalankan pemeliharaan database SQLite &amp; storage FSTRIM\nsu -c Lxcore maintenance\n\n# Mengekspor berkas diagnostik lengkap 1-klik (.zip di /sdcard/Lynx/)\nsu -c Lxcore log export\n\n# Menu TUI Interaktif Terminal\nsu -c lynx</pre>\n\n<p>---</p>\n\n<h2>🛡️ Lisensi & Hak Cipta</h2>\n<p>Dikembangkan oleh <b>ɴᴏɪʀ</b> dengan kontribusi komunitas performa Android.</p>\n<p>Dilarang keras menyalin atau mengemas ulang modul ini tanpa atribusi resmi.</p>",
+  "homepageUrl": "https://github.com/Zy0x/Lynx",
+  "sourceUrl": "https://github.com/Zy0x/Lynx",
+  "url": "https://github.com/Zy0x/Lynx",
+  "latestRelease": {
+    "name": "Velocity2.9",
+    "version": "Velocity2.9",
+    "time": "2024-07-01T16:47:37Z",
+    "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.9/Lynx.-.Velocity.v2.9.zip"
+  },
+  "releases": [
+    {
+      "name": "Deity-v3.0-beta",
+      "tagName": "Deity-v3.0-beta",
+      "publishedAt": "2025-05-11T02:28:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Deity.v3.0-Beta.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Deity-v3.0-beta/Lynx.-.Deity.v3.0-Beta.zip",
+          "size": 7906813,
+          "downloadCount": 160
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.9",
+      "tagName": "Velocity2.9",
+      "publishedAt": "2024-07-01T16:47:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.9.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.9/Lynx.-.Velocity.v2.9.zip",
+          "size": 970396,
+          "downloadCount": 574
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.8",
+      "tagName": "Velocity2.8",
+      "publishedAt": "2024-07-01T04:56:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.8.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.8/Lynx.-.Velocity.v2.8.zip",
+          "size": 2011799,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.7",
+      "tagName": "Velocity2.7",
+      "publishedAt": "2024-04-08T10:33:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.7.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.7/Lynx.-.Velocity.v2.7.zip",
+          "size": 2004631,
+          "downloadCount": 46
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.6",
+      "tagName": "Velocity2.6",
+      "publishedAt": "2024-03-12T17:36:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.6.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.6/Lynx.-.Velocity.v2.6.zip",
+          "size": 960837,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.5",
+      "tagName": "Velocity2.5",
+      "publishedAt": "2024-02-20T11:44:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.5.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.5/Lynx.-.Velocity.v2.5.zip",
+          "size": 950103,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.4",
+      "tagName": "Velocity2.4",
+      "publishedAt": "2024-02-06T17:28:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.4.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.4/Lynx.-.Velocity.v2.4.zip",
+          "size": 946103,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.3",
+      "tagName": "Velocity2.3",
+      "publishedAt": "2024-01-25T19:53:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.3.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.3/Lynx.-.Velocity.v2.3.zip",
+          "size": 949951,
+          "downloadCount": 31
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.2",
+      "tagName": "Velocity2.2",
+      "publishedAt": "2024-01-15T19:17:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.2.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.2/Lynx.-.Velocity.v2.2.Stable.Release.zip",
+          "size": 946058,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.1",
+      "tagName": "Velocity2.1",
+      "publishedAt": "2023-12-26T16:57:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.1.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.1/Lynx.-.Velocity.v2.1.Stable.Release.zip",
+          "size": 1848684,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "Velocity2.0",
+      "tagName": "Velocity2.0",
+      "publishedAt": "2023-12-19T01:13:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Velocity.v2.0.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.0/Lynx.-.Velocity.v2.0.Stable.Release.zip",
+          "size": 1848562,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.9",
+      "tagName": "Quiet1.9",
+      "publishedAt": "2023-11-26T13:56:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.9.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.9/Lynx.-.Quiet.v1.9.Stable.Release.zip",
+          "size": 1835420,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.8",
+      "tagName": "Quiet1.8",
+      "publishedAt": "2023-11-26T10:49:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.8.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.8/Lynx.-.Quiet.v1.8.Stable.Release.zip",
+          "size": 1836047,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.7",
+      "tagName": "Quiet1.7",
+      "publishedAt": "2023-11-26T10:40:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.7.Stable.Release.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.7/Lynx.-.Quiet.v1.7.Stable.Release.zip",
+          "size": 916673,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.6",
+      "tagName": "Quiet1.6",
+      "publishedAt": "2023-09-24T14:10:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.6.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.6/Lynx.-.Quiet.v1.6.zip",
+          "size": 914888,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.5",
+      "tagName": "Quiet1.5",
+      "publishedAt": "2023-08-29T13:01:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.5.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.5/Lynx.-.Quiet.v1.5.zip",
+          "size": 922891,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.4",
+      "tagName": "Quiet1.4",
+      "publishedAt": "2023-08-09T07:51:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.4.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.4/Lynx.-.Quiet.v1.4.zip",
+          "size": 923389,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.3",
+      "tagName": "Quiet1.3",
+      "publishedAt": "2023-08-06T13:34:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.3.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.3/Lynx.-.Quiet.v1.3.zip",
+          "size": 922524,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.2",
+      "tagName": "Quiet1.2",
+      "publishedAt": "2023-08-06T02:28:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.2.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.2/Lynx.-.Quiet.v1.2.zip",
+          "size": 917518,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "Quiet1.1",
+      "tagName": "Quiet1.1",
+      "publishedAt": "2023-08-05T13:24:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.1.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet1.1/Lynx.-.Quiet.v1.1.zip",
+          "size": 916780,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "Quiet",
+      "tagName": "Quiet",
+      "publishedAt": "2023-08-05T11:06:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lynx.-.Quiet.v1.0.zip",
+          "downloadUrl": "https://github.com/Zy0x/Lynx/releases/download/Quiet/Lynx.-.Quiet.v1.0.zip",
+          "size": 916783,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

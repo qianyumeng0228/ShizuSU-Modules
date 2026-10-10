@@ -1,0 +1,169 @@
+{
+  "readme": "### This repository is [forked](https://github.com/siavash79/PixelXpert) ###\nThe original project was shutdown and this repository was created to continue the work for future Android builds, you can find older builds in the original repository.\n\n\n### For Pixel Stock Android 17 and newer:  \n[![Latest Release](https://img.shields.io/github/v/release/anirudhgupta109/PixelXpert-Next?color=green&include_prereleases&label=Download%20Latest%20Stable)](https://github.com/anirudhgupta109/PixelXpert-Next/releases/latest)\n[![Latest Canary Release](https://img.shields.io/badge/Download%20Latest-Canary-blue)](https://github.com/anirudhgupta109/PixelXpert-Next/releases/tag/canary_builds)\n\n![Downloads - Stable channel](https://img.shields.io/github/downloads/anirudhgupta109/PixelXpert-Next/total?color=red&label=Downloads%20-%20Stable%20Channel)\n\n### For Older Pixel Stock builds:\nRefer to [The original project](https://github.com/siavash79/PixelXpert#for-pixel-stock-android-12-and-13-up-to-nov-2022---aosp-13r8)\n\n\n\n[![Telegram URL](https://img.shields.io/badge/Telegram-Join-2CA5E?style=social&logo=telegram)](https://t.me/PixelXpert_Github)\n\n<p align=\"center\">\n  <img src=\"PixelXpert.svg\" alt=\"PixelXpert Logo\" width=\"200\" height=\"200\" />\n</p>\n\nThis is a mixed Xposed+Magisk/KSU module, which is made to allow customizations that are not originally designed in AOSP (Android Open Source Project). Please read thorough below before reaching to download links\n<hr>\n\n### **Features:**\nCurrently, PixelXpert-Next offers customizations on different aspects of system framework and SystemUI, including:\n- Status bar\n- Quick Settings panel\n- Lock screen\n- Notifications\n- Gesture Navigations\n- Phone & Dialer\n- Hotspot\n- Package Manager\n- Screen properties\n<hr>\n\n### **Compatibility:**\nPixelXpert-Next is ONLY compatible with pixel stock firmware on Google Pixel devices. Any custom ROM (including PE, PE plus, pixel plus ui and etc) or stock ROM outside stock pixel firmware on Google pixel devices (e.g. OneUI on Samsung, MIUI on Xiaomi and etc) is not supported and may not be fully (or even at all) compatible.\n\nHere is the compatibility chart according to different android versions and QPRs:\n\n- Android 17 newer: [latest stable version](https://github.com/anirudhgupta109/PixelXpert-Next/releases/latest)\n- Android 16 (June 2022) and older Android Versions: [Refer to original project](https://github.com/siavash79/PixelXpert#compatibility).\n<hr>\n\n### **Prerequisites:**\n- Compatible ROM (see Compatibility text above)\n- Device Rooted with Magisk/KSU\n- If you're using KSU, you need to flash a metamodule like [Mountify](https://github.com/backslashxx/mountify/releases/latest) or [NoMount](https://github.com/maxsteeel/nomount/releases/latest)\n- LSPosed (Zygisk Version preferred) (For Android 14+ use [LSPosed fork (Vector) by JingMatrix](https://github.com/JingMatrix/Vector/releases)) or the [closed source LSPosed by the original team](https://lsposed.zip)\n<hr>\n\n### **How to install:**\n- Download the module according to your firmware as mentioned above\n- If you're using KSU, Flash a metamodule in KSU that has overlay support like [Mountify](https://github.com/backslashxx/mountify/releases/latest) or [NoMount](https://github.com/maxsteeel/nomount/releases/latest) [SKIP IF MAGISK!!!!]\nPS. You might need to configure your metamodule (in the case of Mountify, set `MOUNT_DEVICE_NAME` to `KSU` and ensure `mountify_mounts` is `2` and `mountify_custom_umount` is `0`)\n- Reboot\n- Flash PixelXpert-Next in Magisk/KSU\n- Reboot\n- Grant root for PixelXpert-Next in KSU (doesn’t automatically request, it will be listed only when `Show System Apps` option is enabled from the three dot menu) or Magisk (if it’s not already)\n- Enable PixelXpert-Next in LSPosed if it isn’t already (ensure all the scopes are checked)\n- Preferably reboot\n- Open PixelXpert-Next app and apply changes\n\n<hr>\n\n### **Release Variants:**  \nThe module is also released in 2 flavors with different manual download and update procedures. But both can utilize automated updates through magisk manager, or through in-app updater (for canary, updates will not count against the module's download count).\n\n<ins>Stable release:</ins> \n- Manual Install/Update: through repository's Github release page (link below) AND through in-app updater\n\n<ins>Canary release:</ins>\n- Manual Install/Update: through repository's Actions page and [telegram channel](https://t.me/PixelXpert_Github) (latest version is available from [here](https://github.com/anirudhgupta109/PixelXpert-Next/releases/tag/canary_builds) also)\n\n*No matter which flavor you're on, you can always switch to the other one with in-app updater\n<hr>\n\n### **Translations:**  \n[![Crowdin](https://badges.crowdin.net/aospmods/localized.svg)](https://crowdin.com/project/aospmods)  \nWant to help translate PixelXpert to your language? Visit [Crowdin](https://crowdin.com/project/aospmods)\n<hr>\n\n### **Donations:**\nThis project is open source and free for usage, build or copy. However, if you really feel like it, you can donate to your favorite charity on our behalf, or help funding education for children in need, at [Child Foundation](https://mycf.childfoundation.org/s/donate)\n<hr>\n\n### **Credits / Thanks:**\n- Android Team\n- @topjohnwu for Magisk\n- @rovo89 for Xposed\n- Team LSPosed\n- apsun@github for remote-preferences\n- @nijel8 for double-tap to wake\n\n\n**UI design:**  \n- @Mahmud0808  \n\n**Graphic design:**  \n- JstormZx@Telegram (Icon and Banner) \n- RKBDI@Telegram  (Icon)\n\n**Brought to you by:**\n@siavash79, @ElTifo & @anirudhgupta109\n<hr>\n",
+  "readmeHTML": "<h3>This repository is [forked](https://github.com/siavash79/PixelXpert) ###</h3>\n<p>The original project was shutdown and this repository was created to continue the work for future Android builds, you can find older builds in the original repository.</p>\n\n\n<h3>For Pixel Stock Android 17 and newer:</h3>\n<p><a href=\"https://img.shields.io/github/v/release/anirudhgupta109/PixelXpert-Next?color=green&include_prereleases&label=Download%20Latest%20Stable\">![Latest Release</a>](https://github.com/anirudhgupta109/PixelXpert-Next/releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/Download%20Latest-Canary-blue\">![Latest Canary Release</a>](https://github.com/anirudhgupta109/PixelXpert-Next/releases/tag/canary_builds)</p>\n\n<p>!<a href=\"https://img.shields.io/github/downloads/anirudhgupta109/PixelXpert-Next/total?color=red&label=Downloads%20-%20Stable%20Channel\">Downloads - Stable channel</a></p>\n\n<h3>For Older Pixel Stock builds:</h3>\n<p>Refer to <a href=\"https://github.com/siavash79/PixelXpert#for-pixel-stock-android-12-and-13-up-to-nov-2022---aosp-13r8\">The original project</a></p>\n\n\n\n<p><a href=\"https://img.shields.io/badge/Telegram-Join-2CA5E?style=social&logo=telegram\">![Telegram URL</a>](https://t.me/PixelXpert_Github)</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"PixelXpert.svg\" alt=\"PixelXpert Logo\" width=\"200\" height=\"200\" /></p>\n<p></p></p>\n\n<p>This is a mixed Xposed+Magisk/KSU module, which is made to allow customizations that are not originally designed in AOSP (Android Open Source Project). Please read thorough below before reaching to download links</p>\n<p><hr></p>\n\n<h3>**Features:**</h3>\n<p>Currently, PixelXpert-Next offers customizations on different aspects of system framework and SystemUI, including:</p>\n<li>Status bar</li>\n<li>Quick Settings panel</li>\n<li>Lock screen</li>\n<li>Notifications</li>\n<li>Gesture Navigations</li>\n<li>Phone & Dialer</li>\n<li>Hotspot</li>\n<li>Package Manager</li>\n<li>Screen properties</li>\n<p><hr></p>\n\n<h3>**Compatibility:**</h3>\n<p>PixelXpert-Next is ONLY compatible with pixel stock firmware on Google Pixel devices. Any custom ROM (including PE, PE plus, pixel plus ui and etc) or stock ROM outside stock pixel firmware on Google pixel devices (e.g. OneUI on Samsung, MIUI on Xiaomi and etc) is not supported and may not be fully (or even at all) compatible.</p>\n\n<p>Here is the compatibility chart according to different android versions and QPRs:</p>\n\n<li>Android 17 newer: [latest stable version](https://github.com/anirudhgupta109/PixelXpert-Next/releases/latest)</li>\n<li>Android 16 (June 2022) and older Android Versions: [Refer to original project](https://github.com/siavash79/PixelXpert#compatibility).</li>\n<p><hr></p>\n\n<h3>**Prerequisites:**</h3>\n<li>Compatible ROM (see Compatibility text above)</li>\n<li>Device Rooted with Magisk/KSU</li>\n<li>If you're using KSU, you need to flash a metamodule like [Mountify](https://github.com/backslashxx/mountify/releases/latest) or [NoMount](https://github.com/maxsteeel/nomount/releases/latest)</li>\n<li>LSPosed (Zygisk Version preferred) (For Android 14+ use [LSPosed fork (Vector) by JingMatrix](https://github.com/JingMatrix/Vector/releases)) or the [closed source LSPosed by the original team](https://lsposed.zip)</li>\n<p><hr></p>\n\n<h3>**How to install:**</h3>\n<li>Download the module according to your firmware as mentioned above</li>\n<li>If you're using KSU, Flash a metamodule in KSU that has overlay support like [Mountify](https://github.com/backslashxx/mountify/releases/latest) or [NoMount](https://github.com/maxsteeel/nomount/releases/latest) [SKIP IF MAGISK!!!!]</li>\n<p>PS. You might need to configure your metamodule (in the case of Mountify, set <code>MOUNT_DEVICE_NAME</code> to <code>KSU</code> and ensure <code>mountify_mounts</code> is <code>2</code> and <code>mountify_custom_umount</code> is <code>0</code>)</p>\n<li>Reboot</li>\n<li>Flash PixelXpert-Next in Magisk/KSU</li>\n<li>Reboot</li>\n<li>Grant root for PixelXpert-Next in KSU (doesn’t automatically request, it will be listed only when `Show System Apps` option is enabled from the three dot menu) or Magisk (if it’s not already)</li>\n<li>Enable PixelXpert-Next in LSPosed if it isn’t already (ensure all the scopes are checked)</li>\n<li>Preferably reboot</li>\n<li>Open PixelXpert-Next app and apply changes</li>\n\n<p><hr></p>\n\n<h3>**Release Variants:**</h3>\n<p>The module is also released in 2 flavors with different manual download and update procedures. But both can utilize automated updates through magisk manager, or through in-app updater (for canary, updates will not count against the module's download count).</p>\n\n<p><ins>Stable release:</ins></p>\n<li>Manual Install/Update: through repository's Github release page (link below) AND through in-app updater</li>\n\n<p><ins>Canary release:</ins></p>\n<li>Manual Install/Update: through repository's Actions page and [telegram channel](https://t.me/PixelXpert_Github) (latest version is available from [here](https://github.com/anirudhgupta109/PixelXpert-Next/releases/tag/canary_builds) also)</li>\n\n<p>*No matter which flavor you're on, you can always switch to the other one with in-app updater</p>\n<p><hr></p>\n\n<h3>**Translations:**</h3>\n<p><a href=\"https://badges.crowdin.net/aospmods/localized.svg\">![Crowdin</a>](https://crowdin.com/project/aospmods)</p>\n<p>Want to help translate PixelXpert to your language? Visit <a href=\"https://crowdin.com/project/aospmods\">Crowdin</a></p>\n<p><hr></p>\n\n<h3>**Donations:**</h3>\n<p>This project is open source and free for usage, build or copy. However, if you really feel like it, you can donate to your favorite charity on our behalf, or help funding education for children in need, at <a href=\"https://mycf.childfoundation.org/s/donate\">Child Foundation</a></p>\n<p><hr></p>\n\n<h3>**Credits / Thanks:**</h3>\n<li>Android Team</li>\n<li>@topjohnwu for Magisk</li>\n<li>@rovo89 for Xposed</li>\n<li>Team LSPosed</li>\n<li>apsun@github for remote-preferences</li>\n<li>@nijel8 for double-tap to wake</li>\n\n\n<p><b>UI design:</b></p>\n<li>@Mahmud0808</li>\n\n<p><b>Graphic design:</b></p>\n<li>JstormZx@Telegram (Icon and Banner)</li>\n<li>RKBDI@Telegram  (Icon)</li>\n\n<p><b>Brought to you by:</b></p>\n<p>@siavash79, @ElTifo & @anirudhgupta109</p>\n<p><hr></p>",
+  "homepageUrl": "https://github.com/anirudhgupta109/PixelXpert-Next",
+  "sourceUrl": "https://github.com/anirudhgupta109/PixelXpert-Next",
+  "url": "https://github.com/anirudhgupta109/PixelXpert-Next",
+  "latestRelease": {
+    "name": "v6.0.9",
+    "version": "v6.0.9",
+    "time": "2026-10-08T17:17:09Z",
+    "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.9/PixelXpert-Next.zip"
+  },
+  "releases": [
+    {
+      "name": "v6.0.9",
+      "tagName": "v6.0.9",
+      "publishedAt": "2026-10-08T17:17:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.9/PixelXpert-Next.zip",
+          "size": 4244842,
+          "downloadCount": 255
+        }
+      ]
+    },
+    {
+      "name": "v6.0.8",
+      "tagName": "v6.0.8",
+      "publishedAt": "2026-09-29T14:45:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.8/PixelXpert-Next.zip",
+          "size": 4236822,
+          "downloadCount": 457
+        }
+      ]
+    },
+    {
+      "name": "v6.0.7",
+      "tagName": "v6.0.7",
+      "publishedAt": "2026-09-27T23:57:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.7/PixelXpert-Next.zip",
+          "size": 4234057,
+          "downloadCount": 230
+        }
+      ]
+    },
+    {
+      "name": "v6.0.6",
+      "tagName": "v6.0.6",
+      "publishedAt": "2026-09-22T22:20:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.6/PixelXpert-Next.zip",
+          "size": 4232006,
+          "downloadCount": 318
+        }
+      ]
+    },
+    {
+      "name": "v6.0.5",
+      "tagName": "v6.0.5",
+      "publishedAt": "2026-09-21T19:13:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.5/PixelXpert-Next.zip",
+          "size": 4232702,
+          "downloadCount": 117
+        }
+      ]
+    },
+    {
+      "name": "v6.0.4",
+      "tagName": "v6.0.4",
+      "publishedAt": "2026-09-21T10:17:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.4/PixelXpert-Next.zip",
+          "size": 4232660,
+          "downloadCount": 106
+        }
+      ]
+    },
+    {
+      "name": "v6.0.3",
+      "tagName": "v6.0.3",
+      "publishedAt": "2026-09-10T09:39:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.3/PixelXpert-Next.zip",
+          "size": 4231184,
+          "downloadCount": 443
+        }
+      ]
+    },
+    {
+      "name": "v6.0.2",
+      "tagName": "v6.0.2",
+      "publishedAt": "2026-09-03T20:44:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.2/PixelXpert-Next.zip",
+          "size": 4226605,
+          "downloadCount": 174
+        }
+      ]
+    },
+    {
+      "name": "v6.0.1",
+      "tagName": "v6.0.1",
+      "publishedAt": "2026-09-02T19:39:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.1/PixelXpert-Next.zip",
+          "size": 4226470,
+          "downloadCount": 51
+        }
+      ]
+    },
+    {
+      "name": "v6.0.0",
+      "tagName": "v6.0.0",
+      "publishedAt": "2026-08-29T16:37:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.0.0/PixelXpert-Next.zip",
+          "size": 4225941,
+          "downloadCount": 92
+        }
+      ]
+    },
+    {
+      "name": "canary_builds",
+      "tagName": "canary_builds",
+      "publishedAt": "2026-08-29T15:58:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PixelXpert-Next.zip",
+          "downloadUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/canary_builds/PixelXpert-Next.zip",
+          "size": 4245071,
+          "downloadCount": 144
+        }
+      ]
+    }
+  ]
+}

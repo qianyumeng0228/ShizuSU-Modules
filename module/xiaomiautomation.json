@@ -1,0 +1,267 @@
+{
+  "readme": "# 澎湃自动化—XiaomiAutomation\n\n[English](README.en.md) · [Français](README.fr.md) · [Русский](README.ru.md)\n\n> **English summary** (the full English documentation is in [README.en.md](README.en.md); the rest of this file is the Chinese version, which is the primary one)\n>\n> **澎湃自动化 (XiaomiAutomation)** is a **device-specific** root automation module for **Xiaomi 17 Pro / HyperOS 4**, installable on **KernelSU, Magisk and APatch**. It provides multi-profile scheduling, record/replay of arbitrary app interactions, and a built-in ICBC daily watering task (07:30 by default). Automation is done by **pure root control** (`screencap` / `getevent` / `sendevent`) — no accessibility service, no Xposed, no hooks, no `input` injection.\n>\n> | Feature | KernelSU / forks | APatch | Magisk |\n> | --- | :---: | :---: | :---: |\n> | Scheduling / record / replay / PIN auto-unlock | ✅ | ✅ | ✅ |\n> | Module WebUI (Chinese / English / Français / Русский) | ✅ | ✅ | ✅ with KsuWebUI or MMRL installed |\n>\n> The WebUI runs on APatch too, not just KernelSU — both inject the same `ksu` global into `webroot/`. Stock Magisk has no WebView code at all, so it needs a host app (KsuWebUI or MMRL) to provide one; this module then works unchanged. See [Requirements](#运行环境) below.\n>\n> Other HyperOS 4 phones can be calibrated with the built-in device-profile layer (screen size, display ID, lock-keypad geometry), but the ICBC flow is only tested on the Xiaomi 17 Pro.\n>\n> **Disclaimer:** this project is for technical study and research only and has no connection to ICBC. Automating an app may violate its terms of service or local law — assess the risk yourself. The authors accept no responsibility for any consequences.\n>\n> **License:** MIT (redistribution permitted). All scripts ship as plain, unobfuscated source.\n\n面向 **Xiaomi 17 Pro / HyperOS 4** 的 KSU / Magisk root 自动化模块。模块提供多 Profile 定时调度、任意 App 操作录制与回放，并保留内置的工行定时浇水任务。\n\n实现方式为 **纯 root 直控**（`screencap` / `getevent` / `sendevent`），不使用无障碍服务、Xposed、Hook 或 `input` 注入。\n\n> ⚠️ **免责声明**\n> - 本项目仅供技术学习与研究，与工商银行官方无任何关联，未经官方授权。\n> - 自动操作可能违反 App 用户协议或当地法律法规，请自行了解并评估风险。\n> - 使用本项目造成的任何后果由使用者自负，作者与贡献者不承担任何责任。\n> - 请勿用于商业用途、批量刷取或任何盈利目的；如相关功能被 App 或运营商禁止，请立即停止使用并卸载。\n> - 涉及账户功能，风险自担；不建议在重要或实名账户上使用。\n\n## 特性\n\n- 内置「工行定时浇水」Profile，默认每天 `07:30` 执行；支持手动触发和每日首次打开工行时触发。\n- 多 Profile 独立调度：每个任务可设置时间、启用状态、目标包名和操作序列。\n- **可选周几执行**：全局和每个任务都有周一到周日 7 个开关，哪天跑哪天不跑逐个勾选；单任务不勾则跟随全局，勾 `0` 即一周都不定时跑（手动触发不受影响）。\n- 目标 App 录制模式：切到目标 App 后开始录制，离开自动暂停，回到目标 App 继续；锁屏或暗屏时也会暂停。\n- **全场录取模式**：录制方式选「全场录取」后不填包名也能跨 App 连续录完整操作（先回桌面再开录），回放前同样默认先回桌面；原「指定包名录取」路径原样保留。\n- 裸录模式：包名留空时从亮屏画面开始录制；按规则过滤系统边缘/底部滑动。\n- **图案密码解锁**：解锁方式新增「图案」，在 WebUI 九宫格上直接画出 4-9 点图案，任务执行前按该图案拖拽解锁；坐标可在设备档案里按机型微调，另有「锁屏→解锁」往返测试按钮用于校准。\n- **内置任务可删可恢复**：内置「工行定时浇水」任务现在可以在 WebUI 里直接删除，删除后重启/重装也不会被重建；任务卡上的「恢复内置工行任务」可随时一键重建。\n- 回放时自动处理亮屏、锁屏解锁、目标 App 打开与前台确认，并恢复方向锁、常亮和屏幕超时设置。\n- **跑完清理后台**：任务结束后自动 `am force-stop` 目标 App 回收内存，下次任务从干净状态开始；可全局开关，也可按任务单独覆盖。\n- **多语言 WebUI**：中文 / English / Français / Русский，页面右上角可切换，选择会记住。\n- **多设备适配**：内置设备档案层，可按机型调整屏幕尺寸、显示 ID、锁屏密码宫格位置和图案解锁坐标，让录制、回放和 PIN / 图案自动解锁也能在别的澎湃 4 机型上用；Xiaomi 17 Pro 的实测基线原样保留、不受任何影响。\n- **WebUI 升级即生效**：资源带版本号并禁用缓存，页面还会自检「文档是不是旧的」并自动重载 —— 模块更新后不再需要卸载重装。\n- **新版本待重启提示**：覆盖刷入后还没重启时，新包停在 `modules_update` 里等合并，而右上角版本号已经是新版 —— 顶部横幅会明说「新版本 vX 已就位，重启后生效」，重启后自动消失，不再出现「显示新版、跑旧行为」的迷惑状态。\n- **界面清爽**：细节收进可折叠分组，每张卡自己点开收起，首屏不再是一大坨表单；状态明细集中在「触发检查」卡里。顶部那排只服务默认内置工行的快捷按钮（「今日已浇 / 未浇」状态胶囊、刷新、重启服务、收起全部）已整体撤掉 —— 内置工行早就不是核心，多任务 Profiles 才是唯一入口。\n- PIN 只写入本机配置，不在状态接口、运行日志或源码中出现明文。\n\n## 运行环境\n\n模块只用到标准的 `customize.sh` + `service.sh` 入口：**不含 Zygisk、不改 `/system`、不需要 metamodule**。所以在 Magisk / APatch 下定时调度、录制回放、PIN 自动解锁都能正常跑。\n\nWebUI 也**不只支持 KernelSU**。APatch 从 10568 版起就有模块 WebUI，做法与 KernelSU 一致：把 `webroot/` 挂在 `https://mui.kernelsu.org` 上，并注入一个**同名**的全局对象 `ksu`——本模块的 `kernelsu.js` 用的正是它，所以在 APatch 上开箱即用，一行代码都不用改。KernelSU Next、SukiSU Ultra 等分支同理。\n\nMagisk 是唯一的例外：上游 Magisk 里**一行 WebView 代码都没有**（不是「没实现」，是压根没这个能力），所以它自己不会渲染 `webroot/`。要在那上面用 WebUI，需要一个自带 WebUI 的宿主 App：\n\n| 功能 | KernelSU / 分支 | APatch | Magisk |\n| --- | :---: | :---: | :---: |\n| 定时调度 / 录制 / 回放 / PIN 自动解锁 | ✅ | ✅ | ✅ |\n| 模块 WebUI | ✅ | ✅ | 装 KsuWebUI 或 MMRL 后 ✅ |\n\n**KsuWebUI** 和 **MMRL** 做的事就是在 Magisk 上自己申请 root，再把**同一个** `ksu` 全局注入给 `webroot/`。装了它们之后本模块无需任何改动，WebUI 原样可用——这正是整个生态在 Magisk 上的通行做法。本模块已附带 `config.json`，声明 `\"webui-engine\": \"ksu\"`，MMRL 会据此选用 `ksu` 兼容引擎，而不是它默认的 WebUI X（后者 API 不兼容）。\n\n> ⚠️ 两条路都通，但 **KsuWebUI 更稳**：它是个独立 App，自己拿 root，不依赖任何管理器。MMRL 的 `ksu` 兼容引擎在其 WebUI X Portable 依赖里已于 2026-03-14 被标记废弃（当前 MMRL 恰好锁在废弃前 7 小时的版本上，所以暂时可用），MMRL 升级后这一条可能失效。真出问题就换 KsuWebUI，本模块不用动。\n\n任何环境下想改配置，都可以用 root shell 直接调 `webctl.sh`（与 WebUI 完全同一套后端）：\n\n```sh\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh status'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh settime 0730'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh trigger'      # 立刻跑一次内置任务\nsu -c 'WEBUI_PIN=123456 sh /data/adb/modules/icbc_daily_water/webctl.sh setpin'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh setdays 1234567'   # 每天都跑；135=只跑周一三五，0=一周都不定时跑\nsu -c 'WEBUI_PATTERN=14789 sh /data/adb/modules/icbc_daily_water/webctl.sh setpattern'  # 画好图案后保存；不带值即清除\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh unlock'       # 锁屏→解锁 往返测试（校准图案/PIN 用）\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh profile del icbc'   # 删除内置工行任务（记入 no_icbc，不再重建）\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh profile addicbc'    # 恢复内置工行任务\n```\n\nPIN 刻意**只接受环境变量 `WEBUI_PIN`**，不接受命令行参数，这样明文不会出现在进程列表里。图案同理，走 `WEBUI_PATTERN`，点序是 4-9 个互不重复的 `1-9`，空值表示清除图案。上面这几条请在本地终端手敲，不要写进脚本、别名或聊天记录。\n\n完整子命令见文件头注释：`webctl.sh status|setpin|setpattern|settime|setdays|setenable|setmode|setopen|setsleep|setwatch|setcleanup|unlock|trigger[NAME]|restart|log|profiles|profile add/addicbc/del/set|record start/stop/status`。\n\n## 安装\n\n1. 从 Releases 下载 `XiaomiAutomation-v0.13.3.zip`。\n2. 在 KernelSU / Magisk 中刷入该 zip。\n3. 重启设备后打开模块 WebUI，按需设置解锁方式和 PIN。\n4. 首次使用录制任务时，填写目标 App 包名；切到该 App 后点击「开始录制」，操作完成后点击「停止录制」。\n\n### 从旧版本升级\n\n可以直接在 KernelSU / Magisk 中覆盖安装新版 zip。为保证旧用户配置和任务不丢失，模块内部兼容标识保持不变：\n\n```text\nid=icbc_daily_water\n/data/adb/modules/icbc_daily_water\n/data/adb/icbc_water\n```\n\n请不要手动删除这些目录或修改模块 ID；配置、Profile、PIN 和录制动作会继续沿用。\n\n> 刷完**要重启才真正生效**：新包先落在 `modules_update`，重启时才合并到 `modules`。这期间右上角版本号往往已经是新版、跑的却是旧代码 —— 为此 WebUI 顶部会挂一条黄色横幅「新版本 vX 已就位，重启后生效」，横幅消失才说明新代码已经在跑（模块启动日志里也会留一行 `UPDATE pending=vX reboot=needed`）。\n\n## 使用说明\n\n### 内置任务\n\n首次安装会自动创建「工行定时浇水」任务。它是脚本型 Profile，调用内置 `water.sh` 完成工行首页判断、任务入口点击和浇水流程。默认定时为 `07:30`，可以在 WebUI 中修改。\n\n内置任务现在**可以删除**：任务卡右下角的「删除」对它同样有效，删除后写入 `/data/adb/icbc_water/no_icbc` 标记，开机守护和升级安装都不会再把它建回来。想恢复时点「恢复内置工行任务」按钮（或执行 `webctl.sh profile addicbc`）即可按当前全局时间重新创建；恢复后标记自动清除，后续删除/恢复可以反复进行。\n\n### 定时可选周几\n\n- 「⚙️ 其它」里的**全局执行日**是一排周一到周日的按钮，全开即每天执行（默认），关掉的日子不会触发任何定时任务。\n- 每个任务卡上还有**该任务自己的执行日**，默认「跟随全局」；单独勾选后只按自己勾的日子跑，与全局互不影响。\n- 取值规则：空 = 跟随全局（全局空 = 每天），`0` = 一天都不跑，其余为 `1-7` 的升序串（`135` = 周一/三/五）。\n- 手动「▶ 运行」不受执行日限制，任何时候都会执行；「每日首次打开工行」那条链路同样只在执行日生效。\n\n### 录制任务\n\n1. 在 WebUI 中新增任务，填写任务名；**录制方式**二选一：\n   - **指定包名录取**（默认）：填写目标 App 包名，切到该 App 后开始录制，离开自动暂停，回到目标 App 继续。\n   - **全场录取**：包名留空并把录制方式切到「全场录取」，从桌面开始跨 App 连续录制整套操作，中途切换 App 不中断；回放前默认先回一次桌面，保证起点一致。\n2. 点击任务的「开始录制」，切换到目标 App。\n3. 完成操作后回到 WebUI，点击「停止录制」。\n4. 确认动作数量后，可立即运行或等待该 Profile 的定时时间。\n\n要录制左右边缘返回手势，请选择「指定包名录取」并填写目标包名；App 绑定模式会保留边缘返回，普通离开 App 的动作会被丢弃。\n\n### 跑完清理后台\n\n「⚙️ 其它 → 跑完清理后台」控制所有任务跑完后是否自动退出目标 App，**默认开启**。它只回收进程，不会清除数据、账号或登录状态。\n\n两种例外需要注意：\n\n- **同 App 接力**：如果你把同一个 App 的操作拆成多个任务（例如前半段和后半段各录一个），前一个跑完就退出 App 会让后一个回到首页而错位。给接力链上的任务在任务卡里把清理选为「跟随全局」以外的方式即可，具体做法是把**接力中间的**任务设为「关（保持后台）」，只在链条最后一个任务保留清理。\n- **裸录任务**（包名留空）没有确定的目标 App，服务端无从判断该退出哪个进程，因此这类任务不会自动清理，任务卡上会标注。\n\n「每日首次打开工行自动浇水」是另一条链路：你正在用手机、主动打开了工行，模块不会把你踢出 App。\n\n### 锁屏与电源\n\n任务执行前会尝试亮屏并解锁，支持 PIN 盲打、图案解锁或上滑解锁。执行期间会临时保持常亮，结束后恢复原来的方向锁、`screen_off_timeout` 和常亮设置。锁屏状态无法确认时会安全中止，不会盲目注入坐标。\n\n**图案解锁**：解锁方式选「图案」后，在 WebUI 的九宫格上按顺序点出 4-9 个互不重复的点（支持拖拽连画，Android 允许的「中间格补全」会自动补上），保存即可。图案只存在本机配置里，接口回显一律是「已设置」，不会带出点序。九宫格坐标默认用 Xiaomi 17 Pro 的实测值（由 1220×2656 锁屏截图量点得到），别的机型在「📱 设备档案」里微调 `PAT_X0/PAT_Y0/PAT_DX/PAT_DY`（起点 X/Y 与横纵间距）；改完点「锁屏→解锁 测试」跑一次往返，成功会回 `UNLOCK_OK`，失败看日志再调。没有设置图案时自动回落到 PIN 或上滑。\n\n**测试解锁的中止语义**：「锁屏→解锁 测试」现在有两道闸 —— 锁屏必须真的出现，且上滑一下解不开才继续画。锁屏没出现（屏幕根本没锁上）会提示「测试中止：锁屏没有真正出现」；上滑一下就进了桌面（说明锁屏没要求图案/PIN，比如自动锁定还没生效）会提示「测试中止：上滑一下就进了桌面」。两种情况回的都是 `UNLOCK_SKIP`（`nolock` / `nocred`）而不是 `UNLOCK_OK` —— 没有这两道闸时，画偏了也照样报成功，白白误导校准。\n\n### 语言\n\nWebUI 右上角的下拉可切换中文 / English / Français / Русussian（Русский），选择保存在浏览器本地存储中。日志、命令和包名属于技术内容，保持原文不翻译。\n\n## 设备与校准\n\n默认目标设备为 Xiaomi 17 Pro，模块通过 `getevent -p` 自动发现触摸设备，并根据触摸轴范围换算坐标。\n\n### 换机器用：设备档案\n\n「📱 设备档案」卡片只影响几样东西：**屏幕宽高、显示 ID、锁屏密码宫格位置，以及图案解锁的九宫格坐标**。这些值直接决定录制、回放和 PIN / 图案自动解锁能不能正常工作，别的机器和 17 Pro 不一样，所以要单独填。\n\n- **Xiaomi 17 Pro**：卡片默认就是这套已实测的值，**不需要改动**。「启用覆盖」保持关闭，模块用的就是 `water.sh` / `sched.conf` 里的原值。\n- **其它澎湃 4 机型**（小米 17 / 17 Pro Max 等）：点「🔍 自动检测本机」自动填入 `wm size` 和 `wm density` 的值，核对无误后勾上「启用覆盖」再保存。锁屏密码宫格无法自动可靠识别，需要手动填 —— 不填就用 17 Pro 的值，别的机器上会点错格子。\n- **图案解锁坐标**：`PAT_X0` / `PAT_Y0` 是九宫格左上角第一个点的像素坐标，`PAT_DX` / `PAT_DY` 是横纵间距（默认 `310 / 1193 / 300 / 300`，取自 17 Pro 1220×2656 锁屏截图的实测值）。用任务卡或「⚙️ 其它」里的「锁屏→解锁 测试」验证：点错格子就微调这四个值再测，直到回 `UNLOCK_OK`。\n- 设备档案存放在 `/data/adb/icbc_water/device.conf`。`DEV_APPLY=0`（默认）表示「不覆盖，按 17 Pro 基线走」；只有 `DEV_APPLY=1` 才启用覆盖。所有数值都要通过「唯一 + 纯数字」校验，填错或文件损坏最多让覆盖不生效，不会把浇水流程带歪。\n\n> **除 Xiaomi 17 Pro 外，其它机型均为「测试中」状态。** 分辨率、DPI、系统导航栏高度都会影响 UI 布局，所以：**工行流程不保证可用**；但**录制、回放、PIN 自动解锁等基础功能是可以正常使用的**。请勿在主力机上直接使用。\n\n### 跨机器回放录好的动作\n\n每个录制型任务卡上有一个「不缩放 / 按比例缩放」下拉。如果某个任务是在**分辨率不同的机器**上录的、现在要在本机回放，把它选为「按比例缩放」——模块会读录制文件头里记录的分辨率，把每个坐标按比例换算。默认是「不缩放」，同机录制回放不受任何影响。\n\n### 工行流程坐标\n\n工行流程的像素探针和坐标集中在 `water.sh` 顶部配置区。可使用仓库中的辅助工具检查截图颜色：\n\n```sh\npython3 tools/px.py screen.png 216,778 518,780 746,748\n```\n\n## 文件说明\n\n| 文件 | 作用 |\n|---|---|\n| `module.prop` | 模块元数据（显示名称、版本、作者） |\n| `service.sh` | 多 Profile 守护与调度、亮屏/解锁/电源恢复、跑完清理 |\n| `water.sh` | 内置工行浇水业务逻辑 |\n| `record.sh` | 触摸事件录制内核 |\n| `replay.sh` | 录制动作回放内核 |\n| `webctl.sh` | WebUI root 命令接口 |\n| `webroot/` | KernelSU WebUI 页面、脚本与多语言词典 |\n| `sched.conf` | 默认配置模板（安装后实际配置位于 `/data/adb/icbc_water/`） |\n| `device.conf` | 设备档案模板（安装后实际位于 `/data/adb/icbc_water/device.conf`） |\n| `customize.sh` | 安装/升级兼容流程、权限设置与 WebUI 完整性校验 |\n| `tools/px.py` | 截图像素校准工具 |\n| `tools/run_once.sh` | 手动运行内置工行流程 |\n| `tools/build_zip.sh` | 从仓库内容生成可刷入 zip |\n\n## 从源码构建\n\n在仓库根目录执行：\n\n```sh\nbash tools/build_zip.sh\n```\n\n脚本会在仓库父目录生成：\n\n```text\nXiaomiAutomation-v0.13.3.zip\n```\n\n## 许可证\n\n[MIT](LICENSE) License.\n",
+  "readmeHTML": "<h1>澎湃自动化—XiaomiAutomation</h1>\n\n<p><a href=\"README.en.md\">English</a> · <a href=\"README.fr.md\">Français</a> · <a href=\"README.ru.md\">Русский</a></p>\n\n<p>> <b>English summary</b> (the full English documentation is in <a href=\"README.en.md\">README.en.md</a>; the rest of this file is the Chinese version, which is the primary one)</p>\n<p>></p>\n<p>> <b>澎湃自动化 (XiaomiAutomation)</b> is a <b>device-specific</b> root automation module for <b>Xiaomi 17 Pro / HyperOS 4</b>, installable on <b>KernelSU, Magisk and APatch</b>. It provides multi-profile scheduling, record/replay of arbitrary app interactions, and a built-in ICBC daily watering task (07:30 by default). Automation is done by <b>pure root control</b> (<code>screencap</code> / <code>getevent</code> / <code>sendevent</code>) — no accessibility service, no Xposed, no hooks, no <code>input</code> injection.</p>\n<p>></p>\n<p>> | Feature | KernelSU / forks | APatch | Magisk |</p>\n<p>> | --- | :---: | :---: | :---: |</p>\n<p>> | Scheduling / record / replay / PIN auto-unlock | ✅ | ✅ | ✅ |</p>\n<p>> | Module WebUI (Chinese / English / Français / Русский) | ✅ | ✅ | ✅ with KsuWebUI or MMRL installed |</p>\n<p>></p>\n<p>> The WebUI runs on APatch too, not just KernelSU — both inject the same <code>ksu</code> global into <code>webroot/</code>. Stock Magisk has no WebView code at all, so it needs a host app (KsuWebUI or MMRL) to provide one; this module then works unchanged. See <a href=\"#运行环境\">Requirements</a> below.</p>\n<p>></p>\n<p>> Other HyperOS 4 phones can be calibrated with the built-in device-profile layer (screen size, display ID, lock-keypad geometry), but the ICBC flow is only tested on the Xiaomi 17 Pro.</p>\n<p>></p>\n<p>> <b>Disclaimer:</b> this project is for technical study and research only and has no connection to ICBC. Automating an app may violate its terms of service or local law — assess the risk yourself. The authors accept no responsibility for any consequences.</p>\n<p>></p>\n<p>> <b>License:</b> MIT (redistribution permitted). All scripts ship as plain, unobfuscated source.</p>\n\n<p>面向 <b>Xiaomi 17 Pro / HyperOS 4</b> 的 KSU / Magisk root 自动化模块。模块提供多 Profile 定时调度、任意 App 操作录制与回放，并保留内置的工行定时浇水任务。</p>\n\n<p>实现方式为 <b>纯 root 直控</b>（<code>screencap</code> / <code>getevent</code> / <code>sendevent</code>），不使用无障碍服务、Xposed、Hook 或 <code>input</code> 注入。</p>\n\n<p>> ⚠️ <b>免责声明</b></p>\n<p>> - 本项目仅供技术学习与研究，与工商银行官方无任何关联，未经官方授权。</p>\n<p>> - 自动操作可能违反 App 用户协议或当地法律法规，请自行了解并评估风险。</p>\n<p>> - 使用本项目造成的任何后果由使用者自负，作者与贡献者不承担任何责任。</p>\n<p>> - 请勿用于商业用途、批量刷取或任何盈利目的；如相关功能被 App 或运营商禁止，请立即停止使用并卸载。</p>\n<p>> - 涉及账户功能，风险自担；不建议在重要或实名账户上使用。</p>\n\n<h2>特性</h2>\n\n<li>内置「工行定时浇水」Profile，默认每天 `07:30` 执行；支持手动触发和每日首次打开工行时触发。</li>\n<li>多 Profile 独立调度：每个任务可设置时间、启用状态、目标包名和操作序列。</li>\n<li>**可选周几执行**：全局和每个任务都有周一到周日 7 个开关，哪天跑哪天不跑逐个勾选；单任务不勾则跟随全局，勾 `0` 即一周都不定时跑（手动触发不受影响）。</li>\n<li>目标 App 录制模式：切到目标 App 后开始录制，离开自动暂停，回到目标 App 继续；锁屏或暗屏时也会暂停。</li>\n<li>**全场录取模式**：录制方式选「全场录取」后不填包名也能跨 App 连续录完整操作（先回桌面再开录），回放前同样默认先回桌面；原「指定包名录取」路径原样保留。</li>\n<li>裸录模式：包名留空时从亮屏画面开始录制；按规则过滤系统边缘/底部滑动。</li>\n<li>**图案密码解锁**：解锁方式新增「图案」，在 WebUI 九宫格上直接画出 4-9 点图案，任务执行前按该图案拖拽解锁；坐标可在设备档案里按机型微调，另有「锁屏→解锁」往返测试按钮用于校准。</li>\n<li>**内置任务可删可恢复**：内置「工行定时浇水」任务现在可以在 WebUI 里直接删除，删除后重启/重装也不会被重建；任务卡上的「恢复内置工行任务」可随时一键重建。</li>\n<li>回放时自动处理亮屏、锁屏解锁、目标 App 打开与前台确认，并恢复方向锁、常亮和屏幕超时设置。</li>\n<li>**跑完清理后台**：任务结束后自动 `am force-stop` 目标 App 回收内存，下次任务从干净状态开始；可全局开关，也可按任务单独覆盖。</li>\n<li>**多语言 WebUI**：中文 / English / Français / Русский，页面右上角可切换，选择会记住。</li>\n<li>**多设备适配**：内置设备档案层，可按机型调整屏幕尺寸、显示 ID、锁屏密码宫格位置和图案解锁坐标，让录制、回放和 PIN / 图案自动解锁也能在别的澎湃 4 机型上用；Xiaomi 17 Pro 的实测基线原样保留、不受任何影响。</li>\n<li>**WebUI 升级即生效**：资源带版本号并禁用缓存，页面还会自检「文档是不是旧的」并自动重载 —— 模块更新后不再需要卸载重装。</li>\n<li>**新版本待重启提示**：覆盖刷入后还没重启时，新包停在 `modules_update` 里等合并，而右上角版本号已经是新版 —— 顶部横幅会明说「新版本 vX 已就位，重启后生效」，重启后自动消失，不再出现「显示新版、跑旧行为」的迷惑状态。</li>\n<li>**界面清爽**：细节收进可折叠分组，每张卡自己点开收起，首屏不再是一大坨表单；状态明细集中在「触发检查」卡里。顶部那排只服务默认内置工行的快捷按钮（「今日已浇 / 未浇」状态胶囊、刷新、重启服务、收起全部）已整体撤掉 —— 内置工行早就不是核心，多任务 Profiles 才是唯一入口。</li>\n<li>PIN 只写入本机配置，不在状态接口、运行日志或源码中出现明文。</li>\n\n<h2>运行环境</h2>\n\n<p>模块只用到标准的 <code>customize.sh</code> + <code>service.sh</code> 入口：<b>不含 Zygisk、不改 <code>/system</code>、不需要 metamodule</b>。所以在 Magisk / APatch 下定时调度、录制回放、PIN 自动解锁都能正常跑。</p>\n\n<p>WebUI 也<b>不只支持 KernelSU</b>。APatch 从 10568 版起就有模块 WebUI，做法与 KernelSU 一致：把 <code>webroot/</code> 挂在 <code>https://mui.kernelsu.org</code> 上，并注入一个<b>同名</b>的全局对象 <code>ksu</code>——本模块的 <code>kernelsu.js</code> 用的正是它，所以在 APatch 上开箱即用，一行代码都不用改。KernelSU Next、SukiSU Ultra 等分支同理。</p>\n\n<p>Magisk 是唯一的例外：上游 Magisk 里<b>一行 WebView 代码都没有</b>（不是「没实现」，是压根没这个能力），所以它自己不会渲染 <code>webroot/</code>。要在那上面用 WebUI，需要一个自带 WebUI 的宿主 App：</p>\n\n<p>| 功能 | KernelSU / 分支 | APatch | Magisk |</p>\n<p>| --- | :---: | :---: | :---: |</p>\n<p>| 定时调度 / 录制 / 回放 / PIN 自动解锁 | ✅ | ✅ | ✅ |</p>\n<p>| 模块 WebUI | ✅ | ✅ | 装 KsuWebUI 或 MMRL 后 ✅ |</p>\n\n<p><b>KsuWebUI</b> 和 <b>MMRL</b> 做的事就是在 Magisk 上自己申请 root，再把<b>同一个</b> <code>ksu</code> 全局注入给 <code>webroot/</code>。装了它们之后本模块无需任何改动，WebUI 原样可用——这正是整个生态在 Magisk 上的通行做法。本模块已附带 <code>config.json</code>，声明 <code>\"webui-engine\": \"ksu\"</code>，MMRL 会据此选用 <code>ksu</code> 兼容引擎，而不是它默认的 WebUI X（后者 API 不兼容）。</p>\n\n<p>> ⚠️ 两条路都通，但 <b>KsuWebUI 更稳</b>：它是个独立 App，自己拿 root，不依赖任何管理器。MMRL 的 <code>ksu</code> 兼容引擎在其 WebUI X Portable 依赖里已于 2026-03-14 被标记废弃（当前 MMRL 恰好锁在废弃前 7 小时的版本上，所以暂时可用），MMRL 升级后这一条可能失效。真出问题就换 KsuWebUI，本模块不用动。</p>\n\n<p>任何环境下想改配置，都可以用 root shell 直接调 <code>webctl.sh</code>（与 WebUI 完全同一套后端）：</p>\n\n<pre>su -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh status'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh settime 0730'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh trigger'      # 立刻跑一次内置任务\nsu -c 'WEBUI_PIN=123456 sh /data/adb/modules/icbc_daily_water/webctl.sh setpin'\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh setdays 1234567'   # 每天都跑；135=只跑周一三五，0=一周都不定时跑\nsu -c 'WEBUI_PATTERN=14789 sh /data/adb/modules/icbc_daily_water/webctl.sh setpattern'  # 画好图案后保存；不带值即清除\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh unlock'       # 锁屏→解锁 往返测试（校准图案/PIN 用）\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh profile del icbc'   # 删除内置工行任务（记入 no_icbc，不再重建）\nsu -c 'sh /data/adb/modules/icbc_daily_water/webctl.sh profile addicbc'    # 恢复内置工行任务</pre>\n\n<p>PIN 刻意<b>只接受环境变量 <code>WEBUI_PIN</code></b>，不接受命令行参数，这样明文不会出现在进程列表里。图案同理，走 <code>WEBUI_PATTERN</code>，点序是 4-9 个互不重复的 <code>1-9</code>，空值表示清除图案。上面这几条请在本地终端手敲，不要写进脚本、别名或聊天记录。</p>\n\n<p>完整子命令见文件头注释：<code>webctl.sh status|setpin|setpattern|settime|setdays|setenable|setmode|setopen|setsleep|setwatch|setcleanup|unlock|trigger[NAME]|restart|log|profiles|profile add/addicbc/del/set|record start/stop/status</code>。</p>\n\n<h2>安装</h2>\n\n<li>从 Releases 下载 `XiaomiAutomation-v0.13.3.zip`。</li>\n<li>在 KernelSU / Magisk 中刷入该 zip。</li>\n<li>重启设备后打开模块 WebUI，按需设置解锁方式和 PIN。</li>\n<li>首次使用录制任务时，填写目标 App 包名；切到该 App 后点击「开始录制」，操作完成后点击「停止录制」。</li>\n\n<h3>从旧版本升级</h3>\n\n<p>可以直接在 KernelSU / Magisk 中覆盖安装新版 zip。为保证旧用户配置和任务不丢失，模块内部兼容标识保持不变：</p>\n\n<pre>id=icbc_daily_water\n/data/adb/modules/icbc_daily_water\n/data/adb/icbc_water</pre>\n\n<p>请不要手动删除这些目录或修改模块 ID；配置、Profile、PIN 和录制动作会继续沿用。</p>\n\n<p>> 刷完<b>要重启才真正生效</b>：新包先落在 <code>modules_update</code>，重启时才合并到 <code>modules</code>。这期间右上角版本号往往已经是新版、跑的却是旧代码 —— 为此 WebUI 顶部会挂一条黄色横幅「新版本 vX 已就位，重启后生效」，横幅消失才说明新代码已经在跑（模块启动日志里也会留一行 <code>UPDATE pending=vX reboot=needed</code>）。</p>\n\n<h2>使用说明</h2>\n\n<h3>内置任务</h3>\n\n<p>首次安装会自动创建「工行定时浇水」任务。它是脚本型 Profile，调用内置 <code>water.sh</code> 完成工行首页判断、任务入口点击和浇水流程。默认定时为 <code>07:30</code>，可以在 WebUI 中修改。</p>\n\n<p>内置任务现在<b>可以删除</b>：任务卡右下角的「删除」对它同样有效，删除后写入 <code>/data/adb/icbc_water/no_icbc</code> 标记，开机守护和升级安装都不会再把它建回来。想恢复时点「恢复内置工行任务」按钮（或执行 <code>webctl.sh profile addicbc</code>）即可按当前全局时间重新创建；恢复后标记自动清除，后续删除/恢复可以反复进行。</p>\n\n<h3>定时可选周几</h3>\n\n<li>「⚙️ 其它」里的**全局执行日**是一排周一到周日的按钮，全开即每天执行（默认），关掉的日子不会触发任何定时任务。</li>\n<li>每个任务卡上还有**该任务自己的执行日**，默认「跟随全局」；单独勾选后只按自己勾的日子跑，与全局互不影响。</li>\n<li>取值规则：空 = 跟随全局（全局空 = 每天），`0` = 一天都不跑，其余为 `1-7` 的升序串（`135` = 周一/三/五）。</li>\n<li>手动「▶ 运行」不受执行日限制，任何时候都会执行；「每日首次打开工行」那条链路同样只在执行日生效。</li>\n\n<h3>录制任务</h3>\n\n<li>在 WebUI 中新增任务，填写任务名；**录制方式**二选一：</li>\n<p>   - <b>指定包名录取</b>（默认）：填写目标 App 包名，切到该 App 后开始录制，离开自动暂停，回到目标 App 继续。</p>\n<p>   - <b>全场录取</b>：包名留空并把录制方式切到「全场录取」，从桌面开始跨 App 连续录制整套操作，中途切换 App 不中断；回放前默认先回一次桌面，保证起点一致。</p>\n<li>点击任务的「开始录制」，切换到目标 App。</li>\n<li>完成操作后回到 WebUI，点击「停止录制」。</li>\n<li>确认动作数量后，可立即运行或等待该 Profile 的定时时间。</li>\n\n<p>要录制左右边缘返回手势，请选择「指定包名录取」并填写目标包名；App 绑定模式会保留边缘返回，普通离开 App 的动作会被丢弃。</p>\n\n<h3>跑完清理后台</h3>\n\n<p>「⚙️ 其它 → 跑完清理后台」控制所有任务跑完后是否自动退出目标 App，<b>默认开启</b>。它只回收进程，不会清除数据、账号或登录状态。</p>\n\n<p>两种例外需要注意：</p>\n\n<li>**同 App 接力**：如果你把同一个 App 的操作拆成多个任务（例如前半段和后半段各录一个），前一个跑完就退出 App 会让后一个回到首页而错位。给接力链上的任务在任务卡里把清理选为「跟随全局」以外的方式即可，具体做法是把**接力中间的**任务设为「关（保持后台）」，只在链条最后一个任务保留清理。</li>\n<li>**裸录任务**（包名留空）没有确定的目标 App，服务端无从判断该退出哪个进程，因此这类任务不会自动清理，任务卡上会标注。</li>\n\n<p>「每日首次打开工行自动浇水」是另一条链路：你正在用手机、主动打开了工行，模块不会把你踢出 App。</p>\n\n<h3>锁屏与电源</h3>\n\n<p>任务执行前会尝试亮屏并解锁，支持 PIN 盲打、图案解锁或上滑解锁。执行期间会临时保持常亮，结束后恢复原来的方向锁、<code>screen_off_timeout</code> 和常亮设置。锁屏状态无法确认时会安全中止，不会盲目注入坐标。</p>\n\n<p><b>图案解锁</b>：解锁方式选「图案」后，在 WebUI 的九宫格上按顺序点出 4-9 个互不重复的点（支持拖拽连画，Android 允许的「中间格补全」会自动补上），保存即可。图案只存在本机配置里，接口回显一律是「已设置」，不会带出点序。九宫格坐标默认用 Xiaomi 17 Pro 的实测值（由 1220×2656 锁屏截图量点得到），别的机型在「📱 设备档案」里微调 <code>PAT_X0/PAT_Y0/PAT_DX/PAT_DY</code>（起点 X/Y 与横纵间距）；改完点「锁屏→解锁 测试」跑一次往返，成功会回 <code>UNLOCK_OK</code>，失败看日志再调。没有设置图案时自动回落到 PIN 或上滑。</p>\n\n<p><b>测试解锁的中止语义</b>：「锁屏→解锁 测试」现在有两道闸 —— 锁屏必须真的出现，且上滑一下解不开才继续画。锁屏没出现（屏幕根本没锁上）会提示「测试中止：锁屏没有真正出现」；上滑一下就进了桌面（说明锁屏没要求图案/PIN，比如自动锁定还没生效）会提示「测试中止：上滑一下就进了桌面」。两种情况回的都是 <code>UNLOCK_SKIP</code>（<code>nolock</code> / <code>nocred</code>）而不是 <code>UNLOCK_OK</code> —— 没有这两道闸时，画偏了也照样报成功，白白误导校准。</p>\n\n<h3>语言</h3>\n\n<p>WebUI 右上角的下拉可切换中文 / English / Français / Русussian（Русский），选择保存在浏览器本地存储中。日志、命令和包名属于技术内容，保持原文不翻译。</p>\n\n<h2>设备与校准</h2>\n\n<p>默认目标设备为 Xiaomi 17 Pro，模块通过 <code>getevent -p</code> 自动发现触摸设备，并根据触摸轴范围换算坐标。</p>\n\n<h3>换机器用：设备档案</h3>\n\n<p>「📱 设备档案」卡片只影响几样东西：<b>屏幕宽高、显示 ID、锁屏密码宫格位置，以及图案解锁的九宫格坐标</b>。这些值直接决定录制、回放和 PIN / 图案自动解锁能不能正常工作，别的机器和 17 Pro 不一样，所以要单独填。</p>\n\n<li>**Xiaomi 17 Pro**：卡片默认就是这套已实测的值，**不需要改动**。「启用覆盖」保持关闭，模块用的就是 `water.sh` / `sched.conf` 里的原值。</li>\n<li>**其它澎湃 4 机型**（小米 17 / 17 Pro Max 等）：点「🔍 自动检测本机」自动填入 `wm size` 和 `wm density` 的值，核对无误后勾上「启用覆盖」再保存。锁屏密码宫格无法自动可靠识别，需要手动填 —— 不填就用 17 Pro 的值，别的机器上会点错格子。</li>\n<li>**图案解锁坐标**：`PAT_X0` / `PAT_Y0` 是九宫格左上角第一个点的像素坐标，`PAT_DX` / `PAT_DY` 是横纵间距（默认 `310 / 1193 / 300 / 300`，取自 17 Pro 1220×2656 锁屏截图的实测值）。用任务卡或「⚙️ 其它」里的「锁屏→解锁 测试」验证：点错格子就微调这四个值再测，直到回 `UNLOCK_OK`。</li>\n<li>设备档案存放在 `/data/adb/icbc_water/device.conf`。`DEV_APPLY=0`（默认）表示「不覆盖，按 17 Pro 基线走」；只有 `DEV_APPLY=1` 才启用覆盖。所有数值都要通过「唯一 + 纯数字」校验，填错或文件损坏最多让覆盖不生效，不会把浇水流程带歪。</li>\n\n<p>> <b>除 Xiaomi 17 Pro 外，其它机型均为「测试中」状态。</b> 分辨率、DPI、系统导航栏高度都会影响 UI 布局，所以：<b>工行流程不保证可用</b>；但<b>录制、回放、PIN 自动解锁等基础功能是可以正常使用的</b>。请勿在主力机上直接使用。</p>\n\n<h3>跨机器回放录好的动作</h3>\n\n<p>每个录制型任务卡上有一个「不缩放 / 按比例缩放」下拉。如果某个任务是在<b>分辨率不同的机器</b>上录的、现在要在本机回放，把它选为「按比例缩放」——模块会读录制文件头里记录的分辨率，把每个坐标按比例换算。默认是「不缩放」，同机录制回放不受任何影响。</p>\n\n<h3>工行流程坐标</h3>\n\n<p>工行流程的像素探针和坐标集中在 <code>water.sh</code> 顶部配置区。可使用仓库中的辅助工具检查截图颜色：</p>\n\n<pre>python3 tools/px.py screen.png 216,778 518,780 746,748</pre>\n\n<h2>文件说明</h2>\n\n<p>| 文件 | 作用 |</p>\n<p>|---|---|</p>\n<p>| <code>module.prop</code> | 模块元数据（显示名称、版本、作者） |</p>\n<p>| <code>service.sh</code> | 多 Profile 守护与调度、亮屏/解锁/电源恢复、跑完清理 |</p>\n<p>| <code>water.sh</code> | 内置工行浇水业务逻辑 |</p>\n<p>| <code>record.sh</code> | 触摸事件录制内核 |</p>\n<p>| <code>replay.sh</code> | 录制动作回放内核 |</p>\n<p>| <code>webctl.sh</code> | WebUI root 命令接口 |</p>\n<p>| <code>webroot/</code> | KernelSU WebUI 页面、脚本与多语言词典 |</p>\n<p>| <code>sched.conf</code> | 默认配置模板（安装后实际配置位于 <code>/data/adb/icbc_water/</code>） |</p>\n<p>| <code>device.conf</code> | 设备档案模板（安装后实际位于 <code>/data/adb/icbc_water/device.conf</code>） |</p>\n<p>| <code>customize.sh</code> | 安装/升级兼容流程、权限设置与 WebUI 完整性校验 |</p>\n<p>| <code>tools/px.py</code> | 截图像素校准工具 |</p>\n<p>| <code>tools/run_once.sh</code> | 手动运行内置工行流程 |</p>\n<p>| <code>tools/build_zip.sh</code> | 从仓库内容生成可刷入 zip |</p>\n\n<h2>从源码构建</h2>\n\n<p>在仓库根目录执行：</p>\n\n<pre>bash tools/build_zip.sh</pre>\n\n<p>脚本会在仓库父目录生成：</p>\n\n<pre>XiaomiAutomation-v0.13.3.zip</pre>\n\n<h2>许可证</h2>\n\n<p><a href=\"LICENSE\">MIT</a> License.</p>",
+  "homepageUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/latest",
+  "sourceUrl": "https://github.com/Petittux1/XiaomiAutomation",
+  "url": "https://github.com/Petittux1/XiaomiAutomation",
+  "latestRelease": {
+    "name": "v0.13.3",
+    "version": "v0.13.3",
+    "time": "2026-10-07T10:35:16Z",
+    "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.3/XiaomiAutomation-v0.13.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.13.3",
+      "tagName": "v0.13.3",
+      "publishedAt": "2026-10-07T10:35:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.13.3.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.3/XiaomiAutomation-v0.13.3.zip",
+          "size": 139488,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v0.13.2",
+      "tagName": "v0.13.2",
+      "publishedAt": "2026-10-07T07:45:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.13.2.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.2/XiaomiAutomation-v0.13.2.zip",
+          "size": 138868,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.13.1",
+      "tagName": "v0.13.1",
+      "publishedAt": "2026-10-07T05:43:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.13.1.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.1/XiaomiAutomation-v0.13.1.zip",
+          "size": 133627,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.13.0",
+      "tagName": "v0.13.0",
+      "publishedAt": "2026-10-07T05:05:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.13.0.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.0/XiaomiAutomation-v0.13.0.zip",
+          "size": 132959,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.10",
+      "tagName": "v0.12.10",
+      "publishedAt": "2026-10-01T02:49:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.12.10.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.10/XiaomiAutomation-v0.12.10.zip",
+          "size": 110916,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v0.12.9",
+      "tagName": "v0.12.9",
+      "publishedAt": "2026-09-30T08:55:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.12.9.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.9/XiaomiAutomation-v0.12.9.zip",
+          "size": 108307,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v0.12.8",
+      "tagName": "v0.12.8",
+      "publishedAt": "2026-09-30T07:59:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.12.8.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.8/XiaomiAutomation-v0.12.8.zip",
+          "size": 107743,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.7",
+      "tagName": "v0.12.7",
+      "publishedAt": "2026-09-27T10:34:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "XiaomiAutomation-v0.12.7.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.7/XiaomiAutomation-v0.12.7.zip",
+          "size": 103943,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v0.12.6",
+      "tagName": "v0.12.6",
+      "publishedAt": "2026-09-27T10:06:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.6.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.6/xiaomi-17-pro-automation-v0.12.6.zip",
+          "size": 103983,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.5",
+      "tagName": "v0.12.5",
+      "publishedAt": "2026-09-27T09:57:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.5.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.5/xiaomi-17-pro-automation-v0.12.5.zip",
+          "size": 102168,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.4",
+      "tagName": "v0.12.4",
+      "publishedAt": "2026-09-27T09:18:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.4.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.4/xiaomi-17-pro-automation-v0.12.4.zip",
+          "size": 97852,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.2",
+      "tagName": "v0.12.2",
+      "publishedAt": "2026-09-27T08:58:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.2.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.2/xiaomi-17-pro-automation-v0.12.2.zip",
+          "size": 97039,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.1",
+      "tagName": "v0.12.1",
+      "publishedAt": "2026-09-27T05:42:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.1.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.1/xiaomi-17-pro-automation-v0.12.1.zip",
+          "size": 94324,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.12.0",
+      "tagName": "v0.12.0",
+      "publishedAt": "2026-09-27T05:25:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.12.0.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.12.0/xiaomi-17-pro-automation-v0.12.0.zip",
+          "size": 93700,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.11.0",
+      "tagName": "v0.11.0",
+      "publishedAt": "2026-09-27T04:29:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.11.0.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.11.0/xiaomi-17-pro-automation-v0.11.0.zip",
+          "size": 84479,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.10.0",
+      "tagName": "v0.10.0",
+      "publishedAt": "2026-09-27T02:55:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.10.0.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.10.0/xiaomi-17-pro-automation-v0.10.0.zip",
+          "size": 70253,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.9.6",
+      "tagName": "v0.9.6",
+      "publishedAt": "2026-09-25T14:39:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "xiaomi-17-pro-automation-v0.9.6.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.9.6/xiaomi-17-pro-automation-v0.9.6.zip",
+          "size": 47432,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.7.7",
+      "tagName": "v0.7.7",
+      "publishedAt": "2026-09-24T06:54:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "icbc-daily-water-v0.7.7.zip",
+          "downloadUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.7.7/icbc-daily-water-v0.7.7.zip",
+          "size": 117317,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "readme": "# MFFMv14 — Universal Android Font Module Framework\n\n<div align=\"center\">\n\n[![Android](https://img.shields.io/badge/Android-8.0_to_15+-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://android.com)\n[![Magisk](https://img.shields.io/badge/Magisk-v20.4+-B0BEC5?style=for-the-badge&logo=android&logoColor=black)](https://github.com/topjohnwu/Magisk)\n[![KernelSU](https://img.shields.io/badge/KernelSU-v0.9.4+-80CBC4?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/tiann/KernelSU)\n[![APatch](https://img.shields.io/badge/APatch-v0.11.0+-90CAF9?style=for-the-badge&logo=android&logoColor=black)](https://github.com/bmax121/APatch)\n[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)\n[![Telegram](https://img.shields.io/badge/Telegram-MFFMMain-0088CC?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/MFFMMain)\n\n**The easy, universal system font engine for rooted Android devices.**  \n*Use any font you love system-wide on Magisk, KernelSU, and APatch — with automatic fixes for lockscreens, clocks, and accents.*\n\n</div>\n\n---\n\n## 📖 What is MFFMv14?\n\n**MFFMv14** turns your favorite fonts into clean, flashable root modules. \n\nUnlike traditional font modules that only copy static files, MFFMv14 harmonizes font metrics, aligns lockscreen clock colons, equalizes clock digit widths, prevents accent clipping, and maps OEM-specific lockscreen PUA codepoints.\n\nMFFMv14 provides **two distinct builder workflows** tailored to your preference:\n\n1. **Regular Edition (`build.py` / `MFFMv14-Source-Template.zip`)**:  \n   Uses a shared on-device engine ([`mffm-runtime`](https://github.com/mistu01/MFFMv14/releases)) to dynamically compile, adjust, and re-tune your fonts directly on your phone using `/sdcard/MFFM/*.conf` configuration files. Can be built on PC or entirely on your phone via a file manager.\n2. **Standalone Edition (`build_standalone.py` / `MFFMv14-Standalone-Template.zip`)**:  \n   Performs all font transformations upfront during build time (on PC or in mobile Termux). The resulting module is **100% readymade** and **completely Python-free** — it flashes in **under 2 seconds** with zero on-device dependencies.\n\n---\n\n## ⚖️ Builder Workflow Comparison\n\n| Feature | 🔄 Regular Edition (Shared Runtime) | ⚡ Standalone Edition (100% Python-Free) |\n| :--- | :--- | :--- |\n| **Primary Build Script** | `python build.py` | `python build_standalone.py` *(or `termux-build.sh`)* |\n| **Flashing Speed on Device** | ~10–30 seconds | **< 2 seconds** (Instant flash) |\n| **Phone Prerequisites** | Requires `mffm-runtime` module installed once | **Zero prerequisites** (no Python, no runtime) |\n| **Creation on Android** | Any File Manager (MiXplorer, MT Manager, ZArchiver) | Mobile Termux one-shot script (`termux-build.sh`) |\n| **Template ZIP Asset** | `MFFMv14-Source-Template.zip` | `MFFMv14-Standalone-Template.zip` |\n| **On-Device Customization** | Full `.conf` support (colons, italics, features, metrics) | Native variable font axis control via `.conf` |\n| **Detailed Handbook** | 📖 **[Regular User Guide](USAGE_GUIDE.md)** | ⚡ **[Standalone User Guide](USAGE_GUIDE_STANDALONE.md)** |\n| **Version History** | 📜 **[Regular Changelog](CHANGELOG.md)** | 📋 **[Standalone Changelog](CHANGELOG_STANDALONE.md)** |\n\n---\n\n## ✨ Universal Typography Features\n\n- 🕒 **Centered Lockscreen Clock Colon**  \n  Standard fonts place the colon (`:`) low on the baseline. MFFM lifts the colon in `12:30` on your lockscreen and status bar to be vertically centered while preserving normal punctuation in body text.\n- 📱 **Lockscreen Colon Missing Glyph Fix (PUA `U+EE01`)**  \n  Resolves broken tofu boxes (`[?]`) on OEM lockscreens (Google Pixel, Xiaomi HyperOS, Samsung One UI, OnePlus OxygenOS, Nothing OS) by mapping the colon to Android system clock Private Use Area codepoints.\n- 📐 **Synthetic Italic Companion Generator**  \n  If your favorite font only has upright weights, MFFM can algorithmically synthesize slanted italic companion faces on-the-fly.\n- ⏱️ **Jitter-Free Clock Numbers**  \n  Equalizes digit widths (`0`–`9`) so your lockscreen clock doesn't wobble or jump sideways as time ticks.\n- 🛡️ **Zero Text Clipping (Safe Metrics)**  \n  Ensures tall accents (e.g., Vietnamese `ế`, `Ậ`, Devanagari, Thai, Arabic, or `Å`) fit comfortably without inflating line spacing or breaking app layouts.\n- 🎨 **Slashed Zeros & Style Alternates**  \n  Freeze OpenType features system-wide (e.g. slashed zero `zero`, alternate `cv01`, stylistic sets `ss01`–`ss20`).\n- 🛑 **Anti-Google Font Override Shield**  \n  Built-in protection that blocks Google Play System updates from silently reverting your font back to Roboto.\n- 🌐 **Multi-Family Support**  \n  Apply custom fonts for your main system font (**Sans**), coding/terminal font (**Monospace**), book font (**Serif**), and **Bengali** script in the same module.\n\n---\n\n## 🚀 Workflow 1: Regular Edition (Shared Runtime)\n\n> Detailed guide: 📖 **[USAGE_GUIDE.md](USAGE_GUIDE.md)**\n\n### Step 1: Install MFFM Runtime (One-Time Setup)\nBefore flashing any regular font module, install the standalone **MFFM Runtime** module once in your root manager:\n```\nmffm-runtime-YYYY.MM.DD.zip\n```\n*Download the latest runtime from **[GitHub Releases](https://github.com/mistu01/MFFMv14/releases)**.*\n\n### Step 2: Build & Flash\n* **Option A (On PC via `build.py`)**:\n  ```sh\n  pip install -r requirements.txt\n  # Put fonts in Fonts/Sans/\n  python build.py\n  ```\n  Flash the generated ZIP from `dist/Regular/` in Magisk, KernelSU, or APatch.\n* **Option B (On Phone via File Manager)**:\n  Extract **`MFFMv14-Source-Template.zip`**, place your fonts in `Files/Sans/`, compress the folder contents back into a ZIP, and flash!\n\n---\n\n## ⚡ Workflow 2: Standalone Edition (100% Python-Free)\n\n> Detailed guide: ⚡ **[USAGE_GUIDE_STANDALONE.md](USAGE_GUIDE_STANDALONE.md)**\n\n### On PC (Windows / Linux / macOS)\n1. Install Python dependencies:\n   ```sh\n   pip install -r requirements.txt\n   ```\n2. Place your source fonts into `Fonts/Sans/` *(optional: `Fonts/Monospace/`, `Fonts/Serif/`, `Fonts/Bengali/`)*.\n3. Run the standalone builder:\n   ```sh\n   python build_standalone.py\n   ```\n4. Transfer the flashable ZIP from `dist/Standalone/` to your phone and flash it. **No runtime or Python required on device!**\n\n### On Android Phone (via Termux)\n1. Extract `MFFMv14-Standalone-Template.zip` in Termux.\n2. Put your fonts into `Fonts/Sans/`.\n3. Run the automated one-shot script:\n   ```sh\n   sh termux-build.sh\n   ```\n### On Android Phone (via Standalone Builder App)\n> **Best for:** Users who want an easy, graphical app with zero technical commands.\n\n1. Install **`MFFM-Font-Module-Builder-v14.0.0.apk`** on your Android device (no PC, Termux, or internet needed).\n2. Open the app and choose your fonts:\n   - **Main Sans-serif (Required):** Select a variable font or multiple static weights (Regular, Bold, Italic, etc.).\n   - **Optional Companion Fonts:** Add custom fonts for **Monospace** (coding/terminal), **Serif** (books/reading), and **Bengali** script in the same module!\n3. Choose your builder mode:\n   - **⚡ Quick Mode (Recommended for Beginners):** 1-tap build with perfect defaults (centered clock colon, wobble-free digits, safe metrics, synthetic italic).\n   - **⚙️ Custom Mode (Options to Modify):** Fine-tune module name, clock colon shift, digit equalization, metrics mode, synthetic italics, tracking, and OpenType features.\n4. Tap **⚡ Build Flashable Module**. The app packages and signs the flashable ZIP, saves it directly into your `Downloads` folder, and offers 1-tap direct root flashing for Magisk, KernelSU, and APatch!\n\n---\n\n## 📚 Documentation Index\n\n| Document | Purpose |\n| :--- | :--- |\n| 📖 **[Regular User Guide (USAGE_GUIDE.md)](USAGE_GUIDE.md)** | Complete handbook for the dynamic shared-runtime workflow, on-device module creation, and `.conf` options. |\n| ⚡ **[Standalone User Guide (USAGE_GUIDE_STANDALONE.md)](USAGE_GUIDE_STANDALONE.md)** | Complete handbook for building readymade, Python-free standalone modules on PC & Termux. |\n| 📜 **[Regular Changelog (CHANGELOG.md)](CHANGELOG.md)** | Version history and release notes for the regular runtime framework. |\n| 📋 **[Standalone Changelog (CHANGELOG_STANDALONE.md)](CHANGELOG_STANDALONE.md)** | Version history and architectural notes for the standalone module builder. |\n| ⚖️ **[License (LICENSE)](LICENSE)** | Full MIT License text. |\n\n---\n\n## 📂 Repository Structure\n\n```\nMFFMv14/\n├── build.py                  # Regular module builder (dynamic runtime packaging)\n├── build_standalone.py       # Standalone module builder (100% readymade payload)\n├── font_module.py            # Regular font compilation and packaging engine\n├── font_module_standalone.py # Standalone font compilation engine\n├── build_runtime.py          # MFFM Runtime module builder\n├── prepare_runtime.py        # Runtime payload assembler\n├── package_template.py       # Template ZIP packager (Source & Standalone templates)\n├── runtime_helper.py         # On-device helper CLI & font tools\n├── termux-build.sh           # Mobile Termux one-shot builder and installer\n├── zipsigner_auto.py         # Automatic ZIP signer\n├── template/                 # Dynamic runtime module template\n├── template-standalone/      # 100% Python-free standalone module template\n├── runtime-template/         # Standalone MFFM Runtime module skeleton\n├── USAGE_GUIDE.md            # Comprehensive user manual (Regular Edition)\n├── USAGE_GUIDE_STANDALONE.md # Comprehensive user manual (Standalone Edition)\n├── CHANGELOG.md              # Version history (Regular Edition)\n├── CHANGELOG_STANDALONE.md   # Version history (Standalone Edition)\n├── LICENSE                   # MIT License\n└── ReadMe.md                 # Project frontpage\n```\n\n---\n\n## 📱 Compatibility\n\n- **Root Managers**: Magisk v20.4+, KernelSU v0.9.4+, APatch v0.11.0+, MMRL.\n- **Android Versions**: Android 15+.\n- **Architectures**: ARM64 (`arm64-v8a`) and x86_64.\n\n---\n\n## ⚖️ License\n\nThis project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.\n\n```text\nCopyright (c) 2026 Mistu (@MFFMMain)\n```\n\n---\n\n## 💬 Community & Support\n\n- **Official Releases**: [GitHub Releases](https://github.com/mistu01/MFFMv14/releases)\n- **Telegram Community**: [t.me/MFFMMain](https://t.me/MFFMMain)\n- **Author**: Mistu (@MFFMMain)\n- **Feedback & Issues**: Bug reports and feature suggestions are welcome on GitHub Issues!\n",
+  "readmeHTML": "<h1>MFFMv14 — Universal Android Font Module Framework</h1>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/Android-8.0_to_15+-3DDC84?style=for-the-badge&logo=android&logoColor=white\">![Android</a>](https://android.com)</p>\n<p><a href=\"https://img.shields.io/badge/Magisk-v20.4+-B0BEC5?style=for-the-badge&logo=android&logoColor=black\">![Magisk</a>](https://github.com/topjohnwu/Magisk)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU-v0.9.4+-80CBC4?style=for-the-badge&logo=linux&logoColor=black\">![KernelSU</a>](https://github.com/tiann/KernelSU)</p>\n<p><a href=\"https://img.shields.io/badge/APatch-v0.11.0+-90CAF9?style=for-the-badge&logo=android&logoColor=black\">![APatch</a>](https://github.com/bmax121/APatch)</p>\n<p><a href=\"https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge\">![License: MIT</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-MFFMMain-0088CC?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram</a>](https://t.me/MFFMMain)</p>\n\n<p><b>The easy, universal system font engine for rooted Android devices.</b></p>\n<p>*Use any font you love system-wide on Magisk, KernelSU, and APatch — with automatic fixes for lockscreens, clocks, and accents.*</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>📖 What is MFFMv14?</h2>\n\n<p><b>MFFMv14</b> turns your favorite fonts into clean, flashable root modules.</p>\n\n<p>Unlike traditional font modules that only copy static files, MFFMv14 harmonizes font metrics, aligns lockscreen clock colons, equalizes clock digit widths, prevents accent clipping, and maps OEM-specific lockscreen PUA codepoints.</p>\n\n<p>MFFMv14 provides <b>two distinct builder workflows</b> tailored to your preference:</p>\n\n<li>**Regular Edition (`build.py` / `MFFMv14-Source-Template.zip`)**:</li>\n<p>   Uses a shared on-device engine (<a href=\"https://github.com/mistu01/MFFMv14/releases\"><code>mffm-runtime</code></a>) to dynamically compile, adjust, and re-tune your fonts directly on your phone using <code>/sdcard/MFFM/*.conf</code> configuration files. Can be built on PC or entirely on your phone via a file manager.</p>\n<li>**Standalone Edition (`build_standalone.py` / `MFFMv14-Standalone-Template.zip`)**:</li>\n<p>   Performs all font transformations upfront during build time (on PC or in mobile Termux). The resulting module is <b>100% readymade</b> and <b>completely Python-free</b> — it flashes in <b>under 2 seconds</b> with zero on-device dependencies.</p>\n\n<p>---</p>\n\n<h2>⚖️ Builder Workflow Comparison</h2>\n\n<p>| Feature | 🔄 Regular Edition (Shared Runtime) | ⚡ Standalone Edition (100% Python-Free) |</p>\n<p>| :--- | :--- | :--- |</p>\n<p>| <b>Primary Build Script</b> | <code>python build.py</code> | <code>python build_standalone.py</code> *(or <code>termux-build.sh</code>)* |</p>\n<p>| <b>Flashing Speed on Device</b> | ~10–30 seconds | <b>< 2 seconds</b> (Instant flash) |</p>\n<p>| <b>Phone Prerequisites</b> | Requires <code>mffm-runtime</code> module installed once | <b>Zero prerequisites</b> (no Python, no runtime) |</p>\n<p>| <b>Creation on Android</b> | Any File Manager (MiXplorer, MT Manager, ZArchiver) | Mobile Termux one-shot script (<code>termux-build.sh</code>) |</p>\n<p>| <b>Template ZIP Asset</b> | <code>MFFMv14-Source-Template.zip</code> | <code>MFFMv14-Standalone-Template.zip</code> |</p>\n<p>| <b>On-Device Customization</b> | Full <code>.conf</code> support (colons, italics, features, metrics) | Native variable font axis control via <code>.conf</code> |</p>\n<p>| <b>Detailed Handbook</b> | 📖 <b><a href=\"USAGE_GUIDE.md\">Regular User Guide</a></b> | ⚡ <b><a href=\"USAGE_GUIDE_STANDALONE.md\">Standalone User Guide</a></b> |</p>\n<p>| <b>Version History</b> | 📜 <b><a href=\"CHANGELOG.md\">Regular Changelog</a></b> | 📋 <b><a href=\"CHANGELOG_STANDALONE.md\">Standalone Changelog</a></b> |</p>\n\n<p>---</p>\n\n<h2>✨ Universal Typography Features</h2>\n\n<li>🕒 **Centered Lockscreen Clock Colon**</li>\n<p>  Standard fonts place the colon (<code>:</code>) low on the baseline. MFFM lifts the colon in <code>12:30</code> on your lockscreen and status bar to be vertically centered while preserving normal punctuation in body text.</p>\n<li>📱 **Lockscreen Colon Missing Glyph Fix (PUA `U+EE01`)**</li>\n<p>  Resolves broken tofu boxes (<code>[?]</code>) on OEM lockscreens (Google Pixel, Xiaomi HyperOS, Samsung One UI, OnePlus OxygenOS, Nothing OS) by mapping the colon to Android system clock Private Use Area codepoints.</p>\n<li>📐 **Synthetic Italic Companion Generator**</li>\n<p>  If your favorite font only has upright weights, MFFM can algorithmically synthesize slanted italic companion faces on-the-fly.</p>\n<li>⏱️ **Jitter-Free Clock Numbers**</li>\n<p>  Equalizes digit widths (<code>0</code>–<code>9</code>) so your lockscreen clock doesn't wobble or jump sideways as time ticks.</p>\n<li>🛡️ **Zero Text Clipping (Safe Metrics)**</li>\n<p>  Ensures tall accents (e.g., Vietnamese <code>ế</code>, <code>Ậ</code>, Devanagari, Thai, Arabic, or <code>Å</code>) fit comfortably without inflating line spacing or breaking app layouts.</p>\n<li>🎨 **Slashed Zeros & Style Alternates**</li>\n<p>  Freeze OpenType features system-wide (e.g. slashed zero <code>zero</code>, alternate <code>cv01</code>, stylistic sets <code>ss01</code>–<code>ss20</code>).</p>\n<li>🛑 **Anti-Google Font Override Shield**</li>\n<p>  Built-in protection that blocks Google Play System updates from silently reverting your font back to Roboto.</p>\n<li>🌐 **Multi-Family Support**</li>\n<p>  Apply custom fonts for your main system font (<b>Sans</b>), coding/terminal font (<b>Monospace</b>), book font (<b>Serif</b>), and <b>Bengali</b> script in the same module.</p>\n\n<p>---</p>\n\n<h2>🚀 Workflow 1: Regular Edition (Shared Runtime)</h2>\n\n<p>> Detailed guide: 📖 <b><a href=\"USAGE_GUIDE.md\">USAGE_GUIDE.md</a></b></p>\n\n<h3>Step 1: Install MFFM Runtime (One-Time Setup)</h3>\n<p>Before flashing any regular font module, install the standalone <b>MFFM Runtime</b> module once in your root manager:</p>\n<pre>mffm-runtime-YYYY.MM.DD.zip</pre>\n<p>*Download the latest runtime from <b><a href=\"https://github.com/mistu01/MFFMv14/releases\">GitHub Releases</a></b>.*</p>\n\n<h3>Step 2: Build & Flash</h3>\n<li>**Option A (On PC via `build.py`)**:</li>\n<p>  ```sh</p>\n<p>  pip install -r requirements.txt</p>\n<p>  # Put fonts in Fonts/Sans/</p>\n<p>  python build.py</p>\n<p>  ```</p>\n<p>  Flash the generated ZIP from <code>dist/Regular/</code> in Magisk, KernelSU, or APatch.</p>\n<li>**Option B (On Phone via File Manager)**:</li>\n<p>  Extract <b><code>MFFMv14-Source-Template.zip</code></b>, place your fonts in <code>Files/Sans/</code>, compress the folder contents back into a ZIP, and flash!</p>\n\n<p>---</p>\n\n<h2>⚡ Workflow 2: Standalone Edition (100% Python-Free)</h2>\n\n<p>> Detailed guide: ⚡ <b><a href=\"USAGE_GUIDE_STANDALONE.md\">USAGE_GUIDE_STANDALONE.md</a></b></p>\n\n<h3>On PC (Windows / Linux / macOS)</h3>\n<li>Install Python dependencies:</li>\n<p>   ```sh</p>\n<p>   pip install -r requirements.txt</p>\n<p>   ```</p>\n<li>Place your source fonts into `Fonts/Sans/` *(optional: `Fonts/Monospace/`, `Fonts/Serif/`, `Fonts/Bengali/`)*.</li>\n<li>Run the standalone builder:</li>\n<p>   ```sh</p>\n<p>   python build_standalone.py</p>\n<p>   ```</p>\n<li>Transfer the flashable ZIP from `dist/Standalone/` to your phone and flash it. **No runtime or Python required on device!**</li>\n\n<h3>On Android Phone (via Termux)</h3>\n<li>Extract `MFFMv14-Standalone-Template.zip` in Termux.</li>\n<li>Put your fonts into `Fonts/Sans/`.</li>\n<li>Run the automated one-shot script:</li>\n<p>   ```sh</p>\n<p>   sh termux-build.sh</p>\n<p>   ```</p>\n<h3>On Android Phone (via Standalone Builder App)</h3>\n<p>> <b>Best for:</b> Users who want an easy, graphical app with zero technical commands.</p>\n\n<li>Install **`MFFM-Font-Module-Builder-v14.0.0.apk`** on your Android device (no PC, Termux, or internet needed).</li>\n<li>Open the app and choose your fonts:</li>\n<p>   - <b>Main Sans-serif (Required):</b> Select a variable font or multiple static weights (Regular, Bold, Italic, etc.).</p>\n<p>   - <b>Optional Companion Fonts:</b> Add custom fonts for <b>Monospace</b> (coding/terminal), <b>Serif</b> (books/reading), and <b>Bengali</b> script in the same module!</p>\n<li>Choose your builder mode:</li>\n<p>   - <b>⚡ Quick Mode (Recommended for Beginners):</b> 1-tap build with perfect defaults (centered clock colon, wobble-free digits, safe metrics, synthetic italic).</p>\n<p>   - <b>⚙️ Custom Mode (Options to Modify):</b> Fine-tune module name, clock colon shift, digit equalization, metrics mode, synthetic italics, tracking, and OpenType features.</p>\n<li>Tap **⚡ Build Flashable Module**. The app packages and signs the flashable ZIP, saves it directly into your `Downloads` folder, and offers 1-tap direct root flashing for Magisk, KernelSU, and APatch!</li>\n\n<p>---</p>\n\n<h2>📚 Documentation Index</h2>\n\n<p>| Document | Purpose |</p>\n<p>| :--- | :--- |</p>\n<p>| 📖 <b><a href=\"USAGE_GUIDE.md\">Regular User Guide (USAGE_GUIDE.md)</a></b> | Complete handbook for the dynamic shared-runtime workflow, on-device module creation, and <code>.conf</code> options. |</p>\n<p>| ⚡ <b><a href=\"USAGE_GUIDE_STANDALONE.md\">Standalone User Guide (USAGE_GUIDE_STANDALONE.md)</a></b> | Complete handbook for building readymade, Python-free standalone modules on PC & Termux. |</p>\n<p>| 📜 <b><a href=\"CHANGELOG.md\">Regular Changelog (CHANGELOG.md)</a></b> | Version history and release notes for the regular runtime framework. |</p>\n<p>| 📋 <b><a href=\"CHANGELOG_STANDALONE.md\">Standalone Changelog (CHANGELOG_STANDALONE.md)</a></b> | Version history and architectural notes for the standalone module builder. |</p>\n<p>| ⚖️ <b><a href=\"LICENSE\">License (LICENSE)</a></b> | Full MIT License text. |</p>\n\n<p>---</p>\n\n<h2>📂 Repository Structure</h2>\n\n<pre>MFFMv14/\n├── build.py                  # Regular module builder (dynamic runtime packaging)\n├── build_standalone.py       # Standalone module builder (100% readymade payload)\n├── font_module.py            # Regular font compilation and packaging engine\n├── font_module_standalone.py # Standalone font compilation engine\n├── build_runtime.py          # MFFM Runtime module builder\n├── prepare_runtime.py        # Runtime payload assembler\n├── package_template.py       # Template ZIP packager (Source &amp; Standalone templates)\n├── runtime_helper.py         # On-device helper CLI &amp; font tools\n├── termux-build.sh           # Mobile Termux one-shot builder and installer\n├── zipsigner_auto.py         # Automatic ZIP signer\n├── template/                 # Dynamic runtime module template\n├── template-standalone/      # 100% Python-free standalone module template\n├── runtime-template/         # Standalone MFFM Runtime module skeleton\n├── USAGE_GUIDE.md            # Comprehensive user manual (Regular Edition)\n├── USAGE_GUIDE_STANDALONE.md # Comprehensive user manual (Standalone Edition)\n├── CHANGELOG.md              # Version history (Regular Edition)\n├── CHANGELOG_STANDALONE.md   # Version history (Standalone Edition)\n├── LICENSE                   # MIT License\n└── ReadMe.md                 # Project frontpage</pre>\n\n<p>---</p>\n\n<h2>📱 Compatibility</h2>\n\n<li>**Root Managers**: Magisk v20.4+, KernelSU v0.9.4+, APatch v0.11.0+, MMRL.</li>\n<li>**Android Versions**: Android 15+.</li>\n<li>**Architectures**: ARM64 (`arm64-v8a`) and x86_64.</li>\n\n<p>---</p>\n\n<h2>⚖️ License</h2>\n\n<p>This project is licensed under the <b>MIT License</b> — see the <a href=\"LICENSE\">LICENSE</a> file for details.</p>\n\n<pre>Copyright (c) 2026 Mistu (@MFFMMain)</pre>\n\n<p>---</p>\n\n<h2>💬 Community & Support</h2>\n\n<li>**Official Releases**: [GitHub Releases](https://github.com/mistu01/MFFMv14/releases)</li>\n<li>**Telegram Community**: [t.me/MFFMMain](https://t.me/MFFMMain)</li>\n<li>**Author**: Mistu (@MFFMMain)</li>\n<li>**Feedback & Issues**: Bug reports and feature suggestions are welcome on GitHub Issues!</li>",
+  "homepageUrl": "https://github.com/mistu01/MFFMv14",
+  "sourceUrl": "https://github.com/mistu01/MFFMv14",
+  "url": "https://github.com/mistu01/MFFMv14",
+  "latestRelease": {
+    "name": "runtime-v2026.10.10",
+    "version": "runtime-v2026.10.10",
+    "time": "2026-10-10T08:08:22Z",
+    "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.10/mffm-runtime-2026.10.10.zip"
+  },
+  "releases": [
+    {
+      "name": "runtime-v2026.10.10",
+      "tagName": "runtime-v2026.10.10",
+      "publishedAt": "2026-10-10T08:08:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.10.10.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.10/mffm-runtime-2026.10.10.zip",
+          "size": 34517024,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.10/SHA256SUMS.txt",
+          "size": 94,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.08.2",
+      "tagName": "v2026.10.08.2",
+      "publishedAt": "2026-10-08T19:44:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MFFM-Font-Module-Builder-v2026.10.08.2.apk",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.2/MFFM-Font-Module-Builder-v2026.10.08.2.apk",
+          "size": 52254328,
+          "downloadCount": 4
+        },
+        {
+          "name": "mffm-runtime-2026.10.08.2.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.2/mffm-runtime-2026.10.08.2.zip",
+          "size": 34499935,
+          "downloadCount": 3
+        },
+        {
+          "name": "MFFMv14-Source-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.2/MFFMv14-Source-Template.zip",
+          "size": 65391,
+          "downloadCount": 4
+        },
+        {
+          "name": "MFFMv14-Standalone-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.2/MFFMv14-Standalone-Template.zip",
+          "size": 122380,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.2/SHA256SUMS.txt",
+          "size": 397,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.08.1",
+      "tagName": "v2026.10.08.1",
+      "publishedAt": "2026-10-08T13:06:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MFFM-Font-Module-Builder-v2026.10.08.1.apk",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.1/MFFM-Font-Module-Builder-v2026.10.08.1.apk",
+          "size": 52237642,
+          "downloadCount": 3
+        },
+        {
+          "name": "mffm-runtime-2026.10.08.1.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.1/mffm-runtime-2026.10.08.1.zip",
+          "size": 34498648,
+          "downloadCount": 2
+        },
+        {
+          "name": "MFFMv14-Source-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.1/MFFMv14-Source-Template.zip",
+          "size": 65391,
+          "downloadCount": 2
+        },
+        {
+          "name": "MFFMv14-Standalone-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.1/MFFMv14-Standalone-Template.zip",
+          "size": 122380,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08.1/SHA256SUMS.txt",
+          "size": 397,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.08",
+      "tagName": "v2026.10.08",
+      "publishedAt": "2026-10-08T12:11:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MFFM-Font-Module-Builder-v2026.10.08.apk",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/MFFM-Font-Module-Builder-v2026.10.08.apk",
+          "size": 52254328,
+          "downloadCount": 0
+        },
+        {
+          "name": "mffm-runtime-2026.10.08.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/mffm-runtime-2026.10.08.zip",
+          "size": 34501939,
+          "downloadCount": 0
+        },
+        {
+          "name": "MFFMv14-Source-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/MFFMv14-Source-Template.zip",
+          "size": 65391,
+          "downloadCount": 0
+        },
+        {
+          "name": "MFFMv14-Standalone-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/MFFMv14-Standalone-Template.zip",
+          "size": 118609,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS-APK.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/SHA256SUMS-APK.txt",
+          "size": 107,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.10.08/SHA256SUMS.txt",
+          "size": 393,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "runtime-v2026.10.04",
+      "tagName": "runtime-v2026.10.04",
+      "publishedAt": "2026-10-04T07:48:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.10.04.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.04/mffm-runtime-2026.10.04.zip",
+          "size": 34496594,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.04/SHA256SUMS.txt",
+          "size": 94,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "runtime-v2026.10.02",
+      "tagName": "runtime-v2026.10.02",
+      "publishedAt": "2026-10-02T07:58:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.10.02.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.02/mffm-runtime-2026.10.02.zip",
+          "size": 34499899,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.02/SHA256SUMS.txt",
+          "size": 94,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "runtime-v2026.09.30",
+      "tagName": "runtime-v2026.09.30",
+      "publishedAt": "2026-09-30T08:01:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.09.30.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.09.30/mffm-runtime-2026.09.30.zip",
+          "size": 34493344,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.09.30/SHA256SUMS.txt",
+          "size": 94,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "runtime-v2026.09.25",
+      "tagName": "runtime-v2026.09.25",
+      "publishedAt": "2026-09-25T07:09:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.09.25.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.09.25/mffm-runtime-2026.09.25.zip",
+          "size": 34486692,
+          "downloadCount": 5
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.09.25/SHA256SUMS.txt",
+          "size": 94,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2026.09.24.1",
+      "tagName": "v2026.09.24.1",
+      "publishedAt": "2026-09-24T00:28:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mffm-runtime-2026.09.24.1.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.09.24.1/mffm-runtime-2026.09.24.1.zip",
+          "size": 34472189,
+          "downloadCount": 11
+        },
+        {
+          "name": "MFFMv14-Source-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.09.24.1/MFFMv14-Source-Template.zip",
+          "size": 65391,
+          "downloadCount": 15
+        },
+        {
+          "name": "MFFMv14-Standalone-Template.zip",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.09.24.1/MFFMv14-Standalone-Template.zip",
+          "size": 118207,
+          "downloadCount": 6
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/mistu01/MFFMv14/releases/download/v2026.09.24.1/SHA256SUMS.txt",
+          "size": 288,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

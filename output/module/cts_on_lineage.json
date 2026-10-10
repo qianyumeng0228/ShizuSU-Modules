@@ -1,0 +1,29 @@
+{
+  "readme": "# Circle to Search on LineageOS\n\n## About\n\nThis module adds base support files from [MindTheGapps](https://github.com/MindTheGapps/vendor_gapps) to enforce Circle to Search integration availability introduced in LineageOS 22.2, bringing this feature to setups with microG or minimal GApps packages.\n\nContains:\n* system resource overlay that selects Google app as the Contextual Search provider;\n* [sysconfig file](./sysconfig-cts.xml) declaring `com.google.android.feature.CONTEXTUAL_SEARCH`.\n\n## Installation\n\n1. Flash the module and reboot;\n2. If you haven't already, install or update the Google app;\n3. Invoke Circle to Search by long-pressing the navigation bar. If it's not working, check if Circle to Search is enabled in Settings -> System -> Gestures -> Navigation mode. That's it.\n\n## Build the overlay\n\nRequires Python 3.11+, Java and zipalign. Other Android build tools are downloaded automatically.\n\n```sh\npython3 build.py\n```\n\nThis builds and signs `overlay/`, then writes the APK to `output/CtsOverlay.apk`.\n",
+  "readmeHTML": "<h1>Circle to Search on LineageOS</h1>\n\n<h2>About</h2>\n\n<p>This module adds base support files from <a href=\"https://github.com/MindTheGapps/vendor_gapps\">MindTheGapps</a> to enforce Circle to Search integration availability introduced in LineageOS 22.2, bringing this feature to setups with microG or minimal GApps packages.</p>\n\n<p>Contains:</p>\n<li>system resource overlay that selects Google app as the Contextual Search provider;</li>\n<li>[sysconfig file](./sysconfig-cts.xml) declaring `com.google.android.feature.CONTEXTUAL_SEARCH`.</li>\n\n<h2>Installation</h2>\n\n<li>Flash the module and reboot;</li>\n<li>If you haven't already, install or update the Google app;</li>\n<li>Invoke Circle to Search by long-pressing the navigation bar. If it's not working, check if Circle to Search is enabled in Settings -> System -> Gestures -> Navigation mode. That's it.</li>\n\n<h2>Build the overlay</h2>\n\n<p>Requires Python 3.11+, Java and zipalign. Other Android build tools are downloaded automatically.</p>\n\n<pre>python3 build.py</pre>\n\n<p>This builds and signs <code>overlay/</code>, then writes the APK to <code>output/CtsOverlay.apk</code>.</p>",
+  "homepageUrl": "https://github.com/reddxae/cts-on-lineage",
+  "sourceUrl": "https://github.com/reddxae/cts-on-lineage",
+  "url": "https://github.com/reddxae/cts-on-lineage",
+  "latestRelease": {
+    "name": "v0.0.1",
+    "version": "v0.0.1",
+    "time": "2026-10-07T22:00:10Z",
+    "downloadUrl": "https://github.com/reddxae/cts-on-lineage/releases/download/v0.0.1/cts-on-lineage-v0.0.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.0.1",
+      "tagName": "v0.0.1",
+      "publishedAt": "2026-10-07T22:00:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "cts-on-lineage-v0.0.1.zip",
+          "downloadUrl": "https://github.com/reddxae/cts-on-lineage/releases/download/v0.0.1/cts-on-lineage-v0.0.1.zip",
+          "size": 6608,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

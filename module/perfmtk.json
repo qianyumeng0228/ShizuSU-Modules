@@ -1,0 +1,447 @@
+{
+  "readme": "# PerfMTK\n\n**A high-performance, native systemless optimization engine for MediaTek devices with Mali GPUs**\n\n[![GitHub Downloads](https://img.shields.io/github/downloads/JUANIMAN/PerfMTK/total)](https://github.com/JUANIMAN/PerfMTK/releases)\n[![Join the Telegram group](https://img.shields.io/badge/PerfMTK%20Telegram%20group-blue?style=flat-square&logo=telegram)](https://t.me/PerfMTK_chat)\n[![Current Version](https://img.shields.io/badge/version-v16.4-success?style=flat-square)](https://github.com/JUANIMAN/PerfMTK/releases/latest)\n\n## Overview\n\nPerfMTK is an advanced Magisk / KernelSU / APatch module backed by an ultra-lightweight native C daemon (`perfmtkd`) and a rich CLI (`perfmtk`). Engineered specifically for MediaTek Dimensity and Helio platforms, it grants total, fine-grained control over CPU clusters, Mali GPUs, LPDDR memory buses, hardware touch digitizers, thermal curves, and storage subsystems.\n\nWith sub-millisecond profile transitions, an event-driven `epoll` reactor (< 3.0 MB RSS, 0.0% idle CPU), and deep multi-OEM compatibility, PerfMTK unlocks maximum gaming frame rates (120 FPS stable) and exceptional daily battery endurance.\n\n---\n\n## Features\n\n* **Universal SoC & Multi-OEM Support**:\n  * Auto-calibrated for all MediaTek CPU topologies: All-Big-Core (Dimensity 9400/9300), Tri-Cluster (Dimensity 9200/9000/8300), Dual-Cluster (Dimensity 8200/8100/7000, Helio G99/G95/G90T), and entry-level SoCs.\n  * Universal compatibility verified across Xiaomi/POCO (HyperOS/MIUI), OnePlus/OPPO/Realme (ColorOS/OxygenOS), Vivo/iQOO (OriginOS/FuntouchOS), Samsung (One UI), Motorola (HelloUI/MyUX), Transsion (Infinix XOS/Tecno HiOS), and AOSP.\n* **Native C Engine & In-Memory Daemon (`perfmtkd`)**:\n  * Event-driven `epoll` reactor running on only 2 threads with < 3.0 MB RSS and 0.0% idle CPU overhead.\n  * In-memory configuration caching for sub-millisecond hardware switching latency.\n  * 4-tier foreground app detection: LSPosed hook (`PerfMTK-Hook`), Netlink Process Connector (`cn_proc`), kernel `cgroup.procs` inotify, and adaptive debounced fallback.\n* **Hardware Touch & Digitizer Booster**:\n  * Native kernel-level touch sampling rate unlock (sustained 480Hz/500Hz) via direct digitizer `ioctl` (`/dev/xiaomi-touch`, `/proc/touchpanel`, `/sys/class/touch/touch_dev`, Samsung TSP).\n  * Host-side `THP Smooth` filter integration to eliminate gesture jitter.\n  * Touch input IRQs and dispatchers kept unpinned to Little cores, preventing frame preemption on Big cores and ensuring rock-solid **120 FPS** in AAA games (PUBG Mobile, Wuthering Waves, Genshin Impact).\n* **Smart Fast Charge Bypass & Battery Care**:\n  * Dedicated gaming thermal bypass: charges at full speed without thermal throttle, keeping battery cells cool (31°C - 36°C even under sustained 120 FPS gaming loads).\n  * Universal hardware capability probing: strictly distinguishes between genuine PMIC hardware bypass (Infinix, Samsung, Asus, Sony) and input suspension, preventing unintended battery discharge during gaming.\n  * Automated battery safety guard with configurable emergency cutoff (45°C - 55°C, default 52°C).\n  * **Battery Care** engine: configurable charge ceiling (50% - 100%, default 80%) to maximize lithium cell health over years.\n* **Sensor & IMU Latency Booster**:\n  * Isolated Sensor HAL and Xiaomi CIT Sensor to dedicated Little VIP cores (Cores 2-3) with nice -10 priority.\n  * MediaTek SCP mailbox IRQ steering to eliminate gyroscope and touch jitter during high-load gaming.\n* **Advanced MediaTek Hardware Knobs**:\n  * **DRAM DVFSRC LPDDR5X**: Direct memory bus scaling with clocks up to 8533 MHz for memory-intensive titles.\n  * **Mali GPU & GED HAL**: Dynamic frequency scaling and margin tuning for modern 5.x and 6.x kernels (`dvfs_margin_value`, `gpu_boost_level`).\n  * **MediaTek Game Boost Engine (GBE)**: Automated foreground game process acceleration and thermal headroom reserve.\n  * **FPSGO Sysfs**: Adaptive tuning for `/sys/kernel/fpsgo` on Android 14, 15, and 16.\n  * **UFS Storage I/O Optimization**: `simple_ondemand` clock governors and queue depth tuning for seamless open-world texture streaming.\n* **Full-Featured Terminal CLI & Interactive TUI (`perfmtk`)**:\n  * Colorized dashboard, live telemetry, hardware inspection, profile editing, and backup/restore management.\n* **Companion App**: Seamless integration with the [PerfMTK-Manager](https://github.com/JUANIMAN/PerfMTK-Manager) Flutter companion app (Bento HUD, live thermal graphs, Quick Settings tiles).\n\n---\n\n## Compatibility & Requirements\n\n* **Processor**: MediaTek SoC with a Mali GPU (Dimensity or Helio series).\n* **Android OS**: Android 9.0 (Pie) up to Android 15 / 16.\n* **Linux Kernel**: Version 4.14.x up to 6.1.x+.\n* **Root Manager**: Magisk (v27+ recommended), KernelSU, or APatch.\n\n> [!IMPORTANT]\n> **KernelSU & APatch Users:**  \n> Ensure your environment has a magic mount helper module installed (e.g., **Hybrid Mount** or **Mountify**) to guarantee proper module filesystem overlay support.\n\n---\n\n## Installation\n\n1. Download the latest release `.zip` from the [Releases page](https://github.com/JUANIMAN/PerfMTK/releases/latest).\n2. Flash the `.zip` in Magisk, KernelSU, or APatch.\n3. **Smart Installation Modes**:\n   * **Express Mode (Recommended)**: Wait 10 seconds (or press `[VOL-]`) for an optimal automatic setup tuned to your RAM and SoC.\n   * **Custom Mode**: Press `[VOL+]` within 10 seconds to selectively customize `system.prop`, `post-fs-data.sh`, or `service.sh`.\n4. Reboot your device to apply all kernel and daemon settings.\n\n---\n\n## Automatic Profile Switching (Daemon Setup)\n\nThe native daemon automatically switches profiles when apps enter the foreground:\n\n1. *(Optional but Recommended)* Install the [LSPosed framework](https://github.com/JingMatrix/LSPosed).\n2. Install the [PerfMTK-Hook](https://www.opendesktop.org/p/1670559/) companion app.\n3. Enable **PerfMTK-Hook** inside the LSPosed manager.\n4. If LSPosed is not used, the daemon will seamlessly and automatically fall back to its internal kernel Netlink process connector and cgroup inotify engine with zero configuration required!\n\n### App Profile Directives (`app_profiles.conf`)\n\nLocated at `/data/adb/modules/perfmtk/config/app_profiles.conf` (with compatibility link at `/data/local/app_profiles.conf`):\n\n```ini\n# Format: package_name=energy_profile;key=value\n\n# Default global profile when no specific rule matches\nDEFAULT_PROFILE=balanced\n\n# Profile applied when the screen turns off\nSCREEN_OFF_PROFILE=powersave\nAPP_DEBOUNCE_MS=2000\n\n# High-performance games with touch acceleration and thermal bypass\ncom.tencent.ig=performance;thermal=off;touch=game\ncom.kurogame.wutheringwaves.global=performance;thermal=off;touch=game\ncom.miHoYo.GenshinImpact=performance;thermal=off;touch=game\n\n# Daily and media apps\ncom.whatsapp=balanced\ncom.android.chrome=balanced\ncom.netflix.mediaclient=powersave\n```\n\n---\n\n## CLI Usage (`perfmtk`)\n\nRun the interactive console dashboard (requires root):\n```bash\nsu -c perfmtk\n```\n\n### Profile Commands\n```bash\nsu -c perfmtk performance   # Apply performance profile\nsu -c perfmtk balanced      # Apply balanced profile\nsu -c perfmtk powersave     # Apply power-saving profile\nsu -c perfmtk powersave+    # Apply ultra power-saving profile\n```\n\n### Smart Fast Charge Bypass\n```bash\nsu -c perfmtk --charge-bypass on      # Force fast charging bypass during games\nsu -c perfmtk --charge-bypass off     # Restore standard charging behavior\nsu -c perfmtk --charge-bypass status  # Query bypass state and battery temperature\nsu -c perfmtk --charge-bypass reset   # Revert manual override to active profile rule\n```\n\n### Battery Care\n```bash\nsu -c perfmtk --battery-care on 80    # Enable charge limiter at 80%\nsu -c perfmtk --battery-care off       # Disable charge limiter\nsu -c perfmtk --battery-care status   # Query Battery Care state\n```\n\n### OEM Thermal Management\n```bash\nsu -c perfmtk thermal disable         # Disable OEM thermal throttling services\nsu -c perfmtk thermal enable          # Re-enable OEM thermal throttling services\nsu -c perfmtk thermal status          # Query OEM thermal state\n```\n\n### Telemetry & Automation\n```bash\nsu -c perfmtk -s                      # Formatted live hardware status\nsu -c perfmtk -s --json               # Machine-readable JSON output\nsu -c perfmtk --stream 1000           # Continuous real-time JSON stream (1000ms interval)\nsu -c perfmtk --backup                # Backup configuration profiles\nsu -c perfmtk --restore               # Restore profiles from backup\n```\n\n---\n\n## Profile Configuration Reference\n\nProfiles are stored in `/data/adb/modules/perfmtk/config/` (`performance.conf`, `balanced.conf`, `powersave.conf`, `powersave+.conf`). All parameters can be tuned manually or via PerfMTK-Manager:\n\n```ini\n[CPU]\nGOVERNOR=\"schedutil schedutil schedutil\"\nDOWN_RATE_LIMIT_US=\"1000 1000 1000\"\nUP_RATE_LIMIT_US=\"1000 1000 1000\"\nCORE_CONFIG=\"cpu0:4:4|cpu4:3:3|cpu7:1:1\"\nMAX_FREQS=\"2200000 2660000 2700000\"\nMIN_FREQS=\"1800000 2300000 2400000\"\n\n[GPU]\nGPU_FREQ=800000\nGPU_GOVERNOR=\"userspace\"\n\n[DEVFREQ]\nDVF_GOVERNOR=\"userspace\"\nDRAM_FREQ=8533000\n\n[UFS]\nUFS_GOVERNOR=\"simple_ondemand\"\nUFS_CLK_ENABLE=1\n\n[FPSGO]\nFORCE_ONOFF=1\nBOOST_TA=1\n\n[GBE]\nENABLE=1\nPOLICY_MASK=7\nHEADROOM=50\n\n[UCLAMP]\nTOP_APP_MIN=96\nTOP_APP_MAX=1024\n\n[THERMAL_CHARGE]\nBYPASS_CHARGE_THROTTLE=1\nUNLOCK_FPS_THERMAL=1\nBATTERY_TEMP_CUTOFF=52\n\n[TOUCH]\nGAME_MODE=1\nTHP_SMOOTH=1\n```\n\n---\n\n## License & Disclaimer\n\n* **License**: This project is licensed under the [GNU GPLv3 License](LICENSE).\n* **Disclaimer**: PerfMTK modifies low-level hardware registers and kernel interfaces. While built with robust thermal and voltage safeguards, the developers assume no liability for hardware damage or instability resulting from improper use.\n",
+  "readmeHTML": "<h1>PerfMTK</h1>\n\n<p><b>A high-performance, native systemless optimization engine for MediaTek devices with Mali GPUs</b></p>\n\n<p><a href=\"https://img.shields.io/github/downloads/JUANIMAN/PerfMTK/total\">![GitHub Downloads</a>](https://github.com/JUANIMAN/PerfMTK/releases)</p>\n<p><a href=\"https://img.shields.io/badge/PerfMTK%20Telegram%20group-blue?style=flat-square&logo=telegram\">![Join the Telegram group</a>](https://t.me/PerfMTK_chat)</p>\n<p><a href=\"https://img.shields.io/badge/version-v16.4-success?style=flat-square\">![Current Version</a>](https://github.com/JUANIMAN/PerfMTK/releases/latest)</p>\n\n<h2>Overview</h2>\n\n<p>PerfMTK is an advanced Magisk / KernelSU / APatch module backed by an ultra-lightweight native C daemon (<code>perfmtkd</code>) and a rich CLI (<code>perfmtk</code>). Engineered specifically for MediaTek Dimensity and Helio platforms, it grants total, fine-grained control over CPU clusters, Mali GPUs, LPDDR memory buses, hardware touch digitizers, thermal curves, and storage subsystems.</p>\n\n<p>With sub-millisecond profile transitions, an event-driven <code>epoll</code> reactor (< 3.0 MB RSS, 0.0% idle CPU), and deep multi-OEM compatibility, PerfMTK unlocks maximum gaming frame rates (120 FPS stable) and exceptional daily battery endurance.</p>\n\n<p>---</p>\n\n<h2>Features</h2>\n\n<li>**Universal SoC & Multi-OEM Support**:</li>\n<p>  * Auto-calibrated for all MediaTek CPU topologies: All-Big-Core (Dimensity 9400/9300), Tri-Cluster (Dimensity 9200/9000/8300), Dual-Cluster (Dimensity 8200/8100/7000, Helio G99/G95/G90T), and entry-level SoCs.</p>\n<p>  * Universal compatibility verified across Xiaomi/POCO (HyperOS/MIUI), OnePlus/OPPO/Realme (ColorOS/OxygenOS), Vivo/iQOO (OriginOS/FuntouchOS), Samsung (One UI), Motorola (HelloUI/MyUX), Transsion (Infinix XOS/Tecno HiOS), and AOSP.</p>\n<li>**Native C Engine & In-Memory Daemon (`perfmtkd`)**:</li>\n<p>  * Event-driven <code>epoll</code> reactor running on only 2 threads with < 3.0 MB RSS and 0.0% idle CPU overhead.</p>\n<p>  * In-memory configuration caching for sub-millisecond hardware switching latency.</p>\n<p>  * 4-tier foreground app detection: LSPosed hook (<code>PerfMTK-Hook</code>), Netlink Process Connector (<code>cn_proc</code>), kernel <code>cgroup.procs</code> inotify, and adaptive debounced fallback.</p>\n<li>**Hardware Touch & Digitizer Booster**:</li>\n<p>  * Native kernel-level touch sampling rate unlock (sustained 480Hz/500Hz) via direct digitizer <code>ioctl</code> (<code>/dev/xiaomi-touch</code>, <code>/proc/touchpanel</code>, <code>/sys/class/touch/touch_dev</code>, Samsung TSP).</p>\n<p>  * Host-side <code>THP Smooth</code> filter integration to eliminate gesture jitter.</p>\n<p>  * Touch input IRQs and dispatchers kept unpinned to Little cores, preventing frame preemption on Big cores and ensuring rock-solid <b>120 FPS</b> in AAA games (PUBG Mobile, Wuthering Waves, Genshin Impact).</p>\n<li>**Smart Fast Charge Bypass & Battery Care**:</li>\n<p>  * Dedicated gaming thermal bypass: charges at full speed without thermal throttle, keeping battery cells cool (31°C - 36°C even under sustained 120 FPS gaming loads).</p>\n<p>  * Universal hardware capability probing: strictly distinguishes between genuine PMIC hardware bypass (Infinix, Samsung, Asus, Sony) and input suspension, preventing unintended battery discharge during gaming.</p>\n<p>  * Automated battery safety guard with configurable emergency cutoff (45°C - 55°C, default 52°C).</p>\n<p>  * <b>Battery Care</b> engine: configurable charge ceiling (50% - 100%, default 80%) to maximize lithium cell health over years.</p>\n<li>**Sensor & IMU Latency Booster**:</li>\n<p>  * Isolated Sensor HAL and Xiaomi CIT Sensor to dedicated Little VIP cores (Cores 2-3) with nice -10 priority.</p>\n<p>  * MediaTek SCP mailbox IRQ steering to eliminate gyroscope and touch jitter during high-load gaming.</p>\n<li>**Advanced MediaTek Hardware Knobs**:</li>\n<p>  * <b>DRAM DVFSRC LPDDR5X</b>: Direct memory bus scaling with clocks up to 8533 MHz for memory-intensive titles.</p>\n<p>  * <b>Mali GPU & GED HAL</b>: Dynamic frequency scaling and margin tuning for modern 5.x and 6.x kernels (<code>dvfs_margin_value</code>, <code>gpu_boost_level</code>).</p>\n<p>  * <b>MediaTek Game Boost Engine (GBE)</b>: Automated foreground game process acceleration and thermal headroom reserve.</p>\n<p>  * <b>FPSGO Sysfs</b>: Adaptive tuning for <code>/sys/kernel/fpsgo</code> on Android 14, 15, and 16.</p>\n<p>  * <b>UFS Storage I/O Optimization</b>: <code>simple_ondemand</code> clock governors and queue depth tuning for seamless open-world texture streaming.</p>\n<li>**Full-Featured Terminal CLI & Interactive TUI (`perfmtk`)**:</li>\n<p>  * Colorized dashboard, live telemetry, hardware inspection, profile editing, and backup/restore management.</p>\n<li>**Companion App**: Seamless integration with the [PerfMTK-Manager](https://github.com/JUANIMAN/PerfMTK-Manager) Flutter companion app (Bento HUD, live thermal graphs, Quick Settings tiles).</li>\n\n<p>---</p>\n\n<h2>Compatibility & Requirements</h2>\n\n<li>**Processor**: MediaTek SoC with a Mali GPU (Dimensity or Helio series).</li>\n<li>**Android OS**: Android 9.0 (Pie) up to Android 15 / 16.</li>\n<li>**Linux Kernel**: Version 4.14.x up to 6.1.x+.</li>\n<li>**Root Manager**: Magisk (v27+ recommended), KernelSU, or APatch.</li>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>KernelSU & APatch Users:</b></p>\n<p>> Ensure your environment has a magic mount helper module installed (e.g., <b>Hybrid Mount</b> or <b>Mountify</b>) to guarantee proper module filesystem overlay support.</p>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>Download the latest release `.zip` from the [Releases page](https://github.com/JUANIMAN/PerfMTK/releases/latest).</li>\n<li>Flash the `.zip` in Magisk, KernelSU, or APatch.</li>\n<li>**Smart Installation Modes**:</li>\n<p>   * <b>Express Mode (Recommended)</b>: Wait 10 seconds (or press <code>[VOL-]</code>) for an optimal automatic setup tuned to your RAM and SoC.</p>\n<p>   * <b>Custom Mode</b>: Press <code>[VOL+]</code> within 10 seconds to selectively customize <code>system.prop</code>, <code>post-fs-data.sh</code>, or <code>service.sh</code>.</p>\n<li>Reboot your device to apply all kernel and daemon settings.</li>\n\n<p>---</p>\n\n<h2>Automatic Profile Switching (Daemon Setup)</h2>\n\n<p>The native daemon automatically switches profiles when apps enter the foreground:</p>\n\n<li>*(Optional but Recommended)* Install the [LSPosed framework](https://github.com/JingMatrix/LSPosed).</li>\n<li>Install the [PerfMTK-Hook](https://www.opendesktop.org/p/1670559/) companion app.</li>\n<li>Enable **PerfMTK-Hook** inside the LSPosed manager.</li>\n<li>If LSPosed is not used, the daemon will seamlessly and automatically fall back to its internal kernel Netlink process connector and cgroup inotify engine with zero configuration required!</li>\n\n<h3>App Profile Directives (`app_profiles.conf`)</h3>\n\n<p>Located at <code>/data/adb/modules/perfmtk/config/app_profiles.conf</code> (with compatibility link at <code>/data/local/app_profiles.conf</code>):</p>\n\n<pre># Format: package_name=energy_profile;key=value\n\n# Default global profile when no specific rule matches\nDEFAULT_PROFILE=balanced\n\n# Profile applied when the screen turns off\nSCREEN_OFF_PROFILE=powersave\nAPP_DEBOUNCE_MS=2000\n\n# High-performance games with touch acceleration and thermal bypass\ncom.tencent.ig=performance;thermal=off;touch=game\ncom.kurogame.wutheringwaves.global=performance;thermal=off;touch=game\ncom.miHoYo.GenshinImpact=performance;thermal=off;touch=game\n\n# Daily and media apps\ncom.whatsapp=balanced\ncom.android.chrome=balanced\ncom.netflix.mediaclient=powersave</pre>\n\n<p>---</p>\n\n<h2>CLI Usage (`perfmtk`)</h2>\n\n<p>Run the interactive console dashboard (requires root):</p>\n<pre>su -c perfmtk</pre>\n\n<h3>Profile Commands</h3>\n<pre>su -c perfmtk performance   # Apply performance profile\nsu -c perfmtk balanced      # Apply balanced profile\nsu -c perfmtk powersave     # Apply power-saving profile\nsu -c perfmtk powersave+    # Apply ultra power-saving profile</pre>\n\n<h3>Smart Fast Charge Bypass</h3>\n<pre>su -c perfmtk --charge-bypass on      # Force fast charging bypass during games\nsu -c perfmtk --charge-bypass off     # Restore standard charging behavior\nsu -c perfmtk --charge-bypass status  # Query bypass state and battery temperature\nsu -c perfmtk --charge-bypass reset   # Revert manual override to active profile rule</pre>\n\n<h3>Battery Care</h3>\n<pre>su -c perfmtk --battery-care on 80    # Enable charge limiter at 80%\nsu -c perfmtk --battery-care off       # Disable charge limiter\nsu -c perfmtk --battery-care status   # Query Battery Care state</pre>\n\n<h3>OEM Thermal Management</h3>\n<pre>su -c perfmtk thermal disable         # Disable OEM thermal throttling services\nsu -c perfmtk thermal enable          # Re-enable OEM thermal throttling services\nsu -c perfmtk thermal status          # Query OEM thermal state</pre>\n\n<h3>Telemetry & Automation</h3>\n<pre>su -c perfmtk -s                      # Formatted live hardware status\nsu -c perfmtk -s --json               # Machine-readable JSON output\nsu -c perfmtk --stream 1000           # Continuous real-time JSON stream (1000ms interval)\nsu -c perfmtk --backup                # Backup configuration profiles\nsu -c perfmtk --restore               # Restore profiles from backup</pre>\n\n<p>---</p>\n\n<h2>Profile Configuration Reference</h2>\n\n<p>Profiles are stored in <code>/data/adb/modules/perfmtk/config/</code> (<code>performance.conf</code>, <code>balanced.conf</code>, <code>powersave.conf</code>, <code>powersave+.conf</code>). All parameters can be tuned manually or via PerfMTK-Manager:</p>\n\n<pre>[CPU]\nGOVERNOR=\"schedutil schedutil schedutil\"\nDOWN_RATE_LIMIT_US=\"1000 1000 1000\"\nUP_RATE_LIMIT_US=\"1000 1000 1000\"\nCORE_CONFIG=\"cpu0:4:4|cpu4:3:3|cpu7:1:1\"\nMAX_FREQS=\"2200000 2660000 2700000\"\nMIN_FREQS=\"1800000 2300000 2400000\"\n\n[GPU]\nGPU_FREQ=800000\nGPU_GOVERNOR=\"userspace\"\n\n[DEVFREQ]\nDVF_GOVERNOR=\"userspace\"\nDRAM_FREQ=8533000\n\n[UFS]\nUFS_GOVERNOR=\"simple_ondemand\"\nUFS_CLK_ENABLE=1\n\n[FPSGO]\nFORCE_ONOFF=1\nBOOST_TA=1\n\n[GBE]\nENABLE=1\nPOLICY_MASK=7\nHEADROOM=50\n\n[UCLAMP]\nTOP_APP_MIN=96\nTOP_APP_MAX=1024\n\n[THERMAL_CHARGE]\nBYPASS_CHARGE_THROTTLE=1\nUNLOCK_FPS_THERMAL=1\nBATTERY_TEMP_CUTOFF=52\n\n[TOUCH]\nGAME_MODE=1\nTHP_SMOOTH=1</pre>\n\n<p>---</p>\n\n<h2>License & Disclaimer</h2>\n\n<li>**License**: This project is licensed under the [GNU GPLv3 License](LICENSE).</li>\n<li>**Disclaimer**: PerfMTK modifies low-level hardware registers and kernel interfaces. While built with robust thermal and voltage safeguards, the developers assume no liability for hardware damage or instability resulting from improper use.</li>",
+  "homepageUrl": "https://github.com/JUANIMAN/PerfMTK",
+  "sourceUrl": "https://github.com/JUANIMAN/PerfMTK",
+  "url": "https://github.com/JUANIMAN/PerfMTK",
+  "latestRelease": {
+    "name": "v17.0",
+    "version": "v17.0",
+    "time": "2026-10-09T03:24:38Z",
+    "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v17.0/PerfMTKv17.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v17.0",
+      "tagName": "v17.0",
+      "publishedAt": "2026-10-09T03:24:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv17.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v17.0/PerfMTKv17.0.zip",
+          "size": 303095,
+          "downloadCount": 495
+        }
+      ]
+    },
+    {
+      "name": "v16.5",
+      "tagName": "v16.5",
+      "publishedAt": "2026-09-28T00:20:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv16.5.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v16.5/PerfMTKv16.5.zip",
+          "size": 248647,
+          "downloadCount": 1519
+        }
+      ]
+    },
+    {
+      "name": "v16.4",
+      "tagName": "v16.4",
+      "publishedAt": "2026-09-26T19:17:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv16.4.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v16.4/PerfMTKv16.4.zip",
+          "size": 244058,
+          "downloadCount": 283
+        }
+      ]
+    },
+    {
+      "name": "v16.3",
+      "tagName": "v16.3",
+      "publishedAt": "2026-09-23T05:34:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv16.3.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v16.3/PerfMTKv16.3.zip",
+          "size": 240321,
+          "downloadCount": 632
+        }
+      ]
+    },
+    {
+      "name": "v16.2",
+      "tagName": "v16.2",
+      "publishedAt": "2026-09-19T20:25:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv16.2.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v16.2/PerfMTKv16.2.zip",
+          "size": 229205,
+          "downloadCount": 298
+        }
+      ]
+    },
+    {
+      "name": "v15.2",
+      "tagName": "v15.2",
+      "publishedAt": "2026-06-28T17:31:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv15.2.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v15.2/PerfMTKv15.2.zip",
+          "size": 234124,
+          "downloadCount": 6622
+        }
+      ]
+    },
+    {
+      "name": "v15.0",
+      "tagName": "v15.0",
+      "publishedAt": "2026-06-26T06:32:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv15.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v15.0/PerfMTKv15.0.zip",
+          "size": 229061,
+          "downloadCount": 455
+        }
+      ]
+    },
+    {
+      "name": "v14.4",
+      "tagName": "v14.4",
+      "publishedAt": "2026-06-23T03:43:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv14.4.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v14.4/PerfMTKv14.4.zip",
+          "size": 204418,
+          "downloadCount": 469
+        }
+      ]
+    },
+    {
+      "name": "v14.3",
+      "tagName": "v14.3",
+      "publishedAt": "2026-06-20T23:11:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv14.3.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v14.3/PerfMTKv14.3.zip",
+          "size": 204204,
+          "downloadCount": 294
+        }
+      ]
+    },
+    {
+      "name": "v13.0",
+      "tagName": "v13.0",
+      "publishedAt": "2026-04-04T21:29:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv13.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v13.0/PerfMTKv13.0.zip",
+          "size": 196872,
+          "downloadCount": 5535
+        }
+      ]
+    },
+    {
+      "name": "v12.2",
+      "tagName": "v12.2",
+      "publishedAt": "2026-03-30T02:22:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv12.2.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v12.2/PerfMTKv12.2.zip",
+          "size": 192489,
+          "downloadCount": 679
+        }
+      ]
+    },
+    {
+      "name": "v12.1",
+      "tagName": "v12.1",
+      "publishedAt": "2026-03-29T18:03:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv12.1.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v12.1/PerfMTKv12.1.zip",
+          "size": 189901,
+          "downloadCount": 97
+        }
+      ]
+    },
+    {
+      "name": "v12.0",
+      "tagName": "v12.0",
+      "publishedAt": "2026-03-22T04:29:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv12.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v12.0/PerfMTKv12.0.zip",
+          "size": 161030,
+          "downloadCount": 437
+        }
+      ]
+    },
+    {
+      "name": "v11.1",
+      "tagName": "v11.1",
+      "publishedAt": "2026-02-10T05:44:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv11.1.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v11.1/PerfMTKv11.1.zip",
+          "size": 160598,
+          "downloadCount": 1883
+        }
+      ]
+    },
+    {
+      "name": "v10.9",
+      "tagName": "v10.9",
+      "publishedAt": "2026-01-02T23:01:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv10.9.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v10.9/PerfMTKv10.9.zip",
+          "size": 137886,
+          "downloadCount": 2475
+        }
+      ]
+    },
+    {
+      "name": "v8.7",
+      "tagName": "v8.7",
+      "publishedAt": "2025-04-19T05:42:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv8.7.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v8.7/PerfMTKv8.7.zip",
+          "size": 114292,
+          "downloadCount": 12522
+        }
+      ]
+    },
+    {
+      "name": "v8.5",
+      "tagName": "v8.5",
+      "publishedAt": "2025-03-23T21:55:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv8.5.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v8.5/PerfMTKv8.5.zip",
+          "size": 111029,
+          "downloadCount": 1404
+        }
+      ]
+    },
+    {
+      "name": "v8.0",
+      "tagName": "v8.0",
+      "publishedAt": "2025-01-21T03:49:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv8.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v8.0/PerfMTKv8.0.zip",
+          "size": 57295,
+          "downloadCount": 3729
+        }
+      ]
+    },
+    {
+      "name": "v7.7",
+      "tagName": "v7.7",
+      "publishedAt": "2024-12-31T01:52:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv7.7.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v7.7/PerfMTKv7.7.zip",
+          "size": 55722,
+          "downloadCount": 969
+        }
+      ]
+    },
+    {
+      "name": "v7.6",
+      "tagName": "v7.6",
+      "publishedAt": "2024-12-22T02:16:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv7.6.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v7.6/PerfMTKv7.6.zip",
+          "size": 54284,
+          "downloadCount": 402
+        }
+      ]
+    },
+    {
+      "name": "v7.5",
+      "tagName": "v7.5",
+      "publishedAt": "2024-12-04T23:11:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv7.5.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v7.5/PerfMTKv7.5.zip",
+          "size": 54323,
+          "downloadCount": 730
+        }
+      ]
+    },
+    {
+      "name": "v6.9",
+      "tagName": "v6.9",
+      "publishedAt": "2024-11-01T21:25:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv6.9.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v6.9/PerfMTKv6.9.zip",
+          "size": 45998,
+          "downloadCount": 1141
+        }
+      ]
+    },
+    {
+      "name": "v6.1",
+      "tagName": "v6.1",
+      "publishedAt": "2024-10-25T23:43:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv6.1.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v6.1/PerfMTKv6.1.zip",
+          "size": 43423,
+          "downloadCount": 335
+        }
+      ]
+    },
+    {
+      "name": "v6.0",
+      "tagName": "v6.0",
+      "publishedAt": "2024-09-13T05:22:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv6.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v6.0/PerfMTKv6.0.zip",
+          "size": 41613,
+          "downloadCount": 1148
+        }
+      ]
+    },
+    {
+      "name": "v5.7",
+      "tagName": "v5.7",
+      "publishedAt": "2024-07-20T21:45:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv5.7.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v5.7/PerfMTKv5.7.zip",
+          "size": 41023,
+          "downloadCount": 951
+        }
+      ]
+    },
+    {
+      "name": "v5.5",
+      "tagName": "v5.5",
+      "publishedAt": "2024-07-10T06:26:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv5.5.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v5.5/PerfMTKv5.5.zip",
+          "size": 40179,
+          "downloadCount": 146
+        }
+      ]
+    },
+    {
+      "name": "v5.0",
+      "tagName": "v5.0",
+      "publishedAt": "2024-07-05T20:45:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv5.0.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v5.0/PerfMTKv5.0.zip",
+          "size": 27452,
+          "downloadCount": 66
+        }
+      ]
+    },
+    {
+      "name": "v4.1",
+      "tagName": "v4.1",
+      "publishedAt": "2024-06-01T18:04:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv4.1.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v4.1/PerfMTKv4.1.zip",
+          "size": 67909,
+          "downloadCount": 306
+        }
+      ]
+    },
+    {
+      "name": "PerfMTKv3.6",
+      "tagName": "PerfMTKv3.6",
+      "publishedAt": "2024-04-09T16:58:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PerfMTKv3.6.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/PerfMTKv3.6/PerfMTKv3.6.zip",
+          "size": 53360,
+          "downloadCount": 307
+        }
+      ]
+    },
+    {
+      "name": "PerfMTK",
+      "tagName": "PerfMTK",
+      "publishedAt": "2024-03-25T09:16:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-arm64-v8a-release.apk",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/PerfMTK/app-arm64-v8a-release.apk",
+          "size": 6672868,
+          "downloadCount": 424
+        },
+        {
+          "name": "app-armeabi-v7a-release.apk",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/PerfMTK/app-armeabi-v7a-release.apk",
+          "size": 6128920,
+          "downloadCount": 94
+        },
+        {
+          "name": "PerfMTKv3.5.zip",
+          "downloadUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/PerfMTK/PerfMTKv3.5.zip",
+          "size": 53696,
+          "downloadCount": 169
+        }
+      ]
+    }
+  ]
+}

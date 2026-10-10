@@ -1,0 +1,633 @@
+{
+  "readme": "# ZeroTier for KSU\n\n[![GitHub Release](https://img.shields.io/github/v/release/powerAn2020/ZeroTierForKSU)](https://github.com/powerAn2020/ZeroTierForKSU/releases)\n[![GitHub Download](https://img.shields.io/github/downloads/powerAn2020/ZeroTierForKSU/total)](https://github.com/powerAn2020/ZeroTierForKSU/releases)\n\n基于KSU WEBUI实现的Zertier客户端，同时支持部分ZerotierOne服务端功能，仅支持老版API(legacy-central-api)，需要自行准备[API Token](https://docs.zerotier.com/tokens/#legacy-central-api-token)。\n\nMagisk需要搭配[5ec1cff/KsuWebUIStandalone](https://github.com/5ec1cff/KsuWebUIStandalone)使用。\n\n自1.14.0之后KSU版本需要在`11928`以上才能正常使用UI\n\n## 分支说明\n\n目前main分支已不在添加新功能，进入维护状态，新的版本开发在dev分支\n\n\n\n## 免责声明\n\n本项目不对以下情况负责：设备变砖、SD 卡损坏或 SoC 烧毁。\n\n## 模块截图\n\n<table>\n  <tr>\n    <td><img src=\"./imgs/Dashboard.png\"/></td>\n    <td><img src=\"./imgs/Dashboard-Moons.png\"/></td>\n    <td><img src=\"./imgs/Local.png\"/></td>\n  </tr>\n  <tr>\n    <td><img src=\"./imgs/Local-Peers.png\"/></td>\n    <td><img src=\"./imgs/Local-Settings.png\"/></td>\n    <td><img src=\"./imgs/Central.png\"/></td>\n  </tr>\n  <tr>\n    <td><img src=\"./imgs/Central-Peers.png\"/></td>\n    <td><img src=\"./imgs/Central-Settings.png\"/></td>\n    <td><img src=\"./imgs/Settings.png\"/></td>\n  </tr>\n</table>\n\n## 一些可选操作说明\n\n### 文件说明\n\n#### Zerotier数据目录:`/data/adb/zerotier`；在该目录下创建以下文件可以做到\n\n  创建文件`/data/adb/zerotier/KEEP_ON_UNINSTALL`，卸载模块可保留数据目录\n\n  创建文件`/data/adb/zerotier/MANMANUAL`，关闭开机自启\n\n  创建文件`/data/adb/zerotier/ALLOW_9993`，iptables放行UDP 9993入端口\n  \n  创建文件`/data/adb/zerotier/ROUTER_RULE_NEW`，zerotier流量路由模式改为新建路由规则表，删除该文件则是提升main表优先级模式\n\n### 执行脚本说明\n\n### **执行所有脚本都需要带全路径/Executing all scripts requires a full path**\n\n```Shell\n  sh /data/adb/modules/ZeroTierForKSU/zerotier-cli # 同官方\n  sh /data/adb/modules/ZeroTierForKSU/zerotier-idtool # 同官方\n  sh /data/adb/modules/ZeroTierForKSU/zerotier.inotify # 监听/data/adb/zerotier/state目录，用于启动服务。\n```\n\n#### ZeroTier for KSU - zerotier.sh\n```Shell\nUsage:\n  zerotier.sh options\n\nOptions:\n  -h                                         -- Show this message.\n  start                                      -- Start Zerotier Service\n  restart                                    -- Retart Zerotier Service\n  stop                                       -- Stop Zerotier Service\n  status                                     -- Show Node Status\n  token                                      -- Show Local Service Token\n  apiToken                                   -- Show Remote Service apiToken\n  inotifyd                                   -- Start inotifyd Service\n\nExample:\n  sh zerotier.sh -h\n  sh zerotier.sh start\n  sh zerotier.sh restart\n  sh zerotier.sh stop\n  sh zerotier.sh status\n  sh zerotier.sh token\n  sh zerotier.sh apiToken\n  sh zerotier.sh inotifyd\n\n```\n#### ZeroTier for KSU - api.sh\n```shell \n\nUsage:\n  api.sh <api_type> [options]\n\nOptions:\n  -h                                            -- Show this message.\n  <api_type>   local/central\n    local\n      status                                    -- Show Node Status\n      service                                    -- Manage Zerotier-One Service Status\n        action     value:[ start | stop ]\n      network                                   -- When the action is \"list\", \"networkid\" and \"bodydata\" are optional. When the action is \"leave\", \"bodydata\" is optional. When the action is \"join\", \"networkid\" and \"bodydata\" are required.\n        action     value:[ list | leave | join ]\n        networkid  value:[ networkid ](optional)\n        bodydata   value:[ JSON object ](optional)\n      peer                                      -- All the nodes your node knows about\n      firewall                                  -- Control the firewall to allow traffic into port 9993\n        action     value:[ A | D ]\n      router                                    -- Set the Zerotier traffic routing method\n        router     value:[ routing  | main ]\n        action     value:[ A | D ]\n      orbit                                     -- Join Private Root Servers\n        moonid     value:[ moonid ]\n    central\n      status                                    -- Show Center Status\n      network                                   -- When the action is \"list\", \"networkid\" and \"bodydata\" are optional. When the action is \"remove\", \"bodydata\" is optional. When the action is \"add\", No parameters are required. When the action is \"modify\", \"networkid\" and \"bodydata\" are required.\n        action     value:[ list | remove | add | modify ]\n        networkid  value:[ networkid ](optional)\n        bodydata   value:[ JSON object ](optional)\n      member                                    -- When the action is \"list\", \"bodydata\" and \"memberID\" are optional. When the action is \"remove\", \"bodydata\" is optional. When the action is \"modify\", \"networkid\", \"memberID\" and \"bodydata\" are required.\n        action     value:[ list | remove | modify ]\n        networkid  value:[ networkid ] (optional)\n        memberID   value:[ memberID ] (optional)\n        bodydata   value:[ JSON object ] (optional)\n    apiToken                                    -- Manage the tokenAuth for accessing the central API\n      action       value:[ show | update ]\n      key          value:[ apiToken ]\n\nExample:\n  help\n    sh api.sh -h\n\n  local\n    sh api.sh local status\n    sh api.sh local service start\n    sh api.sh local service stop\n    sh api.sh local peer\n    sh api.sh local firewall A\n    sh api.sh local firewall D\n    sh api.sh local router routing A \n    sh api.sh local router routing D \n    sh api.sh local router main A\n    sh api.sh local router main D\n    sh api.sh local orbit yourMoonid\n    sh api.sh local network list\n    sh api.sh local network leave yourNetworkid (suggest: use command `zerotier-cli leave yourNetworkid`)\n    sh api.sh local network join  yourNetworkid {} (suggest: use command `zerotier-cli join yourNetworkid`)\n\n  central\n    sh api.sh central status\n    sh api.sh central network list\n    sh api.sh central network remove yourNetworkid\n    sh api.sh central network add\n    sh api.sh central network modify yourNetworkid {}\n    sh api.sh central member list yourNetworkid\n    sh api.sh central member remove yourNetworkid memberID\n    sh api.sh central member modify yourNetworkid memberID '{\"hidden\":false,\"config\":{\"authorized\":true}}'\n\n  apiToken\n    sh api.sh apiToken show\n    sh api.sh apiToken update xxxxxxxxx\n```\n\n## 感谢以下连接提供的帮助，顺序不分先后\n\n- [是否有可能 Zerotier-One 直接在 Android 设备上运行? - V2EX](https://v2ex.com/t/863131)\n- [Android以太网和WIFI完美共存](https://blog.csdn.net/G_Rookie/article/details/109679262)\n- [Network Management in Android: Routing](https://yotam.net/posts/network-management-in-android-routing/)\n- [vant-ui/vant-demo](https://github.com/vant-ui/vant-demo/tree/master/vant/vite)\n- [zfdx123/build-k40-ksu](https://github.com/zfdx123/build-k40-ksu)\n- [eventlOwOp/zerotier-magisk](https://github.com/eventlOwOp/zerotier-magisk/tree/master/zerotier)\n- [linuxscreen/ZeroTierOneForMagisk](https://github.com/linuxscreen/ZeroTierOneForMagisk)\n- [taamarin/box_for_magisk](https://github.com/taamarin/box_for_magisk/blob/master/box/scripts/box.inotify)\n- [stunnel/static-curl](https://github.com/stunnel/static-curl)\n- [tiann/KernelSU](https://github.com/tiann/KernelSU)\n- [shell脚本如何优雅的打印帮助信息](https://blog.csdn.net/lhl_blog/article/details/107409694)\n",
+  "readmeHTML": "<h1>ZeroTier for KSU</h1>\n\n<p><a href=\"https://img.shields.io/github/v/release/powerAn2020/ZeroTierForKSU\">![GitHub Release</a>](https://github.com/powerAn2020/ZeroTierForKSU/releases)</p>\n<p><a href=\"https://img.shields.io/github/downloads/powerAn2020/ZeroTierForKSU/total\">![GitHub Download</a>](https://github.com/powerAn2020/ZeroTierForKSU/releases)</p>\n\n<p>基于KSU WEBUI实现的Zertier客户端，同时支持部分ZerotierOne服务端功能，仅支持老版API(legacy-central-api)，需要自行准备<a href=\"https://docs.zerotier.com/tokens/#legacy-central-api-token\">API Token</a>。</p>\n\n<p>Magisk需要搭配<a href=\"https://github.com/5ec1cff/KsuWebUIStandalone\">5ec1cff/KsuWebUIStandalone</a>使用。</p>\n\n<p>自1.14.0之后KSU版本需要在<code>11928</code>以上才能正常使用UI</p>\n\n<h2>分支说明</h2>\n\n<p>目前main分支已不在添加新功能，进入维护状态，新的版本开发在dev分支</p>\n\n\n\n<h2>免责声明</h2>\n\n<p>本项目不对以下情况负责：设备变砖、SD 卡损坏或 SoC 烧毁。</p>\n\n<h2>模块截图</h2>\n\n<p><table></p>\n<p>  <tr></p>\n<p>    <td><img src=\"./imgs/Dashboard.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Dashboard-Moons.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Local.png\"/></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"./imgs/Local-Peers.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Local-Settings.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Central.png\"/></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"./imgs/Central-Peers.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Central-Settings.png\"/></td></p>\n<p>    <td><img src=\"./imgs/Settings.png\"/></td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<h2>一些可选操作说明</h2>\n\n<h3>文件说明</h3>\n\n<p>#### Zerotier数据目录:<code>/data/adb/zerotier</code>；在该目录下创建以下文件可以做到</p>\n\n<p>  创建文件<code>/data/adb/zerotier/KEEP_ON_UNINSTALL</code>，卸载模块可保留数据目录</p>\n\n<p>  创建文件<code>/data/adb/zerotier/MANMANUAL</code>，关闭开机自启</p>\n\n<p>  创建文件<code>/data/adb/zerotier/ALLOW_9993</code>，iptables放行UDP 9993入端口</p>\n\n<p>  创建文件<code>/data/adb/zerotier/ROUTER_RULE_NEW</code>，zerotier流量路由模式改为新建路由规则表，删除该文件则是提升main表优先级模式</p>\n\n<h3>执行脚本说明</h3>\n\n<h3>**执行所有脚本都需要带全路径/Executing all scripts requires a full path**</h3>\n\n<pre>  sh /data/adb/modules/ZeroTierForKSU/zerotier-cli # 同官方\n  sh /data/adb/modules/ZeroTierForKSU/zerotier-idtool # 同官方\n  sh /data/adb/modules/ZeroTierForKSU/zerotier.inotify # 监听/data/adb/zerotier/state目录，用于启动服务。</pre>\n\n<p>#### ZeroTier for KSU - zerotier.sh</p>\n<pre>Usage:\n  zerotier.sh options\n\nOptions:\n  -h                                         -- Show this message.\n  start                                      -- Start Zerotier Service\n  restart                                    -- Retart Zerotier Service\n  stop                                       -- Stop Zerotier Service\n  status                                     -- Show Node Status\n  token                                      -- Show Local Service Token\n  apiToken                                   -- Show Remote Service apiToken\n  inotifyd                                   -- Start inotifyd Service\n\nExample:\n  sh zerotier.sh -h\n  sh zerotier.sh start\n  sh zerotier.sh restart\n  sh zerotier.sh stop\n  sh zerotier.sh status\n  sh zerotier.sh token\n  sh zerotier.sh apiToken\n  sh zerotier.sh inotifyd\n</pre>\n<p>#### ZeroTier for KSU - api.sh</p>\n<pre>\nUsage:\n  api.sh &lt;api_type&gt; [options]\n\nOptions:\n  -h                                            -- Show this message.\n  &lt;api_type&gt;   local/central\n    local\n      status                                    -- Show Node Status\n      service                                    -- Manage Zerotier-One Service Status\n        action     value:[ start | stop ]\n      network                                   -- When the action is \"list\", \"networkid\" and \"bodydata\" are optional. When the action is \"leave\", \"bodydata\" is optional. When the action is \"join\", \"networkid\" and \"bodydata\" are required.\n        action     value:[ list | leave | join ]\n        networkid  value:[ networkid ](optional)\n        bodydata   value:[ JSON object ](optional)\n      peer                                      -- All the nodes your node knows about\n      firewall                                  -- Control the firewall to allow traffic into port 9993\n        action     value:[ A | D ]\n      router                                    -- Set the Zerotier traffic routing method\n        router     value:[ routing  | main ]\n        action     value:[ A | D ]\n      orbit                                     -- Join Private Root Servers\n        moonid     value:[ moonid ]\n    central\n      status                                    -- Show Center Status\n      network                                   -- When the action is \"list\", \"networkid\" and \"bodydata\" are optional. When the action is \"remove\", \"bodydata\" is optional. When the action is \"add\", No parameters are required. When the action is \"modify\", \"networkid\" and \"bodydata\" are required.\n        action     value:[ list | remove | add | modify ]\n        networkid  value:[ networkid ](optional)\n        bodydata   value:[ JSON object ](optional)\n      member                                    -- When the action is \"list\", \"bodydata\" and \"memberID\" are optional. When the action is \"remove\", \"bodydata\" is optional. When the action is \"modify\", \"networkid\", \"memberID\" and \"bodydata\" are required.\n        action     value:[ list | remove | modify ]\n        networkid  value:[ networkid ] (optional)\n        memberID   value:[ memberID ] (optional)\n        bodydata   value:[ JSON object ] (optional)\n    apiToken                                    -- Manage the tokenAuth for accessing the central API\n      action       value:[ show | update ]\n      key          value:[ apiToken ]\n\nExample:\n  help\n    sh api.sh -h\n\n  local\n    sh api.sh local status\n    sh api.sh local service start\n    sh api.sh local service stop\n    sh api.sh local peer\n    sh api.sh local firewall A\n    sh api.sh local firewall D\n    sh api.sh local router routing A\n    sh api.sh local router routing D\n    sh api.sh local router main A\n    sh api.sh local router main D\n    sh api.sh local orbit yourMoonid\n    sh api.sh local network list\n    sh api.sh local network leave yourNetworkid (suggest: use command `zerotier-cli leave yourNetworkid`)\n    sh api.sh local network join  yourNetworkid {} (suggest: use command `zerotier-cli join yourNetworkid`)\n\n  central\n    sh api.sh central status\n    sh api.sh central network list\n    sh api.sh central network remove yourNetworkid\n    sh api.sh central network add\n    sh api.sh central network modify yourNetworkid {}\n    sh api.sh central member list yourNetworkid\n    sh api.sh central member remove yourNetworkid memberID\n    sh api.sh central member modify yourNetworkid memberID '{\"hidden\":false,\"config\":{\"authorized\":true}}'\n\n  apiToken\n    sh api.sh apiToken show\n    sh api.sh apiToken update xxxxxxxxx</pre>\n\n<h2>感谢以下连接提供的帮助，顺序不分先后</h2>\n\n<li>[是否有可能 Zerotier-One 直接在 Android 设备上运行? - V2EX](https://v2ex.com/t/863131)</li>\n<li>[Android以太网和WIFI完美共存](https://blog.csdn.net/G_Rookie/article/details/109679262)</li>\n<li>[Network Management in Android: Routing](https://yotam.net/posts/network-management-in-android-routing/)</li>\n<li>[vant-ui/vant-demo](https://github.com/vant-ui/vant-demo/tree/master/vant/vite)</li>\n<li>[zfdx123/build-k40-ksu](https://github.com/zfdx123/build-k40-ksu)</li>\n<li>[eventlOwOp/zerotier-magisk](https://github.com/eventlOwOp/zerotier-magisk/tree/master/zerotier)</li>\n<li>[linuxscreen/ZeroTierOneForMagisk](https://github.com/linuxscreen/ZeroTierOneForMagisk)</li>\n<li>[taamarin/box_for_magisk](https://github.com/taamarin/box_for_magisk/blob/master/box/scripts/box.inotify)</li>\n<li>[stunnel/static-curl](https://github.com/stunnel/static-curl)</li>\n<li>[tiann/KernelSU](https://github.com/tiann/KernelSU)</li>\n<li>[shell脚本如何优雅的打印帮助信息](https://blog.csdn.net/lhl_blog/article/details/107409694)</li>",
+  "homepageUrl": "https://github.com/powerAn2020/ZeroTierForKSU",
+  "sourceUrl": "https://github.com/powerAn2020/ZeroTierForKSU",
+  "url": "https://github.com/powerAn2020/ZeroTierForKSU",
+  "latestRelease": {
+    "name": "10517",
+    "version": "10517",
+    "time": "2026-05-29T18:24:08Z",
+    "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10517/ZeroTierForKSU-arm-10517.zip"
+  },
+  "releases": [
+    {
+      "name": "10552",
+      "tagName": "10552",
+      "publishedAt": "2026-09-05T14:29:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog_dev.md",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10552/changelog_dev.md",
+          "size": 1011,
+          "downloadCount": 26
+        },
+        {
+          "name": "update_arm64_dev.json",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10552/update_arm64_dev.json",
+          "size": 254,
+          "downloadCount": 876
+        },
+        {
+          "name": "update_arm_dev.json",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10552/update_arm_dev.json",
+          "size": 252,
+          "downloadCount": 11
+        },
+        {
+          "name": "ZeroTierForKSU-arm-10552.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10552/ZeroTierForKSU-arm-10552.zip",
+          "size": 5182533,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10552.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10552/ZeroTierForKSU-arm64-10552.zip",
+          "size": 6597626,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "10537",
+      "tagName": "10537",
+      "publishedAt": "2026-07-16T15:35:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10537.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10537/ZeroTierForKSU-arm-10537.zip",
+          "size": 6307498,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10537.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10537/ZeroTierForKSU-arm64-10537.zip",
+          "size": 6470875,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "10536",
+      "tagName": "10536",
+      "publishedAt": "2026-07-16T15:31:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10536.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10536/ZeroTierForKSU-arm-10536.zip",
+          "size": 6307498,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10536.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10536/ZeroTierForKSU-arm64-10536.zip",
+          "size": 6470874,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "10535",
+      "tagName": "10535",
+      "publishedAt": "2026-03-18T09:24:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10535.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10535/ZeroTierForKSU-arm-10535.zip",
+          "size": 6285180,
+          "downloadCount": 4
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10535.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10535/ZeroTierForKSU-arm64-10535.zip",
+          "size": 6444938,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "10531",
+      "tagName": "10531",
+      "publishedAt": "2026-02-14T03:54:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10531.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10531/ZeroTierForKSU-arm-10531.zip",
+          "size": 6135045,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10531.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10531/ZeroTierForKSU-arm64-10531.zip",
+          "size": 6294803,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "10529",
+      "tagName": "10529",
+      "publishedAt": "2026-02-13T14:41:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10529.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10529/ZeroTierForKSU-arm-10529.zip",
+          "size": 6134631,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10529.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10529/ZeroTierForKSU-arm64-10529.zip",
+          "size": 6294390,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10527",
+      "tagName": "10527",
+      "publishedAt": "2026-02-13T10:12:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10527.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10527/ZeroTierForKSU-arm-10527.zip",
+          "size": 6134213,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10527.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10527/ZeroTierForKSU-arm64-10527.zip",
+          "size": 6293972,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "10517",
+      "tagName": "10517",
+      "publishedAt": "2026-05-29T18:24:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10517.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10517/ZeroTierForKSU-arm-10517.zip",
+          "size": 5155308,
+          "downloadCount": 30
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10517.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10517/ZeroTierForKSU-arm64-10517.zip",
+          "size": 6578952,
+          "downloadCount": 122
+        }
+      ]
+    },
+    {
+      "name": "10516",
+      "tagName": "10516",
+      "publishedAt": "2025-09-25T09:31:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10516.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10516/ZeroTierForKSU-arm-10516.zip",
+          "size": 4968564,
+          "downloadCount": 15
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10516.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10516/ZeroTierForKSU-arm64-10516.zip",
+          "size": 6371809,
+          "downloadCount": 135
+        }
+      ]
+    },
+    {
+      "name": "10521",
+      "tagName": "10521",
+      "publishedAt": "2025-09-25T08:49:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10521.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10521/ZeroTierForKSU-arm-10521.zip",
+          "size": 6212072,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10521.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10521/ZeroTierForKSU-arm64-10521.zip",
+          "size": 6371831,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "10520",
+      "tagName": "10520",
+      "publishedAt": "2025-09-25T08:09:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10520.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10520/ZeroTierForKSU-arm-10520.zip",
+          "size": 6212070,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10520.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10520/ZeroTierForKSU-arm64-10520.zip",
+          "size": 6371829,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "10508",
+      "tagName": "10508",
+      "publishedAt": "2025-01-19T14:38:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10508.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10508/ZeroTierForKSU-arm-10508.zip",
+          "size": 4903843,
+          "downloadCount": 21
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10508.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10508/ZeroTierForKSU-arm64-10508.zip",
+          "size": 6042711,
+          "downloadCount": 118
+        }
+      ]
+    },
+    {
+      "name": "10498",
+      "tagName": "10498",
+      "publishedAt": "2025-01-19T14:49:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10498.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10498/ZeroTierForKSU-arm-10498.zip",
+          "size": 4903851,
+          "downloadCount": 4
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10498.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10498/ZeroTierForKSU-arm64-10498.zip",
+          "size": 6042718,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10497",
+      "tagName": "10497",
+      "publishedAt": "2024-12-06T06:26:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10497.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10497/ZeroTierForKSU-arm-10497.zip",
+          "size": 4907033,
+          "downloadCount": 5
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10497.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10497/ZeroTierForKSU-arm64-10497.zip",
+          "size": 6046350,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "10490",
+      "tagName": "10490",
+      "publishedAt": "2024-12-10T10:28:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10490.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10490/ZeroTierForKSU-arm-10490.zip",
+          "size": 4907047,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10490.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10490/ZeroTierForKSU-arm64-10490.zip",
+          "size": 6046363,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10486",
+      "tagName": "10486",
+      "publishedAt": "2024-11-08T10:11:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10486.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10486/ZeroTierForKSU-arm-10486.zip",
+          "size": 4892358,
+          "downloadCount": 3
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10486.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10486/ZeroTierForKSU-arm64-10486.zip",
+          "size": 6022196,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "10474",
+      "tagName": "10474",
+      "publishedAt": "2024-11-08T09:08:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10474.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10474/ZeroTierForKSU-arm-10474.zip",
+          "size": 4886957,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10474.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10474/ZeroTierForKSU-arm64-10474.zip",
+          "size": 6016794,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10473",
+      "tagName": "10473",
+      "publishedAt": "2024-11-08T03:40:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10473.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10473/ZeroTierForKSU-arm-10473.zip",
+          "size": 4886957,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10473.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10473/ZeroTierForKSU-arm64-10473.zip",
+          "size": 6016795,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "10472",
+      "tagName": "10472",
+      "publishedAt": "2024-11-08T09:25:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10472.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10472/ZeroTierForKSU-arm-10472.zip",
+          "size": 4886563,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10472.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10472/ZeroTierForKSU-arm64-10472.zip",
+          "size": 6016401,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10471",
+      "tagName": "10471",
+      "publishedAt": "2024-11-05T09:19:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10471.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10471/ZeroTierForKSU-arm-10471.zip",
+          "size": 4886957,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10471.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10471/ZeroTierForKSU-arm64-10471.zip",
+          "size": 6016794,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10467",
+      "tagName": "10467",
+      "publishedAt": "2024-10-15T09:12:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10467.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10467/ZeroTierForKSU-arm-10467.zip",
+          "size": 4885959,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10467.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10467/ZeroTierForKSU-arm64-10467.zip",
+          "size": 6015185,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "10466",
+      "tagName": "10466",
+      "publishedAt": "2024-10-15T08:00:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10466.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10466/ZeroTierForKSU-arm-10466.zip",
+          "size": 4886427,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10466.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10466/ZeroTierForKSU-arm64-10466.zip",
+          "size": 6015654,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "10463",
+      "tagName": "10463",
+      "publishedAt": "2024-10-15T07:17:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10463.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10463/ZeroTierForKSU-arm-10463.zip",
+          "size": 4886364,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10463.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10463/ZeroTierForKSU-arm64-10463.zip",
+          "size": 6015591,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "10454",
+      "tagName": "10454",
+      "publishedAt": "2024-10-05T04:23:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10454.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10454/ZeroTierForKSU-arm-10454.zip",
+          "size": 4888928,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10454.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10454/ZeroTierForKSU-arm64-10454.zip",
+          "size": 6018155,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "10450",
+      "tagName": "10450",
+      "publishedAt": "2024-10-05T10:30:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10450.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10450/ZeroTierForKSU-arm-10450.zip",
+          "size": 4888846,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10450.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10450/ZeroTierForKSU-arm64-10450.zip",
+          "size": 6018073,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "10449",
+      "tagName": "10449",
+      "publishedAt": "2024-10-05T03:57:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-10449.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10449/ZeroTierForKSU-arm-10449.zip",
+          "size": 4888846,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-10449.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10449/ZeroTierForKSU-arm64-10449.zip",
+          "size": 6018073,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "1.14-dev-fix1",
+      "tagName": "1.14-dev-fix1",
+      "publishedAt": "2024-10-03T16:25:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14-dev-fix1/ZeroTierForKSU-arm-1.14.1.zip",
+          "size": 4938135,
+          "downloadCount": 4
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14-dev-fix1/ZeroTierForKSU-arm64-1.14.1.zip",
+          "size": 6082039,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "1.14.1-dev",
+      "tagName": "1.14.1-dev",
+      "publishedAt": "2024-10-02T18:56:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.1-dev/ZeroTierForKSU-arm-1.14.1.zip",
+          "size": 4938404,
+          "downloadCount": 4
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.1-dev/ZeroTierForKSU-arm64-1.14.1.zip",
+          "size": 6082307,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "1.14.1",
+      "tagName": "1.14.1",
+      "publishedAt": "2024-09-16T09:47:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.1/ZeroTierForKSU-arm-1.14.1.zip",
+          "size": 4888331,
+          "downloadCount": 2
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-1.14.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.1/ZeroTierForKSU-arm64-1.14.1.zip",
+          "size": 6017558,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "1.14.0",
+      "tagName": "1.14.0",
+      "publishedAt": "2024-05-06T09:47:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZeroTierForKSU-arm-1.14.0.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.0/ZeroTierForKSU-arm-1.14.0.zip",
+          "size": 4818819,
+          "downloadCount": 5
+        },
+        {
+          "name": "ZeroTierForKSU-arm64-1.14.0.zip",
+          "downloadUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/1.14.0/ZeroTierForKSU-arm64-1.14.0.zip",
+          "size": 5823009,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ]
+}

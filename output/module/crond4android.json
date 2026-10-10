@@ -1,0 +1,123 @@
+{
+  "readme": "# crond4Android\n\n支持 KernelSU、APatch、Magisk下运行。调用对应框架busybox实现crond定时。\n\n从 `1.0.3` 版本开始支持安装时通过创建文件 `/sdcard/crond4android.setup` 或者音量键来控制是否安装命令行\n\n`/sdcard/crond4android.setup` 文件内容为1则自动安装crontab命令，其他则不安装\n> 通常用于解决环境检测时，非必要不推荐安装crontab命令，建议使用别名方式。\n\n## 数据目录\n\n日志: `/data/adb/crond/logs/run.log`\n\n任务数据: `/data/adb/crond/spool/`\n\n配置与辅助: `/data/adb/crond/conf/`\n\ncrontab: `/system/bin/crontab`\n`注意：如果替换了root实现方案，记得修改这个脚本，或者重新安装一次，不然无法执行。`\n\n创建`/data/adb/crond/conf/KEEP_ON_UNINSTALL` 文件，可以在卸载模块时保留任务数据\n创建`/data/adb/crond/conf/MANUAL` 文件，可以禁用开机自启\n## 使用样例\n\n```shell\n# 创建任务 (也可以直接编辑文件)\n# alias crontab=\"root方案路径(参考customize.sh)/busybox crontab -c '/data/adb/crond/spool'\"\necho '30 4 * * * echo \"\" > /data/adb/crond/logs/run.log' >> /data/adb/crond/spool/root # for root user \n# 查看任务\ncrontab -l\n```\n",
+  "readmeHTML": "<h1>crond4Android</h1>\n\n<p>支持 KernelSU、APatch、Magisk下运行。调用对应框架busybox实现crond定时。</p>\n\n<p>从 <code>1.0.3</code> 版本开始支持安装时通过创建文件 <code>/sdcard/crond4android.setup</code> 或者音量键来控制是否安装命令行</p>\n\n<p><code>/sdcard/crond4android.setup</code> 文件内容为1则自动安装crontab命令，其他则不安装</p>\n<p>> 通常用于解决环境检测时，非必要不推荐安装crontab命令，建议使用别名方式。</p>\n\n<h2>数据目录</h2>\n\n<p>日志: <code>/data/adb/crond/logs/run.log</code></p>\n\n<p>任务数据: <code>/data/adb/crond/spool/</code></p>\n\n<p>配置与辅助: <code>/data/adb/crond/conf/</code></p>\n\n<p>crontab: <code>/system/bin/crontab</code></p>\n<p><code>注意：如果替换了root实现方案，记得修改这个脚本，或者重新安装一次，不然无法执行。</code></p>\n\n<p>创建<code>/data/adb/crond/conf/KEEP_ON_UNINSTALL</code> 文件，可以在卸载模块时保留任务数据</p>\n<p>创建<code>/data/adb/crond/conf/MANUAL</code> 文件，可以禁用开机自启</p>\n<h2>使用样例</h2>\n\n<pre># 创建任务 (也可以直接编辑文件)\n# alias crontab=\"root方案路径(参考customize.sh)/busybox crontab -c '/data/adb/crond/spool'\"\necho '30 4 * * * echo \"\" &gt; /data/adb/crond/logs/run.log' &gt;&gt; /data/adb/crond/spool/root # for root user\n# 查看任务\ncrontab -l</pre>",
+  "homepageUrl": "https://github.com/powerAn2020/crond4android",
+  "sourceUrl": "https://github.com/powerAn2020/crond4android",
+  "url": "https://github.com/powerAn2020/crond4android",
+  "latestRelease": {
+    "name": "v1.1.0",
+    "version": "v1.1.0",
+    "time": "2026-08-07T10:04:08Z",
+    "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/v1.1.0/crond4android-v1.1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-08-07T10:04:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/v1.1.0/changelog.md",
+          "size": 286,
+          "downloadCount": 19
+        },
+        {
+          "name": "crond4android-v1.1.0.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/v1.1.0/crond4android-v1.1.0.zip",
+          "size": 17390,
+          "downloadCount": 141
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/v1.1.0/update.json",
+          "size": 266,
+          "downloadCount": 1429
+        }
+      ]
+    },
+    {
+      "name": "1.0.4",
+      "tagName": "1.0.4",
+      "publishedAt": "2026-03-01T14:44:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.4/changelog.md",
+          "size": 47,
+          "downloadCount": 38
+        },
+        {
+          "name": "crond4android.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.4/crond4android.zip",
+          "size": 14559,
+          "downloadCount": 127
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.4/update.json",
+          "size": 263,
+          "downloadCount": 1524
+        }
+      ]
+    },
+    {
+      "name": "1.0.3",
+      "tagName": "1.0.3",
+      "publishedAt": "2025-03-03T02:47:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond4android_v1.0.3.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.3/crond4android_v1.0.3.zip",
+          "size": 163080,
+          "downloadCount": 255
+        }
+      ]
+    },
+    {
+      "name": "1.0.2",
+      "tagName": "1.0.2",
+      "publishedAt": "2025-02-13T03:27:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond4android_v1.0.2.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.2/crond4android_v1.0.2.zip",
+          "size": 162339,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "1.0.1",
+      "tagName": "1.0.1",
+      "publishedAt": "2024-07-09T06:56:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond4android_v1.0.1.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.1/crond4android_v1.0.1.zip",
+          "size": 161539,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "1.0.0",
+      "tagName": "1.0.0",
+      "publishedAt": "2024-06-05T09:42:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond4android.zip",
+          "downloadUrl": "https://github.com/powerAn2020/crond4android/releases/download/1.0.0/crond4android.zip",
+          "size": 2446,
+          "downloadCount": 22
+        }
+      ]
+    }
+  ]
+}

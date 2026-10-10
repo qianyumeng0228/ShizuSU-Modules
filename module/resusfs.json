@@ -1,0 +1,343 @@
+{
+  "readme": "# ReSuSFS\n\n<p align=\"center\">\n  <img src=\"docs/banner.png\" alt=\"ReSuSFS Banner\">\n</p>\n\n[![Build Status](https://github.com/ahmed-alnassif/ReSuSFS/actions/workflows/release.yml/badge.svg)](https://github.com/ahmed-alnassif/ReSuSFS/actions/workflows/release.yml)\n[![Latest Release](https://img.shields.io/github/v/release/ahmed-alnassif/ReSuSFS?label=Latest%20Release&color=00aa00)](https://github.com/ahmed-alnassif/ReSuSFS/releases)\n[![Downloads](https://img.shields.io/github/downloads/ahmed-alnassif/ReSuSFS/total?label=Downloads&color=00aa00)](https://github.com/ahmed-alnassif/ReSuSFS/releases)\n[![Group](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/ahmed_alnassif_tg)\n[![GitHub License](https://img.shields.io/github/license/ahmed-alnassif/ReSuSFS?logo=gnu)](/LICENSE)\n[![SuSFS](https://img.shields.io/badge/SuSFS-4CAF50?&logo=gitlab&logoColor=white)](https://gitlab.com/simonpunk/susfs4ksu)\n[![KernelSU](https://img.shields.io/badge/KernelSU-000000?&logo=github&logoColor=white)](https://github.com/tiann/KernelSU)\n[![ReSukiSU](https://img.shields.io/badge/ReSukiSU-E91E63?&logo=github&logoColor=white)](https://github.com/ReSukiSU/ReSukiSU)\n[![Translation status](https://img.shields.io/weblate/progress/resusfs)](https://hosted.weblate.org/engage/ReSuSFS/)\n\nRoot hiding made simple, powerful when you need it. A [KernelSU](https://kernelsu.org) module and WebUI that turns SuSFS into clean config files and toggle switches for everyday use, with **strong hiding applied out of the box** via built-in spoofing and hiding scripts for one-tap protection, plus a script manager for power users who want more, all without leaving the WebUI.\n\n> [!Important]\n> **KernelSU Next is not recommended.**\n>\n> KernelSU Next is currently **unmaintained** and has been observed engaging in anti-competitive behavior, including blacklisting the official ReSuSFS module without technical justification. This is not a security decision, it is a control decision.\n>\n> Using an unmaintained kernel root solution can lead to:\n>\n> - **Instability** and unexpected crashes.\n> - **Bootloops** that can leave your device unusable.\n> - **Security vulnerabilities** that will never be patched.\n> - **Broken module compatibility** as the ecosystem moves forward.\n>\n> To protect your device and ensure you receive official support:\n>\n> - Use **KernelSU**: The upstream, official root solution.\n> - Use **ReSukiSU**: A trusted, community-respected fork.\n>\n> ReSuSFS is the only official SuSFS module for KernelSU. It is fully supported on KernelSU and ReSukiSU only.\n>\n> Do not use KernelSU Next. Choose stability. Choose freedom. Choose official support.\n\n---\n\n> [!Important]\n> **Future Direction**\n>\n> ReSuSFS will gradually move beyond SuSFS management. SuSFS will become optional, while development will focus more on UserHub, giving users greater freedom and control to create, manage, and automate their own scripts and configurations.\n\n## Requirements\n\n- [KernelSU](https://kernelsu.org)\n- [GKID Kernel](https://github.com/ahmed-alnassif/GKID-Kernels) for SuSFS support (optional)\n\n## Install\n\n1. Download the [latest release](https://github.com/ahmed-alnassif/ReSuSFS/releases/latest)\n2. Flash the zip in KernelSU Manager\n3. Reboot\n4. Strong hiding is applied automatically, no setup needed\n5. Optional: edit config files, or use the WebUI to fine-tune\n\n## Config files\n\nAll optional, all live under `/data/adb/ReSuSFS/`. Missing or empty files mean \"nothing to apply\" for that feature, no errors. Entries are appended in the order they appear, top line first.\n\n| File | What it does |\n|---|---|\n| `sus_paths.txt` | hide static/read-only paths |\n| `sus_paths_loop.txt` | hide frequently changing paths |\n| `sus_maps.txt` | hide mapped library files |\n| `kstat_paths.txt` | spoof file stat for bind mounted paths |\n| `open_redirect.txt` | redirect a path to another path |\n| `uname.txt` | spoof kernel release/version |\n| `cmdline_or_bootconfig.txt` | spoof `/proc/cmdline` or `/proc/bootconfig` |\n| `config.txt` | toggle kernel flags (mount hiding, logging, avc spoofing) |\n| `scripts/` | built-in scripts for spoofing and hiding |\n| `scripts_postfs.txt` | scripts to run at post-fs-data stage |\n| `scripts_bootcompleted.txt` | scripts to run at boot-completed stage |\n\n## Built-in Scripts\n\nPre-made scripts for common spoofing and hiding tasks. They live in `/data/adb/ReSuSFS/scripts/` and are enabled by default for set-and-forget users. They can be disabled by removing their filenames from `scripts_postfs.txt` or `scripts_bootcompleted.txt`.\n\nStrong hiding is applied out of the box with no configuration needed. Power users can fine-tune individual scripts via the WebUI or by editing the files directly.\n\n| Script | Stage | What it does |\n|---|---|---|\n| `ReSuSFS_apply-cmdline-bootconfig.sh` | post-fs-data | hides bootloader unlock state from kernel cmdline/bootconfig |\n| `ReSuSFS_apply-kstat-add.sh` | post-fs-data | hides file stats for framework-managed paths |\n| `ReSuSFS_apply-ksu-settings.sh` | post-fs-data | sets KernelSU features for hiding and compatibility |\n| `ReSuSFS_apply-uname.sh` | post-fs-data | spoofs kernel version and build info from uname |\n| `ReSuSFS_apply-mount-hiding.sh` | boot-completed | hides module mounts redirected to system paths |\n| `ReSuSFS_apply-props.sh` | boot-completed | spoofs root indicators and removes custom ROM fingerprints |\n| `ReSuSFS_apply-settings.sh` | boot-completed | spoofs developer options and debugging states in system settings |\n| `ReSuSFS_apply-sus-maps.sh` | boot-completed | hides zygisk libraries and module font files from memory maps |\n| `ReSuSFS_apply-sus-paths-loop.sh` | boot-completed | hides recovery traces, root tools, and suspicious pty nodes |\n| `ReSuSFS_apply-sus-paths.sh` | boot-completed | hides custom ROM traces and addon.d paths |\n| `ReSuSFS_cleanup-markers.sh` | boot-completed | removes susfs leftover markers from shared storage |\n\n## WebUI Features\n\n- **Strong hiding by default**, built-in scripts are pre-enabled for set-and-forget users\n- **Status dashboard**, see if SuSFS is active at a glance, tap for the full enabled-features breakdown straight from the kernel\n- **Configuration summary**, live entry counts per feature and enabled script count, right on the home page\n- **Built-in code editor**, full-screen editor for every config file and user script, no terminal needed\n- **File manager**, browse storage and load a custom file straight into any feature, without overwriting your default\n- **User-friendly SuSFS configs**, every feature exposed as its own clean box: edit, apply, or load custom\n- **Toggle switches**, flip kernel flags (mount hiding, logging, avc spoofing) without touching raw text\n- **Built-in scripts manager**, view, enable, or disable pre-made spoofing and hiding scripts from the WebUI\n- **UserHub**, create, edit, run, and delete your own shell scripts, with per-script toggles to run automatically at post-fs-data and/or boot-completed\n- **Backup and restore**, export your whole config (and any UserHub scripts) into one archive, restore it on any device\n- **Reboot button**, with confirmation, right in the header\n- **Multi-language support**\n\n## UserHub\n\nA tab for managing your own shell scripts without a terminal:\n\n- Create a new script from a blank template, or import an existing `.sh` file from storage\n- Edit any script in the same full-screen code editor used for config files\n- Run a script on demand, output streams live in the WebUI\n- Toggle a script to run automatically at `post-fs-data` and/or `boot-completed`\n\nScripts live under `/data/adb/ReSuSFS/scripts/`. Which scripts run at which stage is tracked in `scripts_postfs.txt` and `scripts_bootcompleted.txt` under the same directory.\n\n## CLI\n\nEvery command can be run manually via `ReSuSFS <flag>`. Useful for scripting, debugging, or if you just prefer terminal over WebUI.\n\n```\n _____       _____        _____ ______ _____ \n|  __ \\     / ____|      / ____|  ____/ ____|\n| |__) |___| (___  _   _| (___ | |__ | (___  \n|  _  // _ \\\\___ \\| | | |\\___ \\|  __| \\___ \\ \n| | \\ \\  __/____) | |_| |____) | |    ____) |\n|_|  \\_\\___|_____/ \\__,_|_____/|_|   |_____/ \n\nAuthors:  ahmed-alnassif, simonpunk@gitlab.com\nVersion: v2.3.0\n\n[%] status: active ✅ | susfs v2.3.0 (GKI) | features: 9 🧩\nusage:\n --action \t\t\t\tfull apply (early+late stage)\n --stage-early \t\t\t\tpost-fs-data stage only\n --stage-late \t\t\t\tboot-completed stage only\n --status \t\t\t\tshow susfs version / variant / enabled features\n --status-report \t\t\tsilently refresh module.prop's live status line\n\nif [file] is given it is appended (deduped) into the default list, then applied:\n --apply-sus-paths [file] \t\tadd_sus_path from list\n --apply-sus-paths-loop [file] \t\tadd_sus_path_loop from list\n --apply-sus-maps [file] \t\tadd_sus_map from list\n --apply-kstat-add [file] \t\tstage add_sus_kstat from list\n --apply-kstat-update [file] \t\tcommit update_sus_kstat from list\n --apply-open-redirect [file] \t\tadd_open_redirect from list\n --apply-uname [file] \t\t\tset_uname from config\n --apply-cmdline-bootconfig [file] \tset_cmdline_or_bootconfig from file\n --apply-toggles <early|late> [file] \tapply hide_sus_mnts/enable_log/avc_log_spoofing from config\n --run-script <file> \t\t\trun a user script from UserHub\n --run-postfs-scripts \t\t\trun all UserHub scripts flagged for post-fs-data\n --run-bootcompleted-scripts \t\trun all UserHub scripts flagged for boot-completed\n\n --help \t\t\t\tdisplays this message\n\n```\n\nEvery `--apply-*` flag accepts an optional file path. Passing one appends that file's contents into the default config file (deduplicated, comments preserved), then applies the merged default. It does not run standalone or get discarded after, it becomes a permanent part of your saved config:\n\n```sh\nReSuSFS --apply-sus-paths /sdcard/my_paths.txt\n```\n\nCheck status any time to confirm SuSFS is active and see which kernel features are enabled:\n\n```sh\nReSuSFS --status\n```\n\n## Backup and share your config\n\nThe WebUI can export all your config files, built-in scripts, and UserHub scripts into a single archive, and restore from one. This makes it easy to share a working setup with the community, hand someone your config, or back it up before flashing something risky. Your strong hiding setup travels with you.\n\nExport creates an archive in `/storage/emulated/0/Download/`. Send that file to anyone, they load it with Restore, done.\n\n## Donate\n\nIf ReSuSFS is useful to you, consider supporting development.\n\n**[Donations](https://github.com/ahmed-alnassif#-support-my-work)**\n\n## Community\n\nJoin the discussion, get support, and stay up to date on ReSuSFS and other projects:\n\n- **Telegram Group:** [ahmed_alnassif_tg](https://t.me/ahmed_alnassif_tg)\n\n## Translations\n\nWant to see ReSuSFS in your language? Head over to [Weblate](https://hosted.weblate.org/engage/ReSuSFS) to contribute a translation.\n\n[![Translation Status](https://hosted.weblate.org/widgets/ReSuSFS/-/multi-auto.svg)](https://hosted.weblate.org/engage/ReSuSFS/)\n\n## Credits\n\n- [SuSFS](https://gitlab.com/simonpunk/susfs4ksu) by simonpunk\n- WebUI built on top of [bindhosts](https://github.com/bindhosts/bindhosts) by the bindhosts team\n\n## Author\n\n[Ahmed Al-Nassif](https://github.com/ahmed-alnassif) (@ahmed-alnassif)\n\n## License\n\n[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)",
+  "readmeHTML": "<h1>ReSuSFS</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/banner.png\" alt=\"ReSuSFS Banner\"></p>\n<p></p></p>\n\n<p><a href=\"https://github.com/ahmed-alnassif/ReSuSFS/actions/workflows/release.yml/badge.svg\">![Build Status</a>](https://github.com/ahmed-alnassif/ReSuSFS/actions/workflows/release.yml)</p>\n<p><a href=\"https://img.shields.io/github/v/release/ahmed-alnassif/ReSuSFS?label=Latest%20Release&color=00aa00\">![Latest Release</a>](https://github.com/ahmed-alnassif/ReSuSFS/releases)</p>\n<p><a href=\"https://img.shields.io/github/downloads/ahmed-alnassif/ReSuSFS/total?label=Downloads&color=00aa00\">![Downloads</a>](https://github.com/ahmed-alnassif/ReSuSFS/releases)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram\">![Group</a>](https://t.me/ahmed_alnassif_tg)</p>\n<p><a href=\"https://img.shields.io/github/license/ahmed-alnassif/ReSuSFS?logo=gnu\">![GitHub License</a>](/LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/SuSFS-4CAF50?&logo=gitlab&logoColor=white\">![SuSFS</a>](https://gitlab.com/simonpunk/susfs4ksu)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU-000000?&logo=github&logoColor=white\">![KernelSU</a>](https://github.com/tiann/KernelSU)</p>\n<p><a href=\"https://img.shields.io/badge/ReSukiSU-E91E63?&logo=github&logoColor=white\">![ReSukiSU</a>](https://github.com/ReSukiSU/ReSukiSU)</p>\n<p><a href=\"https://img.shields.io/weblate/progress/resusfs\">![Translation status</a>](https://hosted.weblate.org/engage/ReSuSFS/)</p>\n\n<p>Root hiding made simple, powerful when you need it. A <a href=\"https://kernelsu.org\">KernelSU</a> module and WebUI that turns SuSFS into clean config files and toggle switches for everyday use, with <b>strong hiding applied out of the box</b> via built-in spoofing and hiding scripts for one-tap protection, plus a script manager for power users who want more, all without leaving the WebUI.</p>\n\n<p>> [!Important]</p>\n<p>> <b>KernelSU Next is not recommended.</b></p>\n<p>></p>\n<p>> KernelSU Next is currently <b>unmaintained</b> and has been observed engaging in anti-competitive behavior, including blacklisting the official ReSuSFS module without technical justification. This is not a security decision, it is a control decision.</p>\n<p>></p>\n<p>> Using an unmaintained kernel root solution can lead to:</p>\n<p>></p>\n<p>> - <b>Instability</b> and unexpected crashes.</p>\n<p>> - <b>Bootloops</b> that can leave your device unusable.</p>\n<p>> - <b>Security vulnerabilities</b> that will never be patched.</p>\n<p>> - <b>Broken module compatibility</b> as the ecosystem moves forward.</p>\n<p>></p>\n<p>> To protect your device and ensure you receive official support:</p>\n<p>></p>\n<p>> - Use <b>KernelSU</b>: The upstream, official root solution.</p>\n<p>> - Use <b>ReSukiSU</b>: A trusted, community-respected fork.</p>\n<p>></p>\n<p>> ReSuSFS is the only official SuSFS module for KernelSU. It is fully supported on KernelSU and ReSukiSU only.</p>\n<p>></p>\n<p>> Do not use KernelSU Next. Choose stability. Choose freedom. Choose official support.</p>\n\n<p>---</p>\n\n<p>> [!Important]</p>\n<p>> <b>Future Direction</b></p>\n<p>></p>\n<p>> ReSuSFS will gradually move beyond SuSFS management. SuSFS will become optional, while development will focus more on UserHub, giving users greater freedom and control to create, manage, and automate their own scripts and configurations.</p>\n\n<h2>Requirements</h2>\n\n<li>[KernelSU](https://kernelsu.org)</li>\n<li>[GKID Kernel](https://github.com/ahmed-alnassif/GKID-Kernels) for SuSFS support (optional)</li>\n\n<h2>Install</h2>\n\n<li>Download the [latest release](https://github.com/ahmed-alnassif/ReSuSFS/releases/latest)</li>\n<li>Flash the zip in KernelSU Manager</li>\n<li>Reboot</li>\n<li>Strong hiding is applied automatically, no setup needed</li>\n<li>Optional: edit config files, or use the WebUI to fine-tune</li>\n\n<h2>Config files</h2>\n\n<p>All optional, all live under <code>/data/adb/ReSuSFS/</code>. Missing or empty files mean \"nothing to apply\" for that feature, no errors. Entries are appended in the order they appear, top line first.</p>\n\n<p>| File | What it does |</p>\n<p>|---|---|</p>\n<p>| <code>sus_paths.txt</code> | hide static/read-only paths |</p>\n<p>| <code>sus_paths_loop.txt</code> | hide frequently changing paths |</p>\n<p>| <code>sus_maps.txt</code> | hide mapped library files |</p>\n<p>| <code>kstat_paths.txt</code> | spoof file stat for bind mounted paths |</p>\n<p>| <code>open_redirect.txt</code> | redirect a path to another path |</p>\n<p>| <code>uname.txt</code> | spoof kernel release/version |</p>\n<p>| <code>cmdline_or_bootconfig.txt</code> | spoof <code>/proc/cmdline</code> or <code>/proc/bootconfig</code> |</p>\n<p>| <code>config.txt</code> | toggle kernel flags (mount hiding, logging, avc spoofing) |</p>\n<p>| <code>scripts/</code> | built-in scripts for spoofing and hiding |</p>\n<p>| <code>scripts_postfs.txt</code> | scripts to run at post-fs-data stage |</p>\n<p>| <code>scripts_bootcompleted.txt</code> | scripts to run at boot-completed stage |</p>\n\n<h2>Built-in Scripts</h2>\n\n<p>Pre-made scripts for common spoofing and hiding tasks. They live in <code>/data/adb/ReSuSFS/scripts/</code> and are enabled by default for set-and-forget users. They can be disabled by removing their filenames from <code>scripts_postfs.txt</code> or <code>scripts_bootcompleted.txt</code>.</p>\n\n<p>Strong hiding is applied out of the box with no configuration needed. Power users can fine-tune individual scripts via the WebUI or by editing the files directly.</p>\n\n<p>| Script | Stage | What it does |</p>\n<p>|---|---|---|</p>\n<p>| <code>ReSuSFS_apply-cmdline-bootconfig.sh</code> | post-fs-data | hides bootloader unlock state from kernel cmdline/bootconfig |</p>\n<p>| <code>ReSuSFS_apply-kstat-add.sh</code> | post-fs-data | hides file stats for framework-managed paths |</p>\n<p>| <code>ReSuSFS_apply-ksu-settings.sh</code> | post-fs-data | sets KernelSU features for hiding and compatibility |</p>\n<p>| <code>ReSuSFS_apply-uname.sh</code> | post-fs-data | spoofs kernel version and build info from uname |</p>\n<p>| <code>ReSuSFS_apply-mount-hiding.sh</code> | boot-completed | hides module mounts redirected to system paths |</p>\n<p>| <code>ReSuSFS_apply-props.sh</code> | boot-completed | spoofs root indicators and removes custom ROM fingerprints |</p>\n<p>| <code>ReSuSFS_apply-settings.sh</code> | boot-completed | spoofs developer options and debugging states in system settings |</p>\n<p>| <code>ReSuSFS_apply-sus-maps.sh</code> | boot-completed | hides zygisk libraries and module font files from memory maps |</p>\n<p>| <code>ReSuSFS_apply-sus-paths-loop.sh</code> | boot-completed | hides recovery traces, root tools, and suspicious pty nodes |</p>\n<p>| <code>ReSuSFS_apply-sus-paths.sh</code> | boot-completed | hides custom ROM traces and addon.d paths |</p>\n<p>| <code>ReSuSFS_cleanup-markers.sh</code> | boot-completed | removes susfs leftover markers from shared storage |</p>\n\n<h2>WebUI Features</h2>\n\n<li>**Strong hiding by default**, built-in scripts are pre-enabled for set-and-forget users</li>\n<li>**Status dashboard**, see if SuSFS is active at a glance, tap for the full enabled-features breakdown straight from the kernel</li>\n<li>**Configuration summary**, live entry counts per feature and enabled script count, right on the home page</li>\n<li>**Built-in code editor**, full-screen editor for every config file and user script, no terminal needed</li>\n<li>**File manager**, browse storage and load a custom file straight into any feature, without overwriting your default</li>\n<li>**User-friendly SuSFS configs**, every feature exposed as its own clean box: edit, apply, or load custom</li>\n<li>**Toggle switches**, flip kernel flags (mount hiding, logging, avc spoofing) without touching raw text</li>\n<li>**Built-in scripts manager**, view, enable, or disable pre-made spoofing and hiding scripts from the WebUI</li>\n<li>**UserHub**, create, edit, run, and delete your own shell scripts, with per-script toggles to run automatically at post-fs-data and/or boot-completed</li>\n<li>**Backup and restore**, export your whole config (and any UserHub scripts) into one archive, restore it on any device</li>\n<li>**Reboot button**, with confirmation, right in the header</li>\n<li>**Multi-language support**</li>\n\n<h2>UserHub</h2>\n\n<p>A tab for managing your own shell scripts without a terminal:</p>\n\n<li>Create a new script from a blank template, or import an existing `.sh` file from storage</li>\n<li>Edit any script in the same full-screen code editor used for config files</li>\n<li>Run a script on demand, output streams live in the WebUI</li>\n<li>Toggle a script to run automatically at `post-fs-data` and/or `boot-completed`</li>\n\n<p>Scripts live under <code>/data/adb/ReSuSFS/scripts/</code>. Which scripts run at which stage is tracked in <code>scripts_postfs.txt</code> and <code>scripts_bootcompleted.txt</code> under the same directory.</p>\n\n<h2>CLI</h2>\n\n<p>Every command can be run manually via <code>ReSuSFS <flag></code>. Useful for scripting, debugging, or if you just prefer terminal over WebUI.</p>\n\n<pre> _____       _____        _____ ______ _____\n|  __ \\     / ____|      / ____|  ____/ ____|\n| |__) |___| (___  _   _| (___ | |__ | (___\n|  _  // _ \\\\___ \\| | | |\\___ \\|  __| \\___ \\\n| | \\ \\  __/____) | |_| |____) | |    ____) |\n|_|  \\_\\___|_____/ \\__,_|_____/|_|   |_____/\n\nAuthors:  ahmed-alnassif, simonpunk@gitlab.com\nVersion: v2.3.0\n\n[%] status: active ✅ | susfs v2.3.0 (GKI) | features: 9 🧩\nusage:\n --action \t\t\t\tfull apply (early+late stage)\n --stage-early \t\t\t\tpost-fs-data stage only\n --stage-late \t\t\t\tboot-completed stage only\n --status \t\t\t\tshow susfs version / variant / enabled features\n --status-report \t\t\tsilently refresh module.prop's live status line\n\nif [file] is given it is appended (deduped) into the default list, then applied:\n --apply-sus-paths [file] \t\tadd_sus_path from list\n --apply-sus-paths-loop [file] \t\tadd_sus_path_loop from list\n --apply-sus-maps [file] \t\tadd_sus_map from list\n --apply-kstat-add [file] \t\tstage add_sus_kstat from list\n --apply-kstat-update [file] \t\tcommit update_sus_kstat from list\n --apply-open-redirect [file] \t\tadd_open_redirect from list\n --apply-uname [file] \t\t\tset_uname from config\n --apply-cmdline-bootconfig [file] \tset_cmdline_or_bootconfig from file\n --apply-toggles &lt;early|late&gt; [file] \tapply hide_sus_mnts/enable_log/avc_log_spoofing from config\n --run-script &lt;file&gt; \t\t\trun a user script from UserHub\n --run-postfs-scripts \t\t\trun all UserHub scripts flagged for post-fs-data\n --run-bootcompleted-scripts \t\trun all UserHub scripts flagged for boot-completed\n\n --help \t\t\t\tdisplays this message\n</pre>\n\n<p>Every <code>--apply-*</code> flag accepts an optional file path. Passing one appends that file's contents into the default config file (deduplicated, comments preserved), then applies the merged default. It does not run standalone or get discarded after, it becomes a permanent part of your saved config:</p>\n\n<pre>ReSuSFS --apply-sus-paths /sdcard/my_paths.txt</pre>\n\n<p>Check status any time to confirm SuSFS is active and see which kernel features are enabled:</p>\n\n<pre>ReSuSFS --status</pre>\n\n<h2>Backup and share your config</h2>\n\n<p>The WebUI can export all your config files, built-in scripts, and UserHub scripts into a single archive, and restore from one. This makes it easy to share a working setup with the community, hand someone your config, or back it up before flashing something risky. Your strong hiding setup travels with you.</p>\n\n<p>Export creates an archive in <code>/storage/emulated/0/Download/</code>. Send that file to anyone, they load it with Restore, done.</p>\n\n<h2>Donate</h2>\n\n<p>If ReSuSFS is useful to you, consider supporting development.</p>\n\n<p><b><a href=\"https://github.com/ahmed-alnassif#-support-my-work\">Donations</a></b></p>\n\n<h2>Community</h2>\n\n<p>Join the discussion, get support, and stay up to date on ReSuSFS and other projects:</p>\n\n<li>**Telegram Group:** [ahmed_alnassif_tg](https://t.me/ahmed_alnassif_tg)</li>\n\n<h2>Translations</h2>\n\n<p>Want to see ReSuSFS in your language? Head over to <a href=\"https://hosted.weblate.org/engage/ReSuSFS\">Weblate</a> to contribute a translation.</p>\n\n<p><a href=\"https://hosted.weblate.org/widgets/ReSuSFS/-/multi-auto.svg\">![Translation Status</a>](https://hosted.weblate.org/engage/ReSuSFS/)</p>\n\n<h2>Credits</h2>\n\n<li>[SuSFS](https://gitlab.com/simonpunk/susfs4ksu) by simonpunk</li>\n<li>WebUI built on top of [bindhosts](https://github.com/bindhosts/bindhosts) by the bindhosts team</li>\n\n<h2>Author</h2>\n\n<p><a href=\"https://github.com/ahmed-alnassif\">Ahmed Al-Nassif</a> (@ahmed-alnassif)</p>\n\n<h2>License</h2>\n\n<p><a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GPLv3</a></p>",
+  "homepageUrl": "https://t.me/ahmed_alnassif_tg",
+  "sourceUrl": "https://github.com/ahmed-alnassif/ReSuSFS",
+  "url": "https://github.com/ahmed-alnassif/ReSuSFS",
+  "latestRelease": {
+    "name": "v2.3.0-f55930f",
+    "version": "v2.3.0-f55930f",
+    "time": "2026-10-05T17:58:37Z",
+    "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f55930f/ReSuSFS.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.3.0-f55930f",
+      "tagName": "v2.3.0-f55930f",
+      "publishedAt": "2026-10-05T17:58:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f55930f/ReSuSFS.zip",
+          "size": 275752,
+          "downloadCount": 208
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-f55930f.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f55930f/ReSuSFS_v2.3.0-f55930f.zip",
+          "size": 275752,
+          "downloadCount": 94
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-1e6fb20",
+      "tagName": "v2.3.0-1e6fb20",
+      "publishedAt": "2026-10-05T12:54:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-1e6fb20/ReSuSFS.zip",
+          "size": 276071,
+          "downloadCount": 43
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-1e6fb20.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-1e6fb20/ReSuSFS_v2.3.0-1e6fb20.zip",
+          "size": 276071,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-99af3c2",
+      "tagName": "v2.3.0-99af3c2",
+      "publishedAt": "2026-10-03T15:00:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-99af3c2/ReSuSFS.zip",
+          "size": 276039,
+          "downloadCount": 147
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-99af3c2.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-99af3c2/ReSuSFS_v2.3.0-99af3c2.zip",
+          "size": 276039,
+          "downloadCount": 55
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-eb224b2",
+      "tagName": "v2.3.0-eb224b2",
+      "publishedAt": "2026-09-25T12:19:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-eb224b2/ReSuSFS.zip",
+          "size": 274762,
+          "downloadCount": 270
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-eb224b2.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-eb224b2/ReSuSFS_v2.3.0-eb224b2.zip",
+          "size": 274762,
+          "downloadCount": 129
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-edb5e2f",
+      "tagName": "v2.3.0-edb5e2f",
+      "publishedAt": "2026-09-23T05:07:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-edb5e2f/ReSuSFS.zip",
+          "size": 274637,
+          "downloadCount": 112
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-edb5e2f.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-edb5e2f/ReSuSFS_v2.3.0-edb5e2f.zip",
+          "size": 274637,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-d348051",
+      "tagName": "v2.3.0-d348051",
+      "publishedAt": "2026-09-12T15:53:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-d348051/ReSuSFS.zip",
+          "size": 273293,
+          "downloadCount": 298
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-d348051.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-d348051/ReSuSFS_v2.3.0-d348051.zip",
+          "size": 273293,
+          "downloadCount": 154
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-47be13c",
+      "tagName": "v2.3.0-47be13c",
+      "publishedAt": "2026-09-11T07:44:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-47be13c/ReSuSFS.zip",
+          "size": 235818,
+          "downloadCount": 82
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-47be13c.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-47be13c/ReSuSFS_v2.3.0-47be13c.zip",
+          "size": 235818,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-bc8e52b",
+      "tagName": "v2.3.0-bc8e52b",
+      "publishedAt": "2026-09-09T18:20:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-bc8e52b/ReSuSFS.zip",
+          "size": 219852,
+          "downloadCount": 58
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-bc8e52b.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-bc8e52b/ReSuSFS_v2.3.0-bc8e52b.zip",
+          "size": 219852,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-f851a6e",
+      "tagName": "v2.3.0-f851a6e",
+      "publishedAt": "2026-09-06T17:30:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f851a6e/ReSuSFS.zip",
+          "size": 220060,
+          "downloadCount": 56
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-f851a6e.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f851a6e/ReSuSFS_v2.3.0-f851a6e.zip",
+          "size": 220060,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-5ec5ad8",
+      "tagName": "v2.3.0-5ec5ad8",
+      "publishedAt": "2026-09-05T03:22:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-5ec5ad8/ReSuSFS.zip",
+          "size": 217660,
+          "downloadCount": 17
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-5ec5ad8.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-5ec5ad8/ReSuSFS_v2.3.0-5ec5ad8.zip",
+          "size": 217660,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-4d61c95",
+      "tagName": "v2.3.0-4d61c95",
+      "publishedAt": "2026-09-05T14:42:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-4d61c95/ReSuSFS.zip",
+          "size": 218568,
+          "downloadCount": 27
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-4d61c95.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-4d61c95/ReSuSFS_v2.3.0-4d61c95.zip",
+          "size": 218568,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-5556867",
+      "tagName": "v2.3.0-5556867",
+      "publishedAt": "2026-09-04T14:43:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-5556867/ReSuSFS.zip",
+          "size": 215838,
+          "downloadCount": 10
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-5556867.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-5556867/ReSuSFS_v2.3.0-5556867.zip",
+          "size": 215838,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-145b96d",
+      "tagName": "v2.3.0-145b96d",
+      "publishedAt": "2026-09-04T13:43:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-145b96d/ReSuSFS.zip",
+          "size": 215875,
+          "downloadCount": 4
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-145b96d.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-145b96d/ReSuSFS_v2.3.0-145b96d.zip",
+          "size": 215875,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-9244d05",
+      "tagName": "v2.3.0-9244d05",
+      "publishedAt": "2026-09-03T19:12:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-9244d05/ReSuSFS.zip",
+          "size": 202418,
+          "downloadCount": 11
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-9244d05.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-9244d05/ReSuSFS_v2.3.0-9244d05.zip",
+          "size": 202418,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-4171ba3",
+      "tagName": "v2.3.0-4171ba3",
+      "publishedAt": "2026-09-03T11:32:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-4171ba3/ReSuSFS.zip",
+          "size": 202414,
+          "downloadCount": 7
+        },
+        {
+          "name": "ReSuSFS_v2.3.0-4171ba3.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-4171ba3/ReSuSFS_v2.3.0-4171ba3.zip",
+          "size": 202414,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-f454264",
+      "tagName": "v2.3.0-f454264",
+      "publishedAt": "2026-09-01T00:50:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS_v2.3.0-f454264-6dc0868.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-f454264/ReSuSFS_v2.3.0-f454264-6dc0868.zip",
+          "size": 200510,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-dev",
+      "tagName": "v2.3.0-dev",
+      "publishedAt": "2026-08-31T10:14:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReSuSFS.zip",
+          "downloadUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v2.3.0-dev/ReSuSFS.zip",
+          "size": 197358,
+          "downloadCount": 8
+        }
+      ]
+    }
+  ]
+}

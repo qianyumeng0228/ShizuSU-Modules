@@ -1,0 +1,251 @@
+{
+  "readme": "<div align=\"center\">\n\n# `Py2Droid`\n\n[![APatch](https://img.shields.io/badge/APatch-Module-%2332de84)](https://github.com/apatch/apatch)\n[![KernelSU](https://img.shields.io/badge/KernelSU-Module-%23231816)](https://github.com/tiann/KernelSU)\n[![Magisk](https://img.shields.io/badge/Magisk-Module-%2301af9c)](https://github.com/topjohnwu/Magisk)\n[![Python](https://img.shields.io/badge/Python-v3.14.8-%23306a98)](https://python.org)\n[![Build Status](https://img.shields.io/github/actions/workflow/status/Mrakorez/py2droid/release.yml)](https://github.com/Mrakorez/py2droid/actions)\n[![Downloads](https://img.shields.io/github/downloads/Mrakorez/py2droid/total)](https://github.com/Mrakorez/py2droid/releases)\n[![License](https://img.shields.io/github/license/Mrakorez/py2droid)](LICENSE)\n\n**System-level Python 3 for Android via Magisk/KernelSU/APatch**\n\n</div>\n\n* * *\n\n## What is Py2Droid?\n\nPy2Droid is CPython 3 compiled for Android and packaged as a Magisk module.\nIt provides system-level Python access without requiring Termux or other userland environments.\n\nBuilt following official\n[Python for Android](https://github.com/python/cpython/blob/3.14/Android/README.md) guidelines,\nstripped of unnecessary components for minimal size.\n\n## Project Status\n\nThis project is in pre-1.0 development.\n\nCurrent focus has moved to other projects, so updates here are mostly limited to keeping CPython\nbuilds fresh and fixing critical bugs on a spare-time basis.\nBreaking changes may land in minor releases.\n\nIn the future, I plan to rewrite the build and repository automation scripts to make the codebase\ncleaner and improve Py2Droid for module developers.\nHowever, since this was one of my first projects where I gained hands-on Python experience, the\ncodebase might be pretty terrible in places for now :D\n\n## Quick Start\n\n1. Download the latest release from [Releases](https://github.com/Mrakorez/py2droid/releases)\n2. Install via your root manager (Magisk/KernelSU/APatch)\n3. Reboot your device\n4. Start using Python:\n   ```sh\n   python3 --version\n   pip3 install --user requests\n   ```\n\n## Why Py2Droid?\n\n### For Magisk Module Developers\n\nUse Python instead of shell scripts in your modules.\nPython is available as a dependency or runtime for complex logic.\n\n### For System Scripts\n\nGet lightweight Python access at boot time without Termux overhead.\nPerfect for automation scripts and utilities.\n\n### vs Termux\n\n| Feature          | Py2Droid                        | Termux Python                |\n| ---------------- | ------------------------------- | ---------------------------- |\n| Version          | Latest stable Python 3          | May lag behind               |\n| Installation     | Single module                   | App + packages               |\n| Size (aarch64)   | ~44 MB installed                | ~60 MB installed             |\n| Boot-time access | ✅ Available during early boot   | ❌ Unavailable until unlock   |\n| Location         | `/data/adb` (always accessible) | `/data/user` (encrypted)     |\n| Use case         | System scripts, Magisk modules  | Full development environment |\n\n**Note:** Py2Droid is not a Termux replacement.\nThey serve different purposes.\n\n## System Requirements\n\n- **Android:** 5.0+\n- **Architecture:** ARM64 or x86_64\n- **Root:** Magisk/KernelSU/APatch\n\n## Limitations\n\nPy2Droid runs in a bare Android environment (device with minimal shell, without Linux userland\ntools):\n\n- **No GUI support** - No X11/Wayland, so no Tkinter\n- **Limited native extensions** - Most packages with C/C++/Rust code don’t provide Android wheels,\n  and you can’t compile them on-device\n- **Some stdlib modules unavailable** - Modules requiring missing system libraries may not work\n- **Root required** - System directory access needed\n\n## Breaking Changes\n\n> **⚠️ Upgrading from v0.2?** Read this before updating to v0.3+\n\n<details> <summary><b>v0.2 → v0.3 Migration Guide</b></summary>\n\n### 1. Automatic Wrapper Syncing\n\nThe `py2droid-update-bin` command has been removed.\nWrappers now sync automatically at boot.\n\n**What to do:**\n- Remove any `py2droid-update-bin` calls from your scripts\n- Use `. /data/adb/py2droid/env.sh` at the start of your scripts instead\n- Or just reboot to sync wrappers\n\n### 2. Python Prefix Cleanup on Updates\n\nThe Python installation directory (`/data/adb/py2droid/usr`) is now cleaned during updates.\nThis removes globally-installed pip packages.\n\n**What happens:**\n- Packages installed without `--user` flag will be deleted\n- The installer creates a backup: `/sdcard/py2droid-packages.txt`\n\n**What to do:**\n- After updating, check `py2droid-packages.txt` for your packages\n- Reinstall: `pip3 install --user -r /sdcard/py2droid-packages.txt`\n- **Always use `--user` flag:** `pip3 install --user <package>`\n\n</details>\n\n## Usage\n\n### Basic Commands\n\n```sh\n# Check Python version\npython3 --version\n\n# Run a script\npython3 script.py\n\n# Install packages (always use --user!)\npip3 install --user requests beautifulsoup4\n```\n\n### Installing pip\n\nPip is included since v0.3.0. If you need to reinstall it:\n\n```sh\npython3 -m ensurepip --user\n# Reboot or source the environment\npip3 --version\n```\n\n### Virtual Environments\n\n```sh\n# Create venv\npython3 -m venv venv\n\n# Activate (must load env.sh first!)\n. /data/adb/py2droid/env.sh\n. venv/bin/activate\n\n# Install packages\npip3 install -r requirements.txt\n\n# Run your app\npython3 main.py\n```\n\n### In Magisk Modules\n\n#### `customize.sh`, `service.sh`, `action.sh`\n\nWrappers are available:\n\n```sh\n# customize.sh example\ncd \"${MODPATH}\" || exit 1\npython3 main.py\n```\n\n#### `post-fs-data.sh`, `uninstall.sh`\n\nWrappers aren’t mounted yet.\nLoad the environment manually:\n\n```sh\n# post-fs-data.sh example\n. /data/adb/py2droid/env.sh  # Load Py2Droid environment\n\ncd \"${0%/*}\" || exit 1\npython3 main.py\n```\n\n### Customization\n\nCreate `/data/adb/py2droid/.shrc` to customize the environment:\n\n```sh\n# Example .shrc\nexport NAME=\"Mrakorez\"\nhello() { echo \"Hello, ${NAME}!\"; }\n```\n\nThis file is sourced when loading `env.sh` (not during module installation).\n\n## How It Works\n\n### Directory Structure\n\nPy2Droid uses `/data/adb/py2droid` as its home directory:\n\n```\n/data/adb/py2droid/\n├── .cache/           # Cache directory (XDG_CACHE_HOME)\n├── .config/          # Config directory (XDG_CONFIG_HOME)\n├── .local/\n│   ├── bin/          # User binaries (XDG_BIN_HOME)\n│   ├── share/        # Shared data (XDG_DATA_HOME)\n│   └── state/        # State files (XDG_STATE_HOME)\n├── .tmp/             # Temporary files (TMPDIR)\n├── env.sh            # Environment loader\n└── usr/              # Python installation (PREFIX)\n    ├── bin/          # python3, pip3, etc.\n    └── lib/          # Python libraries\n```\n\n### Command Wrappers\n\nCommands like `python3` in `/system/bin` are wrapper scripts:\n\n```sh\n#!/system/bin/sh\n. \"/data/adb/py2droid/env.sh\" && exec python3 \"$@\"\n```\n\nThese wrappers:\n- Load the Py2Droid environment\n- Execute the actual command\n- Are created automatically at boot for new commands\n- Are removed if the underlying command is uninstalled\n\n### Two Ways to Use Python\n\n#### 1. Wrappers (Quick & Isolated)\n\nUse Python commands directly from any shell:\n\n```sh\npython3 -c \"print('Hello')\"\npip3 install --user requests\n```\n\n**Pros:**\n- Works from anywhere\n- Doesn’t affect your current environment\n- Simple to use\n\n**Cons:**\n- New commands require reboot to become available\n\n#### 2. Direct Environment (Full Access)\n\nSource the environment for immediate access to all changes:\n\n```sh\n. /data/adb/py2droid/env.sh\n\n# Now everything is available immediately\npip3 install --user pipx\npipx install cowsay\ncowsay -t \"No reboot needed!\"\n```\n\n**Pros:**\n- Immediate access to newly installed commands\n- Full environment control\n\n**Cons:**\n- Overrides your current environment (including HOME, PATH, etc.)\n- Only works in POSIX-compatible shells (sh, bash, zsh, ash)\n\n## Building from Source\n\n### Prerequisites\n\nFollow\n[CPython Android build prerequisites](https://github.com/python/cpython/blob/3.14/Android/README.md#prerequisites)\n\n### Build Steps\n\n```sh\n# Clone the repo\ngit clone https://github.com/Mrakorez/py2droid.git\ncd py2droid\n\n# Set up Python environment\npython -m venv .venv\n. .venv/bin/activate\npip install -r scripts/requirements.txt\n\n# Build (see build.toml for configuration)\npython scripts/build.py\n\n# Output will be in dist/\n```\n\n### CI/CD\n\nReleases are automated via GitHub Actions:\n\n1. Make changes and commit\n2. Use [`release.py`](scripts/release.py) to prepare release\n3. Push commits and tags\n4. GitHub Actions builds and publishes automatically\n\n## License\n\nMIT License - See [LICENSE](LICENSE) for details.\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>`Py2Droid`</h1>\n\n<p><a href=\"https://img.shields.io/badge/APatch-Module-%2332de84\">![APatch</a>](https://github.com/apatch/apatch)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU-Module-%23231816\">![KernelSU</a>](https://github.com/tiann/KernelSU)</p>\n<p><a href=\"https://img.shields.io/badge/Magisk-Module-%2301af9c\">![Magisk</a>](https://github.com/topjohnwu/Magisk)</p>\n<p><a href=\"https://img.shields.io/badge/Python-v3.14.8-%23306a98\">![Python</a>](https://python.org)</p>\n<p><a href=\"https://img.shields.io/github/actions/workflow/status/Mrakorez/py2droid/release.yml\">![Build Status</a>](https://github.com/Mrakorez/py2droid/actions)</p>\n<p><a href=\"https://img.shields.io/github/downloads/Mrakorez/py2droid/total\">![Downloads</a>](https://github.com/Mrakorez/py2droid/releases)</p>\n<p><a href=\"https://img.shields.io/github/license/Mrakorez/py2droid\">![License</a>](LICENSE)</p>\n\n<p><b>System-level Python 3 for Android via Magisk/KernelSU/APatch</b></p>\n\n<p></div></p>\n\n<li>* *</li>\n\n<h2>What is Py2Droid?</h2>\n\n<p>Py2Droid is CPython 3 compiled for Android and packaged as a Magisk module.</p>\n<p>It provides system-level Python access without requiring Termux or other userland environments.</p>\n\n<p>Built following official</p>\n<p><a href=\"https://github.com/python/cpython/blob/3.14/Android/README.md\">Python for Android</a> guidelines,</p>\n<p>stripped of unnecessary components for minimal size.</p>\n\n<h2>Project Status</h2>\n\n<p>This project is in pre-1.0 development.</p>\n\n<p>Current focus has moved to other projects, so updates here are mostly limited to keeping CPython</p>\n<p>builds fresh and fixing critical bugs on a spare-time basis.</p>\n<p>Breaking changes may land in minor releases.</p>\n\n<p>In the future, I plan to rewrite the build and repository automation scripts to make the codebase</p>\n<p>cleaner and improve Py2Droid for module developers.</p>\n<p>However, since this was one of my first projects where I gained hands-on Python experience, the</p>\n<p>codebase might be pretty terrible in places for now :D</p>\n\n<h2>Quick Start</h2>\n\n<li>Download the latest release from [Releases](https://github.com/Mrakorez/py2droid/releases)</li>\n<li>Install via your root manager (Magisk/KernelSU/APatch)</li>\n<li>Reboot your device</li>\n<li>Start using Python:</li>\n<p>   ```sh</p>\n<p>   python3 --version</p>\n<p>   pip3 install --user requests</p>\n<p>   ```</p>\n\n<h2>Why Py2Droid?</h2>\n\n<h3>For Magisk Module Developers</h3>\n\n<p>Use Python instead of shell scripts in your modules.</p>\n<p>Python is available as a dependency or runtime for complex logic.</p>\n\n<h3>For System Scripts</h3>\n\n<p>Get lightweight Python access at boot time without Termux overhead.</p>\n<p>Perfect for automation scripts and utilities.</p>\n\n<h3>vs Termux</h3>\n\n<p>| Feature          | Py2Droid                        | Termux Python                |</p>\n<p>| ---------------- | ------------------------------- | ---------------------------- |</p>\n<p>| Version          | Latest stable Python 3          | May lag behind               |</p>\n<p>| Installation     | Single module                   | App + packages               |</p>\n<p>| Size (aarch64)   | ~44 MB installed                | ~60 MB installed             |</p>\n<p>| Boot-time access | ✅ Available during early boot   | ❌ Unavailable until unlock   |</p>\n<p>| Location         | <code>/data/adb</code> (always accessible) | <code>/data/user</code> (encrypted)     |</p>\n<p>| Use case         | System scripts, Magisk modules  | Full development environment |</p>\n\n<p><b>Note:</b> Py2Droid is not a Termux replacement.</p>\n<p>They serve different purposes.</p>\n\n<h2>System Requirements</h2>\n\n<li>**Android:** 5.0+</li>\n<li>**Architecture:** ARM64 or x86_64</li>\n<li>**Root:** Magisk/KernelSU/APatch</li>\n\n<h2>Limitations</h2>\n\n<p>Py2Droid runs in a bare Android environment (device with minimal shell, without Linux userland</p>\n<p>tools):</p>\n\n<li>**No GUI support** - No X11/Wayland, so no Tkinter</li>\n<li>**Limited native extensions** - Most packages with C/C++/Rust code don’t provide Android wheels,</li>\n<p>  and you can’t compile them on-device</p>\n<li>**Some stdlib modules unavailable** - Modules requiring missing system libraries may not work</li>\n<li>**Root required** - System directory access needed</li>\n\n<h2>Breaking Changes</h2>\n\n<p>> <b>⚠️ Upgrading from v0.2?</b> Read this before updating to v0.3+</p>\n\n<p><details> <summary><b>v0.2 → v0.3 Migration Guide</b></summary></p>\n\n<h3>1. Automatic Wrapper Syncing</h3>\n\n<p>The <code>py2droid-update-bin</code> command has been removed.</p>\n<p>Wrappers now sync automatically at boot.</p>\n\n<p><b>What to do:</b></p>\n<li>Remove any `py2droid-update-bin` calls from your scripts</li>\n<li>Use `. /data/adb/py2droid/env.sh` at the start of your scripts instead</li>\n<li>Or just reboot to sync wrappers</li>\n\n<h3>2. Python Prefix Cleanup on Updates</h3>\n\n<p>The Python installation directory (<code>/data/adb/py2droid/usr</code>) is now cleaned during updates.</p>\n<p>This removes globally-installed pip packages.</p>\n\n<p><b>What happens:</b></p>\n<li>Packages installed without `--user` flag will be deleted</li>\n<li>The installer creates a backup: `/sdcard/py2droid-packages.txt`</li>\n\n<p><b>What to do:</b></p>\n<li>After updating, check `py2droid-packages.txt` for your packages</li>\n<li>Reinstall: `pip3 install --user -r /sdcard/py2droid-packages.txt`</li>\n<li>**Always use `--user` flag:** `pip3 install --user <package>`</li>\n\n<p></details></p>\n\n<h2>Usage</h2>\n\n<h3>Basic Commands</h3>\n\n<pre># Check Python version\npython3 --version\n\n# Run a script\npython3 script.py\n\n# Install packages (always use --user!)\npip3 install --user requests beautifulsoup4</pre>\n\n<h3>Installing pip</h3>\n\n<p>Pip is included since v0.3.0. If you need to reinstall it:</p>\n\n<pre>python3 -m ensurepip --user\n# Reboot or source the environment\npip3 --version</pre>\n\n<h3>Virtual Environments</h3>\n\n<pre># Create venv\npython3 -m venv venv\n\n# Activate (must load env.sh first!)\n. /data/adb/py2droid/env.sh\n. venv/bin/activate\n\n# Install packages\npip3 install -r requirements.txt\n\n# Run your app\npython3 main.py</pre>\n\n<h3>In Magisk Modules</h3>\n\n<p>#### <code>customize.sh</code>, <code>service.sh</code>, <code>action.sh</code></p>\n\n<p>Wrappers are available:</p>\n\n<pre># customize.sh example\ncd \"${MODPATH}\" || exit 1\npython3 main.py</pre>\n\n<p>#### <code>post-fs-data.sh</code>, <code>uninstall.sh</code></p>\n\n<p>Wrappers aren’t mounted yet.</p>\n<p>Load the environment manually:</p>\n\n<pre># post-fs-data.sh example\n. /data/adb/py2droid/env.sh  # Load Py2Droid environment\n\ncd \"${0%/*}\" || exit 1\npython3 main.py</pre>\n\n<h3>Customization</h3>\n\n<p>Create <code>/data/adb/py2droid/.shrc</code> to customize the environment:</p>\n\n<pre># Example .shrc\nexport NAME=\"Mrakorez\"\nhello() { echo \"Hello, ${NAME}!\"; }</pre>\n\n<p>This file is sourced when loading <code>env.sh</code> (not during module installation).</p>\n\n<h2>How It Works</h2>\n\n<h3>Directory Structure</h3>\n\n<p>Py2Droid uses <code>/data/adb/py2droid</code> as its home directory:</p>\n\n<pre>/data/adb/py2droid/\n├── .cache/           # Cache directory (XDG_CACHE_HOME)\n├── .config/          # Config directory (XDG_CONFIG_HOME)\n├── .local/\n│   ├── bin/          # User binaries (XDG_BIN_HOME)\n│   ├── share/        # Shared data (XDG_DATA_HOME)\n│   └── state/        # State files (XDG_STATE_HOME)\n├── .tmp/             # Temporary files (TMPDIR)\n├── env.sh            # Environment loader\n└── usr/              # Python installation (PREFIX)\n    ├── bin/          # python3, pip3, etc.\n    └── lib/          # Python libraries</pre>\n\n<h3>Command Wrappers</h3>\n\n<p>Commands like <code>python3</code> in <code>/system/bin</code> are wrapper scripts:</p>\n\n<pre>#!/system/bin/sh\n. \"/data/adb/py2droid/env.sh\" &amp;&amp; exec python3 \"$@\"</pre>\n\n<p>These wrappers:</p>\n<li>Load the Py2Droid environment</li>\n<li>Execute the actual command</li>\n<li>Are created automatically at boot for new commands</li>\n<li>Are removed if the underlying command is uninstalled</li>\n\n<h3>Two Ways to Use Python</h3>\n\n<p>#### 1. Wrappers (Quick & Isolated)</p>\n\n<p>Use Python commands directly from any shell:</p>\n\n<pre>python3 -c \"print('Hello')\"\npip3 install --user requests</pre>\n\n<p><b>Pros:</b></p>\n<li>Works from anywhere</li>\n<li>Doesn’t affect your current environment</li>\n<li>Simple to use</li>\n\n<p><b>Cons:</b></p>\n<li>New commands require reboot to become available</li>\n\n<p>#### 2. Direct Environment (Full Access)</p>\n\n<p>Source the environment for immediate access to all changes:</p>\n\n<pre>. /data/adb/py2droid/env.sh\n\n# Now everything is available immediately\npip3 install --user pipx\npipx install cowsay\ncowsay -t \"No reboot needed!\"</pre>\n\n<p><b>Pros:</b></p>\n<li>Immediate access to newly installed commands</li>\n<li>Full environment control</li>\n\n<p><b>Cons:</b></p>\n<li>Overrides your current environment (including HOME, PATH, etc.)</li>\n<li>Only works in POSIX-compatible shells (sh, bash, zsh, ash)</li>\n\n<h2>Building from Source</h2>\n\n<h3>Prerequisites</h3>\n\n<p>Follow</p>\n<p><a href=\"https://github.com/python/cpython/blob/3.14/Android/README.md#prerequisites\">CPython Android build prerequisites</a></p>\n\n<h3>Build Steps</h3>\n\n<pre># Clone the repo\ngit clone https://github.com/Mrakorez/py2droid.git\ncd py2droid\n\n# Set up Python environment\npython -m venv .venv\n. .venv/bin/activate\npip install -r scripts/requirements.txt\n\n# Build (see build.toml for configuration)\npython scripts/build.py\n\n# Output will be in dist/</pre>\n\n<h3>CI/CD</h3>\n\n<p>Releases are automated via GitHub Actions:</p>\n\n<li>Make changes and commit</li>\n<li>Use [`release.py`](scripts/release.py) to prepare release</li>\n<li>Push commits and tags</li>\n<li>GitHub Actions builds and publishes automatically</li>\n\n<h2>License</h2>\n\n<p>MIT License - See <a href=\"LICENSE\">LICENSE</a> for details.</p>",
+  "homepageUrl": "https://github.com/Mrakorez/py2droid",
+  "sourceUrl": "https://github.com/Mrakorez/py2droid",
+  "url": "https://github.com/Mrakorez/py2droid",
+  "latestRelease": {
+    "name": "v0.3.7",
+    "version": "v0.3.7",
+    "time": "2026-10-03T18:34:51Z",
+    "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.7/py2droid-v0.3.7.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.3.7",
+      "tagName": "v0.3.7",
+      "publishedAt": "2026-10-03T18:34:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.7.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.7/py2droid-v0.3.7.zip",
+          "size": 17850466,
+          "downloadCount": 102
+        }
+      ]
+    },
+    {
+      "name": "v0.3.6",
+      "tagName": "v0.3.6",
+      "publishedAt": "2026-08-06T11:55:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.6.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.6/py2droid-v0.3.6.zip",
+          "size": 17533640,
+          "downloadCount": 520
+        }
+      ]
+    },
+    {
+      "name": "v0.3.5",
+      "tagName": "v0.3.5",
+      "publishedAt": "2026-06-10T19:02:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.5.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.5/py2droid-v0.3.5.zip",
+          "size": 17522155,
+          "downloadCount": 472
+        }
+      ]
+    },
+    {
+      "name": "v0.3.4",
+      "tagName": "v0.3.4",
+      "publishedAt": "2026-05-15T19:33:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.4.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.4/py2droid-v0.3.4.zip",
+          "size": 16870531,
+          "downloadCount": 190
+        }
+      ]
+    },
+    {
+      "name": "v0.3.3",
+      "tagName": "v0.3.3",
+      "publishedAt": "2026-04-08T13:30:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.3.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.3/py2droid-v0.3.3.zip",
+          "size": 16837413,
+          "downloadCount": 249
+        }
+      ]
+    },
+    {
+      "name": "v0.3.1",
+      "tagName": "v0.3.1",
+      "publishedAt": "2026-02-04T09:38:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.1.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.1/py2droid-v0.3.1.zip",
+          "size": 16797410,
+          "downloadCount": 935
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-01-19T12:18:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.3.0.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.0/py2droid-v0.3.0.zip",
+          "size": 16789434,
+          "downloadCount": 196
+        }
+      ]
+    },
+    {
+      "name": "v0.2.2",
+      "tagName": "v0.2.2",
+      "publishedAt": "2025-12-06T07:23:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.2.2.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.2.2/py2droid-v0.2.2.zip",
+          "size": 17610478,
+          "downloadCount": 633
+        }
+      ]
+    },
+    {
+      "name": "v0.2.1",
+      "tagName": "v0.2.1",
+      "publishedAt": "2025-12-03T06:52:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.2.1.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.2.1/py2droid-v0.2.1.zip",
+          "size": 17604182,
+          "downloadCount": 84
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2025-10-12T09:22:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "py2droid-v0.2.0.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.2.0/py2droid-v0.2.0.zip",
+          "size": 17583230,
+          "downloadCount": 813
+        }
+      ]
+    },
+    {
+      "name": "v0.1.2",
+      "tagName": "v0.1.2",
+      "publishedAt": "2025-08-16T12:48:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Py2Droid-v0.1.2-arm.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.2/Py2Droid-v0.1.2-arm.zip",
+          "size": 8354631,
+          "downloadCount": 107
+        },
+        {
+          "name": "Py2Droid-v0.1.2-arm64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.2/Py2Droid-v0.1.2-arm64.zip",
+          "size": 8517595,
+          "downloadCount": 415
+        },
+        {
+          "name": "Py2Droid-v0.1.2-x64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.2/Py2Droid-v0.1.2-x64.zip",
+          "size": 8933778,
+          "downloadCount": 46
+        },
+        {
+          "name": "Py2Droid-v0.1.2-x86.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.2/Py2Droid-v0.1.2-x86.zip",
+          "size": 8957750,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2025-08-09T11:56:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Py2Droid-v0.1.1-arm.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.1/Py2Droid-v0.1.1-arm.zip",
+          "size": 8353311,
+          "downloadCount": 8
+        },
+        {
+          "name": "Py2Droid-v0.1.1-arm64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.1/Py2Droid-v0.1.1-arm64.zip",
+          "size": 8517895,
+          "downloadCount": 22
+        },
+        {
+          "name": "Py2Droid-v0.1.1-x64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.1/Py2Droid-v0.1.1-x64.zip",
+          "size": 8932495,
+          "downloadCount": 5
+        },
+        {
+          "name": "Py2Droid-v0.1.1-x86.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.1/Py2Droid-v0.1.1-x86.zip",
+          "size": 8955121,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2025-06-15T15:10:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Py2Droid-v0.1.0-arm.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.0/Py2Droid-v0.1.0-arm.zip",
+          "size": 8429961,
+          "downloadCount": 31
+        },
+        {
+          "name": "Py2Droid-v0.1.0-arm64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.0/Py2Droid-v0.1.0-arm64.zip",
+          "size": 8591801,
+          "downloadCount": 131
+        },
+        {
+          "name": "Py2Droid-v0.1.0-x64.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.0/Py2Droid-v0.1.0-x64.zip",
+          "size": 9007836,
+          "downloadCount": 15
+        },
+        {
+          "name": "Py2Droid-v0.1.0-x86.zip",
+          "downloadUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.1.0/Py2Droid-v0.1.0-x86.zip",
+          "size": 9031708,
+          "downloadCount": 7
+        }
+      ]
+    }
+  ]
+}

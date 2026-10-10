@@ -1,0 +1,84 @@
+{
+  "readme": "<h2 align=\"center\">Android Subsystem for GNU/Linux</h2>\n\n[![Repo size](https://img.shields.io/github/repo-size/Moe-hacker/asl?logo=github&logoColor=white)](https://github.com/Moe-hacker/asl)\n\n## Warning:\nI just bumped rurima to newest version, if there's any issue, please report.      \n\n<details>\n<summary><strong>Currently Supported Systems</strong></summary>\n\n- archlinux\n  - `current`\n- alpine\n  - 3.20\n  - `edge`\n- centos\n  - `9-Stream`\n- debian\n  - `bookworm`\n  - bullseye\n  - buster\n  - trixie\n- fedora\n  - 39\n  - 40\n  - `41`\n- kali\n  - `current`\n- ubuntu\n  - focal\n  - `jammy`\n  - noble\n  - `oracular`\n\n</details>\n\n> [!NOTE]\n> - This module is only for `arm64-v8a`\n> - It has been tested only on the versions marked above\n> - If there are any bugs, please report them. Compatibility with all devices is not guaranteed\n> - If you install the module twice, it will backup old container_dir and install a new container\n> - you can install multipe OS by changeing the module id and ssh port, but this action not supported officially\n## How to connect\nUse port 22, user root and password 123456 by default,          \nbut, please change the password once you connected to the container, and it's better to use ssh key instead of password login, note that please do not expose the ssh port to the pubnet.       \n## About the Binary\n\n### Powered by ruri\n\n- Use [ruri](https://github.com/Moe-hacker/ruri) for container runtime\n- [rurima](https://github.com/Moe-hacker/rurima) is used for fetching the container rootfs\n- The `file` and `curl` command are fake, they actually calls `file-static` and `curl-static` with corrected args\n- Thanks: https://github.com/stunnel/static-curl for curl static binary\n\n> [!WARNING]\n> Please change the default SSH password immediately  \n> Exposing a SSH port without key-based authentication is always a high-risk action!\n>\n> 请修改默认密码，暴露非密钥认证而是密码认证的ssh端口无论何时都是高危行为！\n\n---\n\n## Thanks\n\n- GitHub: [Lin1328](https://github.com/Lin1328) for the module framework\n- Coolapk: 望月古川 for additional framework support\n- GitHub: [stunnel](https://github.com/stunnel) for the curl static binary\n\n## Contributing\n\nContributions are welcome!  \nIf you want to add support for other operating systems, please submit a corresponding `setup.sh`\n\n## License\n\n希腊奶......\n",
+  "readmeHTML": "<p><h2 align=\"center\">Android Subsystem for GNU/Linux</h2></p>\n\n<p><a href=\"https://img.shields.io/github/repo-size/Moe-hacker/asl?logo=github&logoColor=white\">![Repo size</a>](https://github.com/Moe-hacker/asl)</p>\n\n<h2>Warning:</h2>\n<p>I just bumped rurima to newest version, if there's any issue, please report.</p>\n\n<p><details></p>\n<p><summary><strong>Currently Supported Systems</strong></summary></p>\n\n<li>archlinux</li>\n<p>  - <code>current</code></p>\n<li>alpine</li>\n<p>  - 3.20</p>\n<p>  - <code>edge</code></p>\n<li>centos</li>\n<p>  - <code>9-Stream</code></p>\n<li>debian</li>\n<p>  - <code>bookworm</code></p>\n<p>  - bullseye</p>\n<p>  - buster</p>\n<p>  - trixie</p>\n<li>fedora</li>\n<p>  - 39</p>\n<p>  - 40</p>\n<p>  - <code>41</code></p>\n<li>kali</li>\n<p>  - <code>current</code></p>\n<li>ubuntu</li>\n<p>  - focal</p>\n<p>  - <code>jammy</code></p>\n<p>  - noble</p>\n<p>  - <code>oracular</code></p>\n\n<p></details></p>\n\n<p>> [!NOTE]</p>\n<p>> - This module is only for <code>arm64-v8a</code></p>\n<p>> - It has been tested only on the versions marked above</p>\n<p>> - If there are any bugs, please report them. Compatibility with all devices is not guaranteed</p>\n<p>> - If you install the module twice, it will backup old container_dir and install a new container</p>\n<p>> - you can install multipe OS by changeing the module id and ssh port, but this action not supported officially</p>\n<h2>How to connect</h2>\n<p>Use port 22, user root and password 123456 by default,</p>\n<p>but, please change the password once you connected to the container, and it's better to use ssh key instead of password login, note that please do not expose the ssh port to the pubnet.</p>\n<h2>About the Binary</h2>\n\n<h3>Powered by ruri</h3>\n\n<li>Use [ruri](https://github.com/Moe-hacker/ruri) for container runtime</li>\n<li>[rurima](https://github.com/Moe-hacker/rurima) is used for fetching the container rootfs</li>\n<li>The `file` and `curl` command are fake, they actually calls `file-static` and `curl-static` with corrected args</li>\n<li>Thanks: https://github.com/stunnel/static-curl for curl static binary</li>\n\n<p>> [!WARNING]</p>\n<p>> Please change the default SSH password immediately</p>\n<p>> Exposing a SSH port without key-based authentication is always a high-risk action!</p>\n<p>></p>\n<p>> 请修改默认密码，暴露非密钥认证而是密码认证的ssh端口无论何时都是高危行为！</p>\n\n<p>---</p>\n\n<h2>Thanks</h2>\n\n<li>GitHub: [Lin1328](https://github.com/Lin1328) for the module framework</li>\n<li>Coolapk: 望月古川 for additional framework support</li>\n<li>GitHub: [stunnel](https://github.com/stunnel) for the curl static binary</li>\n\n<h2>Contributing</h2>\n\n<p>Contributions are welcome!</p>\n<p>If you want to add support for other operating systems, please submit a corresponding <code>setup.sh</code></p>\n\n<h2>License</h2>\n\n<p>希腊奶......</p>",
+  "homepageUrl": "https://github.com/RuriOSS/asl",
+  "sourceUrl": "https://github.com/RuriOSS/asl",
+  "url": "https://github.com/RuriOSS/asl",
+  "latestRelease": {
+    "name": "v1.1",
+    "version": "v1.1",
+    "time": "2025-09-07T16:50:13Z",
+    "downloadUrl": ""
+  },
+  "releases": [
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2025-09-07T16:50:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2024-12-10T04:46:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "asl-alpine-edge.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-alpine-edge.zip",
+          "size": 8142460,
+          "downloadCount": 6833
+        },
+        {
+          "name": "asl-archlinux-current.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-archlinux-current.zip",
+          "size": 8142465,
+          "downloadCount": 66
+        },
+        {
+          "name": "asl-centos-9-Stream.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-centos-9-Stream.zip",
+          "size": 8142468,
+          "downloadCount": 16
+        },
+        {
+          "name": "asl-debian-bookworm.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-debian-bookworm.zip",
+          "size": 8142467,
+          "downloadCount": 70
+        },
+        {
+          "name": "asl-fedora-41.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-fedora-41.zip",
+          "size": 6863408,
+          "downloadCount": 29
+        },
+        {
+          "name": "asl-fedora-42.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-fedora-42.zip",
+          "size": 8142460,
+          "downloadCount": 16
+        },
+        {
+          "name": "asl-kali-current.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-kali-current.zip",
+          "size": 8142460,
+          "downloadCount": 33
+        },
+        {
+          "name": "asl-ubuntu-jammy.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-ubuntu-jammy.zip",
+          "size": 6864352,
+          "downloadCount": 279
+        },
+        {
+          "name": "asl-ubuntu-oracular.zip",
+          "downloadUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-ubuntu-oracular.zip",
+          "size": 8142463,
+          "downloadCount": 43
+        }
+      ]
+    }
+  ]
+}

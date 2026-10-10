@@ -1,0 +1,495 @@
+{
+  "readme": "<details>\n<summary><strong>Requirements</strong></summary>\n\n> Please make sure you have the following **modules installed** before using Integrity Box:\n\n1) - [**Tricky Store OOS**](https://github.com/beakthoven/TrickyStoreOSS/releases) or [**TEE Simulator**](https://github.com/JingMatrix/TEESimulator/releases) (use any one)\n\n2) - [**Zygisk Next**](https://github.com/Dr-TSNG/ZygiskNext/releases) or [**Meow Zygisk**](https://github.com/MeowDump/MeowZygisk/releases) (use any one) (ZygiskNext is recommended for magisk)\n\n\n> - If you are using Google Pixel stock ROM, or if you want to use your custom ROM's inbuilt spoofing feature, you do not need Zygisk. Simply create a file or folder named `zygisk` in your internal storage `/sdcard/zygisk` (make sure the name is exactly lowercase), and then flash Integrity Box. This will disable all zygisk related components and grant you full CONTROL without any conflict\n\n#\n</details>\n\n<details>\n<summary><strong>FAQ</strong></summary>\n\n- **What is IntegrityBox?**  \n  A complete Play Integrity compatibility and system-signal management toolkit.\n\n- **Who should use IntegrityBox?**  \n  Rooted users and custom ROM users who care about Play Integrity reliability.\n\n- **Why was IntegrityBox created?**  \n  Honestly? It started because so many people were selling keyboxes and I thought, “this is bad, everyone should have access to this for free.” So I made a tool that just gives you keyboxes without paying a cent. Then, well… I kept adding stuff. I kept improving things, fixing bugs, adding new ways to spoof, hide, clean, and optimize. And before I knew it… it turned into a beast of a module, probably the most powerful Play Integrity Fix anyone’s ever seen. It has so many features now that even I sometimes forget half of them 😭. But yeah, that’s the story: started small, got greedy with features, and now it’s the one-stop solution for anyone who wants STRONG or DEVICE integrity without the headaches. Just flash & forget, no need to do anything manually.\n\n- **Does IntegrityBox replace Play Integrity Fix/Fork module?**  \n  Yes! Starting from v28, PIF is fully integrated into IntegrityBox. The module ID was changed to `playintegrityfix` to avoid conflicts, because honestly, using both at the same time doesn’t make sense. IntegrityBox now handles everything PIF did, plus all the extra features I’ve added along the way\n  \n- **Does IntegrityBox improve compatibility with banking apps**  \n  Yes.\n\n- **Does it support DEVICE and STRONG integrity?**  \n  Yes, make sure you have installed tricky store or TEE simulator module.\n\n- **Is IntegrityBox safe to use?**  \n  Yes.\n\n- **Does it modify user data?**  \n  No.\n\n- **Does it modify installed apps?**  \n  No.\n\n- **Does it run constantly in the background?**  \n  No.\n\n- **Is it lightweight?**  \n  Yes.\n\n- **Does it increase CPU usage?**  \n  No, it may reduce it by optimizing targets.\n\n- **Does it drain battery?**  \n  No.\n\n- **Is everything configurable?**  \n  Yes.\n\n- **Can features be disabled individually?**  \n  Yes.\n\n- **Is there a global safety option?**  \n  Yes, the Safe Mode.\n\n- **What does the Safe Mode do?**  \n  Disables all experimental features.\n\n- **Can I recover easily if something breaks?**  \n  Yes.\n\n- **Is it safe to uninstall?**  \n  Yes.\n\n- **Does IntegrityBox collect any data?**  \n  No.\n\n- **Does it include telemetry or tracking?**  \n  No.\n\n- **Are any network connections required?**  \n  No (except optional downloads).\n\n- **Are downloads verified?**  \n  Yes, using hash verification.\n\n- **Does it automatically manage target.txt?**  \n  Yes.\n\n- **Does it reduce unnecessary Play Services load?**  \n  Yes.\n\n- **Does it handle keybox management?**  \n  Yes.\n\n- **Does it support multiple keybox injections?**  \n  Yes.\n\n- **Does it help with “Device not certified” issues?**  \n  Yes.\n\n- **Does it work on all ROMs?**  \n  It works best on clean, enforcing AOSP-based ROMs.\n\n- **Is SELinux enforcing recommended?**  \n  Yes.\n\n- **Does it support Pixel spoofing?**  \n  Yes.\n\n- **Can fingerprints be customized?**  \n  Yes.\n\n- **Does it handle ROM-specific spoofing conflicts?**  \n  Yes.\n\n- **Is this module actively maintained?**  \n  Yes.\n\n- **Is it beginner-friendly?**  \n  Yes, with built-in guidance.\n\n- **Is it suitable for advanced users?**  \n  Yes.\n\n- **Should I reboot after changes?**  \n  Only if you see a popup saying **\"Reboot to apply changes\"**.\n\n- **Should I reboot after flashing?**  \n  Yes.\n\n- **Where should issues be reported?**  \n  Through the WebUI report option.\n\n#\n</details>\n\n\n<details>\n<summary><strong>Module Features</strong></summary>\n  \n> This module provides a wide range of tools designed to improve compatibility, integrity results, and overall system cleanliness. All features are optional and fully configurable.\n\n### Core Utilities\n- Built-in assistant to help answer common questions and guide setup\n- Option downloads recommended tools from their official release sources with hash verification\n- Detects flagged, suspicious, or spoofed applications\n- Fixes **“Device not certified”** issue in playstore\n- Terminates GMS Vending process when required\n\n### Spoofing & Integrity Enhancements\n- Spoofs Android and boot security patch levels\n- Spoofs ROM `release keys` and `build tags`\n- Spoofs LineageOS-specific property detection\n- Spoofs `debug fingerprint` detection\n- Supports custom pixel beta fingerprint configuration\n- Disables inbuilt PIF spoofing on various custom ROMs when needed\n- Fixes `abnormal` or `invalid` boot hash values\n\n### System & Environment Masking\n- Spoofs `SELinux` status\n- Spoofs storage `encryption` state\n- Spoofs `custom recovery` detection\n- Hides `PIF hook` detection\n- Prevents detection of `debug` or `modified` system states\n\n### Keybox & TEE Management\n- Updates and maintains a valid `keybox.xml`\n- Supports multiple keybox injections via TEE Simulator\n- Automatically updates `target.txt` based on current TEE status\n- Blacklists unnecessary packages from `target.txt` (this reduces cpu usage)\n\n### Log & Trace Cleanup\n- Removes logs generated during `GApps` installation\n- Removes logs generated by `KSU / AP / Magisk` modules\n\n### Additional Controls\n- Disables `EU injector` by default\n- Spoofs storage-related and ROM-specific identifiers\n- Spoofs `debug-related` signals\n- **[Deprecated]** ~Switch Shamiko & NoHello modes~\n\n### Many more features exist, but these are the most notable ones. \n### (Honestly, I got tired writing them 😭)\n\n#\n</details>\n\n<details>\n<summary><strong>About Module Settings</strong></summary>\n\n- `Safe Mode :` Enable this & reboot your device if you face any issue after flashing integrity box, this will disable all experimental settings.\n- `Debug Fingerprint :` cleans debug tag from fingerprint to bypass custom rom detection and pass play integrity with stock fingerprint\n- `Debug Build :` spoofs developement build as user\n- `Build Tag :` spoofs build tag to bypass custom rom detection\n- `Storage Encryption :` spoofs device storage as encrypted to fool banking apps\n- `Spoof Custom Recovery :` spoofs custom recovery folder to bypass root detection\n- `Get Recommended Modules :` the most easiest and trusted way to download modules which are recommended to use with IntegrityBox\n- `No Redirect :` you won't be redirected to release source on installation\n#\n</details>\n\n<details>\n<summary><strong>About Module Description</strong></summary>\n<table align=\"center\">\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/valid.png\" alt=\"1\" style=\"max-width: 25%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/soft.png\" alt=\"2\" style=\"max-width: 25%; height: 2400;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/revoked.png\" alt=\"3\" style=\"max-width: 25%; height: auto;\" /></td>\n  </tr>\n</table>\n  \n  - 🟢🟢🟢 means the current keybox can pass **STRONG integrity**\n  - 🟢🟢🔴 means the current keybox can pass **DEVICE integrity**\n  - 🔴🔴🔴 means the current keybox is **REVOKED** and **cannot** pass play integrity\n#\n</details>\n\n\n<details>\n<summary><strong>Common Failure Reasons</strong></summary>\n\nPlay Integrity may fail if any of the following conditions are present:\n\n- **SELinux is set to `permissive`**\n- **Higher Play Store version (higher than 40.xx)**\n- **Conflicting Magisk / KernelSU / LSPosed modules**\n- **Revoked or invalid keybox**\n- **Banned fingerprint**\n- **ROM inbuilt GMS spoofing is enabled (create `/sdcard/zygisk` & flash IntegrityBox if you want to use ROM's inbuilt spoofing with IntegrityBox)**\n- **ROM inbuilt Play Store spoofing is enabled**\n- **Root access is visible or not properly hidden**\n- **IntegrityBox is not updated to the latest version**\n- **Tricky Store is out of sync and requires reflashing**\n\nEnsure all requirements are met and recheck this list before reporting an issue.\n#\n</details>\n\n\n<details>\n<summary><strong>About WEB UI Dashboard</strong></summary>\n\n<img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/dashboard.png\" width=\"25%\">\n\n- `Profile :` Your current PlayIntegrity Profile\n- `Vending :` Your current PlayStore version\n- `Lineage :` Tells whether any lineageos prop exists or not\n- `Spoofing :` Tell whether you're using ROM's inbuilt GMS spoofing or not\n- `Spoof :` The name of pixel device, your playstore spoofed to!\n- `Patch :` Your Android, Vendor security patch date\n- `SELinux :` Your ROM's selinux status. It should not be PERMISSIVE\n- `Target :` Number of apps in tricky store's target.txt file\n- `Android :` Your android version\n- `Zygote :` The zygisk implementation you are using\n#\n</details>\n\n\n<details>\n<summary><strong>Credit & Acknowledgement</strong></summary>\n  \n#### This project uses code from the following external open-source work:\n- **[ezme-nodebug](https://github.com/ez-me/ezme-nodebug)**\n- **[PlayIntegrityFork](https://github.com/osm0sis/PlayIntegrityFork)**\n#\n</details>\n\n<details>\n<summary><strong>Report a Problem</strong></summary>\n  \n- Use Report a bug/issue button in WebUI to report bugs/issues/feedback\n- Enable `SAFE MODE` toggle from webui > `module settings` and reboot your device if you're facing any issue after flashing IntegrityBox. This wil disable all experimental features.\n#\n</details>\n\n<details>\n<summary><strong>Troubleshooting</strong></summary>\n\nGoogle Play Integrity has fully replaced SafetyNet and is now the only attestation system used by modern apps. It checks whether a device looks *trustworthy and close to a certified Android environment*. Because of this, failures are common on outdated, heavily modified, or poorly configured systems.\n\nPlay Integrity checks do **not** only look at root status. They evaluate multiple system signals, including ROM configuration, SELinux state, system hooks, and how Google services behave at runtime.\n\nTo reduce false negatives and improve reliability:\n\n- **Use a ROM with SELinux set to `enforcing`.**  \n  ROMs running in permissive mode are frequently flagged. Even if everything else looks fine, permissive SELinux alone can cause integrity checks to fail.\n\n- **Keep Google Play Services and the Play Store fully up to date.**  \n  Play Integrity relies on Play Services to perform attestation. Old or mismatched versions can break communication with Google’s servers and lead to unexpected failures.\n\n- **Avoid system-level frameworks that hook core services.**  \n  Xposed, LSPosed, or similar frameworks, especially modules that interact with Google Play Services or the Play Store, are a common cause of integrity failures. Even “harmless” hooks can be detected.\n\n- **Minimize invasive system modifications.**  \n  Changes such as aggressive build.prop spoofing, signature spoofing, or runtime code injection increase the likelihood of detection unless they are carefully handled.\n\n- **Keep the system as close to stock behavior as possible.**  \n  The closer your device behaves to a certified, unmodified Android environment, the more consistent Play Integrity results will be.\n\nPlay Integrity is stricter than older systems and is actively updated by Google. Passing checks today does not guarantee passing them forever, especially on custom ROMs. Treat integrity passing as something that requires maintenance, not a one-time setup.\n#\n</details>\n\n<p align=\"center\">\n  <img src=\"https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true\" alt=\"Catppuccin Footer\" />\n</p>\n\n<div align=\"center\">\n  <a href=\"https://github.com/MeowDump/Integrity-Box/releases\" target=\"_blank\">\n    <img src=\"https://github.com/MeowDump/MeowDump/blob/main/Assets/download.png\" alt=\"Download Button\" width=\"400\">\n  </a>\n</div>\n\n<br>\n\n<div align=\"center\" style=\"display: flex; justify-content: center; gap: 40px; flex-wrap: nowrap;\">\n  <a href=\"https://t.me/MeowDump\" target=\"_blank\">\n    <img src=\"https://cdn-icons-png.freepik.com/512/1603/1603076.png?ga=GA1.1.2121308824.1769410236\" width=\"150\" alt=\"Telegram Group\">\n  </a>\n  <a href=\"https://MeowDump.github.io\" target=\"_blank\">\n    <img src=\"https://cdn-icons-png.freepik.com/512/6010/6010222.png?ga=GA1.1.2121308824.1769410236\" width=\"150\" alt=\"Donate\">\n  </a>\n  <a href=\"https://t.me/integritybox\" target=\"_blank\">\n    <img src=\"https://cdn-icons-png.freepik.com/512/1593/1593170.png\" width=\"150\" alt=\"Get Keybox\">\n  </a>\n</div>\n\n## Preview\n<p align=\"center\">\n  <a href=\"https://github.com/MeowDump/Integrity-Box/stargazers\">\n    <img \n      src=\"https://m3-markdown-badges.vercel.app/stars/7/1/MeowDump/Integrity-Box\" \n      alt=\"GitHub Stars\" \n    />\n  </a>\n  <br />\n  <a href=\"https://github.com/MeowDump/Integrity-Box/releases\">\n    <img \n      src=\"https://img.shields.io/github/downloads/MeowDump/Integrity-Box/total?label=Downloads%20%28excluding%20telegram%20release%29&color=%23ff1493&style=flat\" \n      alt=\"GitHub Releases\" \n    />\n  </a>\n</p>\n\n<table align=\"center\">\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/home.gif\" alt=\"1\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/toolkit.png\" alt=\"2\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/simulator.png\" alt=\"3\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/profile.png\" alt=\"4\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/pif.png\" alt=\"5\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/patch.png\" alt=\"6\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/load.png\" alt=\"7\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/hash.png\" alt=\"8\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/fingerprint.png\" alt=\"9\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/ctrlcentre.png\" alt=\"10\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/certified.png\" alt=\"11\" style=\"max-width: 100%; height: 2400;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/blacklist.png\" alt=\"12\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/assistant.png\" alt=\"13\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/apps.png\" alt=\"14\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/help.png\" alt=\"15\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n  <tr>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/action.png\" alt=\"16\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/strong.png\" alt=\"17\" style=\"max-width: 100%; height: auto;\" /></td>\n    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/attestation.png\" alt=\"18\" style=\"max-width: 100%; height: auto;\" /></td>\n  </tr>\n</table>\n",
+  "readmeHTML": "<p><details></p>\n<p><summary><strong>Requirements</strong></summary></p>\n\n<p>> Please make sure you have the following <b>modules installed</b> before using Integrity Box:</p>\n\n<p>1) - <a href=\"https://github.com/beakthoven/TrickyStoreOSS/releases\"><b>Tricky Store OOS</b></a> or <a href=\"https://github.com/JingMatrix/TEESimulator/releases\"><b>TEE Simulator</b></a> (use any one)</p>\n\n<p>2) - <a href=\"https://github.com/Dr-TSNG/ZygiskNext/releases\"><b>Zygisk Next</b></a> or <a href=\"https://github.com/MeowDump/MeowZygisk/releases\"><b>Meow Zygisk</b></a> (use any one) (ZygiskNext is recommended for magisk)</p>\n\n\n<p>> - If you are using Google Pixel stock ROM, or if you want to use your custom ROM's inbuilt spoofing feature, you do not need Zygisk. Simply create a file or folder named <code>zygisk</code> in your internal storage <code>/sdcard/zygisk</code> (make sure the name is exactly lowercase), and then flash Integrity Box. This will disable all zygisk related components and grant you full CONTROL without any conflict</p>\n\n<p>#</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><strong>FAQ</strong></summary></p>\n\n<li>**What is IntegrityBox?**</li>\n<p>  A complete Play Integrity compatibility and system-signal management toolkit.</p>\n\n<li>**Who should use IntegrityBox?**</li>\n<p>  Rooted users and custom ROM users who care about Play Integrity reliability.</p>\n\n<li>**Why was IntegrityBox created?**</li>\n<p>  Honestly? It started because so many people were selling keyboxes and I thought, “this is bad, everyone should have access to this for free.” So I made a tool that just gives you keyboxes without paying a cent. Then, well… I kept adding stuff. I kept improving things, fixing bugs, adding new ways to spoof, hide, clean, and optimize. And before I knew it… it turned into a beast of a module, probably the most powerful Play Integrity Fix anyone’s ever seen. It has so many features now that even I sometimes forget half of them 😭. But yeah, that’s the story: started small, got greedy with features, and now it’s the one-stop solution for anyone who wants STRONG or DEVICE integrity without the headaches. Just flash & forget, no need to do anything manually.</p>\n\n<li>**Does IntegrityBox replace Play Integrity Fix/Fork module?**</li>\n<p>  Yes! Starting from v28, PIF is fully integrated into IntegrityBox. The module ID was changed to <code>playintegrityfix</code> to avoid conflicts, because honestly, using both at the same time doesn’t make sense. IntegrityBox now handles everything PIF did, plus all the extra features I’ve added along the way</p>\n\n<li>**Does IntegrityBox improve compatibility with banking apps**</li>\n<p>  Yes.</p>\n\n<li>**Does it support DEVICE and STRONG integrity?**</li>\n<p>  Yes, make sure you have installed tricky store or TEE simulator module.</p>\n\n<li>**Is IntegrityBox safe to use?**</li>\n<p>  Yes.</p>\n\n<li>**Does it modify user data?**</li>\n<p>  No.</p>\n\n<li>**Does it modify installed apps?**</li>\n<p>  No.</p>\n\n<li>**Does it run constantly in the background?**</li>\n<p>  No.</p>\n\n<li>**Is it lightweight?**</li>\n<p>  Yes.</p>\n\n<li>**Does it increase CPU usage?**</li>\n<p>  No, it may reduce it by optimizing targets.</p>\n\n<li>**Does it drain battery?**</li>\n<p>  No.</p>\n\n<li>**Is everything configurable?**</li>\n<p>  Yes.</p>\n\n<li>**Can features be disabled individually?**</li>\n<p>  Yes.</p>\n\n<li>**Is there a global safety option?**</li>\n<p>  Yes, the Safe Mode.</p>\n\n<li>**What does the Safe Mode do?**</li>\n<p>  Disables all experimental features.</p>\n\n<li>**Can I recover easily if something breaks?**</li>\n<p>  Yes.</p>\n\n<li>**Is it safe to uninstall?**</li>\n<p>  Yes.</p>\n\n<li>**Does IntegrityBox collect any data?**</li>\n<p>  No.</p>\n\n<li>**Does it include telemetry or tracking?**</li>\n<p>  No.</p>\n\n<li>**Are any network connections required?**</li>\n<p>  No (except optional downloads).</p>\n\n<li>**Are downloads verified?**</li>\n<p>  Yes, using hash verification.</p>\n\n<li>**Does it automatically manage target.txt?**</li>\n<p>  Yes.</p>\n\n<li>**Does it reduce unnecessary Play Services load?**</li>\n<p>  Yes.</p>\n\n<li>**Does it handle keybox management?**</li>\n<p>  Yes.</p>\n\n<li>**Does it support multiple keybox injections?**</li>\n<p>  Yes.</p>\n\n<li>**Does it help with “Device not certified” issues?**</li>\n<p>  Yes.</p>\n\n<li>**Does it work on all ROMs?**</li>\n<p>  It works best on clean, enforcing AOSP-based ROMs.</p>\n\n<li>**Is SELinux enforcing recommended?**</li>\n<p>  Yes.</p>\n\n<li>**Does it support Pixel spoofing?**</li>\n<p>  Yes.</p>\n\n<li>**Can fingerprints be customized?**</li>\n<p>  Yes.</p>\n\n<li>**Does it handle ROM-specific spoofing conflicts?**</li>\n<p>  Yes.</p>\n\n<li>**Is this module actively maintained?**</li>\n<p>  Yes.</p>\n\n<li>**Is it beginner-friendly?**</li>\n<p>  Yes, with built-in guidance.</p>\n\n<li>**Is it suitable for advanced users?**</li>\n<p>  Yes.</p>\n\n<li>**Should I reboot after changes?**</li>\n<p>  Only if you see a popup saying <b>\"Reboot to apply changes\"</b>.</p>\n\n<li>**Should I reboot after flashing?**</li>\n<p>  Yes.</p>\n\n<li>**Where should issues be reported?**</li>\n<p>  Through the WebUI report option.</p>\n\n<p>#</p>\n<p></details></p>\n\n\n<p><details></p>\n<p><summary><strong>Module Features</strong></summary></p>\n\n<p>> This module provides a wide range of tools designed to improve compatibility, integrity results, and overall system cleanliness. All features are optional and fully configurable.</p>\n\n<h3>Core Utilities</h3>\n<li>Built-in assistant to help answer common questions and guide setup</li>\n<li>Option downloads recommended tools from their official release sources with hash verification</li>\n<li>Detects flagged, suspicious, or spoofed applications</li>\n<li>Fixes **“Device not certified”** issue in playstore</li>\n<li>Terminates GMS Vending process when required</li>\n\n<h3>Spoofing & Integrity Enhancements</h3>\n<li>Spoofs Android and boot security patch levels</li>\n<li>Spoofs ROM `release keys` and `build tags`</li>\n<li>Spoofs LineageOS-specific property detection</li>\n<li>Spoofs `debug fingerprint` detection</li>\n<li>Supports custom pixel beta fingerprint configuration</li>\n<li>Disables inbuilt PIF spoofing on various custom ROMs when needed</li>\n<li>Fixes `abnormal` or `invalid` boot hash values</li>\n\n<h3>System & Environment Masking</h3>\n<li>Spoofs `SELinux` status</li>\n<li>Spoofs storage `encryption` state</li>\n<li>Spoofs `custom recovery` detection</li>\n<li>Hides `PIF hook` detection</li>\n<li>Prevents detection of `debug` or `modified` system states</li>\n\n<h3>Keybox & TEE Management</h3>\n<li>Updates and maintains a valid `keybox.xml`</li>\n<li>Supports multiple keybox injections via TEE Simulator</li>\n<li>Automatically updates `target.txt` based on current TEE status</li>\n<li>Blacklists unnecessary packages from `target.txt` (this reduces cpu usage)</li>\n\n<h3>Log & Trace Cleanup</h3>\n<li>Removes logs generated during `GApps` installation</li>\n<li>Removes logs generated by `KSU / AP / Magisk` modules</li>\n\n<h3>Additional Controls</h3>\n<li>Disables `EU injector` by default</li>\n<li>Spoofs storage-related and ROM-specific identifiers</li>\n<li>Spoofs `debug-related` signals</li>\n<li>**[Deprecated]** ~Switch Shamiko & NoHello modes~</li>\n\n<h3>Many more features exist, but these are the most notable ones.</h3>\n<h3>(Honestly, I got tired writing them 😭)</h3>\n\n<p>#</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><strong>About Module Settings</strong></summary></p>\n\n<li>`Safe Mode :` Enable this & reboot your device if you face any issue after flashing integrity box, this will disable all experimental settings.</li>\n<li>`Debug Fingerprint :` cleans debug tag from fingerprint to bypass custom rom detection and pass play integrity with stock fingerprint</li>\n<li>`Debug Build :` spoofs developement build as user</li>\n<li>`Build Tag :` spoofs build tag to bypass custom rom detection</li>\n<li>`Storage Encryption :` spoofs device storage as encrypted to fool banking apps</li>\n<li>`Spoof Custom Recovery :` spoofs custom recovery folder to bypass root detection</li>\n<li>`Get Recommended Modules :` the most easiest and trusted way to download modules which are recommended to use with IntegrityBox</li>\n<li>`No Redirect :` you won't be redirected to release source on installation</li>\n<p>#</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><strong>About Module Description</strong></summary></p>\n<p><table align=\"center\"></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/valid.png\" alt=\"1\" style=\"max-width: 25%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/soft.png\" alt=\"2\" style=\"max-width: 25%; height: 2400;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/revoked.png\" alt=\"3\" style=\"max-width: 25%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<p>  - 🟢🟢🟢 means the current keybox can pass <b>STRONG integrity</b></p>\n<p>  - 🟢🟢🔴 means the current keybox can pass <b>DEVICE integrity</b></p>\n<p>  - 🔴🔴🔴 means the current keybox is <b>REVOKED</b> and <b>cannot</b> pass play integrity</p>\n<p>#</p>\n<p></details></p>\n\n\n<p><details></p>\n<p><summary><strong>Common Failure Reasons</strong></summary></p>\n\n<p>Play Integrity may fail if any of the following conditions are present:</p>\n\n<li>**SELinux is set to `permissive`**</li>\n<li>**Higher Play Store version (higher than 40.xx)**</li>\n<li>**Conflicting Magisk / KernelSU / LSPosed modules**</li>\n<li>**Revoked or invalid keybox**</li>\n<li>**Banned fingerprint**</li>\n<li>**ROM inbuilt GMS spoofing is enabled (create `/sdcard/zygisk` & flash IntegrityBox if you want to use ROM's inbuilt spoofing with IntegrityBox)**</li>\n<li>**ROM inbuilt Play Store spoofing is enabled**</li>\n<li>**Root access is visible or not properly hidden**</li>\n<li>**IntegrityBox is not updated to the latest version**</li>\n<li>**Tricky Store is out of sync and requires reflashing**</li>\n\n<p>Ensure all requirements are met and recheck this list before reporting an issue.</p>\n<p>#</p>\n<p></details></p>\n\n\n<p><details></p>\n<p><summary><strong>About WEB UI Dashboard</strong></summary></p>\n\n<p><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/dashboard.png\" width=\"25%\"></p>\n\n<li>`Profile :` Your current PlayIntegrity Profile</li>\n<li>`Vending :` Your current PlayStore version</li>\n<li>`Lineage :` Tells whether any lineageos prop exists or not</li>\n<li>`Spoofing :` Tell whether you're using ROM's inbuilt GMS spoofing or not</li>\n<li>`Spoof :` The name of pixel device, your playstore spoofed to!</li>\n<li>`Patch :` Your Android, Vendor security patch date</li>\n<li>`SELinux :` Your ROM's selinux status. It should not be PERMISSIVE</li>\n<li>`Target :` Number of apps in tricky store's target.txt file</li>\n<li>`Android :` Your android version</li>\n<li>`Zygote :` The zygisk implementation you are using</li>\n<p>#</p>\n<p></details></p>\n\n\n<p><details></p>\n<p><summary><strong>Credit & Acknowledgement</strong></summary></p>\n\n<p>#### This project uses code from the following external open-source work:</p>\n<li>**[ezme-nodebug](https://github.com/ez-me/ezme-nodebug)**</li>\n<li>**[PlayIntegrityFork](https://github.com/osm0sis/PlayIntegrityFork)**</li>\n<p>#</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><strong>Report a Problem</strong></summary></p>\n\n<li>Use Report a bug/issue button in WebUI to report bugs/issues/feedback</li>\n<li>Enable `SAFE MODE` toggle from webui > `module settings` and reboot your device if you're facing any issue after flashing IntegrityBox. This wil disable all experimental features.</li>\n<p>#</p>\n<p></details></p>\n\n<p><details></p>\n<p><summary><strong>Troubleshooting</strong></summary></p>\n\n<p>Google Play Integrity has fully replaced SafetyNet and is now the only attestation system used by modern apps. It checks whether a device looks *trustworthy and close to a certified Android environment*. Because of this, failures are common on outdated, heavily modified, or poorly configured systems.</p>\n\n<p>Play Integrity checks do <b>not</b> only look at root status. They evaluate multiple system signals, including ROM configuration, SELinux state, system hooks, and how Google services behave at runtime.</p>\n\n<p>To reduce false negatives and improve reliability:</p>\n\n<li>**Use a ROM with SELinux set to `enforcing`.**</li>\n<p>  ROMs running in permissive mode are frequently flagged. Even if everything else looks fine, permissive SELinux alone can cause integrity checks to fail.</p>\n\n<li>**Keep Google Play Services and the Play Store fully up to date.**</li>\n<p>  Play Integrity relies on Play Services to perform attestation. Old or mismatched versions can break communication with Google’s servers and lead to unexpected failures.</p>\n\n<li>**Avoid system-level frameworks that hook core services.**</li>\n<p>  Xposed, LSPosed, or similar frameworks, especially modules that interact with Google Play Services or the Play Store, are a common cause of integrity failures. Even “harmless” hooks can be detected.</p>\n\n<li>**Minimize invasive system modifications.**</li>\n<p>  Changes such as aggressive build.prop spoofing, signature spoofing, or runtime code injection increase the likelihood of detection unless they are carefully handled.</p>\n\n<li>**Keep the system as close to stock behavior as possible.**</li>\n<p>  The closer your device behaves to a certified, unmodified Android environment, the more consistent Play Integrity results will be.</p>\n\n<p>Play Integrity is stricter than older systems and is actively updated by Google. Passing checks today does not guarantee passing them forever, especially on custom ROMs. Treat integrity passing as something that requires maintenance, not a one-time setup.</p>\n<p>#</p>\n<p></details></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true\" alt=\"Catppuccin Footer\" /></p>\n<p></p></p>\n\n<p><div align=\"center\"></p>\n<p>  <a href=\"https://github.com/MeowDump/Integrity-Box/releases\" target=\"_blank\"></p>\n<p>    <img src=\"https://github.com/MeowDump/MeowDump/blob/main/Assets/download.png\" alt=\"Download Button\" width=\"400\"></p>\n<p>  </a></p>\n<p></div></p>\n\n<p><br></p>\n\n<p><div align=\"center\" style=\"display: flex; justify-content: center; gap: 40px; flex-wrap: nowrap;\"></p>\n<p>  <a href=\"https://t.me/MeowDump\" target=\"_blank\"></p>\n<p>    <img src=\"https://cdn-icons-png.freepik.com/512/1603/1603076.png?ga=GA1.1.2121308824.1769410236\" width=\"150\" alt=\"Telegram Group\"></p>\n<p>  </a></p>\n<p>  <a href=\"https://MeowDump.github.io\" target=\"_blank\"></p>\n<p>    <img src=\"https://cdn-icons-png.freepik.com/512/6010/6010222.png?ga=GA1.1.2121308824.1769410236\" width=\"150\" alt=\"Donate\"></p>\n<p>  </a></p>\n<p>  <a href=\"https://t.me/integritybox\" target=\"_blank\"></p>\n<p>    <img src=\"https://cdn-icons-png.freepik.com/512/1593/1593170.png\" width=\"150\" alt=\"Get Keybox\"></p>\n<p>  </a></p>\n<p></div></p>\n\n<h2>Preview</h2>\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/MeowDump/Integrity-Box/stargazers\"></p>\n<p>    <img</p>\n<p>      src=\"https://m3-markdown-badges.vercel.app/stars/7/1/MeowDump/Integrity-Box\"</p>\n<p>      alt=\"GitHub Stars\"</p>\n<p>    /></p>\n<p>  </a></p>\n<p>  <br /></p>\n<p>  <a href=\"https://github.com/MeowDump/Integrity-Box/releases\"></p>\n<p>    <img</p>\n<p>      src=\"https://img.shields.io/github/downloads/MeowDump/Integrity-Box/total?label=Downloads%20%28excluding%20telegram%20release%29&color=%23ff1493&style=flat\"</p>\n<p>      alt=\"GitHub Releases\"</p>\n<p>    /></p>\n<p>  </a></p>\n<p></p></p>\n\n<p><table align=\"center\"></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/home.gif\" alt=\"1\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/toolkit.png\" alt=\"2\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/simulator.png\" alt=\"3\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/profile.png\" alt=\"4\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/pif.png\" alt=\"5\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/patch.png\" alt=\"6\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/load.png\" alt=\"7\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/hash.png\" alt=\"8\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/fingerprint.png\" alt=\"9\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/ctrlcentre.png\" alt=\"10\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/certified.png\" alt=\"11\" style=\"max-width: 100%; height: 2400;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/blacklist.png\" alt=\"12\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/assistant.png\" alt=\"13\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/apps.png\" alt=\"14\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/help.png\" alt=\"15\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/action.png\" alt=\"16\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/strong.png\" alt=\"17\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>    <td><img src=\"https://github.com/MeowDump/Integrity-Box/blob/main/assets/attestation.png\" alt=\"18\" style=\"max-width: 100%; height: auto;\" /></td></p>\n<p>  </tr></p>\n<p></table></p>",
+  "homepageUrl": "https://t.me/MeowDump",
+  "sourceUrl": "https://github.com/MeowDump/Integrity-Box",
+  "url": "https://github.com/MeowDump/Integrity-Box",
+  "latestRelease": {
+    "name": "v43",
+    "version": "v43",
+    "time": "2026-09-27T06:34:07Z",
+    "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v43/v43-Integrity-Box-26-09-2026.zip"
+  },
+  "releases": [
+    {
+      "name": "v43",
+      "tagName": "v43",
+      "publishedAt": "2026-09-27T06:34:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v43-Integrity-Box-26-09-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v43/v43-Integrity-Box-26-09-2026.zip",
+          "size": 1728082,
+          "downloadCount": 37360
+        }
+      ]
+    },
+    {
+      "name": "v42",
+      "tagName": "v42",
+      "publishedAt": "2026-09-05T11:32:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v42-Integrity-Box-05-09-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v42/v42-Integrity-Box-05-09-2026.zip",
+          "size": 1676368,
+          "downloadCount": 48900
+        }
+      ]
+    },
+    {
+      "name": "v41",
+      "tagName": "v41",
+      "publishedAt": "2026-08-22T16:07:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v41-Integrity-Box-22-08-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v41/v41-Integrity-Box-22-08-2026.zip",
+          "size": 1444651,
+          "downloadCount": 36912
+        }
+      ]
+    },
+    {
+      "name": "v40",
+      "tagName": "v40",
+      "publishedAt": "2026-08-05T16:27:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v40-Integrity-Box-05-08-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v40/v40-Integrity-Box-05-08-2026.zip",
+          "size": 660542,
+          "downloadCount": 43223
+        }
+      ]
+    },
+    {
+      "name": "v39",
+      "tagName": "v39",
+      "publishedAt": "2026-07-17T05:20:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v39-Integrity-Box-17-07-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v39/v39-Integrity-Box-17-07-2026.zip",
+          "size": 1492841,
+          "downloadCount": 40690
+        },
+        {
+          "name": "v8-HMA-OOS-config.json",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v39/v8-HMA-OOS-config.json",
+          "size": 147349,
+          "downloadCount": 6438
+        }
+      ]
+    },
+    {
+      "name": "Beta-R3",
+      "tagName": "Beta-R3",
+      "publishedAt": "2026-07-26T00:45:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "R3-Integrity-Box-BETA-25-07-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/Beta-R3/R3-Integrity-Box-BETA-25-07-2026.zip",
+          "size": 584648,
+          "downloadCount": 940
+        }
+      ]
+    },
+    {
+      "name": "Beta-R2",
+      "tagName": "Beta-R2",
+      "publishedAt": "2026-07-12T05:39:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Integrity-Box-Beta-R2-12-07-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/Beta-R2/Integrity-Box-Beta-R2-12-07-2026.zip",
+          "size": 1454572,
+          "downloadCount": 1380
+        }
+      ]
+    },
+    {
+      "name": "v38",
+      "tagName": "v38",
+      "publishedAt": "2026-07-07T17:42:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v38-Integrity-Box-07-07-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v38/v38-Integrity-Box-07-07-2026.zip",
+          "size": 473254,
+          "downloadCount": 26937
+        }
+      ]
+    },
+    {
+      "name": "Beta-R1",
+      "tagName": "Beta-R1",
+      "publishedAt": "2026-06-23T04:51:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Integrity-Box-Beta-R1.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/Beta-R1/Integrity-Box-Beta-R1.zip",
+          "size": 427455,
+          "downloadCount": 3131
+        }
+      ]
+    },
+    {
+      "name": "v37",
+      "tagName": "v37",
+      "publishedAt": "2026-06-20T20:21:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v37-Integrity-Box-21-06-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v37/v37-Integrity-Box-21-06-2026.zip",
+          "size": 428547,
+          "downloadCount": 40981
+        }
+      ]
+    },
+    {
+      "name": "v36",
+      "tagName": "v36",
+      "publishedAt": "2026-06-13T06:06:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v36-Integrity-Box-13-06-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v36/v36-Integrity-Box-13-06-2026.zip",
+          "size": 434243,
+          "downloadCount": 31165
+        }
+      ]
+    },
+    {
+      "name": "v35",
+      "tagName": "v35",
+      "publishedAt": "2026-05-01T04:37:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v35-Integrity-Box-01-05-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v35/v35-Integrity-Box-01-05-2026.zip",
+          "size": 402669,
+          "downloadCount": 59857
+        }
+      ]
+    },
+    {
+      "name": "v34.3",
+      "tagName": "v34.3",
+      "publishedAt": "2026-04-04T16:43:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v34.3-Integrity-Box-04-04-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v34.3/v34.3-Integrity-Box-04-04-2026.zip",
+          "size": 314086,
+          "downloadCount": 64572
+        }
+      ]
+    },
+    {
+      "name": "v34",
+      "tagName": "v34",
+      "publishedAt": "2026-04-01T10:29:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v34-Integrity-Box-01-04-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v34/v34-Integrity-Box-01-04-2026.zip",
+          "size": 315178,
+          "downloadCount": 16166
+        }
+      ]
+    },
+    {
+      "name": "v33",
+      "tagName": "v33",
+      "publishedAt": "2026-03-30T11:00:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v33-Integrity-Box-30-03-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v33/v33-Integrity-Box-30-03-2026.zip",
+          "size": 306518,
+          "downloadCount": 9818
+        }
+      ]
+    },
+    {
+      "name": "v32",
+      "tagName": "v32",
+      "publishedAt": "2026-03-06T20:15:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v32-Integrity-Box-07-03-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v32/v32-Integrity-Box-07-03-2026.zip",
+          "size": 407449,
+          "downloadCount": 17573
+        }
+      ]
+    },
+    {
+      "name": "v31",
+      "tagName": "v31",
+      "publishedAt": "2026-02-21T08:23:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v31-Integrity-Box-21-02-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v31/v31-Integrity-Box-21-02-2026.zip",
+          "size": 451548,
+          "downloadCount": 24411
+        }
+      ]
+    },
+    {
+      "name": "v30",
+      "tagName": "v30",
+      "publishedAt": "2026-02-10T17:42:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v30-Integrity-Box-11-02-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v30/v30-Integrity-Box-11-02-2026.zip",
+          "size": 442131,
+          "downloadCount": 19578
+        }
+      ]
+    },
+    {
+      "name": "v29",
+      "tagName": "v29",
+      "publishedAt": "2026-02-05T06:36:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v29-Integrity-Box-05-02-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v29/v29-Integrity-Box-05-02-2026.zip",
+          "size": 439379,
+          "downloadCount": 13885
+        }
+      ]
+    },
+    {
+      "name": "v28",
+      "tagName": "v28",
+      "publishedAt": "2026-01-29T09:53:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v28-Integrity-Box-29-01-2026.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v28/v28-Integrity-Box-29-01-2026.zip",
+          "size": 430653,
+          "downloadCount": 50252
+        }
+      ]
+    },
+    {
+      "name": "archive",
+      "tagName": "archive",
+      "publishedAt": "2026-09-22T10:36:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Canary.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Canary.zip",
+          "size": 9070,
+          "downloadCount": 1160
+        },
+        {
+          "name": "Cleopatra",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Cleopatra",
+          "size": 219374,
+          "downloadCount": 20
+        },
+        {
+          "name": "Elixir",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Elixir",
+          "size": 227786,
+          "downloadCount": 18
+        },
+        {
+          "name": "HMA-OOS.json",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/HMA-OOS.json",
+          "size": 154595,
+          "downloadCount": 1312
+        },
+        {
+          "name": "KOMODO",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/KOMODO",
+          "size": 223224,
+          "downloadCount": 22
+        },
+        {
+          "name": "Megatron",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Megatron",
+          "size": 507953,
+          "downloadCount": 55011
+        },
+        {
+          "name": "Miracle",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Miracle",
+          "size": 241854,
+          "downloadCount": 18
+        },
+        {
+          "name": "Nemesis",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Nemesis",
+          "size": 219374,
+          "downloadCount": 18
+        },
+        {
+          "name": "Prometheus",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Prometheus",
+          "size": 354209,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v27",
+      "tagName": "v27",
+      "publishedAt": "2025-11-25T14:05:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v27-Integrity-Box-25-11-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v27/v27-Integrity-Box-25-11-2025.zip",
+          "size": 97315,
+          "downloadCount": 48127
+        },
+        {
+          "name": "v27.1-Integrity-Box-28-12-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v27/v27.1-Integrity-Box-28-12-2025.zip",
+          "size": 98901,
+          "downloadCount": 37216
+        }
+      ]
+    },
+    {
+      "name": "v26",
+      "tagName": "v26",
+      "publishedAt": "2025-11-16T17:09:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v26-Integrity-Box-16-11-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v26/v26-Integrity-Box-16-11-2025.zip",
+          "size": 84976,
+          "downloadCount": 21275
+        }
+      ]
+    },
+    {
+      "name": "v25",
+      "tagName": "v25",
+      "publishedAt": "2025-11-05T16:29:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v25-Integrity-Box-05-11-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v25/v25-Integrity-Box-05-11-2025.zip",
+          "size": 84440,
+          "downloadCount": 16420
+        }
+      ]
+    },
+    {
+      "name": "v24",
+      "tagName": "v24",
+      "publishedAt": "2025-10-12T09:59:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v24-Integrity-Box-12-10-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v24/v24-Integrity-Box-12-10-2025.zip",
+          "size": 63041,
+          "downloadCount": 25227
+        }
+      ]
+    },
+    {
+      "name": "v23",
+      "tagName": "v23",
+      "publishedAt": "2025-10-02T19:56:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v23-Integrity-Box-03-10-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v23/v23-Integrity-Box-03-10-2025.zip",
+          "size": 68503,
+          "downloadCount": 14061
+        }
+      ]
+    },
+    {
+      "name": "v22",
+      "tagName": "v22",
+      "publishedAt": "2025-09-29T14:07:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v22-Integrity-Box-29-09-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v22/v22-Integrity-Box-29-09-2025.zip",
+          "size": 67785,
+          "downloadCount": 5975
+        }
+      ]
+    },
+    {
+      "name": "v21",
+      "tagName": "v21",
+      "publishedAt": "2025-09-22T04:00:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v21-Integrity-Box-22-09-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v21/v21-Integrity-Box-22-09-2025.zip",
+          "size": 71200,
+          "downloadCount": 8275
+        }
+      ]
+    },
+    {
+      "name": "v20",
+      "tagName": "v20",
+      "publishedAt": "2025-09-19T07:03:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v20-Integrity-Box-19-09-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v20/v20-Integrity-Box-19-09-2025.zip",
+          "size": 94812,
+          "downloadCount": 7372
+        }
+      ]
+    },
+    {
+      "name": "v19",
+      "tagName": "v19",
+      "publishedAt": "2025-09-11T07:03:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v19-Integrity-Box-11-09-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v19/v19-Integrity-Box-11-09-2025.zip",
+          "size": 440790,
+          "downloadCount": 8838
+        }
+      ]
+    }
+  ]
+}
