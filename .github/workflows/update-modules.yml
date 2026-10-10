@@ -21,13 +21,32 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Generate module repo data
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate module repo data (A route)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python build.py
 
+      - name: Audit open-source gate (进阶3)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/validate.py
+
+      - name: Build MMRL-compatible output (B route)
+        run: python tools/build_mmrl.py
+
+      - name: Sign artifacts (进阶2)
+        env:
+          SHIZUSU_SIGN_PRIVATE_KEY: ${{ secrets.SHIZUSU_SIGN_PRIVATE_KEY }}
+        run: python tools/sign.py
+
       - name: Verify schema
         run: python verify_schema.py
+
+      - name: Sync output to repo root (GitHub Pages serves root)
+        run: cp -r output/. .
 
       - name: Commit and push if changed
         run: |

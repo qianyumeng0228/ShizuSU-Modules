@@ -1,0 +1,45 @@
+name: Validate PR
+
+on:
+  pull_request:
+    paths:
+      - "modules.config.json"
+      - "private/**"
+      - "compat/**"
+      - "tools/**"
+      - "build.py"
+      - "verify_schema.py"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate module repo data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python build.py
+
+      - name: Audit open-source gate (strict)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/validate.py --strict
+
+      - name: Build MMRL-compatible output
+        run: python tools/build_mmrl.py
+
+      - name: Verify schema
+        run: python verify_schema.py

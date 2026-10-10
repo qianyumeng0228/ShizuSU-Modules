@@ -33,6 +33,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from http.client import IncompleteRead
 from pathlib import Path
 
 BASE = "https://api.github.com"
@@ -89,6 +90,10 @@ def _get(url, token=None, timeout=30):
             except Exception:
                 pass
             raise ApiError(e.code, detail) from None
+        except IncompleteRead as e:
+            # 大响应传输被截断（常见于单仓库多次拉取）：重试
+            print(f"  [incomplete] {url} -> {e}, retrying", file=sys.stderr)
+            time.sleep(3)
         except urllib.error.URLError as e:
             # 网络瞬时错误：短暂重试
             print(f"  [network] {url} -> {e.reason}, retrying", file=sys.stderr)

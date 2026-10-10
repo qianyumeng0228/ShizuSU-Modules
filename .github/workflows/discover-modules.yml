@@ -1,0 +1,55 @@
+name: Discover modules (topic scan)
+
+on:
+  schedule:
+    # 每天 UTC 01:10（北京时间 09:10），避开 00:30 的构建任务
+    - cron: "10 1 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Scan GitHub topics for candidate modules (进阶1)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/discover.py --write
+
+      - name: Commit candidates if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add catalog/candidates.json
+          if git diff --cached --quiet; then
+            echo "No new candidates"
+          else
+            git commit -m "chore: 自动发现模块候选 $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Open review issue when candidates exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(python -c "import json;print(json.load(open('catalog/candidates.json',encoding='utf-8')).get('candidateCount',0))" 2>/dev/null || echo 0)
+          if [ "$count" -gt 0 ]; then
+            existing=$(gh issue list --label discovery --state open --limit 5 --json number -q '.[0].number' 2>/dev/null || echo "")
+            if [ -z "$existing" ]; then
+              gh issue create \
+                --title "模块收录候选待审阅（自动发现 ${count} 个）" \
+                --label discovery \
+                --body "GitHub topic 自动扫描发现 ${count} 个候选模块，见 [catalog/candidates.json](https://github.com/qianyumeng0228/ShizuSU-Modules/blob/main/catalog/candidates.json)。请审阅后挑选加入 modules.config.json 正式收录。"
+            fi
+          fi
