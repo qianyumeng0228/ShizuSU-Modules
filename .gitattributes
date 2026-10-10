@@ -1,0 +1,20 @@
+# ShizuSU-Modules 产物行尾规范
+# 目的：modules.json 等发布产物与签名文件统一 LF，保证：
+#   1) CI 签名的字节 == GitHub Pages 线上字节 == 管理器(OkHttp/DownloadManager)下载字节
+#   2) 本地 python tools/sign.py --verify 不受 core.autocrlf 行尾转换假象影响
+# 源码文件（build.py / tools/ *.py / workflows）保持默认 text 处理。
+
+# 发布产物 JSON：统一 LF
+modules.json text eol=lf
+module/*.json text eol=lf
+json/*.json text eol=lf
+modules/**/*.json text eol=lf
+audit.json text eol=lf
+catalog/*.json text eol=lf
+
+# 签名与密钥：统一 LF（base64 文本）
+*.sig text eol=lf
+signatures/public.pem text eol=lf
+
+# 二进制 zip：禁止任何行尾/编码转换
+*.zip -text
