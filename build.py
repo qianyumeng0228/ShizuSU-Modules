@@ -522,6 +522,13 @@ def main():
             (output_dir / "module" / f"{module_id}.json").write_text(
                 json.dumps(detail, ensure_ascii=False, indent=2), encoding="utf-8"
             )
+        except ApiError as e:
+            if e.status == 404:
+                # 仓库不存在/已删除：该模块从目录剔除，不阻断整体构建
+                errors.append(f"{module_id}: 仓库不存在或已删除（跳过）")
+                skipped_ids.add(module_id)
+            else:
+                errors.append(f"{module_id}: {type(e).__name__}: {e}")
         except Exception as e:  # noqa: BLE001 单模块失败不中断整体
             errors.append(f"{module_id}: {type(e).__name__}: {e}")
 
@@ -536,8 +543,12 @@ def main():
         print("\n失败项：")
         for e in errors:
             print("  - " + e)
-        # 预期跳过（未配置 repo）不算失败：CI 中这些模块本来就缺，不应导致任务失败
-        real_errors = [e for e in errors if not any(e.startswith(f"{mid}: 未配置 repo") for mid in skipped_ids)]
+        # 预期跳过（未配置 repo / 仓库 404 不存在）不算失败：不应导致任务失败
+        real_errors = [
+            e for e in errors
+            if not any(e.startswith(f"{mid}: 未配置 repo") or e.startswith(f"{mid}: 仓库不存在或已删除")
+                       for mid in skipped_ids)
+        ]
         if real_errors:
             sys.exit(2)
 
