@@ -1,16 +1,198 @@
 {
-  "readme": "<div align=\"center\">\n\n# 📱 全机型机型伪装 · Magisk 模块合集\n\n**全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据**\n\n一键把手机伪装成任意目标机型 —— `manufacturer / brand / model / name / marketname` 全分区覆盖\n\n<img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" />\n\n</div>\n\n---\n\n## ✨ 这是什么\n\n- **主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；\n- 刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；\n- `post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；\n- **Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；\n- 纯 shell 脚本，**无联网、无遥测、不上传任何数据**；\n- 每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。\n\n> 🎯 一句话：**找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。**\n\n---\n\n## 📦 仓库结构\n\n```\nMagisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）\n```\n\n- 目录名 = `品牌 / 机型 (代号)`；\n- zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；\n- 想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；\n- 部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。\n\n### 品牌与机型数量\n\n<!-- BRAND_STATS:BEGIN -->\n\n| 品牌 | 数量 | 品牌 | 数量 |\n| :--- | ---: | :--- | ---: |\n| vivo | 548 | 华硕 | 72 |\n| 三星 | 468 | 中兴 | 71 |\n| OPPO | 336 | 摩托罗拉 | 59 |\n| 华为 | 307 | 索尼 | 51 |\n| 荣耀 | 279 | 酷派 | 46 |\n| 红米 | 277 | 智选 | 42 |\n| realme | 229 | 谷歌 | 40 |\n| 小米 | 158 | 360 | 26 |\n| 努比亚 | 106 | 诺基亚 | 17 |\n| 联想 | 101 | 锤子 | 14 |\n| 一加 | 95 | 黑鲨 | 14 |\n| POCO | 87 | Nothing | 13 |\n| 魅族 | 86 | 乐视 | 12 |\n\n**合计：3554 个机型 / 26 个品牌**\n\n<!-- BRAND_STATS:END -->\n\n---\n\n## 🚀 安装\n\n### ⬇️ 下载\n\n- **[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；\n- 或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。\n\n### Android 6 ~ 17（推荐）\n\n1. 下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；\n2. Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；\n3. 重启，机型生效。\n\n> 如已装其它机型伪装模块，**先卸载旧的再刷新的**：同类模块只保留一个。\n\n### Android 2.2 ~ 5.x\n\n- CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。\n\n### Android 1.x ~ 5.x（手动）\n\n- 解压 zip，见 `legacy/` 目录：\n  - `xj_apply.sh`：应用伪装（自动备份 `build.prop.xj_bak`，重复执行安全）；\n  - `xj_restore.sh`：还原。\n\n### 校验\n\n```sh\ngetprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14\n```\n\n### 还原\n\n- 模块版：管理器里停用 / 卸载模块 → 重启；\n- 老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。\n\n---\n\n## 🔄 管理器内更新\n\n- 每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；\n- 版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；\n- 更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；\n- 注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。\n\n> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。\n\n---\n\n## ⚙️ 工作原理\n\n- 模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；\n- `post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；\n- `service.sh` 开机后再校验一次，防止 OEM 服务回写；\n- 老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。\n\n---\n\n## ⚠️ 注意事项\n\n- 需要 root（Magisk / KernelSU / APatch 任一）；\n- **一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；\n- 伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；\n- 不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；\n- 刷机有风险，操作前请备份重要数据，后果自行承担。\n\n---\n\n## 🙏 数据来源\n\n- 机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；\n- 本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；\n- 代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。\n\n---\n\n## 🤖 自动同步\n\n- GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；\n- 同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；\n- 每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；\n- 相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；\n- 手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。\n\n---\n\n## 💬 反馈与贡献\n\n- [提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；\n- [发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。\n\n---\n\n## ☕ 投喂支持\n\n全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——**完全自愿**，不影响任何功能的使用。\n\n| 支付宝 | 微信支付 |\n| :---: | :---: |\n| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |\n\n---\n\n## 📄 License\n\n代码部分 [MIT](LICENSE) © 2026 L0NE-6；机型数据部分 © [MobileModels](https://github.com/KHwang9883/MobileModels)（CC BY-NC-SA 4.0）。\n",
-  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>📱 全机型机型伪装 · Magisk 模块合集</h1>\n\n<p><b>全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据</b></p>\n\n<p>一键把手机伪装成任意目标机型 —— <code>manufacturer / brand / model / name / marketname</code> 全分区覆盖</p>\n\n<p><img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" /></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>✨ 这是什么</h2>\n\n<li>**主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；</li>\n<li>刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；</li>\n<li>`post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；</li>\n<li>**Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；</li>\n<li>纯 shell 脚本，**无联网、无遥测、不上传任何数据**；</li>\n<li>每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。</li>\n\n<p>> 🎯 一句话：<b>找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。</b></p>\n\n<p>---</p>\n\n<h2>📦 仓库结构</h2>\n\n<pre>Magisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）</pre>\n\n<li>目录名 = `品牌 / 机型 (代号)`；</li>\n<li>zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；</li>\n<li>想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；</li>\n<li>部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。</li>\n\n<h3>品牌与机型数量</h3>\n\n<p><!-- BRAND_STATS:BEGIN --></p>\n\n<p>| 品牌 | 数量 | 品牌 | 数量 |</p>\n<p>| :--- | ---: | :--- | ---: |</p>\n<p>| vivo | 548 | 华硕 | 72 |</p>\n<p>| 三星 | 468 | 中兴 | 71 |</p>\n<p>| OPPO | 336 | 摩托罗拉 | 59 |</p>\n<p>| 华为 | 307 | 索尼 | 51 |</p>\n<p>| 荣耀 | 279 | 酷派 | 46 |</p>\n<p>| 红米 | 277 | 智选 | 42 |</p>\n<p>| realme | 229 | 谷歌 | 40 |</p>\n<p>| 小米 | 158 | 360 | 26 |</p>\n<p>| 努比亚 | 106 | 诺基亚 | 17 |</p>\n<p>| 联想 | 101 | 锤子 | 14 |</p>\n<p>| 一加 | 95 | 黑鲨 | 14 |</p>\n<p>| POCO | 87 | Nothing | 13 |</p>\n<p>| 魅族 | 86 | 乐视 | 12 |</p>\n\n<p><b>合计：3554 个机型 / 26 个品牌</b></p>\n\n<p><!-- BRAND_STATS:END --></p>\n\n<p>---</p>\n\n<h2>🚀 安装</h2>\n\n<h3>⬇️ 下载</h3>\n\n<li>**[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；</li>\n<li>或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。</li>\n\n<h3>Android 6 ~ 17（推荐）</h3>\n\n<li>下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；</li>\n<li>Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；</li>\n<li>重启，机型生效。</li>\n\n<p>> 如已装其它机型伪装模块，<b>先卸载旧的再刷新的</b>：同类模块只保留一个。</p>\n\n<h3>Android 2.2 ~ 5.x</h3>\n\n<li>CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。</li>\n\n<h3>Android 1.x ~ 5.x（手动）</h3>\n\n<li>解压 zip，见 `legacy/` 目录：</li>\n<p>  - <code>xj_apply.sh</code>：应用伪装（自动备份 <code>build.prop.xj_bak</code>，重复执行安全）；</p>\n<p>  - <code>xj_restore.sh</code>：还原。</p>\n\n<h3>校验</h3>\n\n<pre>getprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14</pre>\n\n<h3>还原</h3>\n\n<li>模块版：管理器里停用 / 卸载模块 → 重启；</li>\n<li>老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。</li>\n\n<p>---</p>\n\n<h2>🔄 管理器内更新</h2>\n\n<li>每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；</li>\n<li>版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；</li>\n<li>更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；</li>\n<li>注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。</li>\n\n<p>> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。</p>\n\n<p>---</p>\n\n<h2>⚙️ 工作原理</h2>\n\n<li>模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；</li>\n<li>`post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；</li>\n<li>`service.sh` 开机后再校验一次，防止 OEM 服务回写；</li>\n<li>老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。</li>\n\n<p>---</p>\n\n<h2>⚠️ 注意事项</h2>\n\n<li>需要 root（Magisk / KernelSU / APatch 任一）；</li>\n<li>**一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；</li>\n<li>伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；</li>\n<li>不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；</li>\n<li>刷机有风险，操作前请备份重要数据，后果自行承担。</li>\n\n<p>---</p>\n\n<h2>🙏 数据来源</h2>\n\n<li>机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；</li>\n<li>本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；</li>\n<li>代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。</li>\n\n<p>---</p>\n\n<h2>🤖 自动同步</h2>\n\n<li>GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；</li>\n<li>同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；</li>\n<li>每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；</li>\n<li>相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；</li>\n<li>手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。</li>\n\n<p>---</p>\n\n<h2>💬 反馈与贡献</h2>\n\n<li>[提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；</li>\n<li>[发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。</li>\n\n<p>---</p>\n\n<h2>☕ 投喂支持</h2>\n\n<p>全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——<b>完全自愿</b>，不影响任何功能的使用。</p>\n\n<p>| 支付宝 | 微信支付 |</p>\n<p>| :---: | :---: |</p>\n<p>| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |</p>\n\n<p>---</p>\n\n<h2>📄 License</h2>\n\n<p>代码部分 <a href=\"LICENSE\">MIT</a> © 2026 L0NE-6；机型数据部分 © <a href=\"https://github.com/KHwang9883/MobileModels\">MobileModels</a>（CC BY-NC-SA 4.0）。</p>",
+  "readme": "<div align=\"center\">\n\n# 📱 全机型机型伪装 · Magisk 模块合集\n\n**全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据**\n\n一键把手机伪装成任意目标机型 —— `manufacturer / brand / model / name / marketname` 全分区覆盖\n\n<img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" />\n<img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" />\n<img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" />\n\n</div>\n\n---\n\n## ✨ 这是什么\n\n- **主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；\n- 刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；\n- `post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；\n- **Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；\n- 纯 shell 脚本，**无联网、无遥测、不上传任何数据**；\n- 每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。\n\n> 🎯 一句话：**找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。**\n\n---\n\n## 📦 仓库结构\n\n```\nMagisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）\n```\n\n- 目录名 = `品牌 / 机型 (代号)`；\n- zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；\n- 想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；\n- 部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。\n\n### 品牌与机型数量\n\n<!-- BRAND_STATS:BEGIN -->\n\n| 品牌 | 数量 | 品牌 | 数量 |\n| :--- | ---: | :--- | ---: |\n| vivo | 550 | 华硕 | 72 |\n| 三星 | 468 | 中兴 | 71 |\n| OPPO | 336 | 摩托罗拉 | 59 |\n| 华为 | 307 | 索尼 | 51 |\n| 荣耀 | 279 | 酷派 | 46 |\n| 红米 | 277 | 智选 | 42 |\n| realme | 229 | 谷歌 | 40 |\n| 小米 | 158 | 360 | 26 |\n| 努比亚 | 106 | 诺基亚 | 17 |\n| 联想 | 101 | 锤子 | 14 |\n| 一加 | 96 | 黑鲨 | 14 |\n| POCO | 87 | Nothing | 13 |\n| 魅族 | 86 | 乐视 | 12 |\n\n**合计：3557 个机型 / 26 个品牌**\n\n<!-- BRAND_STATS:END -->\n\n---\n\n## 🚀 安装\n\n### ⬇️ 下载\n\n- **[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；\n- 或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。\n\n### Android 6 ~ 17（推荐）\n\n1. 下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；\n2. Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；\n3. 重启，机型生效。\n\n> 如已装其它机型伪装模块，**先卸载旧的再刷新的**：同类模块只保留一个。\n\n### Android 2.2 ~ 5.x\n\n- CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。\n\n### Android 1.x ~ 5.x（手动）\n\n- 解压 zip，见 `legacy/` 目录：\n  - `xj_apply.sh`：应用伪装（自动备份 `build.prop.xj_bak`，重复执行安全）；\n  - `xj_restore.sh`：还原。\n\n### 校验\n\n```sh\ngetprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14\n```\n\n### 还原\n\n- 模块版：管理器里停用 / 卸载模块 → 重启；\n- 老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。\n\n---\n\n## 🔄 管理器内更新\n\n- 每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；\n- 版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；\n- 更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；\n- 注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。\n\n> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。\n\n---\n\n## ⚙️ 工作原理\n\n- 模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；\n- `post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；\n- `service.sh` 开机后再校验一次，防止 OEM 服务回写；\n- 老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。\n\n---\n\n## ⚠️ 注意事项\n\n- 需要 root（Magisk / KernelSU / APatch 任一）；\n- **一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；\n- 伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；\n- 不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；\n- 刷机有风险，操作前请备份重要数据，后果自行承担。\n\n---\n\n## 🙏 数据来源\n\n- 机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；\n- 本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；\n- 代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。\n\n---\n\n## 🤖 自动同步\n\n- GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；\n- 同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；\n- 每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；\n- 相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；\n- 手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。\n\n---\n\n## 💬 反馈与贡献\n\n- [提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；\n- [发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。\n\n---\n\n## ☕ 投喂支持\n\n全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——**完全自愿**，不影响任何功能的使用。\n\n| 支付宝 | 微信支付 |\n| :---: | :---: |\n| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |\n\n---\n\n## 📄 License\n\n代码部分 [MIT](LICENSE) © 2026 L0NE-6；机型数据部分 © [MobileModels](https://github.com/KHwang9883/MobileModels)（CC BY-NC-SA 4.0）。\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>📱 全机型机型伪装 · Magisk 模块合集</h1>\n\n<p><b>全品牌机型伪装模块 · Android 1 ~ 17 全兼容 · 纯本地脚本 · 无联网 · 每日自动同步上游机型数据</b></p>\n\n<p>一键把手机伪装成任意目标机型 —— <code>manufacturer / brand / model / name / marketname</code> 全分区覆盖</p>\n\n<p><img src=\"https://img.shields.io/badge/Android-1%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Magisk%20%7C%20KernelSU%20%7C%20APatch-Supported-00AF9A?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/Sync-Auto%20Daily-FFC75F?style=for-the-badge&logo=githubactions&logoColor=white\" /></p>\n<p><img src=\"https://img.shields.io/badge/Network-None-2088FF?style=for-the-badge\" /></p>\n<p><img src=\"https://img.shields.io/badge/License-MIT-F472B6?style=for-the-badge\" /></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>✨ 这是什么</h2>\n\n<li>**主流品牌全收录**：vivo、三星、OPPO、华为、小米、红米、荣耀、一加…… 每个机型一个独立、可直接刷入的 Magisk 模块 zip；</li>\n<li>刷入后把 `ro.product.*` 系列属性伪装为目标机型，覆盖 **generic + system / system_ext / vendor / product / odm / bootimage / vendor_dlkm / odm_dlkm** 各分区属性；</li>\n<li>`post-fs-data`（Zygote 启动前）+ `service`（开机后）双阶段写入，防止系统组件把属性回写；</li>\n<li>**Android 1 ~ 17 全兼容**：Android 6-17 走管理器模块；Android 2.2-5.x 走 recovery 直改 `build.prop`；Android 1.x-5.x 可手动执行 `legacy/` 脚本；</li>\n<li>纯 shell 脚本，**无联网、无遥测、不上传任何数据**；</li>\n<li>每个 zip 内自带完整源码（`apply_props.sh` / `system.prop` / `module.prop` 等），同机型可自行改型号替换。</li>\n\n<p>> 🎯 一句话：<b>找到你的目标机型文件夹 → 刷入里面的 zip → 重启 → 机型变了。</b></p>\n\n<p>---</p>\n\n<h2>📦 仓库结构</h2>\n\n<pre>Magisk-DeviceSpoofer/\n├── 小米/\n│   └── Xiaomi 14 (houji)/\n│       └── Xiaomi 14 (23127PN0CC).zip   ← 独立 Magisk 模块（源码 + 安装脚本全在 zip 内）\n├── 红米/\n├── 三星/\n├── vivo/\n└── ...（共 26 个品牌目录）</pre>\n\n<li>目录名 = `品牌 / 机型 (代号)`；</li>\n<li>zip 名 = `机型 (型号)`，**每个 zip 都是完整模块**，管理器直接刷入即可；</li>\n<li>想伪装成某个型号？在仓库里搜索型号（如 `23127PN0CC`）或代号（如 `houji`）即可定位；</li>\n<li>部分机型 zip 内的 `README.md` 列有该机型其它可用型号号（改两个文件即可替换）。</li>\n\n<h3>品牌与机型数量</h3>\n\n<p><!-- BRAND_STATS:BEGIN --></p>\n\n<p>| 品牌 | 数量 | 品牌 | 数量 |</p>\n<p>| :--- | ---: | :--- | ---: |</p>\n<p>| vivo | 550 | 华硕 | 72 |</p>\n<p>| 三星 | 468 | 中兴 | 71 |</p>\n<p>| OPPO | 336 | 摩托罗拉 | 59 |</p>\n<p>| 华为 | 307 | 索尼 | 51 |</p>\n<p>| 荣耀 | 279 | 酷派 | 46 |</p>\n<p>| 红米 | 277 | 智选 | 42 |</p>\n<p>| realme | 229 | 谷歌 | 40 |</p>\n<p>| 小米 | 158 | 360 | 26 |</p>\n<p>| 努比亚 | 106 | 诺基亚 | 17 |</p>\n<p>| 联想 | 101 | 锤子 | 14 |</p>\n<p>| 一加 | 96 | 黑鲨 | 14 |</p>\n<p>| POCO | 87 | Nothing | 13 |</p>\n<p>| 魅族 | 86 | 乐视 | 12 |</p>\n\n<p><b>合计：3557 个机型 / 26 个品牌</b></p>\n\n<p><!-- BRAND_STATS:END --></p>\n\n<p>---</p>\n\n<h2>🚀 安装</h2>\n\n<h3>⬇️ 下载</h3>\n\n<li>**[Releases（推荐）](https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/latest)**：按品牌整包 / 全量合集 / 机型索引 CSV / SHA256 校验文件，全部由 Actions 自动构建；</li>\n<li>或直接在仓库目录树点开 `品牌/机型 (代号)/` 下载单个机型 zip。</li>\n\n<h3>Android 6 ~ 17（推荐）</h3>\n\n<li>下载目标机型的 zip（管理器内直接下载，或 `git clone` 后从本地导入）；</li>\n<li>Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装；</li>\n<li>重启，机型生效。</li>\n\n<p>> 如已装其它机型伪装模块，<b>先卸载旧的再刷新的</b>：同类模块只保留一个。</p>\n\n<h3>Android 2.2 ~ 5.x</h3>\n\n<li>CWM / TWRP 直接刷同一个 zip：检测不到现代 root 方案时，安装器会自动直改 `/system/build.prop`（先备份为 `build.prop.xj_bak`）。</li>\n\n<h3>Android 1.x ~ 5.x（手动）</h3>\n\n<li>解压 zip，见 `legacy/` 目录：</li>\n<p>  - <code>xj_apply.sh</code>：应用伪装（自动备份 <code>build.prop.xj_bak</code>，重复执行安全）；</p>\n<p>  - <code>xj_restore.sh</code>：还原。</p>\n\n<h3>校验</h3>\n\n<pre>getprop ro.product.model       # 应输出目标型号，如 23127PN0CC\ngetprop ro.product.marketname  # 应输出目标机型名，如 Xiaomi 14</pre>\n\n<h3>还原</h3>\n\n<li>模块版：管理器里停用 / 卸载模块 → 重启；</li>\n<li>老系统：`su -c 'sh /sdcard/xj_restore.sh'` → 重启（自动还原 `build.prop.xj_bak`）。</li>\n\n<p>---</p>\n\n<h2>🔄 管理器内更新</h2>\n\n<li>每个模块内置更新信息（`updateJson`）：**刷入后，Magisk / KernelSU / APatch 管理器的模块列表在有新版本时会显示「更新」，点一下即可下载并安装**；</li>\n<li>版本号规则：`v2026.10.04.3`（日期 + 当日序号），只有该机型模块内容真的发生变化时才会提升，不会出现全员假更新；</li>\n<li>更新信息文件在仓库 [`update/`](update/) 目录（`<模块id>.json`），由 Actions 自动生成；</li>\n<li>注意：更新检查需手机端能访问 `raw.githubusercontent.com`，国内网络受限时可能收不到更新提示。</li>\n\n<p>> 之前刷过旧版（没有 updateJson 的版本）需要在管理器里重新刷入一次，之后即可自动检查更新。</p>\n\n<p>---</p>\n\n<h2>⚙️ 工作原理</h2>\n\n<li>模块通过 `resetprop`（自动探测 Magisk / KernelSU / APatch 路径）写入属性，各分区属性同时覆盖；</li>\n<li>`post-fs-data.sh` 在 Zygote 启动前应用，保证 `Build.*` 与系统服务读到新值；</li>\n<li>`service.sh` 开机后再校验一次，防止 OEM 服务回写；</li>\n<li>老系统安装器检测 SDK ≤ 22 时自动走 `build.prop` 直改分支（自动备份，可还原）。</li>\n\n<p>---</p>\n\n<h2>⚠️ 注意事项</h2>\n\n<li>需要 root（Magisk / KernelSU / APatch 任一）；</li>\n<li>**一次只保留一个机型伪装模块**，多个同装会互相覆盖，结果不可预期；</li>\n<li>伪装机型属于系统级属性修改，**部分应用（推送、商店、支付、游戏等）可能受机型影响**，出现异常先卸载模块并重启还原；</li>\n<li>不同设备对 `ro.product.*` 属性的回写行为不同，极少数机型可能需要在其它阶段补写入；</li>\n<li>刷机有风险，操作前请备份重要数据，后果自行承担。</li>\n\n<p>---</p>\n\n<h2>🙏 数据来源</h2>\n\n<li>机型数据来自 **[KHwang9883/MobileModels](https://github.com/KHwang9883/MobileModels)**（CC BY-NC-SA 4.0）：手机品牌 / 机型 / 型号 / 代号汇总；</li>\n<li>本仓库将上述数据批量化生成为独立 Magisk 模块，**免费分享、无任何商业用途**；</li>\n<li>代码与脚本部分：MIT；机型数据部分遵循原数据 CC BY-NC-SA 4.0 许可。</li>\n\n<p>---</p>\n\n<h2>🤖 自动同步</h2>\n\n<li>GitHub Actions 每日 **02:30（北京时间）** 拉取 [MobileModels](https://github.com/KHwang9883/MobileModels) 最新 `brands/*.md`，自动重建全部模块并提交，未变化的机型不会产生任何改动；</li>\n<li>同步产生变更时会自动发布一个**新版本 Release**（`v1`、`v2`、`v3`… 依次递增，每次更新独立成版、不覆盖不合并；全量合集 + 按品牌整包 + 机型索引 CSV + SHA256 校验文件）；</li>\n<li>每次同步同时写入模块更新信息（`updateJson`）：管理器（Magisk / KernelSU / APatch）内可直接检查更新、一键升级；</li>\n<li>相关文件：生成脚本 [`tools/generate_all_brand_modules.ps1`](tools/generate_all_brand_modules.ps1) · 同步脚本 [`tools/sync_from_upstream.ps1`](tools/sync_from_upstream.ps1) · 工作流 [`.github/workflows/sync-modules.yml`](.github/workflows/sync-modules.yml)；</li>\n<li>手动触发：**Actions → Sync modules from MobileModels → Run workflow**（`force` 强制重建，`dry_run` 只生成不提交）。</li>\n\n<p>---</p>\n\n<h2>💬 反馈与贡献</h2>\n\n<li>[提交 Issue](https://github.com/L0NE-6/Magisk-DeviceSpoofer/issues/new) —— 报 bug、求机型、提需求；</li>\n<li>[发起 Pull Request](https://github.com/L0NE-6/Magisk-DeviceSpoofer/pulls) —— 改动越具体越好。</li>\n\n<p>---</p>\n\n<h2>☕ 投喂支持</h2>\n\n<p>全量机型数据、模块生成、每日自动同步与版本发布，都是免费维护的。如果这个项目帮到了你，欢迎投喂作者一杯奶茶——<b>完全自愿</b>，不影响任何功能的使用。</p>\n\n<p>| 支付宝 | 微信支付 |</p>\n<p>| :---: | :---: |</p>\n<p>| <img src=\"assets/sponsor/alipay.jpg\" width=\"300\" alt=\"支付宝投喂码\" /> | <img src=\"assets/sponsor/wechat.png\" width=\"300\" alt=\"微信投喂码\" /> |</p>\n\n<p>---</p>\n\n<h2>📄 License</h2>\n\n<p>代码部分 <a href=\"LICENSE\">MIT</a> © 2026 L0NE-6；机型数据部分 © <a href=\"https://github.com/KHwang9883/MobileModels\">MobileModels</a>（CC BY-NC-SA 4.0）。</p>",
   "homepageUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
   "sourceUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
   "url": "https://github.com/L0NE-6/Magisk-DeviceSpoofer",
   "latestRelease": {
-    "name": "v7",
-    "version": "v7",
-    "time": "2026-10-09T14:15:55Z",
-    "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_360_26_v7.zip"
+    "name": "v8",
+    "version": "v8",
+    "time": "2026-10-10T21:58:57Z",
+    "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_360_26_v8.zip"
   },
   "releases": [
+    {
+      "name": "v8",
+      "tagName": "v8",
+      "publishedAt": "2026-10-10T21:58:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-DeviceSpoofer_360_26_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_360_26_v8.zip",
+          "size": 179757,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_All_3557_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_All_3557_v8.zip",
+          "size": 24633359,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ASUS_72_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_ASUS_72_v8.zip",
+          "size": 503301,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_BlackShark_14_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_BlackShark_14_v8.zip",
+          "size": 97488,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Coolpad_46_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Coolpad_46_v8.zip",
+          "size": 318704,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Google_40_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Google_40_v8.zip",
+          "size": 274942,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_HONOR_279_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_HONOR_279_v8.zip",
+          "size": 1939603,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Huawei_307_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Huawei_307_v8.zip",
+          "size": 2148432,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Index_3557_v8.csv",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Index_3557_v8.csv",
+          "size": 387444,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Lenovo_101_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Lenovo_101_v8.zip",
+          "size": 706970,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Letv_12_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Letv_12_v8.zip",
+          "size": 82343,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Meizu_86_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Meizu_86_v8.zip",
+          "size": 591426,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Motorola_59_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Motorola_59_v8.zip",
+          "size": 405625,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nokia_17_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Nokia_17_v8.zip",
+          "size": 117293,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nothing_13_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Nothing_13_v8.zip",
+          "size": 90040,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Nubia_106_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Nubia_106_v8.zip",
+          "size": 729195,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OnePlus_96_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_OnePlus_96_v8.zip",
+          "size": 663204,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_OPPO_336_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_OPPO_336_v8.zip",
+          "size": 2302006,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_POCO_87_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_POCO_87_v8.zip",
+          "size": 602916,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_realme_229_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_realme_229_v8.zip",
+          "size": 1575506,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Redmi_277_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Redmi_277_v8.zip",
+          "size": 1926975,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Samsung_468_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Samsung_468_v8.zip",
+          "size": 3238411,
+          "downloadCount": 4
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Smartisan_14_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Smartisan_14_v8.zip",
+          "size": 96147,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Sony_51_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Sony_51_v8.zip",
+          "size": 353087,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_vivo_550_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_vivo_550_v8.zip",
+          "size": 3764906,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Xiaomi_158_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Xiaomi_158_v8.zip",
+          "size": 1093033,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_Zhixuan_42_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_Zhixuan_42_v8.zip",
+          "size": 289565,
+          "downloadCount": 1
+        },
+        {
+          "name": "Magisk-DeviceSpoofer_ZTE_71_v8.zip",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/Magisk-DeviceSpoofer_ZTE_71_v8.zip",
+          "size": 495812,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS_v8.txt",
+          "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v8/SHA256SUMS_v8.txt",
+          "size": 2913,
+          "downloadCount": 0
+        }
+      ]
+    },
     {
       "name": "v7",
       "tagName": "v7",
@@ -21,7 +203,7 @@
           "name": "Magisk-DeviceSpoofer_360_26_v7.zip",
           "downloadUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v7/Magisk-DeviceSpoofer_360_26_v7.zip",
           "size": 179757,
-          "downloadCount": 4
+          "downloadCount": 5
         },
         {
           "name": "Magisk-DeviceSpoofer_All_3554_v7.zip",
