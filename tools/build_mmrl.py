@@ -89,6 +89,10 @@ def build_track(mid, mod, audit_entry):
         "arch": ["arm64-v8a"],
         "changelog": "",
     }
+    if mod.get("note"):
+        track["note"] = mod.get("note")
+    if mod.get("origin"):
+        track["origin"] = mod.get("origin")
     return track
 
 

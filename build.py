@@ -230,7 +230,7 @@ def build_catalog_entry(mod, token):
     if not spec:
         authors = mod.get("authors") or []
         latest = mod.get("latestRelease") or {}
-        return {
+        entry = {
             "moduleId": mod["moduleId"],
             "moduleName": mod.get("moduleName") or mod["moduleId"],
             "authors": authors,
@@ -247,6 +247,11 @@ def build_catalog_entry(mod, token):
                 "downloadUrl": latest.get("downloadUrl") or "",
             },
         }
+        if mod.get("origin"):
+            entry["origin"] = mod.get("origin")
+        if mod.get("note"):
+            entry["note"] = mod.get("note")
+        return entry
     repo = fetch_repo(spec, token)
     releases = fetch_releases(spec, token)
     latest = pick_latest_release(releases)
@@ -282,6 +287,10 @@ def build_catalog_entry(mod, token):
     }
     if fallback_note:
         entry["latestRelease"]["note"] = fallback_note
+    if mod.get("origin"):
+        entry["origin"] = mod.get("origin")
+    if mod.get("note"):
+        entry["note"] = mod.get("note")
     return entry
 
 
@@ -334,7 +343,7 @@ def build_detail(mod, token):
     # 手动模块：readme 用 readmeZh，release 用 config
     if not spec:
         latest = mod.get("latestRelease") or {}
-        return {
+        detail = {
             "readme": mod.get("readmeZh") or mod.get("summaryZh") or "",
             "readmeHTML": _naive_md_to_html(mod.get("readmeZh") or mod.get("summaryZh") or ""),
             "homepageUrl": mod.get("homepageUrl") or "",
@@ -359,6 +368,11 @@ def build_detail(mod, token):
                 }] if latest.get("downloadUrl") else [],
             }] if latest.get("name") else [],
         }
+        if mod.get("origin"):
+            detail["origin"] = mod.get("origin")
+        if mod.get("note"):
+            detail["note"] = mod.get("note")
+        return detail
     repo = fetch_repo(spec, token)
     releases = fetch_releases(spec, token)
     readme = fetch_readme(spec, token)
@@ -409,6 +423,10 @@ def build_detail(mod, token):
     }
     if fallback_note:
         detail["latestRelease"]["note"] = fallback_note
+    if mod.get("origin"):
+        detail["origin"] = mod.get("origin")
+    if mod.get("note"):
+        detail["note"] = mod.get("note")
     return detail
 
 
