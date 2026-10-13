@@ -1,0 +1,29 @@
+{
+  "readme": "# Better Creators'App\n\n改善索尼 Creators App 的使用体验，现版本只有点击照片前后弹窗的 OK。\n\n## 功能\n\n- 在索尼 `Creators' App`（包名 `jp.co.sony.ips.portalapp`）的 `TopNavigationActivity` 页面内，命中以下两类弹窗文本后自动点击 OK：\n  - 规则 1：`一旦通过 Wi-Fi 连接到相机，便立即开始导入图像。`（`android:id/message`，`TextView`）\n  - 规则 2：`在后台保持与相机的连接`（`jp.co.sony.ips.portalapp:id/keep_copy`，`TextView`，可点击）\n- 仅在 Creators App 处于前台时检测，切到后台/其他应用即暂停，切回自动恢复。\n- App 未运行时不做检测，只做低频存活轮询，资源消耗可忽略。\n\n## 兼容\n\n- Root 方案：Magisk / KernelSU / APatch 通用。\n- Android：10–16（`dumpsys window` / `dumpsys activity` / `dumpsys accessibility` 多路兼容，`timeout` / `sed` / `grep -o` 能力探测降级）。\n- 已知设备差异：\n  - 部分 ROM（如测试机 Sony Android 13）`dumpsys window windows` 取不到焦点信息，脚本改用 `dumpsys window` + `activity` 兜底。\n  - 部分系统上 `uiautomator dump` 会被杀死（exit 137，`UiAutomation connect` 失败），此时走无障碍聚焦窗坐标直点兜底。\n  - 部分 `sed` 不支持分组替换，坐标解析优先用 `grep -o` 直读数字，`sed` 只做回退。\n\n## 安装\n\n1. 在 Magisk / KernelSU / APatch 管理器中刷入本仓库的 zip 包。\n2. 重启设备。\n3. 日志位置：`/data/local/tmp/creators_auto_ok.log`。\n4. 管理器内点击本模块的 Action/执行按钮可查看守护状态与最近日志。\n5. 卸载模块时会自动清理守护进程与抓屏残留（日志默认保留，见 `uninstall.sh`）。\n\n## 文件结构\n\n```text\nBetter Creators'App-v1.0.0/\n├── module.prop            # 模块元信息（id/name/version/versionCode/author/description）\n├── customize.sh           # 刷机安装脚本（权限、提示）\n├── service.sh             # 开机自启守护\n├── creators_watcher.sh    # 主检测与点击逻辑\n├── action.sh              # 管理器 Action 状态查看\n└── uninstall.sh           # 卸载清理\n```\n## 声明\n\n- 测试设备：Not hing 2 、sony XZ1\n- 此模块由AI辅助完成，导致黑砖、数据丢失等任何设备问题作者概不负责 ",
+  "readmeHTML": "<h1>Better Creators'App</h1>\n\n<p>改善索尼 Creators App 的使用体验，现版本只有点击照片前后弹窗的 OK。</p>\n\n<h2>功能</h2>\n\n<li>在索尼 `Creators' App`（包名 `jp.co.sony.ips.portalapp`）的 `TopNavigationActivity` 页面内，命中以下两类弹窗文本后自动点击 OK：</li>\n<p>  - 规则 1：<code>一旦通过 Wi-Fi 连接到相机，便立即开始导入图像。</code>（<code>android:id/message</code>，<code>TextView</code>）</p>\n<p>  - 规则 2：<code>在后台保持与相机的连接</code>（<code>jp.co.sony.ips.portalapp:id/keep_copy</code>，<code>TextView</code>，可点击）</p>\n<li>仅在 Creators App 处于前台时检测，切到后台/其他应用即暂停，切回自动恢复。</li>\n<li>App 未运行时不做检测，只做低频存活轮询，资源消耗可忽略。</li>\n\n<h2>兼容</h2>\n\n<li>Root 方案：Magisk / KernelSU / APatch 通用。</li>\n<li>Android：10–16（`dumpsys window` / `dumpsys activity` / `dumpsys accessibility` 多路兼容，`timeout` / `sed` / `grep -o` 能力探测降级）。</li>\n<li>已知设备差异：</li>\n<p>  - 部分 ROM（如测试机 Sony Android 13）<code>dumpsys window windows</code> 取不到焦点信息，脚本改用 <code>dumpsys window</code> + <code>activity</code> 兜底。</p>\n<p>  - 部分系统上 <code>uiautomator dump</code> 会被杀死（exit 137，<code>UiAutomation connect</code> 失败），此时走无障碍聚焦窗坐标直点兜底。</p>\n<p>  - 部分 <code>sed</code> 不支持分组替换，坐标解析优先用 <code>grep -o</code> 直读数字，<code>sed</code> 只做回退。</p>\n\n<h2>安装</h2>\n\n<li>在 Magisk / KernelSU / APatch 管理器中刷入本仓库的 zip 包。</li>\n<li>重启设备。</li>\n<li>日志位置：`/data/local/tmp/creators_auto_ok.log`。</li>\n<li>管理器内点击本模块的 Action/执行按钮可查看守护状态与最近日志。</li>\n<li>卸载模块时会自动清理守护进程与抓屏残留（日志默认保留，见 `uninstall.sh`）。</li>\n\n<h2>文件结构</h2>\n\n<pre>Better Creators'App-v1.0.0/\n├── module.prop            # 模块元信息（id/name/version/versionCode/author/description）\n├── customize.sh           # 刷机安装脚本（权限、提示）\n├── service.sh             # 开机自启守护\n├── creators_watcher.sh    # 主检测与点击逻辑\n├── action.sh              # 管理器 Action 状态查看\n└── uninstall.sh           # 卸载清理</pre>\n<h2>声明</h2>\n\n<li>测试设备：Not hing 2 、sony XZ1</li>\n<li>此模块由AI辅助完成，导致黑砖、数据丢失等任何设备问题作者概不负责</li>",
+  "homepageUrl": "https://github.com/KittenLink/Better-Creators-App-v1.0.0",
+  "sourceUrl": "https://github.com/KittenLink/Better-Creators-App-v1.0.0",
+  "url": "https://github.com/KittenLink/Better-Creators-App-v1.0.0",
+  "latestRelease": {
+    "name": "first-version",
+    "version": "first-version",
+    "time": "2026-10-11T09:53:11Z",
+    "downloadUrl": "https://github.com/KittenLink/Better-Creators-App-v1.0.0/releases/download/first-version/Better.Creators.App-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "first-version",
+      "tagName": "first-version",
+      "publishedAt": "2026-10-11T09:53:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Better.Creators.App-v1.0.0.zip",
+          "downloadUrl": "https://github.com/KittenLink/Better-Creators-App-v1.0.0/releases/download/first-version/Better.Creators.App-v1.0.0.zip",
+          "size": 6020,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

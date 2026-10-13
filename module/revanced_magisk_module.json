@@ -1,0 +1,453 @@
+{
+  "readme": "# YouTube ReVanced Zygisk\n\n[![CI](https://github.com/hxreborn/revanced-magisk-module/actions/workflows/ci.yml/badge.svg?event=schedule)](https://github.com/hxreborn/revanced-magisk-module/actions/workflows/ci.yml)\n[![Releases](https://img.shields.io/github/release-date/hxreborn/revanced-magisk-module?label=Latest%20Build)](https://github.com/hxreborn/revanced-magisk-module/releases/latest)\n\nAutomated builds of patched YouTube using [anddea/revanced-patches](https://github.com/anddea/revanced-patches), packaged as a Magisk/KernelSU module for `arm64-v8a`. Patched APK is mounted via Zygisk at app launch.\n\n> [!NOTE]\n> Zygisk is required to scope the mount to YouTube's process namespace to avoid mount leak.\n\n## Downloads\n\n[**Latest Release**](https://github.com/hxreborn/revanced-magisk-module/releases/latest)\n\n## Credits\n\n- [anddea/revanced-patches](https://github.com/anddea/revanced-patches): Patches\n- [MorpheApp/morphe-cli](https://github.com/MorpheApp/morphe-cli): CLI\n- [j-hc/revanced-magisk-module](https://github.com/j-hc/revanced-magisk-module): Build pipeline template\n- [j-hc/rvmm-zygisk-mount](https://github.com/j-hc/rvmm-zygisk-mount): Zygisk companion mount implementation\n\n",
+  "readmeHTML": "<h1>YouTube ReVanced Zygisk</h1>\n\n<p><a href=\"https://github.com/hxreborn/revanced-magisk-module/actions/workflows/ci.yml/badge.svg?event=schedule\">![CI</a>](https://github.com/hxreborn/revanced-magisk-module/actions/workflows/ci.yml)</p>\n<p><a href=\"https://img.shields.io/github/release-date/hxreborn/revanced-magisk-module?label=Latest%20Build\">![Releases</a>](https://github.com/hxreborn/revanced-magisk-module/releases/latest)</p>\n\n<p>Automated builds of patched YouTube using <a href=\"https://github.com/anddea/revanced-patches\">anddea/revanced-patches</a>, packaged as a Magisk/KernelSU module for <code>arm64-v8a</code>. Patched APK is mounted via Zygisk at app launch.</p>\n\n<p>> [!NOTE]</p>\n<p>> Zygisk is required to scope the mount to YouTube's process namespace to avoid mount leak.</p>\n\n<h2>Downloads</h2>\n\n<p><a href=\"https://github.com/hxreborn/revanced-magisk-module/releases/latest\"><b>Latest Release</b></a></p>\n\n<h2>Credits</h2>\n\n<li>[anddea/revanced-patches](https://github.com/anddea/revanced-patches): Patches</li>\n<li>[MorpheApp/morphe-cli](https://github.com/MorpheApp/morphe-cli): CLI</li>\n<li>[j-hc/revanced-magisk-module](https://github.com/j-hc/revanced-magisk-module): Build pipeline template</li>\n<li>[j-hc/rvmm-zygisk-mount](https://github.com/j-hc/rvmm-zygisk-mount): Zygisk companion mount implementation</li>\n",
+  "homepageUrl": "https://github.com/hxreborn/revanced-magisk-module",
+  "sourceUrl": "https://github.com/hxreborn/revanced-magisk-module",
+  "url": "https://github.com/hxreborn/revanced-magisk-module",
+  "latestRelease": {
+    "name": "49",
+    "version": "49",
+    "time": "2026-10-11T16:34:55Z",
+    "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/49/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "49",
+      "tagName": "49",
+      "publishedAt": "2026-10-11T16:34:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/49/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "size": 215479939,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "48",
+      "tagName": "48",
+      "publishedAt": "2026-10-11T16:20:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/48/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "size": 215480009,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "47",
+      "tagName": "47",
+      "publishedAt": "2026-10-06T15:46:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/47/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "size": 215312426,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "46",
+      "tagName": "46",
+      "publishedAt": "2026-10-02T15:32:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/46/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "size": 215788188,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "45",
+      "tagName": "45",
+      "publishedAt": "2026-09-22T14:00:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/45/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
+          "size": 215141061,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "44",
+      "tagName": "44",
+      "publishedAt": "2026-09-14T15:47:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.13.164-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/44/youtube-revanced-zygisk-module-v21.13.164-arm64-v8a.zip",
+          "size": 212288271,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "43",
+      "tagName": "43",
+      "publishedAt": "2026-09-10T13:25:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.13.164-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/43/youtube-revanced-zygisk-module-v21.13.164-arm64-v8a.zip",
+          "size": 212174651,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "42",
+      "tagName": "42",
+      "publishedAt": "2026-09-07T11:48:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.07.247-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/42/youtube-revanced-zygisk-module-v21.07.247-arm64-v8a.zip",
+          "size": 201847888,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "41",
+      "tagName": "41",
+      "publishedAt": "2026-08-10T10:20:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/41/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199760156,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "40",
+      "tagName": "40",
+      "publishedAt": "2026-08-01T10:44:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/40/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199684457,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "39",
+      "tagName": "39",
+      "publishedAt": "2026-07-26T10:47:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/39/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199663810,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "38",
+      "tagName": "38",
+      "publishedAt": "2026-07-25T10:45:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/38/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199664347,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "37",
+      "tagName": "37",
+      "publishedAt": "2026-07-24T20:07:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/37/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 198306496,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "36",
+      "tagName": "36",
+      "publishedAt": "2026-07-24T09:18:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/36/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199662061,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "35",
+      "tagName": "35",
+      "publishedAt": "2026-07-16T13:02:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/35/youtube-revanced-zygisk-module-v21.04.223-arm64-v8a.zip",
+          "size": 199597375,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "34",
+      "tagName": "34",
+      "publishedAt": "2026-07-10T11:56:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/34/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 198372891,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "33",
+      "tagName": "33",
+      "publishedAt": "2026-07-03T11:36:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/33/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 198348203,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "32",
+      "tagName": "32",
+      "publishedAt": "2026-06-24T10:10:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/32/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 198149666,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "31",
+      "tagName": "31",
+      "publishedAt": "2026-06-13T10:05:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/31/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 198067028,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "30",
+      "tagName": "30",
+      "publishedAt": "2026-05-29T10:26:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/30/youtube-revanced-zygisk-module-v20.51.39-arm64-v8a.zip",
+          "size": 197897819,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "29",
+      "tagName": "29",
+      "publishedAt": "2026-05-21T10:22:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/29/youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "size": 197381386,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "28",
+      "tagName": "28",
+      "publishedAt": "2026-05-17T09:40:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/28/youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "size": 197374550,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "27",
+      "tagName": "27",
+      "publishedAt": "2026-05-12T14:36:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/27/youtube-revanced-zygisk-module-v20.47.62-arm64-v8a.zip",
+          "size": 197792455,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "26",
+      "tagName": "26",
+      "publishedAt": "2026-04-30T09:53:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/26/youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "size": 194331549,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "25",
+      "tagName": "25",
+      "publishedAt": "2026-04-29T10:58:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/25/youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "size": 194294917,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "24",
+      "tagName": "24",
+      "publishedAt": "2026-04-29T09:53:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/24/youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "size": 194314316,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "23",
+      "tagName": "23",
+      "publishedAt": "2026-04-29T08:09:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/23/youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "size": 194329190,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "22",
+      "tagName": "22",
+      "publishedAt": "2026-04-29T07:41:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/22/youtube-revanced-zygisk-module-v20.40.45-arm64-v8a.zip",
+          "size": 194240648,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "21",
+      "tagName": "21",
+      "publishedAt": "2026-04-28T20:17:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-revanced-module-v20.40.45-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/21/youtube-revanced-module-v20.40.45-arm64-v8a.zip",
+          "size": 194191811,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "20",
+      "tagName": "20",
+      "publishedAt": "2026-01-15T09:08:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-music-rvx-magisk-v8.30.54-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/20/youtube-music-rvx-magisk-v8.30.54-arm64-v8a.zip",
+          "size": 58103979,
+          "downloadCount": 2
+        },
+        {
+          "name": "youtube-music-rvx-v8.30.54-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/20/youtube-music-rvx-v8.30.54-arm64-v8a.apk",
+          "size": 76334197,
+          "downloadCount": 3
+        },
+        {
+          "name": "youtube-rvx-magisk-v20.05.46-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/20/youtube-rvx-magisk-v20.05.46-arm64-v8a.zip",
+          "size": 179116134,
+          "downloadCount": 3
+        },
+        {
+          "name": "youtube-rvx-v20.05.46-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/20/youtube-rvx-v20.05.46-arm64-v8a.apk",
+          "size": 94950764,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

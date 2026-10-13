@@ -1,0 +1,29 @@
+{
+  "readme": "# FoxHide Root Conceal\n\n深度隐藏 Root 环境的 Android 模块，兼容 **Magisk / KernelSU / APatch** 全部 Root 管理器安装。\n\n## 功能\n\n| 层级 | 作用 | 说明 |\n|---|---|---|\n| Bootloader 状态伪装 | `ro.boot.verifiedbootstate=green`、`ro.boot.flash.locked=1`、`ro.boot.vbmeta.device_state=locked`、`ro.boot.warranty_bit=0`、`ro.boot.veritymode=enforcing` 等 | 让检测方认为 BL 处于锁定、验证启动通过 |\n| 系统安全属性伪装 | `ro.debuggable=0`、`ro.secure=1`、`ro.build.type=user`、`ro.build.tags=release-keys` | 消除可调试/工程版特征 |\n| Root 管理器痕迹隐藏 | 删除 `magisk.version`、`magisk.versionCode`、`ksu.version`、`ap.version`、`init.svc.magiskd` 等属性 | 属性层查不到管理器存在 |\n| 文件系统痕迹清理 | 清理 `/system/xbin/su`、`/system/bin/su`、`/sbin/su`、`/vendor/bin/su` 静态残留、magisk 日志、shell 历史 | 减少 su 文件层暴露 |\n| 环境变量清理 | 从 PATH 剔除 `su/magisk` 目录、清除泄漏环境变量 | 降低 shell 层泄漏 |\n| 守卫循环 | 每 30 秒重扫一次易再生痕迹 | 防止被运行时重新植入 |\n| 暴露点自检 | 内置 `check.sh`，一键列出当前设备仍暴露的检测面 | 安装后可验证效果 |\n\n## 安装\n\n1. 在 Magisk / KernelSU / APatch 的「模块」页安装 `foxhide-v1.0.zip`\n2. 重启设备\n3. **关键配合**（进程级隐藏）：\n   - Magisk：设置 → 开启 **Zygisk** → 开启 **DenyList**，把需要隐藏的 App 勾入名单，**关闭**「遵守排除列表」（让 Shamiko/FoxHide 接管）\n   - KernelSU：开启 Zygisk 兼容（部分版本）或使用内核级 DenyList\n4. 验证：`su -c sh /data/adb/foxhide/check.sh`\n\n## 配置\n\n编辑 `/data/adb/foxhide/config.prop` 可逐层开关（重启生效）：\n\n```ini\nenable=1          # 模块总开关\nconceal_boot=1    # Bootloader 状态伪装\nconceal_system=1  # 系统安全属性\nconceal_manager=1 # 管理器痕迹\nconceal_fs=1      # 文件痕迹\nconceal_env=1     # 环境变量\n```\n\n## 原理简述\n\n- **属性层**：利用各 Root 管理器的 `resetprop` 在 `post-fs-data` 阶段改写只读 `ro.*` 属性（先删后设，规避只读限制），这是属性层隐藏最有效的时机\n- **文件层**：清理可安全移除的静态 su 残留与日志（Magisk overlay 挂载本身交给 DenyList 进程级 unmount）\n- **进程层**：shell 模块无法拦截 syscall——进程级深度隐藏由 Zygisk/DenyList 生态负责（如 Shamiko），本模块与它们互补叠加\n\n## 合规声明\n\n本模块仅用于**你自己的设备**的隐私管理与合规测试：隐藏自身设备 Root 状态、自查环境暴露面。不得用于绕过银行/政务/企业应用的风控、游戏作弊、欺诈或其他非法用途。解锁 Bootloader 与 Root 可能违反设备保修条款，风险自负。\n\n## 结构\n\n```\nfoxhide/\n├── module.prop        # 模块元数据\n├── customize.sh       # 安装脚本（检测管理器、写配置）\n├── post-fs-data.sh    # 早期属性伪装\n├── service.sh         # 服务阶段清理 + 守卫循环\n├── conceal.sh         # 核心隐藏引擎（六层）\n├── uninstall.sh       # 卸载清理\n├── check.sh           # 暴露点自检工具\n└── README.md\n```\n\nMIT License\n",
+  "readmeHTML": "<h1>FoxHide Root Conceal</h1>\n\n<p>深度隐藏 Root 环境的 Android 模块，兼容 <b>Magisk / KernelSU / APatch</b> 全部 Root 管理器安装。</p>\n\n<h2>功能</h2>\n\n<p>| 层级 | 作用 | 说明 |</p>\n<p>|---|---|---|</p>\n<p>| Bootloader 状态伪装 | <code>ro.boot.verifiedbootstate=green</code>、<code>ro.boot.flash.locked=1</code>、<code>ro.boot.vbmeta.device_state=locked</code>、<code>ro.boot.warranty_bit=0</code>、<code>ro.boot.veritymode=enforcing</code> 等 | 让检测方认为 BL 处于锁定、验证启动通过 |</p>\n<p>| 系统安全属性伪装 | <code>ro.debuggable=0</code>、<code>ro.secure=1</code>、<code>ro.build.type=user</code>、<code>ro.build.tags=release-keys</code> | 消除可调试/工程版特征 |</p>\n<p>| Root 管理器痕迹隐藏 | 删除 <code>magisk.version</code>、<code>magisk.versionCode</code>、<code>ksu.version</code>、<code>ap.version</code>、<code>init.svc.magiskd</code> 等属性 | 属性层查不到管理器存在 |</p>\n<p>| 文件系统痕迹清理 | 清理 <code>/system/xbin/su</code>、<code>/system/bin/su</code>、<code>/sbin/su</code>、<code>/vendor/bin/su</code> 静态残留、magisk 日志、shell 历史 | 减少 su 文件层暴露 |</p>\n<p>| 环境变量清理 | 从 PATH 剔除 <code>su/magisk</code> 目录、清除泄漏环境变量 | 降低 shell 层泄漏 |</p>\n<p>| 守卫循环 | 每 30 秒重扫一次易再生痕迹 | 防止被运行时重新植入 |</p>\n<p>| 暴露点自检 | 内置 <code>check.sh</code>，一键列出当前设备仍暴露的检测面 | 安装后可验证效果 |</p>\n\n<h2>安装</h2>\n\n<li>在 Magisk / KernelSU / APatch 的「模块」页安装 `foxhide-v1.0.zip`</li>\n<li>重启设备</li>\n<li>**关键配合**（进程级隐藏）：</li>\n<p>   - Magisk：设置 → 开启 <b>Zygisk</b> → 开启 <b>DenyList</b>，把需要隐藏的 App 勾入名单，<b>关闭</b>「遵守排除列表」（让 Shamiko/FoxHide 接管）</p>\n<p>   - KernelSU：开启 Zygisk 兼容（部分版本）或使用内核级 DenyList</p>\n<li>验证：`su -c sh /data/adb/foxhide/check.sh`</li>\n\n<h2>配置</h2>\n\n<p>编辑 <code>/data/adb/foxhide/config.prop</code> 可逐层开关（重启生效）：</p>\n\n<pre>enable=1          # 模块总开关\nconceal_boot=1    # Bootloader 状态伪装\nconceal_system=1  # 系统安全属性\nconceal_manager=1 # 管理器痕迹\nconceal_fs=1      # 文件痕迹\nconceal_env=1     # 环境变量</pre>\n\n<h2>原理简述</h2>\n\n<li>**属性层**：利用各 Root 管理器的 `resetprop` 在 `post-fs-data` 阶段改写只读 `ro.*` 属性（先删后设，规避只读限制），这是属性层隐藏最有效的时机</li>\n<li>**文件层**：清理可安全移除的静态 su 残留与日志（Magisk overlay 挂载本身交给 DenyList 进程级 unmount）</li>\n<li>**进程层**：shell 模块无法拦截 syscall——进程级深度隐藏由 Zygisk/DenyList 生态负责（如 Shamiko），本模块与它们互补叠加</li>\n\n<h2>合规声明</h2>\n\n<p>本模块仅用于<b>你自己的设备</b>的隐私管理与合规测试：隐藏自身设备 Root 状态、自查环境暴露面。不得用于绕过银行/政务/企业应用的风控、游戏作弊、欺诈或其他非法用途。解锁 Bootloader 与 Root 可能违反设备保修条款，风险自负。</p>\n\n<h2>结构</h2>\n\n<pre>foxhide/\n├── module.prop        # 模块元数据\n├── customize.sh       # 安装脚本（检测管理器、写配置）\n├── post-fs-data.sh    # 早期属性伪装\n├── service.sh         # 服务阶段清理 + 守卫循环\n├── conceal.sh         # 核心隐藏引擎（六层）\n├── uninstall.sh       # 卸载清理\n├── check.sh           # 暴露点自检工具\n└── README.md</pre>\n\n<p>MIT License</p>",
+  "homepageUrl": "https://github.com/FengYeTrade/fox-hide",
+  "sourceUrl": "https://github.com/FengYeTrade/fox-hide",
+  "url": "https://github.com/FengYeTrade/fox-hide",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-10-11T10:28:29Z",
+    "downloadUrl": "https://github.com/FengYeTrade/fox-hide/releases/download/v1.0.0/foxhide-v1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-10-11T10:28:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "foxhide-v1.0.zip",
+          "downloadUrl": "https://github.com/FengYeTrade/fox-hide/releases/download/v1.0.0/foxhide-v1.0.zip",
+          "size": 16746,
+          "downloadCount": 9
+        }
+      ]
+    }
+  ]
+}
