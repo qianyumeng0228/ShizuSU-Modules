@@ -1,0 +1,531 @@
+{
+  "readme": "# Box for Root\n\n[![ID](https://img.shields.io/badge/id-blue.svg?style=for-the-badge)](docs/index_id.md) [![EN](https://img.shields.io/badge/en-blue.svg?style=for-the-badge)](docs/index_en.md) [![ZH](https://img.shields.io/badge/zh-blue.svg?style=for-the-badge)](docs/index_zh.md)\n\n<h1 align=\"center\">\n  <img src=\"https://github.com/taamarin/box_for_magisk/blob/master/docs/box.svg\" alt=\"BOX\" width=\"200\">\n  <br>BOX<br>\n</h1>\n<h4 align=\"center\">Transparent Proxy for Android (Root)</h4>\n\n<div align=\"center\">\n  <a href=\"https://github.com/taamarin/box_for_magisk/releases\">\n    <img src=\"https://img.shields.io/github/downloads/taamarin/box_for_magisk/total.svg?style=for-the-badge\" alt=\"Releases\">\n  </a>\n  <a href=\"#\">\n    <img src=\"https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\">\n  </a>\n</div>\n\n## Introduction\n`Box for Root` (BFR) is a [Magisk](https://github.com/topjohnwu/Magisk), [KernelSU](https://github.com/tiann/KernelSU), and [APatch](https://github.com/bmax121/APatch) module for running transparent proxies on rooted Android devices. It supports Clash/Mihomo, `sing-box`, `v2fly`, `xray`, and `hysteria`.\n\n## Features\n- Multiple proxy cores and network modes, with configurable app and process filtering.\n- Automatic service start after boot and service control from the manager or command line.\n- Optional network-state controls, scheduled updates, and cgroup resource limits.\n\n## Installation\nDownload a release ZIP and install it from the Magisk, KernelSU, or APatch manager. Recovery installation is not supported. KernelSU versions below version code `10670` are not supported.\n\nThe installer offers interactive options for download acceleration and proxy-core binaries. Connect to the internet if you want it to download binaries during installation. Reboot after installation. Existing data under `/data/adb/box` is backed up and restored during an update; the installer also offers to restore supported settings from the previous `settings.ini`.\n\n## Apk Manager\nYou can use the **BFR Manager** app (optional) to manage Box for Root on your device.\n[Download BFR Manager](https://t.me/nothing_taamarin)\n> ⚠️ If you receive continuous notifications, open Magisk Manager, navigate to SuperUser, search for `BoxForRoot`, and disable logs and notifications.\n\n## Files and Configuration\n- Module files: `/data/adb/modules/box_for_root`\n- Persistent data, scripts, and proxy-core configurations: `/data/adb/box`\n- Main settings: `/data/adb/box/settings.ini`\n- Runtime logs and state: `/data/adb/box/run`\n\nThe selected core is set by `bin_name` in `settings.ini` (`clash`, `sing-box`, `xray`, `v2fly`, or `hysteria`). Its executable is stored in `/data/adb/box/bin`; its configuration is in the matching directory under `/data/adb/box` (for example, `/data/adb/box/clash/config.yaml`). Edit configuration files only while BFR is stopped, and keep their proxy listener ports consistent with `settings.ini`.\n\n### Network modes\nSet `network_mode` in `settings.ini` to one of the following:\n\n| Mode | Traffic handling |\n| --- | --- |\n| `redirect` | Redirect TCP; UDP is direct |\n| `tproxy` | TProxy for TCP and UDP |\n| `mixed` | Redirect TCP and route UDP through TUN |\n| `enhance` | Redirect TCP and TProxy UDP |\n| `tun` | Route TCP and UDP through an auto-routed TUN interface |\n\nSupported modes depend on the selected core. `xray` and `v2fly` require `tproxy`; `hysteria` supports `redirect`, `tproxy`, and `enhance`. `clash` and `sing-box` support the modes their configurations provide. `tun` mode is available for `clash` and `sing-box`.\n\n### App, process, and interface filters\n- `/data/adb/box/package.list.cfg` controls app filtering. Choose `mode:blacklist` (the default) to proxy all apps except listed packages, or `mode:whitelist` to proxy only listed packages. Add one Android package name per line; a user ID can optionally prefix a package (for example, `0:com.example.app`).\n- `/data/adb/box/gid.list.cfg` contains numeric group IDs (GIDs) for process filtering. The mode in `package.list.cfg` also determines whether listed GIDs are excluded or included.\n- `/data/adb/box/ap.list.cfg` controls network interfaces. `allow <prefix>` includes an interface and `ignore <prefix>` excludes one. The default allow-list includes `ap+`, `wlan+`, `rndis+`, `swlan+`, `ncm+`, and `eth+`.\n\nWhen package or GID filters, or an `ignore` interface rule, are configured while Clash uses fake-IP mode, BFR switches to redir-host at startup for supported network modes.\n\n### Optional settings\nIPv6 support, network-state service control, and cgroup resource limits are disabled by default. To enable them, edit `settings.ini` while BFR is stopped:\n- Network-state service control: `enable_network_service_control`, `use_module_on_wifi_disconnect`, `use_module_on_wifi`, and the SSID matching options.\n- Resource limits: `cgroup_memcg` / `memcg_limit`, `cgroup_cpuset` / `allow_cpu`, and `cgroup_blkio` / `weight`.\n- IPv6 support: `ipv6`.\n- Scheduled Geo and subscription updates: set `run_crontab` and the relevant update options to `true`, then set the `interva_update` schedule. Its default is `0 0,6,12,18 * * *` (four times daily). The `subs` command documents subscription updates for `clash` only.\n\n## Manage Service Start/Stop\nBy default, BFR starts after boot. Enable or disable the module in the manager to start or stop its service. You can also use the installed `/dev/sbfr` command:\n\n```bash\nsu -c /dev/sbfr start\nsu -c /dev/sbfr stop\nsu -c /dev/sbfr help\n```\n\nThe equivalent direct commands are:\n```bash\nsu -c /data/adb/box/scripts/box.service start && su -c /data/adb/box/scripts/box.iptables enable\nsu -c /data/adb/box/scripts/box.iptables disable && su -c /data/adb/box/scripts/box.service stop\n```\n\nTo prevent automatic startup and manager-based service control, create `/data/adb/box/manual`. In manual mode, start and stop BFR using the commands above.\n\n### Maintenance commands\nRun `box.tool help` to see all available commands:\n```bash\nsu -c /data/adb/box/scripts/box.tool help\n```\n\nCommands include `check`, `geosub`, `geox`, `subs`, `upkernel`, `upxui`, `upyq`, `upcurl`, `reload`, `webroot`, `memcg`, `cpuset`, `blkio`, `bond0`, `bond1`, and `all`. The `subs` command documents subscription updates for `clash` only. Service commands are `start`, `stop`, `restart`, `status`, `cron`, and `kcron`; firewall commands are `enable`, `disable`, and `renew`.\n\nLogs are stored in `/data/adb/box/run`. For more detailed configuration guidance, see the [English guide](docs/index_en.md), [Indonesian guide](docs/index_id.md), and [Chinese guide](docs/index_zh.md).\n\n## Uninstall\nUninstall the module from the Magisk, KernelSU, or APatch manager. The uninstall script removes `/data/adb/box` and its service startup script. If data or service files remain, remove them manually:\n```bash\nsu -c rm -rf /data/adb/box\nsu -c rm -rf /data/adb/service.d/box_service.sh\nsu -c rm -rf /data/adb/ksu/service.d/box_service.sh\nsu -c rm -rf /data/adb/modules/box_for_root\n```\n\n## Credits\n- [CHIZI-0618/box4magisk](https://github.com/CHIZI-0618/box4magisk) for the original Box for Magisk module.\n\n## License\nThis project is licensed under the GPL-3.0 license - see the [LICENSE](https://github.com/taamarin/box_for_magisk/blob/master/LICENSE) file for details.\n",
+  "readmeHTML": "<h1>Box for Root</h1>\n\n<p><a href=\"https://img.shields.io/badge/id-blue.svg?style=for-the-badge\">![ID</a>](docs/index_id.md) <a href=\"https://img.shields.io/badge/en-blue.svg?style=for-the-badge\">![EN</a>](docs/index_en.md) <a href=\"https://img.shields.io/badge/zh-blue.svg?style=for-the-badge\">![ZH</a>](docs/index_zh.md)</p>\n\n<p><h1 align=\"center\"></p>\n<p>  <img src=\"https://github.com/taamarin/box_for_magisk/blob/master/docs/box.svg\" alt=\"BOX\" width=\"200\"></p>\n<p>  <br>BOX<br></p>\n<p></h1></p>\n<p><h4 align=\"center\">Transparent Proxy for Android (Root)</h4></p>\n\n<p><div align=\"center\"></p>\n<p>  <a href=\"https://github.com/taamarin/box_for_magisk/releases\"></p>\n<p>    <img src=\"https://img.shields.io/github/downloads/taamarin/box_for_magisk/total.svg?style=for-the-badge\" alt=\"Releases\"></p>\n<p>  </a></p>\n<p>  <a href=\"#\"></p>\n<p>    <img src=\"https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\"></p>\n<p>  </a></p>\n<p></div></p>\n\n<h2>Introduction</h2>\n<p><code>Box for Root</code> (BFR) is a <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a>, <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a>, and <a href=\"https://github.com/bmax121/APatch\">APatch</a> module for running transparent proxies on rooted Android devices. It supports Clash/Mihomo, <code>sing-box</code>, <code>v2fly</code>, <code>xray</code>, and <code>hysteria</code>.</p>\n\n<h2>Features</h2>\n<li>Multiple proxy cores and network modes, with configurable app and process filtering.</li>\n<li>Automatic service start after boot and service control from the manager or command line.</li>\n<li>Optional network-state controls, scheduled updates, and cgroup resource limits.</li>\n\n<h2>Installation</h2>\n<p>Download a release ZIP and install it from the Magisk, KernelSU, or APatch manager. Recovery installation is not supported. KernelSU versions below version code <code>10670</code> are not supported.</p>\n\n<p>The installer offers interactive options for download acceleration and proxy-core binaries. Connect to the internet if you want it to download binaries during installation. Reboot after installation. Existing data under <code>/data/adb/box</code> is backed up and restored during an update; the installer also offers to restore supported settings from the previous <code>settings.ini</code>.</p>\n\n<h2>Apk Manager</h2>\n<p>You can use the <b>BFR Manager</b> app (optional) to manage Box for Root on your device.</p>\n<p><a href=\"https://t.me/nothing_taamarin\">Download BFR Manager</a></p>\n<p>> ⚠️ If you receive continuous notifications, open Magisk Manager, navigate to SuperUser, search for <code>BoxForRoot</code>, and disable logs and notifications.</p>\n\n<h2>Files and Configuration</h2>\n<li>Module files: `/data/adb/modules/box_for_root`</li>\n<li>Persistent data, scripts, and proxy-core configurations: `/data/adb/box`</li>\n<li>Main settings: `/data/adb/box/settings.ini`</li>\n<li>Runtime logs and state: `/data/adb/box/run`</li>\n\n<p>The selected core is set by <code>bin_name</code> in <code>settings.ini</code> (<code>clash</code>, <code>sing-box</code>, <code>xray</code>, <code>v2fly</code>, or <code>hysteria</code>). Its executable is stored in <code>/data/adb/box/bin</code>; its configuration is in the matching directory under <code>/data/adb/box</code> (for example, <code>/data/adb/box/clash/config.yaml</code>). Edit configuration files only while BFR is stopped, and keep their proxy listener ports consistent with <code>settings.ini</code>.</p>\n\n<h3>Network modes</h3>\n<p>Set <code>network_mode</code> in <code>settings.ini</code> to one of the following:</p>\n\n<p>| Mode | Traffic handling |</p>\n<p>| --- | --- |</p>\n<p>| <code>redirect</code> | Redirect TCP; UDP is direct |</p>\n<p>| <code>tproxy</code> | TProxy for TCP and UDP |</p>\n<p>| <code>mixed</code> | Redirect TCP and route UDP through TUN |</p>\n<p>| <code>enhance</code> | Redirect TCP and TProxy UDP |</p>\n<p>| <code>tun</code> | Route TCP and UDP through an auto-routed TUN interface |</p>\n\n<p>Supported modes depend on the selected core. <code>xray</code> and <code>v2fly</code> require <code>tproxy</code>; <code>hysteria</code> supports <code>redirect</code>, <code>tproxy</code>, and <code>enhance</code>. <code>clash</code> and <code>sing-box</code> support the modes their configurations provide. <code>tun</code> mode is available for <code>clash</code> and <code>sing-box</code>.</p>\n\n<h3>App, process, and interface filters</h3>\n<li>`/data/adb/box/package.list.cfg` controls app filtering. Choose `mode:blacklist` (the default) to proxy all apps except listed packages, or `mode:whitelist` to proxy only listed packages. Add one Android package name per line; a user ID can optionally prefix a package (for example, `0:com.example.app`).</li>\n<li>`/data/adb/box/gid.list.cfg` contains numeric group IDs (GIDs) for process filtering. The mode in `package.list.cfg` also determines whether listed GIDs are excluded or included.</li>\n<li>`/data/adb/box/ap.list.cfg` controls network interfaces. `allow <prefix>` includes an interface and `ignore <prefix>` excludes one. The default allow-list includes `ap+`, `wlan+`, `rndis+`, `swlan+`, `ncm+`, and `eth+`.</li>\n\n<p>When package or GID filters, or an <code>ignore</code> interface rule, are configured while Clash uses fake-IP mode, BFR switches to redir-host at startup for supported network modes.</p>\n\n<h3>Optional settings</h3>\n<p>IPv6 support, network-state service control, and cgroup resource limits are disabled by default. To enable them, edit <code>settings.ini</code> while BFR is stopped:</p>\n<li>Network-state service control: `enable_network_service_control`, `use_module_on_wifi_disconnect`, `use_module_on_wifi`, and the SSID matching options.</li>\n<li>Resource limits: `cgroup_memcg` / `memcg_limit`, `cgroup_cpuset` / `allow_cpu`, and `cgroup_blkio` / `weight`.</li>\n<li>IPv6 support: `ipv6`.</li>\n<li>Scheduled Geo and subscription updates: set `run_crontab` and the relevant update options to `true`, then set the `interva_update` schedule. Its default is `0 0,6,12,18 * * *` (four times daily). The `subs` command documents subscription updates for `clash` only.</li>\n\n<h2>Manage Service Start/Stop</h2>\n<p>By default, BFR starts after boot. Enable or disable the module in the manager to start or stop its service. You can also use the installed <code>/dev/sbfr</code> command:</p>\n\n<pre>su -c /dev/sbfr start\nsu -c /dev/sbfr stop\nsu -c /dev/sbfr help</pre>\n\n<p>The equivalent direct commands are:</p>\n<pre>su -c /data/adb/box/scripts/box.service start &amp;&amp; su -c /data/adb/box/scripts/box.iptables enable\nsu -c /data/adb/box/scripts/box.iptables disable &amp;&amp; su -c /data/adb/box/scripts/box.service stop</pre>\n\n<p>To prevent automatic startup and manager-based service control, create <code>/data/adb/box/manual</code>. In manual mode, start and stop BFR using the commands above.</p>\n\n<h3>Maintenance commands</h3>\n<p>Run <code>box.tool help</code> to see all available commands:</p>\n<pre>su -c /data/adb/box/scripts/box.tool help</pre>\n\n<p>Commands include <code>check</code>, <code>geosub</code>, <code>geox</code>, <code>subs</code>, <code>upkernel</code>, <code>upxui</code>, <code>upyq</code>, <code>upcurl</code>, <code>reload</code>, <code>webroot</code>, <code>memcg</code>, <code>cpuset</code>, <code>blkio</code>, <code>bond0</code>, <code>bond1</code>, and <code>all</code>. The <code>subs</code> command documents subscription updates for <code>clash</code> only. Service commands are <code>start</code>, <code>stop</code>, <code>restart</code>, <code>status</code>, <code>cron</code>, and <code>kcron</code>; firewall commands are <code>enable</code>, <code>disable</code>, and <code>renew</code>.</p>\n\n<p>Logs are stored in <code>/data/adb/box/run</code>. For more detailed configuration guidance, see the <a href=\"docs/index_en.md\">English guide</a>, <a href=\"docs/index_id.md\">Indonesian guide</a>, and <a href=\"docs/index_zh.md\">Chinese guide</a>.</p>\n\n<h2>Uninstall</h2>\n<p>Uninstall the module from the Magisk, KernelSU, or APatch manager. The uninstall script removes <code>/data/adb/box</code> and its service startup script. If data or service files remain, remove them manually:</p>\n<pre>su -c rm -rf /data/adb/box\nsu -c rm -rf /data/adb/service.d/box_service.sh\nsu -c rm -rf /data/adb/ksu/service.d/box_service.sh\nsu -c rm -rf /data/adb/modules/box_for_root</pre>\n\n<h2>Credits</h2>\n<li>[CHIZI-0618/box4magisk](https://github.com/CHIZI-0618/box4magisk) for the original Box for Magisk module.</li>\n\n<h2>License</h2>\n<p>This project is licensed under the GPL-3.0 license - see the <a href=\"https://github.com/taamarin/box_for_magisk/blob/master/LICENSE\">LICENSE</a> file for details.</p>",
+  "homepageUrl": "https://t.me/nothing_taamarin",
+  "sourceUrl": "https://github.com/taamarin/box_for_magisk",
+  "url": "https://github.com/taamarin/box_for_magisk",
+  "latestRelease": {
+    "name": "v1.10.2",
+    "version": "v1.10.2",
+    "time": "2025-09-05T12:45:22Z",
+    "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.2/box_for_root-v1.10.2.zip"
+  },
+  "releases": [
+    {
+      "name": "pre-v1.10.2(4cec20f)",
+      "tagName": "pre-v1.10.2(4cec20f)",
+      "publishedAt": "2025-10-21T11:56:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.10.2.4cec20f.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/pre-v1.10.2%284cec20f%29/box_for_root-v1.10.2.4cec20f.zip",
+          "size": 76374,
+          "downloadCount": 2891
+        }
+      ]
+    },
+    {
+      "name": "v1.10.2",
+      "tagName": "v1.10.2",
+      "publishedAt": "2025-09-05T12:45:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BFR-20250905-1227-release.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.2/BFR-20250905-1227-release.apk",
+          "size": 4475248,
+          "downloadCount": 13437
+        },
+        {
+          "name": "box_for_root-v1.10.2.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.2/box_for_root-v1.10.2.zip",
+          "size": 76249,
+          "downloadCount": 17737
+        }
+      ]
+    },
+    {
+      "name": "v1.10.1",
+      "tagName": "v1.10.1",
+      "publishedAt": "2025-08-23T04:35:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BFR-20250821-2131-release.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.1/BFR-20250821-2131-release.apk",
+          "size": 4423558,
+          "downloadCount": 936
+        },
+        {
+          "name": "box_for_root-v1.10.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.1/box_for_root-v1.10.1.zip",
+          "size": 75167,
+          "downloadCount": 1684
+        }
+      ]
+    },
+    {
+      "name": "v1.10.0",
+      "tagName": "v1.10.0",
+      "publishedAt": "2025-08-21T06:36:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BFR-20250821-1554-release.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.0/BFR-20250821-1554-release.apk",
+          "size": 4423006,
+          "downloadCount": 282
+        },
+        {
+          "name": "box_for_root-v1.10.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.0/box_for_root-v1.10.0.zip",
+          "size": 75015,
+          "downloadCount": 554
+        }
+      ]
+    },
+    {
+      "name": "v1.9.1",
+      "tagName": "v1.9.1",
+      "publishedAt": "2025-08-02T07:27:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BFR-20250801-2138-release.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.9.1/BFR-20250801-2138-release.apk",
+          "size": 4316222,
+          "downloadCount": 687
+        },
+        {
+          "name": "box_for_root-v1.9.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.9.1/box_for_root-v1.9.1.zip",
+          "size": 74655,
+          "downloadCount": 1734
+        }
+      ]
+    },
+    {
+      "name": "v1.9.0",
+      "tagName": "v1.9.0",
+      "publishedAt": "2025-07-19T23:25:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BFR-20250722-0127-release.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.9.0/BFR-20250722-0127-release.apk",
+          "size": 4177680,
+          "downloadCount": 1375
+        },
+        {
+          "name": "box_for_root-v1.9.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.9.0/box_for_root-v1.9.0.zip",
+          "size": 74703,
+          "downloadCount": 2319
+        }
+      ]
+    },
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2024-12-22T11:12:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.8.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.8/box_for_root-v1.8.zip",
+          "size": 60144,
+          "downloadCount": 15029
+        }
+      ]
+    },
+    {
+      "name": "v1.7.5",
+      "tagName": "v1.7.5",
+      "publishedAt": "2024-11-17T10:52:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Box4Root-Manager_v1.13-07c89a1.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.5/Box4Root-Manager_v1.13-07c89a1.apk",
+          "size": 2736300,
+          "downloadCount": 2058
+        },
+        {
+          "name": "box_for_root-v1.7.5.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.5/box_for_root-v1.7.5.zip",
+          "size": 58031,
+          "downloadCount": 3632
+        }
+      ]
+    },
+    {
+      "name": "v1.7.4",
+      "tagName": "v1.7.4",
+      "publishedAt": "2024-10-30T16:13:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.7.4.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.4/box_for_root-v1.7.4.zip",
+          "size": 57030,
+          "downloadCount": 1978
+        }
+      ]
+    },
+    {
+      "name": "v1.7.3",
+      "tagName": "v1.7.3",
+      "publishedAt": "2024-10-04T19:39:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.7.3.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.3/box_for_root-v1.7.3.zip",
+          "size": 56396,
+          "downloadCount": 2431
+        }
+      ]
+    },
+    {
+      "name": "v1.7.2",
+      "tagName": "v1.7.2",
+      "publishedAt": "2024-09-17T13:07:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.7.2.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.2/box_for_root-v1.7.2.zip",
+          "size": 56394,
+          "downloadCount": 1863
+        }
+      ]
+    },
+    {
+      "name": "v1.7.1",
+      "tagName": "v1.7.1",
+      "publishedAt": "2024-08-12T01:08:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.7.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.1/box_for_root-v1.7.1.zip",
+          "size": 56685,
+          "downloadCount": 3259
+        }
+      ]
+    },
+    {
+      "name": "v1.7.0",
+      "tagName": "v1.7.0",
+      "publishedAt": "2024-08-10T06:13:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.7.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.7.0/box_for_root-v1.7.0.zip",
+          "size": 56792,
+          "downloadCount": 495
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2024-07-14T18:58:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.6.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.6.0/box_for_root-v1.6.0.zip",
+          "size": 55251,
+          "downloadCount": 2505
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2024-03-26T07:46:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.5.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.5.0/box_for_root-v1.5.0.zip",
+          "size": 47222,
+          "downloadCount": 6224
+        }
+      ]
+    },
+    {
+      "name": "v1.4.5",
+      "tagName": "v1.4.5",
+      "publishedAt": "2024-01-29T16:15:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.5.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.5/box_for_root-v1.4.5.zip",
+          "size": 46749,
+          "downloadCount": 4383
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4",
+      "tagName": "v1.4.4",
+      "publishedAt": "2023-12-24T11:51:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.4.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.4/box_for_root-v1.4.4.zip",
+          "size": 46556,
+          "downloadCount": 3444
+        }
+      ]
+    },
+    {
+      "name": "v1.4.3",
+      "tagName": "v1.4.3",
+      "publishedAt": "2023-12-02T16:31:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.3.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.3/box_for_root-v1.4.3.zip",
+          "size": 47142,
+          "downloadCount": 2392
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2",
+      "tagName": "v1.4.2",
+      "publishedAt": "2023-11-23T13:38:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.2-offline-arm64.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.2/box_for_root-v1.4.2-offline-arm64.zip",
+          "size": 58382775,
+          "downloadCount": 1363
+        },
+        {
+          "name": "box_for_root-v1.4.2-offline-armv7.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.2/box_for_root-v1.4.2-offline-armv7.zip",
+          "size": 22030658,
+          "downloadCount": 292
+        },
+        {
+          "name": "box_for_root-v1.4.2.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.2/box_for_root-v1.4.2.zip",
+          "size": 48124,
+          "downloadCount": 837
+        },
+        {
+          "name": "Busybox-NDK-Installer-v1.36.1-all.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.2/Busybox-NDK-Installer-v1.36.1-all.zip",
+          "size": 9899263,
+          "downloadCount": 1014
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2023-10-24T15:43:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.1-offline-arm64-armv8.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/box_for_root-v1.4.1-offline-arm64-armv8.zip",
+          "size": 60209710,
+          "downloadCount": 1462
+        },
+        {
+          "name": "box_for_root-v1.4.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/box_for_root-v1.4.1.zip",
+          "size": 47861,
+          "downloadCount": 2031
+        },
+        {
+          "name": "clash.meta-android-arm64-alpha-8c3557e.gz",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/clash.meta-android-arm64-alpha-8c3557e.gz",
+          "size": 10628897,
+          "downloadCount": 338
+        },
+        {
+          "name": "clash.meta-android-armv7-alpha-8c3557e.gz",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/clash.meta-android-armv7-alpha-8c3557e.gz",
+          "size": 10408460,
+          "downloadCount": 107
+        },
+        {
+          "name": "clash.premium-linux-arm64-latest.gz",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/clash.premium-linux-arm64-latest.gz",
+          "size": 6985117,
+          "downloadCount": 549
+        },
+        {
+          "name": "clash.premium-linux-armv7-latest.gz",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.1/clash.premium-linux-armv7-latest.gz",
+          "size": 7116519,
+          "downloadCount": 214
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2023-10-16T11:12:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.4.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.4.0/box_for_root-v1.4.0.zip",
+          "size": 47823,
+          "downloadCount": 1100
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2023-08-14T11:56:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.3.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.3.0/box_for_root-v1.3.0.zip",
+          "size": 47240,
+          "downloadCount": 4008
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2023-08-04T16:15:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box-manager-57b4bda-prerelease.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.2.1/box-manager-57b4bda-prerelease.apk",
+          "size": 2601923,
+          "downloadCount": 1556
+        },
+        {
+          "name": "box_for_root-v1.2.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.2.1/box_for_root-v1.2.1.zip",
+          "size": 46502,
+          "downloadCount": 1155
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2023-08-01T15:27:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box-manager-0b91822-prerelease.apk",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.2.0/box-manager-0b91822-prerelease.apk",
+          "size": 3158979,
+          "downloadCount": 598
+        },
+        {
+          "name": "box_for_root-v1.2.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.2.0/box_for_root-v1.2.0.zip",
+          "size": 46819,
+          "downloadCount": 469
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2023-07-25T11:41:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.1/box_for_root-v1.1.zip",
+          "size": 47111,
+          "downloadCount": 794
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2023-07-20T02:23:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v1.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.0/box_for_root-v1.0.zip",
+          "size": 46730,
+          "downloadCount": 534
+        }
+      ]
+    },
+    {
+      "name": "v0.9.1",
+      "tagName": "v0.9.1",
+      "publishedAt": "2023-06-16T18:48:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v0.9.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v0.9.1/box_for_root-v0.9.1.zip",
+          "size": 41852,
+          "downloadCount": 1732
+        }
+      ]
+    },
+    {
+      "name": "v0.9.0",
+      "tagName": "v0.9.0",
+      "publishedAt": "2023-06-11T10:03:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v0.9.0.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v0.9.0/box_for_root-v0.9.0.zip",
+          "size": 41858,
+          "downloadCount": 319
+        }
+      ]
+    },
+    {
+      "name": "v0.8.2",
+      "tagName": "v0.8.2",
+      "publishedAt": "2023-05-15T14:31:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v0.8.2.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v0.8.2/box_for_root-v0.8.2.zip",
+          "size": 40258,
+          "downloadCount": 1425
+        }
+      ]
+    },
+    {
+      "name": "v0.8.1",
+      "tagName": "v0.8.1",
+      "publishedAt": "2023-05-08T08:35:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "box_for_root-v0.8.1.zip",
+          "downloadUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v0.8.1/box_for_root-v0.8.1.zip",
+          "size": 40086,
+          "downloadCount": 414
+        }
+      ]
+    }
+  ]
+}
