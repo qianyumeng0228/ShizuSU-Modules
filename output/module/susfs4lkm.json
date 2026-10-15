@@ -1,0 +1,79 @@
+{
+  "readme": "# SUSFS4LKM\n\n为 KSU LKM 适配 SUSFS，让 LKM 也能使用无敌环境\n\nSUSFS4LKM 是一个 KernelSU 模块：它在设备上加载 SUSFS 的可加载内核模块（LKM），并给管理器提供配置界面与统一控制接口，用于隐藏路径、挂载、KSTAT、open redirect 等痕迹。\n\n## 模块功能\n\n- **LKM 后端**：以 `.ko` 动态加载 SUSFS，不需要替换内核或刷入镜像\n- **后端优先级**：先探测内核已有后端（native 或已加载的 LKM），探测到就直接复用；只有确认“无后端”时才加载 LKM，避免二次加载\n- **8 个 GKI KMI 变体**：android12-5.10 / android13-5.10 / android13-5.15 / android14-5.15 / android14-6.1 / android15-6.6 / android16-6.12 / android17-6.18，模块按内核版本自动选择\n- **统一 JSON 控制入口**：`susfsctl --json '<单个 JSON 参数>'`，请求结构 `{operation, target, values}`，响应 `{ok, code, backend, version, capabilities, data, error}`，参数严格 POSIX 引用，helper 只操作白名单接口\n- **固定退出码**：`0` 成功 / `2` 参数错误 / `3` 无后端 / `4` 版本或布局不支持 / `5` 权限错误 / `6` 协议错误 / `7` 内核业务失败，失败时 stdout 为空、诊断在 stderr\n- **接口边界（实测）**：JSON 路径必须是以 `/` 开头的无空白字符串（含空格/换行/反斜杠会被判 `2`），拒绝 `..` 穿越与内嵌 NUL，单次请求受系统单个参数长度上限（约 128 KiB）限制，重复 key 按第一个取值\n- **WebUI**：状态页显示集成模块版本与后端版本；高级页在后端不是 LKM 时会置灰入口并在页面内禁用全部控件（path / kstat / redirect 的删除清空、full-clone、模块名与挂载前缀列表、日志与 AVC、只读诊断）\n- **保存与立即应用分离**：保存启动配置不会立刻改动运行态，立即应用不会写回配置\n- **默认策略**：后端确认 ready 后才执行原模块默认策略与属性调整，单项失败独立记录，核心失败停止后续操作\n- **远程更新**：模块内置 `updateJson` 指向本仓库 `update.json`，之后发布新版本可直接从仓库拉取\n- **可停用可回滚**：`disable` 文件 + 重启即可停用；配置与状态都在独立目录\n- **不干扰其他模块**：不修改 KernelSU、启动镜像与其他模块；不自动停用、卸载或覆盖其他模块，也不会重复加载或卸载已存在的 SUSFS LKM（外部模块自己管理的规则不属于本模块职责）\n\n## 支持范围\n\n| KMI 变体 | 内核模块来源 | 验证状态 |\n| --- | --- | --- |\n| android14-6.1 | 本仓库源码构建（含 6.1 专用补丁） | 已在 OPD2404 / kernel 6.1.141-android14-11 真机验收 |\n| android12-5.10 / android13-5.10 / android13-5.15 / android14-5.15 / android15-6.6 / android16-6.12 / android17-6.18 | 本仓库源码构建（锁定 commit `85ef920c` + 每个变体固定 DDK 镜像 digest） | 仅构建、ELF/vermagic 与包结构校验，未在对应设备启动验证 |\n\n> 下表以外的设备（非 GKI、预 5.10 内核、其他架构）不在本项目支持范围。相同 KMI 不等于相同内核 ABI，若加载失败请停用模块。\n\n## 安装教程\n\n### 前置条件\n\n1. 已安装并能正常使用 KernelSU（管理器与 `ksud` 可用）\n2. 设备为 arm64、GKI 内核，KMI 在上表支持范围内\n3. 能访问 GitHub；受限网络请先准备代理或镜像下载方式\n\n### 一、下载\n\n从 Release 页面下载最新的 `SUSFS4LKM-arm64.zip`：\n\n```\nhttps://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/latest/download/SUSFS4LKM-arm64.zip\n```\n\n建议同时下载 `SHA256SUMS` 校验：\n\n```sh\nsha256sum -c SHA256SUMS\n```\n\n### 二、安装\n\n方式 A（管理器）：KernelSU 管理器 → 模块 → 从本地安装 → 选择 `SUSFS4LKM-arm64.zip`\n\n方式 B（命令行）：\n\n```sh\nsu -c 'ksud module install /sdcard/Download/SUSFS4LKM-arm64.zip'\n```\n\n安装脚本会把配置复制到 `/data/adb/susfs4ksu_unified`，之后重启生效。\n\n### 三、重启并验证\n\n```sh\nsu -c '/data/adb/modules/susfs4ksu_unified/bin/susfsctl probe'\n```\n\n期望输出：\n\n```\nlkm v2.3.0\n```\n\n查看后端状态与能力：\n\n```sh\nsu -c '/data/adb/modules/susfs4ksu_unified/bin/susfsctl --json \"{\\\"operation\\\":\\\"status\\\"}\"'\n```\n\n### 四、打开 WebUI\n\n在 KernelSU 管理器中打开本模块的 WebUI。首页显示集成模块版本与后端版本；只有 LKM 后端会启用高级页。\n\n## 升级\n\n- 管理器内更新：版本比较依据 `update.json`（当前版本基线 `versionCode=100`）\n- 手动升级：直接在管理器里安装新版 ZIP，`/data/adb/susfs4ksu_unified` 下已有配置会保留\n\n## 停用与卸载\n\n停用（保留配置，重启后不再加载）：\n\n```sh\nsu -c 'touch /data/adb/modules/susfs4ksu_unified/disable'\nsu -c 'reboot'\n```\n\n重新启用：\n\n```sh\nsu -c 'rm -f /data/adb/modules/susfs4ksu_unified/disable'\nsu -c 'reboot'\n```\n\n卸载：在管理器中删除模块，或\n\n```sh\nsu -c 'ksud module uninstall susfs4ksu_unified'\nsu -c 'reboot'\n```\n\n停用或卸载后重启即回到模块加载前的状态；本项目不提供热卸载。\n\n## 故障排查\n\n| 现象 | 含义 | 处理 |\n| --- | --- | --- |\n| `susfsctl probe` 输出 `susfsctl: none` 且退出码 3 | 没有检测到后端 | 确认模块已启用、重启过、KMI 匹配 |\n| 退出码 4 | 版本或布局不支持 / 该操作不被当前后端支持 | 查看 stderr 里的 JSON `error` 字段 |\n| 退出码 5 | 权限错误 | 用 root（`su`）执行 |\n| 退出码 6 | 协议错误 | 内核返回异常，查看 stderr 诊断 |\n| 退出码 7 | 内核业务失败 | 目标路径/规则本身不满足条件 |\n| 高级页灰置 | 当前不是 LKM 后端 | native SUSFS 后端不提供高级页 |\n| 无法下载更新包 | 网络访问 GitHub 受限 | 用代理/镜像下载 ZIP，并按 `SHA256SUMS` 校验后再安装 |\n\n## 从源码构建\n\nWindows（本机维护流程，需要 WSL2 + Docker + Android NDK + Node.js ≥ 20 + Python 3.12）：\n\n```powershell\npowershell -File tools/build.ps1\n```\n\n产物在构建目录的 `release/`：`SUSFS4LKM-arm64.zip`、`provenance`、`SHA256SUMS`、`ROLLBACK.sh`。\n\nLinux / CI 使用同一批脚本：`tools/fetch-sources.py` → `tools/source_lock.py` → `tools/build-lkm.sh` → `tools/fetch-ko.py` → `tools/package.py`，完整顺序见 `.github/workflows/release.yml`。\n\nCI 发布的 ZIP 就是这套流程的产物，与本机 Windows 构建的 ZIP 对比：91 个成员名称、顺序与内容一致，只有宿主编译的两个 helper（`bin/susfsctl`、`bin/susfs_insmod`）因宿主 clang 工具链不同而字节不同；8 个内核模块与 WebUI 产物逐字节一致。发布包以 CI 产物为准。\n\n注意：上游源码不随仓库提交，由 `tools/fetch-sources.py` 按 `manifest.yaml` 中固定的 commit 抓取，并逐个文件核对 `SOURCE_LOCK.json` 里的 SHA256；**任何改动 `overlay/`、`src/`、`tools/`、`tests/` 或 `manifest.yaml` 之后都必须重新生成锁文件**：\n\n```sh\npython3 tools/source_lock.py . --write\n```\n\n## 目录结构\n\n```\noverlay/module/    模块脚本与 module.prop（安装进设备的文件）\noverlay/webui/     WebUI 覆盖层（与上游 webui 合并后构建）\nsrc/susfsctl/      统一控制入口的 C 源码\ntools/             取源、构建、打包、版本与校验脚本\ntests/             本地与设备端测试脚本\nupdate.json        远程更新元数据\nSOURCE_LOCK.json   构建输入锁定（含上游文件 SHA256）\n```\n\n## 开源协议\n\n- 本仓库自有代码（模块脚本、工具、WebUI 覆盖层、用户态 helper）：AGPL-3.0，见 `LICENSE`\n- 上游组件许可：LKM 为 GPL-2.0，cJSON 为 MIT，模块与 WebUI 上游为 AGPL-3.0，见 `LICENSES/`\n\n## 免责声明\n\n本模块会修改运行中的内核行为（加载 LKM、隐藏路径与挂载等），请自行评估风险并在可回滚的设备上使用。仅在上表支持范围内、且已备份数据的设备上安装。\n",
+  "readmeHTML": "<h1>SUSFS4LKM</h1>\n\n<p>为 KSU LKM 适配 SUSFS，让 LKM 也能使用无敌环境</p>\n\n<p>SUSFS4LKM 是一个 KernelSU 模块：它在设备上加载 SUSFS 的可加载内核模块（LKM），并给管理器提供配置界面与统一控制接口，用于隐藏路径、挂载、KSTAT、open redirect 等痕迹。</p>\n\n<h2>模块功能</h2>\n\n<li>**LKM 后端**：以 `.ko` 动态加载 SUSFS，不需要替换内核或刷入镜像</li>\n<li>**后端优先级**：先探测内核已有后端（native 或已加载的 LKM），探测到就直接复用；只有确认“无后端”时才加载 LKM，避免二次加载</li>\n<li>**8 个 GKI KMI 变体**：android12-5.10 / android13-5.10 / android13-5.15 / android14-5.15 / android14-6.1 / android15-6.6 / android16-6.12 / android17-6.18，模块按内核版本自动选择</li>\n<li>**统一 JSON 控制入口**：`susfsctl --json '<单个 JSON 参数>'`，请求结构 `{operation, target, values}`，响应 `{ok, code, backend, version, capabilities, data, error}`，参数严格 POSIX 引用，helper 只操作白名单接口</li>\n<li>**固定退出码**：`0` 成功 / `2` 参数错误 / `3` 无后端 / `4` 版本或布局不支持 / `5` 权限错误 / `6` 协议错误 / `7` 内核业务失败，失败时 stdout 为空、诊断在 stderr</li>\n<li>**接口边界（实测）**：JSON 路径必须是以 `/` 开头的无空白字符串（含空格/换行/反斜杠会被判 `2`），拒绝 `..` 穿越与内嵌 NUL，单次请求受系统单个参数长度上限（约 128 KiB）限制，重复 key 按第一个取值</li>\n<li>**WebUI**：状态页显示集成模块版本与后端版本；高级页在后端不是 LKM 时会置灰入口并在页面内禁用全部控件（path / kstat / redirect 的删除清空、full-clone、模块名与挂载前缀列表、日志与 AVC、只读诊断）</li>\n<li>**保存与立即应用分离**：保存启动配置不会立刻改动运行态，立即应用不会写回配置</li>\n<li>**默认策略**：后端确认 ready 后才执行原模块默认策略与属性调整，单项失败独立记录，核心失败停止后续操作</li>\n<li>**远程更新**：模块内置 `updateJson` 指向本仓库 `update.json`，之后发布新版本可直接从仓库拉取</li>\n<li>**可停用可回滚**：`disable` 文件 + 重启即可停用；配置与状态都在独立目录</li>\n<li>**不干扰其他模块**：不修改 KernelSU、启动镜像与其他模块；不自动停用、卸载或覆盖其他模块，也不会重复加载或卸载已存在的 SUSFS LKM（外部模块自己管理的规则不属于本模块职责）</li>\n\n<h2>支持范围</h2>\n\n<p>| KMI 变体 | 内核模块来源 | 验证状态 |</p>\n<p>| --- | --- | --- |</p>\n<p>| android14-6.1 | 本仓库源码构建（含 6.1 专用补丁） | 已在 OPD2404 / kernel 6.1.141-android14-11 真机验收 |</p>\n<p>| android12-5.10 / android13-5.10 / android13-5.15 / android14-5.15 / android15-6.6 / android16-6.12 / android17-6.18 | 本仓库源码构建（锁定 commit <code>85ef920c</code> + 每个变体固定 DDK 镜像 digest） | 仅构建、ELF/vermagic 与包结构校验，未在对应设备启动验证 |</p>\n\n<p>> 下表以外的设备（非 GKI、预 5.10 内核、其他架构）不在本项目支持范围。相同 KMI 不等于相同内核 ABI，若加载失败请停用模块。</p>\n\n<h2>安装教程</h2>\n\n<h3>前置条件</h3>\n\n<li>已安装并能正常使用 KernelSU（管理器与 `ksud` 可用）</li>\n<li>设备为 arm64、GKI 内核，KMI 在上表支持范围内</li>\n<li>能访问 GitHub；受限网络请先准备代理或镜像下载方式</li>\n\n<h3>一、下载</h3>\n\n<p>从 Release 页面下载最新的 <code>SUSFS4LKM-arm64.zip</code>：</p>\n\n<pre>https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/latest/download/SUSFS4LKM-arm64.zip</pre>\n\n<p>建议同时下载 <code>SHA256SUMS</code> 校验：</p>\n\n<pre>sha256sum -c SHA256SUMS</pre>\n\n<h3>二、安装</h3>\n\n<p>方式 A（管理器）：KernelSU 管理器 → 模块 → 从本地安装 → 选择 <code>SUSFS4LKM-arm64.zip</code></p>\n\n<p>方式 B（命令行）：</p>\n\n<pre>su -c 'ksud module install /sdcard/Download/SUSFS4LKM-arm64.zip'</pre>\n\n<p>安装脚本会把配置复制到 <code>/data/adb/susfs4ksu_unified</code>，之后重启生效。</p>\n\n<h3>三、重启并验证</h3>\n\n<pre>su -c '/data/adb/modules/susfs4ksu_unified/bin/susfsctl probe'</pre>\n\n<p>期望输出：</p>\n\n<pre>lkm v2.3.0</pre>\n\n<p>查看后端状态与能力：</p>\n\n<pre>su -c '/data/adb/modules/susfs4ksu_unified/bin/susfsctl --json \"{\\\"operation\\\":\\\"status\\\"}\"'</pre>\n\n<h3>四、打开 WebUI</h3>\n\n<p>在 KernelSU 管理器中打开本模块的 WebUI。首页显示集成模块版本与后端版本；只有 LKM 后端会启用高级页。</p>\n\n<h2>升级</h2>\n\n<li>管理器内更新：版本比较依据 `update.json`（当前版本基线 `versionCode=100`）</li>\n<li>手动升级：直接在管理器里安装新版 ZIP，`/data/adb/susfs4ksu_unified` 下已有配置会保留</li>\n\n<h2>停用与卸载</h2>\n\n<p>停用（保留配置，重启后不再加载）：</p>\n\n<pre>su -c 'touch /data/adb/modules/susfs4ksu_unified/disable'\nsu -c 'reboot'</pre>\n\n<p>重新启用：</p>\n\n<pre>su -c 'rm -f /data/adb/modules/susfs4ksu_unified/disable'\nsu -c 'reboot'</pre>\n\n<p>卸载：在管理器中删除模块，或</p>\n\n<pre>su -c 'ksud module uninstall susfs4ksu_unified'\nsu -c 'reboot'</pre>\n\n<p>停用或卸载后重启即回到模块加载前的状态；本项目不提供热卸载。</p>\n\n<h2>故障排查</h2>\n\n<p>| 现象 | 含义 | 处理 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <code>susfsctl probe</code> 输出 <code>susfsctl: none</code> 且退出码 3 | 没有检测到后端 | 确认模块已启用、重启过、KMI 匹配 |</p>\n<p>| 退出码 4 | 版本或布局不支持 / 该操作不被当前后端支持 | 查看 stderr 里的 JSON <code>error</code> 字段 |</p>\n<p>| 退出码 5 | 权限错误 | 用 root（<code>su</code>）执行 |</p>\n<p>| 退出码 6 | 协议错误 | 内核返回异常，查看 stderr 诊断 |</p>\n<p>| 退出码 7 | 内核业务失败 | 目标路径/规则本身不满足条件 |</p>\n<p>| 高级页灰置 | 当前不是 LKM 后端 | native SUSFS 后端不提供高级页 |</p>\n<p>| 无法下载更新包 | 网络访问 GitHub 受限 | 用代理/镜像下载 ZIP，并按 <code>SHA256SUMS</code> 校验后再安装 |</p>\n\n<h2>从源码构建</h2>\n\n<p>Windows（本机维护流程，需要 WSL2 + Docker + Android NDK + Node.js ≥ 20 + Python 3.12）：</p>\n\n<pre>powershell -File tools/build.ps1</pre>\n\n<p>产物在构建目录的 <code>release/</code>：<code>SUSFS4LKM-arm64.zip</code>、<code>provenance</code>、<code>SHA256SUMS</code>、<code>ROLLBACK.sh</code>。</p>\n\n<p>Linux / CI 使用同一批脚本：<code>tools/fetch-sources.py</code> → <code>tools/source_lock.py</code> → <code>tools/build-lkm.sh</code> → <code>tools/fetch-ko.py</code> → <code>tools/package.py</code>，完整顺序见 <code>.github/workflows/release.yml</code>。</p>\n\n<p>CI 发布的 ZIP 就是这套流程的产物，与本机 Windows 构建的 ZIP 对比：91 个成员名称、顺序与内容一致，只有宿主编译的两个 helper（<code>bin/susfsctl</code>、<code>bin/susfs_insmod</code>）因宿主 clang 工具链不同而字节不同；8 个内核模块与 WebUI 产物逐字节一致。发布包以 CI 产物为准。</p>\n\n<p>注意：上游源码不随仓库提交，由 <code>tools/fetch-sources.py</code> 按 <code>manifest.yaml</code> 中固定的 commit 抓取，并逐个文件核对 <code>SOURCE_LOCK.json</code> 里的 SHA256；<b>任何改动 <code>overlay/</code>、<code>src/</code>、<code>tools/</code>、<code>tests/</code> 或 <code>manifest.yaml</code> 之后都必须重新生成锁文件</b>：</p>\n\n<pre>python3 tools/source_lock.py . --write</pre>\n\n<h2>目录结构</h2>\n\n<pre>overlay/module/    模块脚本与 module.prop（安装进设备的文件）\noverlay/webui/     WebUI 覆盖层（与上游 webui 合并后构建）\nsrc/susfsctl/      统一控制入口的 C 源码\ntools/             取源、构建、打包、版本与校验脚本\ntests/             本地与设备端测试脚本\nupdate.json        远程更新元数据\nSOURCE_LOCK.json   构建输入锁定（含上游文件 SHA256）</pre>\n\n<h2>开源协议</h2>\n\n<li>本仓库自有代码（模块脚本、工具、WebUI 覆盖层、用户态 helper）：AGPL-3.0，见 `LICENSE`</li>\n<li>上游组件许可：LKM 为 GPL-2.0，cJSON 为 MIT，模块与 WebUI 上游为 AGPL-3.0，见 `LICENSES/`</li>\n\n<h2>免责声明</h2>\n\n<p>本模块会修改运行中的内核行为（加载 LKM、隐藏路径与挂载等），请自行评估风险并在可回滚的设备上使用。仅在上表支持范围内、且已备份数据的设备上安装。</p>",
+  "homepageUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM",
+  "sourceUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM",
+  "url": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM",
+  "latestRelease": {
+    "name": "v0.1.1",
+    "version": "v0.1.1",
+    "time": "2026-10-14T06:12:27Z",
+    "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/SUSFS4LKM-arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-10-14T06:12:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ROLLBACK.sh",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/ROLLBACK.sh",
+          "size": 188,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/SHA256SUMS",
+          "size": 262,
+          "downloadCount": 6
+        },
+        {
+          "name": "SUSFS4LKM-arm64.provenance.json",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/SUSFS4LKM-arm64.provenance.json",
+          "size": 14897,
+          "downloadCount": 8
+        },
+        {
+          "name": "SUSFS4LKM-arm64.zip",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/SUSFS4LKM-arm64.zip",
+          "size": 9675428,
+          "downloadCount": 87
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-10-14T05:58:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ROLLBACK.sh",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.0/ROLLBACK.sh",
+          "size": 188,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.0/SHA256SUMS",
+          "size": 262,
+          "downloadCount": 1
+        },
+        {
+          "name": "SUSFS4LKM-arm64.provenance.json",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.0/SUSFS4LKM-arm64.provenance.json",
+          "size": 14451,
+          "downloadCount": 2
+        },
+        {
+          "name": "SUSFS4LKM-arm64.zip",
+          "downloadUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.0/SUSFS4LKM-arm64.zip",
+          "size": 9674624,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ]
+}
