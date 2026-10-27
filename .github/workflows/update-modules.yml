@@ -62,5 +62,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: 每日模块仓库自动更新 $(date -u +%Y-%m-%d)"
+            # 远端可能已有 discover 自动审核的新提交，rebase 到最新后重推（产物下一轮会被新 config 覆盖）
+            git pull --rebase
             git push
           fi
