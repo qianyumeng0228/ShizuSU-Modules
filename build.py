@@ -501,7 +501,16 @@ def main():
     modules = config["modules"]
     output_dir = Path(config.get("outputDir", DEFAULT_OUTPUT))
     output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "module").mkdir(parents=True, exist_ok=True)
+    module_dir = output_dir / "module"
+    module_dir.mkdir(parents=True, exist_ok=True)
+    # 全量重建：清空旧详情文件，避免仓库失效/删除后残留旧文件，
+    # 导致 verify_schema.py 交叉核对（目录与详情集合不一致）失败
+    removed = 0
+    for old in module_dir.glob("*.json"):
+        old.unlink()
+        removed += 1
+    if removed:
+        print(f"已清理 {removed} 个旧详情文件（全量重建）")
 
     print(f"开始生成 {len(modules)} 个模块...")
     catalog = []

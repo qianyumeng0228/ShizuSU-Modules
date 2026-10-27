@@ -182,6 +182,12 @@ def main():
     # tracks + update.json
     tracks = {}
     modules_dir = OUT_DIR / "modules"
+    # 全量重建：清空旧 track/update，避免失效模块残留
+    if modules_dir.exists():
+        for old in modules_dir.glob("*/track.json"):
+            old.unlink()
+        for old in modules_dir.glob("*/update.json"):
+            old.unlink()
     catalog_by_id = {e["moduleId"]: e for e in catalog}
     for mid, mod in by_id.items():
         audit_entry = audit.get(mid)
