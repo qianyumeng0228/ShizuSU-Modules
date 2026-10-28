@@ -1,0 +1,49 @@
+{
+  "readme": "# 移植 ROM 上的 VoWiFi\n\n为 Redmi K50 至尊版的 HyperOS 移植 ROM 提供 VoWiFi 注册与短信通道，打包为一个 KernelSU 模块。\n\n当前维护目标是**收短信、按期产生有效账户活动以保号，以及可以恢复部署**。\n2026-09-13 用户反馈接打电话仍失败，语音保留为已知限制。\n\n## 适用范围\n\n仅验证过 `diting`、酷安 @江南烟雨断桥殇 的澎湃 OS4 移植包、Android 17 / API 37、英国 VOXI。\n其他 ROM 需要按 [移植指南](PORTING-GUIDE.md) 重新适配；模块会改变 IMS 提供方，可能影响通话和短信。\n\n## 安装与检查\n\n下载 [Release 模块](https://github.com/Suiying6023/VoWiFiPortedRom/releases/latest)，在 KernelSU 中安装后重启。\nv7 包含手机实际使用的 **Iwlan v13、phh v43 和 MinQns v1**，以及三个组件的权限白名单。\n\n在模块的 Action 中查看状态，或运行：\n\n```sh\nsu -c 'sh /data/local/tmp/phh_status.sh'\n```\n\n健康空闲状态应有至少一个 established socket、一个监听 socket、分属两个 UID 的 IPsec SA、\n`dangling=0`、近期注册授权和一个看门狗。无 WiFi 时显示 `WAIT`。\n这些指标说明本地注册链路正常；**短信投递、实际扣费与保号期限要分别核实**。\n\n## 保号\n\n取消 VOXI 包月后仍可按标准资费使用充值余额。其正式条款把充值、购买套餐或收费外发活动都计为有效使用。\n建议按 **150 天**留出余量；用收费短信时核对实际扣费，通道不可用时可在账户网页充值。\n具体依据、操作记录和恢复方法见 [保号与维护](docs/maintenance.md)。\n\n## 构建与结构\n\n从仓库中的预编译组件生成安装包，只需 Python：\n\n```sh\npython code/build/package_module.py\npython -m unittest discover -s code/tests -v\n```\n\n输出为 `code/module/vowifi-stack-v7.zip`。打包前验证载荷 SHA-256，ZIP 内附完整校验清单。\n脚本、诊断工具、三个 APK 和权限文件分别保存在 `code/module/`、`code/diagnostics/`；\n生成的 ZIP 不重复存入 Git，发布到 Release。\n\nphh 的源码补丁与构建参考见 `code/patches/`、`code/build/`，最小 QNS 源码见 `code/minqns/`。\n重新编译 APK 仍需目标 ROM 的框架文件与本地 Android 工具链；与上述打包步骤不同。\n\n部署细节见 [模块说明](docs/module-internals.md)，移植过程见 [PORTING-GUIDE.md](PORTING-GUIDE.md)。\n项目脚本及 phh 衍生补丁按 GPL-2.0 发布，见 [LICENSE](LICENSE)。\n",
+  "readmeHTML": "<h1>移植 ROM 上的 VoWiFi</h1>\n\n<p>为 Redmi K50 至尊版的 HyperOS 移植 ROM 提供 VoWiFi 注册与短信通道，打包为一个 KernelSU 模块。</p>\n\n<p>当前维护目标是<b>收短信、按期产生有效账户活动以保号，以及可以恢复部署</b>。</p>\n<p>2026-09-13 用户反馈接打电话仍失败，语音保留为已知限制。</p>\n\n<h2>适用范围</h2>\n\n<p>仅验证过 <code>diting</code>、酷安 @江南烟雨断桥殇 的澎湃 OS4 移植包、Android 17 / API 37、英国 VOXI。</p>\n<p>其他 ROM 需要按 <a href=\"PORTING-GUIDE.md\">移植指南</a> 重新适配；模块会改变 IMS 提供方，可能影响通话和短信。</p>\n\n<h2>安装与检查</h2>\n\n<p>下载 <a href=\"https://github.com/Suiying6023/VoWiFiPortedRom/releases/latest\">Release 模块</a>，在 KernelSU 中安装后重启。</p>\n<p>v7 包含手机实际使用的 <b>Iwlan v13、phh v43 和 MinQns v1</b>，以及三个组件的权限白名单。</p>\n\n<p>在模块的 Action 中查看状态，或运行：</p>\n\n<pre>su -c 'sh /data/local/tmp/phh_status.sh'</pre>\n\n<p>健康空闲状态应有至少一个 established socket、一个监听 socket、分属两个 UID 的 IPsec SA、</p>\n<p><code>dangling=0</code>、近期注册授权和一个看门狗。无 WiFi 时显示 <code>WAIT</code>。</p>\n<p>这些指标说明本地注册链路正常；<b>短信投递、实际扣费与保号期限要分别核实</b>。</p>\n\n<h2>保号</h2>\n\n<p>取消 VOXI 包月后仍可按标准资费使用充值余额。其正式条款把充值、购买套餐或收费外发活动都计为有效使用。</p>\n<p>建议按 <b>150 天</b>留出余量；用收费短信时核对实际扣费，通道不可用时可在账户网页充值。</p>\n<p>具体依据、操作记录和恢复方法见 <a href=\"docs/maintenance.md\">保号与维护</a>。</p>\n\n<h2>构建与结构</h2>\n\n<p>从仓库中的预编译组件生成安装包，只需 Python：</p>\n\n<pre>python code/build/package_module.py\npython -m unittest discover -s code/tests -v</pre>\n\n<p>输出为 <code>code/module/vowifi-stack-v7.zip</code>。打包前验证载荷 SHA-256，ZIP 内附完整校验清单。</p>\n<p>脚本、诊断工具、三个 APK 和权限文件分别保存在 <code>code/module/</code>、<code>code/diagnostics/</code>；</p>\n<p>生成的 ZIP 不重复存入 Git，发布到 Release。</p>\n\n<p>phh 的源码补丁与构建参考见 <code>code/patches/</code>、<code>code/build/</code>，最小 QNS 源码见 <code>code/minqns/</code>。</p>\n<p>重新编译 APK 仍需目标 ROM 的框架文件与本地 Android 工具链；与上述打包步骤不同。</p>\n\n<p>部署细节见 <a href=\"docs/module-internals.md\">模块说明</a>，移植过程见 <a href=\"PORTING-GUIDE.md\">PORTING-GUIDE.md</a>。</p>\n<p>项目脚本及 phh 衍生补丁按 GPL-2.0 发布，见 <a href=\"LICENSE\">LICENSE</a>。</p>",
+  "homepageUrl": "https://github.com/Suiying6023/VoWiFiPortedRom",
+  "sourceUrl": "https://github.com/Suiying6023/VoWiFiPortedRom",
+  "url": "https://github.com/Suiying6023/VoWiFiPortedRom",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-09-13T08:02:56Z",
+    "downloadUrl": "https://github.com/Suiying6023/VoWiFiPortedRom/releases/download/v1.0.1/vowifi-stack-v7.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-09-13T08:02:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/Suiying6023/VoWiFiPortedRom/releases/download/v1.0.1/SHA256SUMS.txt",
+          "size": 86,
+          "downloadCount": 4
+        },
+        {
+          "name": "vowifi-stack-v7.zip",
+          "downloadUrl": "https://github.com/Suiying6023/VoWiFiPortedRom/releases/download/v1.0.1/vowifi-stack-v7.zip",
+          "size": 1515003,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-08-23T17:05:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vowifi-stack-v6.zip",
+          "downloadUrl": "https://github.com/Suiying6023/VoWiFiPortedRom/releases/download/v1.0.0/vowifi-stack-v6.zip",
+          "size": 1505937,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

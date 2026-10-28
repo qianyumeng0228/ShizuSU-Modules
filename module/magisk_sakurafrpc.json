@@ -1,0 +1,29 @@
+{
+  "readme": "# Magisk-SakuraFrpc\n\n基于Magisk的内网穿透模块,内含SakuraFrp程序,填入sakurafrp的token和隧道id后可以暴露开放在手机上的服务,例如adb和http等,如果你的设备使用了Web服务或其他服务需要远程访问,那么该模块将是您的不错的选择。\n\n## 描述\n\n用Magisk来启动sakurafrpc,有以下三大特性:\n\n1.对比App权限更高,不容易被杀死,杀死后再次拉起,保证服务的在线率\n\n2.可以在开机进入系统前(也就是加载/sdcard/前)启动,避免重启后需要手动拉起,这点在adb远控上比较重要\n\n3.在后台无感知运行\n\n## 使用方法\n\n### 先决条件\n\n- Magisk v20.4 +\n- 连接互联网\n- 仅支持Arm AArch64 / ARM64,如果是老处理器可以手动下载并替换掉压缩文件中的frpc\n\n### 安装步骤\n\n1. **下载模块文件**\n\n2. **获取token和隧道id**:在natfrp.com官网上隧道列表中获取token和隧道id,形式如下: 01234567890ctgljp24oq11234567890:12345678\n\n3. **修改`token.conf`**（可选）：如果你在安装模块之前已经知道了你的token和隧道ID，可以先解压模块文件，把 `token.conf.example` 复制为 `token.conf` 并填入相应的信息（仓库中只提供 `token.conf.example` 模板，`token.conf` 已被 `.gitignore` 忽略，避免泄露 token）。\n\n4. **安装模块**：通过Magisk Manager安装模块文件。\n\n5. **配置Token和隧道ID**：如果你没有在第3步中提前修改`token.conf`，请在安装模块后通过文件管理器或终端编辑`/data/adb/modules/sakurafrp_magisk_module/token.conf`，将你的token和隧道ID填入该文件。\n\n6. **重启设备**：完成配置后，重启你的设备以启动SakuraFrpc服务。\n\n### ADB远控步骤\n\n隧道的本地端口需指向设备的 ADB 端口(在 natfrp 面板里把隧道本地端口设为 ADB 端口,如 5555),并让设备以 TCP 方式监听该端口。\n\n让 ADB 开机自动监听 TCP 端口(需 root),任选其一:\n\n1. **持久属性**(推荐,重启生效):\n   ```\n   su -c 'setprop persist.adb.tcp.port 5555; stop adbd; start adbd'\n   ```\n2. 或用一个独立的 Magisk 模块在开机时执行 `resetprop persist.adb.tcp.port 5555` 并重启 adbd(比改 build.prop 干净,现代 Android 上 build.prop 需 remount,不推荐)。\n\n配置完成后,从外网用 `adb connect <隧道地址>:<端口>` 即可远程调试。\n\n> ⚠️ 安全提示:ADB over TCP 经隧道暴露到公网时,仅靠 ADB 的 RSA 授权防护:会话明文、密钥单点、流量过第三方节点。请妥善保管 `~/.android/adbkey`,确认 `ro.adb.secure=1`,长期使用建议改用 Tailscale/WireGuard 等加密方案或为隧道开启访问认证。\n",
+  "readmeHTML": "<h1>Magisk-SakuraFrpc</h1>\n\n<p>基于Magisk的内网穿透模块,内含SakuraFrp程序,填入sakurafrp的token和隧道id后可以暴露开放在手机上的服务,例如adb和http等,如果你的设备使用了Web服务或其他服务需要远程访问,那么该模块将是您的不错的选择。</p>\n\n<h2>描述</h2>\n\n<p>用Magisk来启动sakurafrpc,有以下三大特性:</p>\n\n<p>1.对比App权限更高,不容易被杀死,杀死后再次拉起,保证服务的在线率</p>\n\n<p>2.可以在开机进入系统前(也就是加载/sdcard/前)启动,避免重启后需要手动拉起,这点在adb远控上比较重要</p>\n\n<p>3.在后台无感知运行</p>\n\n<h2>使用方法</h2>\n\n<h3>先决条件</h3>\n\n<li>Magisk v20.4 +</li>\n<li>连接互联网</li>\n<li>仅支持Arm AArch64 / ARM64,如果是老处理器可以手动下载并替换掉压缩文件中的frpc</li>\n\n<h3>安装步骤</h3>\n\n<li>**下载模块文件**</li>\n\n<li>**获取token和隧道id**:在natfrp.com官网上隧道列表中获取token和隧道id,形式如下: 01234567890ctgljp24oq11234567890:12345678</li>\n\n<li>**修改`token.conf`**（可选）：如果你在安装模块之前已经知道了你的token和隧道ID，可以先解压模块文件，把 `token.conf.example` 复制为 `token.conf` 并填入相应的信息（仓库中只提供 `token.conf.example` 模板，`token.conf` 已被 `.gitignore` 忽略，避免泄露 token）。</li>\n\n<li>**安装模块**：通过Magisk Manager安装模块文件。</li>\n\n<li>**配置Token和隧道ID**：如果你没有在第3步中提前修改`token.conf`，请在安装模块后通过文件管理器或终端编辑`/data/adb/modules/sakurafrp_magisk_module/token.conf`，将你的token和隧道ID填入该文件。</li>\n\n<li>**重启设备**：完成配置后，重启你的设备以启动SakuraFrpc服务。</li>\n\n<h3>ADB远控步骤</h3>\n\n<p>隧道的本地端口需指向设备的 ADB 端口(在 natfrp 面板里把隧道本地端口设为 ADB 端口,如 5555),并让设备以 TCP 方式监听该端口。</p>\n\n<p>让 ADB 开机自动监听 TCP 端口(需 root),任选其一:</p>\n\n<li>**持久属性**(推荐,重启生效):</li>\n<p>   ```</p>\n<p>   su -c 'setprop persist.adb.tcp.port 5555; stop adbd; start adbd'</p>\n<p>   ```</p>\n<li>或用一个独立的 Magisk 模块在开机时执行 `resetprop persist.adb.tcp.port 5555` 并重启 adbd(比改 build.prop 干净,现代 Android 上 build.prop 需 remount,不推荐)。</li>\n\n<p>配置完成后,从外网用 <code>adb connect <隧道地址>:<端口></code> 即可远程调试。</p>\n\n<p>> ⚠️ 安全提示:ADB over TCP 经隧道暴露到公网时,仅靠 ADB 的 RSA 授权防护:会话明文、密钥单点、流量过第三方节点。请妥善保管 <code>~/.android/adbkey</code>,确认 <code>ro.adb.secure=1</code>,长期使用建议改用 Tailscale/WireGuard 等加密方案或为隧道开启访问认证。</p>",
+  "homepageUrl": "https://github.com/christarcher/Magisk-Sakurafrpc",
+  "sourceUrl": "https://github.com/christarcher/Magisk-Sakurafrpc",
+  "url": "https://github.com/christarcher/Magisk-Sakurafrpc",
+  "latestRelease": {
+    "name": "v0.1.0",
+    "version": "v0.1.0",
+    "time": "2024-03-22T11:58:12Z",
+    "downloadUrl": "https://github.com/christarcher/Magisk-Sakurafrpc/releases/download/v0.1.0/v0.1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2024-03-22T11:58:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v0.1.0.zip",
+          "downloadUrl": "https://github.com/christarcher/Magisk-Sakurafrpc/releases/download/v0.1.0/v0.1.0.zip",
+          "size": 4012580,
+          "downloadCount": 129
+        }
+      ]
+    }
+  ]
+}

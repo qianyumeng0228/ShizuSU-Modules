@@ -1,0 +1,435 @@
+{
+  "readme": "# ZNNext\n\nA from-scratch, standalone implementation of the **Zygisk Next module**.\n\n> [!IMPORTANT]\n> ZNNext is not a **Zygisk** implementation\n> \n> ZNNext 不是一个 **Zygisk** 实现\n\n## Introduction\n\nA Magisk module that attempts to implement the ZygiskNext API.\n\n> A Zygisk Next module is a valid Magisk module. Starting with version v1.2.0—preview1 after the project went closed-source—ZygiskNext introduced support for \"ZygiskNext modules.\" These provide more convenient interfaces for inline and PLT hooking and even support advanced injection into the HyperOS Runtime. Consequently, I created this open-source Magisk module to load those ZygiskNext modules.\n\n## Supported Versions\n\n- Android 5.0 - 17 QPR3 Beta1\n- Linux 3.17 or newer\n\nor\n\n- GrapheneOS\n- Linux 3.17 or newer\n\n> Kernel event tracking is optional and uses whatever the kernel provides: tracefs\n> `sched_process_exec` events first, then the proc connector and eBPF. A `/proc`\n> polling mode needs no kernel support at all, so any supported kernel works\n> without kernel events.\n\n## Install\n\n1. Install Magisk 26402+ or KernelSU 11425+ or APatch 10700+\n2. [Download](#download) and install ZNNext in manager\n3. Reboot\n4. Have fun :)\n\n## Download\n\n- For stable releases, please go to [Github Releases page](https://github.com/VeryBaaad/ZNNext/releases)\n- For canary build, please check [Github Actions](https://github.com/VeryBaaad/ZNNext/actions/workflows/ci.yml?query=branch%3Amaster)\n\nNote: debug builds are only available in Github Actions.\n\n## Get Help\n\n**Only bug reports from **THE LATEST DEBUG BUILD** will be accepted.**\n\n- GitHub issues: [Issues](https://github.com/VeryBaaad/ZNNext/issues/)\n\n## For Developers\n\nRead the [ZygiskNextModuleSample](https://github.com/5ec1cff/ZygiskNextModuleSample)\n\n### HyperOS Runtime\n\nLook this: [hyos_runtime.md](https://github.com/LSPosed/ZygiskNext/blob/main/docs/hyos_runtime.md)\n\n## Community Discussion\n\n- Telegram: [@EdLSPesodITed](https://t.me/EdLSPesodITed)\n\nNotice: These community groups don't accept any bug report, please use [Get help](#get-help) to report.\n\n## Translation Contributing\n\nCreate a Pull Request.\n\n## Credits \n\n- [Magisk](https://github.com/topjohnwu/Magisk/): makes all these possible\n- [ZygiskNext](https://github.com/LSPosed/ZygiskNext): OG implementation\n- [Dobby](https://github.com/LSPosed/Dobby), [rv64hook](https://github.com/eirv/riscv64-inline-hook), [ShadowHook](https://github.com/bytedance/android-inline-hook), [And64InlineHook](https://github.com/Rprop/And64InlineHook), [frida-gum](https://github.com/frida/frida-gum), [HookZz](https://github.com/jmpews/HookZz/tree/2b48240203c95eb4164eded8f2b31f4bc846528a), [UrHook](https://github.com/SMlc666/urhook) and [Whale](https://github.com/asLody/whale): used for inline hooking\n- [LSPlt](https://github.com/LSPosed/LSPlt), [ByteHook](https://github.com/bytedance/bhook), [xHook](https://github.com/iqiyi/xHook), [PLTI](https://github.com/PerformanC/PLTI), [PLTHook](https://github.com/metacall/plthook) and [UrHook](https://github.com/SMlc666/urhook): used for plt hooking\n- [libcxx](https://github.com/LSPosed/prefab-libcxx): libc++/libc++abi statically linked into the loader\n- [LZMA SDK](https://www.7-zip.org/sdk.html) and [xz-embedded](https://github.com/tukaani-project/xz-embedded): `.gnu_debugdata` decompressor\n- [KernelPatch](https://github.com/bmax121/KernelPatch): for KernelPatch Module\n\n## License\n\nZNNext is licensed under the **GNU General Public License v3 (GPL-3)** (http://www.gnu.org/copyleft/gpl.html).\n\nThird-party license texts are bundled verbatim under `licenses/` in the module zip.\n",
+  "readmeHTML": "<h1>ZNNext</h1>\n\n<p>A from-scratch, standalone implementation of the <b>Zygisk Next module</b>.</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> ZNNext is not a <b>Zygisk</b> implementation</p>\n<p>></p>\n<p>> ZNNext 不是一个 <b>Zygisk</b> 实现</p>\n\n<h2>Introduction</h2>\n\n<p>A Magisk module that attempts to implement the ZygiskNext API.</p>\n\n<p>> A Zygisk Next module is a valid Magisk module. Starting with version v1.2.0—preview1 after the project went closed-source—ZygiskNext introduced support for \"ZygiskNext modules.\" These provide more convenient interfaces for inline and PLT hooking and even support advanced injection into the HyperOS Runtime. Consequently, I created this open-source Magisk module to load those ZygiskNext modules.</p>\n\n<h2>Supported Versions</h2>\n\n<li>Android 5.0 - 17 QPR3 Beta1</li>\n<li>Linux 3.17 or newer</li>\n\n<p>or</p>\n\n<li>GrapheneOS</li>\n<li>Linux 3.17 or newer</li>\n\n<p>> Kernel event tracking is optional and uses whatever the kernel provides: tracefs</p>\n<p>> <code>sched_process_exec</code> events first, then the proc connector and eBPF. A <code>/proc</code></p>\n<p>> polling mode needs no kernel support at all, so any supported kernel works</p>\n<p>> without kernel events.</p>\n\n<h2>Install</h2>\n\n<li>Install Magisk 26402+ or KernelSU 11425+ or APatch 10700+</li>\n<li>[Download](#download) and install ZNNext in manager</li>\n<li>Reboot</li>\n<li>Have fun :)</li>\n\n<h2>Download</h2>\n\n<li>For stable releases, please go to [Github Releases page](https://github.com/VeryBaaad/ZNNext/releases)</li>\n<li>For canary build, please check [Github Actions](https://github.com/VeryBaaad/ZNNext/actions/workflows/ci.yml?query=branch%3Amaster)</li>\n\n<p>Note: debug builds are only available in Github Actions.</p>\n\n<h2>Get Help</h2>\n\n<p><b>Only bug reports from </b>THE LATEST DEBUG BUILD<b> will be accepted.</b></p>\n\n<li>GitHub issues: [Issues](https://github.com/VeryBaaad/ZNNext/issues/)</li>\n\n<h2>For Developers</h2>\n\n<p>Read the <a href=\"https://github.com/5ec1cff/ZygiskNextModuleSample\">ZygiskNextModuleSample</a></p>\n\n<h3>HyperOS Runtime</h3>\n\n<p>Look this: <a href=\"https://github.com/LSPosed/ZygiskNext/blob/main/docs/hyos_runtime.md\">hyos_runtime.md</a></p>\n\n<h2>Community Discussion</h2>\n\n<li>Telegram: [@EdLSPesodITed](https://t.me/EdLSPesodITed)</li>\n\n<p>Notice: These community groups don't accept any bug report, please use <a href=\"#get-help\">Get help</a> to report.</p>\n\n<h2>Translation Contributing</h2>\n\n<p>Create a Pull Request.</p>\n\n<h2>Credits</h2>\n\n<li>[Magisk](https://github.com/topjohnwu/Magisk/): makes all these possible</li>\n<li>[ZygiskNext](https://github.com/LSPosed/ZygiskNext): OG implementation</li>\n<li>[Dobby](https://github.com/LSPosed/Dobby), [rv64hook](https://github.com/eirv/riscv64-inline-hook), [ShadowHook](https://github.com/bytedance/android-inline-hook), [And64InlineHook](https://github.com/Rprop/And64InlineHook), [frida-gum](https://github.com/frida/frida-gum), [HookZz](https://github.com/jmpews/HookZz/tree/2b48240203c95eb4164eded8f2b31f4bc846528a), [UrHook](https://github.com/SMlc666/urhook) and [Whale](https://github.com/asLody/whale): used for inline hooking</li>\n<li>[LSPlt](https://github.com/LSPosed/LSPlt), [ByteHook](https://github.com/bytedance/bhook), [xHook](https://github.com/iqiyi/xHook), [PLTI](https://github.com/PerformanC/PLTI), [PLTHook](https://github.com/metacall/plthook) and [UrHook](https://github.com/SMlc666/urhook): used for plt hooking</li>\n<li>[libcxx](https://github.com/LSPosed/prefab-libcxx): libc++/libc++abi statically linked into the loader</li>\n<li>[LZMA SDK](https://www.7-zip.org/sdk.html) and [xz-embedded](https://github.com/tukaani-project/xz-embedded): `.gnu_debugdata` decompressor</li>\n<li>[KernelPatch](https://github.com/bmax121/KernelPatch): for KernelPatch Module</li>\n\n<h2>License</h2>\n\n<p>ZNNext is licensed under the <b>GNU General Public License v3 (GPL-3)</b> (http://www.gnu.org/copyleft/gpl.html).</p>\n\n<p>Third-party license texts are bundled verbatim under <code>licenses/</code> in the module zip.</p>",
+  "homepageUrl": "https://github.com/VeryBaaad/ZNNext",
+  "sourceUrl": "https://github.com/VeryBaaad/ZNNext",
+  "url": "https://github.com/VeryBaaad/ZNNext",
+  "latestRelease": {
+    "name": "v2.6.0",
+    "version": "v2.6.0",
+    "time": "2026-10-25T11:01:44Z",
+    "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.6.0/ZNNext-v2.6.0-235-d2c08c7-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.6.0",
+      "tagName": "v2.6.0",
+      "publishedAt": "2026-10-25T11:01:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.6.0-235-d2c08c7-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.6.0/ZNNext-v2.6.0-235-d2c08c7-release.zip",
+          "size": 6592617,
+          "downloadCount": 649
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0",
+      "tagName": "v2.5.0",
+      "publishedAt": "2026-10-25T07:14:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.5.0-231-8e48bf1-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.5.0/ZNNext-v2.5.0-231-8e48bf1-release.zip",
+          "size": 6496628,
+          "downloadCount": 77
+        }
+      ]
+    },
+    {
+      "name": "v2.4.0",
+      "tagName": "v2.4.0",
+      "publishedAt": "2026-10-25T06:55:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.4.0-229-aa1f893-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.4.0/ZNNext-v2.4.0-229-aa1f893-release.zip",
+          "size": 6472697,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2026-10-25T03:18:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.3.0-227-7d37a67-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.3.0/ZNNext-v2.3.0-227-7d37a67-release.zip",
+          "size": 6463764,
+          "downloadCount": 56
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-10-24T14:34:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.2.0-224-28c0eb5-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.2.0/ZNNext-v2.2.0-224-28c0eb5-release.zip",
+          "size": 6506676,
+          "downloadCount": 148
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-10-23T15:32:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.1.0-222-29823c3-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.1.0/ZNNext-v2.1.0-222-29823c3-release.zip",
+          "size": 3253298,
+          "downloadCount": 233
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2026-10-23T14:45:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.0.1-220-f941574-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.0.1/ZNNext-v2.0.1-220-f941574-release.zip",
+          "size": 3253269,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-10-19T12:19:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZNNext-v2.0.0-212-57b46bb-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.0.0/ZNNext-v2.0.0-212-57b46bb-release.zip",
+          "size": 3225097,
+          "downloadCount": 782
+        }
+      ]
+    },
+    {
+      "name": "v1.14.1",
+      "tagName": "v1.14.1",
+      "publishedAt": "2026-10-18T13:32:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.14.1-210-614eb8e-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.14.1/Zygisk-Next-Next-v1.14.1-210-614eb8e-release.zip",
+          "size": 3225904,
+          "downloadCount": 409
+        }
+      ]
+    },
+    {
+      "name": "v1.13.0",
+      "tagName": "v1.13.0",
+      "publishedAt": "2026-10-18T09:03:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.13.0-204-22a8959-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.13.0/Zygisk-Next-Next-v1.13.0-204-22a8959-release.zip",
+          "size": 3225459,
+          "downloadCount": 184
+        }
+      ]
+    },
+    {
+      "name": "v1.12.0",
+      "tagName": "v1.12.0",
+      "publishedAt": "2026-10-17T09:44:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.12.0-202-ca4d4b7-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.12.0/Zygisk-Next-Next-v1.12.0-202-ca4d4b7-release.zip",
+          "size": 3223602,
+          "downloadCount": 530
+        }
+      ]
+    },
+    {
+      "name": "v1.11.0",
+      "tagName": "v1.11.0",
+      "publishedAt": "2026-10-17T05:16:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.11.0-199-17a19d4-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.11.0/Zygisk-Next-Next-v1.11.0-199-17a19d4-release.zip",
+          "size": 3159867,
+          "downloadCount": 170
+        }
+      ]
+    },
+    {
+      "name": "v1.10.1",
+      "tagName": "v1.10.1",
+      "publishedAt": "2026-10-17T04:17:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.10.1-197-5f01c24-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.10.1/Zygisk-Next-Next-v1.10.1-197-5f01c24-release.zip",
+          "size": 3159643,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "v1.10.0",
+      "tagName": "v1.10.0",
+      "publishedAt": "2026-10-17T04:07:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.10.0-195-8431fbc-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.10.0/Zygisk-Next-Next-v1.10.0-195-8431fbc-release.zip",
+          "size": 3160161,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v1.9.0",
+      "tagName": "v1.9.0",
+      "publishedAt": "2026-10-16T14:00:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.9.0-192-b8d9af2-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.9.0/Zygisk-Next-Next-v1.9.0-192-b8d9af2-release.zip",
+          "size": 2990089,
+          "downloadCount": 275
+        }
+      ]
+    },
+    {
+      "name": "v1.8.3",
+      "tagName": "v1.8.3",
+      "publishedAt": "2026-10-14T13:44:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.8.3-184-e4da082-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.8.3/Zygisk-Next-Next-v1.8.3-184-e4da082-release.zip",
+          "size": 2988450,
+          "downloadCount": 565
+        }
+      ]
+    },
+    {
+      "name": "v1.8.2",
+      "tagName": "v1.8.2",
+      "publishedAt": "2026-10-13T16:47:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.8.2-172-15ebf86-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.8.2/Zygisk-Next-Next-v1.8.2-172-15ebf86-release.zip",
+          "size": 2964661,
+          "downloadCount": 287
+        }
+      ]
+    },
+    {
+      "name": "v1.8.1",
+      "tagName": "v1.8.1",
+      "publishedAt": "2026-10-13T13:21:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.8.1-129-946c8c3-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.8.1/Zygisk-Next-Next-v1.8.1-129-946c8c3-release.zip",
+          "size": 3641540,
+          "downloadCount": 75
+        }
+      ]
+    },
+    {
+      "name": "v1.8.0",
+      "tagName": "v1.8.0",
+      "publishedAt": "2026-10-11T09:40:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.8.0-99-da2570a-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.8.0/Zygisk-Next-Next-v1.8.0-99-da2570a-release.zip",
+          "size": 3449038,
+          "downloadCount": 461
+        }
+      ]
+    },
+    {
+      "name": "v1.7.2",
+      "tagName": "v1.7.2",
+      "publishedAt": "2026-10-11T08:01:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.7.2-96-9940daf-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.7.2/Zygisk-Next-Next-v1.7.2-96-9940daf-release.zip",
+          "size": 3449034,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2026-10-07T04:37:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.6.0-89-4ce560c-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.6.0/Zygisk-Next-Next-v1.6.0-89-4ce560c-release.zip",
+          "size": 3449357,
+          "downloadCount": 310
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-10-04T10:41:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.5.0-79-de40e83-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.5.0/Zygisk-Next-Next-v1.5.0-79-de40e83-release.zip",
+          "size": 3857229,
+          "downloadCount": 197
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-10-02T03:10:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.4.0-74-8602d4e-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.4.0/Zygisk-Next-Next-v1.4.0-74-8602d4e-release.zip",
+          "size": 3857290,
+          "downloadCount": 116
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-09-26T14:20:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.3.0-69-a0ca46c-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.3.0/Zygisk-Next-Next-v1.3.0-69-a0ca46c-release.zip",
+          "size": 3809296,
+          "downloadCount": 76
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-09-24T13:56:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.2.0-63-47a0a2f-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.2.0/Zygisk-Next-Next-v1.2.0-63-47a0a2f-release.zip",
+          "size": 4325541,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-09-23T14:53:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.1.0-60-04a193f-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.1.0/Zygisk-Next-Next-v1.1.0-60-04a193f-release.zip",
+          "size": 4186267,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-09-21T16:06:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.0.1-58-8386d9a-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.0.1/Zygisk-Next-Next-v1.0.1-58-8386d9a-release.zip",
+          "size": 3163549,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-09-19T03:50:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v1.0.0-52-5696995-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v1.0.0/Zygisk-Next-Next-v1.0.0-52-5696995-release.zip",
+          "size": 3106372,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v0.8.0",
+      "tagName": "v0.8.0",
+      "publishedAt": "2026-09-13T03:34:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v0.8.0-36-ff97ac6-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v0.8.0/Zygisk-Next-Next-v0.8.0-36-ff97ac6-release.zip",
+          "size": 1835302,
+          "downloadCount": 133
+        }
+      ]
+    },
+    {
+      "name": "v0.7.0",
+      "tagName": "v0.7.0",
+      "publishedAt": "2026-09-08T16:14:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Zygisk-Next-Next-v0.7.0-33-360512b-release.zip",
+          "downloadUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v0.7.0/Zygisk-Next-Next-v0.7.0-33-360512b-release.zip",
+          "size": 1835006,
+          "downloadCount": 10
+        }
+      ]
+    }
+  ]
+}

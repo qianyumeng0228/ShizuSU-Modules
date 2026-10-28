@@ -1,16 +1,668 @@
 {
-  "readme": "# YouTube & YT Music Mod Builder\n\nAutomated builds of modified **YouTube** and **YouTube Music** – on two patch sets:\n[**anddea/revanced-patches**](https://github.com/anddea/revanced-patches) (ReVanced Extended) and\n[**MorpheApp/morphe-patches**](https://github.com/MorpheApp/morphe-patches) (Morphe), with voice-over translation via\n[**Yandex VoT**](https://github.com/sashade8-ship-it/morphe-patches-yavot).\n\nEvery build ships in two flavors – **NonRoot** (a plain APK) and **Root** (a Magisk/KernelSU/APatch module) – and gets\nrebuilt automatically as soon as new patches are released.\n\nSupports seamless **In-App Updates** and one-tap **Obtainium** auto-update profiles.\n\n<!--release--><a href=\"../../releases/latest\"><img src=\"https://img.shields.io/badge/release-v466-blue\" alt=\"Latest release\"></a><!--/release--> <!--downloads--><a href=\"../../releases\"><img src=\"https://img.shields.io/badge/downloads-628.0k-success\" alt=\"Downloads\"></a><!--/downloads-->\n\n## Download\n\nThe links below always point straight at the file, kept up to date automatically after every build (see full history\nin [**Releases**](../../releases)). YouTube Music ships two architectures – pick the one matching your device.\n\n> [!TIP]\n> **Using [Obtainium](https://github.com/ImranR98/Obtainium)?**  \n> Tap **Import** in the table on your Android device to automatically add the app's update profile directly into Obtainium.\n\n| App | NonRoot<br>(APK / Obtainium) | Root<br>(module) |\n| :---: | :---: | :---: |\n| **YouTube**<br>RVX (anddea) | <!--yt-rvx-apk-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-v21.13.164-all.apk)<!--/yt-rvx-apk--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%2C%5C%22appName%5C%22%3A%5C%22YouTube%20RVX%20%28anddea%29%5C%22%7D%22%7D) | <!--yt-rvx-zip-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-module-v21.13.164-all.zip)<!--/yt-rvx-zip--> |\n| **YouTube Music**<br>RVX (anddea) | <!--ytm-rvx-apk-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk)<!--/ytm-rvx-apk-arm64--><br><!--ytm-rvx-apk-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk)<!--/ytm-rvx-apk-armv7--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22YT%20Music%20RVX%20%28anddea%29%5C%22%7D%22%7D) | <!--ytm-rvx-zip-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip)<!--/ytm-rvx-zip-arm64--><br><!--ytm-rvx-zip-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip)<!--/ytm-rvx-zip-armv7--> |\n| **YouTube**<br>Morphe (VoT) | <!--yt-morphe-apk-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-v21.20.405-all.apk)<!--/yt-morphe-apk--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D) | <!--yt-morphe-zip-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-module-v21.20.405-all.zip)<!--/yt-morphe-zip--> |\n| **YouTube Music**<br>Morphe | <!--ytm-morphe-apk-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm64-v8a.apk)<!--/ytm-morphe-apk-arm64--><br><!--ytm-morphe-apk-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm-v7a.apk)<!--/ytm-morphe-apk-armv7--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.apps.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D) | <!--ytm-morphe-zip-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip)<!--/ytm-morphe-zip-arm64--><br><!--ytm-morphe-zip-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm-v7a.zip)<!--/ytm-morphe-zip-armv7--> |\n\n## NonRoot\n\n<details>\n<summary><b>Installation & Updating Guide</b></summary>\n\n#### Installation\n**1.** Install [**MicroG RE**](https://github.com/MorpheApp/MicroG-RE/releases) ([Import into Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.revanced.android.gms%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FMicroG-RE%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22MicroG%20RE%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Emicrog%28%3F%21.%2Anoicon%29%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D)) *(required to run without Root and sign into your Google account)*.  \n**2.** Install the matching app: download the APK from the table above, or simply tap **[Import]** to install and manage updates directly via Obtainium.\n\n#### Updating\n• **In-App Updater:** Check for updates directly inside the app (`Settings` → `RVX` / `Morphe` → `Patch updates`). Features: version comparison, changelog preview, direct APK download, and snooze.  \n• **Via Obtainium (Auto-updates):** Install [**Obtainium**](https://github.com/ImranR98/Obtainium) and tap the **[Import]** links in the main Download table above to add automatic update profiles directly on your Android device.\n\n</details>\n\n<details>\n<summary><b>Troubleshooting: Infinite Buffering / Playback Fix</b></summary>\n\n### ReVanced Extended (anddea) – YouTube & YouTube Music\n\n**Method 1: Spoof video streams (Recommended)**  \n**1.** Go to `Settings` → `RVX` → `Miscellaneous` → `Spoof video streams`.  \n**2.** Turn **OFF** `PoToken provider`.  \n**3.** Turn **ON** `Spoof video streams` and select a suitable default client.  \n**4.** Restart the app.\n\n**Method 2: Built-in PoToken (Fallback)**  \n**1.** Go to `Settings` → `RVX` → `Miscellaneous` → `Spoof video streams`.  \n**2.** Turn **OFF** `Spoof video streams`.  \n**3.** Turn **ON** `PoToken provider`.  \n**4.** Restart the app *(if buffering persists, force stop **MicroG RE** in Android system settings)*.\n\n> [!NOTE]\n> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.\n\n---\n\n### Morphe – YouTube & YouTube Music\n\n**Method 1: Spoof video streams (Recommended)**  \n**1.** Go to `Settings` → `Morphe` → `Miscellaneous`.  \n**2.** Turn **OFF** `PoToken provider` → `External PoToken provider`.  \n**3.** Turn **ON** `Spoof video streams` → `Spoof video streams` and select a default client.  \n**4.** Restart the app.\n\n**Method 2: External PoToken via PotHelper (Fallback)**  \n**1.** Install [**PotHelper**](https://github.com/MorpheApp/PotHelper/releases/latest) ([Import into Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.pot.helper%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FPotHelper%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22PotHelper%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%7D%22%7D)).  \n**2.** Go to `Settings` → `Morphe` → `Miscellaneous`.  \n**3.** Turn **OFF** `Spoof video streams` → `Spoof video streams`.  \n**4.** Turn **ON** `PoToken provider` → `External PoToken provider`.  \n**5.** Restart the app.\n\n> [!NOTE]\n> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.\n\n</details>\n\n## Root\n\n<details>\n<summary><b>Installation & Updating Guide</b></summary>\n\n#### Installation\n**1.** Flash the module zip archive via **Magisk**, **KernelSU**, or **APatch**.  \n**2.** Reboot the device.\n\n#### Updating\n• **In Root Manager:** Tap the **Update** button in Magisk / KernelSU / APatch (modules check for updates automatically).  \n• **Manually:** Flash the new zip archive on top of the existing one without uninstalling.\n\n</details>\n\n<details>\n<summary><b>Detach from Google Play & Troubleshooting</b></summary>\n\n#### Detach from Google Play (prevent automatic updates)\n**1.** Enable **Zygisk** in Magisk settings (or install a standalone module for KernelSU / APatch: open-source [**ReZygisk**](https://github.com/PerformanC/ReZygisk/releases) or **Zygisk Next**).  \n**2.** Flash the [**zygisk-detach**](https://github.com/j-hc/zygisk-detach/releases) module and install [**zygisk-detach-app**](https://github.com/j-hc/zygisk-detach-app/releases) APK, grant Root permissions → reboot the device.  \n**3.** Open **zygisk-detach-app**, select your target app (**YouTube** / **YouTube Music**) → tap **Detach**.\n\n#### Troubleshooting\n• **KernelSU only (blank/stock app or launch issues):**  \nOpen `KernelSU App` → `Superuser` → select target app (**YouTube** / **YouTube Music**) → *(Custom, if present)* → set `Unmount modules` to **Off** → reboot the device.  \n• **Mounting errors (*\"Reflash needed\"* / *\"Suspicious mount detected\"*):**  \nInstall the [**rvmm-zygisk-mount**](https://github.com/j-hc/rvmm-zygisk-mount) module to resolve overlayfs / mount namespace conflicts.  \n• **Playback issues & buffering:**  \nGo to `Settings` → `RVX` / `Morphe` → `Miscellaneous` → `Spoof video streams`:  \n**1.** Try turning **OFF** `Spoof video streams` and restart the app.  \n**2.** If playback issues persist, turn **ON** `Spoof video streams`, change the **Default client**, and restart the app.\n\n</details>\n\n## Credits\n\nThis build system started as a fork of [**j-hc/revanced-magisk-module**](https://github.com/j-hc/revanced-magisk-module) –\nhuge thanks to [**j-hc**](https://github.com/j-hc) for the original builder, the module template, and the tooling\n(`zygisk-detach`, `rvmm-zygisk-mount`) this repo still relies on.\n\nPatches and translation add-on come from [**anddea**](https://github.com/anddea/revanced-patches),\n[**MorpheApp**](https://github.com/MorpheApp/morphe-patches), and [**sashade8-ship-it**](https://github.com/sashade8-ship-it/morphe-patches-yavot).\n",
-  "readmeHTML": "<h1>YouTube & YT Music Mod Builder</h1>\n\n<p>Automated builds of modified <b>YouTube</b> and <b>YouTube Music</b> – on two patch sets:</p>\n<p><a href=\"https://github.com/anddea/revanced-patches\"><b>anddea/revanced-patches</b></a> (ReVanced Extended) and</p>\n<p><a href=\"https://github.com/MorpheApp/morphe-patches\"><b>MorpheApp/morphe-patches</b></a> (Morphe), with voice-over translation via</p>\n<p><a href=\"https://github.com/sashade8-ship-it/morphe-patches-yavot\"><b>Yandex VoT</b></a>.</p>\n\n<p>Every build ships in two flavors – <b>NonRoot</b> (a plain APK) and <b>Root</b> (a Magisk/KernelSU/APatch module) – and gets</p>\n<p>rebuilt automatically as soon as new patches are released.</p>\n\n<p>Supports seamless <b>In-App Updates</b> and one-tap <b>Obtainium</b> auto-update profiles.</p>\n\n<p><!--release--><a href=\"../../releases/latest\"><img src=\"https://img.shields.io/badge/release-v466-blue\" alt=\"Latest release\"></a><!--/release--> <!--downloads--><a href=\"../../releases\"><img src=\"https://img.shields.io/badge/downloads-628.0k-success\" alt=\"Downloads\"></a><!--/downloads--></p>\n\n<h2>Download</h2>\n\n<p>The links below always point straight at the file, kept up to date automatically after every build (see full history</p>\n<p>in <a href=\"../../releases\"><b>Releases</b></a>). YouTube Music ships two architectures – pick the one matching your device.</p>\n\n<p>> [!TIP]</p>\n<p>> <b>Using <a href=\"https://github.com/ImranR98/Obtainium\">Obtainium</a>?</b></p>\n<p>> Tap <b>Import</b> in the table on your Android device to automatically add the app's update profile directly into Obtainium.</p>\n\n<p>| App | NonRoot<br>(APK / Obtainium) | Root<br>(module) |</p>\n<p>| :---: | :---: | :---: |</p>\n<p>| <b>YouTube</b><br>RVX (anddea) | <!--yt-rvx-apk--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-v21.13.164-all.apk\">universal</a><!--/yt-rvx-apk--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%2C%5C%22appName%5C%22%3A%5C%22YouTube%20RVX%20%28anddea%29%5C%22%7D%22%7D\">Import</a> | <!--yt-rvx-zip--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-module-v21.13.164-all.zip\">universal</a><!--/yt-rvx-zip--> |</p>\n<p>| <b>YouTube Music</b><br>RVX (anddea) | <!--ytm-rvx-apk-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk\">arm64&#8209;v8a</a><!--/ytm-rvx-apk-arm64--><br><!--ytm-rvx-apk-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk\">arm&#8209;v7a</a><!--/ytm-rvx-apk-armv7--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22YT%20Music%20RVX%20%28anddea%29%5C%22%7D%22%7D\">Import</a> | <!--ytm-rvx-zip-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip\">arm64&#8209;v8a</a><!--/ytm-rvx-zip-arm64--><br><!--ytm-rvx-zip-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip\">arm&#8209;v7a</a><!--/ytm-rvx-zip-armv7--> |</p>\n<p>| <b>YouTube</b><br>Morphe (VoT) | <!--yt-morphe-apk--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-v21.20.405-all.apk\">universal</a><!--/yt-morphe-apk--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D\">Import</a> | <!--yt-morphe-zip--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-module-v21.20.405-all.zip\">universal</a><!--/yt-morphe-zip--> |</p>\n<p>| <b>YouTube Music</b><br>Morphe | <!--ytm-morphe-apk-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm64-v8a.apk\">arm64&#8209;v8a</a><!--/ytm-morphe-apk-arm64--><br><!--ytm-morphe-apk-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm-v7a.apk\">arm&#8209;v7a</a><!--/ytm-morphe-apk-armv7--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.apps.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D\">Import</a> | <!--ytm-morphe-zip-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip\">arm64&#8209;v8a</a><!--/ytm-morphe-zip-arm64--><br><!--ytm-morphe-zip-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm-v7a.zip\">arm&#8209;v7a</a><!--/ytm-morphe-zip-armv7--> |</p>\n\n<h2>NonRoot</h2>\n\n<p><details></p>\n<p><summary><b>Installation & Updating Guide</b></summary></p>\n\n<p>#### Installation</p>\n<p><b>1.</b> Install <a href=\"https://github.com/MorpheApp/MicroG-RE/releases\"><b>MicroG RE</b></a> (<a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.revanced.android.gms%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FMicroG-RE%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22MicroG%20RE%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Emicrog%28%3F%21.%2Anoicon%29%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D\">Import into Obtainium</a>) *(required to run without Root and sign into your Google account)*.</p>\n<p><b>2.</b> Install the matching app: download the APK from the table above, or simply tap <b>[Import]</b> to install and manage updates directly via Obtainium.</p>\n\n<p>#### Updating</p>\n<p>• <b>In-App Updater:</b> Check for updates directly inside the app (<code>Settings</code> → <code>RVX</code> / <code>Morphe</code> → <code>Patch updates</code>). Features: version comparison, changelog preview, direct APK download, and snooze.</p>\n<p>• <b>Via Obtainium (Auto-updates):</b> Install <a href=\"https://github.com/ImranR98/Obtainium\"><b>Obtainium</b></a> and tap the <b>[Import]</b> links in the main Download table above to add automatic update profiles directly on your Android device.</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Troubleshooting: Infinite Buffering / Playback Fix</b></summary></p>\n\n<h3>ReVanced Extended (anddea) – YouTube & YouTube Music</h3>\n\n<p><b>Method 1: Spoof video streams (Recommended)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>RVX</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>PoToken provider</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>Spoof video streams</code> and select a suitable default client.</p>\n<p><b>4.</b> Restart the app.</p>\n\n<p><b>Method 2: Built-in PoToken (Fallback)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>RVX</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>Spoof video streams</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>PoToken provider</code>.</p>\n<p><b>4.</b> Restart the app *(if buffering persists, force stop <b>MicroG RE</b> in Android system settings)*.</p>\n\n<p>> [!NOTE]</p>\n<p>> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.</p>\n\n<p>---</p>\n\n<h3>Morphe – YouTube & YouTube Music</h3>\n\n<p><b>Method 1: Spoof video streams (Recommended)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>Morphe</code> → <code>Miscellaneous</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>PoToken provider</code> → <code>External PoToken provider</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>Spoof video streams</code> → <code>Spoof video streams</code> and select a default client.</p>\n<p><b>4.</b> Restart the app.</p>\n\n<p><b>Method 2: External PoToken via PotHelper (Fallback)</b></p>\n<p><b>1.</b> Install <a href=\"https://github.com/MorpheApp/PotHelper/releases/latest\"><b>PotHelper</b></a> (<a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.pot.helper%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FPotHelper%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22PotHelper%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%7D%22%7D\">Import into Obtainium</a>).</p>\n<p><b>2.</b> Go to <code>Settings</code> → <code>Morphe</code> → <code>Miscellaneous</code>.</p>\n<p><b>3.</b> Turn <b>OFF</b> <code>Spoof video streams</code> → <code>Spoof video streams</code>.</p>\n<p><b>4.</b> Turn <b>ON</b> <code>PoToken provider</code> → <code>External PoToken provider</code>.</p>\n<p><b>5.</b> Restart the app.</p>\n\n<p>> [!NOTE]</p>\n<p>> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.</p>\n\n<p></details></p>\n\n<h2>Root</h2>\n\n<p><details></p>\n<p><summary><b>Installation & Updating Guide</b></summary></p>\n\n<p>#### Installation</p>\n<p><b>1.</b> Flash the module zip archive via <b>Magisk</b>, <b>KernelSU</b>, or <b>APatch</b>.</p>\n<p><b>2.</b> Reboot the device.</p>\n\n<p>#### Updating</p>\n<p>• <b>In Root Manager:</b> Tap the <b>Update</b> button in Magisk / KernelSU / APatch (modules check for updates automatically).</p>\n<p>• <b>Manually:</b> Flash the new zip archive on top of the existing one without uninstalling.</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Detach from Google Play & Troubleshooting</b></summary></p>\n\n<p>#### Detach from Google Play (prevent automatic updates)</p>\n<p><b>1.</b> Enable <b>Zygisk</b> in Magisk settings (or install a standalone module for KernelSU / APatch: open-source <a href=\"https://github.com/PerformanC/ReZygisk/releases\"><b>ReZygisk</b></a> or <b>Zygisk Next</b>).</p>\n<p><b>2.</b> Flash the <a href=\"https://github.com/j-hc/zygisk-detach/releases\"><b>zygisk-detach</b></a> module and install <a href=\"https://github.com/j-hc/zygisk-detach-app/releases\"><b>zygisk-detach-app</b></a> APK, grant Root permissions → reboot the device.</p>\n<p><b>3.</b> Open <b>zygisk-detach-app</b>, select your target app (<b>YouTube</b> / <b>YouTube Music</b>) → tap <b>Detach</b>.</p>\n\n<p>#### Troubleshooting</p>\n<p>• <b>KernelSU only (blank/stock app or launch issues):</b></p>\n<p>Open <code>KernelSU App</code> → <code>Superuser</code> → select target app (<b>YouTube</b> / <b>YouTube Music</b>) → *(Custom, if present)* → set <code>Unmount modules</code> to <b>Off</b> → reboot the device.</p>\n<p>• **Mounting errors (*\"Reflash needed\"* / *\"Suspicious mount detected\"*):**</p>\n<p>Install the <a href=\"https://github.com/j-hc/rvmm-zygisk-mount\"><b>rvmm-zygisk-mount</b></a> module to resolve overlayfs / mount namespace conflicts.</p>\n<p>• <b>Playback issues & buffering:</b></p>\n<p>Go to <code>Settings</code> → <code>RVX</code> / <code>Morphe</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>:</p>\n<p><b>1.</b> Try turning <b>OFF</b> <code>Spoof video streams</code> and restart the app.</p>\n<p><b>2.</b> If playback issues persist, turn <b>ON</b> <code>Spoof video streams</code>, change the <b>Default client</b>, and restart the app.</p>\n\n<p></details></p>\n\n<h2>Credits</h2>\n\n<p>This build system started as a fork of <a href=\"https://github.com/j-hc/revanced-magisk-module\"><b>j-hc/revanced-magisk-module</b></a> –</p>\n<p>huge thanks to <a href=\"https://github.com/j-hc\"><b>j-hc</b></a> for the original builder, the module template, and the tooling</p>\n<p>(<code>zygisk-detach</code>, <code>rvmm-zygisk-mount</code>) this repo still relies on.</p>\n\n<p>Patches and translation add-on come from <a href=\"https://github.com/anddea/revanced-patches\"><b>anddea</b></a>,</p>\n<p><a href=\"https://github.com/MorpheApp/morphe-patches\"><b>MorpheApp</b></a>, and <a href=\"https://github.com/sashade8-ship-it/morphe-patches-yavot\"><b>sashade8-ship-it</b></a>.</p>",
+  "readme": "# YouTube & YT Music Mod Builder\n\nAutomated builds of modified **YouTube** and **YouTube Music** – on two patch sets:\n[**anddea/revanced-patches**](https://github.com/anddea/revanced-patches) (ReVanced Extended) and\n[**MorpheApp/morphe-patches**](https://github.com/MorpheApp/morphe-patches) (Morphe), with voice-over translation via\n[**Yandex VoT**](https://github.com/sashade8-ship-it/morphe-patches-yavot).\n\nEvery build ships in two flavors – **NonRoot** (a plain APK) and **Root** (a Magisk/KernelSU/APatch module) – and gets\nrebuilt automatically as soon as new patches are released.\n\nSupports seamless **In-App Updates** and one-tap **Obtainium** auto-update profiles.\n\n<!--release--><a href=\"../../releases/latest\"><img src=\"https://img.shields.io/badge/release-v480-blue\" alt=\"Latest release\"></a><!--/release--> <!--downloads--><a href=\"../../releases\"><img src=\"https://img.shields.io/badge/downloads-694.9k-success\" alt=\"Downloads\"></a><!--/downloads-->\n\n## Download\n\nThe links below always point straight at the file, kept up to date automatically after every build (see full history\nin [**Releases**](../../releases)). YouTube Music ships two architectures – pick the one matching your device.\n\n> [!TIP]\n> **Using [Obtainium](https://github.com/ImranR98/Obtainium)?**  \n> Tap **Import** in the table on your Android device to automatically add the app's update profile directly into Obtainium.\n\n| App | NonRoot<br>(APK / Obtainium) | Root<br>(module) |\n| :---: | :---: | :---: |\n| **YouTube**<br>RVX (anddea) | <!--yt-rvx-apk-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-v21.13.164-all.apk)<!--/yt-rvx-apk--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%2C%5C%22appName%5C%22%3A%5C%22YouTube%20RVX%20%28anddea%29%5C%22%7D%22%7D) | <!--yt-rvx-zip-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-module-v21.13.164-all.zip)<!--/yt-rvx-zip--> |\n| **YouTube Music**<br>RVX (anddea) | <!--ytm-rvx-apk-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk)<!--/ytm-rvx-apk-arm64--><br><!--ytm-rvx-apk-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk)<!--/ytm-rvx-apk-armv7--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22YT%20Music%20RVX%20%28anddea%29%5C%22%7D%22%7D) | <!--ytm-rvx-zip-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip)<!--/ytm-rvx-zip-arm64--><br><!--ytm-rvx-zip-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip)<!--/ytm-rvx-zip-armv7--> |\n| **YouTube**<br>Morphe (VoT) | <!--yt-morphe-apk-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-v21.23.492-all.apk)<!--/yt-morphe-apk--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D) | <!--yt-morphe-zip-->[universal](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-module-v21.23.492-all.zip)<!--/yt-morphe-zip--> |\n| **YouTube Music**<br>Morphe | <!--ytm-morphe-apk-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm64-v8a.apk)<!--/ytm-morphe-apk-arm64--><br><!--ytm-morphe-apk-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm-v7a.apk)<!--/ytm-morphe-apk-armv7--><br><br>[Import](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.apps.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D) | <!--ytm-morphe-zip-arm64-->[arm64&#8209;v8a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip)<!--/ytm-morphe-zip-arm64--><br><!--ytm-morphe-zip-armv7-->[arm&#8209;v7a](https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm-v7a.zip)<!--/ytm-morphe-zip-armv7--> |\n\n## NonRoot\n\n<details>\n<summary><b>Installation & Updating Guide</b></summary>\n\n#### Installation\n**1.** Install [**MicroG RE**](https://github.com/MorpheApp/MicroG-RE/releases) ([Import into Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.revanced.android.gms%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FMicroG-RE%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22MicroG%20RE%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Emicrog%28%3F%21.%2Anoicon%29%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D)) *(required to run without Root and sign into your Google account)*.  \n**2.** Install the matching app: download the APK from the table above, or simply tap **[Import]** to install and manage updates directly via Obtainium.\n\n#### Updating\n• **In-App Updater:** Check for updates directly inside the app (`Settings` → `RVX` / `Morphe` → `Build update`). Features: version comparison, changelog preview, direct APK download, and snooze.  \n• **Via Obtainium (Auto-updates):** Install [**Obtainium**](https://github.com/ImranR98/Obtainium) and tap the **[Import]** links in the main Download table above to add automatic update profiles directly on your Android device.\n\n</details>\n\n<details>\n<summary><b>Troubleshooting: Infinite Buffering / Playback Fix</b></summary>\n\n### ReVanced Extended (anddea) – YouTube & YouTube Music\n\n**Method 1: Spoof video streams (Recommended)**  \n**1.** Go to `Settings` → `RVX` → `Miscellaneous` → `Spoof video streams`.  \n**2.** Turn **OFF** `PoToken provider`.  \n**3.** Turn **ON** `Spoof video streams` and select a suitable default client.  \n**4.** Restart the app.\n\n**Method 2: Built-in PoToken (Fallback)**  \n**1.** Go to `Settings` → `RVX` → `Miscellaneous` → `Spoof video streams`.  \n**2.** Turn **OFF** `Spoof video streams`.  \n**3.** Turn **ON** `PoToken provider`.  \n**4.** Restart the app *(if buffering persists, force stop **MicroG RE** in Android system settings)*.\n\n> [!NOTE]\n> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.\n\n---\n\n### Morphe – YouTube & YouTube Music\n\n**Method 1: Spoof video streams (Recommended)**  \n**1.** Go to `Settings` → `Morphe` → `Miscellaneous`.  \n**2.** Turn **OFF** `PoToken provider` → `External PoToken provider`.  \n**3.** Turn **ON** `Spoof video streams` → `Spoof video streams` and select a default client.  \n**4.** Restart the app.\n\n**Method 2: External PoToken via PotHelper (Fallback)**  \n**1.** Install [**PotHelper**](https://github.com/MorpheApp/PotHelper/releases/latest) ([Import into Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.pot.helper%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FPotHelper%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22PotHelper%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%7D%22%7D)).  \n**2.** Go to `Settings` → `Morphe` → `Miscellaneous`.  \n**3.** Turn **OFF** `Spoof video streams` → `Spoof video streams`.  \n**4.** Turn **ON** `PoToken provider` → `External PoToken provider`.  \n**5.** Restart the app.\n\n> [!NOTE]\n> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.\n\n</details>\n\n## Root\n\n<details>\n<summary><b>Installation & Updating Guide</b></summary>\n\n#### Installation\n**1.** Flash the module zip archive via **Magisk**, **KernelSU**, or **APatch**.  \n**2.** Reboot the device.\n\n#### Updating\n• **In Root Manager:** Tap the **Update** button in Magisk / KernelSU / APatch (modules check for updates automatically).  \n• **Manually:** Flash the new zip archive on top of the existing one without uninstalling.\n\n</details>\n\n<details>\n<summary><b>Detach from Google Play & Troubleshooting</b></summary>\n\n#### Detach from Google Play (prevent automatic updates)\n**1.** Enable **Zygisk** in Magisk settings (or install a standalone module for KernelSU / APatch: open-source [**ReZygisk**](https://github.com/PerformanC/ReZygisk/releases) or **Zygisk Next**).  \n**2.** Flash the [**zygisk-detach**](https://github.com/j-hc/zygisk-detach/releases) module and install [**zygisk-detach-app**](https://github.com/j-hc/zygisk-detach-app/releases) APK, grant Root permissions → reboot the device.  \n**3.** Open **zygisk-detach-app**, select your target app (**YouTube** / **YouTube Music**) → tap **Detach**.\n\n#### Troubleshooting\n• **KernelSU only (blank/stock app or launch issues):**  \nOpen `KernelSU App` → `Superuser` → select target app (**YouTube** / **YouTube Music**) → *(Custom, if present)* → set `Unmount modules` to **Off** → reboot the device.  \n• **Mounting errors (*\"Reflash needed\"* / *\"Suspicious mount detected\"*):**  \nInstall the [**rvmm-zygisk-mount**](https://github.com/j-hc/rvmm-zygisk-mount) module to resolve overlayfs / mount namespace conflicts.  \n• **Playback issues & buffering:**  \nGo to `Settings` → `RVX` / `Morphe` → `Miscellaneous` → `Spoof video streams`:  \n**1.** Try turning **OFF** `Spoof video streams` and restart the app.  \n**2.** If playback issues persist, turn **ON** `Spoof video streams`, change the **Default client**, and restart the app.\n\n</details>\n\n## Credits\n\nThis build system started as a fork of [**j-hc/revanced-magisk-module**](https://github.com/j-hc/revanced-magisk-module) –\nhuge thanks to [**j-hc**](https://github.com/j-hc) for the original builder, the module template, and the tooling\n(`zygisk-detach`, `rvmm-zygisk-mount`) this repo still relies on.\n\nPatches and translation add-on come from [**anddea**](https://github.com/anddea/revanced-patches),\n[**MorpheApp**](https://github.com/MorpheApp/morphe-patches), and [**sashade8-ship-it**](https://github.com/sashade8-ship-it/morphe-patches-yavot).\n",
+  "readmeHTML": "<h1>YouTube & YT Music Mod Builder</h1>\n\n<p>Automated builds of modified <b>YouTube</b> and <b>YouTube Music</b> – on two patch sets:</p>\n<p><a href=\"https://github.com/anddea/revanced-patches\"><b>anddea/revanced-patches</b></a> (ReVanced Extended) and</p>\n<p><a href=\"https://github.com/MorpheApp/morphe-patches\"><b>MorpheApp/morphe-patches</b></a> (Morphe), with voice-over translation via</p>\n<p><a href=\"https://github.com/sashade8-ship-it/morphe-patches-yavot\"><b>Yandex VoT</b></a>.</p>\n\n<p>Every build ships in two flavors – <b>NonRoot</b> (a plain APK) and <b>Root</b> (a Magisk/KernelSU/APatch module) – and gets</p>\n<p>rebuilt automatically as soon as new patches are released.</p>\n\n<p>Supports seamless <b>In-App Updates</b> and one-tap <b>Obtainium</b> auto-update profiles.</p>\n\n<p><!--release--><a href=\"../../releases/latest\"><img src=\"https://img.shields.io/badge/release-v480-blue\" alt=\"Latest release\"></a><!--/release--> <!--downloads--><a href=\"../../releases\"><img src=\"https://img.shields.io/badge/downloads-694.9k-success\" alt=\"Downloads\"></a><!--/downloads--></p>\n\n<h2>Download</h2>\n\n<p>The links below always point straight at the file, kept up to date automatically after every build (see full history</p>\n<p>in <a href=\"../../releases\"><b>Releases</b></a>). YouTube Music ships two architectures – pick the one matching your device.</p>\n\n<p>> [!TIP]</p>\n<p>> <b>Using <a href=\"https://github.com/ImranR98/Obtainium\">Obtainium</a>?</b></p>\n<p>> Tap <b>Import</b> in the table on your Android device to automatically add the app's update profile directly into Obtainium.</p>\n\n<p>| App | NonRoot<br>(APK / Obtainium) | Root<br>(module) |</p>\n<p>| :---: | :---: | :---: |</p>\n<p>| <b>YouTube</b><br>RVX (anddea) | <!--yt-rvx-apk--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-v21.13.164-all.apk\">universal</a><!--/yt-rvx-apk--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%2C%5C%22appName%5C%22%3A%5C%22YouTube%20RVX%20%28anddea%29%5C%22%7D%22%7D\">Import</a> | <!--yt-rvx-zip--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-module-v21.13.164-all.zip\">universal</a><!--/yt-rvx-zip--> |</p>\n<p>| <b>YouTube Music</b><br>RVX (anddea) | <!--ytm-rvx-apk-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk\">arm64&#8209;v8a</a><!--/ytm-rvx-apk-arm64--><br><!--ytm-rvx-apk-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk\">arm&#8209;v7a</a><!--/ytm-rvx-apk-armv7--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22anddea.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20RVX%20%28anddea%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-revanced-extended%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22YT%20Music%20RVX%20%28anddea%29%5C%22%7D%22%7D\">Import</a> | <!--ytm-rvx-zip-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip\">arm64&#8209;v8a</a><!--/ytm-rvx-zip-arm64--><br><!--ytm-rvx-zip-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip\">arm&#8209;v7a</a><!--/ytm-rvx-zip-armv7--> |</p>\n<p>| <b>YouTube</b><br>Morphe (VoT) | <!--yt-morphe-apk--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-v21.23.492-all.apk\">universal</a><!--/yt-morphe-apk--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.youtube%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YouTube%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D\">Import</a> | <!--yt-morphe-zip--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-module-v21.23.492-all.zip\">universal</a><!--/yt-morphe-zip--> |</p>\n<p>| <b>YouTube Music</b><br>Morphe | <!--ytm-morphe-apk-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm64-v8a.apk\">arm64&#8209;v8a</a><!--/ytm-morphe-apk-arm64--><br><!--ytm-morphe-apk-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm-v7a.apk\">arm&#8209;v7a</a><!--/ytm-morphe-apk-armv7--><br><br><a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.android.apps.youtube.music%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMANCrimSon%2FYouTube-ReVanced-Extended%22%2C%22author%22%3A%22MANCrimSon%22%2C%22name%22%3A%22YT%20Music%20Morphe%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22versionDetection%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Eyoutube-music-morphe%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D\">Import</a> | <!--ytm-morphe-zip-arm64--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip\">arm64&#8209;v8a</a><!--/ytm-morphe-zip-arm64--><br><!--ytm-morphe-zip-armv7--><a href=\"https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm-v7a.zip\">arm&#8209;v7a</a><!--/ytm-morphe-zip-armv7--> |</p>\n\n<h2>NonRoot</h2>\n\n<p><details></p>\n<p><summary><b>Installation & Updating Guide</b></summary></p>\n\n<p>#### Installation</p>\n<p><b>1.</b> Install <a href=\"https://github.com/MorpheApp/MicroG-RE/releases\"><b>MicroG RE</b></a> (<a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.revanced.android.gms%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FMicroG-RE%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22MicroG%20RE%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5Emicrog%28%3F%21.%2Anoicon%29%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D\">Import into Obtainium</a>) *(required to run without Root and sign into your Google account)*.</p>\n<p><b>2.</b> Install the matching app: download the APK from the table above, or simply tap <b>[Import]</b> to install and manage updates directly via Obtainium.</p>\n\n<p>#### Updating</p>\n<p>• <b>In-App Updater:</b> Check for updates directly inside the app (<code>Settings</code> → <code>RVX</code> / <code>Morphe</code> → <code>Build update</code>). Features: version comparison, changelog preview, direct APK download, and snooze.</p>\n<p>• <b>Via Obtainium (Auto-updates):</b> Install <a href=\"https://github.com/ImranR98/Obtainium\"><b>Obtainium</b></a> and tap the <b>[Import]</b> links in the main Download table above to add automatic update profiles directly on your Android device.</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Troubleshooting: Infinite Buffering / Playback Fix</b></summary></p>\n\n<h3>ReVanced Extended (anddea) – YouTube & YouTube Music</h3>\n\n<p><b>Method 1: Spoof video streams (Recommended)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>RVX</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>PoToken provider</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>Spoof video streams</code> and select a suitable default client.</p>\n<p><b>4.</b> Restart the app.</p>\n\n<p><b>Method 2: Built-in PoToken (Fallback)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>RVX</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>Spoof video streams</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>PoToken provider</code>.</p>\n<p><b>4.</b> Restart the app *(if buffering persists, force stop <b>MicroG RE</b> in Android system settings)*.</p>\n\n<p>> [!NOTE]</p>\n<p>> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.</p>\n\n<p>---</p>\n\n<h3>Morphe – YouTube & YouTube Music</h3>\n\n<p><b>Method 1: Spoof video streams (Recommended)</b></p>\n<p><b>1.</b> Go to <code>Settings</code> → <code>Morphe</code> → <code>Miscellaneous</code>.</p>\n<p><b>2.</b> Turn <b>OFF</b> <code>PoToken provider</code> → <code>External PoToken provider</code>.</p>\n<p><b>3.</b> Turn <b>ON</b> <code>Spoof video streams</code> → <code>Spoof video streams</code> and select a default client.</p>\n<p><b>4.</b> Restart the app.</p>\n\n<p><b>Method 2: External PoToken via PotHelper (Fallback)</b></p>\n<p><b>1.</b> Install <a href=\"https://github.com/MorpheApp/PotHelper/releases/latest\"><b>PotHelper</b></a> (<a href=\"https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22app.morphe.pot.helper%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMorpheApp%2FPotHelper%22%2C%22author%22%3A%22MorpheApp%22%2C%22name%22%3A%22PotHelper%22%2C%22additionalSettings%22%3A%22%7B%5C%22fallbackToOlderReleases%5C%22%3Atrue%7D%22%7D\">Import into Obtainium</a>).</p>\n<p><b>2.</b> Go to <code>Settings</code> → <code>Morphe</code> → <code>Miscellaneous</code>.</p>\n<p><b>3.</b> Turn <b>OFF</b> <code>Spoof video streams</code> → <code>Spoof video streams</code>.</p>\n<p><b>4.</b> Turn <b>ON</b> <code>PoToken provider</code> → <code>External PoToken provider</code>.</p>\n<p><b>5.</b> Restart the app.</p>\n\n<p>> [!NOTE]</p>\n<p>> Due to regional network restrictions or DPI blocking, playback may still be affected by ISP filters – verify your network bypass or VPN configuration if needed.</p>\n\n<p></details></p>\n\n<h2>Root</h2>\n\n<p><details></p>\n<p><summary><b>Installation & Updating Guide</b></summary></p>\n\n<p>#### Installation</p>\n<p><b>1.</b> Flash the module zip archive via <b>Magisk</b>, <b>KernelSU</b>, or <b>APatch</b>.</p>\n<p><b>2.</b> Reboot the device.</p>\n\n<p>#### Updating</p>\n<p>• <b>In Root Manager:</b> Tap the <b>Update</b> button in Magisk / KernelSU / APatch (modules check for updates automatically).</p>\n<p>• <b>Manually:</b> Flash the new zip archive on top of the existing one without uninstalling.</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Detach from Google Play & Troubleshooting</b></summary></p>\n\n<p>#### Detach from Google Play (prevent automatic updates)</p>\n<p><b>1.</b> Enable <b>Zygisk</b> in Magisk settings (or install a standalone module for KernelSU / APatch: open-source <a href=\"https://github.com/PerformanC/ReZygisk/releases\"><b>ReZygisk</b></a> or <b>Zygisk Next</b>).</p>\n<p><b>2.</b> Flash the <a href=\"https://github.com/j-hc/zygisk-detach/releases\"><b>zygisk-detach</b></a> module and install <a href=\"https://github.com/j-hc/zygisk-detach-app/releases\"><b>zygisk-detach-app</b></a> APK, grant Root permissions → reboot the device.</p>\n<p><b>3.</b> Open <b>zygisk-detach-app</b>, select your target app (<b>YouTube</b> / <b>YouTube Music</b>) → tap <b>Detach</b>.</p>\n\n<p>#### Troubleshooting</p>\n<p>• <b>KernelSU only (blank/stock app or launch issues):</b></p>\n<p>Open <code>KernelSU App</code> → <code>Superuser</code> → select target app (<b>YouTube</b> / <b>YouTube Music</b>) → *(Custom, if present)* → set <code>Unmount modules</code> to <b>Off</b> → reboot the device.</p>\n<p>• **Mounting errors (*\"Reflash needed\"* / *\"Suspicious mount detected\"*):**</p>\n<p>Install the <a href=\"https://github.com/j-hc/rvmm-zygisk-mount\"><b>rvmm-zygisk-mount</b></a> module to resolve overlayfs / mount namespace conflicts.</p>\n<p>• <b>Playback issues & buffering:</b></p>\n<p>Go to <code>Settings</code> → <code>RVX</code> / <code>Morphe</code> → <code>Miscellaneous</code> → <code>Spoof video streams</code>:</p>\n<p><b>1.</b> Try turning <b>OFF</b> <code>Spoof video streams</code> and restart the app.</p>\n<p><b>2.</b> If playback issues persist, turn <b>ON</b> <code>Spoof video streams</code>, change the <b>Default client</b>, and restart the app.</p>\n\n<p></details></p>\n\n<h2>Credits</h2>\n\n<p>This build system started as a fork of <a href=\"https://github.com/j-hc/revanced-magisk-module\"><b>j-hc/revanced-magisk-module</b></a> –</p>\n<p>huge thanks to <a href=\"https://github.com/j-hc\"><b>j-hc</b></a> for the original builder, the module template, and the tooling</p>\n<p>(<code>zygisk-detach</code>, <code>rvmm-zygisk-mount</code>) this repo still relies on.</p>\n\n<p>Patches and translation add-on come from <a href=\"https://github.com/anddea/revanced-patches\"><b>anddea</b></a>,</p>\n<p><a href=\"https://github.com/MorpheApp/morphe-patches\"><b>MorpheApp</b></a>, and <a href=\"https://github.com/sashade8-ship-it/morphe-patches-yavot\"><b>sashade8-ship-it</b></a>.</p>",
   "homepageUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended",
   "sourceUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended",
   "url": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended",
   "latestRelease": {
-    "name": "466",
-    "version": "466",
-    "time": "2026-10-15T17:23:19Z",
-    "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-module-v21.20.405-all.zip"
+    "name": "480",
+    "version": "480",
+    "time": "2026-10-27T18:58:27Z",
+    "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-module-v21.23.492-all.zip"
   },
   "releases": [
+    {
+      "name": "480",
+      "tagName": "480",
+      "publishedAt": "2026-10-27T18:58:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.23.492-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-module-v21.23.492-all.zip",
+          "size": 227010476,
+          "downloadCount": 110
+        },
+        {
+          "name": "youtube-morphe-v21.23.492-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-morphe-v21.23.492-all.apk",
+          "size": 138672451,
+          "downloadCount": 750
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 65110952,
+          "downloadCount": 5
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67860854,
+          "downloadCount": 39
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66894331,
+          "downloadCount": 7
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/480/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 78170577,
+          "downloadCount": 246
+        }
+      ]
+    },
+    {
+      "name": "479",
+      "tagName": "479",
+      "publishedAt": "2026-10-26T15:30:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.23.492-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-morphe-module-v21.23.492-all.zip",
+          "size": 226801968,
+          "downloadCount": 238
+        },
+        {
+          "name": "youtube-morphe-v21.23.492-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-morphe-v21.23.492-all.apk",
+          "size": 138195235,
+          "downloadCount": 1560
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64978321,
+          "downloadCount": 17
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67727981,
+          "downloadCount": 61
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66542075,
+          "downloadCount": 41
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/479/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77810129,
+          "downloadCount": 607
+        }
+      ]
+    },
+    {
+      "name": "478",
+      "tagName": "478",
+      "publishedAt": "2026-10-25T17:52:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.23.492-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-morphe-module-v21.23.492-all.zip",
+          "size": 226778478,
+          "downloadCount": 190
+        },
+        {
+          "name": "youtube-morphe-v21.23.492-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-morphe-v21.23.492-all.apk",
+          "size": 138113315,
+          "downloadCount": 1236
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64981119,
+          "downloadCount": 7
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67730844,
+          "downloadCount": 70
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66546171,
+          "downloadCount": 23
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/478/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77814225,
+          "downloadCount": 490
+        }
+      ]
+    },
+    {
+      "name": "477",
+      "tagName": "477",
+      "publishedAt": "2026-10-24T21:12:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.23.492-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-morphe-module-v21.23.492-all.zip",
+          "size": 226443231,
+          "downloadCount": 188
+        },
+        {
+          "name": "youtube-morphe-v21.23.492-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-morphe-v21.23.492-all.apk",
+          "size": 137756549,
+          "downloadCount": 1439
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64968707,
+          "downloadCount": 17
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67718337,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66513403,
+          "downloadCount": 31
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/477/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77781457,
+          "downloadCount": 561
+        }
+      ]
+    },
+    {
+      "name": "476",
+      "tagName": "476",
+      "publishedAt": "2026-10-23T21:06:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.23.492-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-morphe-module-v21.23.492-all.zip",
+          "size": 226433946,
+          "downloadCount": 235
+        },
+        {
+          "name": "youtube-morphe-v21.23.492-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-morphe-v21.23.492-all.apk",
+          "size": 137744261,
+          "downloadCount": 1576
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64938134,
+          "downloadCount": 13
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67687278,
+          "downloadCount": 58
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66451963,
+          "downloadCount": 29
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/476/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77720017,
+          "downloadCount": 722
+        }
+      ]
+    },
+    {
+      "name": "475",
+      "tagName": "475",
+      "publishedAt": "2026-10-22T20:17:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "size": 66250519,
+          "downloadCount": 78
+        },
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "size": 69301153,
+          "downloadCount": 438
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "size": 72475810,
+          "downloadCount": 120
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "size": 86508664,
+          "downloadCount": 2420
+        },
+        {
+          "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-module-v21.13.164-all.zip",
+          "size": 212806318,
+          "downloadCount": 1839
+        },
+        {
+          "name": "youtube-revanced-extended-v21.13.164-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/475/youtube-revanced-extended-v21.13.164-all.apk",
+          "size": 135926945,
+          "downloadCount": 9296
+        }
+      ]
+    },
+    {
+      "name": "474",
+      "tagName": "474",
+      "publishedAt": "2026-10-22T17:47:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219714089,
+          "downloadCount": 195
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-morphe-v21.20.405-all.apk",
+          "size": 134479136,
+          "downloadCount": 1599
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64933396,
+          "downloadCount": 2
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67683153,
+          "downloadCount": 47
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66451963,
+          "downloadCount": 12
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/474/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77720017,
+          "downloadCount": 491
+        }
+      ]
+    },
+    {
+      "name": "473",
+      "tagName": "473",
+      "publishedAt": "2026-10-21T19:39:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219607670,
+          "downloadCount": 204
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-morphe-v21.20.405-all.apk",
+          "size": 134315212,
+          "downloadCount": 1374
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64934230,
+          "downloadCount": 6
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67683590,
+          "downloadCount": 49
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66468347,
+          "downloadCount": 19
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/473/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77736401,
+          "downloadCount": 675
+        }
+      ]
+    },
+    {
+      "name": "472",
+      "tagName": "472",
+      "publishedAt": "2026-10-20T18:01:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219544190,
+          "downloadCount": 309
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-morphe-v21.20.405-all.apk",
+          "size": 134249676,
+          "downloadCount": 1563
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64874577,
+          "downloadCount": 13
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67624704,
+          "downloadCount": 79
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66365947,
+          "downloadCount": 37
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/472/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77634001,
+          "downloadCount": 759
+        }
+      ]
+    },
+    {
+      "name": "471",
+      "tagName": "471",
+      "publishedAt": "2026-10-20T01:19:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219563662,
+          "downloadCount": 176
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-morphe-v21.20.405-all.apk",
+          "size": 134286540,
+          "downloadCount": 1132
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64862601,
+          "downloadCount": 3
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67612076,
+          "downloadCount": 51
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66333179,
+          "downloadCount": 15
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/471/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77601233,
+          "downloadCount": 600
+        }
+      ]
+    },
+    {
+      "name": "470",
+      "tagName": "470",
+      "publishedAt": "2026-10-19T00:31:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 220181517,
+          "downloadCount": 212
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-morphe-v21.20.405-all.apk",
+          "size": 134167559,
+          "downloadCount": 1539
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 65240700,
+          "downloadCount": 6
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67990101,
+          "downloadCount": 65
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66333179,
+          "downloadCount": 28
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/470/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77601233,
+          "downloadCount": 792
+        }
+      ]
+    },
+    {
+      "name": "469",
+      "tagName": "469",
+      "publishedAt": "2026-10-18T00:00:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 220160767,
+          "downloadCount": 320
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-morphe-v21.20.405-all.apk",
+          "size": 134142983,
+          "downloadCount": 1534
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 65240871,
+          "downloadCount": 36
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67990271,
+          "downloadCount": 90
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66333179,
+          "downloadCount": 36
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77601233,
+          "downloadCount": 464
+        },
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "size": 66356044,
+          "downloadCount": 48
+        },
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "size": 69407317,
+          "downloadCount": 436
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "size": 72295586,
+          "downloadCount": 60
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "size": 86332536,
+          "downloadCount": 2258
+        },
+        {
+          "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-revanced-extended-module-v21.13.164-all.zip",
+          "size": 213190690,
+          "downloadCount": 1913
+        },
+        {
+          "name": "youtube-revanced-extended-v21.13.164-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/469/youtube-revanced-extended-v21.13.164-all.apk",
+          "size": 135664801,
+          "downloadCount": 8259
+        }
+      ]
+    },
+    {
+      "name": "468",
+      "tagName": "468",
+      "publishedAt": "2026-10-17T14:26:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 220137480,
+          "downloadCount": 102
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-morphe-v21.20.405-all.apk",
+          "size": 134093831,
+          "downloadCount": 801
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 65236554,
+          "downloadCount": 7
+        },
+        {
+          "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67986090,
+          "downloadCount": 35
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66333179,
+          "downloadCount": 14
+        },
+        {
+          "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/468/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77601233,
+          "downloadCount": 358
+        }
+      ]
+    },
+    {
+      "name": "467",
+      "tagName": "467",
+      "publishedAt": "2026-10-16T17:44:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
+          "size": 65782563,
+          "downloadCount": 45
+        },
+        {
+          "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
+          "size": 68831414,
+          "downloadCount": 208
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
+          "size": 71668839,
+          "downloadCount": 60
+        },
+        {
+          "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
+          "size": 85705789,
+          "downloadCount": 1305
+        },
+        {
+          "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-revanced-extended-module-v21.13.164-all.zip",
+          "size": 212125540,
+          "downloadCount": 660
+        },
+        {
+          "name": "youtube-revanced-extended-v21.13.164-all.apk",
+          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/467/youtube-revanced-extended-v21.13.164-all.apk",
+          "size": 134587435,
+          "downloadCount": 4355
+        }
+      ]
+    },
     {
       "name": "466",
       "tagName": "466",
@@ -21,37 +673,37 @@
           "name": "youtube-morphe-module-v21.20.405-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-module-v21.20.405-all.zip",
           "size": 218300421,
-          "downloadCount": 125
+          "downloadCount": 346
         },
         {
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-morphe-v21.20.405-all.apk",
           "size": 132141311,
-          "downloadCount": 747
+          "downloadCount": 2097
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "size": 64469942,
-          "downloadCount": 13
+          "downloadCount": 23
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "size": 67219568,
-          "downloadCount": 37
+          "downloadCount": 98
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 65395136,
-          "downloadCount": 16
+          "downloadCount": 43
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/466/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76663190,
-          "downloadCount": 310
+          "downloadCount": 928
         }
       ]
     },
@@ -65,25 +717,25 @@
           "name": "youtube-morphe-module-v21.20.405-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-morphe-module-v21.20.405-all.zip",
           "size": 217986969,
-          "downloadCount": 275
+          "downloadCount": 278
         },
         {
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-morphe-v21.20.405-all.apk",
           "size": 131457002,
-          "downloadCount": 1586
+          "downloadCount": 1660
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "size": 64470594,
-          "downloadCount": 22
+          "downloadCount": 24
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "size": 67220155,
-          "downloadCount": 64
+          "downloadCount": 66
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
@@ -95,43 +747,43 @@
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76659094,
-          "downloadCount": 489
+          "downloadCount": 530
         },
         {
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
           "size": 65642456,
-          "downloadCount": 20
+          "downloadCount": 26
         },
         {
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
           "size": 68690836,
-          "downloadCount": 221
+          "downloadCount": 267
         },
         {
           "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
           "size": 71484438,
-          "downloadCount": 29
+          "downloadCount": 42
         },
         {
           "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "size": 85521388,
-          "downloadCount": 1251
+          "downloadCount": 1600
         },
         {
           "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-module-v21.13.164-all.zip",
           "size": 211958007,
-          "downloadCount": 773
+          "downloadCount": 1109
         },
         {
           "name": "youtube-revanced-extended-v21.13.164-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/465/youtube-revanced-extended-v21.13.164-all.apk",
           "size": 134390316,
-          "downloadCount": 4303
+          "downloadCount": 5770
         }
       ]
     },
@@ -151,7 +803,7 @@
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/464/youtube-morphe-v21.20.405-all.apk",
           "size": 131448810,
-          "downloadCount": 1070
+          "downloadCount": 1084
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -169,13 +821,13 @@
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/464/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 65349999,
-          "downloadCount": 15
+          "downloadCount": 16
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/464/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76622149,
-          "downloadCount": 382
+          "downloadCount": 388
         }
       ]
     },
@@ -195,7 +847,7 @@
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/463/youtube-morphe-v21.20.405-all.apk",
           "size": 131448810,
-          "downloadCount": 1511
+          "downloadCount": 1539
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -219,7 +871,7 @@
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/463/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76560709,
-          "downloadCount": 565
+          "downloadCount": 568
         }
       ]
     },
@@ -233,13 +885,13 @@
           "name": "youtube-morphe-module-v21.20.405-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/462/youtube-morphe-module-v21.20.405-all.zip",
           "size": 217915717,
-          "downloadCount": 271
+          "downloadCount": 274
         },
         {
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/462/youtube-morphe-v21.20.405-all.apk",
           "size": 131325930,
-          "downloadCount": 1922
+          "downloadCount": 1946
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -257,13 +909,13 @@
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/462/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 65251695,
-          "downloadCount": 35
+          "downloadCount": 37
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/462/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76523845,
-          "downloadCount": 732
+          "downloadCount": 734
         }
       ]
     },
@@ -283,7 +935,7 @@
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/461/youtube-morphe-v21.20.405-all.apk",
           "size": 131317738,
-          "downloadCount": 725
+          "downloadCount": 727
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -307,7 +959,7 @@
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/461/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76523845,
-          "downloadCount": 240
+          "downloadCount": 242
         }
       ]
     },
@@ -339,7 +991,7 @@
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/460/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76421445,
-          "downloadCount": 728
+          "downloadCount": 733
         }
       ]
     },
@@ -353,13 +1005,13 @@
           "name": "youtube-morphe-module-v21.20.405-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/459/youtube-morphe-module-v21.20.405-all.zip",
           "size": 217827679,
-          "downloadCount": 311
+          "downloadCount": 313
         },
         {
           "name": "youtube-morphe-v21.20.405-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/459/youtube-morphe-v21.20.405-all.apk",
           "size": 131125226,
-          "downloadCount": 2157
+          "downloadCount": 2193
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -397,13 +1049,13 @@
           "name": "youtube-morphe-module-v21.16.256-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-morphe-module-v21.16.256-all.zip",
           "size": 215238261,
-          "downloadCount": 256
+          "downloadCount": 257
         },
         {
           "name": "youtube-morphe-v21.16.256-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-morphe-v21.16.256-all.apk",
           "size": 129723184,
-          "downloadCount": 1702
+          "downloadCount": 1721
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -421,13 +1073,13 @@
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 65252320,
-          "downloadCount": 40
+          "downloadCount": 42
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76524470,
-          "downloadCount": 467
+          "downloadCount": 470
         },
         {
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
@@ -439,31 +1091,31 @@
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
           "size": 68507763,
-          "downloadCount": 448
+          "downloadCount": 449
         },
         {
           "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
           "size": 71279551,
-          "downloadCount": 120
+          "downloadCount": 126
         },
         {
           "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "size": 85316501,
-          "downloadCount": 2535
+          "downloadCount": 2564
         },
         {
           "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-revanced-extended-module-v21.13.164-all.zip",
           "size": 211686858,
-          "downloadCount": 1946
+          "downloadCount": 1969
         },
         {
           "name": "youtube-revanced-extended-v21.13.164-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/458/youtube-revanced-extended-v21.13.164-all.apk",
           "size": 134054065,
-          "downloadCount": 10909
+          "downloadCount": 11344
         }
       ]
     },
@@ -483,7 +1135,7 @@
           "name": "youtube-morphe-v21.16.256-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/457/youtube-morphe-v21.16.256-all.apk",
           "size": 129694421,
-          "downloadCount": 1748
+          "downloadCount": 1769
         }
       ]
     },
@@ -497,7 +1149,7 @@
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/456/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "size": 64365127,
-          "downloadCount": 64
+          "downloadCount": 65
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
@@ -515,7 +1167,7 @@
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/456/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76479414,
-          "downloadCount": 844
+          "downloadCount": 845
         }
       ]
     },
@@ -535,7 +1187,7 @@
           "name": "youtube-morphe-v21.16.256-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/455/youtube-morphe-v21.16.256-all.apk",
           "size": 129673941,
-          "downloadCount": 2047
+          "downloadCount": 2056
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -579,7 +1231,7 @@
           "name": "youtube-morphe-v21.16.256-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/454/youtube-morphe-v21.16.256-all.apk",
           "size": 129678037,
-          "downloadCount": 1530
+          "downloadCount": 1566
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
@@ -617,7 +1269,7 @@
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/453/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
           "size": 65457880,
-          "downloadCount": 102
+          "downloadCount": 103
         },
         {
           "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
@@ -635,7 +1287,7 @@
           "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/453/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
           "size": 85316501,
-          "downloadCount": 2932
+          "downloadCount": 2943
         },
         {
           "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
@@ -647,7 +1299,7 @@
           "name": "youtube-revanced-extended-v21.13.164-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/453/youtube-revanced-extended-v21.13.164-all.apk",
           "size": 134054065,
-          "downloadCount": 9753
+          "downloadCount": 9845
         }
       ]
     },
@@ -667,31 +1319,31 @@
           "name": "youtube-morphe-v21.16.256-all.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/452/youtube-morphe-v21.16.256-all.apk",
           "size": 129653475,
-          "downloadCount": 1665
+          "downloadCount": 1683
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/452/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "size": 64338908,
-          "downloadCount": 4
+          "downloadCount": 5
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/452/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "size": 67085934,
-          "downloadCount": 54
+          "downloadCount": 55
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/452/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 65158112,
-          "downloadCount": 17
+          "downloadCount": 18
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/452/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 76426166,
-          "downloadCount": 463
+          "downloadCount": 464
         }
       ]
     },
@@ -705,653 +1357,25 @@
           "name": "youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/451/youtube-music-morphe-module-v9.20.53-arm-v7a.zip",
           "size": 64000352,
-          "downloadCount": 40
+          "downloadCount": 41
         },
         {
           "name": "youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/451/youtube-music-morphe-module-v9.20.53-arm64-v8a.zip",
           "size": 66750751,
-          "downloadCount": 67
+          "downloadCount": 68
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/451/youtube-music-morphe-v9.20.53-arm-v7a.apk",
           "size": 64707678,
-          "downloadCount": 44
+          "downloadCount": 45
         },
         {
           "name": "youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/451/youtube-music-morphe-v9.20.53-arm64-v8a.apk",
           "size": 75992116,
           "downloadCount": 619
-        }
-      ]
-    },
-    {
-      "name": "450",
-      "tagName": "450",
-      "publishedAt": "2026-10-03T12:06:08Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/450/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215199428,
-          "downloadCount": 179
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/450/youtube-morphe-v21.16.256-all.apk",
-          "size": 129710945,
-          "downloadCount": 1552
-        }
-      ]
-    },
-    {
-      "name": "449",
-      "tagName": "449",
-      "publishedAt": "2026-10-01T21:05:19Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215660831,
-          "downloadCount": 369
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-morphe-v21.16.256-all.apk",
-          "size": 130036003,
-          "downloadCount": 2405
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65348127,
-          "downloadCount": 25
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68397831,
-          "downloadCount": 93
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 68339601,
-          "downloadCount": 38
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/449/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 82376551,
-          "downloadCount": 649
-        }
-      ]
-    },
-    {
-      "name": "448",
-      "tagName": "448",
-      "publishedAt": "2026-09-30T18:32:29Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215631851,
-          "downloadCount": 357
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-morphe-v21.16.256-all.apk",
-          "size": 129968264,
-          "downloadCount": 1631
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65187720,
-          "downloadCount": 13
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68237532,
-          "downloadCount": 68
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67995537,
-          "downloadCount": 39
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/448/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 82032487,
-          "downloadCount": 497
-        }
-      ]
-    },
-    {
-      "name": "447",
-      "tagName": "447",
-      "publishedAt": "2026-09-28T17:25:04Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215590157,
-          "downloadCount": 335
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-morphe-v21.16.256-all.apk",
-          "size": 129923208,
-          "downloadCount": 2044
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65181345,
-          "downloadCount": 37
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68231463,
-          "downloadCount": 87
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67979153,
-          "downloadCount": 55
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 82032487,
-          "downloadCount": 593
-        },
-        {
-          "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
-          "size": 64982496,
-          "downloadCount": 51
-        },
-        {
-          "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
-          "size": 68031681,
-          "downloadCount": 434
-        },
-        {
-          "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
-          "size": 70825021,
-          "downloadCount": 139
-        },
-        {
-          "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
-          "size": 84874259,
-          "downloadCount": 2156
-        },
-        {
-          "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-revanced-extended-module-v21.13.164-all.zip",
-          "size": 211676871,
-          "downloadCount": 2073
-        },
-        {
-          "name": "youtube-revanced-extended-v21.13.164-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/447/youtube-revanced-extended-v21.13.164-all.apk",
-          "size": 134172975,
-          "downloadCount": 9283
-        }
-      ]
-    },
-    {
-      "name": "446",
-      "tagName": "446",
-      "publishedAt": "2026-09-27T22:04:59Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215586373,
-          "downloadCount": 185
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-morphe-v21.16.256-all.apk",
-          "size": 129923208,
-          "downloadCount": 1097
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65158367,
-          "downloadCount": 13
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68205238,
-          "downloadCount": 54
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67950481,
-          "downloadCount": 35
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/446/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81987431,
-          "downloadCount": 344
-        }
-      ]
-    },
-    {
-      "name": "445",
-      "tagName": "445",
-      "publishedAt": "2026-09-26T19:55:31Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215576780,
-          "downloadCount": 234
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-morphe-v21.16.256-all.apk",
-          "size": 129894536,
-          "downloadCount": 1397
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65150199,
-          "downloadCount": 12
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68199976,
-          "downloadCount": 69
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67930001,
-          "downloadCount": 35
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/445/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81971047,
-          "downloadCount": 506
-        }
-      ]
-    },
-    {
-      "name": "444",
-      "tagName": "444",
-      "publishedAt": "2026-09-25T19:16:28Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215034090,
-          "downloadCount": 210
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-morphe-v21.16.256-all.apk",
-          "size": 128928324,
-          "downloadCount": 1296
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65121888,
-          "downloadCount": 8
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68171560,
-          "downloadCount": 63
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67880677,
-          "downloadCount": 20
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81929915,
-          "downloadCount": 406
-        },
-        {
-          "name": "youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-revanced-extended-module-v9.15.51-arm-v7a.zip",
-          "size": 64980583,
-          "downloadCount": 29
-        },
-        {
-          "name": "youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-revanced-extended-module-v9.15.51-arm64-v8a.zip",
-          "size": 68030265,
-          "downloadCount": 303
-        },
-        {
-          "name": "youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-revanced-extended-v9.15.51-arm-v7a.apk",
-          "size": 70825021,
-          "downloadCount": 66
-        },
-        {
-          "name": "youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-music-revanced-extended-v9.15.51-arm64-v8a.apk",
-          "size": 84874259,
-          "downloadCount": 1575
-        },
-        {
-          "name": "youtube-revanced-extended-module-v21.13.164-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-revanced-extended-module-v21.13.164-all.zip",
-          "size": 211677154,
-          "downloadCount": 1206
-        },
-        {
-          "name": "youtube-revanced-extended-v21.13.164-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/444/youtube-revanced-extended-v21.13.164-all.apk",
-          "size": 134172975,
-          "downloadCount": 5062
-        }
-      ]
-    },
-    {
-      "name": "443",
-      "tagName": "443",
-      "publishedAt": "2026-09-25T01:35:02Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215032436,
-          "downloadCount": 152
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-morphe-v21.16.256-all.apk",
-          "size": 128895556,
-          "downloadCount": 1219
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65099925,
-          "downloadCount": 11
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68149645,
-          "downloadCount": 42
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67847909,
-          "downloadCount": 26
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/443/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81880763,
-          "downloadCount": 397
-        }
-      ]
-    },
-    {
-      "name": "442",
-      "tagName": "442",
-      "publishedAt": "2026-09-24T21:30:20Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215032414,
-          "downloadCount": 46
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-morphe-v21.16.256-all.apk",
-          "size": 128895556,
-          "downloadCount": 221
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65103001,
-          "downloadCount": 8
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68151805,
-          "downloadCount": 6
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67847909,
-          "downloadCount": 3
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/442/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81880763,
-          "downloadCount": 117
-        }
-      ]
-    },
-    {
-      "name": "441",
-      "tagName": "441",
-      "publishedAt": "2026-09-24T00:17:38Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/441/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65082360,
-          "downloadCount": 31
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/441/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68132200,
-          "downloadCount": 53
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/441/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67815141,
-          "downloadCount": 45
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/441/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81864379,
-          "downloadCount": 469
-        }
-      ]
-    },
-    {
-      "name": "440",
-      "tagName": "440",
-      "publishedAt": "2026-09-23T22:23:29Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/440/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215028927,
-          "downloadCount": 157
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/440/youtube-morphe-v21.16.256-all.apk",
-          "size": 128883268,
-          "downloadCount": 1090
-        }
-      ]
-    },
-    {
-      "name": "439",
-      "tagName": "439",
-      "publishedAt": "2026-09-23T18:59:31Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215023303,
-          "downloadCount": 58
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-morphe-v21.16.256-all.apk",
-          "size": 128883268,
-          "downloadCount": 322
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65083142,
-          "downloadCount": 5
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68132384,
-          "downloadCount": 21
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67815141,
-          "downloadCount": 1
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/439/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81864379,
-          "downloadCount": 132
-        }
-      ]
-    },
-    {
-      "name": "438",
-      "tagName": "438",
-      "publishedAt": "2026-09-22T19:43:06Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215020209,
-          "downloadCount": 182
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-morphe-v21.16.256-all.apk",
-          "size": 128870809,
-          "downloadCount": 1181
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65070427,
-          "downloadCount": 11
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68120310,
-          "downloadCount": 55
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67794490,
-          "downloadCount": 32
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/438/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81843728,
-          "downloadCount": 425
-        }
-      ]
-    },
-    {
-      "name": "437",
-      "tagName": "437",
-      "publishedAt": "2026-09-22T18:14:45Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "youtube-morphe-module-v21.16.256-all.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-morphe-module-v21.16.256-all.zip",
-          "size": 215019741,
-          "downloadCount": 26
-        },
-        {
-          "name": "youtube-morphe-v21.16.256-all.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-morphe-v21.16.256-all.apk",
-          "size": 128870809,
-          "downloadCount": 154
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-music-morphe-module-v9.15.51-arm-v7a.zip",
-          "size": 65070427,
-          "downloadCount": 1
-        },
-        {
-          "name": "youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-music-morphe-module-v9.15.51-arm64-v8a.zip",
-          "size": 68120313,
-          "downloadCount": 6
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-music-morphe-v9.15.51-arm-v7a.apk",
-          "size": 67794490,
-          "downloadCount": 3
-        },
-        {
-          "name": "youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "downloadUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/437/youtube-music-morphe-v9.15.51-arm64-v8a.apk",
-          "size": 81843728,
-          "downloadCount": 54
         }
       ]
     }

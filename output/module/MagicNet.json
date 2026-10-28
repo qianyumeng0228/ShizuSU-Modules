@@ -1,16 +1,762 @@
 {
-  "readme": "<p align=\"center\">\n  <img src=\"./icon.png\" alt=\"MagicNet Logo\" width=\"180\" />\n</p>\n\n<h1 align=\"center\">MagicNet</h1>\n\n<p align=\"center\">\n  <a href=\"./README.md\">简体中文</a> · <a href=\"./README.en.md\">English</a> · <a href=\"./README.ru.md\">Русский</a>\n</p>\n\n<p align=\"center\">\n  Android root 设备上的 sing-box 透明网络工作台\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/LIghtJUNction/MagicNet?display_name=tag&sort=semver&style=flat-square\" /></a>\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml\"><img alt=\"Code Quality\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml/badge.svg?branch=main\" /></a>\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml\"><img alt=\"Build\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml/badge.svg?branch=main\" /></a>\n  <a href=\"./sing-box\"><img alt=\"sing-box fork\" src=\"https://img.shields.io/badge/core-sing--box%20fork-17181C?style=flat-square\" /></a>\n  <img alt=\"TUN and eBPF\" src=\"https://img.shields.io/badge/dataplane-TUN%20%7C%20eBPF-6E56CF?style=flat-square\" />\n  <a href=\"./LICENSE\"><img alt=\"MIT license\" src=\"https://img.shields.io/github/license/LIghtJUNction/MagicNet?style=flat-square\" /></a>\n</p>\n\nMagicNet 用 root 管理的 [sing-box fork](sing-box) 接管、分流和代理 Android 设备流量，不占用系统 VPN slot。默认使用 `tun`；需要时可显式切换到 `ebpf`。主线只支持这两种模式，不包含 `auto`、TProxy、Redirect 或 netd `ALLOW_MULTI` 路径。\n\n## 核心特色\n\n- **订阅内容不限定为 sing-box 格式**：支持一行一个公网 HTTPS 订阅链接，最多五个来源。下载内容可识别 Clash/Mihomo YAML、base64、常见分享链接集合、sing-box JSON 和纯文本。\n- **直接兼容 Clash/Mihomo 订阅**：无需先找“sing-box 专用订阅”。把同一个合法 Clash/Mihomo 订阅 URL 交给 MagicNet，模块会解析节点并生成受控的 sing-box 配置。\n- **覆盖常见节点协议**：原生导入 VLESS、VMess、Trojan、Shadowsocks、SOCKS、Hysteria2、AnyTLS 与 TUIC；可选转换器可处理额外格式。 原生备用解析支持常见字面量字段和普通引号值；不支持的协议、复杂 TLS/传输选项、别名、块标量及需要转义解析的字段值需要完整转换器。转换器不可用或失败时，这些输入会被明确拒绝并保留当前配置。\n- **自带 sing-box fork 内核**：仓库固定内核子模块和 Android arm64 构建，包含 MagicNet 使用的 eBPF inbound、Android 兼容修复与回归测试，不调用系统中来源不明的 sing-box。\n- **TUN 与 eBPF 两套透明数据面**：TUN 创建 `magicnet0`；eBPF 默认使用 hybrid，同时启用 local cgroup，并在确认下游接口后通过 shared TC 接管热点流量；没有下游接口时 shared 保持 pending。两种模式显式、互斥、原子切换，失败会回滚。\n- **应用、Wi-Fi 与热点策略**：应用可设为 Proxy、Direct 或 Bypass；Wi-Fi 可按 SSID/BSSID 切换策略；热点可选择 Direct 或 Proxy。\n- **配置模板仓库**：默认使用固定 commit 和 SHA-256 的 `MagicSingBox` 配置，也可改为自己的 GitHub/GitLab fork，在仓库中维护规则后原子同步。\n- **DNS 与故障边界可见**：拦截物理出口上的明文 DNS/DoT，`cli health` 和 `cli transparent status` 分别按 TUN 接口或 eBPF capability/cgroup/TC 报告真实状态。\n- **WebUI、CLI 与 MCP**：同一套受控命令覆盖日常配置、节点测试、诊断、备份和自动化；私密 payload 使用临时文件传递，支持包默认脱敏。WebUI 概览以“流量星座”实时展示 设备 → 数据面 → sing-box → 出口 的已证实状态，按 `Ctrl/⌘ + K` 或 `/` 可快速跳转到任意页面。\n\n## 安装与首次成功运行\n\n1. 从 [Releases](https://github.com/LIghtJUNction/MagicNet/releases) 下载模块 ZIP，在 Magisk、KernelSU 或 APatch 的模块页面安装并重启。\n2. 在系统设置中关闭“私人 DNS / 私密 DNS / Private DNS”，不要保留为“自动”。\n3. 打开 root 管理器提供的模块 WebUI，在“订阅”中保存合法的 URL，或导入本地 Clash YAML、base64、分享链接、JSON 或文本订阅。\n4. 等待“保存并启用”完成，在 WebUI 健康页确认 sing-box 与当前数据面正常。默认 TUN 应建立 `magicnet0`；eBPF 应显示 local cgroup 状态及 shared attached/pending 状态。\n\n也可以在 root shell 中完成 URL 配置和验收：\n\n```bash\nsu -c '/data/adb/modules/MagicNet/cli setup \"https://example.com/subscription\"'\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\n```\n\n成功状态应同时满足：`cli health` 没有核心/Dataplane 阻塞项，`cli transparent status` 的 configured/effective 状态准确。TUN 以 `magicnet0` 为准；eBPF 不能要求 `magicnet0`，而应报告 capability、local cgroup 与 shared TC/interface。MagicNet 不提供节点、订阅或外部出口，请只使用你有权使用且符合当地法律与服务条款的资源。\n\n详细格式、协议和操作说明见 [用户指南](docs/user-guide.md)。\n\n## 常用命令\n\n```bash\n# 状态与恢复\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli transparent set tun\nsu -c /data/adb/modules/MagicNet/cli transparent set ebpf\nsu -c /data/adb/modules/MagicNet/cli repair\nsu -c /data/adb/modules/MagicNet/cli service restart sing-box\n\n# 订阅与节点\nsu -c /data/adb/modules/MagicNet/cli sub status\nsu -c /data/adb/modules/MagicNet/cli sub update sing-box\nsu -c /data/adb/modules/MagicNet/cli node test-all\n\n# 应用策略；bypass 适合与外部 VPN 共存，普通直连优先用 direct\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.app proxy'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.browser direct'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.vpn bypass'\n\n# Wi-Fi 与热点\nsu -c '/data/adb/modules/MagicNet/cli wifi add-ssid \"Home WiFi\"'\nsu -c /data/adb/modules/MagicNet/cli wifi enable\nsu -c /data/adb/modules/MagicNet/cli hotspot enable\nsu -c /data/adb/modules/MagicNet/cli hotspot status\n\n# 网络兼容与支持包\nsu -c /data/adb/modules/MagicNet/cli network status\nsu -c '/data/adb/modules/MagicNet/cli network set ipv4_only 1400 5m'\nsu -c /data/adb/modules/MagicNet/cli support bundle\n```\n\n## 网络边界\n\nMagicNet 会拦截物理出口上的直连 DNS/DoT（53/853），但浏览器内置 DoH 和外部 VPN 有自己的流量边界。关闭 Private DNS 后再做泄露测试；抓包接口应以 `ip route get 1.1.1.1` 的实际物理出口为准。\n\nMagicNet 不创建热点，不替代厂商 tethering/NAT，也不自动接管外部 VPN overlay。局域网默认走 `lan`/Direct；userspace Tailscale endpoint 需要显式配置，边界与验收见 [Tailscale 说明](docs/tailscale.md)。\n\n断网时不要反复切换模式。保留当前现场，依次查看 configured/effective、rollback/pending 与健康状态：\n\n```bash\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli diagnose\nsu -c /data/adb/modules/MagicNet/cli support bundle\n```\n\n## 控制界面\n\n- 模块 WebUI：安装模块后由 Magisk、KernelSU 或 APatch 的模块页面打开，覆盖首次配置、应用/Wi-Fi/热点策略、节点与诊断。\n- 界面语言：WebUI 支持简体中文、English 和 Русский，可手动切换并记住选择。安装向导及模块操作菜单支持英文、俄语，保留已有中文、日语和韩语。安装器默认跟随 Android 系统语言，也可在交互安装时选择。\n- [MCP](docs/mcp.md)：适合从工作站自动化控制真机，默认关闭且要求 secret 认证。\n\n终端操作菜单可用 `KAM_UI_LANGUAGE=ru` 或 `KAM_UI_LANGUAGE=en` 临时指定语言，例如：\n\n```bash\nsu -c 'KAM_UI_LANGUAGE=ru sh /data/adb/modules/MagicNet/action.sh'\n```\n\nCLI 命令、状态字段、配置值和原始日志保持原样，方便脚本及诊断工具读取；内置第三方内核面板使用其自身的语言设置。\n\n## 开发安装\n\n已配置 [kam](https://github.com/MemDeco-WG/kamfw) 时可以直接安装：\n\n```bash\nkam install LIghtJUNction/MagicNet\n```\n\n从源码构建：\n\n```bash\ngit clone https://github.com/LIghtJUNction/MagicNet.git\ncd MagicNet\ngit submodule update --init\nkam build\n```\n\n产物位于 `dist/MagicNet.zip`。构建、包结构和发布验收见 [构建与发布包说明](docs/build.md)。\n\n## 文档\n\n- [用户指南](docs/user-guide.md)：安装、导入、节点、应用/Wi-Fi/热点与排障。\n- [构建与发布包说明](docs/build.md)：发布 ZIP、依赖锁和包验收。\n- [本机仿真、AVD 和真机验收](docs/local-simulation.md)：分层测试与安全传输目录。\n- [MCP 自动化说明](docs/mcp.md)：认证、端口转发、日志和启动故障检查。\n- [架构说明](ARCHITECTURE.md)：仓库模块、运行架构、状态归属和故障边界。\n- [贡献指南](CONTRIBUTING.md)：开发环境、质量检查和改动边界。\n- [安全策略](SECURITY.md)：私密漏洞报告方式和需要保持的安全属性。\n- [kamfw 本地文档](src/MagicNet/lib/kamfw/README.md)：模块内嵌运行时；上游项目见 [MemDeco-WG/kamfw](https://github.com/MemDeco-WG/kamfw)。\n\n## 社区与支持\n\n<a href=\"https://donate.lmm.best/?project=magicnet\"><img src=\"https://donate.lmm.best/badge.svg?project=magicnet&amp;currency=CNY&amp;lang=zh-CN&amp;period=all&amp;layout=compact&amp;theme=dark&amp;width=360&amp;title=MagicNet\" alt=\"捐赠支持\" width=\"360\" /></a>\n\n- Discord：[加入官方群聊](https://discord.gg/asRwgK9FpA)\n- GitHub Issue：建议附上 `cli health`、`cli transparent status` 和 `cli support bundle` 的脱敏结果。\n- 开发支持：MagicNet 的网络功能不依赖 LLM API；如需 OpenAI 兼容的多模型接口，可以使用 [LMM API Gateway](https://api.lmm.best)。[项目源码](https://github.com/TokenNotIncluded/api.lmm.best)现由 [TokenNotIncluded](https://github.com/TokenNotIncluded) 组织托管。\n\nWebUI 的“反馈问题 / 创建 Issue”会先选择问题类型，再按类型生成脱敏上下文。提交前仍应检查正文，不要公开订阅 URL、token、secret、password、完整节点地址或设备标识。\n\n## 许可证\n\nMIT，见 [LICENSE](LICENSE)。\n",
-  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"./icon.png\" alt=\"MagicNet Logo\" width=\"180\" /></p>\n<p></p></p>\n\n<p><h1 align=\"center\">MagicNet</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"./README.md\">简体中文</a> · <a href=\"./README.en.md\">English</a> · <a href=\"./README.ru.md\">Русский</a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  Android root 设备上的 sing-box 透明网络工作台</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/LIghtJUNction/MagicNet?display_name=tag&sort=semver&style=flat-square\" /></a></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml\"><img alt=\"Code Quality\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml/badge.svg?branch=main\" /></a></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml\"><img alt=\"Build\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml/badge.svg?branch=main\" /></a></p>\n<p>  <a href=\"./sing-box\"><img alt=\"sing-box fork\" src=\"https://img.shields.io/badge/core-sing--box%20fork-17181C?style=flat-square\" /></a></p>\n<p>  <img alt=\"TUN and eBPF\" src=\"https://img.shields.io/badge/dataplane-TUN%20%7C%20eBPF-6E56CF?style=flat-square\" /></p>\n<p>  <a href=\"./LICENSE\"><img alt=\"MIT license\" src=\"https://img.shields.io/github/license/LIghtJUNction/MagicNet?style=flat-square\" /></a></p>\n<p></p></p>\n\n<p>MagicNet 用 root 管理的 <a href=\"sing-box\">sing-box fork</a> 接管、分流和代理 Android 设备流量，不占用系统 VPN slot。默认使用 <code>tun</code>；需要时可显式切换到 <code>ebpf</code>。主线只支持这两种模式，不包含 <code>auto</code>、TProxy、Redirect 或 netd <code>ALLOW_MULTI</code> 路径。</p>\n\n<h2>核心特色</h2>\n\n<li>**订阅内容不限定为 sing-box 格式**：支持一行一个公网 HTTPS 订阅链接，最多五个来源。下载内容可识别 Clash/Mihomo YAML、base64、常见分享链接集合、sing-box JSON 和纯文本。</li>\n<li>**直接兼容 Clash/Mihomo 订阅**：无需先找“sing-box 专用订阅”。把同一个合法 Clash/Mihomo 订阅 URL 交给 MagicNet，模块会解析节点并生成受控的 sing-box 配置。</li>\n<li>**覆盖常见节点协议**：原生导入 VLESS、VMess、Trojan、Shadowsocks、SOCKS、Hysteria2、AnyTLS 与 TUIC；可选转换器可处理额外格式。 原生备用解析支持常见字面量字段和普通引号值；不支持的协议、复杂 TLS/传输选项、别名、块标量及需要转义解析的字段值需要完整转换器。转换器不可用或失败时，这些输入会被明确拒绝并保留当前配置。</li>\n<li>**自带 sing-box fork 内核**：仓库固定内核子模块和 Android arm64 构建，包含 MagicNet 使用的 eBPF inbound、Android 兼容修复与回归测试，不调用系统中来源不明的 sing-box。</li>\n<li>**TUN 与 eBPF 两套透明数据面**：TUN 创建 `magicnet0`；eBPF 默认使用 hybrid，同时启用 local cgroup，并在确认下游接口后通过 shared TC 接管热点流量；没有下游接口时 shared 保持 pending。两种模式显式、互斥、原子切换，失败会回滚。</li>\n<li>**应用、Wi-Fi 与热点策略**：应用可设为 Proxy、Direct 或 Bypass；Wi-Fi 可按 SSID/BSSID 切换策略；热点可选择 Direct 或 Proxy。</li>\n<li>**配置模板仓库**：默认使用固定 commit 和 SHA-256 的 `MagicSingBox` 配置，也可改为自己的 GitHub/GitLab fork，在仓库中维护规则后原子同步。</li>\n<li>**DNS 与故障边界可见**：拦截物理出口上的明文 DNS/DoT，`cli health` 和 `cli transparent status` 分别按 TUN 接口或 eBPF capability/cgroup/TC 报告真实状态。</li>\n<li>**WebUI、CLI 与 MCP**：同一套受控命令覆盖日常配置、节点测试、诊断、备份和自动化；私密 payload 使用临时文件传递，支持包默认脱敏。WebUI 概览以“流量星座”实时展示 设备 → 数据面 → sing-box → 出口 的已证实状态，按 `Ctrl/⌘ + K` 或 `/` 可快速跳转到任意页面。</li>\n\n<h2>安装与首次成功运行</h2>\n\n<li>从 [Releases](https://github.com/LIghtJUNction/MagicNet/releases) 下载模块 ZIP，在 Magisk、KernelSU 或 APatch 的模块页面安装并重启。</li>\n<li>在系统设置中关闭“私人 DNS / 私密 DNS / Private DNS”，不要保留为“自动”。</li>\n<li>打开 root 管理器提供的模块 WebUI，在“订阅”中保存合法的 URL，或导入本地 Clash YAML、base64、分享链接、JSON 或文本订阅。</li>\n<li>等待“保存并启用”完成，在 WebUI 健康页确认 sing-box 与当前数据面正常。默认 TUN 应建立 `magicnet0`；eBPF 应显示 local cgroup 状态及 shared attached/pending 状态。</li>\n\n<p>也可以在 root shell 中完成 URL 配置和验收：</p>\n\n<pre>su -c '/data/adb/modules/MagicNet/cli setup \"https://example.com/subscription\"'\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status</pre>\n\n<p>成功状态应同时满足：<code>cli health</code> 没有核心/Dataplane 阻塞项，<code>cli transparent status</code> 的 configured/effective 状态准确。TUN 以 <code>magicnet0</code> 为准；eBPF 不能要求 <code>magicnet0</code>，而应报告 capability、local cgroup 与 shared TC/interface。MagicNet 不提供节点、订阅或外部出口，请只使用你有权使用且符合当地法律与服务条款的资源。</p>\n\n<p>详细格式、协议和操作说明见 <a href=\"docs/user-guide.md\">用户指南</a>。</p>\n\n<h2>常用命令</h2>\n\n<pre># 状态与恢复\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli transparent set tun\nsu -c /data/adb/modules/MagicNet/cli transparent set ebpf\nsu -c /data/adb/modules/MagicNet/cli repair\nsu -c /data/adb/modules/MagicNet/cli service restart sing-box\n\n# 订阅与节点\nsu -c /data/adb/modules/MagicNet/cli sub status\nsu -c /data/adb/modules/MagicNet/cli sub update sing-box\nsu -c /data/adb/modules/MagicNet/cli node test-all\n\n# 应用策略；bypass 适合与外部 VPN 共存，普通直连优先用 direct\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.app proxy'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.browser direct'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.vpn bypass'\n\n# Wi-Fi 与热点\nsu -c '/data/adb/modules/MagicNet/cli wifi add-ssid \"Home WiFi\"'\nsu -c /data/adb/modules/MagicNet/cli wifi enable\nsu -c /data/adb/modules/MagicNet/cli hotspot enable\nsu -c /data/adb/modules/MagicNet/cli hotspot status\n\n# 网络兼容与支持包\nsu -c /data/adb/modules/MagicNet/cli network status\nsu -c '/data/adb/modules/MagicNet/cli network set ipv4_only 1400 5m'\nsu -c /data/adb/modules/MagicNet/cli support bundle</pre>\n\n<h2>网络边界</h2>\n\n<p>MagicNet 会拦截物理出口上的直连 DNS/DoT（53/853），但浏览器内置 DoH 和外部 VPN 有自己的流量边界。关闭 Private DNS 后再做泄露测试；抓包接口应以 <code>ip route get 1.1.1.1</code> 的实际物理出口为准。</p>\n\n<p>MagicNet 不创建热点，不替代厂商 tethering/NAT，也不自动接管外部 VPN overlay。局域网默认走 <code>lan</code>/Direct；userspace Tailscale endpoint 需要显式配置，边界与验收见 <a href=\"docs/tailscale.md\">Tailscale 说明</a>。</p>\n\n<p>断网时不要反复切换模式。保留当前现场，依次查看 configured/effective、rollback/pending 与健康状态：</p>\n\n<pre>su -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli diagnose\nsu -c /data/adb/modules/MagicNet/cli support bundle</pre>\n\n<h2>控制界面</h2>\n\n<li>模块 WebUI：安装模块后由 Magisk、KernelSU 或 APatch 的模块页面打开，覆盖首次配置、应用/Wi-Fi/热点策略、节点与诊断。</li>\n<li>界面语言：WebUI 支持简体中文、English 和 Русский，可手动切换并记住选择。安装向导及模块操作菜单支持英文、俄语，保留已有中文、日语和韩语。安装器默认跟随 Android 系统语言，也可在交互安装时选择。</li>\n<li>[MCP](docs/mcp.md)：适合从工作站自动化控制真机，默认关闭且要求 secret 认证。</li>\n\n<p>终端操作菜单可用 <code>KAM_UI_LANGUAGE=ru</code> 或 <code>KAM_UI_LANGUAGE=en</code> 临时指定语言，例如：</p>\n\n<pre>su -c 'KAM_UI_LANGUAGE=ru sh /data/adb/modules/MagicNet/action.sh'</pre>\n\n<p>CLI 命令、状态字段、配置值和原始日志保持原样，方便脚本及诊断工具读取；内置第三方内核面板使用其自身的语言设置。</p>\n\n<h2>开发安装</h2>\n\n<p>已配置 <a href=\"https://github.com/MemDeco-WG/kamfw\">kam</a> 时可以直接安装：</p>\n\n<pre>kam install LIghtJUNction/MagicNet</pre>\n\n<p>从源码构建：</p>\n\n<pre>git clone https://github.com/LIghtJUNction/MagicNet.git\ncd MagicNet\ngit submodule update --init\nkam build</pre>\n\n<p>产物位于 <code>dist/MagicNet.zip</code>。构建、包结构和发布验收见 <a href=\"docs/build.md\">构建与发布包说明</a>。</p>\n\n<h2>文档</h2>\n\n<li>[用户指南](docs/user-guide.md)：安装、导入、节点、应用/Wi-Fi/热点与排障。</li>\n<li>[构建与发布包说明](docs/build.md)：发布 ZIP、依赖锁和包验收。</li>\n<li>[本机仿真、AVD 和真机验收](docs/local-simulation.md)：分层测试与安全传输目录。</li>\n<li>[MCP 自动化说明](docs/mcp.md)：认证、端口转发、日志和启动故障检查。</li>\n<li>[架构说明](ARCHITECTURE.md)：仓库模块、运行架构、状态归属和故障边界。</li>\n<li>[贡献指南](CONTRIBUTING.md)：开发环境、质量检查和改动边界。</li>\n<li>[安全策略](SECURITY.md)：私密漏洞报告方式和需要保持的安全属性。</li>\n<li>[kamfw 本地文档](src/MagicNet/lib/kamfw/README.md)：模块内嵌运行时；上游项目见 [MemDeco-WG/kamfw](https://github.com/MemDeco-WG/kamfw)。</li>\n\n<h2>社区与支持</h2>\n\n<p><a href=\"https://donate.lmm.best/?project=magicnet\"><img src=\"https://donate.lmm.best/badge.svg?project=magicnet&amp;currency=CNY&amp;lang=zh-CN&amp;period=all&amp;layout=compact&amp;theme=dark&amp;width=360&amp;title=MagicNet\" alt=\"捐赠支持\" width=\"360\" /></a></p>\n\n<li>Discord：[加入官方群聊](https://discord.gg/asRwgK9FpA)</li>\n<li>GitHub Issue：建议附上 `cli health`、`cli transparent status` 和 `cli support bundle` 的脱敏结果。</li>\n<li>开发支持：MagicNet 的网络功能不依赖 LLM API；如需 OpenAI 兼容的多模型接口，可以使用 [LMM API Gateway](https://api.lmm.best)。[项目源码](https://github.com/TokenNotIncluded/api.lmm.best)现由 [TokenNotIncluded](https://github.com/TokenNotIncluded) 组织托管。</li>\n\n<p>WebUI 的“反馈问题 / 创建 Issue”会先选择问题类型，再按类型生成脱敏上下文。提交前仍应检查正文，不要公开订阅 URL、token、secret、password、完整节点地址或设备标识。</p>\n\n<h2>许可证</h2>\n\n<p>MIT，见 <a href=\"LICENSE\">LICENSE</a>。</p>",
+  "readme": "<p align=\"center\">\n  <img src=\"./icon.png\" alt=\"MagicNet Logo\" width=\"180\" />\n</p>\n\n<h1 align=\"center\">MagicNet</h1>\n\n<p align=\"center\">\n  <a href=\"./README.md\">简体中文</a> · <a href=\"./README.en.md\">English</a> · <a href=\"./README.ru.md\">Русский</a>\n</p>\n\n<p align=\"center\">\n  Android root 设备上的 sing-box 透明网络工作台\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/LIghtJUNction/MagicNet?display_name=tag&sort=semver&style=flat-square\" /></a>\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml\"><img alt=\"Code Quality\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml/badge.svg?branch=main\" /></a>\n  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml\"><img alt=\"Build\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml/badge.svg?branch=main\" /></a>\n  <a href=\"./sing-box\"><img alt=\"sing-box fork\" src=\"https://img.shields.io/badge/core-sing--box%20fork-17181C?style=flat-square\" /></a>\n  <img alt=\"TUN and eBPF\" src=\"https://img.shields.io/badge/dataplane-TUN%20%7C%20eBPF-6E56CF?style=flat-square\" />\n  <a href=\"./LICENSE\"><img alt=\"MIT license\" src=\"https://img.shields.io/github/license/LIghtJUNction/MagicNet?style=flat-square\" /></a>\n</p>\n\nMagicNet 用 root 管理的 [sing-box fork](sing-box) 接管、分流和代理 Android 设备流量，不占用系统 VPN slot。默认使用 `tun`；需要时可显式切换到 `ebpf`。主线只支持这两种模式，不包含 `auto`、TProxy、Redirect 或 netd `ALLOW_MULTI` 路径。\n\n## 核心特色\n\n- **订阅内容不限定为 sing-box 格式**：支持一行一个公网 HTTPS 订阅链接，最多五个来源。下载内容可识别 Clash/Mihomo YAML、base64、常见分享链接集合、sing-box JSON 和纯文本。\n- **直接兼容 Clash/Mihomo 订阅**：无需先找“sing-box 专用订阅”。把同一个合法 Clash/Mihomo 订阅 URL 交给 MagicNet，模块会解析节点并生成受控的 sing-box 配置。\n- **覆盖常见节点协议**：原生导入 VLESS、VMess、Trojan、Shadowsocks、SOCKS、Hysteria2、AnyTLS 与 TUIC；可选转换器可处理额外格式。 原生备用解析支持常见字面量字段和普通引号值；不支持的协议、复杂 TLS/传输选项、别名、块标量及需要转义解析的字段值需要完整转换器。转换器不可用或失败时，这些输入会被明确拒绝并保留当前配置。\n- **自带 sing-box fork 内核**：仓库固定内核子模块和 Android arm64 构建，包含 MagicNet 使用的 eBPF inbound、Android 兼容修复与回归测试，不调用系统中来源不明的 sing-box。\n- **TUN 与 eBPF 两套透明数据面**：TUN 创建 `magicnet0`；eBPF 默认使用 hybrid，同时启用 local cgroup，并在确认下游接口后通过 shared TC 接管热点流量；没有下游接口时 shared 保持 pending。两种模式显式、互斥、原子切换，失败会回滚。\n- **应用、Wi-Fi 与热点策略**：应用可设为 Proxy、Direct 或 Bypass；Wi-Fi 可按 SSID/BSSID 切换策略；热点可选择 Direct 或 Proxy。\n- **配置模板仓库**：默认使用固定 commit 和 SHA-256 的 `MagicSingBox` 配置，也可改为自己的 GitHub/GitLab fork，在仓库中维护规则后原子同步。\n- **DNS 与故障边界可见**：拦截物理出口上的明文 DNS/DoT，`cli health` 和 `cli transparent status` 分别按 TUN 接口或 eBPF capability/cgroup/TC 报告真实状态。\n- **WebUI、CLI 与 MCP**：同一套受控命令覆盖日常配置、节点测试、诊断、备份和自动化；私密 payload 使用临时文件传递，支持包默认脱敏。WebUI 概览以“流量星座”实时展示 设备 → 数据面 → sing-box → 出口 的已证实状态，按 `Ctrl/⌘ + K` 或 `/` 可快速跳转到任意页面。\n\n## 安装与首次成功运行\n\n> **旧版本升级到 v1.6.2：需要手动安装一次。** 本版为符合 KernelSU Modules 限制，将版本码迁移为 `10602`。先备份配置，再在 root 管理器中直接安装 `MagicNet-full.zip`，不要先卸载。详见 [版本码迁移说明](docs/releases/v1.6.2.md)。\n\n1. 从 [Releases](https://github.com/LIghtJUNction/MagicNet/releases) 下载模块 ZIP，在 Magisk、KernelSU 或 APatch 的模块页面安装并重启。\n2. 在系统设置中关闭“私人 DNS / 私密 DNS / Private DNS”，不要保留为“自动”。\n3. 打开 root 管理器提供的模块 WebUI，在“订阅”中保存合法的 URL，或导入本地 Clash YAML、base64、分享链接、JSON 或文本订阅。\n4. 等待“保存并启用”完成，在 WebUI 健康页确认 sing-box 与当前数据面正常。默认 TUN 应建立 `magicnet0`；eBPF 应显示 local cgroup 状态及 shared attached/pending 状态。\n\n也可以在 root shell 中完成 URL 配置和验收：\n\n```bash\nsu -c '/data/adb/modules/MagicNet/cli setup \"https://example.com/subscription\"'\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\n```\n\n成功状态应同时满足：`cli health` 没有核心/Dataplane 阻塞项，`cli transparent status` 的 configured/effective 状态准确。TUN 以 `magicnet0` 为准；eBPF 不能要求 `magicnet0`，而应报告 capability、local cgroup 与 shared TC/interface。MagicNet 不提供节点、订阅或外部出口，请只使用你有权使用且符合当地法律与服务条款的资源。\n\n详细格式、协议和操作说明见 [用户指南](docs/user-guide.md)。\n\n## 常用命令\n\n```bash\n# 状态与恢复\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli transparent set tun\nsu -c /data/adb/modules/MagicNet/cli transparent set ebpf\nsu -c /data/adb/modules/MagicNet/cli repair\nsu -c /data/adb/modules/MagicNet/cli service restart sing-box\n\n# 订阅与节点\nsu -c /data/adb/modules/MagicNet/cli sub status\nsu -c /data/adb/modules/MagicNet/cli sub update sing-box\nsu -c /data/adb/modules/MagicNet/cli node test-all\n\n# 应用策略；bypass 适合与外部 VPN 共存，普通直连优先用 direct\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.app proxy'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.browser direct'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.vpn bypass'\n\n# Wi-Fi 与热点\nsu -c '/data/adb/modules/MagicNet/cli wifi add-ssid \"Home WiFi\"'\nsu -c /data/adb/modules/MagicNet/cli wifi enable\nsu -c /data/adb/modules/MagicNet/cli hotspot enable\nsu -c /data/adb/modules/MagicNet/cli hotspot status\n\n# 网络兼容与支持包\nsu -c /data/adb/modules/MagicNet/cli network status\nsu -c '/data/adb/modules/MagicNet/cli network set ipv4_only 1400 5m'\nsu -c /data/adb/modules/MagicNet/cli support bundle\n```\n\n## 网络边界\n\nMagicNet 会拦截物理出口上的直连 DNS/DoT（53/853），但浏览器内置 DoH 和外部 VPN 有自己的流量边界。关闭 Private DNS 后再做泄露测试；抓包接口应以 `ip route get 1.1.1.1` 的实际物理出口为准。\n\nMagicNet 不创建热点，不替代厂商 tethering/NAT，也不自动接管外部 VPN overlay。局域网默认走 `lan`/Direct；userspace Tailscale endpoint 需要显式配置，边界与验收见 [Tailscale 说明](docs/tailscale.md)。\n\n断网时不要反复切换模式。保留当前现场，依次查看 configured/effective、rollback/pending 与健康状态：\n\n```bash\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli diagnose\nsu -c /data/adb/modules/MagicNet/cli support bundle\n```\n\n## 控制界面\n\n- 模块 WebUI：安装模块后由 Magisk、KernelSU 或 APatch 的模块页面打开，覆盖首次配置、应用/Wi-Fi/热点策略、节点与诊断。\n- 界面语言：WebUI 支持简体中文、English 和 Русский，可手动切换并记住选择。安装向导及模块操作菜单支持英文、俄语，保留已有中文、日语和韩语。安装器默认跟随 Android 系统语言，也可在交互安装时选择。\n- [MCP](docs/mcp.md)：适合从工作站自动化控制真机，默认关闭且要求 secret 认证。\n\n终端操作菜单可用 `KAM_UI_LANGUAGE=ru` 或 `KAM_UI_LANGUAGE=en` 临时指定语言，例如：\n\n```bash\nsu -c 'KAM_UI_LANGUAGE=ru sh /data/adb/modules/MagicNet/action.sh'\n```\n\nCLI 命令、状态字段、配置值和原始日志保持原样，方便脚本及诊断工具读取；内置第三方内核面板使用其自身的语言设置。\n\n## 开发安装\n\n已配置 [kam](https://github.com/MemDeco-WG/kamfw) 时可以直接安装：\n\n```bash\nkam install LIghtJUNction/MagicNet\n```\n\n从源码构建：\n\n```bash\ngit clone https://github.com/LIghtJUNction/MagicNet.git\ncd MagicNet\ngit submodule update --init\nkam build\n```\n\n产物位于 `dist/MagicNet.zip`。构建、包结构和发布验收见 [构建与发布包说明](docs/build.md)。\n\n## 文档\n\n- [用户指南](docs/user-guide.md)：安装、导入、节点、应用/Wi-Fi/热点与排障。\n- [构建与发布包说明](docs/build.md)：发布 ZIP、依赖锁和包验收。\n- [本机仿真、AVD 和真机验收](docs/local-simulation.md)：分层测试与安全传输目录。\n- [MCP 自动化说明](docs/mcp.md)：认证、端口转发、日志和启动故障检查。\n- [架构说明](ARCHITECTURE.md)：仓库模块、运行架构、状态归属和故障边界。\n- [贡献指南](CONTRIBUTING.md)：开发环境、质量检查和改动边界。\n- [安全策略](SECURITY.md)：私密漏洞报告方式和需要保持的安全属性。\n- [kamfw 本地文档](src/MagicNet/lib/kamfw/README.md)：模块内嵌运行时；上游项目见 [MemDeco-WG/kamfw](https://github.com/MemDeco-WG/kamfw)。\n\n## 社区与支持\n\n<a href=\"https://donate.lmm.best/?project=magicnet\"><img src=\"https://donate.lmm.best/badge.svg?project=magicnet&amp;currency=CNY&amp;lang=zh-CN&amp;period=all&amp;layout=compact&amp;theme=dark&amp;width=360&amp;title=MagicNet\" alt=\"捐赠支持\" width=\"360\" /></a>\n\n- Discord：[加入官方群聊](https://discord.gg/asRwgK9FpA)\n- GitHub Issue：建议附上 `cli health`、`cli transparent status` 和 `cli support bundle` 的脱敏结果。\n- 开发支持：MagicNet 的网络功能不依赖 LLM API；如需 OpenAI 兼容的多模型接口，可以使用 [LMM API Gateway](https://api.lmm.best)。[项目源码](https://github.com/TokenNotIncluded/api.lmm.best)现由 [TokenNotIncluded](https://github.com/TokenNotIncluded) 组织托管。\n\nWebUI 的“反馈问题 / 创建 Issue”会先选择问题类型，再按类型生成脱敏上下文。提交前仍应检查正文，不要公开订阅 URL、token、secret、password、完整节点地址或设备标识。\n\n## 许可证\n\nMIT，见 [LICENSE](LICENSE)。\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"./icon.png\" alt=\"MagicNet Logo\" width=\"180\" /></p>\n<p></p></p>\n\n<p><h1 align=\"center\">MagicNet</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"./README.md\">简体中文</a> · <a href=\"./README.en.md\">English</a> · <a href=\"./README.ru.md\">Русский</a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  Android root 设备上的 sing-box 透明网络工作台</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/releases/latest\"><img alt=\"Latest release\" src=\"https://img.shields.io/github/v/release/LIghtJUNction/MagicNet?display_name=tag&sort=semver&style=flat-square\" /></a></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml\"><img alt=\"Code Quality\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/quality.yml/badge.svg?branch=main\" /></a></p>\n<p>  <a href=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml\"><img alt=\"Build\" src=\"https://github.com/LIghtJUNction/MagicNet/actions/workflows/init.yml/badge.svg?branch=main\" /></a></p>\n<p>  <a href=\"./sing-box\"><img alt=\"sing-box fork\" src=\"https://img.shields.io/badge/core-sing--box%20fork-17181C?style=flat-square\" /></a></p>\n<p>  <img alt=\"TUN and eBPF\" src=\"https://img.shields.io/badge/dataplane-TUN%20%7C%20eBPF-6E56CF?style=flat-square\" /></p>\n<p>  <a href=\"./LICENSE\"><img alt=\"MIT license\" src=\"https://img.shields.io/github/license/LIghtJUNction/MagicNet?style=flat-square\" /></a></p>\n<p></p></p>\n\n<p>MagicNet 用 root 管理的 <a href=\"sing-box\">sing-box fork</a> 接管、分流和代理 Android 设备流量，不占用系统 VPN slot。默认使用 <code>tun</code>；需要时可显式切换到 <code>ebpf</code>。主线只支持这两种模式，不包含 <code>auto</code>、TProxy、Redirect 或 netd <code>ALLOW_MULTI</code> 路径。</p>\n\n<h2>核心特色</h2>\n\n<li>**订阅内容不限定为 sing-box 格式**：支持一行一个公网 HTTPS 订阅链接，最多五个来源。下载内容可识别 Clash/Mihomo YAML、base64、常见分享链接集合、sing-box JSON 和纯文本。</li>\n<li>**直接兼容 Clash/Mihomo 订阅**：无需先找“sing-box 专用订阅”。把同一个合法 Clash/Mihomo 订阅 URL 交给 MagicNet，模块会解析节点并生成受控的 sing-box 配置。</li>\n<li>**覆盖常见节点协议**：原生导入 VLESS、VMess、Trojan、Shadowsocks、SOCKS、Hysteria2、AnyTLS 与 TUIC；可选转换器可处理额外格式。 原生备用解析支持常见字面量字段和普通引号值；不支持的协议、复杂 TLS/传输选项、别名、块标量及需要转义解析的字段值需要完整转换器。转换器不可用或失败时，这些输入会被明确拒绝并保留当前配置。</li>\n<li>**自带 sing-box fork 内核**：仓库固定内核子模块和 Android arm64 构建，包含 MagicNet 使用的 eBPF inbound、Android 兼容修复与回归测试，不调用系统中来源不明的 sing-box。</li>\n<li>**TUN 与 eBPF 两套透明数据面**：TUN 创建 `magicnet0`；eBPF 默认使用 hybrid，同时启用 local cgroup，并在确认下游接口后通过 shared TC 接管热点流量；没有下游接口时 shared 保持 pending。两种模式显式、互斥、原子切换，失败会回滚。</li>\n<li>**应用、Wi-Fi 与热点策略**：应用可设为 Proxy、Direct 或 Bypass；Wi-Fi 可按 SSID/BSSID 切换策略；热点可选择 Direct 或 Proxy。</li>\n<li>**配置模板仓库**：默认使用固定 commit 和 SHA-256 的 `MagicSingBox` 配置，也可改为自己的 GitHub/GitLab fork，在仓库中维护规则后原子同步。</li>\n<li>**DNS 与故障边界可见**：拦截物理出口上的明文 DNS/DoT，`cli health` 和 `cli transparent status` 分别按 TUN 接口或 eBPF capability/cgroup/TC 报告真实状态。</li>\n<li>**WebUI、CLI 与 MCP**：同一套受控命令覆盖日常配置、节点测试、诊断、备份和自动化；私密 payload 使用临时文件传递，支持包默认脱敏。WebUI 概览以“流量星座”实时展示 设备 → 数据面 → sing-box → 出口 的已证实状态，按 `Ctrl/⌘ + K` 或 `/` 可快速跳转到任意页面。</li>\n\n<h2>安装与首次成功运行</h2>\n\n<p>> <b>旧版本升级到 v1.6.2：需要手动安装一次。</b> 本版为符合 KernelSU Modules 限制，将版本码迁移为 <code>10602</code>。先备份配置，再在 root 管理器中直接安装 <code>MagicNet-full.zip</code>，不要先卸载。详见 <a href=\"docs/releases/v1.6.2.md\">版本码迁移说明</a>。</p>\n\n<li>从 [Releases](https://github.com/LIghtJUNction/MagicNet/releases) 下载模块 ZIP，在 Magisk、KernelSU 或 APatch 的模块页面安装并重启。</li>\n<li>在系统设置中关闭“私人 DNS / 私密 DNS / Private DNS”，不要保留为“自动”。</li>\n<li>打开 root 管理器提供的模块 WebUI，在“订阅”中保存合法的 URL，或导入本地 Clash YAML、base64、分享链接、JSON 或文本订阅。</li>\n<li>等待“保存并启用”完成，在 WebUI 健康页确认 sing-box 与当前数据面正常。默认 TUN 应建立 `magicnet0`；eBPF 应显示 local cgroup 状态及 shared attached/pending 状态。</li>\n\n<p>也可以在 root shell 中完成 URL 配置和验收：</p>\n\n<pre>su -c '/data/adb/modules/MagicNet/cli setup \"https://example.com/subscription\"'\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status</pre>\n\n<p>成功状态应同时满足：<code>cli health</code> 没有核心/Dataplane 阻塞项，<code>cli transparent status</code> 的 configured/effective 状态准确。TUN 以 <code>magicnet0</code> 为准；eBPF 不能要求 <code>magicnet0</code>，而应报告 capability、local cgroup 与 shared TC/interface。MagicNet 不提供节点、订阅或外部出口，请只使用你有权使用且符合当地法律与服务条款的资源。</p>\n\n<p>详细格式、协议和操作说明见 <a href=\"docs/user-guide.md\">用户指南</a>。</p>\n\n<h2>常用命令</h2>\n\n<pre># 状态与恢复\nsu -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli transparent set tun\nsu -c /data/adb/modules/MagicNet/cli transparent set ebpf\nsu -c /data/adb/modules/MagicNet/cli repair\nsu -c /data/adb/modules/MagicNet/cli service restart sing-box\n\n# 订阅与节点\nsu -c /data/adb/modules/MagicNet/cli sub status\nsu -c /data/adb/modules/MagicNet/cli sub update sing-box\nsu -c /data/adb/modules/MagicNet/cli node test-all\n\n# 应用策略；bypass 适合与外部 VPN 共存，普通直连优先用 direct\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.app proxy'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.browser direct'\nsu -c '/data/adb/modules/MagicNet/cli app add com.example.vpn bypass'\n\n# Wi-Fi 与热点\nsu -c '/data/adb/modules/MagicNet/cli wifi add-ssid \"Home WiFi\"'\nsu -c /data/adb/modules/MagicNet/cli wifi enable\nsu -c /data/adb/modules/MagicNet/cli hotspot enable\nsu -c /data/adb/modules/MagicNet/cli hotspot status\n\n# 网络兼容与支持包\nsu -c /data/adb/modules/MagicNet/cli network status\nsu -c '/data/adb/modules/MagicNet/cli network set ipv4_only 1400 5m'\nsu -c /data/adb/modules/MagicNet/cli support bundle</pre>\n\n<h2>网络边界</h2>\n\n<p>MagicNet 会拦截物理出口上的直连 DNS/DoT（53/853），但浏览器内置 DoH 和外部 VPN 有自己的流量边界。关闭 Private DNS 后再做泄露测试；抓包接口应以 <code>ip route get 1.1.1.1</code> 的实际物理出口为准。</p>\n\n<p>MagicNet 不创建热点，不替代厂商 tethering/NAT，也不自动接管外部 VPN overlay。局域网默认走 <code>lan</code>/Direct；userspace Tailscale endpoint 需要显式配置，边界与验收见 <a href=\"docs/tailscale.md\">Tailscale 说明</a>。</p>\n\n<p>断网时不要反复切换模式。保留当前现场，依次查看 configured/effective、rollback/pending 与健康状态：</p>\n\n<pre>su -c /data/adb/modules/MagicNet/cli health\nsu -c /data/adb/modules/MagicNet/cli transparent status\nsu -c /data/adb/modules/MagicNet/cli diagnose\nsu -c /data/adb/modules/MagicNet/cli support bundle</pre>\n\n<h2>控制界面</h2>\n\n<li>模块 WebUI：安装模块后由 Magisk、KernelSU 或 APatch 的模块页面打开，覆盖首次配置、应用/Wi-Fi/热点策略、节点与诊断。</li>\n<li>界面语言：WebUI 支持简体中文、English 和 Русский，可手动切换并记住选择。安装向导及模块操作菜单支持英文、俄语，保留已有中文、日语和韩语。安装器默认跟随 Android 系统语言，也可在交互安装时选择。</li>\n<li>[MCP](docs/mcp.md)：适合从工作站自动化控制真机，默认关闭且要求 secret 认证。</li>\n\n<p>终端操作菜单可用 <code>KAM_UI_LANGUAGE=ru</code> 或 <code>KAM_UI_LANGUAGE=en</code> 临时指定语言，例如：</p>\n\n<pre>su -c 'KAM_UI_LANGUAGE=ru sh /data/adb/modules/MagicNet/action.sh'</pre>\n\n<p>CLI 命令、状态字段、配置值和原始日志保持原样，方便脚本及诊断工具读取；内置第三方内核面板使用其自身的语言设置。</p>\n\n<h2>开发安装</h2>\n\n<p>已配置 <a href=\"https://github.com/MemDeco-WG/kamfw\">kam</a> 时可以直接安装：</p>\n\n<pre>kam install LIghtJUNction/MagicNet</pre>\n\n<p>从源码构建：</p>\n\n<pre>git clone https://github.com/LIghtJUNction/MagicNet.git\ncd MagicNet\ngit submodule update --init\nkam build</pre>\n\n<p>产物位于 <code>dist/MagicNet.zip</code>。构建、包结构和发布验收见 <a href=\"docs/build.md\">构建与发布包说明</a>。</p>\n\n<h2>文档</h2>\n\n<li>[用户指南](docs/user-guide.md)：安装、导入、节点、应用/Wi-Fi/热点与排障。</li>\n<li>[构建与发布包说明](docs/build.md)：发布 ZIP、依赖锁和包验收。</li>\n<li>[本机仿真、AVD 和真机验收](docs/local-simulation.md)：分层测试与安全传输目录。</li>\n<li>[MCP 自动化说明](docs/mcp.md)：认证、端口转发、日志和启动故障检查。</li>\n<li>[架构说明](ARCHITECTURE.md)：仓库模块、运行架构、状态归属和故障边界。</li>\n<li>[贡献指南](CONTRIBUTING.md)：开发环境、质量检查和改动边界。</li>\n<li>[安全策略](SECURITY.md)：私密漏洞报告方式和需要保持的安全属性。</li>\n<li>[kamfw 本地文档](src/MagicNet/lib/kamfw/README.md)：模块内嵌运行时；上游项目见 [MemDeco-WG/kamfw](https://github.com/MemDeco-WG/kamfw)。</li>\n\n<h2>社区与支持</h2>\n\n<p><a href=\"https://donate.lmm.best/?project=magicnet\"><img src=\"https://donate.lmm.best/badge.svg?project=magicnet&amp;currency=CNY&amp;lang=zh-CN&amp;period=all&amp;layout=compact&amp;theme=dark&amp;width=360&amp;title=MagicNet\" alt=\"捐赠支持\" width=\"360\" /></a></p>\n\n<li>Discord：[加入官方群聊](https://discord.gg/asRwgK9FpA)</li>\n<li>GitHub Issue：建议附上 `cli health`、`cli transparent status` 和 `cli support bundle` 的脱敏结果。</li>\n<li>开发支持：MagicNet 的网络功能不依赖 LLM API；如需 OpenAI 兼容的多模型接口，可以使用 [LMM API Gateway](https://api.lmm.best)。[项目源码](https://github.com/TokenNotIncluded/api.lmm.best)现由 [TokenNotIncluded](https://github.com/TokenNotIncluded) 组织托管。</li>\n\n<p>WebUI 的“反馈问题 / 创建 Issue”会先选择问题类型，再按类型生成脱敏上下文。提交前仍应检查正文，不要公开订阅 URL、token、secret、password、完整节点地址或设备标识。</p>\n\n<h2>许可证</h2>\n\n<p>MIT，见 <a href=\"LICENSE\">LICENSE</a>。</p>",
   "homepageUrl": "https://github.com/KernelSU-Modules-Repo/MagicNet",
   "sourceUrl": "https://github.com/LIghtJUNction/MagicNet",
   "url": "https://github.com/LIghtJUNction/MagicNet",
   "latestRelease": {
-    "name": "v1.6.0",
-    "version": "v1.6.0",
-    "time": "2026-10-16T00:52:31Z",
-    "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip"
+    "name": "v1.7.2",
+    "version": "v1.7.2",
+    "time": "2026-10-24T03:45:11Z",
+    "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip"
   },
   "releases": [
+    {
+      "name": "v1.7.2",
+      "tagName": "v1.7.2",
+      "publishedAt": "2026-10-24T03:45:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-submodules.txt",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/build-submodules.txt",
+          "size": 1102,
+          "downloadCount": 6
+        },
+        {
+          "name": "components.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/components.json",
+          "size": 37415,
+          "downloadCount": 2
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "size": 18241443,
+          "downloadCount": 325
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "size": 796214,
+          "downloadCount": 105
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-a90b420544939495b3ff9284e963177bf6ce51417650081e44372c2fc4fd95df.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-magicnet-cli-a90b420544939495b3ff9284e963177bf6ce51417650081e44372c2fc4fd95df.zip",
+          "size": 959561,
+          "downloadCount": 225
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "size": 2775320,
+          "downloadCount": 247
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "size": 27470578,
+          "downloadCount": 188
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "size": 4878730,
+          "downloadCount": 106
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "size": 3343958,
+          "downloadCount": 92
+        },
+        {
+          "name": "MagicNet-component-webui-b98029ec520fbbf789c546e0adb285a5fa0f5b6b7b172c778734127cfc62d79b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-webui-b98029ec520fbbf789c546e0adb285a5fa0f5b6b7b172c778734127cfc62d79b.zip",
+          "size": 637654,
+          "downloadCount": 122
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "size": 1776596,
+          "downloadCount": 161
+        },
+        {
+          "name": "MagicNet-core.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-core.zip",
+          "size": 3477161,
+          "downloadCount": 8
+        },
+        {
+          "name": "MagicNet-full.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet-full.zip",
+          "size": 65316432,
+          "downloadCount": 344
+        },
+        {
+          "name": "MagicNet.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/MagicNet.zip",
+          "size": 3477161,
+          "downloadCount": 7
+        },
+        {
+          "name": "magicnet_installer.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/magicnet_installer.zip",
+          "size": 3477161,
+          "downloadCount": 208
+        },
+        {
+          "name": "package-sizes.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/package-sizes.json",
+          "size": 1509,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.2/SHA256SUMS",
+          "size": 2069,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v1.7.0",
+      "tagName": "v1.7.0",
+      "publishedAt": "2026-10-22T04:33:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-submodules.txt",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/build-submodules.txt",
+          "size": 1102,
+          "downloadCount": 3
+        },
+        {
+          "name": "build-submodules.txt.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/build-submodules.txt.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "components.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/components.json",
+          "size": 37415,
+          "downloadCount": 1
+        },
+        {
+          "name": "components.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/components.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "size": 18241443,
+          "downloadCount": 194
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "size": 796214,
+          "downloadCount": 56
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-8557ef6e8f6e25189895eba586db554925b77229dd17f702d91d7b84160a45d8.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-magicnet-cli-8557ef6e8f6e25189895eba586db554925b77229dd17f702d91d7b84160a45d8.zip",
+          "size": 957056,
+          "downloadCount": 116
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-8557ef6e8f6e25189895eba586db554925b77229dd17f702d91d7b84160a45d8.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-magicnet-cli-8557ef6e8f6e25189895eba586db554925b77229dd17f702d91d7b84160a45d8.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "size": 2775320,
+          "downloadCount": 153
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "size": 27470578,
+          "downloadCount": 93
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "size": 4878730,
+          "downloadCount": 49
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "size": 3343958,
+          "downloadCount": 41
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-webui-1b9f01632ae9135af86938832d7cadd9fc657edd1f96eb64b21d133fbba0b647.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-webui-1b9f01632ae9135af86938832d7cadd9fc657edd1f96eb64b21d133fbba0b647.zip",
+          "size": 637568,
+          "downloadCount": 56
+        },
+        {
+          "name": "MagicNet-component-webui-1b9f01632ae9135af86938832d7cadd9fc657edd1f96eb64b21d133fbba0b647.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-webui-1b9f01632ae9135af86938832d7cadd9fc657edd1f96eb64b21d133fbba0b647.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "size": 1776596,
+          "downloadCount": 91
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-core.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-core.zip",
+          "size": 3473504,
+          "downloadCount": 5
+        },
+        {
+          "name": "MagicNet-core.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-core.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-full.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-full.zip",
+          "size": 65307679,
+          "downloadCount": 242
+        },
+        {
+          "name": "MagicNet-full.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet-full.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet.zip",
+          "size": 3473504,
+          "downloadCount": 4
+        },
+        {
+          "name": "MagicNet.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/MagicNet.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "magicnet_installer.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/magicnet_installer.zip",
+          "size": 3473504,
+          "downloadCount": 146
+        },
+        {
+          "name": "magicnet_installer.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/magicnet_installer.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/package-sizes.json",
+          "size": 1509,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/package-sizes.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/SHA256SUMS",
+          "size": 2069,
+          "downloadCount": 5
+        },
+        {
+          "name": "SHA256SUMS.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.7.0/SHA256SUMS.sig",
+          "size": 136,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.6.2",
+      "tagName": "v1.6.2",
+      "publishedAt": "2026-10-17T20:03:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-submodules.txt",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/build-submodules.txt",
+          "size": 1102,
+          "downloadCount": 2
+        },
+        {
+          "name": "build-submodules.txt.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/build-submodules.txt.sig",
+          "size": 140,
+          "downloadCount": 2
+        },
+        {
+          "name": "components.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/components.json",
+          "size": 37415,
+          "downloadCount": 2
+        },
+        {
+          "name": "components.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/components.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "size": 18241443,
+          "downloadCount": 401
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "size": 140,
+          "downloadCount": 2
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "size": 796214,
+          "downloadCount": 104
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip",
+          "size": 947597,
+          "downloadCount": 116
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "size": 2775320,
+          "downloadCount": 278
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "size": 27470578,
+          "downloadCount": 204
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "size": 136,
+          "downloadCount": 1
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "size": 4878730,
+          "downloadCount": 115
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "size": 3343958,
+          "downloadCount": 90
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip",
+          "size": 635513,
+          "downloadCount": 89
+        },
+        {
+          "name": "MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "size": 1776596,
+          "downloadCount": 167
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-core.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-core.zip",
+          "size": 3450599,
+          "downloadCount": 4
+        },
+        {
+          "name": "MagicNet-core.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-core.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "MagicNet-full.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-full.zip",
+          "size": 65263801,
+          "downloadCount": 442
+        },
+        {
+          "name": "MagicNet-full.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet-full.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet.zip",
+          "size": 3450599,
+          "downloadCount": 16
+        },
+        {
+          "name": "MagicNet.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/MagicNet.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "magicnet_installer.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/magicnet_installer.zip",
+          "size": 3450599,
+          "downloadCount": 297
+        },
+        {
+          "name": "magicnet_installer.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/magicnet_installer.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/package-sizes.json",
+          "size": 1509,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/package-sizes.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/SHA256SUMS",
+          "size": 2069,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.2/SHA256SUMS.sig",
+          "size": 136,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.6.1",
+      "tagName": "v1.6.1",
+      "publishedAt": "2026-10-16T13:08:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-submodules.txt",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/build-submodules.txt",
+          "size": 1102,
+          "downloadCount": 2
+        },
+        {
+          "name": "build-submodules.txt.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/build-submodules.txt.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "components.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/components.json",
+          "size": 37415,
+          "downloadCount": 0
+        },
+        {
+          "name": "components.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/components.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
+          "size": 18241443,
+          "downloadCount": 76
+        },
+        {
+          "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
+          "size": 796214,
+          "downloadCount": 30
+        },
+        {
+          "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip",
+          "size": 947597,
+          "downloadCount": 35
+        },
+        {
+          "name": "MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-magicnet-cli-319d22e37574747b833a4b6ebc0a5e9fab2daadd43cd9e7621e60d6f36250f41.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
+          "size": 2775320,
+          "downloadCount": 45
+        },
+        {
+          "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
+          "size": 27470578,
+          "downloadCount": 41
+        },
+        {
+          "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
+          "size": 4878730,
+          "downloadCount": 14
+        },
+        {
+          "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
+          "size": 3343958,
+          "downloadCount": 32
+        },
+        {
+          "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip",
+          "size": 635513,
+          "downloadCount": 20
+        },
+        {
+          "name": "MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-webui-15db9580ff5d2d8f58cbd4a091616ebb4aeace602a289c5139a86843aaa2bfe2.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
+          "size": 1776596,
+          "downloadCount": 27
+        },
+        {
+          "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-core.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-core.zip",
+          "size": 3450609,
+          "downloadCount": 2
+        },
+        {
+          "name": "MagicNet-core.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-core.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet-full.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-full.zip",
+          "size": 65263811,
+          "downloadCount": 17
+        },
+        {
+          "name": "MagicNet-full.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet-full.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "MagicNet.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet.zip",
+          "size": 3450609,
+          "downloadCount": 4
+        },
+        {
+          "name": "MagicNet.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/MagicNet.zip.sig",
+          "size": 136,
+          "downloadCount": 0
+        },
+        {
+          "name": "magicnet_installer.zip",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/magicnet_installer.zip",
+          "size": 3450609,
+          "downloadCount": 39
+        },
+        {
+          "name": "magicnet_installer.zip.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/magicnet_installer.zip.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/package-sizes.json",
+          "size": 1509,
+          "downloadCount": 0
+        },
+        {
+          "name": "package-sizes.json.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/package-sizes.json.sig",
+          "size": 140,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/SHA256SUMS",
+          "size": 2069,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.sig",
+          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.1/SHA256SUMS.sig",
+          "size": 140,
+          "downloadCount": 0
+        }
+      ]
+    },
     {
       "name": "v1.6.0",
       "tagName": "v1.6.0",
@@ -45,7 +791,7 @@
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "size": 18241443,
-          "downloadCount": 2
+          "downloadCount": 26
         },
         {
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
@@ -57,7 +803,7 @@
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "size": 796214,
-          "downloadCount": 0
+          "downloadCount": 4
         },
         {
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
@@ -69,7 +815,7 @@
           "name": "MagicNet-component-bin-magicnet-cli-7eedd022ab692fcdb503ef7748ddc32e8eeb7c3cdb0c01600e97e3d0442b5fdb.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-magicnet-cli-7eedd022ab692fcdb503ef7748ddc32e8eeb7c3cdb0c01600e97e3d0442b5fdb.zip",
           "size": 944621,
-          "downloadCount": 1
+          "downloadCount": 9
         },
         {
           "name": "MagicNet-component-bin-magicnet-cli-7eedd022ab692fcdb503ef7748ddc32e8eeb7c3cdb0c01600e97e3d0442b5fdb.zip.sig",
@@ -81,7 +827,7 @@
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "size": 2775320,
-          "downloadCount": 0
+          "downloadCount": 16
         },
         {
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
@@ -93,7 +839,7 @@
           "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip",
           "size": 27470578,
-          "downloadCount": 0
+          "downloadCount": 9
         },
         {
           "name": "MagicNet-component-bin-sing-box-41217646f2cb15ca678c6f09906f00cab15babb38c3e253eaad0acd922a8e52b.zip.sig",
@@ -105,7 +851,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 0
+          "downloadCount": 8
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -117,7 +863,7 @@
           "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
           "size": 3343958,
-          "downloadCount": 0
+          "downloadCount": 10
         },
         {
           "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
@@ -129,7 +875,7 @@
           "name": "MagicNet-component-webui-a5279dc23669c850256b4c0fc43323e30075948ff5205689a9da799d107869bd.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-webui-a5279dc23669c850256b4c0fc43323e30075948ff5205689a9da799d107869bd.zip",
           "size": 635188,
-          "downloadCount": 0
+          "downloadCount": 5
         },
         {
           "name": "MagicNet-component-webui-a5279dc23669c850256b4c0fc43323e30075948ff5205689a9da799d107869bd.zip.sig",
@@ -141,7 +887,7 @@
           "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
           "size": 1776596,
-          "downloadCount": 0
+          "downloadCount": 4
         },
         {
           "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
@@ -165,7 +911,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/MagicNet-full.zip",
           "size": 65257539,
-          "downloadCount": 4
+          "downloadCount": 25
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -189,7 +935,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.6.0/magicnet_installer.zip",
           "size": 3450614,
-          "downloadCount": 5
+          "downloadCount": 18
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -281,7 +1027,7 @@
           "name": "MagicNet-component-bin-magicnet-cli-c4c4d0f09023354eb96b78ab21265ff28dd38de39e883c113b7193400fb9f119.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-component-bin-magicnet-cli-c4c4d0f09023354eb96b78ab21265ff28dd38de39e883c113b7193400fb9f119.zip",
           "size": 943727,
-          "downloadCount": 119
+          "downloadCount": 120
         },
         {
           "name": "MagicNet-component-bin-magicnet-cli-c4c4d0f09023354eb96b78ab21265ff28dd38de39e883c113b7193400fb9f119.zip.sig",
@@ -305,7 +1051,7 @@
           "name": "MagicNet-component-bin-sing-box-e0d1a9d12fd659f03b4a56a10578302ba5fb4399bd42ee39fd983101cf875763.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-component-bin-sing-box-e0d1a9d12fd659f03b4a56a10578302ba5fb4399bd42ee39fd983101cf875763.zip",
           "size": 27469308,
-          "downloadCount": 108
+          "downloadCount": 109
         },
         {
           "name": "MagicNet-component-bin-sing-box-e0d1a9d12fd659f03b4a56a10578302ba5fb4399bd42ee39fd983101cf875763.zip.sig",
@@ -317,7 +1063,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 63
+          "downloadCount": 64
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -329,7 +1075,7 @@
           "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip",
           "size": 3343958,
-          "downloadCount": 85
+          "downloadCount": 86
         },
         {
           "name": "MagicNet-component-rules-d925e8b7c9fb1e9ddd822ecf468ac8aa7f6789b47fbe8e59c4e15482e5947cc6.zip.sig",
@@ -341,7 +1087,7 @@
           "name": "MagicNet-component-webui-c23231576a4203c8371d92aa177e4b686bdbc71f18d2c60bb24fc82cc1a07ad2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-component-webui-c23231576a4203c8371d92aa177e4b686bdbc71f18d2c60bb24fc82cc1a07ad2.zip",
           "size": 623284,
-          "downloadCount": 59
+          "downloadCount": 60
         },
         {
           "name": "MagicNet-component-webui-c23231576a4203c8371d92aa177e4b686bdbc71f18d2c60bb24fc82cc1a07ad2.zip.sig",
@@ -365,7 +1111,7 @@
           "name": "MagicNet-core.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-core.zip",
           "size": 3445561,
-          "downloadCount": 15
+          "downloadCount": 16
         },
         {
           "name": "MagicNet-core.zip.sig",
@@ -377,7 +1123,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet-full.zip",
           "size": 65237524,
-          "downloadCount": 42
+          "downloadCount": 44
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -389,7 +1135,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/MagicNet.zip",
           "size": 3445561,
-          "downloadCount": 10
+          "downloadCount": 11
         },
         {
           "name": "MagicNet.zip.sig",
@@ -401,7 +1147,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.22/magicnet_installer.zip",
           "size": 3445561,
-          "downloadCount": 151
+          "downloadCount": 152
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -481,7 +1227,7 @@
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "size": 796214,
-          "downloadCount": 75
+          "downloadCount": 76
         },
         {
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
@@ -493,7 +1239,7 @@
           "name": "MagicNet-component-bin-magicnet-cli-b150956612fb0252a4a73c5dfca72abeaaaaf240f26da35e1b574dfbd4a5071a.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-component-bin-magicnet-cli-b150956612fb0252a4a73c5dfca72abeaaaaf240f26da35e1b574dfbd4a5071a.zip",
           "size": 939473,
-          "downloadCount": 79
+          "downloadCount": 80
         },
         {
           "name": "MagicNet-component-bin-magicnet-cli-b150956612fb0252a4a73c5dfca72abeaaaaf240f26da35e1b574dfbd4a5071a.zip.sig",
@@ -517,7 +1263,7 @@
           "name": "MagicNet-component-bin-sing-box-069a7caa6e17512b4fb9a75f75e3f26f750abba9c92a7b1d486aae32bb63d1f8.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-component-bin-sing-box-069a7caa6e17512b4fb9a75f75e3f26f750abba9c92a7b1d486aae32bb63d1f8.zip",
           "size": 27466318,
-          "downloadCount": 106
+          "downloadCount": 107
         },
         {
           "name": "MagicNet-component-bin-sing-box-069a7caa6e17512b4fb9a75f75e3f26f750abba9c92a7b1d486aae32bb63d1f8.zip.sig",
@@ -529,7 +1275,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 52
+          "downloadCount": 53
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -577,7 +1323,7 @@
           "name": "MagicNet-core.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-core.zip",
           "size": 3439457,
-          "downloadCount": 6
+          "downloadCount": 7
         },
         {
           "name": "MagicNet-core.zip.sig",
@@ -589,7 +1335,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet-full.zip",
           "size": 65057727,
-          "downloadCount": 11
+          "downloadCount": 13
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -601,7 +1347,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/MagicNet.zip",
           "size": 3439457,
-          "downloadCount": 5
+          "downloadCount": 7
         },
         {
           "name": "MagicNet.zip.sig",
@@ -613,7 +1359,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.21/magicnet_installer.zip",
           "size": 3439457,
-          "downloadCount": 90
+          "downloadCount": 92
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -681,7 +1427,7 @@
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "size": 18241443,
-          "downloadCount": 62
+          "downloadCount": 63
         },
         {
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
@@ -717,7 +1463,7 @@
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "size": 2775320,
-          "downloadCount": 39
+          "downloadCount": 40
         },
         {
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
@@ -765,7 +1511,7 @@
           "name": "MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip",
           "size": 612947,
-          "downloadCount": 12
+          "downloadCount": 13
         },
         {
           "name": "MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip.sig",
@@ -813,7 +1559,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/MagicNet.zip",
           "size": 3436563,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet.zip.sig",
@@ -825,7 +1571,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/magicnet_installer.zip",
           "size": 3436563,
-          "downloadCount": 29
+          "downloadCount": 30
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -849,7 +1595,7 @@
           "name": "SHA256SUMS",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.20/SHA256SUMS",
           "size": 2069,
-          "downloadCount": 9
+          "downloadCount": 10
         },
         {
           "name": "SHA256SUMS.sig",
@@ -905,7 +1651,7 @@
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "size": 796214,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
@@ -917,7 +1663,7 @@
           "name": "MagicNet-component-bin-magicnet-cli-810e38a0c48f4ebf35a478f43ff375ccfa78029ef0649b278195be18edaf2545.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-bin-magicnet-cli-810e38a0c48f4ebf35a478f43ff375ccfa78029ef0649b278195be18edaf2545.zip",
           "size": 891712,
-          "downloadCount": 6
+          "downloadCount": 7
         },
         {
           "name": "MagicNet-component-bin-magicnet-cli-810e38a0c48f4ebf35a478f43ff375ccfa78029ef0649b278195be18edaf2545.zip.sig",
@@ -929,7 +1675,7 @@
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "size": 2775320,
-          "downloadCount": 3
+          "downloadCount": 4
         },
         {
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
@@ -953,7 +1699,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -965,7 +1711,7 @@
           "name": "MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip",
           "size": 3184731,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip.sig",
@@ -977,7 +1723,7 @@
           "name": "MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip",
           "size": 612947,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "MagicNet-component-webui-d568fb9f70383609b38c71087a10703f4afa733f804a3c9561c7122a6e217dd6.zip.sig",
@@ -989,7 +1735,7 @@
           "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip",
           "size": 1776596,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet-component-zashboard-6459ba4a32be9e3a40d83de273573c6e20a9b560b89aa3fec87f0ae2d377aebc.zip.sig",
@@ -1001,7 +1747,7 @@
           "name": "MagicNet-core.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-core.zip",
           "size": 3436258,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-core.zip.sig",
@@ -1013,7 +1759,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet-full.zip",
           "size": 64133615,
-          "downloadCount": 4
+          "downloadCount": 5
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -1025,7 +1771,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.19/MagicNet.zip",
           "size": 3436258,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet.zip.sig",
@@ -1117,7 +1863,7 @@
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "size": 796214,
-          "downloadCount": 10
+          "downloadCount": 11
         },
         {
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
@@ -1141,7 +1887,7 @@
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "size": 2775320,
-          "downloadCount": 24
+          "downloadCount": 25
         },
         {
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
@@ -1165,7 +1911,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 7
+          "downloadCount": 8
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -1177,7 +1923,7 @@
           "name": "MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip",
           "size": 3184731,
-          "downloadCount": 7
+          "downloadCount": 8
         },
         {
           "name": "MagicNet-component-rules-dc4f2d8e9d43a706b1e36556b501b987ee2d64c3532f20b11293493456d464ac.zip.sig",
@@ -1189,7 +1935,7 @@
           "name": "MagicNet-component-webui-52c16c00a46dcb0bd3533bb75787b4b8f0e44878ec9cb9de38145e526560f542.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-component-webui-52c16c00a46dcb0bd3533bb75787b4b8f0e44878ec9cb9de38145e526560f542.zip",
           "size": 609493,
-          "downloadCount": 8
+          "downloadCount": 9
         },
         {
           "name": "MagicNet-component-webui-52c16c00a46dcb0bd3533bb75787b4b8f0e44878ec9cb9de38145e526560f542.zip.sig",
@@ -1213,7 +1959,7 @@
           "name": "MagicNet-core.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-core.zip",
           "size": 3436265,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet-core.zip.sig",
@@ -1225,7 +1971,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet-full.zip",
           "size": 64128096,
-          "downloadCount": 3
+          "downloadCount": 4
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -1237,7 +1983,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/MagicNet.zip",
           "size": 3436265,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "MagicNet.zip.sig",
@@ -1249,7 +1995,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/magicnet_installer.zip",
           "size": 3436265,
-          "downloadCount": 14
+          "downloadCount": 15
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -1273,7 +2019,7 @@
           "name": "SHA256SUMS",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.18/SHA256SUMS",
           "size": 2069,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "SHA256SUMS.sig",
@@ -1529,7 +2275,7 @@
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
           "size": 18241443,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip.sig",
@@ -1541,7 +2287,7 @@
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip",
           "size": 796214,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-component-bin-jq-64b47114d97556740c0994d1520fef6eb438ff919ae9eae2d47f3948269bd8a2.zip.sig",
@@ -1553,7 +2299,7 @@
           "name": "MagicNet-component-bin-magicnet-cli-9227b7fe0974e72a3846204084d621ff7e8197363609c1105578c35e1df7c914.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-magicnet-cli-9227b7fe0974e72a3846204084d621ff7e8197363609c1105578c35e1df7c914.zip",
           "size": 842686,
-          "downloadCount": 6
+          "downloadCount": 7
         },
         {
           "name": "MagicNet-component-bin-magicnet-cli-9227b7fe0974e72a3846204084d621ff7e8197363609c1105578c35e1df7c914.zip.sig",
@@ -1565,7 +2311,7 @@
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip",
           "size": 2775320,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-component-bin-proxylink-adf05d6e1355ce97f0695e88578dab40e9b82474f1a8a4ad6dafdcc5c0ab5bf5.zip.sig",
@@ -1577,7 +2323,7 @@
           "name": "MagicNet-component-bin-sing-box-5e9800407ee3e037ded058d7eb5d4a7ab5688ef39495092298c64bc0b21baadf.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-sing-box-5e9800407ee3e037ded058d7eb5d4a7ab5688ef39495092298c64bc0b21baadf.zip",
           "size": 26648296,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "MagicNet-component-bin-sing-box-5e9800407ee3e037ded058d7eb5d4a7ab5688ef39495092298c64bc0b21baadf.zip.sig",
@@ -1589,7 +2335,7 @@
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip",
           "size": 4878730,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-component-bin-yq-b5eadbcbb8e8df4a0fbfd9c5374af4204b11cad00d8fb0a1f926765ff645e35b.zip.sig",
@@ -1613,7 +2359,7 @@
           "name": "MagicNet-component-webui-cb9e12ad214422b5630b919869c728088bba70d5140281bd02cc26cd37118b6d.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-component-webui-cb9e12ad214422b5630b919869c728088bba70d5140281bd02cc26cd37118b6d.zip",
           "size": 603221,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "MagicNet-component-webui-cb9e12ad214422b5630b919869c728088bba70d5140281bd02cc26cd37118b6d.zip.sig",
@@ -1637,7 +2383,7 @@
           "name": "MagicNet-core.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet-core.zip",
           "size": 3425674,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet-core.zip.sig",
@@ -1661,7 +2407,7 @@
           "name": "MagicNet.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/MagicNet.zip",
           "size": 3425674,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "MagicNet.zip.sig",
@@ -1673,7 +2419,7 @@
           "name": "magicnet_installer.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.13/magicnet_installer.zip",
           "size": 3425674,
-          "downloadCount": 3
+          "downloadCount": 4
         },
         {
           "name": "magicnet_installer.zip.sig",
@@ -1861,7 +2607,7 @@
           "name": "MagicNet-full.zip",
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.5.12/MagicNet-full.zip",
           "size": 64018767,
-          "downloadCount": 3
+          "downloadCount": 4
         },
         {
           "name": "MagicNet-full.zip.sig",
@@ -4848,110 +5594,6 @@
           "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.4.4/MagicNet.zip.sig",
           "size": 140,
           "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v1.4.1",
-      "tagName": "v1.4.1",
-      "publishedAt": "2026-09-13T07:14:56Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "build-submodules.txt",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.4.1/build-submodules.txt",
-          "size": 971,
-          "downloadCount": 1
-        },
-        {
-          "name": "MagicNet.zip",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.4.1/MagicNet.zip",
-          "size": 88861376,
-          "downloadCount": 6
-        },
-        {
-          "name": "MagicNet.zip.sig",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.4.1/MagicNet.zip.sig",
-          "size": 136,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "magicnet-installer-v1.0.2",
-      "tagName": "magicnet-installer-v1.0.2",
-      "publishedAt": "2026-09-13T13:18:54Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "magicnet_installer-source.tar.gz",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.2/magicnet_installer-source.tar.gz",
-          "size": 10433,
-          "downloadCount": 0
-        },
-        {
-          "name": "magicnet_installer.zip",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.2/magicnet_installer.zip",
-          "size": 2665045,
-          "downloadCount": 17
-        },
-        {
-          "name": "SHA256SUMS",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.2/SHA256SUMS",
-          "size": 188,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "magicnet-installer-v1.0.1",
-      "tagName": "magicnet-installer-v1.0.1",
-      "publishedAt": "2026-09-13T12:55:38Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "magicnet_installer-source.tar.gz",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.1/magicnet_installer-source.tar.gz",
-          "size": 9319,
-          "downloadCount": 1
-        },
-        {
-          "name": "magicnet_installer.zip",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.1/magicnet_installer.zip",
-          "size": 2661171,
-          "downloadCount": 4
-        },
-        {
-          "name": "SHA256SUMS",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.1/SHA256SUMS",
-          "size": 188,
-          "downloadCount": 1
-        }
-      ]
-    },
-    {
-      "name": "magicnet-installer-v1.0.0",
-      "tagName": "magicnet-installer-v1.0.0",
-      "publishedAt": "2026-09-13T12:41:57Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "magicnet_installer-source.tar.gz",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.0/magicnet_installer-source.tar.gz",
-          "size": 9122,
-          "downloadCount": 1
-        },
-        {
-          "name": "magicnet_installer.zip",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.0/magicnet_installer.zip",
-          "size": 2661067,
-          "downloadCount": 3
-        },
-        {
-          "name": "SHA256SUMS",
-          "downloadUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/magicnet-installer-v1.0.0/SHA256SUMS",
-          "size": 188,
-          "downloadCount": 1
         }
       ]
     }

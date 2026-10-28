@@ -1,0 +1,69 @@
+{
+  "readme": "# Strace for Android\n\nMagisk module packaging a pre-compiled [strace](https://github.com/strace/strace) v6.19 binary for Android.\nSupports **ARM64**, **ARM**, **x86_64**, and **x86** architectures. Built with GCC, LTO, statically linked, stripped.\n\nThe module installs `strace` to `/system/bin/` via Magisk's systemless overlay, automatically selecting the correct binary for your device architecture at install time. Supports auto-update through Magisk's built-in update mechanism.\n\n## How to install\n\n### From release (recommended)\n\n1. Download the latest zip from the [releases page](https://github.com/evdenis/strace/releases)\n2. Open Magisk → Modules → Install from storage → select the zip → Reboot\n\n### From source\n\nRequires `make`, `adb`, and a rooted device connected via USB.\n\n```bash\ngit clone https://github.com/evdenis/strace\ncd strace\nmake install\n```\n\n## Building from source\n\nRequires Docker.\n\n```bash\n# Build strace for a single architecture (default: arm64)\nmake build-strace ARCH=arm64\n\n# Build for all architectures\nmake build-strace-all\n\n# Run binary verification tests\nmake test-strace-all\n\n# Package into installable zip\nmake zip\n```\n\nSupported `ARCH` values: `arm64`, `arm`, `x86_64`, `x86`.\n\n## Support\n\n- [Telegram](https://t.me/joinchat/GsJfBBaxozXvVkSJhm0IOQ)\n- [XDA Thread](https://forum.xda-developers.com/apps/magisk/module-debugging-modules-adb-root-t4050041)\n",
+  "readmeHTML": "<h1>Strace for Android</h1>\n\n<p>Magisk module packaging a pre-compiled <a href=\"https://github.com/strace/strace\">strace</a> v6.19 binary for Android.</p>\n<p>Supports <b>ARM64</b>, <b>ARM</b>, <b>x86_64</b>, and <b>x86</b> architectures. Built with GCC, LTO, statically linked, stripped.</p>\n\n<p>The module installs <code>strace</code> to <code>/system/bin/</code> via Magisk's systemless overlay, automatically selecting the correct binary for your device architecture at install time. Supports auto-update through Magisk's built-in update mechanism.</p>\n\n<h2>How to install</h2>\n\n<h3>From release (recommended)</h3>\n\n<li>Download the latest zip from the [releases page](https://github.com/evdenis/strace/releases)</li>\n<li>Open Magisk → Modules → Install from storage → select the zip → Reboot</li>\n\n<h3>From source</h3>\n\n<p>Requires <code>make</code>, <code>adb</code>, and a rooted device connected via USB.</p>\n\n<pre>git clone https://github.com/evdenis/strace\ncd strace\nmake install</pre>\n\n<h2>Building from source</h2>\n\n<p>Requires Docker.</p>\n\n<pre># Build strace for a single architecture (default: arm64)\nmake build-strace ARCH=arm64\n\n# Build for all architectures\nmake build-strace-all\n\n# Run binary verification tests\nmake test-strace-all\n\n# Package into installable zip\nmake zip</pre>\n\n<p>Supported <code>ARCH</code> values: <code>arm64</code>, <code>arm</code>, <code>x86_64</code>, <code>x86</code>.</p>\n\n<h2>Support</h2>\n\n<li>[Telegram](https://t.me/joinchat/GsJfBBaxozXvVkSJhm0IOQ)</li>\n<li>[XDA Thread](https://forum.xda-developers.com/apps/magisk/module-debugging-modules-adb-root-t4050041)</li>",
+  "homepageUrl": "https://github.com/evdenis/strace",
+  "sourceUrl": "https://github.com/evdenis/strace",
+  "url": "https://github.com/evdenis/strace",
+  "latestRelease": {
+    "name": "v2",
+    "version": "v2",
+    "time": "2026-03-24T11:50:46Z",
+    "downloadUrl": "https://github.com/evdenis/strace/releases/download/v2/strace-v2.zip"
+  },
+  "releases": [
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2026-03-24T11:50:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "strace-v2.zip",
+          "downloadUrl": "https://github.com/evdenis/strace/releases/download/v2/strace-v2.zip",
+          "size": 3939215,
+          "downloadCount": 634
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/evdenis/strace/releases/download/v2/update.json",
+          "size": 194,
+          "downloadCount": 2587
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-03-23T19:58:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "strace-v1.1.zip",
+          "downloadUrl": "https://github.com/evdenis/strace/releases/download/v1.1/strace-v1.1.zip",
+          "size": 726654,
+          "downloadCount": 8
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/evdenis/strace/releases/download/v1.1/update.json",
+          "size": 202,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2020-11-04T09:44:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "strace-v1.zip",
+          "downloadUrl": "https://github.com/evdenis/strace/releases/download/v1/strace-v1.zip",
+          "size": 727104,
+          "downloadCount": 808
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,407 @@
+{
+  "readme": "## A Magisk module for setting miscellaneous audio configuration values\n\nThis module,\n<ol>\n    <li>changes the number of steps in media volume to 100 steps (0.4~0.7dB per step),</li>\n    <li>raises the resampling quality of the Android OS mixer (AudioFlinger) to a very mastering quality (i.e., no resampling distortion in a real sense); Install <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\" module</a> together to override its resampling settings if you intend to use LDAC bluetooth earphones or DAC's under $30,</li>\n    <li>disables the effects framework of the mixer (to interface to equalizers, virtualizers, visualizers, echo cancelers, automatic gain controls, etc.) for obtaining a nearly direct low jitter audio pass (very few vulnerable equalizers may crash without this framework, but please ignore it),</li>\n    <li>disables the CSD (Calculated Sound Dose) feature of the mixer,</li>\n    <li>disables the android built-in spatial audio feature (A13 or higher; especially Tensor devices) for obtaining a nearly direct low jitter audio pass too,</li>\n    <li>disables pre-installed Moto Dolby features and Digital Wellbeing (please uninstall this manually if remaining as a usual app) for the same as above,</li>\n    <li>stops Tensor device's AOC daemon for reducing significant jitter,</li>\n    <li>adjusts a USB transfer period of the USB HAL driver (not the recently common hardware offloading USB (tunneling) driver, but including Tensor device's offloading USB driver) for directly reducing the jitter of a PLL in a DAC (even in an asynchronous mode); Use <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB_SampleRate_Changer\"</a> or <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer\">\"Audio Samplerate Changer\"</a> to switch from the usual hardware offloading USB (tunneling) driver to the USB HAL one,</li>\n    <li>sets an audio scheduling tunable \"vendor.audio.adm.buffering.ms\" \"2\" to reduce jitter on all audio outputs,</li>\n    <li>nullifies volume listener libraries in \"soundfx\" folders for disabling slight compression (maybe a peak limiter only on Qcomm devices); I recommend using <a href=\"https://github.com/Magisk-Modules-Alt-Repo/drc-remover\">\"DRC remover\"</a> additionally for disabling much larger compression (DRC) if on Qcomm devices</li>\n</ol><br/>\n    for improving audio quality effectively in a simple manner.\n<br/>\n<br/>\n<br/>\n\n* Don't forget to install [\"Audio jitter silencer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer) together and uninstall \"Digital Wellbeing\" app (for reducing very large jitters which this module cannot reduce by itself)! If you like much clearer replay (especially on Qcomm devices using an offloading USB driver with large jitter), use <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB_SampleRate_Changer\"</a> or <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer\">\"Audio Samplerate Changer\"</a> for reducing the jitter (making foggy sound).\n\n* Don't use Am@zon music using a much worse internal re-sampler which bypasses the mastering quality re-sampling in the OS mixer (audioFlinger). Other music streaming services don't use such an internal re-sampler, as far as I know.\n\n* This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 10 ~ 16, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations). For users of Motorola and Xiaomi stock ROM's, try to install a GSI through DSU and this module together once, then you could know how much the ROM's degrade audio quality probably for adapting to regulations.\n\n* Note 1: This module raises the resampling quality from AOSP standard one (stop band attenuation 90dB & cut off 100% of the Nyquist frequency & half filter length 32) to a very mastering quality (194dB & 98% & 520 for very high performance devices, 179dB & 99% & 408 for Android 12 and later ones and 160db & 91% & 480 for Android 9 & 10 & 11 ones (except low performance ones), but 167dB & 106% & 368 (194dB & 100% & 520 exceptionally for Galaxy S4) for low performance Android 12 and later devices, 160dB & 91% & 320 for low performance Android 9 & 10 & 11 ones; because earlier than Android 12 has a bug relating to aliasing processing around the Nyquist frequency). However, this cannot raise the quality for Android 8.1 and earlier ones. Please keep in mind that those attenuation values are used for a resampler design as targeted ones and may not be accomplished in the AOSP implementation.\n\n* Note 2: Entry class USB DAC's usually adopt an interface chip communicating with the adaptive mode or the synchronous one defined in the USB audio standard. As in these modes an Android host controller sends audio sampling rate clock signals to the DAC, jitter generated at the host side affects the audio quality of the DAC tremendously. Higher class DAC's communicate with the asynchronous mode (also defined in the standard) to a host controller, but they actually use a PLL to reduce jitter from the host not to stutter even in heavy jitter situations. As this result, they behave as the adaptive mode with a feedback loop to dynamically adjust the host side sampling clock signals while referring a DAC side clock in a real sense, so even with the asynchronous mode they are more or less affected by host side jitter. You can see the mode of your USB DAC by opening \"/proc/asound/card1/stream0\" on your phone while playing music. Please see a word in parentheses at \"Endpoint:\" lines; \"SYNC\", \"ADAPTIVE\" or \"ASYNC\" means that your DAC uses \"synchronous\", \"adaptive\" or \"asynchronous\" mode to communicate to your phone, respectively. Moreover, almost all audio peripherals, e.g., bluetooth earphones, internal DAC's, network audio devices have a PLL in themselves and are affected by host side jitter for the same reason.\n\n* I recommend expert users not to install [\"Audio jitter silencer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer), but manually to disable \"Manage apps automatically\" in \"Battery manager\" (or \"Adaptive battery\" of \"Adaptive preferences\") in the battery section (needless to say, don't enable battery savers, performance limiters and the like), turning off \"Adaptive connectivity\" in the Network & internet section (if exists), and changing \"Battery optimization\" from \"Optimize\" to \"Don't optimize\" (or change \"Battery usage\" from \"Optimized\" to \"Unrestricted\") for following app's manually through the settings UI of Android OS (to lower less than 10Hz jitter making extremely short reverb or foggy sound like distortion) even though disabling the Android doze itself: music (streaming) player apps, their licensing apps (if exist), \"AirMusic\" (if exists), \"AirMusic  Recording Service\" (system app; if exists), equalizer apps (if exist), \"Bluetooth\" (system app), \"Bluetooth MIDI Service\" (system app), \"MTP Host\" (system app), \"NFC Service\" (system app; if exists), \"Magisk\" (if exists), System WebView apps (system app), Browser apps, \"PhhTrebleApp\" (system app; if exists), \"Android Services Library\" (system app), \"Android Shared Library\" (system app), \"Android System\" (system app), \"System UI\" (system app), \"Input Devices\" (system app), {Gesture, 3 Button, 2  Button} Navigation Bar apps (which you are using only; system app), \"crDroid System\" (system app; if exists), \"LineageOS System\" (system app; if exists), launcher app, \"Google Play Store\" (system app), \"Google Play services\" (system app), \"Styles & wallpaper\" or the like (system app), {Lineage, crDroid, Arrow, etc.} themes app (system app; if exists),  \"AOSP panel\" (system app; if exists), \"OmniJaws\" (system app; if exists), \"OmniStyle\" (system app; if exists), \"Active Edge Service\" (system app; if exists), \"Android Device Security Module\" (system app; if exists), \"Call Management\" (system app; if exists), \"Phone\" (system app; if exists), \"Phone Calls\" (system app; if exists), \"Phone Services\" (system app; if exists), \"Phone and Messaging Storage\" (system app; if exists), \"Storage Manager\" (system app), \"Default\" (system app; if exists), \"Default StatusBar\" (system app; if exists), \"Wfd Service\" (system app; if exists), \"Wallpaper\" or the like (system app), \"Adreno Graphics Drivers\" (system app; if exists), \"com.android.providers.media\" (system app), \"Files by Google\" (system app; if exists), \"Google Play Services for AR\" (system app; if exists), \"Google Services Framework\" (system app), \"Waterfall cutout\" (system app), \"Punch Hole cutout\" (system app), \"Network Manager\" (system app), \"Companion Device Manager\" (system app), \"Intent Filter Verification Service\" (system app), \"Calendar\", camera apps, keyboard app, kernel adiutors (if exist), etc. And uninstall \"Digital Wellbeing\" (system app; if it exists) itself or change \"Battery usage\" from \"Optimized\" to \"Restricted\" (this is very harmful for audio like camera servers). Because \"Audio jitter silencer\" isn't complete and needs some maintenance after its installation.\n\n* See also my companion script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, post-echo and intermodulation) ultimately, and its simplified Magisk module version [\"Audio Samplerate Changer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer). If annoying (perhaps, for many people) DRC (Dynamic Range Control, i.e., a kind of compression) has been enabled on your device (e.g., smart phones and tablets having an SDM??? or SM???? model numbered SoC internally), you can disable DRC by this script or the Magisk module.\n\n* Appendix A. Examples of Re-sampling Parameters:\n    \n    \n    | Stop band attenuation (dB) | Half filter length | Cut-off (%) | Stop band (%) | Memo |\n    | ---: | ---: | ---: | ---: | ---- |\n    | 90 | 32 | 100 | | AOSP default |\n    | This mod. parameters: | - | - | - | - |\n    | 159 | 320 | 92 | | Low Performance devices under A12 |\n    | 159 | 480 | 92 | | High Performance devices under A12 |\n    | 165 | 360 | | 104 | Low Performance devices for A12 and later |\n    | 179 | 408 | | 99 | High Performance devices for A12 and later, and Galaxy S4 |\n    | 194 | 520 | | 98 | Very High Performance devices |\n    | External examples: | - | - | - | - |\n    | 100 | 29 | (91) | 109 | AK4493 (Sharp roll-off N-fold over-sampling) |\n    | 150 | 42 | (91) | 109 | AK4191EQ (Sharp roll-off N-fold over-sampling) |\n    | 120 | 35 | (97) | 110 | ES9038PRO (Fast roll-off N-fold over-sampling) |\n    | vary 50 ~ 118 | 34 | 96 | (398) | ES9039PRO (Fast roll-off N-fold over-sampling) |\n    | 110 | 40 | (96) | 109 | CS43131 (Fast roll-off N-fold over-sampling) |\n    | 110 | 40 | (96) | 109 | CS43198 (Fast roll-off N-fold over-sampling) |\n    | 98 | 130 | 98.5 | | MacOS Leopard (guess) |\n    | 159 | 240 | | 99 | iZotope, No-Alias (guess) |\n    | 100 | 64 | | 99 | SoX HQ linear phase (guess) |\n    | 170 | 520 | | 99 | SoX VHQ linear phase (guess) |\n\n<br/>\n<br/>\n\n## DISCLAIMER\n\n* I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.\n\n##\n",
+  "readmeHTML": "<h2>A Magisk module for setting miscellaneous audio configuration values</h2>\n\n<p>This module,</p>\n<p><ol></p>\n<p>    <li>changes the number of steps in media volume to 100 steps (0.4~0.7dB per step),</li></p>\n<p>    <li>raises the resampling quality of the Android OS mixer (AudioFlinger) to a very mastering quality (i.e., no resampling distortion in a real sense); Install <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\" module</a> together to override its resampling settings if you intend to use LDAC bluetooth earphones or DAC's under $30,</li></p>\n<p>    <li>disables the effects framework of the mixer (to interface to equalizers, virtualizers, visualizers, echo cancelers, automatic gain controls, etc.) for obtaining a nearly direct low jitter audio pass (very few vulnerable equalizers may crash without this framework, but please ignore it),</li></p>\n<p>    <li>disables the CSD (Calculated Sound Dose) feature of the mixer,</li></p>\n<p>    <li>disables the android built-in spatial audio feature (A13 or higher; especially Tensor devices) for obtaining a nearly direct low jitter audio pass too,</li></p>\n<p>    <li>disables pre-installed Moto Dolby features and Digital Wellbeing (please uninstall this manually if remaining as a usual app) for the same as above,</li></p>\n<p>    <li>stops Tensor device's AOC daemon for reducing significant jitter,</li></p>\n<p>    <li>adjusts a USB transfer period of the USB HAL driver (not the recently common hardware offloading USB (tunneling) driver, but including Tensor device's offloading USB driver) for directly reducing the jitter of a PLL in a DAC (even in an asynchronous mode); Use <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB_SampleRate_Changer\"</a> or <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer\">\"Audio Samplerate Changer\"</a> to switch from the usual hardware offloading USB (tunneling) driver to the USB HAL one,</li></p>\n<p>    <li>sets an audio scheduling tunable \"vendor.audio.adm.buffering.ms\" \"2\" to reduce jitter on all audio outputs,</li></p>\n<p>    <li>nullifies volume listener libraries in \"soundfx\" folders for disabling slight compression (maybe a peak limiter only on Qcomm devices); I recommend using <a href=\"https://github.com/Magisk-Modules-Alt-Repo/drc-remover\">\"DRC remover\"</a> additionally for disabling much larger compression (DRC) if on Qcomm devices</li></p>\n<p></ol><br/></p>\n<p>    for improving audio quality effectively in a simple manner.</p>\n<p><br/></p>\n<p><br/></p>\n<p><br/></p>\n\n<li>Don't forget to install [\"Audio jitter silencer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer) together and uninstall \"Digital Wellbeing\" app (for reducing very large jitters which this module cannot reduce by itself)! If you like much clearer replay (especially on Qcomm devices using an offloading USB driver with large jitter), use <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB_SampleRate_Changer\"</a> or <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer\">\"Audio Samplerate Changer\"</a> for reducing the jitter (making foggy sound).</li>\n\n<li>Don't use Am@zon music using a much worse internal re-sampler which bypasses the mastering quality re-sampling in the OS mixer (audioFlinger). Other music streaming services don't use such an internal re-sampler, as far as I know.</li>\n\n<li>This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 10 ~ 16, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations). For users of Motorola and Xiaomi stock ROM's, try to install a GSI through DSU and this module together once, then you could know how much the ROM's degrade audio quality probably for adapting to regulations.</li>\n\n<li>Note 1: This module raises the resampling quality from AOSP standard one (stop band attenuation 90dB & cut off 100% of the Nyquist frequency & half filter length 32) to a very mastering quality (194dB & 98% & 520 for very high performance devices, 179dB & 99% & 408 for Android 12 and later ones and 160db & 91% & 480 for Android 9 & 10 & 11 ones (except low performance ones), but 167dB & 106% & 368 (194dB & 100% & 520 exceptionally for Galaxy S4) for low performance Android 12 and later devices, 160dB & 91% & 320 for low performance Android 9 & 10 & 11 ones; because earlier than Android 12 has a bug relating to aliasing processing around the Nyquist frequency). However, this cannot raise the quality for Android 8.1 and earlier ones. Please keep in mind that those attenuation values are used for a resampler design as targeted ones and may not be accomplished in the AOSP implementation.</li>\n\n<li>Note 2: Entry class USB DAC's usually adopt an interface chip communicating with the adaptive mode or the synchronous one defined in the USB audio standard. As in these modes an Android host controller sends audio sampling rate clock signals to the DAC, jitter generated at the host side affects the audio quality of the DAC tremendously. Higher class DAC's communicate with the asynchronous mode (also defined in the standard) to a host controller, but they actually use a PLL to reduce jitter from the host not to stutter even in heavy jitter situations. As this result, they behave as the adaptive mode with a feedback loop to dynamically adjust the host side sampling clock signals while referring a DAC side clock in a real sense, so even with the asynchronous mode they are more or less affected by host side jitter. You can see the mode of your USB DAC by opening \"/proc/asound/card1/stream0\" on your phone while playing music. Please see a word in parentheses at \"Endpoint:\" lines; \"SYNC\", \"ADAPTIVE\" or \"ASYNC\" means that your DAC uses \"synchronous\", \"adaptive\" or \"asynchronous\" mode to communicate to your phone, respectively. Moreover, almost all audio peripherals, e.g., bluetooth earphones, internal DAC's, network audio devices have a PLL in themselves and are affected by host side jitter for the same reason.</li>\n\n<li>I recommend expert users not to install [\"Audio jitter silencer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer), but manually to disable \"Manage apps automatically\" in \"Battery manager\" (or \"Adaptive battery\" of \"Adaptive preferences\") in the battery section (needless to say, don't enable battery savers, performance limiters and the like), turning off \"Adaptive connectivity\" in the Network & internet section (if exists), and changing \"Battery optimization\" from \"Optimize\" to \"Don't optimize\" (or change \"Battery usage\" from \"Optimized\" to \"Unrestricted\") for following app's manually through the settings UI of Android OS (to lower less than 10Hz jitter making extremely short reverb or foggy sound like distortion) even though disabling the Android doze itself: music (streaming) player apps, their licensing apps (if exist), \"AirMusic\" (if exists), \"AirMusic  Recording Service\" (system app; if exists), equalizer apps (if exist), \"Bluetooth\" (system app), \"Bluetooth MIDI Service\" (system app), \"MTP Host\" (system app), \"NFC Service\" (system app; if exists), \"Magisk\" (if exists), System WebView apps (system app), Browser apps, \"PhhTrebleApp\" (system app; if exists), \"Android Services Library\" (system app), \"Android Shared Library\" (system app), \"Android System\" (system app), \"System UI\" (system app), \"Input Devices\" (system app), {Gesture, 3 Button, 2  Button} Navigation Bar apps (which you are using only; system app), \"crDroid System\" (system app; if exists), \"LineageOS System\" (system app; if exists), launcher app, \"Google Play Store\" (system app), \"Google Play services\" (system app), \"Styles & wallpaper\" or the like (system app), {Lineage, crDroid, Arrow, etc.} themes app (system app; if exists),  \"AOSP panel\" (system app; if exists), \"OmniJaws\" (system app; if exists), \"OmniStyle\" (system app; if exists), \"Active Edge Service\" (system app; if exists), \"Android Device Security Module\" (system app; if exists), \"Call Management\" (system app; if exists), \"Phone\" (system app; if exists), \"Phone Calls\" (system app; if exists), \"Phone Services\" (system app; if exists), \"Phone and Messaging Storage\" (system app; if exists), \"Storage Manager\" (system app), \"Default\" (system app; if exists), \"Default StatusBar\" (system app; if exists), \"Wfd Service\" (system app; if exists), \"Wallpaper\" or the like (system app), \"Adreno Graphics Drivers\" (system app; if exists), \"com.android.providers.media\" (system app), \"Files by Google\" (system app; if exists), \"Google Play Services for AR\" (system app; if exists), \"Google Services Framework\" (system app), \"Waterfall cutout\" (system app), \"Punch Hole cutout\" (system app), \"Network Manager\" (system app), \"Companion Device Manager\" (system app), \"Intent Filter Verification Service\" (system app), \"Calendar\", camera apps, keyboard app, kernel adiutors (if exist), etc. And uninstall \"Digital Wellbeing\" (system app; if it exists) itself or change \"Battery usage\" from \"Optimized\" to \"Restricted\" (this is very harmful for audio like camera servers). Because \"Audio jitter silencer\" isn't complete and needs some maintenance after its installation.</li>\n\n<li>See also my companion script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, post-echo and intermodulation) ultimately, and its simplified Magisk module version [\"Audio Samplerate Changer\"](https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer). If annoying (perhaps, for many people) DRC (Dynamic Range Control, i.e., a kind of compression) has been enabled on your device (e.g., smart phones and tablets having an SDM??? or SM???? model numbered SoC internally), you can disable DRC by this script or the Magisk module.</li>\n\n<li>Appendix A. Examples of Re-sampling Parameters:</li>\n\n\n<p>    | Stop band attenuation (dB) | Half filter length | Cut-off (%) | Stop band (%) | Memo |</p>\n<p>    | ---: | ---: | ---: | ---: | ---- |</p>\n<p>    | 90 | 32 | 100 | | AOSP default |</p>\n<p>    | This mod. parameters: | - | - | - | - |</p>\n<p>    | 159 | 320 | 92 | | Low Performance devices under A12 |</p>\n<p>    | 159 | 480 | 92 | | High Performance devices under A12 |</p>\n<p>    | 165 | 360 | | 104 | Low Performance devices for A12 and later |</p>\n<p>    | 179 | 408 | | 99 | High Performance devices for A12 and later, and Galaxy S4 |</p>\n<p>    | 194 | 520 | | 98 | Very High Performance devices |</p>\n<p>    | External examples: | - | - | - | - |</p>\n<p>    | 100 | 29 | (91) | 109 | AK4493 (Sharp roll-off N-fold over-sampling) |</p>\n<p>    | 150 | 42 | (91) | 109 | AK4191EQ (Sharp roll-off N-fold over-sampling) |</p>\n<p>    | 120 | 35 | (97) | 110 | ES9038PRO (Fast roll-off N-fold over-sampling) |</p>\n<p>    | vary 50 ~ 118 | 34 | 96 | (398) | ES9039PRO (Fast roll-off N-fold over-sampling) |</p>\n<p>    | 110 | 40 | (96) | 109 | CS43131 (Fast roll-off N-fold over-sampling) |</p>\n<p>    | 110 | 40 | (96) | 109 | CS43198 (Fast roll-off N-fold over-sampling) |</p>\n<p>    | 98 | 130 | 98.5 | | MacOS Leopard (guess) |</p>\n<p>    | 159 | 240 | | 99 | iZotope, No-Alias (guess) |</p>\n<p>    | 100 | 64 | | 99 | SoX HQ linear phase (guess) |</p>\n<p>    | 170 | 520 | | 99 | SoX VHQ linear phase (guess) |</p>\n\n<p><br/></p>\n<p><br/></p>\n\n<h2>DISCLAIMER</h2>\n\n<li>I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.</li>\n\n<p>##</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings",
+  "latestRelease": {
+    "name": "v1.3.12",
+    "version": "v1.3.12",
+    "time": "2026-10-26T14:45:37Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.12/magisk-module-audio-misc-v1.3.12.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.12",
+      "tagName": "v1.3.12",
+      "publishedAt": "2026-10-26T14:45:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.12.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.12/magisk-module-audio-misc-v1.3.12.zip",
+          "size": 28426,
+          "downloadCount": 295
+        }
+      ]
+    },
+    {
+      "name": "v1.3.11",
+      "tagName": "v1.3.11",
+      "publishedAt": "2025-06-07T14:48:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.11.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.11/magisk-module-audio-misc-v1.3.11.zip",
+          "size": 27826,
+          "downloadCount": 19145
+        }
+      ]
+    },
+    {
+      "name": "v1.3.10",
+      "tagName": "v1.3.10",
+      "publishedAt": "2025-04-30T13:23:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.10.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.10/magisk-module-audio-misc-v1.3.10.zip",
+          "size": 27719,
+          "downloadCount": 711
+        }
+      ]
+    },
+    {
+      "name": "v1.3.9",
+      "tagName": "v1.3.9",
+      "publishedAt": "2024-10-28T07:56:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.9/magisk-module-audio-misc-v1.3.9.zip",
+          "size": 27415,
+          "downloadCount": 2706
+        }
+      ]
+    },
+    {
+      "name": "v1.3.8",
+      "tagName": "v1.3.8",
+      "publishedAt": "2024-07-28T06:32:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.8-3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.8/magisk-module-audio-misc-v1.3.8-3.zip",
+          "size": 26421,
+          "downloadCount": 278
+        }
+      ]
+    },
+    {
+      "name": "v1.3.7",
+      "tagName": "v1.3.7",
+      "publishedAt": "2024-04-15T06:30:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.7-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.7/magisk-module-audio-misc-v1.3.7-1.zip",
+          "size": 25853,
+          "downloadCount": 1749
+        }
+      ]
+    },
+    {
+      "name": "v1.3.6",
+      "tagName": "v1.3.6",
+      "publishedAt": "2024-03-05T06:29:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.6/magisk-module-audio-misc-v1.3.6.zip",
+          "size": 25695,
+          "downloadCount": 1012
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5",
+      "tagName": "v1.3.5",
+      "publishedAt": "2023-12-31T11:12:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.5/magisk-module-audio-misc-v1.3.5.zip",
+          "size": 25509,
+          "downloadCount": 1297
+        }
+      ]
+    },
+    {
+      "name": "v1.3.4",
+      "tagName": "v1.3.4",
+      "publishedAt": "2023-08-13T14:22:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.4/magisk-module-audio-misc-v1.3.4.zip",
+          "size": 25457,
+          "downloadCount": 2080
+        }
+      ]
+    },
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2023-06-25T08:31:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.3-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.3/magisk-module-audio-misc-v1.3.3-2.zip",
+          "size": 25351,
+          "downloadCount": 467
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2023-06-19T13:14:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.2/magisk-module-audio-misc-v1.3.2.zip",
+          "size": 25108,
+          "downloadCount": 126
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2023-06-12T11:30:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.1/magisk-module-audio-misc-v1.3.1.zip",
+          "size": 24984,
+          "downloadCount": 133
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2023-04-11T09:47:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-v1.3.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.0/magisk-module-audio-misc-v1.3.0.zip",
+          "size": 23921,
+          "downloadCount": 674
+        }
+      ]
+    },
+    {
+      "name": "V1.2.4",
+      "tagName": "V1.2.4",
+      "publishedAt": "2023-03-08T07:14:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-2-4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.2.4/magisk-module-audio-misc-V1-2-4.zip",
+          "size": 23232,
+          "downloadCount": 522
+        }
+      ]
+    },
+    {
+      "name": "V1.2.3",
+      "tagName": "V1.2.3",
+      "publishedAt": "2023-01-25T10:41:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-2-3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.2.3/magisk-module-audio-misc-V1-2-3.zip",
+          "size": 22513,
+          "downloadCount": 475
+        }
+      ]
+    },
+    {
+      "name": "V1.2.2",
+      "tagName": "V1.2.2",
+      "publishedAt": "2022-11-14T12:45:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-2-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.2.2/magisk-module-audio-misc-V1-2-2.zip",
+          "size": 22291,
+          "downloadCount": 804
+        }
+      ]
+    },
+    {
+      "name": "V1.2.1",
+      "tagName": "V1.2.1",
+      "publishedAt": "2022-10-06T06:15:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-2-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.2.1/magisk-module-audio-misc-V1-2-1.zip",
+          "size": 21946,
+          "downloadCount": 363
+        }
+      ]
+    },
+    {
+      "name": "V1.2.0",
+      "tagName": "V1.2.0",
+      "publishedAt": "2022-08-06T10:12:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-2-0-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.2.0/magisk-module-audio-misc-V1-2-0-1.zip",
+          "size": 21628,
+          "downloadCount": 600
+        }
+      ]
+    },
+    {
+      "name": "V1.1.0",
+      "tagName": "V1.1.0",
+      "publishedAt": "2022-06-01T08:46:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-1-0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.1.0/magisk-module-audio-misc-V1-1-0.zip",
+          "size": 19461,
+          "downloadCount": 802
+        }
+      ]
+    },
+    {
+      "name": "V1.0.9",
+      "tagName": "V1.0.9",
+      "publishedAt": "2022-05-08T12:18:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.9/magisk-module-audio-misc-V1-0-9.zip",
+          "size": 18697,
+          "downloadCount": 369
+        }
+      ]
+    },
+    {
+      "name": "V1.0.8",
+      "tagName": "V1.0.8",
+      "publishedAt": "2022-04-22T08:58:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-8.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.8/magisk-module-audio-misc-V1-0-8.zip",
+          "size": 18176,
+          "downloadCount": 318
+        }
+      ]
+    },
+    {
+      "name": "V1.0.7",
+      "tagName": "V1.0.7",
+      "publishedAt": "2022-04-11T10:27:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.7/magisk-module-audio-misc-V1-0-7.zip",
+          "size": 18062,
+          "downloadCount": 336
+        }
+      ]
+    },
+    {
+      "name": "V1.0.6",
+      "tagName": "V1.0.6",
+      "publishedAt": "2022-04-02T11:20:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.6/magisk-module-audio-misc-V1-0-6.zip",
+          "size": 18020,
+          "downloadCount": 229
+        }
+      ]
+    },
+    {
+      "name": "V1.0.5",
+      "tagName": "V1.0.5",
+      "publishedAt": "2022-03-16T11:55:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-5-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.5/magisk-module-audio-misc-V1-0-5-2.zip",
+          "size": 17674,
+          "downloadCount": 192
+        }
+      ]
+    },
+    {
+      "name": "V1.0.4",
+      "tagName": "V1.0.4",
+      "publishedAt": "2022-02-11T10:05:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.4/magisk-module-audio-misc-V1-0-4-1.zip",
+          "size": 16795,
+          "downloadCount": 106
+        }
+      ]
+    },
+    {
+      "name": "V1.0.3",
+      "tagName": "V1.0.3",
+      "publishedAt": "2022-01-23T08:19:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-3-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.3/magisk-module-audio-misc-V1-0-3-1.zip",
+          "size": 16588,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "V1.0.2",
+      "tagName": "V1.0.2",
+      "publishedAt": "2022-01-15T10:06:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.2/magisk-module-audio-misc-V1-0-2.zip",
+          "size": 16285,
+          "downloadCount": 51
+        }
+      ]
+    },
+    {
+      "name": "V1.0.1",
+      "tagName": "V1.0.1",
+      "publishedAt": "2022-01-11T02:52:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-misc-V1-0-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/V1.0.1/magisk-module-audio-misc-V1-0-1.zip",
+          "size": 15485,
+          "downloadCount": 67
+        }
+      ]
+    }
+  ]
+}

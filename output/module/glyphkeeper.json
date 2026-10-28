@@ -1,0 +1,99 @@
+{
+  "readme": "<div align=\"center\">\n\n# 🌒 Glyph Keeper\n\n**Reclaiming Glyph control on Nothing Phone (2a).**\n\n[![Platform](https://img.shields.io/badge/Platform-Android%2017%20%7C%20Nothing%20OS%205.0-000000?style=flat-square&logo=android)](https://github.com/vaccrate/GlyphKeeper)\n[![Root Manager](https://img.shields.io/badge/Root-KernelSU%20%7C%20Magisk-orange?style=flat-square)](#requirements)\n[![License](https://img.shields.io/badge/License-WTFPL-blue?style=flat-square)](LICENSE)\n[![Status](https://img.shields.io/badge/Status-Experimental-red?style=flat-square)](#disclaimer)\n\n</div>\n\n---\n\nAfter the update to **Android 17 (Nothing OS 5.0)**, the system service responsible for Glyph management started aggressively resetting the LED driver's operating mode. This breaks third-party apps, automation, and any manual control over the Glyphs.\n\n**Glyph Keeper** is a root module (KernelSU / Magisk) that bypasses the Nothing system service and communicates directly with the `aw20036` LED driver via `sysfs`.\n\n## 📑 Table of Contents\n- [⚠️ Disclaimer](#️-disclaimer)\n- [✨ Features](#-features)\n- [📋 Requirements](#-requirements)\n- [📦 Installation](#-installation)\n- [🕹️ Usage](#️-usage)\n- [⚙️ How it works](#️-how-it-works)\n- [🐛 Known Issues](#-known-issues)\n- [🤝 Credits](#-credits)\n- [📄 License](#-license)\n\n## ⚠️ Disclaimer\n\n> **🚨 EXPERIMENTAL MODULE**\n> Use at your own risk. The author is not responsible for any damage to your device, Glyph LEDs, or any other hardware. This project is distributed under the WTFPL license. \n> \n> *Manual commands (especially `led` and `progress`) are provided for testing and may behave unpredictably.*\n\n## ✨ Features\n\n- **Start / Stop:** Manual control to turn all Glyphs on or off instantly.\n- **Brightness Control:** Smooth brightness adjustment (0–255) via WebUI or CLI.\n- **Wave Animation:** A software-based running wave effect.\n- **WebUI:** Convenient and clean control directly from your root manager.\n- **CLI (Termux):** Direct access via the `glyphctl` binary, including experimental `led` and `progress` commands.\n\n## 📋 Requirements\n\n- **Device:** Nothing Phone (2a) *(tested on Android 17 / Nothing OS 5.0)*.\n- **Root Manager:** **KernelSU** (or a fork like ReSukiSU / SukiSU) or **Magisk**.\n- **Important for KernelSU users:** The `meta-overlayfs` metamodule is required for files in `system/bin` to be mounted correctly.\n\n> **ℹ️ Note on other devices:** Paths to the sysfs nodes may differ on Phone (1) or Phone (2). Check `/sys/devices/platform/soc/*.i2c/i2c-*/...` before installing.\n\n## 📦 Installation\n\n1. Download the latest `.zip` from the [**Releases**](../../releases) page.\n2. Install the ZIP via your root manager (KernelSU, ReSukiSU, or Magisk).\n3. **Reboot** your device.\n\n## 🕹️ Usage\n\n### 🌐 WebUI\nOpen the module in your root manager and launch the WebUI. From there, you can control the brightness, start/stop the Glyphs, and trigger the wave animation.\n\n### 💻 CLI (Termux)\nAfter installation, the utility is available at `/system/bin/glyphctl`:\n\n| Command | Description |\n| :--- | :--- |\n| `su -c 'glyphctl start'` | Turn all Glyphs on (manual mode, brightness 255) |\n| `su -c 'glyphctl stop'` | Turn all Glyphs off |\n| `su -c 'glyphctl brightness 128'` | Set brightness (0-255) |\n| `su -c 'glyphctl wave'` | Run the wave animation |\n| `su -c 'glyphctl led 5 255'` | 🧪 Experimental: control a single LED (ID 0-25) |\n| `su -c 'glyphctl progress 50'` | 🧪 Experimental: fill a percentage of the top strip (0-100) |\n\n## ⚙️ How it works\n\nThe module consists of two core parts:\n\n1. **`glyphctl`**: A C utility that writes directly to the `aw20036` driver sysfs nodes (`/sys/devices/platform/soc/11e80000.i2c/i2c-3/3-003a/leds/aw20036_led/`).\n2. **Daemon**: A background process (started via `service.sh`) that holds `operating_mode` at `1` (manual mode), preventing the Nothing system service from resetting it. It also listens to a FIFO (`/data/local/tmp/glyph_fifo`) for commands from external apps.\n\n## 🐛 Known Issues\n\n- Individual LED mapping (IDs 0–25) may require further research. The `progress` command currently only affects the top 24 LEDs.\n- Aggressive system services may still cause brief conflicts; the daemon tries to recover the mode as quickly as possible.\n\n## 🤝 Credits\n\n- The **Nothing community** for reverse-engineering the `aw20036` driver and sharing sysfs paths.\n- The **KernelSU** and **Magisk** developers for their module APIs and documentation.\n- **XDA Developers** forum for ongoing discussions and testing.\n\n## 📄 License\n\nThis project is licensed under the **WTFPL** (Do What The Fuck You Want To Public License). See the [LICENSE](LICENSE) file for details.\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>🌒 Glyph Keeper</h1>\n\n<p><b>Reclaiming Glyph control on Nothing Phone (2a).</b></p>\n\n<p><a href=\"https://img.shields.io/badge/Platform-Android%2017%20%7C%20Nothing%20OS%205.0-000000?style=flat-square&logo=android\">![Platform</a>](https://github.com/vaccrate/GlyphKeeper)</p>\n<p><a href=\"https://img.shields.io/badge/Root-KernelSU%20%7C%20Magisk-orange?style=flat-square\">![Root Manager</a>](#requirements)</p>\n<p><a href=\"https://img.shields.io/badge/License-WTFPL-blue?style=flat-square\">![License</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Status-Experimental-red?style=flat-square\">![Status</a>](#disclaimer)</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p>After the update to <b>Android 17 (Nothing OS 5.0)</b>, the system service responsible for Glyph management started aggressively resetting the LED driver's operating mode. This breaks third-party apps, automation, and any manual control over the Glyphs.</p>\n\n<p><b>Glyph Keeper</b> is a root module (KernelSU / Magisk) that bypasses the Nothing system service and communicates directly with the <code>aw20036</code> LED driver via <code>sysfs</code>.</p>\n\n<h2>📑 Table of Contents</h2>\n<li>[⚠️ Disclaimer](#️-disclaimer)</li>\n<li>[✨ Features](#-features)</li>\n<li>[📋 Requirements](#-requirements)</li>\n<li>[📦 Installation](#-installation)</li>\n<li>[🕹️ Usage](#️-usage)</li>\n<li>[⚙️ How it works](#️-how-it-works)</li>\n<li>[🐛 Known Issues](#-known-issues)</li>\n<li>[🤝 Credits](#-credits)</li>\n<li>[📄 License](#-license)</li>\n\n<h2>⚠️ Disclaimer</h2>\n\n<p>> <b>🚨 EXPERIMENTAL MODULE</b></p>\n<p>> Use at your own risk. The author is not responsible for any damage to your device, Glyph LEDs, or any other hardware. This project is distributed under the WTFPL license.</p>\n<p>></p>\n<p>> *Manual commands (especially <code>led</code> and <code>progress</code>) are provided for testing and may behave unpredictably.*</p>\n\n<h2>✨ Features</h2>\n\n<li>**Start / Stop:** Manual control to turn all Glyphs on or off instantly.</li>\n<li>**Brightness Control:** Smooth brightness adjustment (0–255) via WebUI or CLI.</li>\n<li>**Wave Animation:** A software-based running wave effect.</li>\n<li>**WebUI:** Convenient and clean control directly from your root manager.</li>\n<li>**CLI (Termux):** Direct access via the `glyphctl` binary, including experimental `led` and `progress` commands.</li>\n\n<h2>📋 Requirements</h2>\n\n<li>**Device:** Nothing Phone (2a) *(tested on Android 17 / Nothing OS 5.0)*.</li>\n<li>**Root Manager:** **KernelSU** (or a fork like ReSukiSU / SukiSU) or **Magisk**.</li>\n<li>**Important for KernelSU users:** The `meta-overlayfs` metamodule is required for files in `system/bin` to be mounted correctly.</li>\n\n<p>> <b>ℹ️ Note on other devices:</b> Paths to the sysfs nodes may differ on Phone (1) or Phone (2). Check <code>/sys/devices/platform/soc/*.i2c/i2c-*/...</code> before installing.</p>\n\n<h2>📦 Installation</h2>\n\n<li>Download the latest `.zip` from the [**Releases**](../../releases) page.</li>\n<li>Install the ZIP via your root manager (KernelSU, ReSukiSU, or Magisk).</li>\n<li>**Reboot** your device.</li>\n\n<h2>🕹️ Usage</h2>\n\n<h3>🌐 WebUI</h3>\n<p>Open the module in your root manager and launch the WebUI. From there, you can control the brightness, start/stop the Glyphs, and trigger the wave animation.</p>\n\n<h3>💻 CLI (Termux)</h3>\n<p>After installation, the utility is available at <code>/system/bin/glyphctl</code>:</p>\n\n<p>| Command | Description |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>su -c 'glyphctl start'</code> | Turn all Glyphs on (manual mode, brightness 255) |</p>\n<p>| <code>su -c 'glyphctl stop'</code> | Turn all Glyphs off |</p>\n<p>| <code>su -c 'glyphctl brightness 128'</code> | Set brightness (0-255) |</p>\n<p>| <code>su -c 'glyphctl wave'</code> | Run the wave animation |</p>\n<p>| <code>su -c 'glyphctl led 5 255'</code> | 🧪 Experimental: control a single LED (ID 0-25) |</p>\n<p>| <code>su -c 'glyphctl progress 50'</code> | 🧪 Experimental: fill a percentage of the top strip (0-100) |</p>\n\n<h2>⚙️ How it works</h2>\n\n<p>The module consists of two core parts:</p>\n\n<li>**`glyphctl`**: A C utility that writes directly to the `aw20036` driver sysfs nodes (`/sys/devices/platform/soc/11e80000.i2c/i2c-3/3-003a/leds/aw20036_led/`).</li>\n<li>**Daemon**: A background process (started via `service.sh`) that holds `operating_mode` at `1` (manual mode), preventing the Nothing system service from resetting it. It also listens to a FIFO (`/data/local/tmp/glyph_fifo`) for commands from external apps.</li>\n\n<h2>🐛 Known Issues</h2>\n\n<li>Individual LED mapping (IDs 0–25) may require further research. The `progress` command currently only affects the top 24 LEDs.</li>\n<li>Aggressive system services may still cause brief conflicts; the daemon tries to recover the mode as quickly as possible.</li>\n\n<h2>🤝 Credits</h2>\n\n<li>The **Nothing community** for reverse-engineering the `aw20036` driver and sharing sysfs paths.</li>\n<li>The **KernelSU** and **Magisk** developers for their module APIs and documentation.</li>\n<li>**XDA Developers** forum for ongoing discussions and testing.</li>\n\n<h2>📄 License</h2>\n\n<p>This project is licensed under the <b>WTFPL</b> (Do What The Fuck You Want To Public License). See the <a href=\"LICENSE\">LICENSE</a> file for details.</p>",
+  "homepageUrl": "https://github.com/vaccreate/GlyphKeeper",
+  "sourceUrl": "https://github.com/vaccreate/GlyphKeeper",
+  "url": "https://github.com/vaccreate/GlyphKeeper",
+  "latestRelease": {
+    "name": "v1.5.1",
+    "version": "v1.5.1",
+    "time": "2026-10-25T09:28:02Z",
+    "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.5.1/GlyphKeeper-v1.5.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-10-25T09:28:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.5.1.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.5.1/GlyphKeeper-v1.5.1.zip",
+          "size": 18599,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-10-24T16:33:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.5.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.5/GlyphKeeper-v1.5.zip",
+          "size": 17399,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2026-10-24T11:54:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.4.1.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.4.1/GlyphKeeper-v1.4.1.zip",
+          "size": 17365,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2026-10-24T08:47:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.3.3.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.3.3/GlyphKeeper-v1.3.3.zip",
+          "size": 13383,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2026-10-24T07:58:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.3.2.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.3.2/GlyphKeeper-v1.3.2.zip",
+          "size": 13114,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-10-23T17:32:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlyphKeeper-v1.3.zip",
+          "downloadUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.3/GlyphKeeper-v1.3.zip",
+          "size": 11904,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

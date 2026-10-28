@@ -1,0 +1,127 @@
+{
+  "readme": "# 极速高刷 Astra_MaxRefresh_Pro\n\n> **警告**：\n> 1. 操作前请务必确保自己拥有救砖能力。\n> 2. 从旧版（星驰引擎）升级：刷入时将自动备份旧版配置，请按提示卸载旧模块并重启后重新刷入，配置将自动恢复。\n> 3. 任何问题可前往 QQ群：979221822 咨询。\n\n## 简介\n\n极速高刷 Astra_MaxRefresh_Pro 是专为欧加（Oplus）系设备打造的高刷模块，支持原生刷新率与超频 DTBO 档位，可强制锁定所需的刷新率，无论在原生还是超频环境下，都能实现稳定高效的屏幕刷新控制。\n\n## 功能特性\n\n### 刷新率锁定\n\n- 支持原生刷新率：如 60Hz、90Hz、120Hz 等\n- 支持超频 DTBO：可根据需求自定义刷新率档位\n- 强制锁定指定档位，避免系统自动降频或切换\n- 支持按应用自动切换档位，轮询间隔可调\n\n### WebUI 管理器\n\n- 拟物仪表盘设计，实时显示当前档位、切换路径与帧信号\n- 应用规则可从已安装应用中选择，显示应用图标\n- 浅色 / 深色 / 跟随系统三种外观，动画可选完整 / 精简 / 关闭\n- 边到边布局，原生适配状态栏与手势导航条\n\n### 超频 DTBO 兼容性\n\n- 首次启动时自动扫描全部刷新率档位，并按 120Hz 原生基准自动标注原生与超频档位，可在 WebUI 中调整\n- 超频 DTBO 中必须保留 120Hz 档位，否则可能导致功能失效或不稳定\n- 当自定义应用切换功能不生效时，请优先联系提供该 DTBO 的作者更新至最新版本\n\n## 使用步骤\n\n1. 下载并刷入 极速高刷 Astra_MaxRefresh_Pro 模块（KernelSU，或 Magisk + KsuWebUI）。\n2. 重启设备，模块将自动扫描并标注全部刷新率档位。\n3. 打开 WebUI，在「设置」页核对档位属性：超频档位需填写切换顺序，存在超频档位的分辨率需设置原生基准，然后保存。\n4. 在「主页」选择全局档位并保存，或在「应用」页按应用添加档位规则。\n\n配置文件保存在 `/data/adb/Astra_MaxRefresh_Pro_data`，卸载模块时保留，重新安装后自动恢复。运行记录位于同一目录下的 `run.log`。\n\n## 常见问题\n\n### 锁屏或关机重启后无法切换到高档位\n\n- 某些设备上，超频 DTBO 在锁屏或关机重启后无法直接切换到高档位；原生用户在重启后几秒内可自动恢复到之前设定的档位。\n- 建议更新超频 DTBO 至最新版本。\n\n### 管理器推荐\n\n- KernelSU 及其分支体验最好。\n- Magisk 用户必须下载 KsuWebUI 软件，并授予 Root 权限后使用。\n\n---\n\n更新日志见 [CHANGELOG.md](CHANGELOG.md)。\n",
+  "readmeHTML": "<h1>极速高刷 Astra_MaxRefresh_Pro</h1>\n\n<p>> <b>警告</b>：</p>\n<p>> 1. 操作前请务必确保自己拥有救砖能力。</p>\n<p>> 2. 从旧版（星驰引擎）升级：刷入时将自动备份旧版配置，请按提示卸载旧模块并重启后重新刷入，配置将自动恢复。</p>\n<p>> 3. 任何问题可前往 QQ群：979221822 咨询。</p>\n\n<h2>简介</h2>\n\n<p>极速高刷 Astra_MaxRefresh_Pro 是专为欧加（Oplus）系设备打造的高刷模块，支持原生刷新率与超频 DTBO 档位，可强制锁定所需的刷新率，无论在原生还是超频环境下，都能实现稳定高效的屏幕刷新控制。</p>\n\n<h2>功能特性</h2>\n\n<h3>刷新率锁定</h3>\n\n<li>支持原生刷新率：如 60Hz、90Hz、120Hz 等</li>\n<li>支持超频 DTBO：可根据需求自定义刷新率档位</li>\n<li>强制锁定指定档位，避免系统自动降频或切换</li>\n<li>支持按应用自动切换档位，轮询间隔可调</li>\n\n<h3>WebUI 管理器</h3>\n\n<li>拟物仪表盘设计，实时显示当前档位、切换路径与帧信号</li>\n<li>应用规则可从已安装应用中选择，显示应用图标</li>\n<li>浅色 / 深色 / 跟随系统三种外观，动画可选完整 / 精简 / 关闭</li>\n<li>边到边布局，原生适配状态栏与手势导航条</li>\n\n<h3>超频 DTBO 兼容性</h3>\n\n<li>首次启动时自动扫描全部刷新率档位，并按 120Hz 原生基准自动标注原生与超频档位，可在 WebUI 中调整</li>\n<li>超频 DTBO 中必须保留 120Hz 档位，否则可能导致功能失效或不稳定</li>\n<li>当自定义应用切换功能不生效时，请优先联系提供该 DTBO 的作者更新至最新版本</li>\n\n<h2>使用步骤</h2>\n\n<li>下载并刷入 极速高刷 Astra_MaxRefresh_Pro 模块（KernelSU，或 Magisk + KsuWebUI）。</li>\n<li>重启设备，模块将自动扫描并标注全部刷新率档位。</li>\n<li>打开 WebUI，在「设置」页核对档位属性：超频档位需填写切换顺序，存在超频档位的分辨率需设置原生基准，然后保存。</li>\n<li>在「主页」选择全局档位并保存，或在「应用」页按应用添加档位规则。</li>\n\n<p>配置文件保存在 <code>/data/adb/Astra_MaxRefresh_Pro_data</code>，卸载模块时保留，重新安装后自动恢复。运行记录位于同一目录下的 <code>run.log</code>。</p>\n\n<h2>常见问题</h2>\n\n<h3>锁屏或关机重启后无法切换到高档位</h3>\n\n<li>某些设备上，超频 DTBO 在锁屏或关机重启后无法直接切换到高档位；原生用户在重启后几秒内可自动恢复到之前设定的档位。</li>\n<li>建议更新超频 DTBO 至最新版本。</li>\n\n<h3>管理器推荐</h3>\n\n<li>KernelSU 及其分支体验最好。</li>\n<li>Magisk 用户必须下载 KsuWebUI 软件，并授予 Root 权限后使用。</li>\n\n<p>---</p>\n\n<p>更新日志见 <a href=\"CHANGELOG.md\">CHANGELOG.md</a>。</p>",
+  "homepageUrl": "https://cloud.sakuraki.love/",
+  "sourceUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro",
+  "url": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro",
+  "latestRelease": {
+    "name": "V6.0",
+    "version": "V6.0",
+    "time": "2026-10-28T05:06:24Z",
+    "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V6.0/Astra_MaxRefresh_Pro_V6.0.zip"
+  },
+  "releases": [
+    {
+      "name": "V6.0",
+      "tagName": "V6.0",
+      "publishedAt": "2026-10-28T05:06:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Astra_MaxRefresh_Pro_V6.0.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V6.0/Astra_MaxRefresh_Pro_V6.0.zip",
+          "size": 158452,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "V5.0",
+      "tagName": "V5.0",
+      "publishedAt": "2026-07-24T20:51:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Astra_MaxRefresh_Pro_V5.0.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V5.0/Astra_MaxRefresh_Pro_V5.0.zip",
+          "size": 42290,
+          "downloadCount": 1752
+        }
+      ]
+    },
+    {
+      "name": "V4.5",
+      "tagName": "V4.5",
+      "publishedAt": "2026-03-02T05:18:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_MaxRefresh_Pro_V4.5.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V4.5/Yuanxing_Stellar_MaxRefresh_Pro_V4.5.zip",
+          "size": 248834,
+          "downloadCount": 177
+        }
+      ]
+    },
+    {
+      "name": "V4.4",
+      "tagName": "V4.4",
+      "publishedAt": "2026-02-12T20:03:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_MaxRefresh_Pro_V4.4.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V4.4/Yuanxing_Stellar_MaxRefresh_Pro_V4.4.zip",
+          "size": 263868,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "V3.1",
+      "tagName": "V3.1",
+      "publishedAt": "2025-12-19T13:25:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_MaxRefresh_Pro_V3.1.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V3.1/Yuanxing_Stellar_MaxRefresh_Pro_V3.1.zip",
+          "size": 242711,
+          "downloadCount": 148
+        }
+      ]
+    },
+    {
+      "name": "V3.0",
+      "tagName": "V3.0",
+      "publishedAt": "2025-12-17T05:27:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_MaxRefresh_Pro_V3.0.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V3.0/Yuanxing_Stellar_MaxRefresh_Pro_V3.0.zip",
+          "size": 17019,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "V2.6",
+      "tagName": "V2.6",
+      "publishedAt": "2025-12-16T15:10:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_LTPO_V2.6.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V2.6/Yuanxing_Stellar_LTPO_V2.6.zip",
+          "size": 16514,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "V2.5",
+      "tagName": "V2.5",
+      "publishedAt": "2025-12-13T02:36:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Yuanxing_Stellar_LTPO_V2.5.zip",
+          "downloadUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/V2.5/Yuanxing_Stellar_LTPO_V2.5.zip",
+          "size": 16465,
+          "downloadCount": 23
+        }
+      ]
+    }
+  ]
+}

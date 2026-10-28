@@ -1,0 +1,451 @@
+{
+  "readme": "<img src=\"https://raw.githubusercontent.com/sidex15/susfs4ksu-binaries/refs/heads/new/susfsbanner.png\" width=400px height=225px>\n<a href=\"https://nightly.link/sidex15/susfs4ksu-module/workflows/build/v1.5.2%2B?preview\">\n  <img alt=\"Static Badge\" src=\"https://img.shields.io/badge/Module%20CI%20Version-8A2BE2?style=for-the-badge&logo=github\">\n</a>\n\n# A KernelSU module for SUSFS patched kernel #\n\nThis module installs a userspace helper tool called **ksu_susfs** and **sus_su** into /data/adb/ksu and provides a script to communicate with SUSFS kernel.\nThis module provides root hiding for KernelSU on the kernel level.\n\n## Notes\n- Make sure you have a custom kernel with SUSFS patched in it. Check the custom kernel source to see if it has SUSFS.\n- Make sure the kernel is using SUSFS 1.5.2 or later for effective hide.\n- Shamiko v1.2.1 or later is acceptable (but it's highly optional to use it)\n- HideMyApplist is acceptable\n- ReVanced root module compatible\n- Recommended to use [bindhosts](https://github.com/bindhosts/bindhosts) if you want to use systemless hosts\n\n## SUSFS Custom settings documentation\nhttps://github.com/sidex15/susfs4ksu-module/wiki\n\n## Spoofing Kernel Uname guide on Revision 16+\nIn the new R16 of SUSFS includes a new parameter called \"Spoof Kernel Build\". this may confuse some users about what those are.\n\nIn the kernel version it affects this part:\n```\n6.1.75-android14-11-g16c5f6cd5e9b-ab12268515\n```\nWhile on the Kernel Build part is this:\n```\n#1 SMP PREEMPT Fri Aug 23 03:08:10 UTC 2024\n```\nYou may check them by using these commands:\n```\n#This is for the Kernel Version\nuname -r\n#This is for the Kernel Build\nuname -v\n```\n\n## Adding ro.boot.vbmeta.digest value (Will be deprecated in the next release and Latest CI)\nThis module will now have a directory called `VerifiedBootHash` in `/data/adb` containing `VerifiedBootHash.txt` for users with missing `ro.boot.vbmeta.digest` value to prevent partition modified and abnormal boot state detection. \n- Copy your VerifiedBootHash in the Key Attestation demo and paste it to `/data/adb/VerifiedBootHash/VerifiedBootHash.txt`\n\n## Localization\n### [Crowdin contribution (to update languages)](https://crowdin.com/project/susfs4ksu-module)\n\n### New Language Pull Request\nIf you want to add your own language, use the `webui` branch and add your translations in the `./languages` directory. Make sure to test the implementation thoroughly before submitting a pull request.\nAlso, the name of the XML files should be the same as the language code, for example:\n- For English, the file should be named `en.xml`\n- For Spanish, the file should be named `es.xml`\n\nThen add your language to the `./languages/languages.json` with this format:\n<br>\n```\n\"<your language code>\": \"<Name of the language (not English translation)>\"\n```\nso it will be included in the language drop-down menu. <br>\n\n#### NOTE: Only PR when you're going to add new languages. Updating existing languages should use Crowdin; language update PRs will be automatically rejected.\n\n## Credits\nsusfs4ksu: https://gitlab.com/simonpunk/susfs4ksu/\n\n[Among Us characters 1](https://www.reddit.com/r/AmongUs/comments/iut5y2/couldnt_find_many_pngs_of_the_among_us_characters/)\n\n[Among Us characters 2](https://www.stickpng.com/img/cartoons/among-us/among-us-characters)\n\n## Buy us some coffee ☕\n### simonpunk\nPayPal: `kingjeffkimo@yahoo.com.tw`\n<br>BTC: `bc1qgkwvsfln02463zpjf7z6tds8xnpeykggtgk4kw`\n### sidex15\nPayPal: `sidex15.official@gmail.com`\n<br>BTC: `1AVaRmoEivK94XRooqbbAgvzdTMA5cwGdc`\n<br>ETH (ERC20): `0xa52151ebd2718a00af9e1dfcacfb30e1d3a94860`\n<br>USDT (TRC20): `TAUbxzug7cygExFunhFBiG6ntmbJwz7Skn`\n<br>USDT (ERC20): \n`0xa52151ebd2718a00af9e1dfcacfb30e1d3a94860`\n\n## Stars 🌟\n[![Stars 🌟](https://starchart.cc/sidex15/susfs4ksu-module.svg?variant=adaptive)](https://starchart.cc/sidex15/susfs4ksu-module)\n\n## Legal Disclaimer\n```\nThis project is a non-commercial, fan-made tool. It is not affiliated with, endorsed by, or associated with Innersloth LLC.\n\n\"Among Us\" and all related characters and elements are trademarks and copyrights of Innersloth LLC.\n\nThis project is intended for educational and personal use only. It is not intended for any commercial purposes or distribution.\n```\n",
+  "readmeHTML": "<p><img src=\"https://raw.githubusercontent.com/sidex15/susfs4ksu-binaries/refs/heads/new/susfsbanner.png\" width=400px height=225px></p>\n<p><a href=\"https://nightly.link/sidex15/susfs4ksu-module/workflows/build/v1.5.2%2B?preview\"></p>\n<p>  <img alt=\"Static Badge\" src=\"https://img.shields.io/badge/Module%20CI%20Version-8A2BE2?style=for-the-badge&logo=github\"></p>\n<p></a></p>\n\n<h1>A KernelSU module for SUSFS patched kernel #</h1>\n\n<p>This module installs a userspace helper tool called <b>ksu_susfs</b> and <b>sus_su</b> into /data/adb/ksu and provides a script to communicate with SUSFS kernel.</p>\n<p>This module provides root hiding for KernelSU on the kernel level.</p>\n\n<h2>Notes</h2>\n<li>Make sure you have a custom kernel with SUSFS patched in it. Check the custom kernel source to see if it has SUSFS.</li>\n<li>Make sure the kernel is using SUSFS 1.5.2 or later for effective hide.</li>\n<li>Shamiko v1.2.1 or later is acceptable (but it's highly optional to use it)</li>\n<li>HideMyApplist is acceptable</li>\n<li>ReVanced root module compatible</li>\n<li>Recommended to use [bindhosts](https://github.com/bindhosts/bindhosts) if you want to use systemless hosts</li>\n\n<h2>SUSFS Custom settings documentation</h2>\n<p>https://github.com/sidex15/susfs4ksu-module/wiki</p>\n\n<h2>Spoofing Kernel Uname guide on Revision 16+</h2>\n<p>In the new R16 of SUSFS includes a new parameter called \"Spoof Kernel Build\". this may confuse some users about what those are.</p>\n\n<p>In the kernel version it affects this part:</p>\n<pre>6.1.75-android14-11-g16c5f6cd5e9b-ab12268515</pre>\n<p>While on the Kernel Build part is this:</p>\n<pre>#1 SMP PREEMPT Fri Aug 23 03:08:10 UTC 2024</pre>\n<p>You may check them by using these commands:</p>\n<pre>#This is for the Kernel Version\nuname -r\n#This is for the Kernel Build\nuname -v</pre>\n\n<h2>Adding ro.boot.vbmeta.digest value (Will be deprecated in the next release and Latest CI)</h2>\n<p>This module will now have a directory called <code>VerifiedBootHash</code> in <code>/data/adb</code> containing <code>VerifiedBootHash.txt</code> for users with missing <code>ro.boot.vbmeta.digest</code> value to prevent partition modified and abnormal boot state detection.</p>\n<li>Copy your VerifiedBootHash in the Key Attestation demo and paste it to `/data/adb/VerifiedBootHash/VerifiedBootHash.txt`</li>\n\n<h2>Localization</h2>\n<h3>[Crowdin contribution (to update languages)](https://crowdin.com/project/susfs4ksu-module)</h3>\n\n<h3>New Language Pull Request</h3>\n<p>If you want to add your own language, use the <code>webui</code> branch and add your translations in the <code>./languages</code> directory. Make sure to test the implementation thoroughly before submitting a pull request.</p>\n<p>Also, the name of the XML files should be the same as the language code, for example:</p>\n<li>For English, the file should be named `en.xml`</li>\n<li>For Spanish, the file should be named `es.xml`</li>\n\n<p>Then add your language to the <code>./languages/languages.json</code> with this format:</p>\n<p><br></p>\n<pre>\"&lt;your language code&gt;\": \"&lt;Name of the language (not English translation)&gt;\"</pre>\n<p>so it will be included in the language drop-down menu. <br></p>\n\n<p>#### NOTE: Only PR when you're going to add new languages. Updating existing languages should use Crowdin; language update PRs will be automatically rejected.</p>\n\n<h2>Credits</h2>\n<p>susfs4ksu: https://gitlab.com/simonpunk/susfs4ksu/</p>\n\n<p><a href=\"https://www.reddit.com/r/AmongUs/comments/iut5y2/couldnt_find_many_pngs_of_the_among_us_characters/\">Among Us characters 1</a></p>\n\n<p><a href=\"https://www.stickpng.com/img/cartoons/among-us/among-us-characters\">Among Us characters 2</a></p>\n\n<h2>Buy us some coffee ☕</h2>\n<h3>simonpunk</h3>\n<p>PayPal: <code>kingjeffkimo@yahoo.com.tw</code></p>\n<p><br>BTC: <code>bc1qgkwvsfln02463zpjf7z6tds8xnpeykggtgk4kw</code></p>\n<h3>sidex15</h3>\n<p>PayPal: <code>sidex15.official@gmail.com</code></p>\n<p><br>BTC: <code>1AVaRmoEivK94XRooqbbAgvzdTMA5cwGdc</code></p>\n<p><br>ETH (ERC20): <code>0xa52151ebd2718a00af9e1dfcacfb30e1d3a94860</code></p>\n<p><br>USDT (TRC20): <code>TAUbxzug7cygExFunhFBiG6ntmbJwz7Skn</code></p>\n<p><br>USDT (ERC20):</p>\n<p><code>0xa52151ebd2718a00af9e1dfcacfb30e1d3a94860</code></p>\n\n<h2>Stars 🌟</h2>\n<p><a href=\"https://starchart.cc/sidex15/susfs4ksu-module.svg?variant=adaptive\">![Stars 🌟</a>](https://starchart.cc/sidex15/susfs4ksu-module)</p>\n\n<h2>Legal Disclaimer</h2>\n<pre>This project is a non-commercial, fan-made tool. It is not affiliated with, endorsed by, or associated with Innersloth LLC.\n\n\"Among Us\" and all related characters and elements are trademarks and copyrights of Innersloth LLC.\n\nThis project is intended for educational and personal use only. It is not intended for any commercial purposes or distribution.</pre>",
+  "homepageUrl": "https://github.com/sidex15/susfs4ksu-module",
+  "sourceUrl": "https://github.com/sidex15/susfs4ksu-module",
+  "url": "https://github.com/sidex15/susfs4ksu-module",
+  "latestRelease": {
+    "name": "v1.5.2+_R28",
+    "version": "v1.5.2+_R28",
+    "time": "2026-07-26T09:11:01Z",
+    "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R28/ksu_module_susfs_1.5.2%2B.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.2+_R28",
+      "tagName": "v1.5.2+_R28",
+      "publishedAt": "2026-07-26T09:11:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R28/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 911798,
+          "downloadCount": 75630
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R27",
+      "tagName": "v1.5.2+_R27",
+      "publishedAt": "2026-03-27T14:23:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R27/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 903621,
+          "downloadCount": 98621
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R26",
+      "tagName": "v1.5.2+_R26",
+      "publishedAt": "2026-03-06T03:37:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R26/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1035452,
+          "downloadCount": 9080
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R25",
+      "tagName": "v1.5.2+_R25",
+      "publishedAt": "2026-01-29T09:02:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R25/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 983240,
+          "downloadCount": 38496
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R24",
+      "tagName": "v1.5.2+_R24",
+      "publishedAt": "2026-01-03T10:16:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R24/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1187502,
+          "downloadCount": 22785
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R23",
+      "tagName": "v1.5.2+_R23",
+      "publishedAt": "2025-10-19T08:34:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R23/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1156068,
+          "downloadCount": 79124
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R22",
+      "tagName": "v1.5.2+_R22",
+      "publishedAt": "2025-09-26T06:14:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R22/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1161002,
+          "downloadCount": 34062
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R21",
+      "tagName": "v1.5.2+_R21",
+      "publishedAt": "2025-09-07T13:13:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R21/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1358238,
+          "downloadCount": 28019
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R20",
+      "tagName": "v1.5.2+_R20",
+      "publishedAt": "2025-07-06T13:27:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R20/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1354763,
+          "downloadCount": 65277
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R19",
+      "tagName": "v1.5.2+_R19",
+      "publishedAt": "2025-06-12T08:20:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R19/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1276688,
+          "downloadCount": 32633
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R18",
+      "tagName": "v1.5.2+_R18",
+      "publishedAt": "2025-05-02T12:50:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R18/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1294363,
+          "downloadCount": 42131
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R17",
+      "tagName": "v1.5.2+_R17",
+      "publishedAt": "2025-04-16T13:56:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R17/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1168730,
+          "downloadCount": 18180
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R16",
+      "tagName": "v1.5.2+_R16",
+      "publishedAt": "2025-03-02T07:15:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R16/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1005831,
+          "downloadCount": 28890
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2+_R15",
+      "tagName": "v1.5.2+_R15",
+      "publishedAt": "2025-02-06T22:17:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R15/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1018081,
+          "downloadCount": 14456
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-v1.5.4-R14",
+      "tagName": "v1.5.2-v1.5.4-R14",
+      "publishedAt": "2025-02-02T23:26:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-v1.5.4-R14/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1273740,
+          "downloadCount": 3899
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-v1.5.4-R13",
+      "tagName": "v1.5.2-v1.5.4-R13",
+      "publishedAt": "2025-01-27T09:36:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-v1.5.4-R13/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1260474,
+          "downloadCount": 6808
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-v1.5.3-R12",
+      "tagName": "v1.5.2-v1.5.3-R12",
+      "publishedAt": "2024-12-30T08:11:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.4.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-v1.5.3-R12/ksu_module_susfs_1.4.2.zip",
+          "size": 892829,
+          "downloadCount": 1617
+        },
+        {
+          "name": "ksu_module_susfs_1.5.2+.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-v1.5.3-R12/ksu_module_susfs_1.5.2%2B.zip",
+          "size": 1519553,
+          "downloadCount": 10133
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-R11",
+      "tagName": "v1.5.2-R11",
+      "publishedAt": "2024-12-13T09:30:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.4.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R11/ksu_module_susfs_1.4.2.zip",
+          "size": 891400,
+          "downloadCount": 1051
+        },
+        {
+          "name": "ksu_module_susfs_1.5.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R11/ksu_module_susfs_1.5.2.zip",
+          "size": 978221,
+          "downloadCount": 2446
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-R10",
+      "tagName": "v1.5.2-R10",
+      "publishedAt": "2024-12-08T10:47:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs_1.4.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R10/ksu_module_susfs_1.4.2.zip",
+          "size": 878077,
+          "downloadCount": 316
+        },
+        {
+          "name": "ksu_module_susfs_1.5.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R10/ksu_module_susfs_1.5.2.zip",
+          "size": 1102543,
+          "downloadCount": 848
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-R9",
+      "tagName": "v1.5.2-R9",
+      "publishedAt": "2024-12-05T07:15:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R9/ksu_module_susfs.zip",
+          "size": 890023,
+          "downloadCount": 438
+        },
+        {
+          "name": "ksu_module_susfs_1.5.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R9/ksu_module_susfs_1.5.2.zip",
+          "size": 1102493,
+          "downloadCount": 756
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-R8",
+      "tagName": "v1.5.2-R8",
+      "publishedAt": "2024-12-02T06:46:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R8/ksu_module_susfs.zip",
+          "size": 885082,
+          "downloadCount": 267
+        },
+        {
+          "name": "ksu_module_susfs_1.5.2.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2-R8/ksu_module_susfs_1.5.2.zip",
+          "size": 913441,
+          "downloadCount": 250
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R7",
+      "tagName": "v1.4.2-R7",
+      "publishedAt": "2024-11-26T04:38:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R7/ksu_module_susfs.zip",
+          "size": 649659,
+          "downloadCount": 356
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R6",
+      "tagName": "v1.4.2-R6",
+      "publishedAt": "2024-11-21T12:08:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R6/ksu_module_susfs.zip",
+          "size": 649316,
+          "downloadCount": 209
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R5",
+      "tagName": "v1.4.2-R5",
+      "publishedAt": "2024-11-21T01:29:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R5/ksu_module_susfs.zip",
+          "size": 649299,
+          "downloadCount": 100
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R4",
+      "tagName": "v1.4.2-R4",
+      "publishedAt": "2024-10-29T12:24:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R4/ksu_module_susfs.zip",
+          "size": 638212,
+          "downloadCount": 515
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R3",
+      "tagName": "v1.4.2-R3",
+      "publishedAt": "2024-10-28T23:27:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R3/ksu_module_susfs.zip",
+          "size": 638095,
+          "downloadCount": 83
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R2",
+      "tagName": "v1.4.2-R2",
+      "publishedAt": "2024-10-21T04:56:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R2/ksu_module_susfs.zip",
+          "size": 636949,
+          "downloadCount": 134
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-SUSFS",
+      "tagName": "v1.4.2-SUSFS",
+      "publishedAt": "2024-10-19T04:27:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-SUSFS/ksu_module_susfs.zip",
+          "size": 635857,
+          "downloadCount": 169
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2-R1",
+      "tagName": "v1.4.2-R1",
+      "publishedAt": "2024-10-19T07:19:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_module_susfs.zip",
+          "downloadUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.4.2-R1/ksu_module_susfs.zip",
+          "size": 636700,
+          "downloadCount": 170
+        }
+      ]
+    }
+  ]
+}

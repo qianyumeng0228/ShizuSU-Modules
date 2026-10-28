@@ -1,0 +1,29 @@
+{
+  "readme": "# AdGuard CA for NoMount\n\n![AI generated Thumbnail](./docs/thumb.webp)\n> Thumbnail generated with GPT 6.1 Sol\n\nA KernelSU module for injecting AdGuard Personal CA with NoMount.\n\nReplaces [adguardcert](https://github.com/AdguardTeam/adguardcert) to `NoMount` based injection.\n\nTested on Galaxy S25 Edge with [DFRoot](https://github.com/diabl0w/DFRoot) Jailbreak.\n\n## Development\n\n### Build zip\n\n```sh\nbun install --frozen-lockfile\nbun run typecheck\nbun test\nbun run build\n```\n\nExport at `dist/adguard-ca-nomount-<version>.zip`.\n\n### Module WebUI\n\nYou can check `Personal CA` installed and VFS rule of NoMount Injection in webui.\n\nUse `bun run build` to compile webui.\n\n### GitHub Releases\n\nBefore tagging, update `version` and increment `versionCode` in `module/module.prop`, then commit the changes. The tag must match `v<version>`; a mismatch fails the build before publishing.\n\n```sh\ngit tag v0.1.1\ngit push origin v0.1.1\n```\n\n### Verify\n\n```sh\nbun run verify:device\n# When multiple devices is connected to adb\nbun run verify:device DEVICE_SERIAL\n```\n\nVerify checks basic CA cert is installed.\n\n## Third party LICENSE notice\n\n- adguardcert\n\n```\nMIT License\n\nCopyright (c) Adguard Software Limited\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n```\n",
+  "readmeHTML": "<h1>AdGuard CA for NoMount</h1>\n\n<p>!<a href=\"./docs/thumb.webp\">AI generated Thumbnail</a></p>\n<p>> Thumbnail generated with GPT 6.1 Sol</p>\n\n<p>A KernelSU module for injecting AdGuard Personal CA with NoMount.</p>\n\n<p>Replaces <a href=\"https://github.com/AdguardTeam/adguardcert\">adguardcert</a> to <code>NoMount</code> based injection.</p>\n\n<p>Tested on Galaxy S25 Edge with <a href=\"https://github.com/diabl0w/DFRoot\">DFRoot</a> Jailbreak.</p>\n\n<h2>Development</h2>\n\n<h3>Build zip</h3>\n\n<pre>bun install --frozen-lockfile\nbun run typecheck\nbun test\nbun run build</pre>\n\n<p>Export at <code>dist/adguard-ca-nomount-<version>.zip</code>.</p>\n\n<h3>Module WebUI</h3>\n\n<p>You can check <code>Personal CA</code> installed and VFS rule of NoMount Injection in webui.</p>\n\n<p>Use <code>bun run build</code> to compile webui.</p>\n\n<h3>GitHub Releases</h3>\n\n<p>Before tagging, update <code>version</code> and increment <code>versionCode</code> in <code>module/module.prop</code>, then commit the changes. The tag must match <code>v<version></code>; a mismatch fails the build before publishing.</p>\n\n<pre>git tag v0.1.1\ngit push origin v0.1.1</pre>\n\n<h3>Verify</h3>\n\n<pre>bun run verify:device\n# When multiple devices is connected to adb\nbun run verify:device DEVICE_SERIAL</pre>\n\n<p>Verify checks basic CA cert is installed.</p>\n\n<h2>Third party LICENSE notice</h2>\n\n<li>adguardcert</li>\n\n<pre>MIT License\n\nCopyright (c) Adguard Software Limited\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.</pre>",
+  "homepageUrl": "https://github.com/craftingmod/Adguard-CA-NoMount",
+  "sourceUrl": "https://github.com/craftingmod/Adguard-CA-NoMount",
+  "url": "https://github.com/craftingmod/Adguard-CA-NoMount",
+  "latestRelease": {
+    "name": "v0.1.2",
+    "version": "v0.1.2",
+    "time": "2026-10-25T07:40:04Z",
+    "downloadUrl": "https://github.com/craftingmod/Adguard-CA-NoMount/releases/download/v0.1.2/adguard-ca-nomount-0.1.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.2",
+      "tagName": "v0.1.2",
+      "publishedAt": "2026-10-25T07:40:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adguard-ca-nomount-0.1.2.zip",
+          "downloadUrl": "https://github.com/craftingmod/Adguard-CA-NoMount/releases/download/v0.1.2/adguard-ca-nomount-0.1.2.zip",
+          "size": 6925,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

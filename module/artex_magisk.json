@@ -1,0 +1,73 @@
+{
+  "readme": "# ARTEX Magisk 模块\n\n把 ARTEX 装进 Android 的 Magisk 模块。刷完重启，浏览器打开 `http://手机IP:8787` 就能用。\n\nARTEX 是套 AI 自主渗透测试系统（Go 后端 + Next.js 前端），原本要求 Docker 加 PostgreSQL。\nAndroid 上这两样都不好使：bionic 拒绝执行 glibc 程序，系统里也没有 PostgreSQL。\n所以这里的办法是往手机里塞一个 Debian 12 arm64 的 rootfs，用 chroot 跑起来，\n容器里装 PostgreSQL 15 和 artex 本体，只把 8787 端口露给宿主。\n\n在 Android 14 + Magisk alpha 上实测可用。arm64，Android 10 以上应该都行，KernelSU / APatch 没试过。\n\n## 装\n\n1. 到 [Releases](../../releases/latest) 下 `artex-magisk-v3.zip`（144 MB）\n2. Magisk → 模块 → 从本地安装 → 选这个 zip，重启\n3. 打开 `http://<手机局域网IP>:8787`，第一次进去会让你设密码\n\n首次开机会跑 initdb 建库，等 20–60 秒，期间打不开是正常的。\n进度看日志：\n\n```sh\nsu -c 'tail -f /data/adb/artex/service.log'\n```\n\n不想重启也可以走命令行（手动把 update 目录挪过去）：\n\n```sh\nsu -c 'magisk --install-module /sdcard/Download/artex-magisk-v3.zip'\nsu -c 'cp -a /data/adb/modules_update/artex/. /data/adb/modules/artex/ && rm -rf /data/adb/modules_update/artex && sh /data/adb/modules/artex/service.sh'\n```\n\n## 用\n\n端口和两个开关都在 `/data/adb/artex/ports.conf`，改完重启手机或在模块卡片上点「运行」：\n\n```ini\nWEB_PORT=8787              # 网页端口\nPROXY_ADDR=127.0.0.1:8788  # 流量录制代理，只监听本机；留空就关掉\nKEEP_AWAKE=1               # 开着不睡，保证随时能连；嫌费电改 0\n```\n\n几个常用命令：\n\n```sh\nsu -c 'tail -f /data/artex/app/logs/artex.log'      # 应用日志\nsu -c 'tail -f /data/artex/app/logs/postgresql.log' # 数据库日志\nsu -c 'chroot /data/artex/rootfs /bin/bash'         # 进容器\nsu -c '/data/adb/modules/artex/service.sh'          # 重启服务\nsu -c 'curl -s http://127.0.0.1:8787/api/health'    # 健康检查\n```\n\n东西都在这几个位置：\n\n| 路径 | 是什么 |\n| :--- | :--- |\n| `/data/adb/modules/artex/` | 模块本体（脚本、`tools.sh`） |\n| `/data/adb/artex/` | `ports.conf`、`service.log`、`apt-packages.list` |\n| `/data/artex/rootfs/` | Debian 容器，约 648 MB |\n| `/data/artex/app/` | `artex` 二进制、`skills/`、`jwt.key`、`data/`、`persist/` |\n| `/data/artex/pgdata/` | PostgreSQL 数据目录 |\n\n## 加工具\n\n容器里已经带了 Python 3.11（含 pip、venv）、Node 24、git、curl、wget、jq、dig、nc、\nripgrep、sqlite3、nmap、vim-tiny。ARTEX 的 Bash 工具和 Python 脚本工具都在这个容器里跑，\nPATH 里已经包含 `/usr/local/venv/bin`、`/usr/local/bin`、`/opt/node/bin`。\n\n再装东西用 `tools.sh`：\n\n```sh\nT=/data/adb/modules/artex/tools.sh\n\nsh $T list                        # 看看有啥\nsh $T pip install requests httpx  # Python 包\nsh $T npm install playwright      # Node 全局包\nsh $T install masscan seclists    # apt 包\nsh $T run \"python3 -c 'import requests; print(requests.__version__)'\"\nsh $T shell\n```\n\n持久化这块容易踩：pip 和 npm 装到 `/data/artex/app/persist/usr-local`（容器里的\n`/usr/local` 和 `/opt/tools` 都 bind 到这里），重刷模块不会丢；\napt 包装在 rootfs 里，重刷会被冲掉，但包名记在 `/data/adb/artex/apt-packages.list`，\n刷入时自动重装（要联网）。数据库和任务数据一直在 `/data/artex`，不受影响。\n\n想用 Playwright 抓浏览器：`sh $T npm install playwright && sh $T run \"playwright install chromium\"`，\n浏览器约 150 MB，按需再装。\n\n## 实现\n\n```\nMagisk service.sh\n└── chroot /data/artex/rootfs          Debian 12 arm64\n    ├── /opt/artex        ← /data/artex/app\n    ├── /usr/local        ← /data/artex/app/persist/usr-local\n    ├── /opt/tools        ← /data/artex/app/persist/tools\n    ├── /var/lib/postgresql/data ← /data/artex/pgdata\n    ├── PostgreSQL 15     只走 /run/postgresql 的 unix socket，不开 TCP\n    └── /opt/artex/artex  Go 单二进制，前端已内嵌\n```\n\n守护进程每 30 秒查一次 PostgreSQL 和 artex 在不在，掉了就拉起来。\n\n有个坑值得单独说一句：Android 的 GKI 内核基本都关了 `CONFIG_SYSVIPC`，`shmget` 直接返回\nENOSYS，PostgreSQL 连 `initdb` 都过不去：\n\n```\nFATAL:  could not create shared memory segment: Function not implemented\nDETAIL:  Failed system call was shmget(key=4452628, size=56, 03600)\n```\n\n`shared_memory_type = mmap` 能绕开主共享内存，但 initdb 的 bootstrap 和\n`PGSharedMemoryCreate()` 内部还会直接调 SysV，这两处没有配置项能管。\n所以模块里带了个 30 行的 `libsysv-shim.so`（源码在 `files/app/shim/shimsysv.c`），\n把这几个调用映射到 `MAP_SHARED|MAP_ANONYMOUS`，靠 `LD_PRELOAD` 只注入 PostgreSQL。\n\n## 已知问题\n\n- **DNS 不走 VPN**。容器里的 `/etc/resolv.conf` 写死 `223.5.5.5 / 119.29.29.29`，\n  ARTEX 的 Go 解析器读的就是它，所以走 VPN 或内网 DNS 时，域名解析结果可能和手机浏览器不一样。\n  改法：`su -c 'printf \"nameserver 1.1.1.1\\n\" > /data/artex/rootfs/etc/resolv.conf'` 后重启。\n- **手动 `pg_ctl start` 会失败**，因为没带 `LD_PRELOAD`。日常别手起，用 `service.sh` 或 `tools.sh`。\n- **内存紧的机器会被系统杀**。守护 30 秒内会拉回来，但如果一直不够内存就会反复重启；\n  可以调小 `/data/artex/pgdata/postgresql.conf` 里的 `shared_buffers`。\n- **MIUI / HyperOS 这类系统喜欢杀后台**，`KEEP_AWAKE` 只防休眠，不防厂商清理，得去电池设置里放行。\n- **升级方式**：直接再刷新 zip。rootfs 会重新解压，数据目录和持久层不动。\n  卸载想留数据就先 `su -c 'mkdir -p /data/adb/artex && touch /data/adb/artex/.keep_on_uninstall'`。\n- 只支持 arm64。x86 模拟器、32 位设备用不了。\n\n## 从源码构建\n\n构建得在 Debian 容器里做（Next 的 SWC 只有 linux/arm64 版，Go 交叉编译没问题）：\n\n```sh\n# 前端静态导出\ncd web && npm ci && NEXT_EXPORT=1 npx next build\ncd .. && rm -rf server/webui/dist && mkdir -p server/webui/dist && cp -a web/out/. server/webui/dist/\n\n# 后端（前端内嵌，纯静态）\nCGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags embedui -trimpath \\\n  -ldflags \"-s -w -buildid= -X main.version=v0.3.15\" -o artex ./cmd/artex\n```\n\nARTEX 源码在上游仓库被作者删除后，我把对应源码放进\n[`source-v0.3.15`](../../tree/source-v0.3.15) 分支（标签 `v0.3.15-source`），\n里面 `SOURCE.md` 写了完整环境和命令。ARTEX 本体是 AGPL-3.0。\n",
+  "readmeHTML": "<h1>ARTEX Magisk 模块</h1>\n\n<p>把 ARTEX 装进 Android 的 Magisk 模块。刷完重启，浏览器打开 <code>http://手机IP:8787</code> 就能用。</p>\n\n<p>ARTEX 是套 AI 自主渗透测试系统（Go 后端 + Next.js 前端），原本要求 Docker 加 PostgreSQL。</p>\n<p>Android 上这两样都不好使：bionic 拒绝执行 glibc 程序，系统里也没有 PostgreSQL。</p>\n<p>所以这里的办法是往手机里塞一个 Debian 12 arm64 的 rootfs，用 chroot 跑起来，</p>\n<p>容器里装 PostgreSQL 15 和 artex 本体，只把 8787 端口露给宿主。</p>\n\n<p>在 Android 14 + Magisk alpha 上实测可用。arm64，Android 10 以上应该都行，KernelSU / APatch 没试过。</p>\n\n<h2>装</h2>\n\n<li>到 [Releases](../../releases/latest) 下 `artex-magisk-v3.zip`（144 MB）</li>\n<li>Magisk → 模块 → 从本地安装 → 选这个 zip，重启</li>\n<li>打开 `http://<手机局域网IP>:8787`，第一次进去会让你设密码</li>\n\n<p>首次开机会跑 initdb 建库，等 20–60 秒，期间打不开是正常的。</p>\n<p>进度看日志：</p>\n\n<pre>su -c 'tail -f /data/adb/artex/service.log'</pre>\n\n<p>不想重启也可以走命令行（手动把 update 目录挪过去）：</p>\n\n<pre>su -c 'magisk --install-module /sdcard/Download/artex-magisk-v3.zip'\nsu -c 'cp -a /data/adb/modules_update/artex/. /data/adb/modules/artex/ &amp;&amp; rm -rf /data/adb/modules_update/artex &amp;&amp; sh /data/adb/modules/artex/service.sh'</pre>\n\n<h2>用</h2>\n\n<p>端口和两个开关都在 <code>/data/adb/artex/ports.conf</code>，改完重启手机或在模块卡片上点「运行」：</p>\n\n<pre>WEB_PORT=8787              # 网页端口\nPROXY_ADDR=127.0.0.1:8788  # 流量录制代理，只监听本机；留空就关掉\nKEEP_AWAKE=1               # 开着不睡，保证随时能连；嫌费电改 0</pre>\n\n<p>几个常用命令：</p>\n\n<pre>su -c 'tail -f /data/artex/app/logs/artex.log'      # 应用日志\nsu -c 'tail -f /data/artex/app/logs/postgresql.log' # 数据库日志\nsu -c 'chroot /data/artex/rootfs /bin/bash'         # 进容器\nsu -c '/data/adb/modules/artex/service.sh'          # 重启服务\nsu -c 'curl -s http://127.0.0.1:8787/api/health'    # 健康检查</pre>\n\n<p>东西都在这几个位置：</p>\n\n<p>| 路径 | 是什么 |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>/data/adb/modules/artex/</code> | 模块本体（脚本、<code>tools.sh</code>） |</p>\n<p>| <code>/data/adb/artex/</code> | <code>ports.conf</code>、<code>service.log</code>、<code>apt-packages.list</code> |</p>\n<p>| <code>/data/artex/rootfs/</code> | Debian 容器，约 648 MB |</p>\n<p>| <code>/data/artex/app/</code> | <code>artex</code> 二进制、<code>skills/</code>、<code>jwt.key</code>、<code>data/</code>、<code>persist/</code> |</p>\n<p>| <code>/data/artex/pgdata/</code> | PostgreSQL 数据目录 |</p>\n\n<h2>加工具</h2>\n\n<p>容器里已经带了 Python 3.11（含 pip、venv）、Node 24、git、curl、wget、jq、dig、nc、</p>\n<p>ripgrep、sqlite3、nmap、vim-tiny。ARTEX 的 Bash 工具和 Python 脚本工具都在这个容器里跑，</p>\n<p>PATH 里已经包含 <code>/usr/local/venv/bin</code>、<code>/usr/local/bin</code>、<code>/opt/node/bin</code>。</p>\n\n<p>再装东西用 <code>tools.sh</code>：</p>\n\n<pre>T=/data/adb/modules/artex/tools.sh\n\nsh $T list                        # 看看有啥\nsh $T pip install requests httpx  # Python 包\nsh $T npm install playwright      # Node 全局包\nsh $T install masscan seclists    # apt 包\nsh $T run \"python3 -c 'import requests; print(requests.__version__)'\"\nsh $T shell</pre>\n\n<p>持久化这块容易踩：pip 和 npm 装到 <code>/data/artex/app/persist/usr-local</code>（容器里的</p>\n<p><code>/usr/local</code> 和 <code>/opt/tools</code> 都 bind 到这里），重刷模块不会丢；</p>\n<p>apt 包装在 rootfs 里，重刷会被冲掉，但包名记在 <code>/data/adb/artex/apt-packages.list</code>，</p>\n<p>刷入时自动重装（要联网）。数据库和任务数据一直在 <code>/data/artex</code>，不受影响。</p>\n\n<p>想用 Playwright 抓浏览器：<code>sh $T npm install playwright && sh $T run \"playwright install chromium\"</code>，</p>\n<p>浏览器约 150 MB，按需再装。</p>\n\n<h2>实现</h2>\n\n<pre>Magisk service.sh\n└── chroot /data/artex/rootfs          Debian 12 arm64\n    ├── /opt/artex        ← /data/artex/app\n    ├── /usr/local        ← /data/artex/app/persist/usr-local\n    ├── /opt/tools        ← /data/artex/app/persist/tools\n    ├── /var/lib/postgresql/data ← /data/artex/pgdata\n    ├── PostgreSQL 15     只走 /run/postgresql 的 unix socket，不开 TCP\n    └── /opt/artex/artex  Go 单二进制，前端已内嵌</pre>\n\n<p>守护进程每 30 秒查一次 PostgreSQL 和 artex 在不在，掉了就拉起来。</p>\n\n<p>有个坑值得单独说一句：Android 的 GKI 内核基本都关了 <code>CONFIG_SYSVIPC</code>，<code>shmget</code> 直接返回</p>\n<p>ENOSYS，PostgreSQL 连 <code>initdb</code> 都过不去：</p>\n\n<pre>FATAL:  could not create shared memory segment: Function not implemented\nDETAIL:  Failed system call was shmget(key=4452628, size=56, 03600)</pre>\n\n<p><code>shared_memory_type = mmap</code> 能绕开主共享内存，但 initdb 的 bootstrap 和</p>\n<p><code>PGSharedMemoryCreate()</code> 内部还会直接调 SysV，这两处没有配置项能管。</p>\n<p>所以模块里带了个 30 行的 <code>libsysv-shim.so</code>（源码在 <code>files/app/shim/shimsysv.c</code>），</p>\n<p>把这几个调用映射到 <code>MAP_SHARED|MAP_ANONYMOUS</code>，靠 <code>LD_PRELOAD</code> 只注入 PostgreSQL。</p>\n\n<h2>已知问题</h2>\n\n<li>**DNS 不走 VPN**。容器里的 `/etc/resolv.conf` 写死 `223.5.5.5 / 119.29.29.29`，</li>\n<p>  ARTEX 的 Go 解析器读的就是它，所以走 VPN 或内网 DNS 时，域名解析结果可能和手机浏览器不一样。</p>\n<p>  改法：<code>su -c 'printf \"nameserver 1.1.1.1\\n\" > /data/artex/rootfs/etc/resolv.conf'</code> 后重启。</p>\n<li>**手动 `pg_ctl start` 会失败**，因为没带 `LD_PRELOAD`。日常别手起，用 `service.sh` 或 `tools.sh`。</li>\n<li>**内存紧的机器会被系统杀**。守护 30 秒内会拉回来，但如果一直不够内存就会反复重启；</li>\n<p>  可以调小 <code>/data/artex/pgdata/postgresql.conf</code> 里的 <code>shared_buffers</code>。</p>\n<li>**MIUI / HyperOS 这类系统喜欢杀后台**，`KEEP_AWAKE` 只防休眠，不防厂商清理，得去电池设置里放行。</li>\n<li>**升级方式**：直接再刷新 zip。rootfs 会重新解压，数据目录和持久层不动。</li>\n<p>  卸载想留数据就先 <code>su -c 'mkdir -p /data/adb/artex && touch /data/adb/artex/.keep_on_uninstall'</code>。</p>\n<li>只支持 arm64。x86 模拟器、32 位设备用不了。</li>\n\n<h2>从源码构建</h2>\n\n<p>构建得在 Debian 容器里做（Next 的 SWC 只有 linux/arm64 版，Go 交叉编译没问题）：</p>\n\n<pre># 前端静态导出\ncd web &amp;&amp; npm ci &amp;&amp; NEXT_EXPORT=1 npx next build\ncd .. &amp;&amp; rm -rf server/webui/dist &amp;&amp; mkdir -p server/webui/dist &amp;&amp; cp -a web/out/. server/webui/dist/\n\n# 后端（前端内嵌，纯静态）\nCGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags embedui -trimpath \\\n  -ldflags \"-s -w -buildid= -X main.version=v0.3.15\" -o artex ./cmd/artex</pre>\n\n<p>ARTEX 源码在上游仓库被作者删除后，我把对应源码放进</p>\n<p><a href=\"../../tree/source-v0.3.15\"><code>source-v0.3.15</code></a> 分支（标签 <code>v0.3.15-source</code>），</p>\n<p>里面 <code>SOURCE.md</code> 写了完整环境和命令。ARTEX 本体是 AGPL-3.0。</p>",
+  "homepageUrl": "https://github.com/hmruu/ARTEX-Magisk",
+  "sourceUrl": "https://github.com/hmruu/ARTEX-Magisk",
+  "url": "https://github.com/hmruu/ARTEX-Magisk",
+  "latestRelease": {
+    "name": "v0.3.15-source",
+    "version": "v0.3.15-source",
+    "time": "2026-10-21T16:29:19Z",
+    "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-linux-arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.3.15-source",
+      "tagName": "v0.3.15-source",
+      "publishedAt": "2026-10-21T16:29:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "artex-0.3.15-source-linux-arm64.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-linux-arm64.zip",
+          "size": 13076865,
+          "downloadCount": 8
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/SHA256SUMS",
+          "size": 514,
+          "downloadCount": 1
+        },
+        {
+          "name": "artex-0.3.15-source-darwin-amd64.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-darwin-amd64.zip",
+          "size": 14244912,
+          "downloadCount": 1
+        },
+        {
+          "name": "artex-0.3.15-source-windows-amd64.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-windows-amd64.zip",
+          "size": 14245558,
+          "downloadCount": 2
+        },
+        {
+          "name": "artex-0.3.15-source-darwin-arm64.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-darwin-arm64.zip",
+          "size": 13576196,
+          "downloadCount": 2
+        },
+        {
+          "name": "artex-0.3.15-source-linux-amd64.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-linux-amd64.zip",
+          "size": 14032362,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.15-r3",
+      "tagName": "v0.3.15-r3",
+      "publishedAt": "2026-10-20T15:57:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "artex-magisk-v3.zip",
+          "downloadUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-r3/artex-magisk-v3.zip",
+          "size": 150053774,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ]
+}

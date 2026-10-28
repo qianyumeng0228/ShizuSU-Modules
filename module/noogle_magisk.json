@@ -1,0 +1,363 @@
+{
+  "readme": "# noogle-magisk\n\nMagisk modules for removing/replacing Google applications on stock Android 11-17.\n\nNoogle is developed in my free time. If it helps you get rid of Google, consider supporting its development:\n\n[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N5E229GJPZ)\n[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/SelfRef)\n[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/SelfRef/donate)\n\n## Modules\n\nName | Description\n--- | ---\nNoogle microG | Installs microG Services in place of Google Services (if present), comes in [4 variants](#which-noogle-microg-to-choose)\nNoogle Unbundle | Removes other Google apps from system, comes in [3 variants](#which-noogle-unbundle-to-choose)\n\nModules are independent, use one or both. Variants of a module replace each other, switch anytime by installing another variant over the installed one, the installer brings back or removes apps as needed.\n\n### Which Noogle microG to choose\n\nVariant | Play Store | Signature spoofing | microG updates from F-Droid | Play Integrity Fix\n:--- | --- | --- | --- | ---\n`noogle-microg` | Replaced by microG Companion | Needed | Yes | Yes\n`noogle-microg-playful` | Kept [*](#playful-variant) | Needed | Yes | Yes\n`noogle-microg-catfish` | Replaced by microG Companion | Not needed | No | microG may crash\n`noogle-microg-playful-catfish` | Kept [*](#playful-variant) | Not needed | No | microG may crash\n\n**Playful or not:** Playful keeps Play Store of your ROM. The others replace it with microG Companion, which only provides Play Store services to apps, use [Aurora Store](https://auroraoss.com) to get apps.\n\n**Catfish or not:** Regular variants need your ROM to report Google's signature for microG ([signature spoofing](#signatures-are-not-correct)), which stock Android can't do without Vector and FakeGApps. Catfish microG carries signing blocks copied from Google's APKs instead. Android doesn't check contents of system apps against their signatures, so it reports Google's signature without any spoofing. Idea from [microG_no_sigspoof](https://github.com/IsHacker003/microg_no_sigspoof) by IsHacker. The downsides:\n- Signatures don't match the contents, so Catfish APKs can't be installed as user apps: microG updates come only with the module (switching to Catfish removes ones installed from F-Droid), and Play Integrity Fix workaround (microG installed as user updates) isn't possible\n- Google's updates of Play Services pass as valid updates, the module removes them on every boot\n- Tested on Android 15 emulator so far\n\nIf your ROM already supports signature spoofing (see [ROMs](#signatures-are-not-correct)), use a regular variant.\n\n### Which Noogle Unbundle to choose\n\nVariant | Removes | Kept | List\n:--- | --- | --- | ---\n`noogle-unbundle` | Google apps installable from store: Chrome, Gmail, Maps, YouTube, Photos, Drive, Google app... | Phone basics, accessibility, Google system components | [packages.txt](src/module-unbundle/packages.txt)\n`noogle-unbundle-hard` | Same, plus phone basics (Pixel Launcher, Phone, Messages, Gboard, Camera, Clock, Contacts...), accessibility (TalkBack, Speech Services), Google system components (Android System Intelligence, Digital Wellbeing, Android Auto...) and Pixel extras | Setup Wizard, Device Health Services, Network Stack, file and sound pickers, carrier services and others that break the phone when removed ([tested](src/module-unbundle/packages-hard.txt)) | [packages.txt](src/module-unbundle/packages.txt) + [packages-hard.txt](src/module-unbundle/packages-hard.txt)\n`noogle-unbundle-fossify` | Same as Hard, and installs [Fossify](https://fossify.org) apps as replacements | Same as Hard | Same as Hard\n\nThey never remove apps Noogle microG replaces. Switching from Hard or Fossify to a lighter variant brings back apps removed only by them.\n\n**Fossify:** installs Launcher, Phone, Messages, Keyboard, Contacts, Gallery, Calculator, Clock, Camera, File Manager, Calendar, Notes and Voice Recorder as system apps. They are the versions from F-Droid (Fossify's own reproducible builds), so F-Droid updates them, updates stay installed even after removing the module. On every boot the module switches to Fossify Keyboard when the keyboard in use is gone (also on lock screen, so you can type your password), and gives empty home, phone and SMS roles to Fossify apps. Other Fossify apps (Music Player, Paint, Documents...) are in F-Droid.\n\n> [!WARNING]\n> Hard removes apps your phone may have no other one for. Install and set up replacements before installing it: launcher, phone, SMS app, camera, clock with alarms, and a keyboard enabled in settings (without one you can't type your password). The installer keeps apps with no replacement installed (it shows them as KEPT), install the module again after adding replacements. Contacts, Gallery or Calculator are removed without checks, install your own if you need them. Open your clock and calendar once and allow notifications, otherwise alarms ring with nothing on screen to stop them and reminders don't show. On some phones alarms of any app may go silent without Google Clock, check yours rings after installing. Fossify variant brings its own replacements and allows notifications for Fossify Clock and Calendar, but the alarm warning applies too.\n\n## Install\n\nIt requires Magisk v29.0 or newer. If you don't have it yet, consult the [official installation instructions](https://topjohnwu.github.io/Magisk/install.html).\n\n> [!TIP]\n> It's a good idea to enable ADB debugging as well before installing in case of any issues.\n\n> [!NOTE]\n> KernelSU and APatch are supported too, but tested less than Magisk. Recent versions (KernelSU v3.0+, APatch 11219+) need a metamodule installed first (e.g. meta-overlayfs or NoMount, which one works best depends on the device), otherwise the module files are not mounted. On KernelSU disable \"Umount modules\" in App Profile of microG Services, microG Companion and Services Framework Proxy.\n\n> [!NOTE]\n> Modules are mainly tested on Android emulators (Google Play images). Real devices and vendor ROMs may behave differently, please [report](#reporting-issues) any issues you hit.\n\n1. Download [variant of your choice](#which-noogle-microg-to-choose) from [releases](https://github.com/SelfRef/noogle-magisk/releases)\n    - For playful variant on ROMs without Play Store see [playful build](#playful-variant)\n    - [Noogle Unbundle](#which-noogle-unbundle-to-choose) is optional and works on its own, install it as a separate module\n2. Install through Magisk app\n3. Reboot, microG permissions are granted automatically on first boot\n4. Ensure all permission boxes are checked in microG Self-Check\n    - If not, click \"Action\" button next to module in Magisk to grant them again, or tap them in Self-Check\n5. Check signature spoofing status at the top of Self-Check\n    - Regular variants on ROMs without signature spoofing: [add it](#signatures-are-not-correct)\n6. Playful only: enable Google device registration in microG settings, Play Store doesn't work without it\n\n## Build\n\nRequires Linux, Mac or WSL on Windows with `bash`, `zip`, `curl` and `jq`. Optionally `apksigner` (Android SDK build-tools) and `keytool` (JDK) to re-sign Services Framework Proxy with newer signature schemes, which some ROMs may require.\n\n1. Run `scripts/pull-microg.sh` to download latest microG APKs to `apk/` and verify their checksums\n    - Or [download them manually](https://microg.org/download.html) and place in `apk/` directory\n2. Run `scripts/build-noogle-microg.sh` (or `scripts/build-noogle-unbundle.sh` for Noogle Unbundle, it needs no APKs, `-H` builds Hard, `-F` Fossify after `scripts/pull-fossify.sh` downloads Fossify apps)\n    - Module will be created in `dist/`\n    - Check `-h` flag for build options, like destination partition\n\n### Playful variant\n\nReleased playful modules don't contain Play Store, they keep the one your ROM has. Bundling it would mean redistributing Google's APK, and it comes in different versions and architectures. If your ROM has no Play Store (e.g. LineageOS), build playful variant with Play Store APK yourself (`-P` below).\n\n- `scripts/build-noogle-microg.sh -p` builds playful variant, which keeps Play Store of your ROM\n- `scripts/build-noogle-microg.sh -P <apk>` builds playful variant with given Play Store APK, for ROMs without Play Store (e.g. LineageOS)\n    - Play Store APK must support your Android version (newer ones need Android 12+)\n    - This build is not updated by Magisk, updating to released playful build would remove Play Store\n\n### Catfish variant\n\nCatfish build needs `zipalign` and `apksigner` (Android SDK build-tools) and signing blocks of Google's APKs, which aren't in the repo:\n\n1. Get the signing blocks into `signatures/` with `scripts/pull-signatures.sh`, once:\n    - From a device with stock Google apps through ADB (Noogle microG disabled)\n    - Or from APK files: `scripts/pull-signatures.sh <Play Services APK> <Play Store APK>`\n    - It checks the APKs are signed by Google, microG ones are rejected\n2. Run `scripts/build-noogle-microg.sh -c`, add `-p` or `-P <apk>` for playful catfish (only microG Services gets Google's signature, Play Store has its own)\n\n### Install from PC\n\nInstead of copying the module to your phone, you can build and install it through ADB in one go:\n\n1. Enable ADB debugging and connect your phone\n2. Grant root to Shell in Magisk (it will ask on first `adb shell su`)\n3. Run `scripts/install-noogle.sh`\n    - It builds the module, installs it and reboots the phone, asking before each step (`-y` to skip)\n    - It accepts the same build options as the build script, `-u` installs Noogle Unbundle instead, `-H` Noogle Unbundle Hard, `-F` Noogle Unbundle Fossify\n\n## Compatibility\n\nModule/Type | Notes\n:--- | ---\nVector + FakeGApps | Recommended way to [enable signature spoofing](#signatures-are-not-correct), not needed with Catfish\nPlay Integrity Fix | [Maintained forks](#signatures-are-not-correct) only, not with Catfish\nUser updates | Installing microG updates from F-Droid repo, not with Catfish\n\n## Troubleshooting\n\n### Signatures are not correct\nmicroG apps pretend to be Google apps, so Android must report Google's signature for them. This is called [signature spoofing](https://github.com/microg/GmsCore/wiki/Signature-Spoofing) and microG Self-Check shows at the top whether it works. [Catfish variants](#which-noogle-microg-to-choose) don't need it.\n\nSome custom ROMs support it out of the box (e.g. LineageOS since 2024-02-26, crDroid, CalyxOS, /e/), in that case nothing else is needed. Note that Google changed signature checks in 2024-11, so older ROM builds may need an update.\n\nStock Android and most other ROMs don't support it, so it has to be added with an Xposed module. This is the way I recommend:\n\n1. Enable Zygisk in Magisk's settings\n2. Download and install [Vector](https://github.com/JingMatrix/Vector/releases) (formerly LSPosed) through Magisk\n    - Android 17 doesn't work yet, Vector can't load into the system there\n3. Download and install [FakeGApps](https://github.com/whew-inc/FakeGApps/releases) APK\n    - Supports up to Android 16, Android 17 is not confirmed yet\n4. Reboot\n5. Open Vector from notifications, enable FakeGApps in Modules and select System Framework as its only scope\n    - System Framework is hidden by default, show it with Filter > What the module asks for\n    - Tap Apply to save the scope\n6. Reboot, or tap Soft reboot in the dialog after Apply\n7. Check in microG Self-Check if signatures are correct now\n8. Optionally install Play Integrity Fix through Magisk, original is discontinued, use one of the maintained forks:\n    - [PlayIntegrityFork](https://github.com/osm0sis/PlayIntegrityFork) by osm0sis\n    - [PIF Inject](https://github.com/KOWX712/PlayIntegrityFix) by KOWX712\n    - It hides module files from microG, so the module installs microG Services and Companion as user updates on next boot\n\nOther ways you may find:\n- ROM patchers (Haystack, NanoDroid-patcher, Tingle) work properly only below Android 9\n\n### Play Store shows \"Server error\" or DF-DFERH-01\nEnable Google device registration in microG settings and restart Play Store.\n\n### microG crashing\nIf microG crashes when used with other modules interacting with it, install both microG Services and microG Companion (same APKs as in this module, from [official site](https://microg.org/download.html)) on top, as user updates. With Play Integrity Fix the module does it on its own on boot.\n\nIf you built the module yourself, you can install them from `apk/` through ADB:\n```sh\nadb install --user all apk/com.google.android.gms*.apk\nadb install --user all apk/com.android.vending*.apk\n```\n\n### Bootloop\nIf you have ADB debugging enabled, connect your phone to PC and run `scripts/disable-noogle.sh`. It waits for the phone to connect, disables Noogle microG module and reboots it, so you can run it while the phone is bootlooping.\n\nMore nuclear option is to run `adb shell magisk --remove-modules`. It will remove all modules from Magisk and reboot.\n\nIf you don't have ADB enabled, you may try to restart the device a few times (holding Power + Vol-) while keeping Vol- for a while until animated boot animation starts. This will trigger Magisk safe mode and modules will be disabled. More about this in [official documentation](https://topjohnwu.github.io/Magisk/faq.html).\n\n## Q&A\n\n### General\n\n#### What is the difference between this and other microG installers?\nThis module aims for stock Android support with Google apps preinstalled and doesn't require debloating Google apps first. Should work on AOSP-based ROMs as well.\n\n#### Which Android versions are supported?\nAndroid 11 to 17, tested on emulators. On Android 17 signature spoofing with Vector doesn't work yet, so microG works there only on ROMs supporting spoofing on their own.\n\n#### Does it work on OnePlus, OPPO or realme?\nOnly if Google apps are on regular partitions. Some of their ROMs (e.g. OxygenOS 12) keep them on `my_*` partitions like `/my_heytap`, which Magisk modules can't modify. The installer stops with a message in that case.\n\n#### Which apps does Noogle Unbundle remove?\nSee [which to choose](#which-noogle-unbundle-to-choose), lists have a comment for each app and say what's kept on purpose. Apps not on your device are skipped.\n\n#### What happens to my data in unbundled apps?\nApps you updated stay installed as regular apps with their data, so you can uninstall them like any other app. Apps never updated are removed with their data. After uninstalling Noogle Unbundle they are back as system apps.\n\n### Setup\n\n#### Do I need Vector and FakeGApps?\nOnly with regular variants on ROMs without signature spoofing, which is the case for every stock Android. Check the top of microG Self-Check, if spoofing is ticked, you don't need them. Catfish variants don't need them at all.\n\n#### Can I use the real Play Store instead of microG Companion?\nYes, install a playful variant, see [which to choose](#which-noogle-microg-to-choose). If your ROM has no Play Store, build the [playful variant](#playful-variant) with Play Store APK. Aurora Store works with all variants too.\n\n#### How do I update microG?\nModule updates with new microG versions come through Magisk app. With regular variants you can also install microG updates from microG F-Droid repo on top of the module. Or [build the module](#build) yourself, `scripts/pull-microg.sh` downloads the latest microG.\n\n### Problems\n\n#### Logging in to Google account fails with \"There was a problem communicating with Google servers\"\nUpdate microG to the latest version (see above). If you use a firewall, allow network access for microG Services, it's a separate app from Google's one.\n\n#### What happens when I uninstall the module?\nThe system partition is not modified, so after reboot preinstalled Google apps are back. Their updates are removed during module installation, so Play Store will download them again.\n\n#### Location doesn't work after uninstalling the module\nGoogle Play Services may be left without location permissions. Grant them with:\n```sh\nadb shell pm grant com.google.android.gms android.permission.ACCESS_COARSE_LOCATION\nadb shell pm grant com.google.android.gms android.permission.ACCESS_FINE_LOCATION\n```\n\n## Reporting issues\n\nOpen a [bug report](https://github.com/SelfRef/noogle-magisk/issues/new?template=bug_report.yml), it asks for your device, versions and logs:\n\n- Installer output: save button in Magisk after installing\n- Noogle microG log of last boot: `adb shell su -c cat /data/adb/modules/noogle-microg/service.log`\n- For crashes, logcat right after the crash: `adb logcat -d -b crash,main > logcat.txt`\n\nLogcat may contain personal data like account names or nearby networks, check it before attaching. Questions are welcome in [Issues](https://github.com/SelfRef/noogle-magisk/issues).\n\n## Credits\n\n- [microG](https://github.com/microg/GmsCore), [Magisk](https://github.com/topjohnwu/Magisk), [Vector](https://github.com/JingMatrix/Vector) and [FakeGApps](https://github.com/whew-inc/FakeGApps) developers\n- People reporting issues and sending pull requests on GitHub, especially:\n    - [bschtl](https://github.com/bschtl), for answering many issues too\n    - [sewnie](https://github.com/sewnie), [becknik](https://github.com/becknik) and [adiktofsugar](https://github.com/adiktofsugar), for pull requests that shaped the APK download script, device path detection and microG permission updates\n    - [StarchildCatalystN7](https://github.com/StarchildCatalystN7), for a fork with fixes that helped users while the project was paused\n    - [Louis047](https://github.com/Louis047) and [Gorkido](https://github.com/Gorkido), for testing and helping others update microG manually\n- People in the [XDA thread](https://xdaforums.com/t/guide-magisk-module-universal-systemless-microg-installation-on-stock-android.4686426/) helping others and testing on their devices, especially:\n    - bschtl, for keeping the thread alive with fixes and workarounds (Play Store swap, KernelSU metamodule)\n    - someone8, for the inspiration and research on privileged permissions and signature spoofing, and the pointer to microG without it\n    - IsHacker, for [microG_no_sigspoof](https://github.com/IsHacker003/microg_no_sigspoof), the idea behind the catfish variant\n    - stormy1777, for the Play Integrity Fix crash report and workaround\n",
+  "readmeHTML": "<h1>noogle-magisk</h1>\n\n<p>Magisk modules for removing/replacing Google applications on stock Android 11-17.</p>\n\n<p>Noogle is developed in my free time. If it helps you get rid of Google, consider supporting its development:</p>\n\n<p><a href=\"https://ko-fi.com/img/githubbutton_sm.svg\">![Support me on Ko-fi</a>](https://ko-fi.com/N5E229GJPZ)</p>\n<p><a href=\"https://img.shields.io/badge/Sponsor-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white\">![Sponsor on GitHub</a>](https://github.com/sponsors/SelfRef)</p>\n<p><a href=\"https://liberapay.com/assets/widgets/donate.svg\">![Donate using Liberapay</a>](https://liberapay.com/SelfRef/donate)</p>\n\n<h2>Modules</h2>\n\n<p>Name | Description</p>\n<p>--- | ---</p>\n<p>Noogle microG | Installs microG Services in place of Google Services (if present), comes in <a href=\"#which-noogle-microg-to-choose\">4 variants</a></p>\n<p>Noogle Unbundle | Removes other Google apps from system, comes in <a href=\"#which-noogle-unbundle-to-choose\">3 variants</a></p>\n\n<p>Modules are independent, use one or both. Variants of a module replace each other, switch anytime by installing another variant over the installed one, the installer brings back or removes apps as needed.</p>\n\n<h3>Which Noogle microG to choose</h3>\n\n<p>Variant | Play Store | Signature spoofing | microG updates from F-Droid | Play Integrity Fix</p>\n<p>:--- | --- | --- | --- | ---</p>\n<p><code>noogle-microg</code> | Replaced by microG Companion | Needed | Yes | Yes</p>\n<p><code>noogle-microg-playful</code> | Kept <a href=\"#playful-variant\">*</a> | Needed | Yes | Yes</p>\n<p><code>noogle-microg-catfish</code> | Replaced by microG Companion | Not needed | No | microG may crash</p>\n<p><code>noogle-microg-playful-catfish</code> | Kept <a href=\"#playful-variant\">*</a> | Not needed | No | microG may crash</p>\n\n<p><b>Playful or not:</b> Playful keeps Play Store of your ROM. The others replace it with microG Companion, which only provides Play Store services to apps, use <a href=\"https://auroraoss.com\">Aurora Store</a> to get apps.</p>\n\n<p><b>Catfish or not:</b> Regular variants need your ROM to report Google's signature for microG (<a href=\"#signatures-are-not-correct\">signature spoofing</a>), which stock Android can't do without Vector and FakeGApps. Catfish microG carries signing blocks copied from Google's APKs instead. Android doesn't check contents of system apps against their signatures, so it reports Google's signature without any spoofing. Idea from <a href=\"https://github.com/IsHacker003/microg_no_sigspoof\">microG_no_sigspoof</a> by IsHacker. The downsides:</p>\n<li>Signatures don't match the contents, so Catfish APKs can't be installed as user apps: microG updates come only with the module (switching to Catfish removes ones installed from F-Droid), and Play Integrity Fix workaround (microG installed as user updates) isn't possible</li>\n<li>Google's updates of Play Services pass as valid updates, the module removes them on every boot</li>\n<li>Tested on Android 15 emulator so far</li>\n\n<p>If your ROM already supports signature spoofing (see <a href=\"#signatures-are-not-correct\">ROMs</a>), use a regular variant.</p>\n\n<h3>Which Noogle Unbundle to choose</h3>\n\n<p>Variant | Removes | Kept | List</p>\n<p>:--- | --- | --- | ---</p>\n<p><code>noogle-unbundle</code> | Google apps installable from store: Chrome, Gmail, Maps, YouTube, Photos, Drive, Google app... | Phone basics, accessibility, Google system components | <a href=\"src/module-unbundle/packages.txt\">packages.txt</a></p>\n<p><code>noogle-unbundle-hard</code> | Same, plus phone basics (Pixel Launcher, Phone, Messages, Gboard, Camera, Clock, Contacts...), accessibility (TalkBack, Speech Services), Google system components (Android System Intelligence, Digital Wellbeing, Android Auto...) and Pixel extras | Setup Wizard, Device Health Services, Network Stack, file and sound pickers, carrier services and others that break the phone when removed (<a href=\"src/module-unbundle/packages-hard.txt\">tested</a>) | <a href=\"src/module-unbundle/packages.txt\">packages.txt</a> + <a href=\"src/module-unbundle/packages-hard.txt\">packages-hard.txt</a></p>\n<p><code>noogle-unbundle-fossify</code> | Same as Hard, and installs <a href=\"https://fossify.org\">Fossify</a> apps as replacements | Same as Hard | Same as Hard</p>\n\n<p>They never remove apps Noogle microG replaces. Switching from Hard or Fossify to a lighter variant brings back apps removed only by them.</p>\n\n<p><b>Fossify:</b> installs Launcher, Phone, Messages, Keyboard, Contacts, Gallery, Calculator, Clock, Camera, File Manager, Calendar, Notes and Voice Recorder as system apps. They are the versions from F-Droid (Fossify's own reproducible builds), so F-Droid updates them, updates stay installed even after removing the module. On every boot the module switches to Fossify Keyboard when the keyboard in use is gone (also on lock screen, so you can type your password), and gives empty home, phone and SMS roles to Fossify apps. Other Fossify apps (Music Player, Paint, Documents...) are in F-Droid.</p>\n\n<p>> [!WARNING]</p>\n<p>> Hard removes apps your phone may have no other one for. Install and set up replacements before installing it: launcher, phone, SMS app, camera, clock with alarms, and a keyboard enabled in settings (without one you can't type your password). The installer keeps apps with no replacement installed (it shows them as KEPT), install the module again after adding replacements. Contacts, Gallery or Calculator are removed without checks, install your own if you need them. Open your clock and calendar once and allow notifications, otherwise alarms ring with nothing on screen to stop them and reminders don't show. On some phones alarms of any app may go silent without Google Clock, check yours rings after installing. Fossify variant brings its own replacements and allows notifications for Fossify Clock and Calendar, but the alarm warning applies too.</p>\n\n<h2>Install</h2>\n\n<p>It requires Magisk v29.0 or newer. If you don't have it yet, consult the <a href=\"https://topjohnwu.github.io/Magisk/install.html\">official installation instructions</a>.</p>\n\n<p>> [!TIP]</p>\n<p>> It's a good idea to enable ADB debugging as well before installing in case of any issues.</p>\n\n<p>> [!NOTE]</p>\n<p>> KernelSU and APatch are supported too, but tested less than Magisk. Recent versions (KernelSU v3.0+, APatch 11219+) need a metamodule installed first (e.g. meta-overlayfs or NoMount, which one works best depends on the device), otherwise the module files are not mounted. On KernelSU disable \"Umount modules\" in App Profile of microG Services, microG Companion and Services Framework Proxy.</p>\n\n<p>> [!NOTE]</p>\n<p>> Modules are mainly tested on Android emulators (Google Play images). Real devices and vendor ROMs may behave differently, please <a href=\"#reporting-issues\">report</a> any issues you hit.</p>\n\n<li>Download [variant of your choice](#which-noogle-microg-to-choose) from [releases](https://github.com/SelfRef/noogle-magisk/releases)</li>\n<p>    - For playful variant on ROMs without Play Store see <a href=\"#playful-variant\">playful build</a></p>\n<p>    - <a href=\"#which-noogle-unbundle-to-choose\">Noogle Unbundle</a> is optional and works on its own, install it as a separate module</p>\n<li>Install through Magisk app</li>\n<li>Reboot, microG permissions are granted automatically on first boot</li>\n<li>Ensure all permission boxes are checked in microG Self-Check</li>\n<p>    - If not, click \"Action\" button next to module in Magisk to grant them again, or tap them in Self-Check</p>\n<li>Check signature spoofing status at the top of Self-Check</li>\n<p>    - Regular variants on ROMs without signature spoofing: <a href=\"#signatures-are-not-correct\">add it</a></p>\n<li>Playful only: enable Google device registration in microG settings, Play Store doesn't work without it</li>\n\n<h2>Build</h2>\n\n<p>Requires Linux, Mac or WSL on Windows with <code>bash</code>, <code>zip</code>, <code>curl</code> and <code>jq</code>. Optionally <code>apksigner</code> (Android SDK build-tools) and <code>keytool</code> (JDK) to re-sign Services Framework Proxy with newer signature schemes, which some ROMs may require.</p>\n\n<li>Run `scripts/pull-microg.sh` to download latest microG APKs to `apk/` and verify their checksums</li>\n<p>    - Or <a href=\"https://microg.org/download.html\">download them manually</a> and place in <code>apk/</code> directory</p>\n<li>Run `scripts/build-noogle-microg.sh` (or `scripts/build-noogle-unbundle.sh` for Noogle Unbundle, it needs no APKs, `-H` builds Hard, `-F` Fossify after `scripts/pull-fossify.sh` downloads Fossify apps)</li>\n<p>    - Module will be created in <code>dist/</code></p>\n<p>    - Check <code>-h</code> flag for build options, like destination partition</p>\n\n<h3>Playful variant</h3>\n\n<p>Released playful modules don't contain Play Store, they keep the one your ROM has. Bundling it would mean redistributing Google's APK, and it comes in different versions and architectures. If your ROM has no Play Store (e.g. LineageOS), build playful variant with Play Store APK yourself (<code>-P</code> below).</p>\n\n<li>`scripts/build-noogle-microg.sh -p` builds playful variant, which keeps Play Store of your ROM</li>\n<li>`scripts/build-noogle-microg.sh -P <apk>` builds playful variant with given Play Store APK, for ROMs without Play Store (e.g. LineageOS)</li>\n<p>    - Play Store APK must support your Android version (newer ones need Android 12+)</p>\n<p>    - This build is not updated by Magisk, updating to released playful build would remove Play Store</p>\n\n<h3>Catfish variant</h3>\n\n<p>Catfish build needs <code>zipalign</code> and <code>apksigner</code> (Android SDK build-tools) and signing blocks of Google's APKs, which aren't in the repo:</p>\n\n<li>Get the signing blocks into `signatures/` with `scripts/pull-signatures.sh`, once:</li>\n<p>    - From a device with stock Google apps through ADB (Noogle microG disabled)</p>\n<p>    - Or from APK files: <code>scripts/pull-signatures.sh <Play Services APK> <Play Store APK></code></p>\n<p>    - It checks the APKs are signed by Google, microG ones are rejected</p>\n<li>Run `scripts/build-noogle-microg.sh -c`, add `-p` or `-P <apk>` for playful catfish (only microG Services gets Google's signature, Play Store has its own)</li>\n\n<h3>Install from PC</h3>\n\n<p>Instead of copying the module to your phone, you can build and install it through ADB in one go:</p>\n\n<li>Enable ADB debugging and connect your phone</li>\n<li>Grant root to Shell in Magisk (it will ask on first `adb shell su`)</li>\n<li>Run `scripts/install-noogle.sh`</li>\n<p>    - It builds the module, installs it and reboots the phone, asking before each step (<code>-y</code> to skip)</p>\n<p>    - It accepts the same build options as the build script, <code>-u</code> installs Noogle Unbundle instead, <code>-H</code> Noogle Unbundle Hard, <code>-F</code> Noogle Unbundle Fossify</p>\n\n<h2>Compatibility</h2>\n\n<p>Module/Type | Notes</p>\n<p>:--- | ---</p>\n<p>Vector + FakeGApps | Recommended way to <a href=\"#signatures-are-not-correct\">enable signature spoofing</a>, not needed with Catfish</p>\n<p>Play Integrity Fix | <a href=\"#signatures-are-not-correct\">Maintained forks</a> only, not with Catfish</p>\n<p>User updates | Installing microG updates from F-Droid repo, not with Catfish</p>\n\n<h2>Troubleshooting</h2>\n\n<h3>Signatures are not correct</h3>\n<p>microG apps pretend to be Google apps, so Android must report Google's signature for them. This is called <a href=\"https://github.com/microg/GmsCore/wiki/Signature-Spoofing\">signature spoofing</a> and microG Self-Check shows at the top whether it works. <a href=\"#which-noogle-microg-to-choose\">Catfish variants</a> don't need it.</p>\n\n<p>Some custom ROMs support it out of the box (e.g. LineageOS since 2024-02-26, crDroid, CalyxOS, /e/), in that case nothing else is needed. Note that Google changed signature checks in 2024-11, so older ROM builds may need an update.</p>\n\n<p>Stock Android and most other ROMs don't support it, so it has to be added with an Xposed module. This is the way I recommend:</p>\n\n<li>Enable Zygisk in Magisk's settings</li>\n<li>Download and install [Vector](https://github.com/JingMatrix/Vector/releases) (formerly LSPosed) through Magisk</li>\n<p>    - Android 17 doesn't work yet, Vector can't load into the system there</p>\n<li>Download and install [FakeGApps](https://github.com/whew-inc/FakeGApps/releases) APK</li>\n<p>    - Supports up to Android 16, Android 17 is not confirmed yet</p>\n<li>Reboot</li>\n<li>Open Vector from notifications, enable FakeGApps in Modules and select System Framework as its only scope</li>\n<p>    - System Framework is hidden by default, show it with Filter > What the module asks for</p>\n<p>    - Tap Apply to save the scope</p>\n<li>Reboot, or tap Soft reboot in the dialog after Apply</li>\n<li>Check in microG Self-Check if signatures are correct now</li>\n<li>Optionally install Play Integrity Fix through Magisk, original is discontinued, use one of the maintained forks:</li>\n<p>    - <a href=\"https://github.com/osm0sis/PlayIntegrityFork\">PlayIntegrityFork</a> by osm0sis</p>\n<p>    - <a href=\"https://github.com/KOWX712/PlayIntegrityFix\">PIF Inject</a> by KOWX712</p>\n<p>    - It hides module files from microG, so the module installs microG Services and Companion as user updates on next boot</p>\n\n<p>Other ways you may find:</p>\n<li>ROM patchers (Haystack, NanoDroid-patcher, Tingle) work properly only below Android 9</li>\n\n<h3>Play Store shows \"Server error\" or DF-DFERH-01</h3>\n<p>Enable Google device registration in microG settings and restart Play Store.</p>\n\n<h3>microG crashing</h3>\n<p>If microG crashes when used with other modules interacting with it, install both microG Services and microG Companion (same APKs as in this module, from <a href=\"https://microg.org/download.html\">official site</a>) on top, as user updates. With Play Integrity Fix the module does it on its own on boot.</p>\n\n<p>If you built the module yourself, you can install them from <code>apk/</code> through ADB:</p>\n<pre>adb install --user all apk/com.google.android.gms*.apk\nadb install --user all apk/com.android.vending*.apk</pre>\n\n<h3>Bootloop</h3>\n<p>If you have ADB debugging enabled, connect your phone to PC and run <code>scripts/disable-noogle.sh</code>. It waits for the phone to connect, disables Noogle microG module and reboots it, so you can run it while the phone is bootlooping.</p>\n\n<p>More nuclear option is to run <code>adb shell magisk --remove-modules</code>. It will remove all modules from Magisk and reboot.</p>\n\n<p>If you don't have ADB enabled, you may try to restart the device a few times (holding Power + Vol-) while keeping Vol- for a while until animated boot animation starts. This will trigger Magisk safe mode and modules will be disabled. More about this in <a href=\"https://topjohnwu.github.io/Magisk/faq.html\">official documentation</a>.</p>\n\n<h2>Q&A</h2>\n\n<h3>General</h3>\n\n<p>#### What is the difference between this and other microG installers?</p>\n<p>This module aims for stock Android support with Google apps preinstalled and doesn't require debloating Google apps first. Should work on AOSP-based ROMs as well.</p>\n\n<p>#### Which Android versions are supported?</p>\n<p>Android 11 to 17, tested on emulators. On Android 17 signature spoofing with Vector doesn't work yet, so microG works there only on ROMs supporting spoofing on their own.</p>\n\n<p>#### Does it work on OnePlus, OPPO or realme?</p>\n<p>Only if Google apps are on regular partitions. Some of their ROMs (e.g. OxygenOS 12) keep them on <code>my_*</code> partitions like <code>/my_heytap</code>, which Magisk modules can't modify. The installer stops with a message in that case.</p>\n\n<p>#### Which apps does Noogle Unbundle remove?</p>\n<p>See <a href=\"#which-noogle-unbundle-to-choose\">which to choose</a>, lists have a comment for each app and say what's kept on purpose. Apps not on your device are skipped.</p>\n\n<p>#### What happens to my data in unbundled apps?</p>\n<p>Apps you updated stay installed as regular apps with their data, so you can uninstall them like any other app. Apps never updated are removed with their data. After uninstalling Noogle Unbundle they are back as system apps.</p>\n\n<h3>Setup</h3>\n\n<p>#### Do I need Vector and FakeGApps?</p>\n<p>Only with regular variants on ROMs without signature spoofing, which is the case for every stock Android. Check the top of microG Self-Check, if spoofing is ticked, you don't need them. Catfish variants don't need them at all.</p>\n\n<p>#### Can I use the real Play Store instead of microG Companion?</p>\n<p>Yes, install a playful variant, see <a href=\"#which-noogle-microg-to-choose\">which to choose</a>. If your ROM has no Play Store, build the <a href=\"#playful-variant\">playful variant</a> with Play Store APK. Aurora Store works with all variants too.</p>\n\n<p>#### How do I update microG?</p>\n<p>Module updates with new microG versions come through Magisk app. With regular variants you can also install microG updates from microG F-Droid repo on top of the module. Or <a href=\"#build\">build the module</a> yourself, <code>scripts/pull-microg.sh</code> downloads the latest microG.</p>\n\n<h3>Problems</h3>\n\n<p>#### Logging in to Google account fails with \"There was a problem communicating with Google servers\"</p>\n<p>Update microG to the latest version (see above). If you use a firewall, allow network access for microG Services, it's a separate app from Google's one.</p>\n\n<p>#### What happens when I uninstall the module?</p>\n<p>The system partition is not modified, so after reboot preinstalled Google apps are back. Their updates are removed during module installation, so Play Store will download them again.</p>\n\n<p>#### Location doesn't work after uninstalling the module</p>\n<p>Google Play Services may be left without location permissions. Grant them with:</p>\n<pre>adb shell pm grant com.google.android.gms android.permission.ACCESS_COARSE_LOCATION\nadb shell pm grant com.google.android.gms android.permission.ACCESS_FINE_LOCATION</pre>\n\n<h2>Reporting issues</h2>\n\n<p>Open a <a href=\"https://github.com/SelfRef/noogle-magisk/issues/new?template=bug_report.yml\">bug report</a>, it asks for your device, versions and logs:</p>\n\n<li>Installer output: save button in Magisk after installing</li>\n<li>Noogle microG log of last boot: `adb shell su -c cat /data/adb/modules/noogle-microg/service.log`</li>\n<li>For crashes, logcat right after the crash: `adb logcat -d -b crash,main > logcat.txt`</li>\n\n<p>Logcat may contain personal data like account names or nearby networks, check it before attaching. Questions are welcome in <a href=\"https://github.com/SelfRef/noogle-magisk/issues\">Issues</a>.</p>\n\n<h2>Credits</h2>\n\n<li>[microG](https://github.com/microg/GmsCore), [Magisk](https://github.com/topjohnwu/Magisk), [Vector](https://github.com/JingMatrix/Vector) and [FakeGApps](https://github.com/whew-inc/FakeGApps) developers</li>\n<li>People reporting issues and sending pull requests on GitHub, especially:</li>\n<p>    - <a href=\"https://github.com/bschtl\">bschtl</a>, for answering many issues too</p>\n<p>    - <a href=\"https://github.com/sewnie\">sewnie</a>, <a href=\"https://github.com/becknik\">becknik</a> and <a href=\"https://github.com/adiktofsugar\">adiktofsugar</a>, for pull requests that shaped the APK download script, device path detection and microG permission updates</p>\n<p>    - <a href=\"https://github.com/StarchildCatalystN7\">StarchildCatalystN7</a>, for a fork with fixes that helped users while the project was paused</p>\n<p>    - <a href=\"https://github.com/Louis047\">Louis047</a> and <a href=\"https://github.com/Gorkido\">Gorkido</a>, for testing and helping others update microG manually</p>\n<li>People in the [XDA thread](https://xdaforums.com/t/guide-magisk-module-universal-systemless-microg-installation-on-stock-android.4686426/) helping others and testing on their devices, especially:</li>\n<p>    - bschtl, for keeping the thread alive with fixes and workarounds (Play Store swap, KernelSU metamodule)</p>\n<p>    - someone8, for the inspiration and research on privileged permissions and signature spoofing, and the pointer to microG without it</p>\n<p>    - IsHacker, for <a href=\"https://github.com/IsHacker003/microg_no_sigspoof\">microG_no_sigspoof</a>, the idea behind the catfish variant</p>\n<p>    - stormy1777, for the Play Integrity Fix crash report and workaround</p>",
+  "homepageUrl": "https://github.com/SelfRef/noogle-magisk",
+  "sourceUrl": "https://github.com/SelfRef/noogle-magisk",
+  "url": "https://github.com/SelfRef/noogle-magisk",
+  "latestRelease": {
+    "name": "v2026.10.26",
+    "version": "v2026.10.26",
+    "time": "2026-10-26T03:19:17Z",
+    "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-catfish-v2026.10.26.zip"
+  },
+  "releases": [
+    {
+      "name": "v2026.10.26",
+      "tagName": "v2026.10.26",
+      "publishedAt": "2026-10-26T03:19:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-catfish-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-catfish-v2026.10.26.zip",
+          "size": 106437581,
+          "downloadCount": 22
+        },
+        {
+          "name": "noogle-microg-playful-catfish-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-playful-catfish-v2026.10.26.zip",
+          "size": 103261274,
+          "downloadCount": 6
+        },
+        {
+          "name": "noogle-microg-playful-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-playful-v2026.10.26.zip",
+          "size": 103539412,
+          "downloadCount": 27
+        },
+        {
+          "name": "noogle-microg-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-v2026.10.26.zip",
+          "size": 106796624,
+          "downloadCount": 117
+        },
+        {
+          "name": "noogle-unbundle-fossify-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-unbundle-fossify-v2026.10.26.zip",
+          "size": 85464181,
+          "downloadCount": 7
+        },
+        {
+          "name": "noogle-unbundle-hard-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-unbundle-hard-v2026.10.26.zip",
+          "size": 7514,
+          "downloadCount": 10
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.26.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-unbundle-v2026.10.26.zip",
+          "size": 5067,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.18.2",
+      "tagName": "v2026.10.18.2",
+      "publishedAt": "2026-10-18T23:21:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-catfish-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-microg-catfish-v2026.10.18.2.zip",
+          "size": 106437442,
+          "downloadCount": 68
+        },
+        {
+          "name": "noogle-microg-playful-catfish-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-microg-playful-catfish-v2026.10.18.2.zip",
+          "size": 103261135,
+          "downloadCount": 22
+        },
+        {
+          "name": "noogle-microg-playful-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-microg-playful-v2026.10.18.2.zip",
+          "size": 103539277,
+          "downloadCount": 63
+        },
+        {
+          "name": "noogle-microg-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-microg-v2026.10.18.2.zip",
+          "size": 106796480,
+          "downloadCount": 237
+        },
+        {
+          "name": "noogle-unbundle-fossify-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-unbundle-fossify-v2026.10.18.2.zip",
+          "size": 85464107,
+          "downloadCount": 56
+        },
+        {
+          "name": "noogle-unbundle-hard-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-unbundle-hard-v2026.10.18.2.zip",
+          "size": 7441,
+          "downloadCount": 24
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.18.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.2/noogle-unbundle-v2026.10.18.2.zip",
+          "size": 4994,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.18.1",
+      "tagName": "v2026.10.18.1",
+      "publishedAt": "2026-10-18T22:54:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-catfish-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-microg-catfish-v2026.10.18.1.zip",
+          "size": 106437441,
+          "downloadCount": 3
+        },
+        {
+          "name": "noogle-microg-playful-catfish-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-microg-playful-catfish-v2026.10.18.1.zip",
+          "size": 103261123,
+          "downloadCount": 2
+        },
+        {
+          "name": "noogle-microg-playful-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-microg-playful-v2026.10.18.1.zip",
+          "size": 103539274,
+          "downloadCount": 1
+        },
+        {
+          "name": "noogle-microg-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-microg-v2026.10.18.1.zip",
+          "size": 106796483,
+          "downloadCount": 3
+        },
+        {
+          "name": "noogle-unbundle-fossify-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-unbundle-fossify-v2026.10.18.1.zip",
+          "size": 85463748,
+          "downloadCount": 2
+        },
+        {
+          "name": "noogle-unbundle-hard-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-unbundle-hard-v2026.10.18.1.zip",
+          "size": 7337,
+          "downloadCount": 2
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.18.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18.1/noogle-unbundle-v2026.10.18.1.zip",
+          "size": 4993,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.18",
+      "tagName": "v2026.10.18",
+      "publishedAt": "2026-10-18T22:39:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-catfish-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-microg-catfish-v2026.10.18.zip",
+          "size": 106437376,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-microg-playful-catfish-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-microg-playful-catfish-v2026.10.18.zip",
+          "size": 103261069,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-microg-playful-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-microg-playful-v2026.10.18.zip",
+          "size": 103539207,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-microg-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-microg-v2026.10.18.zip",
+          "size": 106796414,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-unbundle-fossify-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-unbundle-fossify-v2026.10.18.zip",
+          "size": 85463747,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-unbundle-hard-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-unbundle-hard-v2026.10.18.zip",
+          "size": 7335,
+          "downloadCount": 0
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.18.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.18/noogle-unbundle-v2026.10.18.zip",
+          "size": 4992,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.16",
+      "tagName": "v2026.10.16",
+      "publishedAt": "2026-10-16T03:10:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-playful-v2026.10.16.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.16/noogle-microg-playful-v2026.10.16.zip",
+          "size": 103538978,
+          "downloadCount": 42
+        },
+        {
+          "name": "noogle-microg-v2026.10.16.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.16/noogle-microg-v2026.10.16.zip",
+          "size": 106796182,
+          "downloadCount": 147
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.16.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.16/noogle-unbundle-v2026.10.16.zip",
+          "size": 3953,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.15.1",
+      "tagName": "v2026.10.15.1",
+      "publishedAt": "2026-10-15T23:34:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-playful-v2026.10.15.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15.1/noogle-microg-playful-v2026.10.15.1.zip",
+          "size": 103538480,
+          "downloadCount": 4
+        },
+        {
+          "name": "noogle-microg-v2026.10.15.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15.1/noogle-microg-v2026.10.15.1.zip",
+          "size": 106795688,
+          "downloadCount": 15
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.15.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15.1/noogle-unbundle-v2026.10.15.1.zip",
+          "size": 3955,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2026.10.15",
+      "tagName": "v2026.10.15",
+      "publishedAt": "2026-10-15T21:16:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-playful-v2026.10.15.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15/noogle-microg-playful-v2026.10.15.zip",
+          "size": 103536576,
+          "downloadCount": 5
+        },
+        {
+          "name": "noogle-microg-v2026.10.15.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15/noogle-microg-v2026.10.15.zip",
+          "size": 106793787,
+          "downloadCount": 13
+        },
+        {
+          "name": "noogle-unbundle-v2026.10.15.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.15/noogle-unbundle-v2026.10.15.zip",
+          "size": 3951,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2025-04-04T09:46:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-v2.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2.1/noogle-microg-v2.1.zip",
+          "size": 45155572,
+          "downloadCount": 13300
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2025-04-03T03:54:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-v2.0.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2.0/noogle-microg-v2.0.zip",
+          "size": 45155585,
+          "downloadCount": 175
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2025-04-01T22:34:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-v1.2.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v1.2/noogle-microg-v1.2.zip",
+          "size": 45158460,
+          "downloadCount": 70
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2025-04-01T10:23:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-v1.1.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v1.1/noogle-microg-v1.1.zip",
+          "size": 45154465,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-04-01T02:31:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "noogle-microg-v1.0.zip",
+          "downloadUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v1.0/noogle-microg-v1.0.zip",
+          "size": 45134756,
+          "downloadCount": 39
+        }
+      ]
+    }
+  ]
+}

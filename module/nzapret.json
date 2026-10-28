@@ -1,0 +1,263 @@
+{
+  "readme": "<div align=\"center\">\n\n<b>Русский</b> | <a href=\"README.en.md\">English</a>\n\n# 🚀 nzapret by nikitos4683\n\n**DPI-bypass модуль для Android (Magisk / KernelSU)**\n\n![Android](https://img.shields.io/badge/Platform-Android-2ea44f?style=for-the-badge)\n![Root](https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU-1f6feb?style=for-the-badge)\n![Engine](https://img.shields.io/badge/Engine-nfqws2%20%7C%20nztg-f59e0b?style=for-the-badge)\n![UI](https://img.shields.io/badge/UI-KernelSU%20WebUI-8b5cf6?style=for-the-badge)\n![Version](https://img.shields.io/badge/Version-v4.0.0-blue?style=for-the-badge)\n\n</div>\n\n---\n\n**nzapret** — автономный и легковесный модуль для Android-устройств с root-доступом. Модуль работает **на базе [zapret2](https://github.com/bol-van/zapret2)**, используя локальный движок `nfqws2` и правила `iptables`/`ip6tables` для обхода DPI, а также встроенный прокси `nztg` для разблокировки Telegram.\n\nБинарники `nfqws2`, пейлоады и списки маршрутизации взяты из оригинального апстрима, прокси-сервер `nztg` собран на базе собственной Go-реализации, а весь код обвязки написан с нуля под Android — с удобным Web-интерфейсом и без лишнего мусора в системе.\n\n---\n\n## 📌 Содержание\n\n- [✨ Ключевые возможности](#-ключевые-возможности)\n- [🚧 Ограничения и известные проблемы](#-ограничения-и-известные-проблемы)\n- [🚀 Быстрый старт](#-быстрый-старт)\n- [🏗 Архитектура и структура](#-архитектура-и-структура)\n- [🛠 Сборка модуля](#-сборка-модуля)\n- [📄 Лицензия](#-лицензия)\n\n---\n\n## ✨ Ключевые возможности\n\n- **Встроенный WebUI:** Удобный и красивый графический интерфейс прямо в менеджере модулей KernelSU.\n- **Мощный CLI:** Полное управление модулем через терминал.\n- **Умный роутинг:** Перехват трафика в цепочках `OUTPUT` и `FORWARD` для IPv4 и IPv6.\n- **Авто-стек IPv4/IPv6:** Модуль сам поднимает перехват для IPv4 и, если работает `ip6tables`, для IPv6 — без ручного выбора режима.\n- **Обход Telegram:** Встроенный локальный MTProto-прокси (`nztgproxy`) с мостом через WebSocket и Cloudflare-фолбэком, управляемый из той же кнопки Старт.\n- **Управление Private DNS:** Автоматическая инициализация DNS и возможность переключения провайдера из WebUI/CLI.\n- **Персональный `list-user`:** Собственный список доменов пользователя, редактируемый напрямую из интерфейса.\n- **VPN-совместимость:** Поддержка совместной работы с большинством популярных VPN-клиентов.\n- **Автономность:** Модуль использует локальные данные и не требует сети при загрузке.\n\n<details>\n<summary>⚙️ Подробная логика работы сети, DNS и Telegram (для гиков)</summary>\n\n- **Сетевой стек:** Модуль всегда поднимает перехват DPI для IPv4, а для IPv6 — когда на устройстве работает `ip6tables` (таблица mangle). Отдельного выбора режима нет и он не нужен: холостые IPv6-правила ничего не стоят при отсутствии IPv6-трафика и уже готовы защитить IPv6, который поднимается позже (после загрузки или при смене Wi-Fi/сотовой сети). Это исключает старую проблему, когда в «режиме только IPv4» трафик (например, YouTube или Instagram) уходил по IPv6 мимо обхода и попадал под DPI.\n- **Private DNS:** Инициализируется один раз при первом старте службы. Если в системе уже настроен валидный сторонний DNS-провайдер в режиме \"Имя хоста\", он сохраняется. В остальных случаях (режимы \"Отключено\", \"Авто\" или пусто) принудительно выставляется значение по умолчанию — `geohide.ru` (необходимо для обхода DNS-блокировок ИИ-сервисов вроде ChatGPT, Gemini и др.). Ручные изменения DNS через CLI или WebUI фиксируются и не сбрасываются при последующих запусках.\n- **Telegram-прокси (nztgproxy):** Локальный MTProto-прокси, написанный на Go (статический, CGO-free бинарник `nztg`). Он принимает входящие MTProto-соединения от клиента Telegram, декодирует обфусцированное рукопожатие (handshake) и транслирует (бриджит) трафик до оригинальных датацентров Telegram поверх протокола WSS (WebSocket-over-TLS) для обхода DPI-блокировок по IP-адресам. Поддерживает прямой TCP-откат, а также Cloudflare Worker / CDN fronting (CF-прокси) для маршрутизации трафика через сеть Cloudflare, если прямые адреса WebSocket-серверов Telegram заблокированы провайдером.\n\n</details>\n\n---\n\n## 🚧 Ограничения и известные проблемы\n\n> [!NOTE]\n> **Telegram:** Модуль включает встроенный локальный MTProto-прокси (`nztgproxy`) для обхода блокировок Telegram. После старта модуля откройте вкладку **Telegram** в WebUI и нажмите **«Открыть в Telegram»** (или скопируйте ссылку/введите `127.0.0.1:1443` и Secret вручную). Если IP Telegram заблокированы провайдером, трафик автоматически идёт через Cloudflare-прокси. Если не грузятся медиа — уберите строку `2:149.154.167.220` в настройках датацентров.\n\n> [!NOTE]\n> **Баг WebUI в KernelSU:** Из-за особенностей менеджера KernelSU процессы `nfqws2` и `nztg`, запущенные *вручную* кнопкой питания в WebUI, могут завершаться системой после смахивания KernelSU из недавних приложений. В KernelSU-Next этот баг уже исправлен (см. issue [#1180](https://github.com/KernelSU-Next/KernelSU-Next/issues/1180))! Для обычного KernelSU рекомендуется использовать кнопку **Action** в списке модулей или команду `nzapret start` в терминале.\n\n---\n\n## 🚀 Быстрый старт\n\n### 1. Установка\n1. Скачайте готовый `ZIP-архив` со страницы релизов (Releases).\n2. Прошейте стандартным способом через **Magisk** или **KernelSU**.\n3. Перезагрузите устройство.\n4. Откройте вкладку модулей в KernelSU для доступа к **WebUI**. *(Пользователям Magisk потребуется приложение [KsuWebUI](https://github.com/KOWX712/KsuWebUIStandalone) для работы с интерфейсом).*\n\n### 2. Использование из терминала (CLI)\nДля управления через CLI требуются root-права (`su`). Если команда `nzapret` не найдена в PATH, используйте полный путь: `/data/adb/modules/nzapret/system/bin/nzapret`.\n\n#### 🔌 Управление службой\n| Команда | Описание |\n| :--- | :--- |\n| `nzapret start` | Инициализировать правила iptables и запустить `nfqws2` |\n| `nzapret stop` | Остановить процессы службы и очистить цепочки фаервола |\n| `nzapret restart` | Полный перезапуск с применением измененных настроек |\n\n#### 📊 Мониторинг и диагностика\n| Команда | Описание |\n| :--- | :--- |\n| `nzapret status` | Посмотреть текущее состояние и статус службы |\n| `nzapret status --json` | Вывод статуса в формате JSON (для WebUI) |\n| `nzapret log` | Просмотр системного лога службы |\n| `nzapret diagnose` | Сбор подробной диагностической информации для отладки |\n\n#### 🌐 Сеть и Private DNS\n| Команда | Описание |\n| :--- | :--- |\n| `nzapret update` | Скачать и обновить списки обхода (hostlists) |\n| `nzapret network status` | Показать активный стек фаервола (IPv4 / IPv4 + IPv6) |\n| `nzapret dns status` | Показать текущее состояние Android Private DNS |\n| `nzapret dns set default` | Установить DNS по умолчанию (`geohide.ru`) |\n| `nzapret dns set auto` | Вернуть системный автоматический режим DNS |\n| `nzapret dns set off` | Полностью отключить системный Private DNS |\n| `nzapret dns set hostname <host>` | Установить собственный хост DNS-провайдера |\n\n#### 📝 Управление пользовательским списком (`list-user`)\n| Команда | Описание |\n| :--- | :--- |\n| `nzapret list-user status` | Показать статус списка и количество доменов |\n| `nzapret list-user show` | Отобразить текущее содержимое списка |\n| `nzapret list-user add <domains...>` | Добавить один или несколько доменов в список |\n| `nzapret list-user remove <domains...>` | Удалить указанные домены из списка |\n| `nzapret list-user replace <domains...>` | Перезаписать список новыми доменами |\n| `nzapret list-user clear` | Полностью очистить пользовательский список |\n\n#### ✈️ Telegram (`tg`)\n| Команда | Описание |\n| :--- | :--- |\n| `nzapret tg status` | Показать состояние прокси, secret и ссылку |\n| `nzapret tg status --json` | Состояние в формате JSON (для WebUI) |\n| `nzapret tg link` | Вывести `tg://`-ссылку для подключения |\n| `nzapret tg open` | Открыть Telegram с настроенным прокси |\n| `nzapret tg regen-secret` | Сгенерировать новый secret |\n| `nzapret tg cf-test` | Проверить доступность Cloudflare-прокси |\n| `nzapret tg set host <ip>` | Задать адрес прослушивания |\n| `nzapret tg set port <n>` | Задать порт |\n| `nzapret tg set cf <on\\|off>` | Включить/выключить Cloudflare-фолбэк |\n| `nzapret tg set cf-domain <domain>` | Задать свой CF-домен (пусто — сбросить) |\n| `nzapret tg set dc <\"n:IP..\">` | Задать правила датацентров (по строке на правило) |\n\n> Служба Telegram запускается и останавливается вместе с модулем (`start`/`stop`/`restart`). Изменения настроек применяются после перезапуска.\n\n---\n\n## 🏗 Архитектура и структура\n\n| Файл / Директория | Описание |\n| :--- | :--- |\n| ⚙️ [service.sh](service.sh) | Системный скрипт автозапуска. Настраивает правила фаервола и запускает `nfqws2`. |\n| 🧠 [system/bin/nzapret](system/bin/nzapret) | Управляющий CLI-интерфейс. Отвечает за команды старта, стопа, сбор метрик для WebUI. |\n| ✈️ [bin/nztg](bin/) | Локальный MTProto-прокси для Telegram (Go, статический бинарник). Запускается вместе с nfqws2. |\n| 🎨 [webroot/](webroot/) | Код WebUI (HTML, CSS, JS) для интеграции в KernelSU. |\n| 📁 [profiles/](profiles/) | Конфигурационные профили с аргументами для `nfqws2`. |\n| 📁 [lists/](lists/) | Списки доменов для маршрутизации (включая пользовательский `list-user.txt`). |\n| 📁 [payloads/](payloads/) | Бинарные фейковые пакеты (TLS/QUIC) для обхода DPI. |\n| 🛠 [customize.sh](customize.sh) | Инсталлятор модуля (определение архитектуры устройства, распаковка и настройка прав). |\n\n---\n\n## 🛠 Сборка модуля\n\nЕсли вы хотите собрать модуль самостоятельно, у вас в системе (Linux/WSL) должны быть установлены базовые утилиты: `bash`, `zip`, `sed`, `mktemp`.\n\nПроцесс сборки запускается всего одной командой:\n```sh\nbash build.sh\n```\nНа выходе в корневой директории появится готовый к прошивке архив `nzapret-vX.Y.Z.zip`. Собирать можно прямо на устройстве (например, в Termux) или на ПК.\n\n---\n\n## 📄 Лицензия\n\nЭтот проект распространяется под лицензией [MIT](LICENSE). Подробную информацию можно найти в файле [LICENSE](LICENSE).\n\n---\n\n<div align=\"center\">\n  <b>🌍 Enjoy open Internet!</b>\n</div>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><b>Русский</b> | <a href=\"README.en.md\">English</a></p>\n\n<h1>🚀 nzapret by nikitos4683</h1>\n\n<p><b>DPI-bypass модуль для Android (Magisk / KernelSU)</b></p>\n\n<p>!<a href=\"https://img.shields.io/badge/Platform-Android-2ea44f?style=for-the-badge\">Android</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU-1f6feb?style=for-the-badge\">Root</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Engine-nfqws2%20%7C%20nztg-f59e0b?style=for-the-badge\">Engine</a></p>\n<p>!<a href=\"https://img.shields.io/badge/UI-KernelSU%20WebUI-8b5cf6?style=for-the-badge\">UI</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Version-v4.0.0-blue?style=for-the-badge\">Version</a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><b>nzapret</b> — автономный и легковесный модуль для Android-устройств с root-доступом. Модуль работает <b>на базе <a href=\"https://github.com/bol-van/zapret2\">zapret2</a></b>, используя локальный движок <code>nfqws2</code> и правила <code>iptables</code>/<code>ip6tables</code> для обхода DPI, а также встроенный прокси <code>nztg</code> для разблокировки Telegram.</p>\n\n<p>Бинарники <code>nfqws2</code>, пейлоады и списки маршрутизации взяты из оригинального апстрима, прокси-сервер <code>nztg</code> собран на базе собственной Go-реализации, а весь код обвязки написан с нуля под Android — с удобным Web-интерфейсом и без лишнего мусора в системе.</p>\n\n<p>---</p>\n\n<h2>📌 Содержание</h2>\n\n<li>[✨ Ключевые возможности](#-ключевые-возможности)</li>\n<li>[🚧 Ограничения и известные проблемы](#-ограничения-и-известные-проблемы)</li>\n<li>[🚀 Быстрый старт](#-быстрый-старт)</li>\n<li>[🏗 Архитектура и структура](#-архитектура-и-структура)</li>\n<li>[🛠 Сборка модуля](#-сборка-модуля)</li>\n<li>[📄 Лицензия](#-лицензия)</li>\n\n<p>---</p>\n\n<h2>✨ Ключевые возможности</h2>\n\n<li>**Встроенный WebUI:** Удобный и красивый графический интерфейс прямо в менеджере модулей KernelSU.</li>\n<li>**Мощный CLI:** Полное управление модулем через терминал.</li>\n<li>**Умный роутинг:** Перехват трафика в цепочках `OUTPUT` и `FORWARD` для IPv4 и IPv6.</li>\n<li>**Авто-стек IPv4/IPv6:** Модуль сам поднимает перехват для IPv4 и, если работает `ip6tables`, для IPv6 — без ручного выбора режима.</li>\n<li>**Обход Telegram:** Встроенный локальный MTProto-прокси (`nztgproxy`) с мостом через WebSocket и Cloudflare-фолбэком, управляемый из той же кнопки Старт.</li>\n<li>**Управление Private DNS:** Автоматическая инициализация DNS и возможность переключения провайдера из WebUI/CLI.</li>\n<li>**Персональный `list-user`:** Собственный список доменов пользователя, редактируемый напрямую из интерфейса.</li>\n<li>**VPN-совместимость:** Поддержка совместной работы с большинством популярных VPN-клиентов.</li>\n<li>**Автономность:** Модуль использует локальные данные и не требует сети при загрузке.</li>\n\n<p><details></p>\n<p><summary>⚙️ Подробная логика работы сети, DNS и Telegram (для гиков)</summary></p>\n\n<li>**Сетевой стек:** Модуль всегда поднимает перехват DPI для IPv4, а для IPv6 — когда на устройстве работает `ip6tables` (таблица mangle). Отдельного выбора режима нет и он не нужен: холостые IPv6-правила ничего не стоят при отсутствии IPv6-трафика и уже готовы защитить IPv6, который поднимается позже (после загрузки или при смене Wi-Fi/сотовой сети). Это исключает старую проблему, когда в «режиме только IPv4» трафик (например, YouTube или Instagram) уходил по IPv6 мимо обхода и попадал под DPI.</li>\n<li>**Private DNS:** Инициализируется один раз при первом старте службы. Если в системе уже настроен валидный сторонний DNS-провайдер в режиме \"Имя хоста\", он сохраняется. В остальных случаях (режимы \"Отключено\", \"Авто\" или пусто) принудительно выставляется значение по умолчанию — `geohide.ru` (необходимо для обхода DNS-блокировок ИИ-сервисов вроде ChatGPT, Gemini и др.). Ручные изменения DNS через CLI или WebUI фиксируются и не сбрасываются при последующих запусках.</li>\n<li>**Telegram-прокси (nztgproxy):** Локальный MTProto-прокси, написанный на Go (статический, CGO-free бинарник `nztg`). Он принимает входящие MTProto-соединения от клиента Telegram, декодирует обфусцированное рукопожатие (handshake) и транслирует (бриджит) трафик до оригинальных датацентров Telegram поверх протокола WSS (WebSocket-over-TLS) для обхода DPI-блокировок по IP-адресам. Поддерживает прямой TCP-откат, а также Cloudflare Worker / CDN fronting (CF-прокси) для маршрутизации трафика через сеть Cloudflare, если прямые адреса WebSocket-серверов Telegram заблокированы провайдером.</li>\n\n<p></details></p>\n\n<p>---</p>\n\n<h2>🚧 Ограничения и известные проблемы</h2>\n\n<p>> [!NOTE]</p>\n<p>> <b>Telegram:</b> Модуль включает встроенный локальный MTProto-прокси (<code>nztgproxy</code>) для обхода блокировок Telegram. После старта модуля откройте вкладку <b>Telegram</b> в WebUI и нажмите <b>«Открыть в Telegram»</b> (или скопируйте ссылку/введите <code>127.0.0.1:1443</code> и Secret вручную). Если IP Telegram заблокированы провайдером, трафик автоматически идёт через Cloudflare-прокси. Если не грузятся медиа — уберите строку <code>2:149.154.167.220</code> в настройках датацентров.</p>\n\n<p>> [!NOTE]</p>\n<p>> <b>Баг WebUI в KernelSU:</b> Из-за особенностей менеджера KernelSU процессы <code>nfqws2</code> и <code>nztg</code>, запущенные *вручную* кнопкой питания в WebUI, могут завершаться системой после смахивания KernelSU из недавних приложений. В KernelSU-Next этот баг уже исправлен (см. issue <a href=\"https://github.com/KernelSU-Next/KernelSU-Next/issues/1180\">#1180</a>)! Для обычного KernelSU рекомендуется использовать кнопку <b>Action</b> в списке модулей или команду <code>nzapret start</code> в терминале.</p>\n\n<p>---</p>\n\n<h2>🚀 Быстрый старт</h2>\n\n<h3>1. Установка</h3>\n<li>Скачайте готовый `ZIP-архив` со страницы релизов (Releases).</li>\n<li>Прошейте стандартным способом через **Magisk** или **KernelSU**.</li>\n<li>Перезагрузите устройство.</li>\n<li>Откройте вкладку модулей в KernelSU для доступа к **WebUI**. *(Пользователям Magisk потребуется приложение [KsuWebUI](https://github.com/KOWX712/KsuWebUIStandalone) для работы с интерфейсом).*</li>\n\n<h3>2. Использование из терминала (CLI)</h3>\n<p>Для управления через CLI требуются root-права (<code>su</code>). Если команда <code>nzapret</code> не найдена в PATH, используйте полный путь: <code>/data/adb/modules/nzapret/system/bin/nzapret</code>.</p>\n\n<p>#### 🔌 Управление службой</p>\n<p>| Команда | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>nzapret start</code> | Инициализировать правила iptables и запустить <code>nfqws2</code> |</p>\n<p>| <code>nzapret stop</code> | Остановить процессы службы и очистить цепочки фаервола |</p>\n<p>| <code>nzapret restart</code> | Полный перезапуск с применением измененных настроек |</p>\n\n<p>#### 📊 Мониторинг и диагностика</p>\n<p>| Команда | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>nzapret status</code> | Посмотреть текущее состояние и статус службы |</p>\n<p>| <code>nzapret status --json</code> | Вывод статуса в формате JSON (для WebUI) |</p>\n<p>| <code>nzapret log</code> | Просмотр системного лога службы |</p>\n<p>| <code>nzapret diagnose</code> | Сбор подробной диагностической информации для отладки |</p>\n\n<p>#### 🌐 Сеть и Private DNS</p>\n<p>| Команда | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>nzapret update</code> | Скачать и обновить списки обхода (hostlists) |</p>\n<p>| <code>nzapret network status</code> | Показать активный стек фаервола (IPv4 / IPv4 + IPv6) |</p>\n<p>| <code>nzapret dns status</code> | Показать текущее состояние Android Private DNS |</p>\n<p>| <code>nzapret dns set default</code> | Установить DNS по умолчанию (<code>geohide.ru</code>) |</p>\n<p>| <code>nzapret dns set auto</code> | Вернуть системный автоматический режим DNS |</p>\n<p>| <code>nzapret dns set off</code> | Полностью отключить системный Private DNS |</p>\n<p>| <code>nzapret dns set hostname <host></code> | Установить собственный хост DNS-провайдера |</p>\n\n<p>#### 📝 Управление пользовательским списком (<code>list-user</code>)</p>\n<p>| Команда | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>nzapret list-user status</code> | Показать статус списка и количество доменов |</p>\n<p>| <code>nzapret list-user show</code> | Отобразить текущее содержимое списка |</p>\n<p>| <code>nzapret list-user add <domains...></code> | Добавить один или несколько доменов в список |</p>\n<p>| <code>nzapret list-user remove <domains...></code> | Удалить указанные домены из списка |</p>\n<p>| <code>nzapret list-user replace <domains...></code> | Перезаписать список новыми доменами |</p>\n<p>| <code>nzapret list-user clear</code> | Полностью очистить пользовательский список |</p>\n\n<p>#### ✈️ Telegram (<code>tg</code>)</p>\n<p>| Команда | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>nzapret tg status</code> | Показать состояние прокси, secret и ссылку |</p>\n<p>| <code>nzapret tg status --json</code> | Состояние в формате JSON (для WebUI) |</p>\n<p>| <code>nzapret tg link</code> | Вывести <code>tg://</code>-ссылку для подключения |</p>\n<p>| <code>nzapret tg open</code> | Открыть Telegram с настроенным прокси |</p>\n<p>| <code>nzapret tg regen-secret</code> | Сгенерировать новый secret |</p>\n<p>| <code>nzapret tg cf-test</code> | Проверить доступность Cloudflare-прокси |</p>\n<p>| <code>nzapret tg set host <ip></code> | Задать адрес прослушивания |</p>\n<p>| <code>nzapret tg set port <n></code> | Задать порт |</p>\n<p>| <code>nzapret tg set cf <on\\|off></code> | Включить/выключить Cloudflare-фолбэк |</p>\n<p>| <code>nzapret tg set cf-domain <domain></code> | Задать свой CF-домен (пусто — сбросить) |</p>\n<p>| <code>nzapret tg set dc <\"n:IP..\"></code> | Задать правила датацентров (по строке на правило) |</p>\n\n<p>> Служба Telegram запускается и останавливается вместе с модулем (<code>start</code>/<code>stop</code>/<code>restart</code>). Изменения настроек применяются после перезапуска.</p>\n\n<p>---</p>\n\n<h2>🏗 Архитектура и структура</h2>\n\n<p>| Файл / Директория | Описание |</p>\n<p>| :--- | :--- |</p>\n<p>| ⚙️ <a href=\"service.sh\">service.sh</a> | Системный скрипт автозапуска. Настраивает правила фаервола и запускает <code>nfqws2</code>. |</p>\n<p>| 🧠 <a href=\"system/bin/nzapret\">system/bin/nzapret</a> | Управляющий CLI-интерфейс. Отвечает за команды старта, стопа, сбор метрик для WebUI. |</p>\n<p>| ✈️ <a href=\"bin/\">bin/nztg</a> | Локальный MTProto-прокси для Telegram (Go, статический бинарник). Запускается вместе с nfqws2. |</p>\n<p>| 🎨 <a href=\"webroot/\">webroot/</a> | Код WebUI (HTML, CSS, JS) для интеграции в KernelSU. |</p>\n<p>| 📁 <a href=\"profiles/\">profiles/</a> | Конфигурационные профили с аргументами для <code>nfqws2</code>. |</p>\n<p>| 📁 <a href=\"lists/\">lists/</a> | Списки доменов для маршрутизации (включая пользовательский <code>list-user.txt</code>). |</p>\n<p>| 📁 <a href=\"payloads/\">payloads/</a> | Бинарные фейковые пакеты (TLS/QUIC) для обхода DPI. |</p>\n<p>| 🛠 <a href=\"customize.sh\">customize.sh</a> | Инсталлятор модуля (определение архитектуры устройства, распаковка и настройка прав). |</p>\n\n<p>---</p>\n\n<h2>🛠 Сборка модуля</h2>\n\n<p>Если вы хотите собрать модуль самостоятельно, у вас в системе (Linux/WSL) должны быть установлены базовые утилиты: <code>bash</code>, <code>zip</code>, <code>sed</code>, <code>mktemp</code>.</p>\n\n<p>Процесс сборки запускается всего одной командой:</p>\n<pre>bash build.sh</pre>\n<p>На выходе в корневой директории появится готовый к прошивке архив <code>nzapret-vX.Y.Z.zip</code>. Собирать можно прямо на устройстве (например, в Termux) или на ПК.</p>\n\n<p>---</p>\n\n<h2>📄 Лицензия</h2>\n\n<p>Этот проект распространяется под лицензией <a href=\"LICENSE\">MIT</a>. Подробную информацию можно найти в файле <a href=\"LICENSE\">LICENSE</a>.</p>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n<p>  <b>🌍 Enjoy open Internet!</b></p>\n<p></div></p>",
+  "homepageUrl": "https://github.com/nikitos4683/nzapret",
+  "sourceUrl": "https://github.com/nikitos4683/nzapret",
+  "url": "https://github.com/nikitos4683/nzapret",
+  "latestRelease": {
+    "name": "v4.0.0",
+    "version": "v4.0.0",
+    "time": "2026-10-18T09:52:04Z",
+    "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v4.0.0/nzapret-v4.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-10-18T09:52:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v4.0.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v4.0.0/nzapret-v4.0.0.zip",
+          "size": 18171098,
+          "downloadCount": 340
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v4.0.0/update.json",
+          "size": 265,
+          "downloadCount": 4757
+        }
+      ]
+    },
+    {
+      "name": "v3.2.0",
+      "tagName": "v3.2.0",
+      "publishedAt": "2026-07-14T19:39:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v3.2.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.2.0/nzapret-v3.2.0.zip",
+          "size": 17028135,
+          "downloadCount": 714
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.2.0/update.json",
+          "size": 265,
+          "downloadCount": 16079
+        }
+      ]
+    },
+    {
+      "name": "v3.1.0",
+      "tagName": "v3.1.0",
+      "publishedAt": "2026-07-07T19:24:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v3.1.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.1.0/nzapret-v3.1.0.zip",
+          "size": 17019452,
+          "downloadCount": 48
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.1.0/update.json",
+          "size": 265,
+          "downloadCount": 352
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-07-03T18:27:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v3.0.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.0.0/nzapret-v3.0.0.zip",
+          "size": 17021884,
+          "downloadCount": 19
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v3.0.0/update.json",
+          "size": 265,
+          "downloadCount": 179
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2026-06-23T10:47:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.2.1.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.2.1/nzapret-v2.2.1.zip",
+          "size": 7093462,
+          "downloadCount": 28
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.2.1/update.json",
+          "size": 264,
+          "downloadCount": 423
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-06-03T21:32:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.2.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.2.0/nzapret-v2.2.0.zip",
+          "size": 7093440,
+          "downloadCount": 48
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.2.0/update.json",
+          "size": 264,
+          "downloadCount": 554
+        }
+      ]
+    },
+    {
+      "name": "v2.1.2",
+      "tagName": "v2.1.2",
+      "publishedAt": "2026-04-24T21:06:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.1.2.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.2/nzapret-v2.1.2.zip",
+          "size": 7079687,
+          "downloadCount": 45
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.2/update.json",
+          "size": 264,
+          "downloadCount": 1409
+        }
+      ]
+    },
+    {
+      "name": "v2.1.1",
+      "tagName": "v2.1.1",
+      "publishedAt": "2026-04-17T22:03:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.1.1.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.1/nzapret-v2.1.1.zip",
+          "size": 7079255,
+          "downloadCount": 24
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.1/update.json",
+          "size": 264,
+          "downloadCount": 193
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-04-16T21:28:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.1.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.0/nzapret-v2.1.0.zip",
+          "size": 7068885,
+          "downloadCount": 8
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.1.0/update.json",
+          "size": 264,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2026-03-31T10:58:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.0.1.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.0.1/nzapret-v2.0.1.zip",
+          "size": 7062524,
+          "downloadCount": 37
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.0.1/update.json",
+          "size": 221,
+          "downloadCount": 159
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-03-30T19:24:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v2.0.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.0.0/nzapret-v2.0.0.zip",
+          "size": 7062522,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v2.0.0/update.json",
+          "size": 221,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-03-29T17:18:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v1.1.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v1.1.0/nzapret-v1.1.0.zip",
+          "size": 6240063,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-03-25T17:30:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nzapret-v1.0.0.zip",
+          "downloadUrl": "https://github.com/nikitos4683/nzapret/releases/download/v1.0.0/nzapret-v1.0.0.zip",
+          "size": 6236189,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}
