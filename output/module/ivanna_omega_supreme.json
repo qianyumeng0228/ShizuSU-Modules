@@ -1,16 +1,400 @@
 {
-  "readme": "<div align=\"center\">\n\n<img src=\"docs/release_media/ivanna_omega_hero.svg\" alt=\"Portada editorial IVANNA OMEGA SUPREME: esfera armilar luminosa, geometría acústica y oro sobre azul noche\" width=\"100%\" />\n\n# IVANNA OMEGA SUPREME\n\n### Audio digital · herramientas espaciales · medición y verificación\n\n<p>\n  <a href=\"LEAME.md\">Guía en español sencillo</a> ·\n  <a href=\"docs/GUIA_CONTROLES_COMPLETA_ES.md\">Guía completa de controles en español</a> ·\n  <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> ·\n  <a href=\"CHANGELOG.md\">Registro de cambios</a> ·\n  <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a>\n</p>\n\n[![CI](https://img.shields.io/github/actions/workflow/status/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/build.yml?branch=main&label=CI%20main)](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions/workflows/build.yml)\n[![Android](https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white)](app/)\n[![Kotlin](https://img.shields.io/badge/app-Kotlin%20%2F%20Compose-7F52FF?logo=kotlin&logoColor=white)](app/src/main/)\n[![C++](https://img.shields.io/badge/motor-nativo%20C%2B%2B-00599C?logo=cplusplus&logoColor=white)](app/src/main/cpp/)\n[![Versión](https://img.shields.io/badge/versión-2.5.176-64748b)](version.properties)\n\n**Un proyecto de ingeniería en desarrollo.** Documentamos lo que existe en el código, qué evidencia hay y qué todavía requiere validación real.\n\n</div>\n\n---\n\n## Navegación del proyecto\n\n<div align=\"center\">\n\n| **Visión general** | **Ingeniería** | **Validación** | **Historial** |\n|:---:|:---:|:---:|:---:|\n| [Áreas del producto](#en-una-mirada) | [Componentes y estado](#componentes-y-estado-real) | [Aceptación Moto G85](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md) | [Changelog](CHANGELOG.md) |\n| [Mapa de arquitectura](#mapa-visual-de-la-arquitectura) | [Ficha de ingeniería](docs/ENGINEERING.md) | [Issues](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues) | [Acciones CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions) |\n\n</div>\n\n> **Principio rector:** la estética presenta el proyecto; el código y la evidencia determinan lo que podemos afirmar.\n\n## Sincronización del estado del código — 2026-10-28\n\nEsta ficha se mantiene deliberadamente alineada con `main`. La versión de esta revisión es **v2.5.176** (`versionCode=467`); el release solo se considera disponible cuando CI publica y verifica los artefactos versionados.\n\n- **Interfaz adaptable:** los indicadores del encabezado OMNI se distribuyen en filas de hasta tres elementos para evitar recortes en pantallas estrechas y con fuente ampliada.\n- **Telemetría robusta:** el panel adaptativo rechaza muestras nativas incompletas o no finitas, limita las escalas de las barras y usa formato numérico independiente de la configuración regional. Si los datos no son válidos, lo indica en vez de simular una lectura.\n- **Lenguaje visual:** se conserva el sistema Aurora Obsidiana (fondo obsidiana, cian de señal, magenta de procesamiento, verde de estado y oro de acento); los colores no sustituyen el estado real del motor.\n- **SAFMUS:** el modelo numérico de deriva/ASRC y sus pruebas de regresión se ejecutan en CI; el modelo de referencia no equivale a un actuador PAL/HAL/DAC ni demuestra corrección del reloj físico Bluetooth.\n- **Evidencia del audio:** la presencia de un indicador de ruta o de un panel de telemetría no certifica por sí misma que el audio se esté procesando ni que exista control del reloj físico del DAC/HAL/PAL.\n- **Puerta de publicación:** la CI debe pasar los tests nativos, el empaquetado Android, la comprobación de integridad del APK/ZIP y la publicación. La mejora visual no se presenta como una mejora acústica medida.\n- **Validación pendiente en hardware:** revisar el encabezado OMNI en el Moto G85 con tamaño de fuente estándar y ampliado, y comprobar que ningún indicador importante queda oculto al cambiar de ruta o activar módulos.\n\nPara el estado vivo, consulta [Actions](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions) y [Releases](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases).\n\n## En una mirada\n\nIVANNA OMEGA SUPREME combina una aplicación Android en Kotlin, componentes nativos de procesamiento de audio en C++, herramientas de medición acústica y módulos de visualización espacial. El propósito es construir rutas de procesamiento y calibración que se puedan inspeccionar y probar, sin convertir una intención de diseño en una promesa de resultado.\n\n<table>\n<tr>\n<td width=\"33%\" valign=\"top\">\n\n### 🎚️ Audio\n\nReproducción y procesamiento desde la aplicación, resampling y un control software de cola de AudioTrack en la ruta propia del reproductor.\n\n</td>\n<td width=\"33%\" valign=\"top\">\n\n### 📐 Medición\n\nHerramientas para reproducir tonos de prueba, registrar la respuesta del micrófono y comparar una medición antes y después de un ajuste.\n\n</td>\n<td width=\"33%\" valign=\"top\">\n\n### 🧭 Espacio\n\nRenderizador geométrico y una ruta de captura AR experimental que puede recopilar puntos espaciales y exportar datos.\n\n</td>\n</tr>\n</table>\n\n> **Regla de lectura:** que un módulo, modelo, dataset, control o contrato esté presente en el repositorio no demuestra por sí solo que esté conectado al audio activo, que funcione en todos los dispositivos ni que haya sido validado físicamente.\n\n## Atlas visual de la arquitectura\n\n<div align=\"center\">\n\n<img src=\"docs/release_media/architecture-map.svg\" alt=\"Atlas técnico con rutas Android, cadena propia de reproducción, motor DSP, medición acústica, visualización espacial y límites de integración de hardware\" width=\"100%\" />\n\n<sub>PLANO 01 · RELACIONES FUNCIONALES · LOS ENLACES NO SUSTITUYEN LAS PRUEBAS DE EJECUCIÓN</sub>\n\n</div>\n\nEl diagrama representa las relaciones generales del código. En particular, el bloque HAL/PAL es un punto de integración documentado: no es evidencia de que exista control físico del reloj o del ASRC del proveedor en el Moto G85.\n\n## Componentes y estado real\n\n<table>\n<thead><tr><th>Área</th><th>Qué contiene el proyecto</th><th>Estado y límites</th></tr></thead>\n<tbody>\n<tr>\n<td><strong>Aplicación Android</strong></td>\n<td>Interfaz Kotlin/Jetpack Compose, servicios y puentes hacia componentes nativos.</td>\n<td>Código presente; la funcionalidad concreta debe evaluarse por ruta y por versión.</td>\n</tr>\n<tr>\n<td><strong>Motor DSP nativo</strong></td>\n<td>Código C++ y enlace JNI para las funciones nativas que llaman desde la app.</td>\n<td>La existencia del motor no prueba que cada etapa experimental participe en toda reproducción.</td>\n</tr>\n<tr>\n<td><strong>PLL software de AudioTrack</strong></td>\n<td><code>AudioTrackBufferPll</code> estima la ocupación de la cola del reproductor de la app y ajusta el resampler dentro de límites de software.</td>\n<td>Implementación a nivel de código. No controla el reloj físico del DAC, Bluetooth ni el HAL global; necesita pruebas de reproducción reales para evaluar estabilidad, clics, latencia y underruns.</td>\n</tr>\n<tr>\n<td><strong>Cadena de reproducción del reproductor propio</strong></td>\n<td><code>IvannaBridgePlayer</code> decodifica, procesa y escribe en <code>AudioTrack</code>. Si el DSP nativo (<code>DSPBridge</code>) está cargado, ejecuta la cadena maestra y la ruta Kotlin no apila procesadores duplicados; si no, se usan NPE, Volterra, modo concierto y motor espacial según sus interruptores.</td>\n<td>Aplica solo al audio que reproduce IVANNA. No procesa el audio de otras apps ni de todo el sistema por sí mismo. Qué etapas se oyen y con qué efecto debe comprobarse con escucha y registros en el Moto G85.</td>\n</tr>\n<tr>\n<td><strong>Motor predictivo (Módulo 1)</strong></td>\n<td><code>predictive_audio_engine</code> analiza el audio en C++ y publica confianza, ganancia estimada y transitorios por JNI hacia la interfaz y las métricas.</td>\n<td>Es un <strong>observador</strong>: el reproductor le entrega el bloque ya procesado y no lo modifica. Hoy produce telemetría, no cambia la señal de salida. La ventana de predicción de 5–10 ms es un objetivo de diseño sin medición en dispositivo registrada.</td>\n</tr>\n<tr>\n<td><strong>HRTF / SOFA / SAF</strong></td>\n<td>Cargadores y convolucionador HRTF, bases PCA y paquetes de datos. <code>check_datasets_deploy.py</code> compara la presencia/paridad de los datasets entre assets del APK y módulo, revisa cabeceras mágicas y tamaño mínimo, comprueba metadatos RIR, hashes de los IHR1 y consistencia del JSON SAF. El empaquetado del workflow impone además los conteos esperados (239 SOFA, 200 ARI, 200 RIR y 12 IHR1).</td>\n<td><strong>Límite del validador actual:</strong> para SOFA solo comprueba la firma inicial HDF5 y un tamaño mínimo; no abre cada archivo con un lector HDF5 ni valida todos sus metadatos o checksums internos. Por tanto, la puerta no demuestra integridad estructural completa de SOFA y el estado de cada archivo requiere una validación HDF5 real. Además, la presencia/paridad de los datos no prueba que la espacialización binaural resulte audible, correcta o cómoda; eso requiere escucha controlada. Una HRTF genérica no equivale a la HRTF personal de cada oyente.</td>\n</tr>\n<tr>\n<td><strong>Anti-Dolby / clasificador de contenido</strong></td>\n<td>Modelo <code>anti_dolby_crnn.tflite</code> que clasifica el contenido en voz, música, bajos y silencio, y lógica nativa que usa esa clasificación.</td>\n<td>Es un clasificador de contenido, no un modelo entrenado de política acústica universal. Las decisiones de orquestación son deterministas y acotadas. No se afirma un desprocesamiento verificado frente a ningún códec concreto sin mediciones con material de referencia.</td>\n</tr>\n<tr>\n<td><strong>Medición y corrección de sala</strong></td>\n<td>Secuencia de tonos, captura de micrófono, comparación antes/después y lógica de restauración cuando el resultado no cumple el criterio interno.</td>\n<td>El micrófono del teléfono no es un instrumento calibrado. La métrica interna no equivale a una mejora audible universal ni a una certificación acústica.</td>\n</tr>\n<tr>\n<td><strong>FotoHolo / captura AR</strong></td>\n<td>Actividad de captura con ARCore, seguimiento espacial, puntos 3D y flujo de exportación.</td>\n<td>Experimental. No debe confundirse una nube de puntos con una malla completa, un plano certificado ni una medición RT60/RIR. Requiere probar permisos, seguimiento, pausa/reanudación y exportación en el equipo.</td>\n</tr>\n<tr>\n<td><strong>Renderizador geométrico</strong></td>\n<td><code>SceneGeometryRenderer</code> genera imágenes a partir de una configuración geométrica; el código contempla hasta 3840 × 2160 píxeles.</td>\n<td>Renderiza la geometría configurada. No es por sí solo una reconstrucción automática de la habitación ni una simulación acústica validada.</td>\n</tr>\n<tr>\n<td><strong>Reloj de hardware (productor HAL)</strong></td>\n<td><code>daemon/hal_clock_producer</code> lee la muestra del driver con <code>SNDRV_PCM_IOCTL_STATUS</code> sobre <code>/dev/snd/pcmC*D*p</code>, que devuelve <code>hw_ptr</code> (frames presentados) y <code>tstamp</code> (CLOCK_MONOTONIC) en una sola consulta, y publica el snapshot compartido <code>IVHC</code> solo si la muestra es correlacionada.</td>\n<td>Desde 2.5.130 el primer tramo de la cadena existe en la ruta Magisk: productor → mmap → lector del efecto → JNI → fila «Reloj hardware». La prueba de extremo a extremo del contrato IPC está en host (9/9). Que el driver del Moto G85 entregue muestras dentro de tolerancia solo se comprueba en el dispositivo, leyendo las líneas <code>HAL-CLOCK</code> del log del daemon.</td>\n</tr>\n<tr>\n<td><strong>Bocinas declaradas (estéreo/surround + subwoofer)</strong></td>\n<td><code>SpeakerLayoutPolicy</code> (lógica pura, 9 pruebas JVM) y el panel <code>SpeakerLayoutPanel</code> dejan declarar modo (estéreo/surround), número de satélites y si hay subwoofer activo. Generaliza el mismo mecanismo que ya conectaba el perfil Genezy MHCPZ1.</td>\n<td>El único actuador real al final de la cadena sigue siendo <code>spatial_width</code> → <code>StereoWidener</code>. El campo <code>high_cut_hz</code> del daemon se guarda y se lee de vuelta, pero ningún código del efecto lo aplica a la señal (confirmado por lectura directa de <code>omega_effect.cpp</code>). Por eso esta función solo matiza el ancho estéreo (±15 % máx.) según lo declarado; <strong>no</strong> enruta canales discretos ni gestiona graves/LFE reales — el motor no tiene un crossover conectado.</td>\n</tr>\n<tr>\n<td><strong>Renderizador binaural de objetos</strong></td>\n<td><code>ivanna_object_renderer.hpp</code> amplió sus posiciones virtuales de 12 a 16, con cuatro satélites laterales adicionales sobre el renderer HRTF/VBAP existente.</td>\n<td>Son fuentes virtuales renderizadas en binaural estéreo (auriculares o los dos altavoces del teléfono), no canales físicos independientes; no implica reenrutamiento multicanal real.</td>\n</tr>\n<tr>\n<td><strong>SAFMUS / ACSR / HAL-PAL</strong></td>\n<td>Hay lógica, adaptadores y contratos de integración en distintas partes del repositorio.</td>\n<td>La documentación de integración no demuestra una unión de extremo a extremo con el hardware del fabricante. No afirmamos un actuador PAL/ASRC operativo ni control físico de reloj en el Moto G85 sin lectura de retorno y pruebas. El actuador ASRC físico sigue sin identificar y sin enlazar: el productor queda <strong>fail-closed</strong> y declara el motivo.</td>\n</tr>\n<tr>\n<td><strong>Wi-Fi / CSI</strong></td>\n<td>Políticas conservadoras para tratar observaciones de radio como indicios de contexto.</td>\n<td>Las API Wi-Fi comunes no equivalen a CSI. La disponibilidad depende de hardware y proveedor compatibles; no se afirma reconstrucción anatómica ni compatibilidad universal.</td>\n</tr>\n</tbody>\n</table>\n\n## Flujos que importan\n\n### Medición: medir, decidir y verificar\n\n```mermaid\nflowchart LR\n    A[\"Medición inicial\"] --> B[\"Diseñar corrección\"]\n    B --> C[\"Aplicar ajuste\"]\n    C --> D[\"Medición posterior\"]\n    D --> E{\"¿Datos válidos y criterio cumplido?\"}\n    E -->|Sí| F[\"Aceptar y registrar\"]\n    E -->|No| G[\"Restaurar estado anterior\"]\n    G --> H[\"Registrar motivo\"]\n```\n\nEste flujo describe la lógica implementada en la ruta de medición. La fiabilidad depende de la señal, el ruido, la posición, el volumen, la salida y las características del micrófono. La reversión de un ajuste no sustituye las pruebas de seguridad de todas las rutas de audio.\n\n### Reproducción: alcance del PLL software\n\n```mermaid\nflowchart TD\n    A[\"Audio de la app\"] --> B[\"AudioTrack\"]\n    B --> C[\"Timestamp / estimación de cola\"]\n    C --> D[\"AudioTrackBufferPll\"]\n    D --> E[\"Corrección limitada en ppm\"]\n    E --> F[\"StereoAudioResampler\"]\n    F --> B\n    H[\"Datos inválidos o desalineados\"] -.-> I[\"Reset a corrección neutra\"]\n    I -.-> D\n```\n\nEl PLL trabaja sobre el resampler del reproductor propio de IVANNA. No puede inferir ni escribir automáticamente el reloj físico de un DAC, una ruta Bluetooth o un módulo HAL. El funcionamiento auditivo y la estabilidad deben comprobarse en el teléfono con cada salida que se quiera declarar compatible.\n\n## FotoHolo y visualización 3D\n\n- **Captura AR:** usa las capacidades que ARCore y el dispositivo expongan; la disponibilidad de profundidad no es universal.\n- **Nube de puntos:** es una representación parcial de las observaciones de captura, no una reconstrucción cerrada de toda la habitación.\n- **Renderizado 3D:** la imagen se deriva de la geometría configurada en el módulo; la resolución de salida no garantiza realismo fotorrealista.\n- **Acústica:** la geometría visual no es una medición de respuesta al impulso, reverberación ni absorción de materiales.\n\n## Privacidad y claves de API\n\nEl procesamiento local que no requiere servicios externos debe poder operar sin una clave de Google. Una clave solo es necesaria para una función opcional cuando esa función invoque realmente un servicio externo que la exija. No se debe interpretar la presencia de una interfaz o configuración de proveedor como prueba de que la integración remota esté activa.\n\nLa cámara y el micrófono deben solicitarse cuando una función los necesita. Antes de compartir diagnósticos, elimina credenciales, tokens, datos personales y grabaciones privadas.\n\n## Compilar y ejecutar comprobaciones\n\n### Requisitos\n\nConsulta las versiones exactas configuradas por el proyecto y por CI. La configuración actual utiliza Android SDK, NDK, CMake, Gradle Wrapper y Node.js para los componentes correspondientes. La reproducción completa de CI puede requerir Linux y dependencias adicionales.\n\n### Pruebas nativas en host\n\nDesde la raíz del repositorio:\n\n```bash\ncmake -B build-tests -S app/src/main/cpp/tests -DCMAKE_BUILD_TYPE=Release\ncmake --build build-tests -j4\nctest --test-dir build-tests --output-on-failure\n```\n\n### Puertas estáticas\n\n```bash\nfor s in scripts/check_*.py; do\n  python3 \"$s\" || exit 1\ndone\n```\n\nEstos comandos no sustituyen la compilación Android, las pruebas instrumentadas ni la validación del teléfono. Para reproducir exactamente la entrega, revisa [el flujo de GitHub Actions](.github/workflows/build.yml).\n\n## Banco sintético de audio y diagnósticos accionables\n\nEl banco de pruebas de Python tiene tres piezas separadas. Sus resultados deben interpretarse según el alcance de cada una:\n\n1. **Analizador WAV** — [`scripts/ivanna_audio_certify.py`](scripts/ivanna_audio_certify.py): lee PCM entero sin compresión de 8, 16, 24 o 32 bits; informa RMS y pico por canal, offset DC, clipping y desequilibrio entre canales. Opcionalmente estima el residuo de un tono conocido y compara una captura contra un WAV de referencia.\n2. **Inyección sintética de fallos** — [`scripts/ivanna_synthetic_audio_suite.py`](scripts/ivanna_synthetic_audio_suite.py): genera siete estímulos de control y verifica que el analizador detecte los defectos inyectados sin marcar determinados casos limpios como defectuosos.\n3. **Puerta de evidencia física** — [`scripts/ivanna_auditory_gate.py`](scripts/ivanna_auditory_gate.py): exige checks explícitos, las rutas requeridas, evidencia del dispositivo y escucha con niveles igualados para devolver `GREEN`. Ausencia de evidencia no pasa como éxito.\n\n### Estímulos sintéticos cubiertos\n\n| Estímulo | Comportamiento esperado |\n|---|---|\n| `clean_sine` | Sin clipping, desequilibrio ni DC detectados; sin THD+N residual crítico. |\n| `clipping` | Debe informar `PCM_CLIPPING`. |\n| `dc_offset` | Debe informar `DC_OFFSET`. |\n| `channel_imbalance` | Debe informar `CHANNEL_IMBALANCE`. |\n| `harmonic_distortion` | Debe informar `TONE_THDN_HIGH`. |\n| `near_full_scale` | Debe avisar `LOW_PEAK_HEADROOM` sin confundirlo con clipping. |\n| `silent` | No debe producir las alarmas de clipping, DC ni desequilibrio definidas para la prueba. |\n\n### Ejecutar el banco\n\nDesde la raíz del repositorio:\n\n```bash\npython3 -m unittest discover -s tests -p 'test_ivanna_audio_certify.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_synthetic_audio_suite.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_auditory_gate.py' -v\npython3 scripts/ivanna_synthetic_audio_suite.py --output-dir /tmp/ivanna-synthetic-report\n```\n\nPara analizar una captura real, el archivo debe ser WAV PCM entero sin compresión:\n\n```bash\npython3 scripts/ivanna_audio_certify.py captura.wav --tone-hz 1000 --json-out informe.json\npython3 scripts/ivanna_audio_certify.py despues.wav --reference antes.wav --json-out comparacion.json\n```\n\nLa comparación de referencia requiere la misma frecuencia de muestreo y el mismo número de canales; el SNR residual también penaliza desalineación temporal y diferencia de ganancia. No recortes muestras arbitrariamente para ocultar latencia: alinea ventanas equivalentes y mide la latencia por separado.\n\nLos hallazgos del analizador pueden ser `CRITICAL`, `WARNING` o inexistentes, y el resumen puede ser `RED`, `AMBER` o `NO_SCREENING_FLAGS`. Son heurísticas de cribado, no límites universales de percepción. La puerta física usa `RED`/`AMBER`/`GREEN` con otra semántica; no son intercambiables.\n\n**Límite esencial:** el banco sintético comprueba el comportamiento del analizador ante señales generadas. No mide la ruta Android en vivo, el códec Bluetooth realmente negociado, el ASRC del proveedor, la latencia extremo a extremo, SPL acústico ni THD de laboratorio. Para eso se requieren capturas de la ruta física, equipo adecuado y escucha controlada con niveles igualados.\n\n## Estado de CI, versiones y pruebas físicas\n\n- [Ver ejecuciones de CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions)\n- [Ver versiones publicadas](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases)\n- [Ver código de la versión indicada](version.properties)\n- [Plan de aceptación para Moto G85 / Android 15](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md)\n\nEl distintivo CI refleja el estado del flujo configurado en GitHub; no es una certificación acústica ni demuestra que se haya probado el teléfono. Antes de considerar una versión lista, verifica que la compilación, los tests, el APK y el ZIP Magisk procedan del mismo commit, inspecciona sus hashes y prueba la instalación en el dispositivo de destino.\n\n### El pipeline de release no publicaba (corregido en 2.5.132)\n\nHasta 2.5.131, el job `publish-release` se disparaba comparando el **texto literal** del mensaje de\ncommit contra `\"release:\"` / `\"— v\"`. Los commits de bump reales usaban formatos como\n`chore(release): v2.5.130 (421) — …`, que no calzan con ese patrón (el paréntesis rompe el match). Resultado\nverificado contra la API de GitHub: **v2.5.129, v2.5.130 y v2.5.131 nunca se publicaron** como release real\npese a estar en `main` con `version.properties`/`module.prop` correctamente bumpeados; `update.json` seguía\napuntando a `v2.5.130`, un tag que nunca existió, y el OTA del módulo Magisk llevaba varias versiones\napuntando a un asset inexistente. El repositorio acumuló cientos de drafts `staging-<sha>-<run>` (el bundle\nintermedio que sí se publica siempre) sin barrer, porque la limpieza de esos drafts vive dentro del mismo job\nque nunca se ejecutaba.\n\nDesde 2.5.132, un job `detect-release` decide si publicar comparando `version.properties` contra el commit\npadre con `git diff` — ya no depende de cómo se redacte el mensaje. Verifica tú mismo que una versión quedó\npublicada de verdad en <https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases>\n(debe aparecer como release, no como draft `staging-*`) antes de confiar en el ZIP que ofrece el updater del\nmódulo.\n\n### Reloj de hardware: qué quedó enlazado en 2.5.130\n\nHasta 2.5.129 la cadena de reloj existía de extremo a extremo **menos en su primer tramo**: el efecto leía el snapshot (`HardwareClockReader`), el JNI lo exponía (`nativeGetClockTelemetryJni`) y el panel «Reloj hardware» lo mostraba, pero nadie lo publicaba en la ruta Magisk. La versión 2.5.130 añade ese productor.\n\n| Pieza añadida | Qué hace | Evidencia |\n|---|---|---|\n| `daemon/hal_clock_producer.hpp` (167 líneas) | `ProducerState` con siete estados honestos, `PcmDevice`, `PairedSample`, `CorrelationGate` y `HalClockProducer` | Compila con `g++ 13 -std=c++20 -O2 -Wall -Wextra`, 0 avisos |\n| `daemon/hal_clock_producer.cpp` (302 líneas) | Descubrimiento por `/proc/asound`, lectura por ioctl, puerta de correlación y publicación en el mmap `IVHC` | 9/9 pruebas host |\n| `daemon/ivanna_daemon.cpp` (+45) | `--hal-clock` / `--no-hal-clock` (activo por defecto) e hilo de sondeo a 250 ms con registro solo al cambiar de estado | Sintaxis verificada en host con cabecera `android/log.h` simulada |\n| `tests/test_hal_clock_producer.cpp` (192 líneas) | 9 pruebas, incluida la de extremo a extremo Publisher → mmap → Reader | `[ PASSED ] 9 tests` |\n\nLa puerta de correlación rechaza rate nominal ausente, timestamp no positivo, Δt ≤ 1 µs, Δt > 500 ms (PCM parado), frames que retroceden y tasa implícita fuera de 0,80–1,20 × la nominal; exige tres pares coherentes consecutivos antes de publicar. Todo rechazo se declara con motivo legible.\n\nLo que **no** cambia con esta versión: el actuador ASRC físico del Moto G85 sigue sin identificar. `hal_integration/MOTO_G85_PAL_CLOCK_INTEGRATION.md` documenta que `pal_get_timestamp` no entrega un par frames + CLOCK_MONOTONIC, así que no puede alimentar al tracker ni al servo; adivinar el nodo produciría la telemetría falsa que la Fase 0 del plan 10D ordena eliminar. Tampoco se ha verificado aquí la compilación Kotlin/APK ni la ejecución de CTest en el runner.\n\n### Lista de aceptación en hardware\n\n- [ ] Instalar APK y módulo generados desde el mismo commit aprobado.\n- [ ] Probar la salida integrada, USB-C DAC/adaptador y Bluetooth por separado cuando estén disponibles.\n- [ ] Confirmar que el reproductor propio avanza, que la corrección permanece dentro de sus límites y que no aparecen clics, cambios de tono o underruns anómalos.\n- [ ] Abrir FotoHolo, confirmar cámara en vivo, seguimiento, pausa/reanudación y exportación.\n- [ ] Registrar el modelo, versión Android, ruta, SHA del commit, hashes de artefactos y resultados.\n- [ ] No declarar HAL/PAL conectado sin identificar el callback real, unidades del parámetro, actuador, lectura de retorno y prueba en hardware.\n- [ ] Leer las líneas `HAL-CLOCK` del log del daemon durante reproducción real y anotar el estado observado (`publishing`, `rejected`, `no-devices`, `no-source`) junto con el motivo y la deriva en ppm.\n\n## Contribuir y reportar problemas\n\nLos informes más útiles incluyen el commit o versión probados, modelo de dispositivo, versión de Android, ruta de audio, pasos para reproducir y registros depurados de datos personales.\n\n- [Abrir un issue](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues)\n- [Revisar cambios](CHANGELOG.md)\n- [Consultar documentación de ingeniería](docs/ENGINEERING.md)\n\n## Licencia y propiedad intelectual\n\nIVANNA OMEGA SUPREME se presenta como un producto propietario. La visibilidad pública del repositorio no concede por sí sola permiso para reutilizar el código propio. Los componentes, bibliotecas, modelos y datasets de terceros conservan sus licencias y avisos; revisa los archivos de licencia y avisos antes de redistribuir. Las concesiones expresas aplicables a versiones anteriores siguen rigiendo esas versiones según sus términos.\n\n---\n\n<div align=\"center\">\n\n**Construir con rigor. Medir cuando sea posible. Declarar solo lo que la evidencia respalda.**\n\n<sub>La arquitectura y las funciones evolucionan; el código, las pruebas reproducibles y la validación física tienen prioridad sobre cualquier etiqueta de marketing.</sub>\n\n</div>\n",
-  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"docs/release_media/ivanna_omega_hero.svg\" alt=\"Portada editorial IVANNA OMEGA SUPREME: esfera armilar luminosa, geometría acústica y oro sobre azul noche\" width=\"100%\" /></p>\n\n<h1>IVANNA OMEGA SUPREME</h1>\n\n<h3>Audio digital · herramientas espaciales · medición y verificación</h3>\n\n<p><p></p>\n<p>  <a href=\"LEAME.md\">Guía en español sencillo</a> ·</p>\n<p>  <a href=\"docs/GUIA_CONTROLES_COMPLETA_ES.md\">Guía completa de controles en español</a> ·</p>\n<p>  <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> ·</p>\n<p>  <a href=\"CHANGELOG.md\">Registro de cambios</a> ·</p>\n<p>  <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a></p>\n<p></p></p>\n\n<p><a href=\"https://img.shields.io/github/actions/workflow/status/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/build.yml?branch=main&label=CI%20main\">![CI</a>](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions/workflows/build.yml)</p>\n<p><a href=\"https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white\">![Android</a>](app/)</p>\n<p><a href=\"https://img.shields.io/badge/app-Kotlin%20%2F%20Compose-7F52FF?logo=kotlin&logoColor=white\">![Kotlin</a>](app/src/main/)</p>\n<p><a href=\"https://img.shields.io/badge/motor-nativo%20C%2B%2B-00599C?logo=cplusplus&logoColor=white\">![C++</a>](app/src/main/cpp/)</p>\n<p><a href=\"https://img.shields.io/badge/versión-2.5.176-64748b\">![Versión</a>](version.properties)</p>\n\n<p><b>Un proyecto de ingeniería en desarrollo.</b> Documentamos lo que existe en el código, qué evidencia hay y qué todavía requiere validación real.</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>Navegación del proyecto</h2>\n\n<p><div align=\"center\"></p>\n\n<p>| <b>Visión general</b> | <b>Ingeniería</b> | <b>Validación</b> | <b>Historial</b> |</p>\n<p>|:---:|:---:|:---:|:---:|</p>\n<p>| <a href=\"#en-una-mirada\">Áreas del producto</a> | <a href=\"#componentes-y-estado-real\">Componentes y estado</a> | <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a> | <a href=\"CHANGELOG.md\">Changelog</a> |</p>\n<p>| <a href=\"#mapa-visual-de-la-arquitectura\">Mapa de arquitectura</a> | <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> | <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues\">Issues</a> | <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions\">Acciones CI</a> |</p>\n\n<p></div></p>\n\n<p>> <b>Principio rector:</b> la estética presenta el proyecto; el código y la evidencia determinan lo que podemos afirmar.</p>\n\n<h2>Sincronización del estado del código — 2026-10-28</h2>\n\n<p>Esta ficha se mantiene deliberadamente alineada con <code>main</code>. La versión de esta revisión es <b>v2.5.176</b> (<code>versionCode=467</code>); el release solo se considera disponible cuando CI publica y verifica los artefactos versionados.</p>\n\n<li>**Interfaz adaptable:** los indicadores del encabezado OMNI se distribuyen en filas de hasta tres elementos para evitar recortes en pantallas estrechas y con fuente ampliada.</li>\n<li>**Telemetría robusta:** el panel adaptativo rechaza muestras nativas incompletas o no finitas, limita las escalas de las barras y usa formato numérico independiente de la configuración regional. Si los datos no son válidos, lo indica en vez de simular una lectura.</li>\n<li>**Lenguaje visual:** se conserva el sistema Aurora Obsidiana (fondo obsidiana, cian de señal, magenta de procesamiento, verde de estado y oro de acento); los colores no sustituyen el estado real del motor.</li>\n<li>**SAFMUS:** el modelo numérico de deriva/ASRC y sus pruebas de regresión se ejecutan en CI; el modelo de referencia no equivale a un actuador PAL/HAL/DAC ni demuestra corrección del reloj físico Bluetooth.</li>\n<li>**Evidencia del audio:** la presencia de un indicador de ruta o de un panel de telemetría no certifica por sí misma que el audio se esté procesando ni que exista control del reloj físico del DAC/HAL/PAL.</li>\n<li>**Puerta de publicación:** la CI debe pasar los tests nativos, el empaquetado Android, la comprobación de integridad del APK/ZIP y la publicación. La mejora visual no se presenta como una mejora acústica medida.</li>\n<li>**Validación pendiente en hardware:** revisar el encabezado OMNI en el Moto G85 con tamaño de fuente estándar y ampliado, y comprobar que ningún indicador importante queda oculto al cambiar de ruta o activar módulos.</li>\n\n<p>Para el estado vivo, consulta <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions\">Actions</a> y <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases\">Releases</a>.</p>\n\n<h2>En una mirada</h2>\n\n<p>IVANNA OMEGA SUPREME combina una aplicación Android en Kotlin, componentes nativos de procesamiento de audio en C++, herramientas de medición acústica y módulos de visualización espacial. El propósito es construir rutas de procesamiento y calibración que se puedan inspeccionar y probar, sin convertir una intención de diseño en una promesa de resultado.</p>\n\n<p><table></p>\n<p><tr></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>🎚️ Audio</h3>\n\n<p>Reproducción y procesamiento desde la aplicación, resampling y un control software de cola de AudioTrack en la ruta propia del reproductor.</p>\n\n<p></td></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>📐 Medición</h3>\n\n<p>Herramientas para reproducir tonos de prueba, registrar la respuesta del micrófono y comparar una medición antes y después de un ajuste.</p>\n\n<p></td></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>🧭 Espacio</h3>\n\n<p>Renderizador geométrico y una ruta de captura AR experimental que puede recopilar puntos espaciales y exportar datos.</p>\n\n<p></td></p>\n<p></tr></p>\n<p></table></p>\n\n<p>> <b>Regla de lectura:</b> que un módulo, modelo, dataset, control o contrato esté presente en el repositorio no demuestra por sí solo que esté conectado al audio activo, que funcione en todos los dispositivos ni que haya sido validado físicamente.</p>\n\n<h2>Atlas visual de la arquitectura</h2>\n\n<p><div align=\"center\"></p>\n\n<p><img src=\"docs/release_media/architecture-map.svg\" alt=\"Atlas técnico con rutas Android, cadena propia de reproducción, motor DSP, medición acústica, visualización espacial y límites de integración de hardware\" width=\"100%\" /></p>\n\n<p><sub>PLANO 01 · RELACIONES FUNCIONALES · LOS ENLACES NO SUSTITUYEN LAS PRUEBAS DE EJECUCIÓN</sub></p>\n\n<p></div></p>\n\n<p>El diagrama representa las relaciones generales del código. En particular, el bloque HAL/PAL es un punto de integración documentado: no es evidencia de que exista control físico del reloj o del ASRC del proveedor en el Moto G85.</p>\n\n<h2>Componentes y estado real</h2>\n\n<p><table></p>\n<p><thead><tr><th>Área</th><th>Qué contiene el proyecto</th><th>Estado y límites</th></tr></thead></p>\n<p><tbody></p>\n<p><tr></p>\n<p><td><strong>Aplicación Android</strong></td></p>\n<p><td>Interfaz Kotlin/Jetpack Compose, servicios y puentes hacia componentes nativos.</td></p>\n<p><td>Código presente; la funcionalidad concreta debe evaluarse por ruta y por versión.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Motor DSP nativo</strong></td></p>\n<p><td>Código C++ y enlace JNI para las funciones nativas que llaman desde la app.</td></p>\n<p><td>La existencia del motor no prueba que cada etapa experimental participe en toda reproducción.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>PLL software de AudioTrack</strong></td></p>\n<p><td><code>AudioTrackBufferPll</code> estima la ocupación de la cola del reproductor de la app y ajusta el resampler dentro de límites de software.</td></p>\n<p><td>Implementación a nivel de código. No controla el reloj físico del DAC, Bluetooth ni el HAL global; necesita pruebas de reproducción reales para evaluar estabilidad, clics, latencia y underruns.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Cadena de reproducción del reproductor propio</strong></td></p>\n<p><td><code>IvannaBridgePlayer</code> decodifica, procesa y escribe en <code>AudioTrack</code>. Si el DSP nativo (<code>DSPBridge</code>) está cargado, ejecuta la cadena maestra y la ruta Kotlin no apila procesadores duplicados; si no, se usan NPE, Volterra, modo concierto y motor espacial según sus interruptores.</td></p>\n<p><td>Aplica solo al audio que reproduce IVANNA. No procesa el audio de otras apps ni de todo el sistema por sí mismo. Qué etapas se oyen y con qué efecto debe comprobarse con escucha y registros en el Moto G85.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Motor predictivo (Módulo 1)</strong></td></p>\n<p><td><code>predictive_audio_engine</code> analiza el audio en C++ y publica confianza, ganancia estimada y transitorios por JNI hacia la interfaz y las métricas.</td></p>\n<p><td>Es un <strong>observador</strong>: el reproductor le entrega el bloque ya procesado y no lo modifica. Hoy produce telemetría, no cambia la señal de salida. La ventana de predicción de 5–10 ms es un objetivo de diseño sin medición en dispositivo registrada.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>HRTF / SOFA / SAF</strong></td></p>\n<p><td>Cargadores y convolucionador HRTF, bases PCA y paquetes de datos. <code>check_datasets_deploy.py</code> compara la presencia/paridad de los datasets entre assets del APK y módulo, revisa cabeceras mágicas y tamaño mínimo, comprueba metadatos RIR, hashes de los IHR1 y consistencia del JSON SAF. El empaquetado del workflow impone además los conteos esperados (239 SOFA, 200 ARI, 200 RIR y 12 IHR1).</td></p>\n<p><td><strong>Límite del validador actual:</strong> para SOFA solo comprueba la firma inicial HDF5 y un tamaño mínimo; no abre cada archivo con un lector HDF5 ni valida todos sus metadatos o checksums internos. Por tanto, la puerta no demuestra integridad estructural completa de SOFA y el estado de cada archivo requiere una validación HDF5 real. Además, la presencia/paridad de los datos no prueba que la espacialización binaural resulte audible, correcta o cómoda; eso requiere escucha controlada. Una HRTF genérica no equivale a la HRTF personal de cada oyente.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Anti-Dolby / clasificador de contenido</strong></td></p>\n<p><td>Modelo <code>anti_dolby_crnn.tflite</code> que clasifica el contenido en voz, música, bajos y silencio, y lógica nativa que usa esa clasificación.</td></p>\n<p><td>Es un clasificador de contenido, no un modelo entrenado de política acústica universal. Las decisiones de orquestación son deterministas y acotadas. No se afirma un desprocesamiento verificado frente a ningún códec concreto sin mediciones con material de referencia.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Medición y corrección de sala</strong></td></p>\n<p><td>Secuencia de tonos, captura de micrófono, comparación antes/después y lógica de restauración cuando el resultado no cumple el criterio interno.</td></p>\n<p><td>El micrófono del teléfono no es un instrumento calibrado. La métrica interna no equivale a una mejora audible universal ni a una certificación acústica.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>FotoHolo / captura AR</strong></td></p>\n<p><td>Actividad de captura con ARCore, seguimiento espacial, puntos 3D y flujo de exportación.</td></p>\n<p><td>Experimental. No debe confundirse una nube de puntos con una malla completa, un plano certificado ni una medición RT60/RIR. Requiere probar permisos, seguimiento, pausa/reanudación y exportación en el equipo.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Renderizador geométrico</strong></td></p>\n<p><td><code>SceneGeometryRenderer</code> genera imágenes a partir de una configuración geométrica; el código contempla hasta 3840 × 2160 píxeles.</td></p>\n<p><td>Renderiza la geometría configurada. No es por sí solo una reconstrucción automática de la habitación ni una simulación acústica validada.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Reloj de hardware (productor HAL)</strong></td></p>\n<p><td><code>daemon/hal_clock_producer</code> lee la muestra del driver con <code>SNDRV_PCM_IOCTL_STATUS</code> sobre <code>/dev/snd/pcmC*D*p</code>, que devuelve <code>hw_ptr</code> (frames presentados) y <code>tstamp</code> (CLOCK_MONOTONIC) en una sola consulta, y publica el snapshot compartido <code>IVHC</code> solo si la muestra es correlacionada.</td></p>\n<p><td>Desde 2.5.130 el primer tramo de la cadena existe en la ruta Magisk: productor → mmap → lector del efecto → JNI → fila «Reloj hardware». La prueba de extremo a extremo del contrato IPC está en host (9/9). Que el driver del Moto G85 entregue muestras dentro de tolerancia solo se comprueba en el dispositivo, leyendo las líneas <code>HAL-CLOCK</code> del log del daemon.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Bocinas declaradas (estéreo/surround + subwoofer)</strong></td></p>\n<p><td><code>SpeakerLayoutPolicy</code> (lógica pura, 9 pruebas JVM) y el panel <code>SpeakerLayoutPanel</code> dejan declarar modo (estéreo/surround), número de satélites y si hay subwoofer activo. Generaliza el mismo mecanismo que ya conectaba el perfil Genezy MHCPZ1.</td></p>\n<p><td>El único actuador real al final de la cadena sigue siendo <code>spatial_width</code> → <code>StereoWidener</code>. El campo <code>high_cut_hz</code> del daemon se guarda y se lee de vuelta, pero ningún código del efecto lo aplica a la señal (confirmado por lectura directa de <code>omega_effect.cpp</code>). Por eso esta función solo matiza el ancho estéreo (±15 % máx.) según lo declarado; <strong>no</strong> enruta canales discretos ni gestiona graves/LFE reales — el motor no tiene un crossover conectado.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Renderizador binaural de objetos</strong></td></p>\n<p><td><code>ivanna_object_renderer.hpp</code> amplió sus posiciones virtuales de 12 a 16, con cuatro satélites laterales adicionales sobre el renderer HRTF/VBAP existente.</td></p>\n<p><td>Son fuentes virtuales renderizadas en binaural estéreo (auriculares o los dos altavoces del teléfono), no canales físicos independientes; no implica reenrutamiento multicanal real.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>SAFMUS / ACSR / HAL-PAL</strong></td></p>\n<p><td>Hay lógica, adaptadores y contratos de integración en distintas partes del repositorio.</td></p>\n<p><td>La documentación de integración no demuestra una unión de extremo a extremo con el hardware del fabricante. No afirmamos un actuador PAL/ASRC operativo ni control físico de reloj en el Moto G85 sin lectura de retorno y pruebas. El actuador ASRC físico sigue sin identificar y sin enlazar: el productor queda <strong>fail-closed</strong> y declara el motivo.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Wi-Fi / CSI</strong></td></p>\n<p><td>Políticas conservadoras para tratar observaciones de radio como indicios de contexto.</td></p>\n<p><td>Las API Wi-Fi comunes no equivalen a CSI. La disponibilidad depende de hardware y proveedor compatibles; no se afirma reconstrucción anatómica ni compatibilidad universal.</td></p>\n<p></tr></p>\n<p></tbody></p>\n<p></table></p>\n\n<h2>Flujos que importan</h2>\n\n<h3>Medición: medir, decidir y verificar</h3>\n\n<pre>flowchart LR\n    A[\"Medición inicial\"] --&gt; B[\"Diseñar corrección\"]\n    B --&gt; C[\"Aplicar ajuste\"]\n    C --&gt; D[\"Medición posterior\"]\n    D --&gt; E{\"¿Datos válidos y criterio cumplido?\"}\n    E --&gt;|Sí| F[\"Aceptar y registrar\"]\n    E --&gt;|No| G[\"Restaurar estado anterior\"]\n    G --&gt; H[\"Registrar motivo\"]</pre>\n\n<p>Este flujo describe la lógica implementada en la ruta de medición. La fiabilidad depende de la señal, el ruido, la posición, el volumen, la salida y las características del micrófono. La reversión de un ajuste no sustituye las pruebas de seguridad de todas las rutas de audio.</p>\n\n<h3>Reproducción: alcance del PLL software</h3>\n\n<pre>flowchart TD\n    A[\"Audio de la app\"] --&gt; B[\"AudioTrack\"]\n    B --&gt; C[\"Timestamp / estimación de cola\"]\n    C --&gt; D[\"AudioTrackBufferPll\"]\n    D --&gt; E[\"Corrección limitada en ppm\"]\n    E --&gt; F[\"StereoAudioResampler\"]\n    F --&gt; B\n    H[\"Datos inválidos o desalineados\"] -.-&gt; I[\"Reset a corrección neutra\"]\n    I -.-&gt; D</pre>\n\n<p>El PLL trabaja sobre el resampler del reproductor propio de IVANNA. No puede inferir ni escribir automáticamente el reloj físico de un DAC, una ruta Bluetooth o un módulo HAL. El funcionamiento auditivo y la estabilidad deben comprobarse en el teléfono con cada salida que se quiera declarar compatible.</p>\n\n<h2>FotoHolo y visualización 3D</h2>\n\n<li>**Captura AR:** usa las capacidades que ARCore y el dispositivo expongan; la disponibilidad de profundidad no es universal.</li>\n<li>**Nube de puntos:** es una representación parcial de las observaciones de captura, no una reconstrucción cerrada de toda la habitación.</li>\n<li>**Renderizado 3D:** la imagen se deriva de la geometría configurada en el módulo; la resolución de salida no garantiza realismo fotorrealista.</li>\n<li>**Acústica:** la geometría visual no es una medición de respuesta al impulso, reverberación ni absorción de materiales.</li>\n\n<h2>Privacidad y claves de API</h2>\n\n<p>El procesamiento local que no requiere servicios externos debe poder operar sin una clave de Google. Una clave solo es necesaria para una función opcional cuando esa función invoque realmente un servicio externo que la exija. No se debe interpretar la presencia de una interfaz o configuración de proveedor como prueba de que la integración remota esté activa.</p>\n\n<p>La cámara y el micrófono deben solicitarse cuando una función los necesita. Antes de compartir diagnósticos, elimina credenciales, tokens, datos personales y grabaciones privadas.</p>\n\n<h2>Compilar y ejecutar comprobaciones</h2>\n\n<h3>Requisitos</h3>\n\n<p>Consulta las versiones exactas configuradas por el proyecto y por CI. La configuración actual utiliza Android SDK, NDK, CMake, Gradle Wrapper y Node.js para los componentes correspondientes. La reproducción completa de CI puede requerir Linux y dependencias adicionales.</p>\n\n<h3>Pruebas nativas en host</h3>\n\n<p>Desde la raíz del repositorio:</p>\n\n<pre>cmake -B build-tests -S app/src/main/cpp/tests -DCMAKE_BUILD_TYPE=Release\ncmake --build build-tests -j4\nctest --test-dir build-tests --output-on-failure</pre>\n\n<h3>Puertas estáticas</h3>\n\n<pre>for s in scripts/check_*.py; do\n  python3 \"$s\" || exit 1\ndone</pre>\n\n<p>Estos comandos no sustituyen la compilación Android, las pruebas instrumentadas ni la validación del teléfono. Para reproducir exactamente la entrega, revisa <a href=\".github/workflows/build.yml\">el flujo de GitHub Actions</a>.</p>\n\n<h2>Banco sintético de audio y diagnósticos accionables</h2>\n\n<p>El banco de pruebas de Python tiene tres piezas separadas. Sus resultados deben interpretarse según el alcance de cada una:</p>\n\n<li>**Analizador WAV** — [`scripts/ivanna_audio_certify.py`](scripts/ivanna_audio_certify.py): lee PCM entero sin compresión de 8, 16, 24 o 32 bits; informa RMS y pico por canal, offset DC, clipping y desequilibrio entre canales. Opcionalmente estima el residuo de un tono conocido y compara una captura contra un WAV de referencia.</li>\n<li>**Inyección sintética de fallos** — [`scripts/ivanna_synthetic_audio_suite.py`](scripts/ivanna_synthetic_audio_suite.py): genera siete estímulos de control y verifica que el analizador detecte los defectos inyectados sin marcar determinados casos limpios como defectuosos.</li>\n<li>**Puerta de evidencia física** — [`scripts/ivanna_auditory_gate.py`](scripts/ivanna_auditory_gate.py): exige checks explícitos, las rutas requeridas, evidencia del dispositivo y escucha con niveles igualados para devolver `GREEN`. Ausencia de evidencia no pasa como éxito.</li>\n\n<h3>Estímulos sintéticos cubiertos</h3>\n\n<p>| Estímulo | Comportamiento esperado |</p>\n<p>|---|---|</p>\n<p>| <code>clean_sine</code> | Sin clipping, desequilibrio ni DC detectados; sin THD+N residual crítico. |</p>\n<p>| <code>clipping</code> | Debe informar <code>PCM_CLIPPING</code>. |</p>\n<p>| <code>dc_offset</code> | Debe informar <code>DC_OFFSET</code>. |</p>\n<p>| <code>channel_imbalance</code> | Debe informar <code>CHANNEL_IMBALANCE</code>. |</p>\n<p>| <code>harmonic_distortion</code> | Debe informar <code>TONE_THDN_HIGH</code>. |</p>\n<p>| <code>near_full_scale</code> | Debe avisar <code>LOW_PEAK_HEADROOM</code> sin confundirlo con clipping. |</p>\n<p>| <code>silent</code> | No debe producir las alarmas de clipping, DC ni desequilibrio definidas para la prueba. |</p>\n\n<h3>Ejecutar el banco</h3>\n\n<p>Desde la raíz del repositorio:</p>\n\n<pre>python3 -m unittest discover -s tests -p 'test_ivanna_audio_certify.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_synthetic_audio_suite.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_auditory_gate.py' -v\npython3 scripts/ivanna_synthetic_audio_suite.py --output-dir /tmp/ivanna-synthetic-report</pre>\n\n<p>Para analizar una captura real, el archivo debe ser WAV PCM entero sin compresión:</p>\n\n<pre>python3 scripts/ivanna_audio_certify.py captura.wav --tone-hz 1000 --json-out informe.json\npython3 scripts/ivanna_audio_certify.py despues.wav --reference antes.wav --json-out comparacion.json</pre>\n\n<p>La comparación de referencia requiere la misma frecuencia de muestreo y el mismo número de canales; el SNR residual también penaliza desalineación temporal y diferencia de ganancia. No recortes muestras arbitrariamente para ocultar latencia: alinea ventanas equivalentes y mide la latencia por separado.</p>\n\n<p>Los hallazgos del analizador pueden ser <code>CRITICAL</code>, <code>WARNING</code> o inexistentes, y el resumen puede ser <code>RED</code>, <code>AMBER</code> o <code>NO_SCREENING_FLAGS</code>. Son heurísticas de cribado, no límites universales de percepción. La puerta física usa <code>RED</code>/<code>AMBER</code>/<code>GREEN</code> con otra semántica; no son intercambiables.</p>\n\n<p><b>Límite esencial:</b> el banco sintético comprueba el comportamiento del analizador ante señales generadas. No mide la ruta Android en vivo, el códec Bluetooth realmente negociado, el ASRC del proveedor, la latencia extremo a extremo, SPL acústico ni THD de laboratorio. Para eso se requieren capturas de la ruta física, equipo adecuado y escucha controlada con niveles igualados.</p>\n\n<h2>Estado de CI, versiones y pruebas físicas</h2>\n\n<li>[Ver ejecuciones de CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions)</li>\n<li>[Ver versiones publicadas](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases)</li>\n<li>[Ver código de la versión indicada](version.properties)</li>\n<li>[Plan de aceptación para Moto G85 / Android 15](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md)</li>\n\n<p>El distintivo CI refleja el estado del flujo configurado en GitHub; no es una certificación acústica ni demuestra que se haya probado el teléfono. Antes de considerar una versión lista, verifica que la compilación, los tests, el APK y el ZIP Magisk procedan del mismo commit, inspecciona sus hashes y prueba la instalación en el dispositivo de destino.</p>\n\n<h3>El pipeline de release no publicaba (corregido en 2.5.132)</h3>\n\n<p>Hasta 2.5.131, el job <code>publish-release</code> se disparaba comparando el <b>texto literal</b> del mensaje de</p>\n<p>commit contra <code>\"release:\"</code> / <code>\"— v\"</code>. Los commits de bump reales usaban formatos como</p>\n<p><code>chore(release): v2.5.130 (421) — …</code>, que no calzan con ese patrón (el paréntesis rompe el match). Resultado</p>\n<p>verificado contra la API de GitHub: <b>v2.5.129, v2.5.130 y v2.5.131 nunca se publicaron</b> como release real</p>\n<p>pese a estar en <code>main</code> con <code>version.properties</code>/<code>module.prop</code> correctamente bumpeados; <code>update.json</code> seguía</p>\n<p>apuntando a <code>v2.5.130</code>, un tag que nunca existió, y el OTA del módulo Magisk llevaba varias versiones</p>\n<p>apuntando a un asset inexistente. El repositorio acumuló cientos de drafts <code>staging-<sha>-<run></code> (el bundle</p>\n<p>intermedio que sí se publica siempre) sin barrer, porque la limpieza de esos drafts vive dentro del mismo job</p>\n<p>que nunca se ejecutaba.</p>\n\n<p>Desde 2.5.132, un job <code>detect-release</code> decide si publicar comparando <code>version.properties</code> contra el commit</p>\n<p>padre con <code>git diff</code> — ya no depende de cómo se redacte el mensaje. Verifica tú mismo que una versión quedó</p>\n<p>publicada de verdad en <https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases></p>\n<p>(debe aparecer como release, no como draft <code>staging-*</code>) antes de confiar en el ZIP que ofrece el updater del</p>\n<p>módulo.</p>\n\n<h3>Reloj de hardware: qué quedó enlazado en 2.5.130</h3>\n\n<p>Hasta 2.5.129 la cadena de reloj existía de extremo a extremo <b>menos en su primer tramo</b>: el efecto leía el snapshot (<code>HardwareClockReader</code>), el JNI lo exponía (<code>nativeGetClockTelemetryJni</code>) y el panel «Reloj hardware» lo mostraba, pero nadie lo publicaba en la ruta Magisk. La versión 2.5.130 añade ese productor.</p>\n\n<p>| Pieza añadida | Qué hace | Evidencia |</p>\n<p>|---|---|---|</p>\n<p>| <code>daemon/hal_clock_producer.hpp</code> (167 líneas) | <code>ProducerState</code> con siete estados honestos, <code>PcmDevice</code>, <code>PairedSample</code>, <code>CorrelationGate</code> y <code>HalClockProducer</code> | Compila con <code>g++ 13 -std=c++20 -O2 -Wall -Wextra</code>, 0 avisos |</p>\n<p>| <code>daemon/hal_clock_producer.cpp</code> (302 líneas) | Descubrimiento por <code>/proc/asound</code>, lectura por ioctl, puerta de correlación y publicación en el mmap <code>IVHC</code> | 9/9 pruebas host |</p>\n<p>| <code>daemon/ivanna_daemon.cpp</code> (+45) | <code>--hal-clock</code> / <code>--no-hal-clock</code> (activo por defecto) e hilo de sondeo a 250 ms con registro solo al cambiar de estado | Sintaxis verificada en host con cabecera <code>android/log.h</code> simulada |</p>\n<p>| <code>tests/test_hal_clock_producer.cpp</code> (192 líneas) | 9 pruebas, incluida la de extremo a extremo Publisher → mmap → Reader | <code>[ PASSED ] 9 tests</code> |</p>\n\n<p>La puerta de correlación rechaza rate nominal ausente, timestamp no positivo, Δt ≤ 1 µs, Δt > 500 ms (PCM parado), frames que retroceden y tasa implícita fuera de 0,80–1,20 × la nominal; exige tres pares coherentes consecutivos antes de publicar. Todo rechazo se declara con motivo legible.</p>\n\n<p>Lo que <b>no</b> cambia con esta versión: el actuador ASRC físico del Moto G85 sigue sin identificar. <code>hal_integration/MOTO_G85_PAL_CLOCK_INTEGRATION.md</code> documenta que <code>pal_get_timestamp</code> no entrega un par frames + CLOCK_MONOTONIC, así que no puede alimentar al tracker ni al servo; adivinar el nodo produciría la telemetría falsa que la Fase 0 del plan 10D ordena eliminar. Tampoco se ha verificado aquí la compilación Kotlin/APK ni la ejecución de CTest en el runner.</p>\n\n<h3>Lista de aceptación en hardware</h3>\n\n<li>[ ] Instalar APK y módulo generados desde el mismo commit aprobado.</li>\n<li>[ ] Probar la salida integrada, USB-C DAC/adaptador y Bluetooth por separado cuando estén disponibles.</li>\n<li>[ ] Confirmar que el reproductor propio avanza, que la corrección permanece dentro de sus límites y que no aparecen clics, cambios de tono o underruns anómalos.</li>\n<li>[ ] Abrir FotoHolo, confirmar cámara en vivo, seguimiento, pausa/reanudación y exportación.</li>\n<li>[ ] Registrar el modelo, versión Android, ruta, SHA del commit, hashes de artefactos y resultados.</li>\n<li>[ ] No declarar HAL/PAL conectado sin identificar el callback real, unidades del parámetro, actuador, lectura de retorno y prueba en hardware.</li>\n<li>[ ] Leer las líneas `HAL-CLOCK` del log del daemon durante reproducción real y anotar el estado observado (`publishing`, `rejected`, `no-devices`, `no-source`) junto con el motivo y la deriva en ppm.</li>\n\n<h2>Contribuir y reportar problemas</h2>\n\n<p>Los informes más útiles incluyen el commit o versión probados, modelo de dispositivo, versión de Android, ruta de audio, pasos para reproducir y registros depurados de datos personales.</p>\n\n<li>[Abrir un issue](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues)</li>\n<li>[Revisar cambios](CHANGELOG.md)</li>\n<li>[Consultar documentación de ingeniería](docs/ENGINEERING.md)</li>\n\n<h2>Licencia y propiedad intelectual</h2>\n\n<p>IVANNA OMEGA SUPREME se presenta como un producto propietario. La visibilidad pública del repositorio no concede por sí sola permiso para reutilizar el código propio. Los componentes, bibliotecas, modelos y datasets de terceros conservan sus licencias y avisos; revisa los archivos de licencia y avisos antes de redistribuir. Las concesiones expresas aplicables a versiones anteriores siguen rigiendo esas versiones según sus términos.</p>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n\n<p><b>Construir con rigor. Medir cuando sea posible. Declarar solo lo que la evidencia respalda.</b></p>\n\n<p><sub>La arquitectura y las funciones evolucionan; el código, las pruebas reproducibles y la validación física tienen prioridad sobre cualquier etiqueta de marketing.</sub></p>\n\n<p></div></p>",
+  "readme": "<div align=\"center\">\n\n<img src=\"docs/release_media/ivanna_omega_hero.svg\" alt=\"Portada editorial IVANNA OMEGA SUPREME: esfera armilar luminosa, geometría acústica y oro sobre azul noche\" width=\"100%\" />\n\n# IVANNA OMEGA SUPREME\n\n### Audio digital · herramientas espaciales · medición y verificación\n\n<p>\n  <a href=\"LEAME.md\">Guía en español sencillo</a> ·\n  <a href=\"README.en.md\">English quick start</a> ·\n  <a href=\"docs/GUIA_CONTROLES_COMPLETA_ES.md\">Guía completa de controles en español</a> ·\n  <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> ·\n  <a href=\"docs/SAF_SAFMUS_UNIFIED_MATHEMATICAL_CONTRACT.md\">Contrato matemático SAF/SAFMUS</a> ·\n  <a href=\"CHANGELOG.md\">Registro de cambios</a> ·\n  <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a>\n</p>\n\n[![CI](https://img.shields.io/github/actions/workflow/status/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/build.yml?branch=main&label=CI%20main)](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions/workflows/build.yml)\n[![Android](https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white)](app/)\n[![Kotlin](https://img.shields.io/badge/app-Kotlin%20%2F%20Compose-7F52FF?logo=kotlin&logoColor=white)](app/src/main/)\n[![C++](https://img.shields.io/badge/motor-nativo%20C%2B%2B-00599C?logo=cplusplus&logoColor=white)](app/src/main/cpp/)\n[![Versión](https://img.shields.io/badge/versión-2.5.193-64748b)](version.properties)\n\n**Un proyecto de ingeniería en desarrollo.** Documentamos lo que existe en el código, qué evidencia hay y qué todavía requiere validación real.\n\n</div>\n\n---\n\n## Navegación del proyecto\n\n<div align=\"center\">\n\n| **Visión general** | **Ingeniería** | **Validación** | **Historial** |\n|:---:|:---:|:---:|:---:|\n| [Áreas del producto](#en-una-mirada) | [Componentes y estado](#componentes-y-estado-real) | [Aceptación Moto G85](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md) | [Changelog](CHANGELOG.md) |\n| [Mapa de arquitectura](#mapa-visual-de-la-arquitectura) | [Ficha de ingeniería](docs/ENGINEERING.md) | [Issues](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues) | [Acciones CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions) |\n\n</div>\n\n> **Principio rector:** la estética presenta el proyecto; el código y la evidencia determinan lo que podemos afirmar.\n\n## Sincronización del estado del código — 2026-10-28\n\nEsta ficha se mantiene deliberadamente alineada con `main`. La versión de esta revisión es **v2.5.193** (`versionCode=484`); el release solo se considera disponible cuando CI publica y verifica los artefactos versionados.\n\n- **Interfaz adaptable:** los indicadores del encabezado OMNI se distribuyen en filas de hasta tres elementos para evitar recortes en pantallas estrechas y con fuente ampliada.\n- **Telemetría robusta:** el panel adaptativo rechaza muestras nativas incompletas o no finitas, limita las escalas de las barras y usa formato numérico independiente de la configuración regional. Si los datos no son válidos, lo indica en vez de simular una lectura.\n- **Lenguaje visual:** se conserva el sistema Aurora Obsidiana (fondo obsidiana, cian de señal, magenta de procesamiento, verde de estado y oro de acento); los colores no sustituyen el estado real del motor.\n- **SAFMUS:** el reproductor propio conecta AudioTrack.getTimestamp() → AudioTrackBufferPll (regresión OLS validada + PI con banda muerta, anti-windup en el límite del actuador y feed-forward con umbral de ruido) → StereoAudioResampler.setClockCorrectionPpm(). La telemetría HAL/PAL del daemon permanece separada para no mezclar relojes de streams distintos. Ver el contrato matemático SAF/SAFMUS.\n- **Evidencia del audio:** la presencia de un indicador de ruta o de un panel de telemetría no certifica por sí misma que el audio se esté procesando ni que exista control del reloj físico del DAC/HAL/PAL.\n- **Puerta de publicación:** la CI debe pasar los tests nativos, el empaquetado Android, la comprobación de integridad del APK/ZIP y la publicación. La mejora visual no se presenta como una mejora acústica medida.\n- **Validación pendiente en hardware:** revisar el encabezado OMNI en el Moto G85 con tamaño de fuente estándar y ampliado, y comprobar que ningún indicador importante queda oculto al cambiar de ruta o activar módulos.\n\nPara el estado vivo, consulta [Actions](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions) y [Releases](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases).\n\n## En una mirada\n\nIVANNA OMEGA SUPREME combina una aplicación Android en Kotlin, componentes nativos de procesamiento de audio en C++, herramientas de medición acústica y módulos de visualización espacial. El propósito es construir rutas de procesamiento y calibración que se puedan inspeccionar y probar, sin convertir una intención de diseño en una promesa de resultado.\n\n<table>\n<tr>\n<td width=\"33%\" valign=\"top\">\n\n### 🎚️ Audio\n\nReproducción y procesamiento desde la aplicación, resampling y un control software de cola de AudioTrack en la ruta propia del reproductor.\n\n</td>\n<td width=\"33%\" valign=\"top\">\n\n### 📐 Medición\n\nHerramientas para reproducir tonos de prueba, registrar la respuesta del micrófono y comparar una medición antes y después de un ajuste.\n\n</td>\n<td width=\"33%\" valign=\"top\">\n\n### 🧭 Espacio\n\nRenderizador geométrico y una ruta de captura AR experimental que puede recopilar puntos espaciales y exportar datos.\n\n</td>\n</tr>\n</table>\n\n> **Regla de lectura:** que un módulo, modelo, dataset, control o contrato esté presente en el repositorio no demuestra por sí solo que esté conectado al audio activo, que funcione en todos los dispositivos ni que haya sido validado físicamente.\n\n## Atlas visual de la arquitectura\n\n<div align=\"center\">\n\n<img src=\"docs/release_media/architecture-map.svg\" alt=\"Atlas técnico con rutas Android, cadena propia de reproducción, motor DSP, medición acústica, visualización espacial y límites de integración de hardware\" width=\"100%\" />\n\n<sub>PLANO 01 · RELACIONES FUNCIONALES · LOS ENLACES NO SUSTITUYEN LAS PRUEBAS DE EJECUCIÓN</sub>\n\n</div>\n\nEl diagrama representa las relaciones generales del código. En particular, el bloque HAL/PAL es un punto de integración documentado: no es evidencia de que exista control físico del reloj o del ASRC del proveedor en el Moto G85.\n\n## Componentes y estado real\n\n<table>\n<thead><tr><th>Área</th><th>Qué contiene el proyecto</th><th>Estado y límites</th></tr></thead>\n<tbody>\n<tr>\n<td><strong>Aplicación Android</strong></td>\n<td>Interfaz Kotlin/Jetpack Compose, servicios y puentes hacia componentes nativos.</td>\n<td>Código presente; la funcionalidad concreta debe evaluarse por ruta y por versión.</td>\n</tr>\n<tr>\n<td><strong>Motor DSP nativo</strong></td>\n<td>Código C++ y enlace JNI para las funciones nativas que llaman desde la app.</td>\n<td>La existencia del motor no prueba que cada etapa experimental participe en toda reproducción.</td>\n</tr>\n<tr>\n<td><strong>PLL software de AudioTrack</strong></td>\n<td><code>AudioTrackBufferPll</code> estima la ocupación de la cola del reproductor de la app y ajusta el resampler dentro de límites de software.</td>\n<td>Implementación a nivel de código. No controla el reloj físico del DAC, Bluetooth ni el HAL global; necesita pruebas de reproducción reales para evaluar estabilidad, clics, latencia y underruns.</td>\n</tr>\n<tr>\n<td><strong>Cadena de reproducción del reproductor propio</strong></td>\n<td><code>IvannaBridgePlayer</code> decodifica, procesa y escribe en <code>AudioTrack</code>. Si el DSP nativo (<code>DSPBridge</code>) está cargado, ejecuta la cadena maestra y la ruta Kotlin no apila procesadores duplicados; si no, se usan NPE, Volterra, modo concierto y motor espacial según sus interruptores.</td>\n<td>Aplica solo al audio que reproduce IVANNA. No procesa el audio de otras apps ni de todo el sistema por sí mismo. Qué etapas se oyen y con qué efecto debe comprobarse con escucha y registros en el Moto G85.</td>\n</tr>\n<tr>\n<td><strong>Motor predictivo (Módulo 1)</strong></td>\n<td><code>predictive_audio_engine</code> analiza el audio en C++ y publica confianza, ganancia estimada y transitorios por JNI hacia la interfaz y las métricas.</td>\n<td>Es un <strong>observador</strong>: el reproductor le entrega el bloque ya procesado y no lo modifica. Hoy produce telemetría, no cambia la señal de salida. La ventana de predicción de 5–10 ms es un objetivo de diseño sin medición en dispositivo registrada.</td>\n</tr>\n<tr>\n<td><strong>HRTF / SOFA / SAF</strong></td>\n<td>Cargadores y convolucionador HRTF, bases PCA y paquetes de datos. <code>check_datasets_deploy.py</code> compara la presencia/paridad de los datasets entre assets del APK y módulo, revisa cabeceras mágicas y tamaño mínimo, comprueba metadatos RIR, hashes de los IHR1 y consistencia del JSON SAF. El empaquetado del workflow impone además los conteos esperados (239 SOFA, 200 ARI, 200 RIR y 12 IHR1).</td>\n<td><strong>Límite del validador actual:</strong> para SOFA solo comprueba la firma inicial HDF5 y un tamaño mínimo; no abre cada archivo con un lector HDF5 ni valida todos sus metadatos o checksums internos. Por tanto, la puerta no demuestra integridad estructural completa de SOFA y el estado de cada archivo requiere una validación HDF5 real. Además, la presencia/paridad de los datos no prueba que la espacialización binaural resulte audible, correcta o cómoda; eso requiere escucha controlada. Una HRTF genérica no equivale a la HRTF personal de cada oyente.</td>\n</tr>\n<tr>\n<td><strong>Anti-Dolby / clasificador de contenido</strong></td>\n<td>Modelo <code>anti_dolby_crnn.tflite</code> que clasifica el contenido en voz, música, bajos y silencio, y lógica nativa que usa esa clasificación.</td>\n<td>Es un clasificador de contenido, no un modelo entrenado de política acústica universal. Las decisiones de orquestación son deterministas y acotadas. No se afirma un desprocesamiento verificado frente a ningún códec concreto sin mediciones con material de referencia.</td>\n</tr>\n<tr>\n<td><strong>Medición y corrección de sala</strong></td>\n<td>Secuencia de tonos, captura de micrófono, comparación antes/después y lógica de restauración cuando el resultado no cumple el criterio interno.</td>\n<td>El micrófono del teléfono no es un instrumento calibrado. La métrica interna no equivale a una mejora audible universal ni a una certificación acústica.</td>\n</tr>\n<tr>\n<td><strong>FotoHolo / captura AR</strong></td>\n<td>Actividad de captura con ARCore, seguimiento espacial, puntos 3D y flujo de exportación.</td>\n<td>Experimental. No debe confundirse una nube de puntos con una malla completa, un plano certificado ni una medición RT60/RIR. Requiere probar permisos, seguimiento, pausa/reanudación y exportación en el equipo.</td>\n</tr>\n<tr>\n<td><strong>Renderizador geométrico</strong></td>\n<td><code>SceneGeometryRenderer</code> genera imágenes a partir de una configuración geométrica; el código contempla hasta 3840 × 2160 píxeles.</td>\n<td>Renderiza la geometría configurada. No es por sí solo una reconstrucción automática de la habitación ni una simulación acústica validada.</td>\n</tr>\n<tr>\n<td><strong>Reloj de hardware (productor HAL)</strong></td>\n<td><code>daemon/hal_clock_producer</code> lee la muestra del driver con <code>SNDRV_PCM_IOCTL_STATUS</code> sobre <code>/dev/snd/pcmC*D*p</code>, que devuelve <code>hw_ptr</code> (frames presentados) y <code>tstamp</code> (CLOCK_MONOTONIC) en una sola consulta, y publica el snapshot compartido <code>IVHC</code> solo si la muestra es correlacionada.</td>\n<td>Desde 2.5.130 el primer tramo de la cadena existe en la ruta Magisk: productor → mmap → lector del efecto → JNI → fila «Reloj hardware». La prueba de extremo a extremo del contrato IPC está en host (9/9). Que el driver del Moto G85 entregue muestras dentro de tolerancia solo se comprueba en el dispositivo, leyendo las líneas <code>HAL-CLOCK</code> del log del daemon.</td>\n</tr>\n<tr>\n<td><strong>Bocinas declaradas (estéreo/surround + subwoofer)</strong></td>\n<td><code>SpeakerLayoutPolicy</code> (lógica pura, 9 pruebas JVM) y el panel <code>SpeakerLayoutPanel</code> dejan declarar modo (estéreo/surround), número de satélites y si hay subwoofer activo. Generaliza el mismo mecanismo que ya conectaba el perfil Genezy MHCPZ1.</td>\n<td>El único actuador real al final de la cadena sigue siendo <code>spatial_width</code> → <code>StereoWidener</code>. El campo <code>high_cut_hz</code> del daemon se guarda y se lee de vuelta, pero ningún código del efecto lo aplica a la señal (confirmado por lectura directa de <code>omega_effect.cpp</code>). Por eso esta función solo matiza el ancho estéreo (±15 % máx.) según lo declarado; <strong>no</strong> enruta canales discretos ni gestiona graves/LFE reales — el motor no tiene un crossover conectado.</td>\n</tr>\n<tr>\n<td><strong>Renderizador binaural de objetos</strong></td>\n<td><code>ivanna_object_renderer.hpp</code> amplió sus posiciones virtuales de 12 a 16, con cuatro satélites laterales adicionales sobre el renderer HRTF/VBAP existente.</td>\n<td>Son fuentes virtuales renderizadas en binaural estéreo (auriculares o los dos altavoces del teléfono), no canales físicos independientes; no implica reenrutamiento multicanal real.</td>\n</tr>\n<tr>\n<td><strong>SAFMUS / ACSR / HAL-PAL</strong></td>\n<td>Hay lógica, adaptadores y contratos de integración en distintas partes del repositorio.</td>\n<td>La documentación de integración no demuestra una unión de extremo a extremo con el hardware del fabricante. No afirmamos un actuador PAL/ASRC operativo ni control físico de reloj en el Moto G85 sin lectura de retorno y pruebas. El actuador ASRC físico sigue sin identificar y sin enlazar: el productor queda <strong>fail-closed</strong> y declara el motivo.</td>\n</tr>\n<tr>\n<td><strong>Wi-Fi / CSI</strong></td>\n<td>Políticas conservadoras para tratar observaciones de radio como indicios de contexto.</td>\n<td>Las API Wi-Fi comunes no equivalen a CSI. La disponibilidad depende de hardware y proveedor compatibles; no se afirma reconstrucción anatómica ni compatibilidad universal.</td>\n</tr>\n</tbody>\n</table>\n\n## Flujos que importan\n\n### Medición: medir, decidir y verificar\n\n```mermaid\nflowchart LR\n    A[\"Medición inicial\"] --> B[\"Diseñar corrección\"]\n    B --> C[\"Aplicar ajuste\"]\n    C --> D[\"Medición posterior\"]\n    D --> E{\"¿Datos válidos y criterio cumplido?\"}\n    E -->|Sí| F[\"Aceptar y registrar\"]\n    E -->|No| G[\"Restaurar estado anterior\"]\n    G --> H[\"Registrar motivo\"]\n```\n\nEste flujo describe la lógica implementada en la ruta de medición. La fiabilidad depende de la señal, el ruido, la posición, el volumen, la salida y las características del micrófono. La reversión de un ajuste no sustituye las pruebas de seguridad de todas las rutas de audio.\n\n### Reproducción: alcance del PLL software\n\n```mermaid\nflowchart TD\n    A[\"Audio de la app\"] --> B[\"AudioTrack\"]\n    B --> C[\"Timestamp / estimación de cola\"]\n    C --> D[\"AudioTrackBufferPll\"]\n    D --> E[\"Corrección limitada en ppm\"]\n    E --> F[\"StereoAudioResampler\"]\n    F --> B\n    H[\"Datos inválidos o desalineados\"] -.-> I[\"Reset a corrección neutra\"]\n    I -.-> D\n```\n\nEl PLL trabaja sobre el resampler del reproductor propio de IVANNA. No puede inferir ni escribir automáticamente el reloj físico de un DAC, una ruta Bluetooth o un módulo HAL. El funcionamiento auditivo y la estabilidad deben comprobarse en el teléfono con cada salida que se quiera declarar compatible.\n\n## FotoHolo y visualización 3D\n\n- **Captura AR:** usa las capacidades que ARCore y el dispositivo expongan; la disponibilidad de profundidad no es universal.\n- **Nube de puntos:** es una representación parcial de las observaciones de captura, no una reconstrucción cerrada de toda la habitación.\n- **Renderizado 3D:** la imagen se deriva de la geometría configurada en el módulo; la resolución de salida no garantiza realismo fotorrealista.\n- **Acústica:** la geometría visual no es una medición de respuesta al impulso, reverberación ni absorción de materiales.\n\n## Privacidad y claves de API\n\nEl procesamiento local que no requiere servicios externos debe poder operar sin una clave de Google. Una clave solo es necesaria para una función opcional cuando esa función invoque realmente un servicio externo que la exija. No se debe interpretar la presencia de una interfaz o configuración de proveedor como prueba de que la integración remota esté activa.\n\nLa cámara y el micrófono deben solicitarse cuando una función los necesita. Antes de compartir diagnósticos, elimina credenciales, tokens, datos personales y grabaciones privadas.\n\n## Compilar y ejecutar comprobaciones\n\n### Requisitos\n\nConsulta las versiones exactas configuradas por el proyecto y por CI. La configuración actual utiliza Android SDK, NDK, CMake, Gradle Wrapper y Node.js para los componentes correspondientes. La reproducción completa de CI puede requerir Linux y dependencias adicionales.\n\n### Pruebas nativas en host\n\nDesde la raíz del repositorio:\n\n```bash\ncmake -B build-tests -S app/src/main/cpp/tests -DCMAKE_BUILD_TYPE=Release\ncmake --build build-tests -j4\nctest --test-dir build-tests --output-on-failure\n```\n\n### Puertas estáticas\n\n```bash\nfor s in scripts/check_*.py; do\n  python3 \"$s\" || exit 1\ndone\n```\n\nEstos comandos no sustituyen la compilación Android, las pruebas instrumentadas ni la validación del teléfono. Para reproducir exactamente la entrega, revisa [el flujo de GitHub Actions](.github/workflows/build.yml).\n\n## Banco sintético de audio y diagnósticos accionables\n\nEl banco de pruebas de Python tiene tres piezas separadas. Sus resultados deben interpretarse según el alcance de cada una:\n\n1. **Analizador WAV** — [`scripts/ivanna_audio_certify.py`](scripts/ivanna_audio_certify.py): lee PCM entero sin compresión de 8, 16, 24 o 32 bits; informa RMS y pico por canal, offset DC, clipping y desequilibrio entre canales. Opcionalmente estima el residuo de un tono conocido y compara una captura contra un WAV de referencia.\n2. **Inyección sintética de fallos** — [`scripts/ivanna_synthetic_audio_suite.py`](scripts/ivanna_synthetic_audio_suite.py): genera siete estímulos de control y verifica que el analizador detecte los defectos inyectados sin marcar determinados casos limpios como defectuosos.\n3. **Puerta de evidencia física** — [`scripts/ivanna_auditory_gate.py`](scripts/ivanna_auditory_gate.py): exige checks explícitos, las rutas requeridas, evidencia del dispositivo y escucha con niveles igualados para devolver `GREEN`. Ausencia de evidencia no pasa como éxito.\n\n### Estímulos sintéticos cubiertos\n\n| Estímulo | Comportamiento esperado |\n|---|---|\n| `clean_sine` | Sin clipping, desequilibrio ni DC detectados; sin THD+N residual crítico. |\n| `clipping` | Debe informar `PCM_CLIPPING`. |\n| `dc_offset` | Debe informar `DC_OFFSET`. |\n| `channel_imbalance` | Debe informar `CHANNEL_IMBALANCE`. |\n| `harmonic_distortion` | Debe informar `TONE_THDN_HIGH`. |\n| `near_full_scale` | Debe avisar `LOW_PEAK_HEADROOM` sin confundirlo con clipping. |\n| `silent` | No debe producir las alarmas de clipping, DC ni desequilibrio definidas para la prueba. |\n\n### Ejecutar el banco\n\nDesde la raíz del repositorio:\n\n```bash\npython3 -m unittest discover -s tests -p 'test_ivanna_audio_certify.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_synthetic_audio_suite.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_auditory_gate.py' -v\npython3 scripts/ivanna_synthetic_audio_suite.py --output-dir /tmp/ivanna-synthetic-report\n```\n\nPara analizar una captura real, el archivo debe ser WAV PCM entero sin compresión:\n\n```bash\npython3 scripts/ivanna_audio_certify.py captura.wav --tone-hz 1000 --json-out informe.json\npython3 scripts/ivanna_audio_certify.py despues.wav --reference antes.wav --json-out comparacion.json\n```\n\nLa comparación de referencia requiere la misma frecuencia de muestreo y el mismo número de canales; el SNR residual también penaliza desalineación temporal y diferencia de ganancia. No recortes muestras arbitrariamente para ocultar latencia: alinea ventanas equivalentes y mide la latencia por separado.\n\nLos hallazgos del analizador pueden ser `CRITICAL`, `WARNING` o inexistentes, y el resumen puede ser `RED`, `AMBER` o `NO_SCREENING_FLAGS`. Son heurísticas de cribado, no límites universales de percepción. La puerta física usa `RED`/`AMBER`/`GREEN` con otra semántica; no son intercambiables.\n\n**Límite esencial:** el banco sintético comprueba el comportamiento del analizador ante señales generadas. No mide la ruta Android en vivo, el códec Bluetooth realmente negociado, el ASRC del proveedor, la latencia extremo a extremo, SPL acústico ni THD de laboratorio. Para eso se requieren capturas de la ruta física, equipo adecuado y escucha controlada con niveles igualados.\n\n## Estado de CI, versiones y pruebas físicas\n\n- [Ver ejecuciones de CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions)\n- [Ver versiones publicadas](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases)\n- [Ver código de la versión indicada](version.properties)\n- [Plan de aceptación para Moto G85 / Android 15](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md)\n\nEl distintivo CI refleja el estado del flujo configurado en GitHub; no es una certificación acústica ni demuestra que se haya probado el teléfono. Antes de considerar una versión lista, verifica que la compilación, los tests, el APK y el ZIP Magisk procedan del mismo commit, inspecciona sus hashes y prueba la instalación en el dispositivo de destino.\n\n### El pipeline de release no publicaba (corregido en 2.5.132)\n\nHasta 2.5.131, el job `publish-release` se disparaba comparando el **texto literal** del mensaje de\ncommit contra `\"release:\"` / `\"— v\"`. Los commits de bump reales usaban formatos como\n`chore(release): v2.5.130 (421) — …`, que no calzan con ese patrón (el paréntesis rompe el match). Resultado\nverificado contra la API de GitHub: **v2.5.129, v2.5.130 y v2.5.131 nunca se publicaron** como release real\npese a estar en `main` con `version.properties`/`module.prop` correctamente bumpeados; `update.json` seguía\napuntando a `v2.5.130`, un tag que nunca existió, y el OTA del módulo Magisk llevaba varias versiones\napuntando a un asset inexistente. El repositorio acumuló cientos de drafts `staging-<sha>-<run>` (el bundle\nintermedio que sí se publica siempre) sin barrer, porque la limpieza de esos drafts vive dentro del mismo job\nque nunca se ejecutaba.\n\nDesde 2.5.132, un job `detect-release` decide si publicar comparando `version.properties` contra el commit\npadre con `git diff` — ya no depende de cómo se redacte el mensaje. Verifica tú mismo que una versión quedó\npublicada de verdad en <https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases>\n(debe aparecer como release, no como draft `staging-*`) antes de confiar en el ZIP que ofrece el updater del\nmódulo.\n\n### Reloj de hardware: qué quedó enlazado en 2.5.130\n\nHasta 2.5.129 la cadena de reloj existía de extremo a extremo **menos en su primer tramo**: el efecto leía el snapshot (`HardwareClockReader`), el JNI lo exponía (`nativeGetClockTelemetryJni`) y el panel «Reloj hardware» lo mostraba, pero nadie lo publicaba en la ruta Magisk. La versión 2.5.130 añade ese productor.\n\n| Pieza añadida | Qué hace | Evidencia |\n|---|---|---|\n| `daemon/hal_clock_producer.hpp` (167 líneas) | `ProducerState` con siete estados honestos, `PcmDevice`, `PairedSample`, `CorrelationGate` y `HalClockProducer` | Compila con `g++ 13 -std=c++20 -O2 -Wall -Wextra`, 0 avisos |\n| `daemon/hal_clock_producer.cpp` (302 líneas) | Descubrimiento por `/proc/asound`, lectura por ioctl, puerta de correlación y publicación en el mmap `IVHC` | 9/9 pruebas host |\n| `daemon/ivanna_daemon.cpp` (+45) | `--hal-clock` / `--no-hal-clock` (activo por defecto) e hilo de sondeo a 250 ms con registro solo al cambiar de estado | Sintaxis verificada en host con cabecera `android/log.h` simulada |\n| `tests/test_hal_clock_producer.cpp` (192 líneas) | 9 pruebas, incluida la de extremo a extremo Publisher → mmap → Reader | `[ PASSED ] 9 tests` |\n\nLa puerta de correlación rechaza rate nominal ausente, timestamp no positivo, Δt ≤ 1 µs, Δt > 500 ms (PCM parado), frames que retroceden y tasa implícita fuera de 0,80–1,20 × la nominal; exige tres pares coherentes consecutivos antes de publicar. Todo rechazo se declara con motivo legible.\n\nLo que **no** cambia con esta versión: el actuador ASRC físico del Moto G85 sigue sin identificar. `hal_integration/MOTO_G85_PAL_CLOCK_INTEGRATION.md` documenta que `pal_get_timestamp` no entrega un par frames + CLOCK_MONOTONIC, así que no puede alimentar al tracker ni al servo; adivinar el nodo produciría la telemetría falsa que la Fase 0 del plan 10D ordena eliminar. Tampoco se ha verificado aquí la compilación Kotlin/APK ni la ejecución de CTest en el runner.\n\n### Lista de aceptación en hardware\n\n- [ ] Instalar APK y módulo generados desde el mismo commit aprobado.\n- [ ] Probar la salida integrada, USB-C DAC/adaptador y Bluetooth por separado cuando estén disponibles.\n- [ ] Confirmar que el reproductor propio avanza, que la corrección permanece dentro de sus límites y que no aparecen clics, cambios de tono o underruns anómalos.\n- [ ] Abrir FotoHolo, confirmar cámara en vivo, seguimiento, pausa/reanudación y exportación.\n- [ ] Registrar el modelo, versión Android, ruta, SHA del commit, hashes de artefactos y resultados.\n- [ ] No declarar HAL/PAL conectado sin identificar el callback real, unidades del parámetro, actuador, lectura de retorno y prueba en hardware.\n- [ ] Leer las líneas `HAL-CLOCK` del log del daemon durante reproducción real y anotar el estado observado (`publishing`, `rejected`, `no-devices`, `no-source`) junto con el motivo y la deriva en ppm.\n\n## Contribuir y reportar problemas\n\nLos informes más útiles incluyen el commit o versión probados, modelo de dispositivo, versión de Android, ruta de audio, pasos para reproducir y registros depurados de datos personales.\n\n- [Abrir un issue](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues)\n- [Revisar cambios](CHANGELOG.md)\n- [Consultar documentación de ingeniería](docs/ENGINEERING.md)\n\n## Licencia y propiedad intelectual\n\nIVANNA OMEGA SUPREME se presenta como un producto propietario. La visibilidad pública del repositorio no concede por sí sola permiso para reutilizar el código propio. Los componentes, bibliotecas, modelos y datasets de terceros conservan sus licencias y avisos; revisa los archivos de licencia y avisos antes de redistribuir. Las concesiones expresas aplicables a versiones anteriores siguen rigiendo esas versiones según sus términos.\n\n---\n\n<div align=\"center\">\n\n**Construir con rigor. Medir cuando sea posible. Declarar solo lo que la evidencia respalda.**\n\n<sub>La arquitectura y las funciones evolucionan; el código, las pruebas reproducibles y la validación física tienen prioridad sobre cualquier etiqueta de marketing.</sub>\n\n</div>\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"docs/release_media/ivanna_omega_hero.svg\" alt=\"Portada editorial IVANNA OMEGA SUPREME: esfera armilar luminosa, geometría acústica y oro sobre azul noche\" width=\"100%\" /></p>\n\n<h1>IVANNA OMEGA SUPREME</h1>\n\n<h3>Audio digital · herramientas espaciales · medición y verificación</h3>\n\n<p><p></p>\n<p>  <a href=\"LEAME.md\">Guía en español sencillo</a> ·</p>\n<p>  <a href=\"README.en.md\">English quick start</a> ·</p>\n<p>  <a href=\"docs/GUIA_CONTROLES_COMPLETA_ES.md\">Guía completa de controles en español</a> ·</p>\n<p>  <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> ·</p>\n<p>  <a href=\"docs/SAF_SAFMUS_UNIFIED_MATHEMATICAL_CONTRACT.md\">Contrato matemático SAF/SAFMUS</a> ·</p>\n<p>  <a href=\"CHANGELOG.md\">Registro de cambios</a> ·</p>\n<p>  <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a></p>\n<p></p></p>\n\n<p><a href=\"https://img.shields.io/github/actions/workflow/status/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/build.yml?branch=main&label=CI%20main\">![CI</a>](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions/workflows/build.yml)</p>\n<p><a href=\"https://img.shields.io/badge/plataforma-Android-3DDC84?logo=android&logoColor=white\">![Android</a>](app/)</p>\n<p><a href=\"https://img.shields.io/badge/app-Kotlin%20%2F%20Compose-7F52FF?logo=kotlin&logoColor=white\">![Kotlin</a>](app/src/main/)</p>\n<p><a href=\"https://img.shields.io/badge/motor-nativo%20C%2B%2B-00599C?logo=cplusplus&logoColor=white\">![C++</a>](app/src/main/cpp/)</p>\n<p><a href=\"https://img.shields.io/badge/versión-2.5.193-64748b\">![Versión</a>](version.properties)</p>\n\n<p><b>Un proyecto de ingeniería en desarrollo.</b> Documentamos lo que existe en el código, qué evidencia hay y qué todavía requiere validación real.</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>Navegación del proyecto</h2>\n\n<p><div align=\"center\"></p>\n\n<p>| <b>Visión general</b> | <b>Ingeniería</b> | <b>Validación</b> | <b>Historial</b> |</p>\n<p>|:---:|:---:|:---:|:---:|</p>\n<p>| <a href=\"#en-una-mirada\">Áreas del producto</a> | <a href=\"#componentes-y-estado-real\">Componentes y estado</a> | <a href=\"docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md\">Aceptación Moto G85</a> | <a href=\"CHANGELOG.md\">Changelog</a> |</p>\n<p>| <a href=\"#mapa-visual-de-la-arquitectura\">Mapa de arquitectura</a> | <a href=\"docs/ENGINEERING.md\">Ficha de ingeniería</a> | <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues\">Issues</a> | <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions\">Acciones CI</a> |</p>\n\n<p></div></p>\n\n<p>> <b>Principio rector:</b> la estética presenta el proyecto; el código y la evidencia determinan lo que podemos afirmar.</p>\n\n<h2>Sincronización del estado del código — 2026-10-28</h2>\n\n<p>Esta ficha se mantiene deliberadamente alineada con <code>main</code>. La versión de esta revisión es <b>v2.5.193</b> (<code>versionCode=484</code>); el release solo se considera disponible cuando CI publica y verifica los artefactos versionados.</p>\n\n<li>**Interfaz adaptable:** los indicadores del encabezado OMNI se distribuyen en filas de hasta tres elementos para evitar recortes en pantallas estrechas y con fuente ampliada.</li>\n<li>**Telemetría robusta:** el panel adaptativo rechaza muestras nativas incompletas o no finitas, limita las escalas de las barras y usa formato numérico independiente de la configuración regional. Si los datos no son válidos, lo indica en vez de simular una lectura.</li>\n<li>**Lenguaje visual:** se conserva el sistema Aurora Obsidiana (fondo obsidiana, cian de señal, magenta de procesamiento, verde de estado y oro de acento); los colores no sustituyen el estado real del motor.</li>\n<li>**SAFMUS:** el reproductor propio conecta AudioTrack.getTimestamp() → AudioTrackBufferPll (regresión OLS validada + PI con banda muerta, anti-windup en el límite del actuador y feed-forward con umbral de ruido) → StereoAudioResampler.setClockCorrectionPpm(). La telemetría HAL/PAL del daemon permanece separada para no mezclar relojes de streams distintos. Ver el contrato matemático SAF/SAFMUS.</li>\n<li>**Evidencia del audio:** la presencia de un indicador de ruta o de un panel de telemetría no certifica por sí misma que el audio se esté procesando ni que exista control del reloj físico del DAC/HAL/PAL.</li>\n<li>**Puerta de publicación:** la CI debe pasar los tests nativos, el empaquetado Android, la comprobación de integridad del APK/ZIP y la publicación. La mejora visual no se presenta como una mejora acústica medida.</li>\n<li>**Validación pendiente en hardware:** revisar el encabezado OMNI en el Moto G85 con tamaño de fuente estándar y ampliado, y comprobar que ningún indicador importante queda oculto al cambiar de ruta o activar módulos.</li>\n\n<p>Para el estado vivo, consulta <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions\">Actions</a> y <a href=\"https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases\">Releases</a>.</p>\n\n<h2>En una mirada</h2>\n\n<p>IVANNA OMEGA SUPREME combina una aplicación Android en Kotlin, componentes nativos de procesamiento de audio en C++, herramientas de medición acústica y módulos de visualización espacial. El propósito es construir rutas de procesamiento y calibración que se puedan inspeccionar y probar, sin convertir una intención de diseño en una promesa de resultado.</p>\n\n<p><table></p>\n<p><tr></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>🎚️ Audio</h3>\n\n<p>Reproducción y procesamiento desde la aplicación, resampling y un control software de cola de AudioTrack en la ruta propia del reproductor.</p>\n\n<p></td></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>📐 Medición</h3>\n\n<p>Herramientas para reproducir tonos de prueba, registrar la respuesta del micrófono y comparar una medición antes y después de un ajuste.</p>\n\n<p></td></p>\n<p><td width=\"33%\" valign=\"top\"></p>\n\n<h3>🧭 Espacio</h3>\n\n<p>Renderizador geométrico y una ruta de captura AR experimental que puede recopilar puntos espaciales y exportar datos.</p>\n\n<p></td></p>\n<p></tr></p>\n<p></table></p>\n\n<p>> <b>Regla de lectura:</b> que un módulo, modelo, dataset, control o contrato esté presente en el repositorio no demuestra por sí solo que esté conectado al audio activo, que funcione en todos los dispositivos ni que haya sido validado físicamente.</p>\n\n<h2>Atlas visual de la arquitectura</h2>\n\n<p><div align=\"center\"></p>\n\n<p><img src=\"docs/release_media/architecture-map.svg\" alt=\"Atlas técnico con rutas Android, cadena propia de reproducción, motor DSP, medición acústica, visualización espacial y límites de integración de hardware\" width=\"100%\" /></p>\n\n<p><sub>PLANO 01 · RELACIONES FUNCIONALES · LOS ENLACES NO SUSTITUYEN LAS PRUEBAS DE EJECUCIÓN</sub></p>\n\n<p></div></p>\n\n<p>El diagrama representa las relaciones generales del código. En particular, el bloque HAL/PAL es un punto de integración documentado: no es evidencia de que exista control físico del reloj o del ASRC del proveedor en el Moto G85.</p>\n\n<h2>Componentes y estado real</h2>\n\n<p><table></p>\n<p><thead><tr><th>Área</th><th>Qué contiene el proyecto</th><th>Estado y límites</th></tr></thead></p>\n<p><tbody></p>\n<p><tr></p>\n<p><td><strong>Aplicación Android</strong></td></p>\n<p><td>Interfaz Kotlin/Jetpack Compose, servicios y puentes hacia componentes nativos.</td></p>\n<p><td>Código presente; la funcionalidad concreta debe evaluarse por ruta y por versión.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Motor DSP nativo</strong></td></p>\n<p><td>Código C++ y enlace JNI para las funciones nativas que llaman desde la app.</td></p>\n<p><td>La existencia del motor no prueba que cada etapa experimental participe en toda reproducción.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>PLL software de AudioTrack</strong></td></p>\n<p><td><code>AudioTrackBufferPll</code> estima la ocupación de la cola del reproductor de la app y ajusta el resampler dentro de límites de software.</td></p>\n<p><td>Implementación a nivel de código. No controla el reloj físico del DAC, Bluetooth ni el HAL global; necesita pruebas de reproducción reales para evaluar estabilidad, clics, latencia y underruns.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Cadena de reproducción del reproductor propio</strong></td></p>\n<p><td><code>IvannaBridgePlayer</code> decodifica, procesa y escribe en <code>AudioTrack</code>. Si el DSP nativo (<code>DSPBridge</code>) está cargado, ejecuta la cadena maestra y la ruta Kotlin no apila procesadores duplicados; si no, se usan NPE, Volterra, modo concierto y motor espacial según sus interruptores.</td></p>\n<p><td>Aplica solo al audio que reproduce IVANNA. No procesa el audio de otras apps ni de todo el sistema por sí mismo. Qué etapas se oyen y con qué efecto debe comprobarse con escucha y registros en el Moto G85.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Motor predictivo (Módulo 1)</strong></td></p>\n<p><td><code>predictive_audio_engine</code> analiza el audio en C++ y publica confianza, ganancia estimada y transitorios por JNI hacia la interfaz y las métricas.</td></p>\n<p><td>Es un <strong>observador</strong>: el reproductor le entrega el bloque ya procesado y no lo modifica. Hoy produce telemetría, no cambia la señal de salida. La ventana de predicción de 5–10 ms es un objetivo de diseño sin medición en dispositivo registrada.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>HRTF / SOFA / SAF</strong></td></p>\n<p><td>Cargadores y convolucionador HRTF, bases PCA y paquetes de datos. <code>check_datasets_deploy.py</code> compara la presencia/paridad de los datasets entre assets del APK y módulo, revisa cabeceras mágicas y tamaño mínimo, comprueba metadatos RIR, hashes de los IHR1 y consistencia del JSON SAF. El empaquetado del workflow impone además los conteos esperados (239 SOFA, 200 ARI, 200 RIR y 12 IHR1).</td></p>\n<p><td><strong>Límite del validador actual:</strong> para SOFA solo comprueba la firma inicial HDF5 y un tamaño mínimo; no abre cada archivo con un lector HDF5 ni valida todos sus metadatos o checksums internos. Por tanto, la puerta no demuestra integridad estructural completa de SOFA y el estado de cada archivo requiere una validación HDF5 real. Además, la presencia/paridad de los datos no prueba que la espacialización binaural resulte audible, correcta o cómoda; eso requiere escucha controlada. Una HRTF genérica no equivale a la HRTF personal de cada oyente.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Anti-Dolby / clasificador de contenido</strong></td></p>\n<p><td>Modelo <code>anti_dolby_crnn.tflite</code> que clasifica el contenido en voz, música, bajos y silencio, y lógica nativa que usa esa clasificación.</td></p>\n<p><td>Es un clasificador de contenido, no un modelo entrenado de política acústica universal. Las decisiones de orquestación son deterministas y acotadas. No se afirma un desprocesamiento verificado frente a ningún códec concreto sin mediciones con material de referencia.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Medición y corrección de sala</strong></td></p>\n<p><td>Secuencia de tonos, captura de micrófono, comparación antes/después y lógica de restauración cuando el resultado no cumple el criterio interno.</td></p>\n<p><td>El micrófono del teléfono no es un instrumento calibrado. La métrica interna no equivale a una mejora audible universal ni a una certificación acústica.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>FotoHolo / captura AR</strong></td></p>\n<p><td>Actividad de captura con ARCore, seguimiento espacial, puntos 3D y flujo de exportación.</td></p>\n<p><td>Experimental. No debe confundirse una nube de puntos con una malla completa, un plano certificado ni una medición RT60/RIR. Requiere probar permisos, seguimiento, pausa/reanudación y exportación en el equipo.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Renderizador geométrico</strong></td></p>\n<p><td><code>SceneGeometryRenderer</code> genera imágenes a partir de una configuración geométrica; el código contempla hasta 3840 × 2160 píxeles.</td></p>\n<p><td>Renderiza la geometría configurada. No es por sí solo una reconstrucción automática de la habitación ni una simulación acústica validada.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Reloj de hardware (productor HAL)</strong></td></p>\n<p><td><code>daemon/hal_clock_producer</code> lee la muestra del driver con <code>SNDRV_PCM_IOCTL_STATUS</code> sobre <code>/dev/snd/pcmC*D*p</code>, que devuelve <code>hw_ptr</code> (frames presentados) y <code>tstamp</code> (CLOCK_MONOTONIC) en una sola consulta, y publica el snapshot compartido <code>IVHC</code> solo si la muestra es correlacionada.</td></p>\n<p><td>Desde 2.5.130 el primer tramo de la cadena existe en la ruta Magisk: productor → mmap → lector del efecto → JNI → fila «Reloj hardware». La prueba de extremo a extremo del contrato IPC está en host (9/9). Que el driver del Moto G85 entregue muestras dentro de tolerancia solo se comprueba en el dispositivo, leyendo las líneas <code>HAL-CLOCK</code> del log del daemon.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Bocinas declaradas (estéreo/surround + subwoofer)</strong></td></p>\n<p><td><code>SpeakerLayoutPolicy</code> (lógica pura, 9 pruebas JVM) y el panel <code>SpeakerLayoutPanel</code> dejan declarar modo (estéreo/surround), número de satélites y si hay subwoofer activo. Generaliza el mismo mecanismo que ya conectaba el perfil Genezy MHCPZ1.</td></p>\n<p><td>El único actuador real al final de la cadena sigue siendo <code>spatial_width</code> → <code>StereoWidener</code>. El campo <code>high_cut_hz</code> del daemon se guarda y se lee de vuelta, pero ningún código del efecto lo aplica a la señal (confirmado por lectura directa de <code>omega_effect.cpp</code>). Por eso esta función solo matiza el ancho estéreo (±15 % máx.) según lo declarado; <strong>no</strong> enruta canales discretos ni gestiona graves/LFE reales — el motor no tiene un crossover conectado.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Renderizador binaural de objetos</strong></td></p>\n<p><td><code>ivanna_object_renderer.hpp</code> amplió sus posiciones virtuales de 12 a 16, con cuatro satélites laterales adicionales sobre el renderer HRTF/VBAP existente.</td></p>\n<p><td>Son fuentes virtuales renderizadas en binaural estéreo (auriculares o los dos altavoces del teléfono), no canales físicos independientes; no implica reenrutamiento multicanal real.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>SAFMUS / ACSR / HAL-PAL</strong></td></p>\n<p><td>Hay lógica, adaptadores y contratos de integración en distintas partes del repositorio.</td></p>\n<p><td>La documentación de integración no demuestra una unión de extremo a extremo con el hardware del fabricante. No afirmamos un actuador PAL/ASRC operativo ni control físico de reloj en el Moto G85 sin lectura de retorno y pruebas. El actuador ASRC físico sigue sin identificar y sin enlazar: el productor queda <strong>fail-closed</strong> y declara el motivo.</td></p>\n<p></tr></p>\n<p><tr></p>\n<p><td><strong>Wi-Fi / CSI</strong></td></p>\n<p><td>Políticas conservadoras para tratar observaciones de radio como indicios de contexto.</td></p>\n<p><td>Las API Wi-Fi comunes no equivalen a CSI. La disponibilidad depende de hardware y proveedor compatibles; no se afirma reconstrucción anatómica ni compatibilidad universal.</td></p>\n<p></tr></p>\n<p></tbody></p>\n<p></table></p>\n\n<h2>Flujos que importan</h2>\n\n<h3>Medición: medir, decidir y verificar</h3>\n\n<pre>flowchart LR\n    A[\"Medición inicial\"] --&gt; B[\"Diseñar corrección\"]\n    B --&gt; C[\"Aplicar ajuste\"]\n    C --&gt; D[\"Medición posterior\"]\n    D --&gt; E{\"¿Datos válidos y criterio cumplido?\"}\n    E --&gt;|Sí| F[\"Aceptar y registrar\"]\n    E --&gt;|No| G[\"Restaurar estado anterior\"]\n    G --&gt; H[\"Registrar motivo\"]</pre>\n\n<p>Este flujo describe la lógica implementada en la ruta de medición. La fiabilidad depende de la señal, el ruido, la posición, el volumen, la salida y las características del micrófono. La reversión de un ajuste no sustituye las pruebas de seguridad de todas las rutas de audio.</p>\n\n<h3>Reproducción: alcance del PLL software</h3>\n\n<pre>flowchart TD\n    A[\"Audio de la app\"] --&gt; B[\"AudioTrack\"]\n    B --&gt; C[\"Timestamp / estimación de cola\"]\n    C --&gt; D[\"AudioTrackBufferPll\"]\n    D --&gt; E[\"Corrección limitada en ppm\"]\n    E --&gt; F[\"StereoAudioResampler\"]\n    F --&gt; B\n    H[\"Datos inválidos o desalineados\"] -.-&gt; I[\"Reset a corrección neutra\"]\n    I -.-&gt; D</pre>\n\n<p>El PLL trabaja sobre el resampler del reproductor propio de IVANNA. No puede inferir ni escribir automáticamente el reloj físico de un DAC, una ruta Bluetooth o un módulo HAL. El funcionamiento auditivo y la estabilidad deben comprobarse en el teléfono con cada salida que se quiera declarar compatible.</p>\n\n<h2>FotoHolo y visualización 3D</h2>\n\n<li>**Captura AR:** usa las capacidades que ARCore y el dispositivo expongan; la disponibilidad de profundidad no es universal.</li>\n<li>**Nube de puntos:** es una representación parcial de las observaciones de captura, no una reconstrucción cerrada de toda la habitación.</li>\n<li>**Renderizado 3D:** la imagen se deriva de la geometría configurada en el módulo; la resolución de salida no garantiza realismo fotorrealista.</li>\n<li>**Acústica:** la geometría visual no es una medición de respuesta al impulso, reverberación ni absorción de materiales.</li>\n\n<h2>Privacidad y claves de API</h2>\n\n<p>El procesamiento local que no requiere servicios externos debe poder operar sin una clave de Google. Una clave solo es necesaria para una función opcional cuando esa función invoque realmente un servicio externo que la exija. No se debe interpretar la presencia de una interfaz o configuración de proveedor como prueba de que la integración remota esté activa.</p>\n\n<p>La cámara y el micrófono deben solicitarse cuando una función los necesita. Antes de compartir diagnósticos, elimina credenciales, tokens, datos personales y grabaciones privadas.</p>\n\n<h2>Compilar y ejecutar comprobaciones</h2>\n\n<h3>Requisitos</h3>\n\n<p>Consulta las versiones exactas configuradas por el proyecto y por CI. La configuración actual utiliza Android SDK, NDK, CMake, Gradle Wrapper y Node.js para los componentes correspondientes. La reproducción completa de CI puede requerir Linux y dependencias adicionales.</p>\n\n<h3>Pruebas nativas en host</h3>\n\n<p>Desde la raíz del repositorio:</p>\n\n<pre>cmake -B build-tests -S app/src/main/cpp/tests -DCMAKE_BUILD_TYPE=Release\ncmake --build build-tests -j4\nctest --test-dir build-tests --output-on-failure</pre>\n\n<h3>Puertas estáticas</h3>\n\n<pre>for s in scripts/check_*.py; do\n  python3 \"$s\" || exit 1\ndone</pre>\n\n<p>Estos comandos no sustituyen la compilación Android, las pruebas instrumentadas ni la validación del teléfono. Para reproducir exactamente la entrega, revisa <a href=\".github/workflows/build.yml\">el flujo de GitHub Actions</a>.</p>\n\n<h2>Banco sintético de audio y diagnósticos accionables</h2>\n\n<p>El banco de pruebas de Python tiene tres piezas separadas. Sus resultados deben interpretarse según el alcance de cada una:</p>\n\n<li>**Analizador WAV** — [`scripts/ivanna_audio_certify.py`](scripts/ivanna_audio_certify.py): lee PCM entero sin compresión de 8, 16, 24 o 32 bits; informa RMS y pico por canal, offset DC, clipping y desequilibrio entre canales. Opcionalmente estima el residuo de un tono conocido y compara una captura contra un WAV de referencia.</li>\n<li>**Inyección sintética de fallos** — [`scripts/ivanna_synthetic_audio_suite.py`](scripts/ivanna_synthetic_audio_suite.py): genera siete estímulos de control y verifica que el analizador detecte los defectos inyectados sin marcar determinados casos limpios como defectuosos.</li>\n<li>**Puerta de evidencia física** — [`scripts/ivanna_auditory_gate.py`](scripts/ivanna_auditory_gate.py): exige checks explícitos, las rutas requeridas, evidencia del dispositivo y escucha con niveles igualados para devolver `GREEN`. Ausencia de evidencia no pasa como éxito.</li>\n\n<h3>Estímulos sintéticos cubiertos</h3>\n\n<p>| Estímulo | Comportamiento esperado |</p>\n<p>|---|---|</p>\n<p>| <code>clean_sine</code> | Sin clipping, desequilibrio ni DC detectados; sin THD+N residual crítico. |</p>\n<p>| <code>clipping</code> | Debe informar <code>PCM_CLIPPING</code>. |</p>\n<p>| <code>dc_offset</code> | Debe informar <code>DC_OFFSET</code>. |</p>\n<p>| <code>channel_imbalance</code> | Debe informar <code>CHANNEL_IMBALANCE</code>. |</p>\n<p>| <code>harmonic_distortion</code> | Debe informar <code>TONE_THDN_HIGH</code>. |</p>\n<p>| <code>near_full_scale</code> | Debe avisar <code>LOW_PEAK_HEADROOM</code> sin confundirlo con clipping. |</p>\n<p>| <code>silent</code> | No debe producir las alarmas de clipping, DC ni desequilibrio definidas para la prueba. |</p>\n\n<h3>Ejecutar el banco</h3>\n\n<p>Desde la raíz del repositorio:</p>\n\n<pre>python3 -m unittest discover -s tests -p 'test_ivanna_audio_certify.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_synthetic_audio_suite.py' -v\npython3 -m unittest discover -s tests -p 'test_ivanna_auditory_gate.py' -v\npython3 scripts/ivanna_synthetic_audio_suite.py --output-dir /tmp/ivanna-synthetic-report</pre>\n\n<p>Para analizar una captura real, el archivo debe ser WAV PCM entero sin compresión:</p>\n\n<pre>python3 scripts/ivanna_audio_certify.py captura.wav --tone-hz 1000 --json-out informe.json\npython3 scripts/ivanna_audio_certify.py despues.wav --reference antes.wav --json-out comparacion.json</pre>\n\n<p>La comparación de referencia requiere la misma frecuencia de muestreo y el mismo número de canales; el SNR residual también penaliza desalineación temporal y diferencia de ganancia. No recortes muestras arbitrariamente para ocultar latencia: alinea ventanas equivalentes y mide la latencia por separado.</p>\n\n<p>Los hallazgos del analizador pueden ser <code>CRITICAL</code>, <code>WARNING</code> o inexistentes, y el resumen puede ser <code>RED</code>, <code>AMBER</code> o <code>NO_SCREENING_FLAGS</code>. Son heurísticas de cribado, no límites universales de percepción. La puerta física usa <code>RED</code>/<code>AMBER</code>/<code>GREEN</code> con otra semántica; no son intercambiables.</p>\n\n<p><b>Límite esencial:</b> el banco sintético comprueba el comportamiento del analizador ante señales generadas. No mide la ruta Android en vivo, el códec Bluetooth realmente negociado, el ASRC del proveedor, la latencia extremo a extremo, SPL acústico ni THD de laboratorio. Para eso se requieren capturas de la ruta física, equipo adecuado y escucha controlada con niveles igualados.</p>\n\n<h2>Estado de CI, versiones y pruebas físicas</h2>\n\n<li>[Ver ejecuciones de CI](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/actions)</li>\n<li>[Ver versiones publicadas](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases)</li>\n<li>[Ver código de la versión indicada](version.properties)</li>\n<li>[Plan de aceptación para Moto G85 / Android 15](docs/PLAN_10D_MOTO_G85_ACCEPTANCE.md)</li>\n\n<p>El distintivo CI refleja el estado del flujo configurado en GitHub; no es una certificación acústica ni demuestra que se haya probado el teléfono. Antes de considerar una versión lista, verifica que la compilación, los tests, el APK y el ZIP Magisk procedan del mismo commit, inspecciona sus hashes y prueba la instalación en el dispositivo de destino.</p>\n\n<h3>El pipeline de release no publicaba (corregido en 2.5.132)</h3>\n\n<p>Hasta 2.5.131, el job <code>publish-release</code> se disparaba comparando el <b>texto literal</b> del mensaje de</p>\n<p>commit contra <code>\"release:\"</code> / <code>\"— v\"</code>. Los commits de bump reales usaban formatos como</p>\n<p><code>chore(release): v2.5.130 (421) — …</code>, que no calzan con ese patrón (el paréntesis rompe el match). Resultado</p>\n<p>verificado contra la API de GitHub: <b>v2.5.129, v2.5.130 y v2.5.131 nunca se publicaron</b> como release real</p>\n<p>pese a estar en <code>main</code> con <code>version.properties</code>/<code>module.prop</code> correctamente bumpeados; <code>update.json</code> seguía</p>\n<p>apuntando a <code>v2.5.130</code>, un tag que nunca existió, y el OTA del módulo Magisk llevaba varias versiones</p>\n<p>apuntando a un asset inexistente. El repositorio acumuló cientos de drafts <code>staging-<sha>-<run></code> (el bundle</p>\n<p>intermedio que sí se publica siempre) sin barrer, porque la limpieza de esos drafts vive dentro del mismo job</p>\n<p>que nunca se ejecutaba.</p>\n\n<p>Desde 2.5.132, un job <code>detect-release</code> decide si publicar comparando <code>version.properties</code> contra el commit</p>\n<p>padre con <code>git diff</code> — ya no depende de cómo se redacte el mensaje. Verifica tú mismo que una versión quedó</p>\n<p>publicada de verdad en <https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases></p>\n<p>(debe aparecer como release, no como draft <code>staging-*</code>) antes de confiar en el ZIP que ofrece el updater del</p>\n<p>módulo.</p>\n\n<h3>Reloj de hardware: qué quedó enlazado en 2.5.130</h3>\n\n<p>Hasta 2.5.129 la cadena de reloj existía de extremo a extremo <b>menos en su primer tramo</b>: el efecto leía el snapshot (<code>HardwareClockReader</code>), el JNI lo exponía (<code>nativeGetClockTelemetryJni</code>) y el panel «Reloj hardware» lo mostraba, pero nadie lo publicaba en la ruta Magisk. La versión 2.5.130 añade ese productor.</p>\n\n<p>| Pieza añadida | Qué hace | Evidencia |</p>\n<p>|---|---|---|</p>\n<p>| <code>daemon/hal_clock_producer.hpp</code> (167 líneas) | <code>ProducerState</code> con siete estados honestos, <code>PcmDevice</code>, <code>PairedSample</code>, <code>CorrelationGate</code> y <code>HalClockProducer</code> | Compila con <code>g++ 13 -std=c++20 -O2 -Wall -Wextra</code>, 0 avisos |</p>\n<p>| <code>daemon/hal_clock_producer.cpp</code> (302 líneas) | Descubrimiento por <code>/proc/asound</code>, lectura por ioctl, puerta de correlación y publicación en el mmap <code>IVHC</code> | 9/9 pruebas host |</p>\n<p>| <code>daemon/ivanna_daemon.cpp</code> (+45) | <code>--hal-clock</code> / <code>--no-hal-clock</code> (activo por defecto) e hilo de sondeo a 250 ms con registro solo al cambiar de estado | Sintaxis verificada en host con cabecera <code>android/log.h</code> simulada |</p>\n<p>| <code>tests/test_hal_clock_producer.cpp</code> (192 líneas) | 9 pruebas, incluida la de extremo a extremo Publisher → mmap → Reader | <code>[ PASSED ] 9 tests</code> |</p>\n\n<p>La puerta de correlación rechaza rate nominal ausente, timestamp no positivo, Δt ≤ 1 µs, Δt > 500 ms (PCM parado), frames que retroceden y tasa implícita fuera de 0,80–1,20 × la nominal; exige tres pares coherentes consecutivos antes de publicar. Todo rechazo se declara con motivo legible.</p>\n\n<p>Lo que <b>no</b> cambia con esta versión: el actuador ASRC físico del Moto G85 sigue sin identificar. <code>hal_integration/MOTO_G85_PAL_CLOCK_INTEGRATION.md</code> documenta que <code>pal_get_timestamp</code> no entrega un par frames + CLOCK_MONOTONIC, así que no puede alimentar al tracker ni al servo; adivinar el nodo produciría la telemetría falsa que la Fase 0 del plan 10D ordena eliminar. Tampoco se ha verificado aquí la compilación Kotlin/APK ni la ejecución de CTest en el runner.</p>\n\n<h3>Lista de aceptación en hardware</h3>\n\n<li>[ ] Instalar APK y módulo generados desde el mismo commit aprobado.</li>\n<li>[ ] Probar la salida integrada, USB-C DAC/adaptador y Bluetooth por separado cuando estén disponibles.</li>\n<li>[ ] Confirmar que el reproductor propio avanza, que la corrección permanece dentro de sus límites y que no aparecen clics, cambios de tono o underruns anómalos.</li>\n<li>[ ] Abrir FotoHolo, confirmar cámara en vivo, seguimiento, pausa/reanudación y exportación.</li>\n<li>[ ] Registrar el modelo, versión Android, ruta, SHA del commit, hashes de artefactos y resultados.</li>\n<li>[ ] No declarar HAL/PAL conectado sin identificar el callback real, unidades del parámetro, actuador, lectura de retorno y prueba en hardware.</li>\n<li>[ ] Leer las líneas `HAL-CLOCK` del log del daemon durante reproducción real y anotar el estado observado (`publishing`, `rejected`, `no-devices`, `no-source`) junto con el motivo y la deriva en ppm.</li>\n\n<h2>Contribuir y reportar problemas</h2>\n\n<p>Los informes más útiles incluyen el commit o versión probados, modelo de dispositivo, versión de Android, ruta de audio, pasos para reproducir y registros depurados de datos personales.</p>\n\n<li>[Abrir un issue](https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/issues)</li>\n<li>[Revisar cambios](CHANGELOG.md)</li>\n<li>[Consultar documentación de ingeniería](docs/ENGINEERING.md)</li>\n\n<h2>Licencia y propiedad intelectual</h2>\n\n<p>IVANNA OMEGA SUPREME se presenta como un producto propietario. La visibilidad pública del repositorio no concede por sí sola permiso para reutilizar el código propio. Los componentes, bibliotecas, modelos y datasets de terceros conservan sus licencias y avisos; revisa los archivos de licencia y avisos antes de redistribuir. Las concesiones expresas aplicables a versiones anteriores siguen rigiendo esas versiones según sus términos.</p>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n\n<p><b>Construir con rigor. Medir cuando sea posible. Declarar solo lo que la evidencia respalda.</b></p>\n\n<p><sub>La arquitectura y las funciones evolucionan; el código, las pruebas reproducibles y la validación física tienen prioridad sobre cualquier etiqueta de marketing.</sub></p>\n\n<p></div></p>",
   "homepageUrl": "https://luisurielpimentelperez814-design.github.io/IVANNA-OMEGA-SUPREME/",
   "sourceUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME",
   "url": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME",
   "latestRelease": {
-    "name": "v2.5.176",
-    "version": "v2.5.176",
-    "time": "2026-10-28T05:23:37Z",
-    "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.176/ivanna_omega_supreme_v2.5.176.zip"
+    "name": "v2.5.193",
+    "version": "v2.5.193",
+    "time": "2026-10-29T04:24:27Z",
+    "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.193/ivanna_omega_supreme_v2.5.193.zip"
   },
   "releases": [
+    {
+      "name": "v2.5.193",
+      "tagName": "v2.5.193",
+      "publishedAt": "2026-10-29T04:24:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-44a03973f0a725d1ea161d0efd020279295b169c.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.193/ivanna-omega-supreme-44a03973f0a725d1ea161d0efd020279295b169c.apk",
+          "size": 209601290,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.193.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.193/ivanna_omega_supreme_v2.5.193.zip",
+          "size": 107458057,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.193/ivanna_promo_flyer.png",
+          "size": 202298,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.193.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.193/ivanna_promo_flyer_v2.5.193.png",
+          "size": 202298,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5.190",
+      "tagName": "v2.5.190",
+      "publishedAt": "2026-10-28T22:30:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-70827959cac2cd0089e31b4414b80b0654dcb587.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.190/ivanna-omega-supreme-70827959cac2cd0089e31b4414b80b0654dcb587.apk",
+          "size": 209601278,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.190.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.190/ivanna_omega_supreme_v2.5.190.zip",
+          "size": 107456252,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.190/ivanna_promo_flyer.png",
+          "size": 185929,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.190.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.190/ivanna_promo_flyer_v2.5.190.png",
+          "size": 185929,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.189",
+      "tagName": "v2.5.189",
+      "publishedAt": "2026-10-28T20:07:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-0591080dcf8564998b28ef06eca4a443e5a1a9b6.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.189/ivanna-omega-supreme-0591080dcf8564998b28ef06eca4a443e5a1a9b6.apk",
+          "size": 209601278,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.189.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.189/ivanna_omega_supreme_v2.5.189.zip",
+          "size": 107456226,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.189/ivanna_promo_flyer.png",
+          "size": 176713,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.189.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.189/ivanna_promo_flyer_v2.5.189.png",
+          "size": 176713,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.188",
+      "tagName": "v2.5.188",
+      "publishedAt": "2026-10-28T17:35:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-85574225c8b2dbb58ded42c441ac2769f683073d.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.188/ivanna-omega-supreme-85574225c8b2dbb58ded42c441ac2769f683073d.apk",
+          "size": 209601282,
+          "downloadCount": 3
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.188.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.188/ivanna_omega_supreme_v2.5.188.zip",
+          "size": 107456231,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.188/ivanna_promo_flyer.png",
+          "size": 174500,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.188.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.188/ivanna_promo_flyer_v2.5.188.png",
+          "size": 174500,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5.187",
+      "tagName": "v2.5.187",
+      "publishedAt": "2026-10-28T13:38:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-fc868eb377c0ef41ff634524450dfbedbd8ce65e.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.187/ivanna-omega-supreme-fc868eb377c0ef41ff634524450dfbedbd8ce65e.apk",
+          "size": 209601278,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.187.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.187/ivanna_omega_supreme_v2.5.187.zip",
+          "size": 107456232,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.187/ivanna_promo_flyer.png",
+          "size": 186757,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.187.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.187/ivanna_promo_flyer_v2.5.187.png",
+          "size": 186757,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5.183",
+      "tagName": "v2.5.183",
+      "publishedAt": "2026-10-28T13:01:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-be68b1ff74bc781e8019fa7ccf1cf2db83846c5a.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.183/ivanna-omega-supreme-be68b1ff74bc781e8019fa7ccf1cf2db83846c5a.apk",
+          "size": 209601282,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.183.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.183/ivanna_omega_supreme_v2.5.183.zip",
+          "size": 107456229,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.183/ivanna_promo_flyer.png",
+          "size": 183937,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.183.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.183/ivanna_promo_flyer_v2.5.183.png",
+          "size": 183937,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.182",
+      "tagName": "v2.5.182",
+      "publishedAt": "2026-10-28T12:53:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-a6f7b0118cf9272793b4869b95ade4670acd2513.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.182/ivanna-omega-supreme-a6f7b0118cf9272793b4869b95ade4670acd2513.apk",
+          "size": 209601278,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.182.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.182/ivanna_omega_supreme_v2.5.182.zip",
+          "size": 107455203,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.182/ivanna_promo_flyer.png",
+          "size": 201909,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.182.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.182/ivanna_promo_flyer_v2.5.182.png",
+          "size": 201909,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5.181",
+      "tagName": "v2.5.181",
+      "publishedAt": "2026-10-28T12:56:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-b30dd1c81199cdf4df42bb9dad923afe5b8d1c10.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.181/ivanna-omega-supreme-b30dd1c81199cdf4df42bb9dad923afe5b8d1c10.apk",
+          "size": 209601282,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.181.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.181/ivanna_omega_supreme_v2.5.181.zip",
+          "size": 107455192,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.181/ivanna_promo_flyer.png",
+          "size": 174604,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.181.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.181/ivanna_promo_flyer_v2.5.181.png",
+          "size": 174604,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.180",
+      "tagName": "v2.5.180",
+      "publishedAt": "2026-10-28T12:48:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-ac8676b8b626d81c316776280ab2671fd700251e.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.180/ivanna-omega-supreme-ac8676b8b626d81c316776280ab2671fd700251e.apk",
+          "size": 209601278,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.180.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.180/ivanna_omega_supreme_v2.5.180.zip",
+          "size": 107449631,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.180/ivanna_promo_flyer.png",
+          "size": 173916,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.180.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.180/ivanna_promo_flyer_v2.5.180.png",
+          "size": 173916,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.179",
+      "tagName": "v2.5.179",
+      "publishedAt": "2026-10-28T12:04:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-2223af50a04123b808ebc12395b91ed29d836b38.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.179/ivanna-omega-supreme-2223af50a04123b808ebc12395b91ed29d836b38.apk",
+          "size": 209601282,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.179.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.179/ivanna_omega_supreme_v2.5.179.zip",
+          "size": 107449649,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.179/ivanna_promo_flyer.png",
+          "size": 181378,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.179.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.179/ivanna_promo_flyer_v2.5.179.png",
+          "size": 181378,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.178",
+      "tagName": "v2.5.178",
+      "publishedAt": "2026-10-28T11:53:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-c0df179e83af4be6a70aa53483dab1d985bbb4be.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.178/ivanna-omega-supreme-c0df179e83af4be6a70aa53483dab1d985bbb4be.apk",
+          "size": 209601282,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.178.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.178/ivanna_omega_supreme_v2.5.178.zip",
+          "size": 107449657,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.178/ivanna_promo_flyer.png",
+          "size": 188236,
+          "downloadCount": 0
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.178.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.178/ivanna_promo_flyer_v2.5.178.png",
+          "size": 188236,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5.177",
+      "tagName": "v2.5.177",
+      "publishedAt": "2026-10-28T06:53:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ivanna-omega-supreme-ccb4dbbce88808202e6e3c513ce57d1bcf7eaa76.apk",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.177/ivanna-omega-supreme-ccb4dbbce88808202e6e3c513ce57d1bcf7eaa76.apk",
+          "size": 209601282,
+          "downloadCount": 2
+        },
+        {
+          "name": "ivanna_omega_supreme_v2.5.177.zip",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.177/ivanna_omega_supreme_v2.5.177.zip",
+          "size": 107449642,
+          "downloadCount": 3
+        },
+        {
+          "name": "ivanna_promo_flyer.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.177/ivanna_promo_flyer.png",
+          "size": 188626,
+          "downloadCount": 1
+        },
+        {
+          "name": "ivanna_promo_flyer_v2.5.177.png",
+          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.177/ivanna_promo_flyer_v2.5.177.png",
+          "size": 188626,
+          "downloadCount": 2
+        }
+      ]
+    },
     {
       "name": "v2.5.176",
       "tagName": "v2.5.176",
@@ -27,19 +411,19 @@
           "name": "ivanna_omega_supreme_v2.5.176.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.176/ivanna_omega_supreme_v2.5.176.zip",
           "size": 107442588,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.176/ivanna_promo_flyer.png",
           "size": 186359,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.176.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.176/ivanna_promo_flyer_v2.5.176.png",
           "size": 186359,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -53,13 +437,13 @@
           "name": "ivanna-omega-supreme-655340662aab4dc68e23d04abcc0103a2ddd6ad6.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.175/ivanna-omega-supreme-655340662aab4dc68e23d04abcc0103a2ddd6ad6.apk",
           "size": 209601282,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.175.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.175/ivanna_omega_supreme_v2.5.175.zip",
           "size": 107442603,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -71,7 +455,7 @@
           "name": "ivanna_promo_flyer_v2.5.175.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.175/ivanna_promo_flyer_v2.5.175.png",
           "size": 184124,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -85,7 +469,7 @@
           "name": "ivanna-omega-supreme-2cf3a80e58895a939bf7c2bf619b006853a71431.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.174/ivanna-omega-supreme-2cf3a80e58895a939bf7c2bf619b006853a71431.apk",
           "size": 209601282,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.174.zip",
@@ -103,7 +487,7 @@
           "name": "ivanna_promo_flyer_v2.5.174.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.174/ivanna_promo_flyer_v2.5.174.png",
           "size": 202024,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -117,13 +501,13 @@
           "name": "ivanna-omega-supreme-0981e5c6cbd7d32413a1aa69e0aea54d40d615d0.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.173/ivanna-omega-supreme-0981e5c6cbd7d32413a1aa69e0aea54d40d615d0.apk",
           "size": 209601282,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.173.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.173/ivanna_omega_supreme_v2.5.173.zip",
           "size": 107442569,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -149,19 +533,19 @@
           "name": "ivanna-omega-supreme-0fa305caa9a282f8f8d51a52fab3f0aa48275219.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.172/ivanna-omega-supreme-0fa305caa9a282f8f8d51a52fab3f0aa48275219.apk",
           "size": 209601282,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.172.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.172/ivanna_omega_supreme_v2.5.172.zip",
           "size": 107442581,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.172/ivanna_promo_flyer.png",
           "size": 189189,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.172.png",
@@ -181,19 +565,19 @@
           "name": "ivanna-omega-supreme-3ce75e4da2dcca37870da33c78b84cf6c3027b09.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.171/ivanna-omega-supreme-3ce75e4da2dcca37870da33c78b84cf6c3027b09.apk",
           "size": 209601282,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.171.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.171/ivanna_omega_supreme_v2.5.171.zip",
           "size": 107441537,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.171/ivanna_promo_flyer.png",
           "size": 207074,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.171.png",
@@ -213,13 +597,13 @@
           "name": "ivanna-omega-supreme-673f7430c5f549a97c82598b14922115c22184b2.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.170/ivanna-omega-supreme-673f7430c5f549a97c82598b14922115c22184b2.apk",
           "size": 209601278,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.170.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.170/ivanna_omega_supreme_v2.5.170.zip",
           "size": 107441538,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -231,7 +615,7 @@
           "name": "ivanna_promo_flyer_v2.5.170.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.170/ivanna_promo_flyer_v2.5.170.png",
           "size": 176594,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -245,19 +629,19 @@
           "name": "ivanna-omega-supreme-ac1bcaf5b6115f8784c3e39d3a9805d9c07bf0b5.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.169/ivanna-omega-supreme-ac1bcaf5b6115f8784c3e39d3a9805d9c07bf0b5.apk",
           "size": 209584898,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.169.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.169/ivanna_omega_supreme_v2.5.169.zip",
           "size": 107441538,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.169/ivanna_promo_flyer.png",
           "size": 183242,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.169.png",
@@ -277,19 +661,19 @@
           "name": "ivanna-omega-supreme-63765243e62fa1d19ced08c5ee7cc4f83232a9cc.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.168/ivanna-omega-supreme-63765243e62fa1d19ced08c5ee7cc4f83232a9cc.apk",
           "size": 209584898,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.168.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.168/ivanna_omega_supreme_v2.5.168.zip",
           "size": 107442028,
-          "downloadCount": 2
+          "downloadCount": 3
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.168/ivanna_promo_flyer.png",
           "size": 184797,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.168.png",
@@ -309,13 +693,13 @@
           "name": "ivanna-omega-supreme-efe62cab1c9cf0447f2def85404939a32b3ab2e3.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.167/ivanna-omega-supreme-efe62cab1c9cf0447f2def85404939a32b3ab2e3.apk",
           "size": 209584898,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.167.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.167/ivanna_omega_supreme_v2.5.167.zip",
           "size": 107442025,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -327,7 +711,7 @@
           "name": "ivanna_promo_flyer_v2.5.167.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.167/ivanna_promo_flyer_v2.5.167.png",
           "size": 188968,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -341,13 +725,13 @@
           "name": "ivanna-omega-supreme-bb011019bc1d4e1445ec54981602f9ade6e1f94a.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.163/ivanna-omega-supreme-bb011019bc1d4e1445ec54981602f9ade6e1f94a.apk",
           "size": 209584898,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.163.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.163/ivanna_omega_supreme_v2.5.163.zip",
           "size": 107442023,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -359,7 +743,7 @@
           "name": "ivanna_promo_flyer_v2.5.163.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.163/ivanna_promo_flyer_v2.5.163.png",
           "size": 190206,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -373,25 +757,25 @@
           "name": "ivanna-omega-supreme-efdac994dae36383651f1fd86f1d51d65dcbd96f.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.161/ivanna-omega-supreme-efdac994dae36383651f1fd86f1d51d65dcbd96f.apk",
           "size": 209584840,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.161.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.161/ivanna_omega_supreme_v2.5.161.zip",
           "size": 107442048,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.161/ivanna_promo_flyer.png",
           "size": 188182,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.161.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.161/ivanna_promo_flyer_v2.5.161.png",
           "size": 188182,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -405,13 +789,13 @@
           "name": "ivanna-omega-supreme-e4c7b74bd96de90e35ce3f18c1155ba9d8a2c0ed.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.160/ivanna-omega-supreme-e4c7b74bd96de90e35ce3f18c1155ba9d8a2c0ed.apk",
           "size": 209584840,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.160.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.160/ivanna_omega_supreme_v2.5.160.zip",
           "size": 107442043,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -423,7 +807,7 @@
           "name": "ivanna_promo_flyer_v2.5.160.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.160/ivanna_promo_flyer_v2.5.160.png",
           "size": 184599,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -437,19 +821,19 @@
           "name": "ivanna-omega-supreme-96730899ba4038b3a74f2b1e78d4cd38eb7cec08.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.149/ivanna-omega-supreme-96730899ba4038b3a74f2b1e78d4cd38eb7cec08.apk",
           "size": 209519292,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.149.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.149/ivanna_omega_supreme_v2.5.149.zip",
           "size": 107440001,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.149/ivanna_promo_flyer.png",
           "size": 191497,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.149.png",
@@ -469,19 +853,19 @@
           "name": "ivanna-omega-supreme-2f84cbcbe5e6435d06245ded5bc0ebdc88ffead8.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.148/ivanna-omega-supreme-2f84cbcbe5e6435d06245ded5bc0ebdc88ffead8.apk",
           "size": 209519292,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_omega_supreme_v2.5.148.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.148/ivanna_omega_supreme_v2.5.148.zip",
           "size": 107440005,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.148/ivanna_promo_flyer.png",
           "size": 202213,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.148.png",
@@ -501,19 +885,19 @@
           "name": "ivanna-omega-supreme-4697aa931b1b5926ca052907c6ab3c82be0b50de.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.147/ivanna-omega-supreme-4697aa931b1b5926ca052907c6ab3c82be0b50de.apk",
           "size": 209519292,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.147.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.147/ivanna_omega_supreme_v2.5.147.zip",
           "size": 107434786,
-          "downloadCount": 1
+          "downloadCount": 2
         },
         {
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.147/ivanna_promo_flyer.png",
           "size": 186232,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.147.png",
@@ -533,13 +917,13 @@
           "name": "ivanna-omega-supreme-5f25e670b4dbc83fb143b6882d1b2c4c9929cdfc.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.146/ivanna-omega-supreme-5f25e670b4dbc83fb143b6882d1b2c4c9929cdfc.apk",
           "size": 209519292,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.146.zip",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.146/ivanna_omega_supreme_v2.5.146.zip",
           "size": 107434798,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer.png",
@@ -551,7 +935,7 @@
           "name": "ivanna_promo_flyer_v2.5.146.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.146/ivanna_promo_flyer_v2.5.146.png",
           "size": 202200,
-          "downloadCount": 0
+          "downloadCount": 1
         }
       ]
     },
@@ -565,7 +949,7 @@
           "name": "ivanna-omega-supreme-33cb03023d5a203fe062bbfee8f30ab53f276bcb.apk",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.145/ivanna-omega-supreme-33cb03023d5a203fe062bbfee8f30ab53f276bcb.apk",
           "size": 209519292,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_omega_supreme_v2.5.145.zip",
@@ -577,396 +961,12 @@
           "name": "ivanna_promo_flyer.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.145/ivanna_promo_flyer.png",
           "size": 188724,
-          "downloadCount": 0
+          "downloadCount": 1
         },
         {
           "name": "ivanna_promo_flyer_v2.5.145.png",
           "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.145/ivanna_promo_flyer_v2.5.145.png",
           "size": 188724,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.144",
-      "tagName": "v2.5.144",
-      "publishedAt": "2026-10-26T08:07:35Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-7b5c77bee9920799faff11c161feb2ffb5f95210.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.144/ivanna-omega-supreme-7b5c77bee9920799faff11c161feb2ffb5f95210.apk",
-          "size": 209519292,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.144.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.144/ivanna_omega_supreme_v2.5.144.zip",
-          "size": 107434779,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.144/ivanna_promo_flyer.png",
-          "size": 182761,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.144.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.144/ivanna_promo_flyer_v2.5.144.png",
-          "size": 182761,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.143",
-      "tagName": "v2.5.143",
-      "publishedAt": "2026-10-26T07:21:00Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-84c8213b9dc2414a09aa1b16ec8be6b357910424.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.143/ivanna-omega-supreme-84c8213b9dc2414a09aa1b16ec8be6b357910424.apk",
-          "size": 209519292,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.143.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.143/ivanna_omega_supreme_v2.5.143.zip",
-          "size": 107434804,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.143/ivanna_promo_flyer.png",
-          "size": 199457,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.143.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.143/ivanna_promo_flyer_v2.5.143.png",
-          "size": 199457,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.142",
-      "tagName": "v2.5.142",
-      "publishedAt": "2026-10-26T04:20:48Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-ce48bd94cd54b5b2323f401588761f5fb6315b5e.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.142/ivanna-omega-supreme-ce48bd94cd54b5b2323f401588761f5fb6315b5e.apk",
-          "size": 209519292,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.142.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.142/ivanna_omega_supreme_v2.5.142.zip",
-          "size": 107434845,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.142/ivanna_promo_flyer.png",
-          "size": 192421,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.142.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.142/ivanna_promo_flyer_v2.5.142.png",
-          "size": 192421,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.140",
-      "tagName": "v2.5.140",
-      "publishedAt": "2026-10-25T18:22:51Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-be39f54e0a4811808c4666d1b6ba0fb7bfc01a58.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.140/ivanna-omega-supreme-be39f54e0a4811808c4666d1b6ba0fb7bfc01a58.apk",
-          "size": 209519292,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.140.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.140/ivanna_omega_supreme_v2.5.140.zip",
-          "size": 107440200,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.140/ivanna_promo_flyer.png",
-          "size": 188233,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.140.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.140/ivanna_promo_flyer_v2.5.140.png",
-          "size": 188233,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.139",
-      "tagName": "v2.5.139",
-      "publishedAt": "2026-10-25T17:58:05Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-2503e6c70c2211a391d1659af26a379b3d4bcc48.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.139/ivanna-omega-supreme-2503e6c70c2211a391d1659af26a379b3d4bcc48.apk",
-          "size": 209519292,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.139.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.139/ivanna_omega_supreme_v2.5.139.zip",
-          "size": 107440298,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.139/ivanna_promo_flyer.png",
-          "size": 200792,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.139.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.139/ivanna_promo_flyer_v2.5.139.png",
-          "size": 200792,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.138",
-      "tagName": "v2.5.138",
-      "publishedAt": "2026-10-25T07:11:43Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-229545182b485593cd4cc4d803615f1ce464679b.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.138/ivanna-omega-supreme-229545182b485593cd4cc4d803615f1ce464679b.apk",
-          "size": 209519292,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.138.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.138/ivanna_omega_supreme_v2.5.138.zip",
-          "size": 107440279,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.138/ivanna_promo_flyer.png",
-          "size": 185110,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.138.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.138/ivanna_promo_flyer_v2.5.138.png",
-          "size": 185110,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.137",
-      "tagName": "v2.5.137",
-      "publishedAt": "2026-10-25T05:05:43Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-b5c0c8d947d10a175ffa55e75e6513b1659ce350.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.137/ivanna-omega-supreme-b5c0c8d947d10a175ffa55e75e6513b1659ce350.apk",
-          "size": 209519292,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.137.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.137/ivanna_omega_supreme_v2.5.137.zip",
-          "size": 107436969,
-          "downloadCount": 3
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.137/ivanna_promo_flyer.png",
-          "size": 191497,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.137.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.137/ivanna_promo_flyer_v2.5.137.png",
-          "size": 191497,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.136",
-      "tagName": "v2.5.136",
-      "publishedAt": "2026-10-25T04:37:15Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-94efc3b2c75e608ef0566ce8298eef0e2914ef68.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.136/ivanna-omega-supreme-94efc3b2c75e608ef0566ce8298eef0e2914ef68.apk",
-          "size": 209519292,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.136.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.136/ivanna_omega_supreme_v2.5.136.zip",
-          "size": 107436983,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.136/ivanna_promo_flyer.png",
-          "size": 192764,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.136.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.136/ivanna_promo_flyer_v2.5.136.png",
-          "size": 192764,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.133",
-      "tagName": "v2.5.133",
-      "publishedAt": "2026-10-24T17:41:33Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-34f7a48d76577e14b96e47818d438e996528a410.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.133/ivanna-omega-supreme-34f7a48d76577e14b96e47818d438e996528a410.apk",
-          "size": 209519092,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.133.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.133/ivanna_omega_supreme_v2.5.133.zip",
-          "size": 107403661,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.133/ivanna_promo_flyer.png",
-          "size": 184695,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.133.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.133/ivanna_promo_flyer_v2.5.133.png",
-          "size": 184695,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.132",
-      "tagName": "v2.5.132",
-      "publishedAt": "2026-10-24T08:32:39Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-118ee7efe95fb6e8133799dd113c6a64b93126ef.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.132/ivanna-omega-supreme-118ee7efe95fb6e8133799dd113c6a64b93126ef.apk",
-          "size": 209519092,
-          "downloadCount": 1
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.132.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.132/ivanna_omega_supreme_v2.5.132.zip",
-          "size": 107389319,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.132/ivanna_promo_flyer.png",
-          "size": 192067,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.132.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.132/ivanna_promo_flyer_v2.5.132.png",
-          "size": 192067,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.128",
-      "tagName": "v2.5.128",
-      "publishedAt": "2026-10-24T00:06:01Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-08957b884272deecdf3d9217484241ef24b6dd48.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.128/ivanna-omega-supreme-08957b884272deecdf3d9217484241ef24b6dd48.apk",
-          "size": 209764916,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.128.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.128/ivanna_omega_supreme_v2.5.128.zip",
-          "size": 107277947,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.128/ivanna_promo_flyer.png",
-          "size": 191348,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.128.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.128/ivanna_promo_flyer_v2.5.128.png",
-          "size": 191348,
-          "downloadCount": 0
-        }
-      ]
-    },
-    {
-      "name": "v2.5.127",
-      "tagName": "v2.5.127",
-      "publishedAt": "2026-10-23T21:36:26Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "ivanna-omega-supreme-231e939b34242eea74abb7c0681f765efa791207.apk",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.127/ivanna-omega-supreme-231e939b34242eea74abb7c0681f765efa791207.apk",
-          "size": 209764916,
-          "downloadCount": 3
-        },
-        {
-          "name": "ivanna_omega_supreme_v2.5.127.zip",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.127/ivanna_omega_supreme_v2.5.127.zip",
-          "size": 107277950,
-          "downloadCount": 2
-        },
-        {
-          "name": "ivanna_promo_flyer.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.127/ivanna_promo_flyer.png",
-          "size": 182959,
-          "downloadCount": 0
-        },
-        {
-          "name": "ivanna_promo_flyer_v2.5.127.png",
-          "downloadUrl": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME/releases/download/v2.5.127/ivanna_promo_flyer_v2.5.127.png",
-          "size": 182959,
           "downloadCount": 0
         }
       ]
