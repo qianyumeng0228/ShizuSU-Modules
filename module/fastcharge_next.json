@@ -1,0 +1,71 @@
+{
+  "readme": "# ⚡ FastCharge Next\n\n[![GitHub release](https://img.shields.io/github/v/release/Dev97633/chargeboost-magisk?style=for-the-badge&color=brightgreen)](../../releases)\n[![GitHub stars](https://img.shields.io/github/stars/Dev97633/chargeboost-magisk?style=for-the-badge&color=yellow)](../../stargazers)\n[![License](https://img.shields.io/github/license/Dev97633/chargeboost-magisk?style=for-the-badge&color=blue)](LICENSE)\n[![Magisk](https://img.shields.io/badge/Magisk-Module-orange?style=for-the-badge&logo=android)](https://github.com/topjohnwu/Magisk)\n\nBoost your charging speed on rooted Android devices with this simple Magisk module.  \n**FastCharge Next** tweaks kernel and system parameters to optimize charging current, reducing charge time while staying safe. 🚀  \n\n---\n\n## ✨ Features\n- ⚡ Increases charging current for faster charging\n- 🔋 Works on most rooted Android devices (Magisk / KernelSU / APatch)\n- 🛡️ Safe limits applied to prevent overheating or battery damage\n- 🔧 Easy install & uninstall via Magisk Manager\n- 📂 Open source & customizable script\n\n---\n\n\n## 📥 Installation\n1. Download the latest release from **[Releases](../../releases)**\n2. Flash the `.zip` in Magisk Manager (or KernelSU/APatch)\n3. Reboot your device\n4. Enjoy faster charging ⚡\n\n---\n\n## 🧑‍💻 Usage\n- Module is automatic — just install & reboot\n- Config file located at: /data/adb/modules/fastcharge-next/config.sh\n-  You can edit limits to suit your device (default = safe values)\n\n---\n\n## 🛠️ Compatibility\n- ✅ Magisk 24+\n- ✅ KernelSU (Compatible with **[latest Releases](../../releases/v2.0.1)**)\n- ✅ Android 9 – 16  \n- ❌ Non-rooted devices are **not supported**\n\n---\n\n## 📜 How It Works\n- Writes safe charging values to:\n- `/sys/class/power_supply/battery/`\n- `/sys/class/power_supply/usb/`\n- Optimizes kernel fast-charge settings if available\n- Ensures no permanent modification — **removing module restores defaults**\n\n---\n\n## 🚀 Example Config (optional)\n```bash\n# Max charging current in mA\nCHARGE_CURRENT=3000\n\n# Max voltage in mV\nCHARGE_VOLTAGE=4400\n```\n\n---\n\n## 🤝 Contributing\n- We welcome contributions from the community! 🚀\n- Here’s how you can help:\n\n1. 🍴 Fork the repository\n2. 🌱 Create a new branch (git checkout -b feature-xyz)\n3. 🛠️ Make your changes\n4. ✅ Commit (git commit -m \"Add feature xyz\")\n5. 📤 Push (git push origin feature-xyz)\n6. 🔄 Open a Pull Request\n\n\n\n\n",
+  "readmeHTML": "<h1>⚡ FastCharge Next</h1>\n\n<p><a href=\"https://img.shields.io/github/v/release/Dev97633/chargeboost-magisk?style=for-the-badge&color=brightgreen\">![GitHub release</a>](../../releases)</p>\n<p><a href=\"https://img.shields.io/github/stars/Dev97633/chargeboost-magisk?style=for-the-badge&color=yellow\">![GitHub stars</a>](../../stargazers)</p>\n<p><a href=\"https://img.shields.io/github/license/Dev97633/chargeboost-magisk?style=for-the-badge&color=blue\">![License</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Magisk-Module-orange?style=for-the-badge&logo=android\">![Magisk</a>](https://github.com/topjohnwu/Magisk)</p>\n\n<p>Boost your charging speed on rooted Android devices with this simple Magisk module.</p>\n<p><b>FastCharge Next</b> tweaks kernel and system parameters to optimize charging current, reducing charge time while staying safe. 🚀</p>\n\n<p>---</p>\n\n<h2>✨ Features</h2>\n<li>⚡ Increases charging current for faster charging</li>\n<li>🔋 Works on most rooted Android devices (Magisk / KernelSU / APatch)</li>\n<li>🛡️ Safe limits applied to prevent overheating or battery damage</li>\n<li>🔧 Easy install & uninstall via Magisk Manager</li>\n<li>📂 Open source & customizable script</li>\n\n<p>---</p>\n\n\n<h2>📥 Installation</h2>\n<li>Download the latest release from **[Releases](../../releases)**</li>\n<li>Flash the `.zip` in Magisk Manager (or KernelSU/APatch)</li>\n<li>Reboot your device</li>\n<li>Enjoy faster charging ⚡</li>\n\n<p>---</p>\n\n<h2>🧑‍💻 Usage</h2>\n<li>Module is automatic — just install & reboot</li>\n<li>Config file located at: /data/adb/modules/fastcharge-next/config.sh</li>\n<li> You can edit limits to suit your device (default = safe values)</li>\n\n<p>---</p>\n\n<h2>🛠️ Compatibility</h2>\n<li>✅ Magisk 24+</li>\n<li>✅ KernelSU (Compatible with **[latest Releases](../../releases/v2.0.1)**)</li>\n<li>✅ Android 9 – 16</li>\n<li>❌ Non-rooted devices are **not supported**</li>\n\n<p>---</p>\n\n<h2>📜 How It Works</h2>\n<li>Writes safe charging values to:</li>\n<li>`/sys/class/power_supply/battery/`</li>\n<li>`/sys/class/power_supply/usb/`</li>\n<li>Optimizes kernel fast-charge settings if available</li>\n<li>Ensures no permanent modification — **removing module restores defaults**</li>\n\n<p>---</p>\n\n<h2>🚀 Example Config (optional)</h2>\n<pre># Max charging current in mA\nCHARGE_CURRENT=3000\n\n# Max voltage in mV\nCHARGE_VOLTAGE=4400</pre>\n\n<p>---</p>\n\n<h2>🤝 Contributing</h2>\n<li>We welcome contributions from the community! 🚀</li>\n<li>Here’s how you can help:</li>\n\n<li>🍴 Fork the repository</li>\n<li>🌱 Create a new branch (git checkout -b feature-xyz)</li>\n<li>🛠️ Make your changes</li>\n<li>✅ Commit (git commit -m \"Add feature xyz\")</li>\n<li>📤 Push (git push origin feature-xyz)</li>\n<li>🔄 Open a Pull Request</li>\n\n\n\n",
+  "homepageUrl": "https://github.com/Dev97633/Fastcharge-next",
+  "sourceUrl": "https://github.com/Dev97633/Fastcharge-next",
+  "url": "https://github.com/Dev97633/Fastcharge-next",
+  "latestRelease": {
+    "name": "v2.0.2",
+    "version": "v2.0.2",
+    "time": "2026-04-12T11:17:26Z",
+    "downloadUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v2.0.2/fastcharge-next-v2.0.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.0.2",
+      "tagName": "v2.0.2",
+      "publishedAt": "2026-04-12T11:17:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fastcharge-next-v2.0.2.zip",
+          "downloadUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v2.0.2/fastcharge-next-v2.0.2.zip",
+          "size": 20647,
+          "downloadCount": 14166
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2025-11-30T07:04:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fastcharge-next-v2.0.1.zip",
+          "downloadUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v2.0.1/fastcharge-next-v2.0.1.zip",
+          "size": 3742,
+          "downloadCount": 2456
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2025-11-29T10:17:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Fastcharge-next-v2.0.0.zip",
+          "downloadUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v2.0/Fastcharge-next-v2.0.0.zip",
+          "size": 3249,
+          "downloadCount": 256
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-08-16T10:42:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Fastcharge-next.zip",
+          "downloadUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v1.0/Fastcharge-next.zip",
+          "size": 2953,
+          "downloadCount": 445
+        }
+      ]
+    }
+  ]
+}
