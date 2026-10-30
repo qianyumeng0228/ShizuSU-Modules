@@ -1,16 +1,30 @@
 {
-  "readme": "<div align=\"center\">\n\n# Komodo Pixel Props\n\n**Spoof your device fingerprint to Google Pixel 9 Pro XL (`komodo`) effortlessly.**\n\n<br>\n\n![Total Downloads](https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads)\n![Latest Stable](https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version)\n![Release Date](https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released)\n![Last Commit](https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update)\n\n<br>\n\n</div>\n\n## Overview\nKomodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (`komodo`). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.\n\n## Features\n- **System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).\n- **Attestation & Integrity Integration:**\n  - **PlayIntegrityFix (PIF):** Automatically generates or syncs `pif.json` targeting the Pixel 9 Pro XL fingerprint.\n  - **TrickyStore:** Generates and maintains `/data/adb/tricky_store/target.txt`, with automatic broken-TEE detection fallback (`teeBroken=true`).\n  - **PropImitationHooks (PIHooks):** Automatic internal property spoofing when standalone PIF is not present.\n- **Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).\n- **Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).\n- **Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.\n\n## Prerequisites\n- **Supported Root Managers:**\n  - Magisk v26.3 or newer\n  - KernelSU v0.9.3 (daemon 10818) or newer\n  - APatch v10763 or newer\n- **Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**\n\n## Installation & Interactive Setup\n1. Download the latest release `.zip` from GitHub Releases:\n   `https://github.com/Elcapitanoe/Komodo-Build-Prop/releases`\n2. Open Magisk, KernelSU, or APatch.\n3. Go to **Modules** -> **Install from storage** and select the downloaded archive.\n4. **Hardware Key Configuration:**\n   During installation, the script requests user input to configure sensitive property checks (`SAFE_DEVICE`, `SAFE_SECURITY_PATCH`, `SAFE_SOC`, `SAFE_SDK`):\n   - `Volume Up (+)` : **Yes (Enable safe check)**\n   - `Volume Down (-)` : **No (Disable check)**\n   - `Power Button` : **Cancel installation**\n   *(Note: Users without physical volume keys can pre-configure these values in `config.prop` inside the zip).*\n5. The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.\n6. Reboot your device.\n\n## Action Script & WebUI\n- In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:\n  - Regenerate `pif.json` for PlayIntegrityFix.\n  - Refresh target packages for TrickyStore (`target.txt`).\n- On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.\n\n## Troubleshooting\nIf your device experiences boot issues after installation:\n1. Boot into Safe Mode or access your device storage via custom recovery / ADB root.\n2. Disable or remove the module directory:\n   - Remove `/data/adb/modules/Komodo_beta_Props` (or `/data/adb/modules/Komodo_Props`).\n   - Alternatively, create an empty file at `/data/adb/modules/Komodo_beta_Props/disable`.\n3. Reboot to system.\n\n## Verification\nConfirm spoofing is active via terminal or ADB:\n\n```bash\ngetprop ro.product.model\n```\nExpected output: `Pixel 9 Pro XL`\n\nCheck fingerprint status:\n```bash\ngetprop ro.product.build.fingerprint\n```\n\n## Developer CLI & Automation\nThis repository includes a Python CLI toolchain (`komodo-tools`) for automated OTA release tracking, checksum operations, and Telegram distribution.\n\n### Setup\n```bash\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\n```\n\n### Usage\n```bash\n# Scan upstream Google OTA releases\nkomodo-tools ota scan --devices komodo\n\n# Generate SHA-256 checksums\nkomodo-tools checksum generate file.zip\n\n# Verify SHA-256 checksum\nkomodo-tools checksum verify file.zip\n\n# Run test suite and linter\npytest\nruff check .\n```\n\n## Changelog\nSee `CHANGELOG.md` for release history, build IDs, and property updates.\n\n## Credits\n- **Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)\n- **Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)\n\n## Support & Feedback\n- Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`\n- Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`\n",
-  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>Komodo Pixel Props</h1>\n\n<p><b>Spoof your device fingerprint to Google Pixel 9 Pro XL (<code>komodo</code>) effortlessly.</b></p>\n\n<p><br></p>\n\n<p>!<a href=\"https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads\">Total Downloads</a></p>\n<p>!<a href=\"https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version\">Latest Stable</a></p>\n<p>!<a href=\"https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released\">Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update\">Last Commit</a></p>\n\n<p><br></p>\n\n<p></div></p>\n\n<h2>Overview</h2>\n<p>Komodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (<code>komodo</code>). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.</p>\n\n<h2>Features</h2>\n<li>**System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).</li>\n<li>**Attestation & Integrity Integration:**</li>\n<p>  - <b>PlayIntegrityFix (PIF):</b> Automatically generates or syncs <code>pif.json</code> targeting the Pixel 9 Pro XL fingerprint.</p>\n<p>  - <b>TrickyStore:</b> Generates and maintains <code>/data/adb/tricky_store/target.txt</code>, with automatic broken-TEE detection fallback (<code>teeBroken=true</code>).</p>\n<p>  - <b>PropImitationHooks (PIHooks):</b> Automatic internal property spoofing when standalone PIF is not present.</p>\n<li>**Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).</li>\n<li>**Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).</li>\n<li>**Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.</li>\n\n<h2>Prerequisites</h2>\n<li>**Supported Root Managers:**</li>\n<p>  - Magisk v26.3 or newer</p>\n<p>  - KernelSU v0.9.3 (daemon 10818) or newer</p>\n<p>  - APatch v10763 or newer</p>\n<li>**Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**</li>\n\n<h2>Installation & Interactive Setup</h2>\n<li>Download the latest release `.zip` from GitHub Releases:</li>\n<p>   <code>https://github.com/Elcapitanoe/Komodo-Build-Prop/releases</code></p>\n<li>Open Magisk, KernelSU, or APatch.</li>\n<li>Go to **Modules** -> **Install from storage** and select the downloaded archive.</li>\n<li>**Hardware Key Configuration:**</li>\n<p>   During installation, the script requests user input to configure sensitive property checks (<code>SAFE_DEVICE</code>, <code>SAFE_SECURITY_PATCH</code>, <code>SAFE_SOC</code>, <code>SAFE_SDK</code>):</p>\n<p>   - <code>Volume Up (+)</code> : <b>Yes (Enable safe check)</b></p>\n<p>   - <code>Volume Down (-)</code> : <b>No (Disable check)</b></p>\n<p>   - <code>Power Button</code> : <b>Cancel installation</b></p>\n<p>   *(Note: Users without physical volume keys can pre-configure these values in <code>config.prop</code> inside the zip).*</p>\n<li>The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.</li>\n<li>Reboot your device.</li>\n\n<h2>Action Script & WebUI</h2>\n<li>In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:</li>\n<p>  - Regenerate <code>pif.json</code> for PlayIntegrityFix.</p>\n<p>  - Refresh target packages for TrickyStore (<code>target.txt</code>).</p>\n<li>On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.</li>\n\n<h2>Troubleshooting</h2>\n<p>If your device experiences boot issues after installation:</p>\n<li>Boot into Safe Mode or access your device storage via custom recovery / ADB root.</li>\n<li>Disable or remove the module directory:</li>\n<p>   - Remove <code>/data/adb/modules/Komodo_beta_Props</code> (or <code>/data/adb/modules/Komodo_Props</code>).</p>\n<p>   - Alternatively, create an empty file at <code>/data/adb/modules/Komodo_beta_Props/disable</code>.</p>\n<li>Reboot to system.</li>\n\n<h2>Verification</h2>\n<p>Confirm spoofing is active via terminal or ADB:</p>\n\n<pre>getprop ro.product.model</pre>\n<p>Expected output: <code>Pixel 9 Pro XL</code></p>\n\n<p>Check fingerprint status:</p>\n<pre>getprop ro.product.build.fingerprint</pre>\n\n<h2>Developer CLI & Automation</h2>\n<p>This repository includes a Python CLI toolchain (<code>komodo-tools</code>) for automated OTA release tracking, checksum operations, and Telegram distribution.</p>\n\n<h3>Setup</h3>\n<pre>python3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"</pre>\n\n<h3>Usage</h3>\n<pre># Scan upstream Google OTA releases\nkomodo-tools ota scan --devices komodo\n\n# Generate SHA-256 checksums\nkomodo-tools checksum generate file.zip\n\n# Verify SHA-256 checksum\nkomodo-tools checksum verify file.zip\n\n# Run test suite and linter\npytest\nruff check .</pre>\n\n<h2>Changelog</h2>\n<p>See <code>CHANGELOG.md</code> for release history, build IDs, and property updates.</p>\n\n<h2>Credits</h2>\n<li>**Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)</li>\n<li>**Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)</li>\n\n<h2>Support & Feedback</h2>\n<li>Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`</li>\n<li>Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`</li>",
+  "readme": "<div align=\"center\">\r\n\r\n# Komodo Pixel Props\r\n\r\n**Spoof your device fingerprint to Google Pixel 9 Pro XL (`komodo`) effortlessly.**\r\n\r\n<br>\r\n\r\n![Total Downloads](https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads)\r\n![Latest Stable](https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version)\r\n![Release Date](https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released)\r\n![Last Commit](https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update)\r\n\r\n<br>\r\n\r\n</div>\r\n\r\n## Overview\r\nKomodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (`komodo`). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.\r\n\r\n## Features\r\n- **System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).\r\n- **Attestation & Integrity Integration:**\r\n  - **PlayIntegrityFix (PIF):** Automatically generates or syncs `pif.json` targeting the Pixel 9 Pro XL fingerprint.\r\n  - **TrickyStore:** Generates and maintains `/data/adb/tricky_store/target.txt`, with automatic broken-TEE detection fallback (`teeBroken=true`).\r\n  - **PropImitationHooks (PIHooks):** Automatic internal property spoofing when standalone PIF is not present.\r\n- **Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).\r\n- **Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).\r\n- **Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.\r\n\r\n## Prerequisites\r\n- **Supported Root Managers:**\r\n  - Magisk v26.3 or newer\r\n  - KernelSU v0.9.3 (daemon 10818) or newer\r\n  - APatch v10763 or newer\r\n- **Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**\r\n\r\n## Installation & Interactive Setup\r\n1. Download the latest release `.zip` from GitHub Releases:\r\n   `https://github.com/Elcapitanoe/Komodo-Build-Prop/releases`\r\n2. Open Magisk, KernelSU, or APatch.\r\n3. Go to **Modules** -> **Install from storage** and select the downloaded archive.\r\n4. **Hardware Key Configuration:**\r\n   During installation, the script requests user input to configure sensitive property checks (`SAFE_DEVICE`, `SAFE_SECURITY_PATCH`, `SAFE_SOC`, `SAFE_SDK`):\r\n   - `Volume Up (+)` : **Yes (Enable safe check)**\r\n   - `Volume Down (-)` : **No (Disable check)**\r\n   - `Power Button` : **Cancel installation**\r\n   *(Note: Users without physical volume keys can pre-configure these values in `config.prop` inside the zip).*\r\n5. The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.\r\n6. Reboot your device.\r\n\r\n## Action Script & WebUI\r\n- In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:\r\n  - Regenerate `pif.json` for PlayIntegrityFix.\r\n  - Refresh target packages for TrickyStore (`target.txt`).\r\n- On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.\r\n\r\n## Troubleshooting\r\nIf your device experiences boot issues after installation:\r\n1. Boot into Safe Mode or access your device storage via custom recovery / ADB root.\r\n2. Disable or remove the module directory:\r\n   - Remove `/data/adb/modules/Komodo_beta_Props` (or `/data/adb/modules/Komodo_Props`).\r\n   - Alternatively, create an empty file at `/data/adb/modules/Komodo_beta_Props/disable`.\r\n3. Reboot to system.\r\n\r\n## Verification\r\nConfirm spoofing is active via terminal or ADB:\r\n\r\n```bash\r\ngetprop ro.product.model\r\n```\r\nExpected output: `Pixel 9 Pro XL`\r\n\r\nCheck fingerprint status:\r\n```bash\r\ngetprop ro.product.build.fingerprint\r\n```\r\n\r\n## Developer CLI & Automation\r\nThis repository includes a Python CLI toolchain (`komodo-tools`) for automated OTA release tracking, checksum operations, and Telegram distribution.\r\n\r\n### Setup\r\n```bash\r\npython3 -m venv .venv\r\nsource .venv/bin/activate\r\npip install -e \".[dev]\"\r\n```\r\n\r\n### Usage\r\n```bash\r\n# Scan upstream Google OTA releases\r\nkomodo-tools ota scan --devices komodo\r\n\r\n# Generate SHA-256 checksums\r\nkomodo-tools checksum generate file.zip\r\n\r\n# Verify SHA-256 checksum\r\nkomodo-tools checksum verify file.zip\r\n\r\n# Run test suite and linter\r\npytest\r\nruff check .\r\n```\r\n\r\nTelegram credentials are optional for automation. If `TELEGRAM_BOT_TOKEN` or\r\n`TELEGRAM_CHAT_ID` is not configured, the OTA monitor still persists its updated\r\nstate in the repository and exits successfully while skipping Telegram delivery.\r\nTelegram API or network failures remain errors so an undelivered notification is\r\nnot silently marked as successful.\r\n\r\n### Automated Komodo builds\r\n\r\nThe `Build Komodo Pixel Props (Upstream)` workflow polls the upstream\r\n`Build-Prop-BETA` state hourly. It only invokes the upstream builder when a new\r\nupstream build ID is not already present in this repository's releases. The\r\nbuilder always receives the codename `komodo`; the current Beta version is\r\nresolved automatically by upstream and is never hardcoded here.\r\n\r\n## Changelog\r\nSee `CHANGELOG.md` for release history, build IDs, and property updates.\r\n\r\n## Credits\r\n- **Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)\r\n- **Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)\r\n\r\n## Support & Feedback\r\n- Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`\r\n- Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`\r\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>Komodo Pixel Props</h1>\n\n<p><b>Spoof your device fingerprint to Google Pixel 9 Pro XL (<code>komodo</code>) effortlessly.</b></p>\n\n<p><br></p>\n\n<p>!<a href=\"https://img.shields.io/github/downloads/Elcapitanoe/Komodo-Build-Prop/total?style=flat-square&color=7490ac&label=Total%20Downloads\">Total Downloads</a></p>\n<p>!<a href=\"https://img.shields.io/github/v/release/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Latest%20Version\">Latest Stable</a></p>\n<p>!<a href=\"https://img.shields.io/github/release-date/Elcapitanoe/Komodo-Build-Prop?style=flat-square&color=7490ac&label=Released\">Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/last-commit/Elcapitanoe/Komodo-Build-Prop/main?style=flat-square&color=7490ac&label=Last%20Update\">Last Commit</a></p>\n\n<p><br></p>\n\n<p></div></p>\n\n<h2>Overview</h2>\n<p>Komodo Pixel Props is a systemless root module that modifies build properties, attestation flags, and system configurations to identify your device as a Google Pixel 9 Pro XL (<code>komodo</code>). It includes automated integration for Play Integrity Fix, TrickyStore, and custom ROM property sanitation.</p>\n\n<h2>Features</h2>\n<li>**System Property Spoofing:** Sets device identity (`model`, `brand`, `manufacturer`, `fingerprint`, `build ID`) across all partitions (`system`, `vendor`, `product`, `system_ext`, `odm`).</li>\n<li>**Attestation & Integrity Integration:**</li>\n<p>  - <b>PlayIntegrityFix (PIF):</b> Automatically generates or syncs <code>pif.json</code> targeting the Pixel 9 Pro XL fingerprint.</p>\n<p>  - <b>TrickyStore:</b> Generates and maintains <code>/data/adb/tricky_store/target.txt</code>, with automatic broken-TEE detection fallback (<code>teeBroken=true</code>).</p>\n<p>  - <b>PropImitationHooks (PIHooks):</b> Automatic internal property spoofing when standalone PIF is not present.</p>\n<li>**Custom ROM Sanitization:** Removes common custom ROM identifiers (`test-keys`, `lineage_`, `userdebug`, `aosp_` prefixes) and sets bootloader flags to green/locked status across major OEMs (OnePlus, Oppo, Realme, Samsung warranty bit).</li>\n<li>**Pixel Features (Sysconfig):** Bundles Google Pixel experience configs including Adaptive Charging, Quick Tap, and Next-Generation Assistant (NGA).</li>\n<li>**Integrated WebUI:** Built-in dashboard for KernelSU and APatch to inspect active properties, manage PIF/TrickyStore targets, and check OTA status.</li>\n\n<h2>Prerequisites</h2>\n<li>**Supported Root Managers:**</li>\n<p>  - Magisk v26.3 or newer</p>\n<p>  - KernelSU v0.9.3 (daemon 10818) or newer</p>\n<p>  - APatch v10763 or newer</p>\n<li>**Installation Environment:** Must be installed from your root manager app while Android is booted. **Flashing via custom recovery (TWRP/OrangeFox) is strictly unsupported.**</li>\n\n<h2>Installation & Interactive Setup</h2>\n<li>Download the latest release `.zip` from GitHub Releases:</li>\n<p>   <code>https://github.com/Elcapitanoe/Komodo-Build-Prop/releases</code></p>\n<li>Open Magisk, KernelSU, or APatch.</li>\n<li>Go to **Modules** -> **Install from storage** and select the downloaded archive.</li>\n<li>**Hardware Key Configuration:**</li>\n<p>   During installation, the script requests user input to configure sensitive property checks (<code>SAFE_DEVICE</code>, <code>SAFE_SECURITY_PATCH</code>, <code>SAFE_SOC</code>, <code>SAFE_SDK</code>):</p>\n<p>   - <code>Volume Up (+)</code> : <b>Yes (Enable safe check)</b></p>\n<p>   - <code>Volume Down (-)</code> : <b>No (Disable check)</b></p>\n<p>   - <code>Power Button</code> : <b>Cancel installation</b></p>\n<p>   *(Note: Users without physical volume keys can pre-configure these values in <code>config.prop</code> inside the zip).*</p>\n<li>The installer writes your selected choices to `config.prop`, generates initial attestation configs, and verifies SHA-256 script integrity.</li>\n<li>Reboot your device.</li>\n\n<h2>Action Script & WebUI</h2>\n<li>In KernelSU / APatch / Magisk, you can trigger the module **Action** button to:</li>\n<p>  - Regenerate <code>pif.json</code> for PlayIntegrityFix.</p>\n<p>  - Refresh target packages for TrickyStore (<code>target.txt</code>).</p>\n<li>On KernelSU and APatch, access the module WebUI from the module details page to review active props and manage integrations.</li>\n\n<h2>Troubleshooting</h2>\n<p>If your device experiences boot issues after installation:</p>\n<li>Boot into Safe Mode or access your device storage via custom recovery / ADB root.</li>\n<li>Disable or remove the module directory:</li>\n<p>   - Remove <code>/data/adb/modules/Komodo_beta_Props</code> (or <code>/data/adb/modules/Komodo_Props</code>).</p>\n<p>   - Alternatively, create an empty file at <code>/data/adb/modules/Komodo_beta_Props/disable</code>.</p>\n<li>Reboot to system.</li>\n\n<h2>Verification</h2>\n<p>Confirm spoofing is active via terminal or ADB:</p>\n\n<pre>getprop ro.product.model</pre>\n<p>Expected output: <code>Pixel 9 Pro XL</code></p>\n\n<p>Check fingerprint status:</p>\n<pre>getprop ro.product.build.fingerprint</pre>\n\n<h2>Developer CLI & Automation</h2>\n<p>This repository includes a Python CLI toolchain (<code>komodo-tools</code>) for automated OTA release tracking, checksum operations, and Telegram distribution.</p>\n\n<h3>Setup</h3>\n<pre>python3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"</pre>\n\n<h3>Usage</h3>\n<pre># Scan upstream Google OTA releases\nkomodo-tools ota scan --devices komodo\n\n# Generate SHA-256 checksums\nkomodo-tools checksum generate file.zip\n\n# Verify SHA-256 checksum\nkomodo-tools checksum verify file.zip\n\n# Run test suite and linter\npytest\nruff check .</pre>\n\n<p>Telegram credentials are optional for automation. If <code>TELEGRAM_BOT_TOKEN</code> or</p>\n<p><code>TELEGRAM_CHAT_ID</code> is not configured, the OTA monitor still persists its updated</p>\n<p>state in the repository and exits successfully while skipping Telegram delivery.</p>\n<p>Telegram API or network failures remain errors so an undelivered notification is</p>\n<p>not silently marked as successful.</p>\n\n<h3>Automated Komodo builds</h3>\n\n<p>The <code>Build Komodo Pixel Props (Upstream)</code> workflow polls the upstream</p>\n<p><code>Build-Prop-BETA</code> state hourly. It only invokes the upstream builder when a new</p>\n<p>upstream build ID is not already present in this repository's releases. The</p>\n<p>builder always receives the codename <code>komodo</code>; the current Beta version is</p>\n<p>resolved automatically by upstream and is never hardcoded here.</p>\n\n<h2>Changelog</h2>\n<p>See <code>CHANGELOG.md</code> for release history, build IDs, and property updates.</p>\n\n<h2>Credits</h2>\n<li>**Maintainer:** [Elcapitanoe](https://github.com/Elcapitanoe)</li>\n<li>**Module Scripts & Logic:** [Tesla](https://t.me/PixelProps) / [0x11DFE](https://github.com/0x11DFE)</li>\n\n<h2>Support & Feedback</h2>\n<li>Issue tracker: `https://github.com/Elcapitanoe/Komodo-Build-Prop/issues`</li>\n<li>Discussions: `https://github.com/Elcapitanoe/Komodo-Build-Prop/discussions`</li>",
   "homepageUrl": "https://pixelprop.pages.dev",
   "sourceUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop",
   "url": "https://github.com/Elcapitanoe/Komodo-Build-Prop",
   "latestRelease": {
-    "name": "20261021",
-    "version": "20261021",
-    "time": "2026-10-21T11:44:20Z",
-    "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20261021/Komodo_beta_DP11.261002.005.zip"
+    "name": "v26.1030",
+    "version": "v26.1030",
+    "time": "2026-10-30T03:08:29Z",
+    "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v26.1030/Komodo_beta_DP11.261016.003.zip"
   },
   "releases": [
+    {
+      "name": "v26.1030",
+      "tagName": "v26.1030",
+      "publishedAt": "2026-10-30T03:08:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Komodo_beta_DP11.261016.003.zip",
+          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v26.1030/Komodo_beta_DP11.261016.003.zip",
+          "size": 70924,
+          "downloadCount": 3
+        }
+      ]
+    },
     {
       "name": "20261021",
       "tagName": "20261021",
@@ -21,7 +35,7 @@
           "name": "Komodo_beta_DP11.261002.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20261021/Komodo_beta_DP11.261002.005.zip",
           "size": 70922,
-          "downloadCount": 108
+          "downloadCount": 118
         }
       ]
     },
@@ -35,7 +49,7 @@
           "name": "Komodo_beta_DP11.260918.006.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20261003/Komodo_beta_DP11.260918.006.zip",
           "size": 70913,
-          "downloadCount": 258
+          "downloadCount": 260
         }
       ]
     },
@@ -49,7 +63,7 @@
           "name": "Komodo_beta_CP41.260831.007.A3.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260930/Komodo_beta_CP41.260831.007.A3.zip",
           "size": 70882,
-          "downloadCount": 39
+          "downloadCount": 41
         }
       ]
     },
@@ -63,7 +77,7 @@
           "name": "Komodo_beta_CP41.260831.007.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260925/Komodo_beta_CP41.260831.007.zip",
           "size": 70880,
-          "downloadCount": 70
+          "downloadCount": 72
         }
       ]
     },
@@ -77,7 +91,7 @@
           "name": "Komodo_beta_CP41.260828.004.A8.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260918/Komodo_beta_CP41.260828.004.A8.zip",
           "size": 65399,
-          "downloadCount": 55
+          "downloadCount": 57
         }
       ]
     },
@@ -91,13 +105,13 @@
           "name": "Komodo_beta_CP41.260814.003.B1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260901/Komodo_beta_CP41.260814.003.B1.zip",
           "size": 64953,
-          "downloadCount": 40
+          "downloadCount": 42
         },
         {
           "name": "Komodo_CP2A.260805.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260901/Komodo_CP2A.260805.005.zip",
           "size": 67634,
-          "downloadCount": 62
+          "downloadCount": 64
         }
       ]
     },
@@ -111,7 +125,7 @@
           "name": "Komodo_beta_CP41.260731.005.B1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260817/Komodo_beta_CP41.260731.005.B1.zip",
           "size": 64884,
-          "downloadCount": 48
+          "downloadCount": 51
         }
       ]
     },
@@ -125,7 +139,7 @@
           "name": "Komodo_beta_CP41.260717.006.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260815/Komodo_beta_CP41.260717.006.zip",
           "size": 64860,
-          "downloadCount": 11
+          "downloadCount": 13
         }
       ]
     },
@@ -139,7 +153,7 @@
           "name": "Komodo_beta_CP41.260717.006.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/20260805/Komodo_beta_CP41.260717.006.zip",
           "size": 64911,
-          "downloadCount": 34
+          "downloadCount": 36
         }
       ]
     },
@@ -153,7 +167,7 @@
           "name": "Komodo_beta_CP41.260717.006.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260804/Komodo_beta_CP41.260717.006.zip",
           "size": 64898,
-          "downloadCount": 2
+          "downloadCount": 4
         }
       ]
     },
@@ -167,7 +181,7 @@
           "name": "Komodo_beta_CP41.260701.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260725/Komodo_beta_CP41.260701.005.zip",
           "size": 64902,
-          "downloadCount": 38
+          "downloadCount": 40
         }
       ]
     },
@@ -181,7 +195,7 @@
           "name": "Komodo_beta_CP31.260623.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260716/Komodo_beta_CP31.260623.005.zip",
           "size": 64894,
-          "downloadCount": 34
+          "downloadCount": 36
         }
       ]
     },
@@ -195,7 +209,7 @@
           "name": "Komodo_beta_CP31.260618.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260702/Komodo_beta_CP31.260618.005.zip",
           "size": 64892,
-          "downloadCount": 52
+          "downloadCount": 54
         }
       ]
     },
@@ -209,7 +223,7 @@
           "name": "Komodo_beta_CP31.260608.007.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260625/Komodo_beta_CP31.260608.007.zip",
           "size": 64900,
-          "downloadCount": 39
+          "downloadCount": 41
         }
       ]
     },
@@ -223,7 +237,7 @@
           "name": "Komodo_beta_CP31.260508.005.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260607/Komodo_beta_CP31.260508.005.zip",
           "size": 38959,
-          "downloadCount": 70
+          "downloadCount": 72
         }
       ]
     },
@@ -237,7 +251,7 @@
           "name": "Komodo_beta_CP31.260423.012.A1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260516/Komodo_beta_CP31.260423.012.A1.zip",
           "size": 41329,
-          "downloadCount": 87
+          "downloadCount": 89
         }
       ]
     },
@@ -251,7 +265,7 @@
           "name": "Komodo_beta_CP21.260330.008.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/V260421/Komodo_beta_CP21.260330.008.zip",
           "size": 41281,
-          "downloadCount": 1301
+          "downloadCount": 1303
         }
       ]
     },
@@ -265,7 +279,7 @@
           "name": "Komodo_beta_CP21.260306.017.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260402/Komodo_beta_CP21.260306.017.zip",
           "size": 40985,
-          "downloadCount": 5520
+          "downloadCount": 5523
         }
       ]
     },
@@ -279,7 +293,7 @@
           "name": "Komodo_beta_CP21.260206.011.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260307/Komodo_beta_CP21.260206.011.zip",
           "size": 41472,
-          "downloadCount": 3056
+          "downloadCount": 3058
         }
       ]
     },
@@ -293,7 +307,7 @@
           "name": "Komodo_beta_CP21.260116.011.B1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260222/Komodo_beta_CP21.260116.011.B1.zip",
           "size": 40693,
-          "downloadCount": 3053
+          "downloadCount": 3055
         }
       ]
     },
@@ -307,7 +321,7 @@
           "name": "Komodo_beta_CP11.251209.009.A1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260211/Komodo_beta_CP11.251209.009.A1.zip",
           "size": 40555,
-          "downloadCount": 2247
+          "downloadCount": 2249
         }
       ]
     },
@@ -321,7 +335,7 @@
           "name": "Komodo_beta_CP11.251209.007.A1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260202/Komodo_beta_CP11.251209.007.A1.zip",
           "size": 40554,
-          "downloadCount": 165
+          "downloadCount": 167
         }
       ]
     },
@@ -335,7 +349,7 @@
           "name": "Komodo_beta_BP41.250916.015.A1.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v260110/Komodo_beta_BP41.250916.015.A1.zip",
           "size": 40278,
-          "downloadCount": 164
+          "downloadCount": 166
         }
       ]
     },
@@ -349,7 +363,7 @@
           "name": "Komodo_beta_BP31.250610.009.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250819/Komodo_beta_BP31.250610.009.zip",
           "size": 40086,
-          "downloadCount": 1166
+          "downloadCount": 1168
         }
       ]
     },
@@ -363,7 +377,7 @@
           "name": "Komodo_beta_BP31.250610.004.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250718/Komodo_beta_BP31.250610.004.zip",
           "size": 40080,
-          "downloadCount": 501
+          "downloadCount": 503
         }
       ]
     },
@@ -377,7 +391,7 @@
           "name": "Komodo_beta_BP31.250523.010.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250708/Komodo_beta_BP31.250523.010.zip",
           "size": 39200,
-          "downloadCount": 201
+          "downloadCount": 202
         }
       ]
     },
@@ -391,7 +405,7 @@
           "name": "Komodo_beta_BP11.241210.004.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250610/Komodo_beta_BP11.241210.004.zip",
           "size": 38482,
-          "downloadCount": 244
+          "downloadCount": 245
         }
       ]
     },
@@ -405,7 +419,7 @@
           "name": "Komodo_BP1A.250305.020.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250309/Komodo_BP1A.250305.020.zip",
           "size": 38460,
-          "downloadCount": 781
+          "downloadCount": 783
         }
       ]
     },
@@ -419,21 +433,7 @@
           "name": "Komodo_BP1A.250305.020-beta-test.zip",
           "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250306/Komodo_BP1A.250305.020-beta-test.zip",
           "size": 19614710,
-          "downloadCount": 15
-        }
-      ]
-    },
-    {
-      "name": "v250305",
-      "tagName": "v250305",
-      "publishedAt": "2025-03-05T02:50:59Z",
-      "descriptionHTML": "",
-      "releaseAssets": [
-        {
-          "name": "Komodo_beta_BP11.241210.004.zip",
-          "downloadUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v250305/Komodo_beta_BP11.241210.004.zip",
-          "size": 38482,
-          "downloadCount": 54
+          "downloadCount": 17
         }
       ]
     }
