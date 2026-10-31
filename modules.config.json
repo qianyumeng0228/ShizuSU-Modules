@@ -2004,6 +2004,36 @@
       "repo": "huxc573/workbuddy2api-panel-magisk",
       "summary": "把 WorkBuddy2API Panel 做成 Android arm64 的 Magisk/APatch/KernelSU 模块：开机自启、崩溃拉起、自动跟随上游更新",
       "versionCodeOverride": 0
+    },
+    {
+      "moduleId": "hma-uidfake",
+      "moduleName": "HMA UID Fake",
+      "license": "MIT",
+      "authors": [
+        {
+          "name": "Kodatemitsuru",
+          "link": ""
+        },
+        {
+          "name": "Anatdx",
+          "link": ""
+        }
+      ],
+      "summary": "Fake UID for apps that are \"risk\", so that they can not be detected by uid scanners",
+      "summaryZh": "为被标记为高风险的应用伪造 UID，使其无法被 UID 扫描器探测到（内核 LKM 模块，仅供高级用户）",
+      "readmeZh": "HMA UID Fake 是一个内核级（LKM）模块：让隐藏的 UID 在 uid 扫描器面前表现为不存在——getpriority(PRIO_USER, uid) / ioprio_get(IOPRIO_WHO_USER, uid) 返回 -ESRCH，setpriority / ioprio_set 在到达 USER 查找时同样返回 -ESRCH。规则来自进程来源应用，被 setuid 的孤立子进程无法选择应用哪些规则。customize.sh 按 uname -r 从 ko/ 匹配对应内核版本的模块（支持 Android 12-17，内核 5.10/5.15/6.1/6.6/6.12/6.18 arm64），post-fs-data.sh 早期加载、service.sh 重试。仅供高级用户，可能影响部分应用，风险自担。",
+      "latestRelease": {
+        "name": "0.4.0+1c71b6c",
+        "version": "0.4.0+1c71b6c",
+        "versionCode": 4000,
+        "time": "2026-10-30T19:41:41Z",
+        "downloadUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/master/private/hma-uidfake-0.4.0-1c71b6c.zip",
+        "size": 845451
+      },
+      "sourceUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules",
+      "versionCodeOverride": 0,
+      "origin": "manual",
+      "note": "上游 KodateMitsuru/hma-uidfake 已不可访问（404），由管理员背书收录 zip 本体；包内 lkmloader.LICENSE 为 MIT"
     }
   ],
   "outputDir": "output",
