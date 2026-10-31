@@ -59,30 +59,12 @@ https://qianyumeng0228.github.io/ShizuSU-Modules
 
 见 [CONTRIBUTING.md](CONTRIBUTING.md)：开源+源码+许可证+可下载 release 为硬门槛；支持人工提交、topic 自动发现、手机端上传+审批三种收录路径。
 
-## 内容清单（27 个模块）
+## 内容清单（共 546 个模块）
 
-| moduleId | 上游仓库 |
-| --- | --- |
-| zygisksu | LSPosed/ZygiskNext |
-| playintegrityfix | osm0sis/PlayIntegrityFork |
-| tricky_store | 5ec1cff/TrickyStore |
-| bindhosts | bindhosts/bindhosts |
-| device_faker | Seyud/device_faker |
-| meta-hybrid | Hybrid-Mount/meta-hybrid_mount |
-| netproxy | Fanju6/NetProxy-Magisk |
-| MagicNet | LIghtJUNction/MagicNet |
-| magic_mount_rs | Tools-cx-app/meta-magic_mount-rs |
-| FreePPS | Seyud/FreePPS |
-| Mediatek_Mali_GPU_Governor | Seyud/Mediatek_Mali_GPU_Governor |
-| deviceidchanger | sidex15/deviceidchanger |
-| HyperUnlocked | ukriu/HyperUnlocked |
-| AZenith | Liliya2727/AZenith |
-| zygisk_lsposed | JingMatrix/LSPosed |
-| hma_oss_zygisk | frknkrc44/HMA-OSS |
-| zygisk-assistant | snake-4/Zygisk-Assistant |
-| ksuwebui | 5ec1cff/KsuWebUIStandalone |
-| busybox-ndk | Magisk-Modules-Repo/busybox-ndk |
-| RescueX | jiayuxuan123/RescueX |
-| Automatic_brick_rescue / Eclipse / Violet / WorkSettingPro / YHGames / YH_YC / shizu-test | private/（管理员背书） |
+覆盖 KernelSU 模块全网生态 19 个分类：Root 隐藏 / Play Integrity、元模块（挂载引擎）、Zygisk 实现、性能调度、网络代理、广告拦截、音频、字体显示、备份救砖、Xposed/LSPosed 等。模块按「开源 + 许可证 + 可下载 release」硬门槛收录（来源：KernelSU 模块全网汇总 1,532 条清单筛选）。
 
-> funbox / asl / meta-mm / meta-overlayfs / MFGA 暂缺（原仓库不可定位），补地址后重新生成即可。
+- 根 `modules.json`（A 路线）：546 个模块目录与详情
+- `json/modules.json`（B 路线 / MMRL / BakaSU）：499 个可安装模块索引
+- `catalog/candidates.json`：topic 自动发现的候选清单
+
+每日 GitHub Actions 自动更新版本、下载链接与统计。
