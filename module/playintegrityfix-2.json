@@ -1,0 +1,241 @@
+{
+  "readme": "# Play Integrity Fix\n\nThis module tries to fix Play Integrity verdicts to get a valid attestation.\n\n## NOTE\n\nThis module is not made to hide root, nor to avoid detections in other apps. It only serves to pass Device verdict in the Play Integrity tests and certify your device.\n\n## Tutorial\n\nYou will need root and Zygisk. Enable Magisk's built-in Zygisk or use [ZygiskNext](https://github.com/Dr-TSNG/ZygiskNext) / [NeoZygisk](https://github.com/JingMatrix/NeoZygisk) / [ReZygisk](https://github.com/PerformanC/ReZygisk).\n\n## Options\n\n- **spoofBuild**: spoof fingerprint field, enabled by default.\n- **spoofProvider**: custom keystore provider, enable when not using [TrickyStore](https://github.com/5ec1cff/TrickyStore) or [TEESimulator](https://github.com/JingMatrix/TEESimulator).\n- **spoofProps**: spoof prop when gms read from system prop, enabled by default.\n- **spoofSignature**: spoof rom signature, enable when your rom is signed by testkey. You can check your rom signature by running this command in terminal.\n  ```sh\n  unzip -l /system/etc/security/otacerts.zip | grep -oE \"testkey|releasekey\"\n  ```\n- **spoofVendingSdk**: spoof sdk version to 32 to Play Store if your device runs Android 13 or higher, this option will not take effect if your device is running Android 12 or lower.\n  - Known issue: \n    - Back gesture/nav button from within the Play Store exits directly to homescreen for all\n    - Blank account sign-in status and broken app updates for ROMs A14+\n    - Incorrect app variants may be served for all\n    - Full Play Store crashes for some setups\n  - pixel_beta fingerprint can no longer get device verdict even on legacy check, so enabling this option won't help you to get device verdict anymore.\n\n## Variety\n\n- **inject-vending**: Based on the official inject branch, with the added spoofVendingSdk option.\n- **inject-manual**: Based on inject-vending, with auto config (detect TrickyStore and ROM signature) removed.\n- **inject-s**: Based on inject-manual, lightweight since it dropped the JSON format (pif.json -> pif.prop).\n\n> [!NOTE]\n> **inject-vending** and **inject-manual** branches are discontinued, but the branches will not be removed.\n\n> [!WARNING]\n> Do not use third-party tools to fetch fingerprints to avoid conflicts.\n> The WebUI provides full control for configurable options.\n\n### About official PIF by chiteroman\n\n- The [official PIF by chiteroman](https://github.com/chiteroman/PlayIntegrityFix) has been removed from GitHub.\n  - Official untouched main branch: https://github.com/KOWX712/PlayIntegrityFix/tree/main\n  - Official untouched inject branch: https://github.com/KOWX712/PlayIntegrityFix/tree/inject\n  - All tags from the official PIF repo are also preserved in this repo.\n\n## Acknowledgments\n\n- [kdrag0n](https://github.com/kdrag0n/safetynet-fix) & [Displax](https://github.com/Displax/safetynet-fix) for the original idea.\n- This project is forked from the official chiteroman's PIF repo.\n- [osm0sis](https://github.com/osm0sis) for his original [autopif2.sh](https://github.com/osm0sis/PlayIntegrityFork/blob/main/module/autopif2.sh) script, and [backslashxx](https://github.com/backslashxx) & [KOWX712](https://github.com/KOWX712) for improving it ([action.sh](https://github.com/chiteroman/PlayIntegrityFix/blob/main/module/action.sh)).\n",
+  "readmeHTML": "<h1>Play Integrity Fix</h1>\n\n<p>This module tries to fix Play Integrity verdicts to get a valid attestation.</p>\n\n<h2>NOTE</h2>\n\n<p>This module is not made to hide root, nor to avoid detections in other apps. It only serves to pass Device verdict in the Play Integrity tests and certify your device.</p>\n\n<h2>Tutorial</h2>\n\n<p>You will need root and Zygisk. Enable Magisk's built-in Zygisk or use <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">ZygiskNext</a> / <a href=\"https://github.com/JingMatrix/NeoZygisk\">NeoZygisk</a> / <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a>.</p>\n\n<h2>Options</h2>\n\n<li>**spoofBuild**: spoof fingerprint field, enabled by default.</li>\n<li>**spoofProvider**: custom keystore provider, enable when not using [TrickyStore](https://github.com/5ec1cff/TrickyStore) or [TEESimulator](https://github.com/JingMatrix/TEESimulator).</li>\n<li>**spoofProps**: spoof prop when gms read from system prop, enabled by default.</li>\n<li>**spoofSignature**: spoof rom signature, enable when your rom is signed by testkey. You can check your rom signature by running this command in terminal.</li>\n<p>  ```sh</p>\n<p>  unzip -l /system/etc/security/otacerts.zip | grep -oE \"testkey|releasekey\"</p>\n<p>  ```</p>\n<li>**spoofVendingSdk**: spoof sdk version to 32 to Play Store if your device runs Android 13 or higher, this option will not take effect if your device is running Android 12 or lower.</li>\n<p>  - Known issue:</p>\n<p>    - Back gesture/nav button from within the Play Store exits directly to homescreen for all</p>\n<p>    - Blank account sign-in status and broken app updates for ROMs A14+</p>\n<p>    - Incorrect app variants may be served for all</p>\n<p>    - Full Play Store crashes for some setups</p>\n<p>  - pixel_beta fingerprint can no longer get device verdict even on legacy check, so enabling this option won't help you to get device verdict anymore.</p>\n\n<h2>Variety</h2>\n\n<li>**inject-vending**: Based on the official inject branch, with the added spoofVendingSdk option.</li>\n<li>**inject-manual**: Based on inject-vending, with auto config (detect TrickyStore and ROM signature) removed.</li>\n<li>**inject-s**: Based on inject-manual, lightweight since it dropped the JSON format (pif.json -> pif.prop).</li>\n\n<p>> [!NOTE]</p>\n<p>> <b>inject-vending</b> and <b>inject-manual</b> branches are discontinued, but the branches will not be removed.</p>\n\n<p>> [!WARNING]</p>\n<p>> Do not use third-party tools to fetch fingerprints to avoid conflicts.</p>\n<p>> The WebUI provides full control for configurable options.</p>\n\n<h3>About official PIF by chiteroman</h3>\n\n<li>The [official PIF by chiteroman](https://github.com/chiteroman/PlayIntegrityFix) has been removed from GitHub.</li>\n<p>  - Official untouched main branch: https://github.com/KOWX712/PlayIntegrityFix/tree/main</p>\n<p>  - Official untouched inject branch: https://github.com/KOWX712/PlayIntegrityFix/tree/inject</p>\n<p>  - All tags from the official PIF repo are also preserved in this repo.</p>\n\n<h2>Acknowledgments</h2>\n\n<li>[kdrag0n](https://github.com/kdrag0n/safetynet-fix) & [Displax](https://github.com/Displax/safetynet-fix) for the original idea.</li>\n<li>This project is forked from the official chiteroman's PIF repo.</li>\n<li>[osm0sis](https://github.com/osm0sis) for his original [autopif2.sh](https://github.com/osm0sis/PlayIntegrityFork/blob/main/module/autopif2.sh) script, and [backslashxx](https://github.com/backslashxx) & [KOWX712](https://github.com/KOWX712) for improving it ([action.sh](https://github.com/chiteroman/PlayIntegrityFix/blob/main/module/action.sh)).</li>",
+  "homepageUrl": "https://t.me/kowchannel",
+  "sourceUrl": "https://github.com/KOWX712/PlayIntegrityFix",
+  "url": "https://github.com/KOWX712/PlayIntegrityFix",
+  "latestRelease": {
+    "name": "v4.9-inject-s",
+    "version": "v4.9-inject-s",
+    "time": "2026-10-15T14:11:46Z",
+    "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.9-inject-s/PlayIntegrityFix_v4.9-inject-s.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.9-inject-s",
+      "tagName": "v4.9-inject-s",
+      "publishedAt": "2026-10-15T14:11:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.9-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.9-inject-s/PlayIntegrityFix_v4.9-inject-s.zip",
+          "size": 692511,
+          "downloadCount": 105126
+        }
+      ]
+    },
+    {
+      "name": "v4.8-inject-s",
+      "tagName": "v4.8-inject-s",
+      "publishedAt": "2026-10-12T13:56:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.8-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.8-inject-s/PlayIntegrityFix_v4.8-inject-s.zip",
+          "size": 691564,
+          "downloadCount": 25014
+        }
+      ]
+    },
+    {
+      "name": "v4.7-inject-s",
+      "tagName": "v4.7-inject-s",
+      "publishedAt": "2026-07-11T09:58:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.7-1-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.7-inject-s/PlayIntegrityFix_v4.7-1-inject-s.zip",
+          "size": 660329,
+          "downloadCount": 248598
+        },
+        {
+          "name": "PlayIntegrityFix_v4.7-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.7-inject-s/PlayIntegrityFix_v4.7-inject-s.zip",
+          "size": 660502,
+          "downloadCount": 27643
+        }
+      ]
+    },
+    {
+      "name": "v4.6-inject-s",
+      "tagName": "v4.6-inject-s",
+      "publishedAt": "2026-06-21T09:16:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.6-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.6-inject-s/PlayIntegrityFix_v4.6-inject-s.zip",
+          "size": 596228,
+          "downloadCount": 65897
+        }
+      ]
+    },
+    {
+      "name": "v4.5-inject-s",
+      "tagName": "v4.5-inject-s",
+      "publishedAt": "2026-03-28T05:32:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.5-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.5-inject-s/PlayIntegrityFix_v4.5-inject-s.zip",
+          "size": 592915,
+          "downloadCount": 259500
+        }
+      ]
+    },
+    {
+      "name": "v4.4-inject-s",
+      "tagName": "v4.4-inject-s",
+      "publishedAt": "2025-11-02T14:32:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.4-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.4-inject-s/PlayIntegrityFix_v4.4-inject-s.zip",
+          "size": 598301,
+          "downloadCount": 283032
+        }
+      ]
+    },
+    {
+      "name": "v4.3-inject-s",
+      "tagName": "v4.3-inject-s",
+      "publishedAt": "2025-09-02T10:01:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.3-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.3-inject-s/PlayIntegrityFix_v4.3-inject-s.zip",
+          "size": 513982,
+          "downloadCount": 141547
+        }
+      ]
+    },
+    {
+      "name": "v19.2",
+      "tagName": "v19.2",
+      "publishedAt": "2025-07-13T01:35:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v19.2.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v19.2/PlayIntegrityFix_v19.2.zip",
+          "size": 537923,
+          "downloadCount": 36235
+        }
+      ]
+    },
+    {
+      "name": "v4.2-inject-s",
+      "tagName": "v4.2-inject-s",
+      "publishedAt": "2025-07-12T00:11:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.2-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.2-inject-s/PlayIntegrityFix_v4.2-inject-s.zip",
+          "size": 510952,
+          "downloadCount": 76691
+        }
+      ]
+    },
+    {
+      "name": "v4.1-inject-s",
+      "tagName": "v4.1-inject-s",
+      "publishedAt": "2025-07-09T08:30:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v4.1-inject-s.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v4.1-inject-s/PlayIntegrityFix_v4.1-inject-s.zip",
+          "size": 510760,
+          "downloadCount": 6718
+        }
+      ]
+    },
+    {
+      "name": "v3.3-inject-vending",
+      "tagName": "v3.3-inject-vending",
+      "publishedAt": "2025-06-12T20:57:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v3.3-inject-manual.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.3-inject-vending/PlayIntegrityFix_v3.3-inject-manual.zip",
+          "size": 549478,
+          "downloadCount": 24634
+        },
+        {
+          "name": "PlayIntegrityFix_v3.3-inject-vending.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.3-inject-vending/PlayIntegrityFix_v3.3-inject-vending.zip",
+          "size": 550180,
+          "downloadCount": 16345
+        }
+      ]
+    },
+    {
+      "name": "v3.2-inject-release",
+      "tagName": "v3.2-inject-release",
+      "publishedAt": "2025-06-05T11:24:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v3.2-inject-manual.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.2-inject-release/PlayIntegrityFix_v3.2-inject-manual.zip",
+          "size": 140268,
+          "downloadCount": 2552
+        },
+        {
+          "name": "PlayIntegrityFix_v3.2-inject-vending.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.2-inject-release/PlayIntegrityFix_v3.2-inject-vending.zip",
+          "size": 141135,
+          "downloadCount": 2184
+        }
+      ]
+    },
+    {
+      "name": "v3.1-inject-release",
+      "tagName": "v3.1-inject-release",
+      "publishedAt": "2025-05-19T14:55:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v3.1-inject-manual.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.1-inject-release/PlayIntegrityFix_v3.1-inject-manual.zip",
+          "size": 140049,
+          "downloadCount": 1906
+        },
+        {
+          "name": "PlayIntegrityFix_v3.1-inject-vending.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3.1-inject-release/PlayIntegrityFix_v3.1-inject-vending.zip",
+          "size": 140912,
+          "downloadCount": 5893
+        }
+      ]
+    },
+    {
+      "name": "v3-inject-release",
+      "tagName": "v3-inject-release",
+      "publishedAt": "2025-04-27T11:21:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix_v3-inject-manual.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3-inject-release/PlayIntegrityFix_v3-inject-manual.zip",
+          "size": 139463,
+          "downloadCount": 1965
+        },
+        {
+          "name": "PlayIntegrityFix_v3-inject-vending.zip",
+          "downloadUrl": "https://github.com/KOWX712/PlayIntegrityFix/releases/download/v3-inject-release/PlayIntegrityFix_v3-inject-vending.zip",
+          "size": 140328,
+          "downloadCount": 1711
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "readme": "# PowerSentinel\n\n**PowerSentinel** is a rooted Android battery-optimization module built around event-driven power policies. It can manage CPU cores, apps, WiFi, Doze, GMS/process priorities, logging, profiles, and safety controls.\n\n## Philosophy\n\nPowerSentinel's goal is not to maximize the number of power-saving actions it takes. It is to **maximize real-world battery energy savings while minimizing performance degradation, wakeups, thermal problems, application instability, notification loss, and unnecessary CPU/network activity of its own**. It should be evaluated as a real battery-management system with observable outcomes, not as a collection of Android tweaks assumed to help.\n\nA few concrete principles this project follows in practice:\n\n- **Never touch what it didn't create.** Actions like suspending an app, forcing a `nice` level, or flipping a system property are only ever undone if PowerSentinel itself recorded making that specific change. An app already suspended by something else, or already running at a non-default `nice` value, or a device that already shipped with a given system setting, is left exactly as it was found - not silently reset to a hardcoded default once an event ends.\n- **Safety-critical apps are never negotiable.** The device's default dialer, SMS, and emergency apps, plus anything already exempted from Android's own battery optimization, are always protected regardless of event configuration. This is not a setting anyone can turn off, because losing the ability to make a call or receive a text is a different category of risk than \"an app lags a bit\".\n- **Measure before enforcing.** Where possible, detection uses stable, documented interfaces (the Linux `/proc` filesystem, standard `getprop` build properties, official Android role/role-holder commands) rather than fragile, version-dependent `dumpsys` text parsing. Where a signal can't be independently verified from a development environment, that limitation is stated plainly in code comments rather than assumed away - and the feature is designed to fail toward \"do nothing extra\" rather than \"do something wrong\" if the signal ever stops matching.\n- **Observe before acting automatically.** New detection features - like flagging an app with sustained background CPU use - start observational-only: recorded for a person to review and act on with one tap, not silently enforced, until there's real confidence in the underlying signal.\n- **Zero cost unless something is actually happening.** Background checks are throttled and gated (e.g. only while the screen is off, only once a minute) rather than run on every poll cycle, and genuinely occasional questions (like \"what's using the most CPU right now\") are answered on demand, with no continuous background cost, rather than sampled constantly just in case someone asks.\n- **Basic mode is a presentation layer, not a different mechanism.** The simplified Config view writes the exact same configuration format the full editor does; nothing behaves differently underneath depending on which mode happens to be showing.\n\n## Requirements\n\n- Rooted Android device with KernelSU.\n- A KernelSU/WebUI-X-capable manager for the graphical WebUI.\n- The module can also be operated entirely from a root shell with `PowerSentinelctl` and `PowerSentinelconf`.\n\n> **Important:** PowerSentinel is intentionally **KernelSU-only for its WebUI**. The legacy Magisk `httpd`/CGI compatibility layer was removed in v3.8.0. There is no local HTTP server or browser fallback.\n\n## Features\n\n- **Event-driven power management** — boot, charging, screen-off, low-power, night, thermal, manual and fully custom events, each with independent configuration.\n- **Adaptive engine** — an opt-in pressure score (0-100, from battery level, temperature, charging state, screen state, night, and CPU load) mapped to three escalating tiers, so behavior scales with how much the device actually needs rather than one fixed policy applying uniformly.\n- **App management** — kill, suspend, or reprioritize applications with allow/deny lists, plus a global **per-app policy in 4 levels** (never touch / gentle only, capped at `nice` / follow whatever the active event asks for / always aggressive, forces suspend) that can override a specific app's treatment regardless of which event is currently active.\n- **Critical app protection** — the device's default dialer, SMS, and emergency apps, and anything already exempt from Android's own battery optimization, are always protected. Not configurable, since this is about safety rather than preference.\n- **Problematic-app detection** — a background watch flags apps sustaining real CPU use while the screen is off, using the stable `/proc/[pid]/stat` kernel interface rather than a fragile framework dump. Purely observational: flagged apps are surfaced for review (with a one-tap \"limit this app\" action in the WebUI), never acted on automatically.\n- **On-demand CPU ranking** — a one-shot, explicitly-triggered measurement of which installed apps are using the most CPU right now, sorted by percentage. Zero ongoing cost: it only runs, and only ever costs anything, when someone asks to see it.\n- **Energy log** — a change-triggered (not continuous) record of battery level, temperature, and what was active at the time, meant for after-the-fact analysis of whether a given setting is genuinely helping rather than assumed to.\n- **Hardware detection** — the WebUI shows the real detected manufacturer/model and exactly which low-level mechanisms this specific device supports (core control, WiFi control method, Doze, GMS, app suspension), and only surfaces a device-specific risk warning (e.g. core disabling on some Samsung devices) when it's actually relevant to the device it's running on.\n- **CPU optimization** — powersave governors and optional core disabling, gated by a Capability Manager that probes what the device can actually do once at startup, instead of blindly attempting something unsupported every cycle.\n- **System controls** — Doze, WiFi, low-RAM mode (with the device's real original value preserved and restored, not overwritten to a hardcoded default), GMS and process priorities.\n- **Basic/Advanced modes** — a simple aggressiveness picker (Low/Medium/High, each with a plain-language breakdown of what it actually does) for anyone who doesn't want to configure individual events by hand, and a full per-event editor with raw JSON access for anyone who does. Both read and write the exact same underlying configuration.\n- **Event Journal & sane notifications** — every event transition and status change is recorded to a structured journal (viewable in the WebUI's \"Historial\" tab); only genuinely critical situations (Safe Mode engaging, a rejected unsafe configuration) ever reach an actual Android notification, instead of every routine status change interrupting the notification shade.\n- **Profiles** — save and restore complete event configurations.\n- **Safe mode** — stops every event immediately and holds off until explicitly resumed, reachable from the WebUI or `PowerSentinelctl safe`/`resume`.\n- **WebUI** — native KernelSU WebUI using `kernelsu.exec()`, no local HTTP server.\n\n## WebUI architecture\n\nThe WebUI lives in `webroot/`, which KernelSU loads directly inside the manager's WebView. The source is under `frontend/` and is built with Vite.\n\n```text\nKernelSU Manager\n      ↓\n   webroot/\n      ↓\n frontend/src/api.js\n      ↓\nbackend-ksu.js\n      ↓\nkernelsu.exec()\n      ↓\nPowerSentinelctl / PowerSentinel-writefile / Android commands\n```\n\nThere is deliberately only one WebUI transport. PowerSentinel does **not** start `httpd`, does **not** expose port 8081, and does **not** ship CGI endpoints or WebUI session tokens.\n\nKernelSU's documentation specifies `webroot/index.html` as the module WebUI entry point and exposes system APIs such as `exec()` to the page.\n\n## Daemon architecture\n\n`PowerSentineld` is split into focused pieces rather than one large script, each doing exactly one job:\n\n```text\nPowerSentineld (orchestrator, main loop, command handling)\n      ↓\nEvent Manager (PowerSentinel-events.sh)\n  - locks/tracks which events are currently active, resolves each\n    event's own field values, re-asserts any still-active event's\n    settings after another event ends\n      ↓\nPolicy (PowerSentinel-policy.sh)  +  Detect (PowerSentinel-detect.sh)\n  - pure decisions (night, thermal, adaptive pressure score) computed\n    from pure reads (battery, CPU topology, load) - detection never\n    decides anything, policy never touches the system directly\n      ↓\nActions (PowerSentinel-actions.sh)\n  - the only place that actually touches the system: apps, CPU cores,\n    WiFi, Doze, GMS, process priorities, low-RAM mode\n```\n\nTwo layers sit in front of every app-affecting action, evaluated in this order:\n\n1. **Critical app protection** (`PowerSentinel-detect.sh`) — the device's default dialer/SMS/emergency apps and anything already exempt from battery optimization. Always wins, never configurable.\n2. **Per-app policy** (`PowerSentinel-apppolicy.sh`) — a global 0-3 level per package (never / gentle only / follow the event / always aggressive) that can override what a specific event's own configuration asks for, for that one app.\n\nA **Capability Manager** (`PowerSentinel-capabilities.sh`) probes once at startup what the device/ROM actually supports - core online/offline control, CPU governor control, which WiFi control method works, whether Doze can be forced, whether Google Mobile Services is even installed, whether `pm suspend` is supported - so actions can skip, with a clear log message, instead of blindly attempting something unsupported every single cycle.\n\nA **State Manager** (`PowerSentinel-state.sh`) persists which events are currently active across daemon restarts and reboots, so a crash (or an unclean reboot) doesn't leave the daemon with no memory of what it previously applied - cores staying offline, apps staying suspended, or WiFi staying blocked indefinitely with nothing left to undo it. On every startup, the daemon reconciles back to a clean baseline before evaluating current conditions from scratch.\n\nAn **Event Journal** (`PowerSentinel-journal.sh`) records every event transition and status change as structured data (viewable in the WebUI's \"Historial\" tab), while an **Alert Bridge** (`PowerSentinel-alertbridge.sh`) is the only place that ever posts a real Android notification - and only for genuinely critical severity, not routine status.\n\n## Installation\n\n1. Download the latest release.\n2. Install the ZIP through your KernelSU manager.\n3. Reboot if requested by the manager.\n4. Open PowerSentinel from the module's native **WebUI/Open** button.\n5. Configure the module from the WebUI or from a root shell.\n\nA default configuration is created automatically on first boot and lives at:\n\n```text\n/data/local/tmp/PowerSentinel/PowerSentinel.json\n```\n\nAny legacy `PowerSentinel.conf` (flat text, pre-v3.10.0) is migrated into this JSON file once, automatically, on the daemon's first start after updating - it is not read again afterward.\n\n## Configuration\n\nPowerSentinel supports the current v2 event-driven configuration format, stored as JSON. A minimal example:\n\n```json\n{\n  \"global\": {\n    \"version\": \"2\",\n    \"delay\": \"3\",\n    \"log_file\": \"/sdcard/PowerSentinel.log\",\n    \"log_level\": \"2\"\n  },\n  \"events\": {\n    \"screen_off\": {\n      \"handle_apps\": \"nice\",\n      \"disable_cores\": \"cpu6 cpu7\"\n    },\n    \"low_power\": {\n      \"doze\": \"light\",\n      \"kill_wifi\": \"false\"\n    }\n  }\n}\n```\n\nMultiple events can be active at the same time. Configure overlapping policies carefully and keep essential applications protected.\n\nThe WebUI's Config tab offers two modes: **Básico**, the default for every fresh install, which exposes just an adaptive-savings switch and an aggressiveness level (Low/Medium/High); and **Avanzado**, which exposes the full per-event editor and a raw JSON view. Both modes read and write this exact same file - Basic mode is a simplified presentation layer, not a different underlying mechanism.\n\n## How configuration changes take effect\n\nSaving a change - from either mode of the WebUI, or by writing the JSON file directly - takes effect immediately. No reboot, and no manual restart of the daemon, is required.\n\nConcretely: the WebUI's save path writes the new configuration and then runs `PowerSentinelctl reload`. On receiving that command, the daemon cleanly undoes whatever it currently has applied (so nothing from the old configuration is left half-applied), then re-executes itself in place (`exec`) - re-reading the new configuration from a clean start, with no gap where the daemon isn't running. This is different from the watchdog in `service.sh`, which only relaunches the daemon if it has actually crashed, and could take up to a minute to notice; a `reload` is immediate and self-triggered.\n\nAfter a reload, the daemon's main loop evaluates real device conditions (battery level, screen state, temperature, etc.) against the new configuration on its very next cycle. If a condition your new configuration cares about isn't met yet - for example, the battery hasn't actually dropped to the level a given adaptive tier requires - nothing will visibly change until it is; that's the normal behavior of an event-driven system reacting to real conditions, not a sign that the reload didn't work. The WebUI's Estado tab, and Basic mode's own live status line, both reflect what's genuinely active right now rather than just what's configured.\n\n## Command-line tools\n\nRun these commands from a root shell:\n\n```bash\nPowerSentinelctl start <event>\nPowerSentinelctl stop <event>\nPowerSentinelctl reload\nPowerSentinelctl pause\nPowerSentinelctl resume\nPowerSentinelctl safe\n```\n\n`PowerSentinelconf` provides an interactive wizard and direct configuration operations:\n\n```bash\nPowerSentinelconf\nPowerSentinelconf show\nPowerSentinelconf events\nPowerSentinelconf set KEY VALUE --event screen_off\nPowerSentinelconf app-policy set <package> <0-3>   # per-app override: 0=never touch, 1=gentle only, 2=follow event (default), 3=always aggressive\nPowerSentinelconf flagged-apps list                # apps flagged for real, sustained background CPU use\n```\n\nIf the WebUI is unavailable, these tools remain the supported recovery/configuration path.\n\n## Development\n\nThe generated `webroot/` directory is the shipped WebUI output. Do not edit it manually.\n\n```bash\ncd frontend\nnpm ci\nnpm run build\n```\n\nThe frontend depends on the `kernelsu` JavaScript package and expects to run inside a compatible KernelSU manager WebView. A normal desktop browser does not provide the root bridge.\n\n## Security\n\nThe WebUI never sends configuration content to a local HTTP server. Configuration writes are base64-encoded and passed to `PowerSentinel-writefile`, which restricts write targets, performs atomic replacement, and keeps a backup.\n\nSee [`docs/security-audit.md`](docs/security-audit.md) for the current security model.\n\n## Disclaimer\n\nPowerSentinel modifies system behavior and requires root access. Aggressive settings can cause lag, missed notifications/alarms, application instability, or SystemUI problems. Use at your own risk and test changes incrementally.\n\n## Credits\n\nPowerSentinel retains historical attribution to the earlier PowerSentinel/Xtreme-Battery-Saver lineage and its original contributors. The project is released under GPLv3.\n",
+  "readmeHTML": "<h1>PowerSentinel</h1>\n\n<p><b>PowerSentinel</b> is a rooted Android battery-optimization module built around event-driven power policies. It can manage CPU cores, apps, WiFi, Doze, GMS/process priorities, logging, profiles, and safety controls.</p>\n\n<h2>Philosophy</h2>\n\n<p>PowerSentinel's goal is not to maximize the number of power-saving actions it takes. It is to <b>maximize real-world battery energy savings while minimizing performance degradation, wakeups, thermal problems, application instability, notification loss, and unnecessary CPU/network activity of its own</b>. It should be evaluated as a real battery-management system with observable outcomes, not as a collection of Android tweaks assumed to help.</p>\n\n<p>A few concrete principles this project follows in practice:</p>\n\n<li>**Never touch what it didn't create.** Actions like suspending an app, forcing a `nice` level, or flipping a system property are only ever undone if PowerSentinel itself recorded making that specific change. An app already suspended by something else, or already running at a non-default `nice` value, or a device that already shipped with a given system setting, is left exactly as it was found - not silently reset to a hardcoded default once an event ends.</li>\n<li>**Safety-critical apps are never negotiable.** The device's default dialer, SMS, and emergency apps, plus anything already exempted from Android's own battery optimization, are always protected regardless of event configuration. This is not a setting anyone can turn off, because losing the ability to make a call or receive a text is a different category of risk than \"an app lags a bit\".</li>\n<li>**Measure before enforcing.** Where possible, detection uses stable, documented interfaces (the Linux `/proc` filesystem, standard `getprop` build properties, official Android role/role-holder commands) rather than fragile, version-dependent `dumpsys` text parsing. Where a signal can't be independently verified from a development environment, that limitation is stated plainly in code comments rather than assumed away - and the feature is designed to fail toward \"do nothing extra\" rather than \"do something wrong\" if the signal ever stops matching.</li>\n<li>**Observe before acting automatically.** New detection features - like flagging an app with sustained background CPU use - start observational-only: recorded for a person to review and act on with one tap, not silently enforced, until there's real confidence in the underlying signal.</li>\n<li>**Zero cost unless something is actually happening.** Background checks are throttled and gated (e.g. only while the screen is off, only once a minute) rather than run on every poll cycle, and genuinely occasional questions (like \"what's using the most CPU right now\") are answered on demand, with no continuous background cost, rather than sampled constantly just in case someone asks.</li>\n<li>**Basic mode is a presentation layer, not a different mechanism.** The simplified Config view writes the exact same configuration format the full editor does; nothing behaves differently underneath depending on which mode happens to be showing.</li>\n\n<h2>Requirements</h2>\n\n<li>Rooted Android device with KernelSU.</li>\n<li>A KernelSU/WebUI-X-capable manager for the graphical WebUI.</li>\n<li>The module can also be operated entirely from a root shell with `PowerSentinelctl` and `PowerSentinelconf`.</li>\n\n<p>> <b>Important:</b> PowerSentinel is intentionally <b>KernelSU-only for its WebUI</b>. The legacy Magisk <code>httpd</code>/CGI compatibility layer was removed in v3.8.0. There is no local HTTP server or browser fallback.</p>\n\n<h2>Features</h2>\n\n<li>**Event-driven power management** — boot, charging, screen-off, low-power, night, thermal, manual and fully custom events, each with independent configuration.</li>\n<li>**Adaptive engine** — an opt-in pressure score (0-100, from battery level, temperature, charging state, screen state, night, and CPU load) mapped to three escalating tiers, so behavior scales with how much the device actually needs rather than one fixed policy applying uniformly.</li>\n<li>**App management** — kill, suspend, or reprioritize applications with allow/deny lists, plus a global **per-app policy in 4 levels** (never touch / gentle only, capped at `nice` / follow whatever the active event asks for / always aggressive, forces suspend) that can override a specific app's treatment regardless of which event is currently active.</li>\n<li>**Critical app protection** — the device's default dialer, SMS, and emergency apps, and anything already exempt from Android's own battery optimization, are always protected. Not configurable, since this is about safety rather than preference.</li>\n<li>**Problematic-app detection** — a background watch flags apps sustaining real CPU use while the screen is off, using the stable `/proc/[pid]/stat` kernel interface rather than a fragile framework dump. Purely observational: flagged apps are surfaced for review (with a one-tap \"limit this app\" action in the WebUI), never acted on automatically.</li>\n<li>**On-demand CPU ranking** — a one-shot, explicitly-triggered measurement of which installed apps are using the most CPU right now, sorted by percentage. Zero ongoing cost: it only runs, and only ever costs anything, when someone asks to see it.</li>\n<li>**Energy log** — a change-triggered (not continuous) record of battery level, temperature, and what was active at the time, meant for after-the-fact analysis of whether a given setting is genuinely helping rather than assumed to.</li>\n<li>**Hardware detection** — the WebUI shows the real detected manufacturer/model and exactly which low-level mechanisms this specific device supports (core control, WiFi control method, Doze, GMS, app suspension), and only surfaces a device-specific risk warning (e.g. core disabling on some Samsung devices) when it's actually relevant to the device it's running on.</li>\n<li>**CPU optimization** — powersave governors and optional core disabling, gated by a Capability Manager that probes what the device can actually do once at startup, instead of blindly attempting something unsupported every cycle.</li>\n<li>**System controls** — Doze, WiFi, low-RAM mode (with the device's real original value preserved and restored, not overwritten to a hardcoded default), GMS and process priorities.</li>\n<li>**Basic/Advanced modes** — a simple aggressiveness picker (Low/Medium/High, each with a plain-language breakdown of what it actually does) for anyone who doesn't want to configure individual events by hand, and a full per-event editor with raw JSON access for anyone who does. Both read and write the exact same underlying configuration.</li>\n<li>**Event Journal & sane notifications** — every event transition and status change is recorded to a structured journal (viewable in the WebUI's \"Historial\" tab); only genuinely critical situations (Safe Mode engaging, a rejected unsafe configuration) ever reach an actual Android notification, instead of every routine status change interrupting the notification shade.</li>\n<li>**Profiles** — save and restore complete event configurations.</li>\n<li>**Safe mode** — stops every event immediately and holds off until explicitly resumed, reachable from the WebUI or `PowerSentinelctl safe`/`resume`.</li>\n<li>**WebUI** — native KernelSU WebUI using `kernelsu.exec()`, no local HTTP server.</li>\n\n<h2>WebUI architecture</h2>\n\n<p>The WebUI lives in <code>webroot/</code>, which KernelSU loads directly inside the manager's WebView. The source is under <code>frontend/</code> and is built with Vite.</p>\n\n<pre>KernelSU Manager\n      ↓\n   webroot/\n      ↓\n frontend/src/api.js\n      ↓\nbackend-ksu.js\n      ↓\nkernelsu.exec()\n      ↓\nPowerSentinelctl / PowerSentinel-writefile / Android commands</pre>\n\n<p>There is deliberately only one WebUI transport. PowerSentinel does <b>not</b> start <code>httpd</code>, does <b>not</b> expose port 8081, and does <b>not</b> ship CGI endpoints or WebUI session tokens.</p>\n\n<p>KernelSU's documentation specifies <code>webroot/index.html</code> as the module WebUI entry point and exposes system APIs such as <code>exec()</code> to the page.</p>\n\n<h2>Daemon architecture</h2>\n\n<p><code>PowerSentineld</code> is split into focused pieces rather than one large script, each doing exactly one job:</p>\n\n<pre>PowerSentineld (orchestrator, main loop, command handling)\n      ↓\nEvent Manager (PowerSentinel-events.sh)\n  - locks/tracks which events are currently active, resolves each\n    event's own field values, re-asserts any still-active event's\n    settings after another event ends\n      ↓\nPolicy (PowerSentinel-policy.sh)  +  Detect (PowerSentinel-detect.sh)\n  - pure decisions (night, thermal, adaptive pressure score) computed\n    from pure reads (battery, CPU topology, load) - detection never\n    decides anything, policy never touches the system directly\n      ↓\nActions (PowerSentinel-actions.sh)\n  - the only place that actually touches the system: apps, CPU cores,\n    WiFi, Doze, GMS, process priorities, low-RAM mode</pre>\n\n<p>Two layers sit in front of every app-affecting action, evaluated in this order:</p>\n\n<li>**Critical app protection** (`PowerSentinel-detect.sh`) — the device's default dialer/SMS/emergency apps and anything already exempt from battery optimization. Always wins, never configurable.</li>\n<li>**Per-app policy** (`PowerSentinel-apppolicy.sh`) — a global 0-3 level per package (never / gentle only / follow the event / always aggressive) that can override what a specific event's own configuration asks for, for that one app.</li>\n\n<p>A <b>Capability Manager</b> (<code>PowerSentinel-capabilities.sh</code>) probes once at startup what the device/ROM actually supports - core online/offline control, CPU governor control, which WiFi control method works, whether Doze can be forced, whether Google Mobile Services is even installed, whether <code>pm suspend</code> is supported - so actions can skip, with a clear log message, instead of blindly attempting something unsupported every single cycle.</p>\n\n<p>A <b>State Manager</b> (<code>PowerSentinel-state.sh</code>) persists which events are currently active across daemon restarts and reboots, so a crash (or an unclean reboot) doesn't leave the daemon with no memory of what it previously applied - cores staying offline, apps staying suspended, or WiFi staying blocked indefinitely with nothing left to undo it. On every startup, the daemon reconciles back to a clean baseline before evaluating current conditions from scratch.</p>\n\n<p>An <b>Event Journal</b> (<code>PowerSentinel-journal.sh</code>) records every event transition and status change as structured data (viewable in the WebUI's \"Historial\" tab), while an <b>Alert Bridge</b> (<code>PowerSentinel-alertbridge.sh</code>) is the only place that ever posts a real Android notification - and only for genuinely critical severity, not routine status.</p>\n\n<h2>Installation</h2>\n\n<li>Download the latest release.</li>\n<li>Install the ZIP through your KernelSU manager.</li>\n<li>Reboot if requested by the manager.</li>\n<li>Open PowerSentinel from the module's native **WebUI/Open** button.</li>\n<li>Configure the module from the WebUI or from a root shell.</li>\n\n<p>A default configuration is created automatically on first boot and lives at:</p>\n\n<pre>/data/local/tmp/PowerSentinel/PowerSentinel.json</pre>\n\n<p>Any legacy <code>PowerSentinel.conf</code> (flat text, pre-v3.10.0) is migrated into this JSON file once, automatically, on the daemon's first start after updating - it is not read again afterward.</p>\n\n<h2>Configuration</h2>\n\n<p>PowerSentinel supports the current v2 event-driven configuration format, stored as JSON. A minimal example:</p>\n\n<pre>{\n  \"global\": {\n    \"version\": \"2\",\n    \"delay\": \"3\",\n    \"log_file\": \"/sdcard/PowerSentinel.log\",\n    \"log_level\": \"2\"\n  },\n  \"events\": {\n    \"screen_off\": {\n      \"handle_apps\": \"nice\",\n      \"disable_cores\": \"cpu6 cpu7\"\n    },\n    \"low_power\": {\n      \"doze\": \"light\",\n      \"kill_wifi\": \"false\"\n    }\n  }\n}</pre>\n\n<p>Multiple events can be active at the same time. Configure overlapping policies carefully and keep essential applications protected.</p>\n\n<p>The WebUI's Config tab offers two modes: <b>Básico</b>, the default for every fresh install, which exposes just an adaptive-savings switch and an aggressiveness level (Low/Medium/High); and <b>Avanzado</b>, which exposes the full per-event editor and a raw JSON view. Both modes read and write this exact same file - Basic mode is a simplified presentation layer, not a different underlying mechanism.</p>\n\n<h2>How configuration changes take effect</h2>\n\n<p>Saving a change - from either mode of the WebUI, or by writing the JSON file directly - takes effect immediately. No reboot, and no manual restart of the daemon, is required.</p>\n\n<p>Concretely: the WebUI's save path writes the new configuration and then runs <code>PowerSentinelctl reload</code>. On receiving that command, the daemon cleanly undoes whatever it currently has applied (so nothing from the old configuration is left half-applied), then re-executes itself in place (<code>exec</code>) - re-reading the new configuration from a clean start, with no gap where the daemon isn't running. This is different from the watchdog in <code>service.sh</code>, which only relaunches the daemon if it has actually crashed, and could take up to a minute to notice; a <code>reload</code> is immediate and self-triggered.</p>\n\n<p>After a reload, the daemon's main loop evaluates real device conditions (battery level, screen state, temperature, etc.) against the new configuration on its very next cycle. If a condition your new configuration cares about isn't met yet - for example, the battery hasn't actually dropped to the level a given adaptive tier requires - nothing will visibly change until it is; that's the normal behavior of an event-driven system reacting to real conditions, not a sign that the reload didn't work. The WebUI's Estado tab, and Basic mode's own live status line, both reflect what's genuinely active right now rather than just what's configured.</p>\n\n<h2>Command-line tools</h2>\n\n<p>Run these commands from a root shell:</p>\n\n<pre>PowerSentinelctl start &lt;event&gt;\nPowerSentinelctl stop &lt;event&gt;\nPowerSentinelctl reload\nPowerSentinelctl pause\nPowerSentinelctl resume\nPowerSentinelctl safe</pre>\n\n<p><code>PowerSentinelconf</code> provides an interactive wizard and direct configuration operations:</p>\n\n<pre>PowerSentinelconf\nPowerSentinelconf show\nPowerSentinelconf events\nPowerSentinelconf set KEY VALUE --event screen_off\nPowerSentinelconf app-policy set &lt;package&gt; &lt;0-3&gt;   # per-app override: 0=never touch, 1=gentle only, 2=follow event (default), 3=always aggressive\nPowerSentinelconf flagged-apps list                # apps flagged for real, sustained background CPU use</pre>\n\n<p>If the WebUI is unavailable, these tools remain the supported recovery/configuration path.</p>\n\n<h2>Development</h2>\n\n<p>The generated <code>webroot/</code> directory is the shipped WebUI output. Do not edit it manually.</p>\n\n<pre>cd frontend\nnpm ci\nnpm run build</pre>\n\n<p>The frontend depends on the <code>kernelsu</code> JavaScript package and expects to run inside a compatible KernelSU manager WebView. A normal desktop browser does not provide the root bridge.</p>\n\n<h2>Security</h2>\n\n<p>The WebUI never sends configuration content to a local HTTP server. Configuration writes are base64-encoded and passed to <code>PowerSentinel-writefile</code>, which restricts write targets, performs atomic replacement, and keeps a backup.</p>\n\n<p>See <a href=\"docs/security-audit.md\"><code>docs/security-audit.md</code></a> for the current security model.</p>\n\n<h2>Disclaimer</h2>\n\n<p>PowerSentinel modifies system behavior and requires root access. Aggressive settings can cause lag, missed notifications/alarms, application instability, or SystemUI problems. Use at your own risk and test changes incrementally.</p>\n\n<h2>Credits</h2>\n\n<p>PowerSentinel retains historical attribution to the earlier PowerSentinel/Xtreme-Battery-Saver lineage and its original contributors. The project is released under GPLv3.</p>",
+  "homepageUrl": "https://github.com/kherio/PowerSentinel",
+  "sourceUrl": "https://github.com/kherio/PowerSentinel",
+  "url": "https://github.com/kherio/PowerSentinel",
+  "latestRelease": {
+    "name": "v4.16.1",
+    "version": "v4.16.1",
+    "time": "2026-09-22T06:32:56Z",
+    "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.16.1/PowerSentinel-v4.16.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.16.1",
+      "tagName": "v4.16.1",
+      "publishedAt": "2026-09-22T06:32:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.16.1.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.16.1/PowerSentinel-v4.16.1.zip",
+          "size": 1995599,
+          "downloadCount": 85
+        }
+      ]
+    },
+    {
+      "name": "v4.16.0",
+      "tagName": "v4.16.0",
+      "publishedAt": "2026-09-21T15:59:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.16.0-test.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.16.0/PowerSentinel-v4.16.0-test.zip",
+          "size": 1994847,
+          "downloadCount": 0
+        },
+        {
+          "name": "PowerSentinel-v4.16.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.16.0/PowerSentinel-v4.16.0.zip",
+          "size": 1994847,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v4.15.0",
+      "tagName": "v4.15.0",
+      "publishedAt": "2026-09-11T10:34:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.15.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.15.0/PowerSentinel-v4.15.0.zip",
+          "size": 2233840,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "v4.13.0",
+      "tagName": "v4.13.0",
+      "publishedAt": "2026-09-11T06:29:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.13.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.13.0/PowerSentinel-v4.13.0.zip",
+          "size": 2228424,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v4.12.0",
+      "tagName": "v4.12.0",
+      "publishedAt": "2026-09-11T06:04:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.12.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.12.0/PowerSentinel-v4.12.0.zip",
+          "size": 2224081,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v4.11.0",
+      "tagName": "v4.11.0",
+      "publishedAt": "2026-09-11T05:43:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.11.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.11.0/PowerSentinel-v4.11.0.zip",
+          "size": 2221184,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v4.10.0",
+      "tagName": "v4.10.0",
+      "publishedAt": "2026-09-10T18:59:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.10.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.10.0/PowerSentinel-v4.10.0.zip",
+          "size": 2203592,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v4.9.0",
+      "tagName": "v4.9.0",
+      "publishedAt": "2026-09-10T18:58:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.9.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.9.0/PowerSentinel-v4.9.0.zip",
+          "size": 2202507,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v4.8.0",
+      "tagName": "v4.8.0",
+      "publishedAt": "2026-09-10T18:58:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.8.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.8.0/PowerSentinel-v4.8.0.zip",
+          "size": 2198171,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v4.7.0",
+      "tagName": "v4.7.0",
+      "publishedAt": "2026-09-10T12:28:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.7.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.7.0/PowerSentinel-v4.7.0.zip",
+          "size": 2196355,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v4.5.0",
+      "tagName": "v4.5.0",
+      "publishedAt": "2026-09-10T12:10:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.5.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.5.0/PowerSentinel-v4.5.0.zip",
+          "size": 2192470,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v4.2.0",
+      "tagName": "v4.2.0",
+      "publishedAt": "2026-09-10T10:07:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.2.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.2.0/PowerSentinel-v4.2.0.zip",
+          "size": 2180574,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v4.1.0",
+      "tagName": "v4.1.0",
+      "publishedAt": "2026-09-10T05:33:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.1.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.1.0/PowerSentinel-v4.1.0.zip",
+          "size": 2175983,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-09-10T05:04:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v4.0.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v4.0.0/PowerSentinel-v4.0.0.zip",
+          "size": 2164913,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.70.0",
+      "tagName": "v3.70.0",
+      "publishedAt": "2026-09-09T20:36:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.70.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.70.0/PowerSentinel-v3.70.0.zip",
+          "size": 2164746,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.69.0",
+      "tagName": "v3.69.0",
+      "publishedAt": "2026-09-09T20:18:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.69.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.69.0/PowerSentinel-v3.69.0.zip",
+          "size": 2148424,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.68.0",
+      "tagName": "v3.68.0",
+      "publishedAt": "2026-09-09T20:10:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.68.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.68.0/PowerSentinel-v3.68.0.zip",
+          "size": 2148056,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.67.0",
+      "tagName": "v3.67.0",
+      "publishedAt": "2026-09-09T18:19:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.67.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.67.0/PowerSentinel-v3.67.0.zip",
+          "size": 2137654,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.66.0",
+      "tagName": "v3.66.0",
+      "publishedAt": "2026-09-09T14:47:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.66.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.66.0/PowerSentinel-v3.66.0.zip",
+          "size": 2136420,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.64.0",
+      "tagName": "v3.64.0",
+      "publishedAt": "2026-09-09T10:19:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.64.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.64.0/PowerSentinel-v3.64.0.zip",
+          "size": 2117357,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.63.0",
+      "tagName": "v3.63.0",
+      "publishedAt": "2026-09-09T10:10:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.63.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.63.0/PowerSentinel-v3.63.0.zip",
+          "size": 2116642,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.62.0",
+      "tagName": "v3.62.0",
+      "publishedAt": "2026-09-09T10:03:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.62.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.62.0/PowerSentinel-v3.62.0.zip",
+          "size": 2116677,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.61.0",
+      "tagName": "v3.61.0",
+      "publishedAt": "2026-09-09T09:36:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.61.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.61.0/PowerSentinel-v3.61.0.zip",
+          "size": 2115397,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.59.0",
+      "tagName": "v3.59.0",
+      "publishedAt": "2026-09-08T17:25:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.59.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.59.0/PowerSentinel-v3.59.0.zip",
+          "size": 2113675,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v3.57.0",
+      "tagName": "v3.57.0",
+      "publishedAt": "2026-09-08T16:51:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.57.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.57.0/PowerSentinel-v3.57.0.zip",
+          "size": 2110695,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.56.0",
+      "tagName": "v3.56.0",
+      "publishedAt": "2026-09-08T16:24:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.56.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.56.0/PowerSentinel-v3.56.0.zip",
+          "size": 2109257,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.54.0",
+      "tagName": "v3.54.0",
+      "publishedAt": "2026-09-08T14:49:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.54.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.54.0/PowerSentinel-v3.54.0.zip",
+          "size": 2104156,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.53.0",
+      "tagName": "v3.53.0",
+      "publishedAt": "2026-09-08T14:16:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.53.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.53.0/PowerSentinel-v3.53.0.zip",
+          "size": 2103218,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.52.0",
+      "tagName": "v3.52.0",
+      "publishedAt": "2026-09-08T13:45:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.52.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.52.0/PowerSentinel-v3.52.0.zip",
+          "size": 2101424,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.49.0",
+      "tagName": "v3.49.0",
+      "publishedAt": "2026-09-08T13:14:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PowerSentinel-v3.49.0.zip",
+          "downloadUrl": "https://github.com/kherio/PowerSentinel/releases/download/v3.49.0/PowerSentinel-v3.49.0.zip",
+          "size": 2095457,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

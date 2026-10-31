@@ -1,0 +1,155 @@
+{
+  "readme": "# System WebView Enforcer\n\n根据酷安贴《强制第三方 APP 调用 Android system webview 运行教程 》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 `root:root`、权限 `000` 的空目录，迫使 App 回退到 Android System WebView。\n\n支持 **KernelSU** 和 **Magisk** 两种框架。\n\n## 安装\n\n1. 从 [Releases](https://github.com/homjson/ksu-system-webview-enforcer/releases) 页面下载最新版本的 zip 包。\n2. 重启手机。\n3. 打开管理器 App（KernelSU Manager 或 Magisk App），进入模块页面，点击本模块的 **Action 按钮**执行一次。\n4. Action 页面会显示最后 40 行日志；完整日志位于模块目录的 `logs/manual.log`。\n\n## 更新\n更新模块不会覆盖apps.conf里的配置，如需要更新模块的apps.conf，删除本地的apps.conf。\n\n## 配置\n\n`config/apps.conf` 使用分段格式。每个 App 从 `app` 开始，到 `end` 结束：\n\n```text\napp Meituan\nenabled 1\npackage com.sankuai.meituan\ndir app_webview_mt_webview\ndir files/cips/common/mtplatform/assets/mtwebview\nend\n```\n\n含义：\n\n- `app`：日志中显示的名称，可以写中文或英文。\n- `enabled 1`：锁定该 App 的私有 WebView 目录。\n- `enabled 0`：保留规则但跳过该 App。\n- `enabled 2`：解锁该 App 的目录（恢复为 App 自身权限），用于单独解锁某个 App 而不影响其他。\n- `package`：App 包名，对应 `/data/data/<package>`。\n- `dir`：要锁死的目录，一行一个，只写相对 `/data/data/<package>` 的路径。\n\n新增 App 时复制一整段；新增目录时只加一行 `dir ...`；禁用某个 App 时把 `enabled 1` 改成 `enabled 0`。\n\n**升级模块时，`apps.conf` 和 `settings.conf` 会被自动保留，不会覆盖你修改过的配置。**\n\n脚本仍兼容旧版 `enabled|package|label|dir,dir` 格式，但不再推荐手写旧格式。\n\n默认启用：\n\n- 美团\n- 京东\n- 淘宝\n- 闲鱼\n- 铁路 12306\n- QQ\n- 天猫\n\n默认禁用：\n\n- 百度地图\n- QQ 音乐\n- 钉钉\n- 微信\n- 抖音\n- 支付宝\n\n这些默认禁用项通常涉及更复杂的安全、风控或业务逻辑，建议确认能接受崩溃、功能异常、账号风控提示等风险后再启用。\n\n脚本会先检查目标目录是否已经是 `root:root` 且权限为 `000`。已经锁好的目录不会重复删除；只有发生新的重锁操作时，才会停止对应 App 并清理缓存。\n\n## 开机自动补锁\n\n默认不开启开机自动执行。需要时在 `config/settings.conf` 中设置 `AUTO_RUN_ON_BOOT=1`：\n\n```sh\nAUTO_RUN_ON_BOOT=1\n```\n\n- **KernelSU**：使用 `boot-completed.sh`\n- **Magisk**：使用 `service.sh`（late_start service 阶段）\n\n两者互不冲突，zip 包同时包含两个脚本，在各自框架下自动生效。\n\n## 回滚\n\n卸载模块时，`uninstall.sh` 会尝试把配置中列出的占位目录恢复为 `0771`，并将所有者改回 App 数据目录的所有者。\n\n注意：模块不会、也无法恢复已经删除的私有 WebView 原始文件。解除占位后，App 通常会在下次启动或更新时自行重建/下载。\n\n## 风险\n\n- 该模块会修改 `/data/data/<package>`，不是纯 systemless 的 `/system` overlay。\n- App 更新后目录名可能变化，需要维护 `config/apps.conf`。\n- 个别 App 可能因检测到数据目录异常而崩溃、降级或触发安全提示。\n- 建议先备份重要 App 数据，再逐个启用规则测试。\n\n## 免责声明\n\n本模块仅供学习和研究用途。安装即视为您已阅读、理解并同意自行承担使用本模块所带来的一切风险。因使用或滥用本模块导致的任何数据丢失、系统异常、账号封禁、功能异常或其他直接或间接损失，模块作者概不负责。\n",
+  "readmeHTML": "<h1>System WebView Enforcer</h1>\n\n<p>根据酷安贴《强制第三方 APP 调用 Android system webview 运行教程 》的思路，将选中 App 的私有 WebView 内核目录删除后替换成 <code>root:root</code>、权限 <code>000</code> 的空目录，迫使 App 回退到 Android System WebView。</p>\n\n<p>支持 <b>KernelSU</b> 和 <b>Magisk</b> 两种框架。</p>\n\n<h2>安装</h2>\n\n<li>从 [Releases](https://github.com/homjson/ksu-system-webview-enforcer/releases) 页面下载最新版本的 zip 包。</li>\n<li>重启手机。</li>\n<li>打开管理器 App（KernelSU Manager 或 Magisk App），进入模块页面，点击本模块的 **Action 按钮**执行一次。</li>\n<li>Action 页面会显示最后 40 行日志；完整日志位于模块目录的 `logs/manual.log`。</li>\n\n<h2>更新</h2>\n<p>更新模块不会覆盖apps.conf里的配置，如需要更新模块的apps.conf，删除本地的apps.conf。</p>\n\n<h2>配置</h2>\n\n<p><code>config/apps.conf</code> 使用分段格式。每个 App 从 <code>app</code> 开始，到 <code>end</code> 结束：</p>\n\n<pre>app Meituan\nenabled 1\npackage com.sankuai.meituan\ndir app_webview_mt_webview\ndir files/cips/common/mtplatform/assets/mtwebview\nend</pre>\n\n<p>含义：</p>\n\n<li>`app`：日志中显示的名称，可以写中文或英文。</li>\n<li>`enabled 1`：锁定该 App 的私有 WebView 目录。</li>\n<li>`enabled 0`：保留规则但跳过该 App。</li>\n<li>`enabled 2`：解锁该 App 的目录（恢复为 App 自身权限），用于单独解锁某个 App 而不影响其他。</li>\n<li>`package`：App 包名，对应 `/data/data/<package>`。</li>\n<li>`dir`：要锁死的目录，一行一个，只写相对 `/data/data/<package>` 的路径。</li>\n\n<p>新增 App 时复制一整段；新增目录时只加一行 <code>dir ...</code>；禁用某个 App 时把 <code>enabled 1</code> 改成 <code>enabled 0</code>。</p>\n\n<p><b>升级模块时，<code>apps.conf</code> 和 <code>settings.conf</code> 会被自动保留，不会覆盖你修改过的配置。</b></p>\n\n<p>脚本仍兼容旧版 <code>enabled|package|label|dir,dir</code> 格式，但不再推荐手写旧格式。</p>\n\n<p>默认启用：</p>\n\n<li>美团</li>\n<li>京东</li>\n<li>淘宝</li>\n<li>闲鱼</li>\n<li>铁路 12306</li>\n<li>QQ</li>\n<li>天猫</li>\n\n<p>默认禁用：</p>\n\n<li>百度地图</li>\n<li>QQ 音乐</li>\n<li>钉钉</li>\n<li>微信</li>\n<li>抖音</li>\n<li>支付宝</li>\n\n<p>这些默认禁用项通常涉及更复杂的安全、风控或业务逻辑，建议确认能接受崩溃、功能异常、账号风控提示等风险后再启用。</p>\n\n<p>脚本会先检查目标目录是否已经是 <code>root:root</code> 且权限为 <code>000</code>。已经锁好的目录不会重复删除；只有发生新的重锁操作时，才会停止对应 App 并清理缓存。</p>\n\n<h2>开机自动补锁</h2>\n\n<p>默认不开启开机自动执行。需要时在 <code>config/settings.conf</code> 中设置 <code>AUTO_RUN_ON_BOOT=1</code>：</p>\n\n<pre>AUTO_RUN_ON_BOOT=1</pre>\n\n<li>**KernelSU**：使用 `boot-completed.sh`</li>\n<li>**Magisk**：使用 `service.sh`（late_start service 阶段）</li>\n\n<p>两者互不冲突，zip 包同时包含两个脚本，在各自框架下自动生效。</p>\n\n<h2>回滚</h2>\n\n<p>卸载模块时，<code>uninstall.sh</code> 会尝试把配置中列出的占位目录恢复为 <code>0771</code>，并将所有者改回 App 数据目录的所有者。</p>\n\n<p>注意：模块不会、也无法恢复已经删除的私有 WebView 原始文件。解除占位后，App 通常会在下次启动或更新时自行重建/下载。</p>\n\n<h2>风险</h2>\n\n<li>该模块会修改 `/data/data/<package>`，不是纯 systemless 的 `/system` overlay。</li>\n<li>App 更新后目录名可能变化，需要维护 `config/apps.conf`。</li>\n<li>个别 App 可能因检测到数据目录异常而崩溃、降级或触发安全提示。</li>\n<li>建议先备份重要 App 数据，再逐个启用规则测试。</li>\n\n<h2>免责声明</h2>\n\n<p>本模块仅供学习和研究用途。安装即视为您已阅读、理解并同意自行承担使用本模块所带来的一切风险。因使用或滥用本模块导致的任何数据丢失、系统异常、账号封禁、功能异常或其他直接或间接损失，模块作者概不负责。</p>",
+  "homepageUrl": "https://github.com/homjson/ksu-system-webview-enforcer",
+  "sourceUrl": "https://github.com/homjson/ksu-system-webview-enforcer",
+  "url": "https://github.com/homjson/ksu-system-webview-enforcer",
+  "latestRelease": {
+    "name": "v1.3.6",
+    "version": "v1.3.6",
+    "time": "2026-07-23T06:50:40Z",
+    "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.6/ksu_system_webview_enforcer_v1.3.6.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.6",
+      "tagName": "v1.3.6",
+      "publishedAt": "2026-07-23T06:50:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_system_webview_enforcer_v1.3.6.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.6/ksu_system_webview_enforcer_v1.3.6.zip",
+          "size": 5930,
+          "downloadCount": 182
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5",
+      "tagName": "v1.3.5",
+      "publishedAt": "2026-07-22T02:12:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_system_webview_enforcer_v1.3.5.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.5/ksu_system_webview_enforcer_v1.3.5.zip",
+          "size": 6207,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v1.3.4",
+      "tagName": "v1.3.4",
+      "publishedAt": "2026-07-21T07:54:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_system_webview_enforcer_v1.3.4.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.4/ksu_system_webview_enforcer_v1.3.4.zip",
+          "size": 5833,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2026-07-21T01:17:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu_system_webview_enforcer_v1.3.3.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.3/ksu_system_webview_enforcer_v1.3.3.zip",
+          "size": 5746,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2026-07-20T11:02:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.3.2.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.2/ksu-system-webview-enforcer-v1.3.2.zip",
+          "size": 5641,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2026-07-20T10:40:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.3.1.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.1/ksu-system-webview-enforcer-v1.3.1.zip",
+          "size": 5642,
+          "downloadCount": 110
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-07-20T10:33:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.3.0.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.3.0/ksu-system-webview-enforcer-v1.3.0.zip",
+          "size": 8413,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-07-20T10:19:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.2.0.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.2.0/ksu-system-webview-enforcer-v1.2.0.zip",
+          "size": 8373,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-07-20T10:16:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.1.1.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.1.1/ksu-system-webview-enforcer-v1.1.1.zip",
+          "size": 8180,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-07-20T10:08:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-system-webview-enforcer-v1.1.0.zip",
+          "downloadUrl": "https://github.com/homjson/ksu-system-webview-enforcer/releases/download/v1.1.0/ksu-system-webview-enforcer-v1.1.0.zip",
+          "size": 8479,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

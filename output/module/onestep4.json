@@ -1,0 +1,175 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"assets/readme/icon.png\" width=\"168\" alt=\"OneStep4.0 应用图标\">\n</p>\n\n<h1 align=\"center\">OneStep4.0</h1>\n\n<p align=\"center\">\n  <img src=\"https://img.shields.io/badge/Version-1.0.5-4caf50\" alt=\"当前版本 1.0.5\">\n  <img src=\"https://img.shields.io/badge/Android-7.0%2B-3ddc84\" alt=\"支持 Android 7.0 及以上版本\">\n  <img src=\"https://img.shields.io/badge/API-24--36-1976d2\" alt=\"Android API 24 至 36\">\n  <img src=\"https://img.shields.io/badge/Root-Required-e53935\" alt=\"需要 Root 或系统特权权限\">\n  <img src=\"https://img.shields.io/badge/License-Apache--2.0-1565c0\" alt=\"Apache License 2.0\">\n</p>\n\n<p align=\"center\">\n  <img src=\"assets/readme/navigation.png\" width=\"23%\" alt=\"导航组件与多窗口演示\">\n  <img src=\"assets/readme/media.png\" width=\"23%\" alt=\"媒体组件与多窗口演示\">\n  <img src=\"assets/readme/settings.png\" width=\"23%\" alt=\"一步设置与多窗口演示\">\n  <img src=\"assets/readme/recorder.png\" width=\"23%\" alt=\"录音组件与多窗口演示\">\n</p>\n\n<p align=\"center\">\n  <a href=\"https://www.bilibili.com/video/BV17b3Y6QE4D\"><strong>观看 Bilibili 演示视频</strong></a>\n  ·\n  <a href=\"https://github.com/SangLuoCN/OneStep4\"><strong>GitHub 项目：SangLuoCN/OneStep4</strong></a>\n</p>\n\n<p align=\"center\">\n  如果 OneStep4.0 对你有帮助，欢迎为演示视频一键三连，也欢迎为 GitHub 项目点一个 Star！\n</p>\n\n## 项目简介\n\nOneStep4.0 是面向 Android Root 与系统特权环境的多应用桌面容器，旨在延续 One Step 的多窗口交互方式。应用自身作为系统 Home 运行，在同一工作区中提供一个主窗口、多个侧边小窗口、顶部应用栏、媒体与导航组件，并允许用户在这些容器之间快速打开和切换真实应用。\n\n项目不依赖 Android 自由窗口模式。具备系统任务嵌入能力时会优先使用系统宿主；在通用 Root 环境中，则通过可信 `VirtualDisplay + SurfaceView` 承载应用画面，并将触摸、输入法和焦点准确交给对应的虚拟显示。\n\n> 容器内运行第三方应用需要 Root/SU、Magisk 特权模块、平台签名或等效的系统级任务嵌入权限。仅以普通 APK 安装时，Android 不会授予项目所需的签名级权限。\n\n## 刷入方法\n\n### Magisk\n\n1. 刷入最新 Magisk 模块。\n2. 重启设备。\n3. 进入 OneStep4.0，并授权 Root 权限；如果没有弹出权限申请，请在 Magisk 中手动授权。\n4. 授权完成后即可正常使用。\n\n### KSU\n\n1. 刷入元模块。\n2. 刷入最新 KSU 模块。\n3. 重启设备。\n4. 打开 OneStep4.0 前，请先在 KSU 中手动授予 Root 权限。如果未授权就打开应用，可能出现黑屏；此时请手动授权，清除应用后台后重新打开。\n5. 授权完成后即可正常使用。\n\n## 实测可用系统及对应方案\n\n| 手机系统 | Android 版本 | Root 方案 | 使用情况 |\n| --- | ---: | --- | --- |\n| ColorOS 16 | 16 | KSU | 可用 |\n| ColorOS 16 | 16 | ReSukiSU | 可用 |\n| ColorOS 16 | 16 | Magisk | 可用 |\n| HyperOS 3 | 16 | KSU | 可用 |\n| ZUXOS | 15 | Magisk | 可用 |\n| 星云 AIOS | 16 | KSU | 可用 |\n| 类原生 | 14 | Magisk | 可用 |\n\n## 核心特性\n\n- **主侧多窗口**：提供一个主窗口和 3 至 6 个侧边小窗口，支持快速打开、切换和关闭应用。\n- **智能窗口分配**：侧屏有空位时将原主屏应用移入侧屏，全部窗口占满后在主屏替换应用。\n- **流畅切换动画**：应用移入侧屏时缩小过渡，替换主屏时原应用渐隐、新应用放大出现。\n- **内置桌面**：可从系统中已安装的桌面应用里选择，Home 返回时直接显示当前所选桌面。\n- **顶部快捷区**：提供可翻页的应用快捷栏、媒体播放控制和高德导航信息。\n- **一步设置**：设置页可像普通应用一样在主屏和侧屏之间切换，并保持页面状态。\n- **自定义布局**：可调整桌面图标排列、侧屏数量、顶部栏尺寸与间距、角落触发区域和灵敏度。\n- **工作区背景**：支持选择自定义背景并同步系统壁纸。\n\n## 协议说明\n- **注意**：锤子相关源代码部分仍为Apache 2.0开源协议，当前项目基于锤子相关源代码作出的新修改及整体组合为AGPL-3.0协议。\n\n## 内测反馈群\n\n欢迎加入 OneStep4.0 内测反馈群，交流使用体验、反馈问题并参与功能测试。\n\n<p align=\"center\">\n  <img src=\"assets/readme/qq-feedback-group.jpg\" width=\"360\" alt=\"OneStep4.0 内测反馈群二维码\">\n</p>\n\n<p align=\"center\"><strong>QQ 群：1081638982</strong></p>\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"assets/readme/icon.png\" width=\"168\" alt=\"OneStep4.0 应用图标\"></p>\n<p></p></p>\n\n<p><h1 align=\"center\">OneStep4.0</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Version-1.0.5-4caf50\" alt=\"当前版本 1.0.5\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Android-7.0%2B-3ddc84\" alt=\"支持 Android 7.0 及以上版本\"></p>\n<p>  <img src=\"https://img.shields.io/badge/API-24--36-1976d2\" alt=\"Android API 24 至 36\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Root-Required-e53935\" alt=\"需要 Root 或系统特权权限\"></p>\n<p>  <img src=\"https://img.shields.io/badge/License-Apache--2.0-1565c0\" alt=\"Apache License 2.0\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"assets/readme/navigation.png\" width=\"23%\" alt=\"导航组件与多窗口演示\"></p>\n<p>  <img src=\"assets/readme/media.png\" width=\"23%\" alt=\"媒体组件与多窗口演示\"></p>\n<p>  <img src=\"assets/readme/settings.png\" width=\"23%\" alt=\"一步设置与多窗口演示\"></p>\n<p>  <img src=\"assets/readme/recorder.png\" width=\"23%\" alt=\"录音组件与多窗口演示\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://www.bilibili.com/video/BV17b3Y6QE4D\"><strong>观看 Bilibili 演示视频</strong></a></p>\n<p>  ·</p>\n<p>  <a href=\"https://github.com/SangLuoCN/OneStep4\"><strong>GitHub 项目：SangLuoCN/OneStep4</strong></a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  如果 OneStep4.0 对你有帮助，欢迎为演示视频一键三连，也欢迎为 GitHub 项目点一个 Star！</p>\n<p></p></p>\n\n<h2>项目简介</h2>\n\n<p>OneStep4.0 是面向 Android Root 与系统特权环境的多应用桌面容器，旨在延续 One Step 的多窗口交互方式。应用自身作为系统 Home 运行，在同一工作区中提供一个主窗口、多个侧边小窗口、顶部应用栏、媒体与导航组件，并允许用户在这些容器之间快速打开和切换真实应用。</p>\n\n<p>项目不依赖 Android 自由窗口模式。具备系统任务嵌入能力时会优先使用系统宿主；在通用 Root 环境中，则通过可信 <code>VirtualDisplay + SurfaceView</code> 承载应用画面，并将触摸、输入法和焦点准确交给对应的虚拟显示。</p>\n\n<p>> 容器内运行第三方应用需要 Root/SU、Magisk 特权模块、平台签名或等效的系统级任务嵌入权限。仅以普通 APK 安装时，Android 不会授予项目所需的签名级权限。</p>\n\n<h2>刷入方法</h2>\n\n<h3>Magisk</h3>\n\n<li>刷入最新 Magisk 模块。</li>\n<li>重启设备。</li>\n<li>进入 OneStep4.0，并授权 Root 权限；如果没有弹出权限申请，请在 Magisk 中手动授权。</li>\n<li>授权完成后即可正常使用。</li>\n\n<h3>KSU</h3>\n\n<li>刷入元模块。</li>\n<li>刷入最新 KSU 模块。</li>\n<li>重启设备。</li>\n<li>打开 OneStep4.0 前，请先在 KSU 中手动授予 Root 权限。如果未授权就打开应用，可能出现黑屏；此时请手动授权，清除应用后台后重新打开。</li>\n<li>授权完成后即可正常使用。</li>\n\n<h2>实测可用系统及对应方案</h2>\n\n<p>| 手机系统 | Android 版本 | Root 方案 | 使用情况 |</p>\n<p>| --- | ---: | --- | --- |</p>\n<p>| ColorOS 16 | 16 | KSU | 可用 |</p>\n<p>| ColorOS 16 | 16 | ReSukiSU | 可用 |</p>\n<p>| ColorOS 16 | 16 | Magisk | 可用 |</p>\n<p>| HyperOS 3 | 16 | KSU | 可用 |</p>\n<p>| ZUXOS | 15 | Magisk | 可用 |</p>\n<p>| 星云 AIOS | 16 | KSU | 可用 |</p>\n<p>| 类原生 | 14 | Magisk | 可用 |</p>\n\n<h2>核心特性</h2>\n\n<li>**主侧多窗口**：提供一个主窗口和 3 至 6 个侧边小窗口，支持快速打开、切换和关闭应用。</li>\n<li>**智能窗口分配**：侧屏有空位时将原主屏应用移入侧屏，全部窗口占满后在主屏替换应用。</li>\n<li>**流畅切换动画**：应用移入侧屏时缩小过渡，替换主屏时原应用渐隐、新应用放大出现。</li>\n<li>**内置桌面**：可从系统中已安装的桌面应用里选择，Home 返回时直接显示当前所选桌面。</li>\n<li>**顶部快捷区**：提供可翻页的应用快捷栏、媒体播放控制和高德导航信息。</li>\n<li>**一步设置**：设置页可像普通应用一样在主屏和侧屏之间切换，并保持页面状态。</li>\n<li>**自定义布局**：可调整桌面图标排列、侧屏数量、顶部栏尺寸与间距、角落触发区域和灵敏度。</li>\n<li>**工作区背景**：支持选择自定义背景并同步系统壁纸。</li>\n\n<h2>协议说明</h2>\n<li>**注意**：锤子相关源代码部分仍为Apache 2.0开源协议，当前项目基于锤子相关源代码作出的新修改及整体组合为AGPL-3.0协议。</li>\n\n<h2>内测反馈群</h2>\n\n<p>欢迎加入 OneStep4.0 内测反馈群，交流使用体验、反馈问题并参与功能测试。</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"assets/readme/qq-feedback-group.jpg\" width=\"360\" alt=\"OneStep4.0 内测反馈群二维码\"></p>\n<p></p></p>\n\n<p><p align=\"center\"><strong>QQ 群：1081638982</strong></p></p>",
+  "homepageUrl": "https://github.com/SangLuoCN/OneStep4",
+  "sourceUrl": "https://github.com/SangLuoCN/OneStep4",
+  "url": "https://github.com/SangLuoCN/OneStep4",
+  "latestRelease": {
+    "name": "v1.0.7",
+    "version": "v1.0.7",
+    "time": "2026-08-06T10:25:14Z",
+    "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.7/OneStep4-1.0.7-ksu-20260806-180401.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.7",
+      "tagName": "v1.0.7",
+      "publishedAt": "2026-08-06T10:25:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.7-ksu-20260806-180401.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.7/OneStep4-1.0.7-ksu-20260806-180401.zip",
+          "size": 8480415,
+          "downloadCount": 1424
+        },
+        {
+          "name": "OneStep4-1.0.7-magisk-20260806-180432.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.7/OneStep4-1.0.7-magisk-20260806-180432.zip",
+          "size": 8482181,
+          "downloadCount": 852
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2026-08-06T01:19:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.6-ksu-20260806-091407.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.6/OneStep4-1.0.6-ksu-20260806-091407.zip",
+          "size": 8472571,
+          "downloadCount": 53
+        },
+        {
+          "name": "OneStep4-1.0.6-magisk-20260806-091440.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.6/OneStep4-1.0.6-magisk-20260806-091440.zip",
+          "size": 8474606,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2026-08-05T11:10:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.5-ksu-20260805-111421.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.5/OneStep4-1.0.5-ksu-20260805-111421.zip",
+          "size": 8464399,
+          "downloadCount": 34
+        },
+        {
+          "name": "OneStep4-1.0.5-magisk-20260805-111511.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.5/OneStep4-1.0.5-magisk-20260805-111511.zip",
+          "size": 8466434,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-08-04T16:17:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.4-ksu-20260805-005212.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.4/OneStep4-1.0.4-ksu-20260805-005212.zip",
+          "size": 8459958,
+          "downloadCount": 58
+        },
+        {
+          "name": "OneStep4-1.0.4-magisk-20260805-005157.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.4/OneStep4-1.0.4-magisk-20260805-005157.zip",
+          "size": 8461987,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-08-02T12:56:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.3-ksu-20260802-205256.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.3/OneStep4-1.0.3-ksu-20260802-205256.zip",
+          "size": 7951721,
+          "downloadCount": 225
+        },
+        {
+          "name": "OneStep4-1.0.3-magisk-20260802-205321.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.3/OneStep4-1.0.3-magisk-20260802-205321.zip",
+          "size": 7953808,
+          "downloadCount": 130
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-08-02T09:26:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.2-ksu-20260802-171225.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.2/OneStep4-1.0.2-ksu-20260802-171225.zip",
+          "size": 7947347,
+          "downloadCount": 41
+        },
+        {
+          "name": "OneStep4-1.0.2-magisk-20260802-171359.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.2/OneStep4-1.0.2-magisk-20260802-171359.zip",
+          "size": 7949434,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-07-29T12:39:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.1-ksu-20260729-213206.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.1/OneStep4-1.0.1-ksu-20260729-213206.zip",
+          "size": 8263831,
+          "downloadCount": 391
+        },
+        {
+          "name": "OneStep4-1.0.1-magisk-20260729-211954.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.1/OneStep4-1.0.1-magisk-20260729-211954.zip",
+          "size": 8265180,
+          "downloadCount": 242
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-07-28T04:56:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep4-1.0.0-magisk-20260728-152826.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.0/OneStep4-1.0.0-magisk-20260728-152826.zip",
+          "size": 7238942,
+          "downloadCount": 226
+        },
+        {
+          "name": "OneStep4-1.0.2-ksu-20260728-175339.zip",
+          "downloadUrl": "https://github.com/SangLuoCN/OneStep4/releases/download/v1.0.0/OneStep4-1.0.2-ksu-20260728-175339.zip",
+          "size": 7239391,
+          "downloadCount": 185
+        }
+      ]
+    }
+  ]
+}

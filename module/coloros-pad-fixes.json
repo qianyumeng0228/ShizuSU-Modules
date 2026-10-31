@@ -1,0 +1,1175 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"assets/readme-hero.png\" alt=\"ColorOS Pad Fixes — 联想小新 Pad Pro GT · SM8650Q\" width=\"100%\">\n</p>\n\n# ColorOS Pad Fixes\n\n> [!NOTE]\n> 本项目已停止维护，源码、文档与历史 Release 作为归档保留，不再处理问题反馈或合并贡献。\n\n联想小新 Pad Pro GT（**TB710FU** / SM8650Q / pineapple）运行 ColorOS 16 移植系统（OPD2513）的适配修复项目。\n\n[![Platform](https://img.shields.io/badge/platform-SM8650Q%20%2F%20pineapple-blue)](#兼容性)\n[![Android](https://img.shields.io/badge/Android-16%20%2F%20ColorOS%2016-green)](#兼容性)\n[![Release](https://img.shields.io/github/v/release/ACLaniakea/coloros-pad-fixes?display_name=tag)](../../releases/latest)\n[![License](https://img.shields.io/badge/code-GPL--3.0-blue)](#许可证与第三方材料)\n\n项目以配套内核、KernelSU 模块和 LSPosed Hook 补齐移植系统的硬件适配、框架兼容与外设桥接。\n\n> [!WARNING]\n> **4.1.3 必须成对刷入 Release 内的 `boot-ACLaniakea-SM8650Q-droidspaces-r3.img` 与 `vendor_boot-hyperSched-stub.img`。** 两者均已在 TB710FU 实机验证。本版 BSP 模块依赖 r3 才导出的符号，r2 内核上会加载失败。`vendor_boot-ColorOS16-original-TB710FU.img` 仅用于回退原始 ColorOS 引导链，不能与本项目的 boot 混刷。\n>\n> 不希望刷分区时，请使用最后一个纯模块版本 [v2.0.15](../../releases/tag/v2.0.15)。它不包含 3.0.0 及之后的内核级、调度与内存扩展修复，也不再维护。\n\n## 功能概览\n\n- 系统适配：显示与环境光、144 Hz、性能/温控拓扑、内存与交换、音频与传感器链路。\n- DroidSpaces 内核基线：完整 Linux 容器命名空间、BinderFS/ashmem/memfd、OverlayFS/FUSE、seccomp 与 io_uring；Arch 等容器直接走内核隔离与 Android 显示桥接，不依赖用户态伪实现。\n- 相机与 AON：相机服务稳定性、前摄占用仲裁、AON 注视感知运行时兼容、物理前摄指示灯。\n- 手写笔：BLE/HID 连接、电量与充电、磁吸状态、设备空间和触觉反馈桥接。\n- 扩展能力：Scene 调度、OPlus BSP 内核模块、CryptoEng 查找设备/互传兼容、ZUI 原厂相机移植。\n\n## 发布内容\n\n| 文件 | 用途 | 安装要求 |\n|---|---|---|\n| `boot-ACLaniakea-SM8650Q-droidspaces-r3.img` | 已验证的 SM8650Q r3 配套内核：DroidSpaces 容器特性、SysV IPC 走 KABI 预留槽、Gloom/pcppages hook、KGSL 桥所需导出 | **必刷，先刷** |\n| `vendor_boot-hyperSched-stub.img` | 与配套 boot 成套的阻塞版 vendor_boot | **必刷，与 boot 同时刷入** |\n| `vendor_boot-ColorOS16-original-TB710FU.img` | 原始 ColorOS vendor_boot 回退镜像 | **仅回退使用，不参与正常安装** |\n| `FixModule-*.zip` | 主修复模块 | **必装** |\n| `BaseFix-Hook-*.apk` | 主修复的 LSPosed Hook | **必装** |\n| `OplusBSP-Modules-*.zip` | 调度、压缩内存、后台冻结等 BSP 内核模块 | 完整 3.x 方案必装 |\n| `PenBridge-Root-*.zip`、`PenBridge-Hook-*.apk`、`PenHidCtl-*.apk` | 手写笔桥接三件套 | 使用手写笔时安装 |\n| `SM8650Q-Scene-Scheduler-*.zip` | Scene 省电/均衡/性能/极速调度配置 | 使用 Scene 时安装 |\n| `FixModule-*.zip` 内置 CryptoEng | 查找设备、密码本与一加互传联系人兼容 | 随主模块安装 |\n| `LenovoPadProGT-ZUI-Camera-Port-*.zip`、`ZUI-Camera-Compat-*.apk` | TB710FU ZUI 原厂相机移植 | 按需安装 |\n\n`base-fix/module` 与 `port-tuning` 是历史源码快照，**不要安装**；它们已合并至 `FixModule`。\n\n## 前置条件\n\n- 设备为 **TB710FU**，已安装 OPD2513 ColorOS 16 移植系统；\n- bootloader 已解锁；\n- 已安装 KernelSU 和 LSPosed（Zygisk）；\n- `init_boot` 已按你的 KernelSU 方案修补。\n\n本项目刷入的 `boot` 只提供配套内核，**不会安装或替代 KernelSU**。KernelSU LKM 位于修补后的 `init_boot`；刷写前请确认保留自己的 KernelSU `init_boot`。\n\n## 安装\n\n安装顺序固定为：**boot + 配套 vendor_boot → KernelSU 模块 → LSPosed APK 与作用域 → 完整重启**。\n\n### 1. 备份当前镜像\n\n在系统中执行：\n\n```bash\nadb shell su -c 'dd if=/dev/block/by-name/boot_a of=/sdcard/boot_a.bak'\nadb shell su -c 'dd if=/dev/block/by-name/vendor_boot_a of=/sdcard/vendor_boot_a.bak'\n```\n\n请将备份拉取到电脑或其他安全位置。\n\n### 2. 刷入配套内核\n\n正常安装应成对刷入 Release 中的 boot 与阻塞版 vendor_boot，**不要**刷入回退用的原始 vendor_boot：\n\n```bash\nadb reboot bootloader\nfastboot flash boot boot-ACLaniakea-SM8650Q-droidspaces-r3.img\nfastboot flash vendor_boot vendor_boot-hyperSched-stub.img\nfastboot reboot\n```\n\n不要将实验内核、旧 BSP 模块与 4.1.3 内核混用。启动后可用以下命令确认内核版本：\n\n```bash\nadb shell uname -r\n```\n\n### 3. 安装 KernelSU 模块\n\n在 KernelSU 管理器中安装以下模块，全部安装完成后再重启：\n\n1. `FixModule-v4.1.3.zip`（内置 CryptoEng）\n2. `OplusBSP-Modules-v4.1.3.zip`\n3. 按需：`PenBridge-Module-v4.1.3.zip`\n4. 按需：`SM8650Q-Scene-Scheduler-v4.1.3.zip`\n5. 按需：`LenovoPadProGT-ZUI-Camera-Port-v4.1.3.zip`\n\n命令行安装示例：\n\n```bash\nadb push FixModule-v4.1.3.zip /sdcard/\nadb shell su -c 'ksud module install /sdcard/FixModule-v4.1.3.zip'\n```\n\n### 4. 安装并启用 LSPosed 模块\n\n```bash\nadb install -r BaseFix-Hook-v4.1.3.apk\nadb install -r PenBridge-Hook-v4.1.3.apk       # 使用手写笔时\nadb install -r PenHidCtl-v4.1.3.apk            # 使用手写笔时\nadb install -r ZUI-Camera-Compat-v4.1.3.apk    # 使用 ZUI 相机时\n```\n\n在 LSPosed 管理器中启用模块，并使用 APK 显示的**推荐作用域**。`FixModule` 会补齐必需作用域的白名单记录，但不会替代你在 LSPosed 中启用模块的操作。\n\n基础修复的常用作用域包括 `android`、`SystemUI`、设置、AON、手写笔与配件相关进程；小布唤醒已关闭，不应再勾选语音唤醒相关进程。ZUI 相机兼容 Hook 只应作用于 `com.zui.camera`。不要把 ZUI Hook 勾选到其他应用。\n\n完成后执行**完整重启**，不要仅重启 zygote。\n\n## 升级与回退\n\n### 升级\n\n1. 从同一 Release 下载全套镜像、模块和 APK。\n2. 成对刷入新的配套 `boot` 与 `vendor_boot-hyperSched-stub`。\n3. 覆盖安装模块和 APK。\n4. 完整重启后再检查 KernelSU 与 LSPosed 状态。\n\n### 回退\n\n1. 优先进入 KernelSU 安全模式，停用最近安装的模块。\n2. 如需完整回退引导链，刷回自己备份的 `boot` 与 `vendor_boot`。Release 的原始 vendor_boot 仅应与同来源的原始 ColorOS boot 一同使用：\n\n   ```bash\n   fastboot flash boot boot_a.bak\n   fastboot flash vendor_boot vendor_boot_a.bak\n   ```\n\n3. 仍无法恢复时，请参考 [刷机事故与救援手册](kernel-compat/刷机事故与救援手册.md)。\n\n## 兼容性\n\n| 项目 | 状态 |\n|---|---|\n| 联想小新 Pad Pro GT（TB710FU / SM8650Q / pineapple） | 支持 |\n| ColorOS 16 移植系统 OPD2513 | 支持 |\n| 其他联想设备、其他 SoC、原生 ZUI | 不支持 |\n| ZUI 相机移植 | 仅限 TB710FU 的原厂相机资源 |\n\n模块会检查目标平台；不匹配时跳过执行。仍请勿将本项目用于其他设备或 ROM。\n\n## 常见问题\n\n**需要全部安装吗？**\n\n完整 4.1.3 方案需要配套 boot、主修复、BaseFix Hook 和 OPlus BSP。手写笔、Scene 与 ZUI 相机均按需安装；CryptoEng 已内置于主修复。\n\n**可以不刷 boot/vendor_boot 吗？**\n\n不建议。4.1.3 的 BSP 依赖配套 boot 内核提供的符号和接口，也依赖成套阻塞版 `vendor_boot` 的启动配置。只想使用纯模块方案时请改用 v2.0.15。\n\n**ZUI 相机是否替换底层相机 HAL？**\n\n不会。ZUI 相机模块部署原厂相机应用及应用级兼容层；不替换 CamX、camera provider、内核驱动或全局设备身份。\n\n**模块是否直接修改 system 或 vendor 分区？**\n\nKernelSU 模块采用 systemless 挂载和运行时绑定，不改写 `system`、`vendor` 分区内容；但完整方案会明确刷写 `boot` 与 `vendor_boot`，两者不可混淆。\n\n## 构建\n\n构建产物输出至 `releases/`。SDK、签名文件、厂商镜像、原厂运行时和临时分析数据不随源码仓库分发。\n\n```bash\nexport ANDROID_SDK=/path/to/android-sdk\nexport XPOSED_STUBS=/path/to/xposed-stubs\nexport ACL_KS=/path/to/signing-key.jks\n\nbash tools/build_all.sh\n```\n\n各模块的构建入口位于相应目录的 `tools/` 中；内核模块、ABI 要求及构建说明见 [kernel-compat](kernel-compat/)。\n\n## 文档\n\n全部文档收在 [`docs/`](docs/)，索引见 [docs/README.md](docs/README.md)。\n\n- [变更记录 CHANGELOG](CHANGELOG.md) — 每版一句话摘要\n- [发布说明](docs/release-notes/) — 每版改了什么、怎么验证、已知问题\n- [排查记录](docs/investigations/) — 完整定位过程与实测数据，含被排除的假设\n- [参考资料](docs/reference/) — 修复汇总、内核兼容性、主线内核可行性、LSPosed 收敛方案\n- [刷机事故与救援手册](kernel-compat/刷机事故与救援手册.md) — 变砖时怎么救\n\n## 维护状态\n\n本项目已停止维护。历史源码、文档和 Release 继续保留供学习与参考。\n\n## 免责声明\n\n本项目仅供个人学习、设备适配与研究。刷机和 root 操作可能导致数据丢失、无法启动或失去保修；请自行评估风险并做好备份。\n\n## 许可证与第三方材料\n\n本项目作者编写的代码默认采用 [GPL-3.0](LICENSE)。`kernel-compat/` 中标注的内核模块源码采用 [GPL-2.0](kernel-compat/LICENSE)。\n\n仓库或 Release 中可能包含用于兼容研究的第三方/原厂材料，例如联想 ZUI 相机 APK、配置、资源、签名关联内容、厂商二进制接口，以及从原厂或第三方实现观察到的 CryptoEng 协议字段和样本。这些材料不因随本项目分发而获得 GPL 再授权，相关权利仍归原权利人所有；本项目不授予复制、再分发、修改、商业使用或绕过设备、账号及服务安全机制的许可。使用者应自行确认拥有合法来源并遵守适用许可与法律。\n\nCryptoEng 的分流、HKDF、AIDL 调用和互操作代码属于本项目代码并适用 GPL-3.0；厂商密钥材料、二进制、服务数据及其引用不在该授权范围内。\n\n## 致谢\n\n感谢所有测试者、上游开发者和开源社区的支持。\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"assets/readme-hero.png\" alt=\"ColorOS Pad Fixes — 联想小新 Pad Pro GT · SM8650Q\" width=\"100%\"></p>\n<p></p></p>\n\n<h1>ColorOS Pad Fixes</h1>\n\n<p>> [!NOTE]</p>\n<p>> 本项目已停止维护，源码、文档与历史 Release 作为归档保留，不再处理问题反馈或合并贡献。</p>\n\n<p>联想小新 Pad Pro GT（<b>TB710FU</b> / SM8650Q / pineapple）运行 ColorOS 16 移植系统（OPD2513）的适配修复项目。</p>\n\n<p><a href=\"https://img.shields.io/badge/platform-SM8650Q%20%2F%20pineapple-blue\">![Platform</a>](#兼容性)</p>\n<p><a href=\"https://img.shields.io/badge/Android-16%20%2F%20ColorOS%2016-green\">![Android</a>](#兼容性)</p>\n<p><a href=\"https://img.shields.io/github/v/release/ACLaniakea/coloros-pad-fixes?display_name=tag\">![Release</a>](../../releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/code-GPL--3.0-blue\">![License</a>](#许可证与第三方材料)</p>\n\n<p>项目以配套内核、KernelSU 模块和 LSPosed Hook 补齐移植系统的硬件适配、框架兼容与外设桥接。</p>\n\n<p>> [!WARNING]</p>\n<p>> <b>4.1.3 必须成对刷入 Release 内的 <code>boot-ACLaniakea-SM8650Q-droidspaces-r3.img</code> 与 <code>vendor_boot-hyperSched-stub.img</code>。</b> 两者均已在 TB710FU 实机验证。本版 BSP 模块依赖 r3 才导出的符号，r2 内核上会加载失败。<code>vendor_boot-ColorOS16-original-TB710FU.img</code> 仅用于回退原始 ColorOS 引导链，不能与本项目的 boot 混刷。</p>\n<p>></p>\n<p>> 不希望刷分区时，请使用最后一个纯模块版本 <a href=\"../../releases/tag/v2.0.15\">v2.0.15</a>。它不包含 3.0.0 及之后的内核级、调度与内存扩展修复，也不再维护。</p>\n\n<h2>功能概览</h2>\n\n<li>系统适配：显示与环境光、144 Hz、性能/温控拓扑、内存与交换、音频与传感器链路。</li>\n<li>DroidSpaces 内核基线：完整 Linux 容器命名空间、BinderFS/ashmem/memfd、OverlayFS/FUSE、seccomp 与 io_uring；Arch 等容器直接走内核隔离与 Android 显示桥接，不依赖用户态伪实现。</li>\n<li>相机与 AON：相机服务稳定性、前摄占用仲裁、AON 注视感知运行时兼容、物理前摄指示灯。</li>\n<li>手写笔：BLE/HID 连接、电量与充电、磁吸状态、设备空间和触觉反馈桥接。</li>\n<li>扩展能力：Scene 调度、OPlus BSP 内核模块、CryptoEng 查找设备/互传兼容、ZUI 原厂相机移植。</li>\n\n<h2>发布内容</h2>\n\n<p>| 文件 | 用途 | 安装要求 |</p>\n<p>|---|---|---|</p>\n<p>| <code>boot-ACLaniakea-SM8650Q-droidspaces-r3.img</code> | 已验证的 SM8650Q r3 配套内核：DroidSpaces 容器特性、SysV IPC 走 KABI 预留槽、Gloom/pcppages hook、KGSL 桥所需导出 | <b>必刷，先刷</b> |</p>\n<p>| <code>vendor_boot-hyperSched-stub.img</code> | 与配套 boot 成套的阻塞版 vendor_boot | <b>必刷，与 boot 同时刷入</b> |</p>\n<p>| <code>vendor_boot-ColorOS16-original-TB710FU.img</code> | 原始 ColorOS vendor_boot 回退镜像 | <b>仅回退使用，不参与正常安装</b> |</p>\n<p>| <code>FixModule-*.zip</code> | 主修复模块 | <b>必装</b> |</p>\n<p>| <code>BaseFix-Hook-*.apk</code> | 主修复的 LSPosed Hook | <b>必装</b> |</p>\n<p>| <code>OplusBSP-Modules-*.zip</code> | 调度、压缩内存、后台冻结等 BSP 内核模块 | 完整 3.x 方案必装 |</p>\n<p>| <code>PenBridge-Root-*.zip</code>、<code>PenBridge-Hook-*.apk</code>、<code>PenHidCtl-*.apk</code> | 手写笔桥接三件套 | 使用手写笔时安装 |</p>\n<p>| <code>SM8650Q-Scene-Scheduler-*.zip</code> | Scene 省电/均衡/性能/极速调度配置 | 使用 Scene 时安装 |</p>\n<p>| <code>FixModule-*.zip</code> 内置 CryptoEng | 查找设备、密码本与一加互传联系人兼容 | 随主模块安装 |</p>\n<p>| <code>LenovoPadProGT-ZUI-Camera-Port-*.zip</code>、<code>ZUI-Camera-Compat-*.apk</code> | TB710FU ZUI 原厂相机移植 | 按需安装 |</p>\n\n<p><code>base-fix/module</code> 与 <code>port-tuning</code> 是历史源码快照，<b>不要安装</b>；它们已合并至 <code>FixModule</code>。</p>\n\n<h2>前置条件</h2>\n\n<li>设备为 **TB710FU**，已安装 OPD2513 ColorOS 16 移植系统；</li>\n<li>bootloader 已解锁；</li>\n<li>已安装 KernelSU 和 LSPosed（Zygisk）；</li>\n<li>`init_boot` 已按你的 KernelSU 方案修补。</li>\n\n<p>本项目刷入的 <code>boot</code> 只提供配套内核，<b>不会安装或替代 KernelSU</b>。KernelSU LKM 位于修补后的 <code>init_boot</code>；刷写前请确认保留自己的 KernelSU <code>init_boot</code>。</p>\n\n<h2>安装</h2>\n\n<p>安装顺序固定为：<b>boot + 配套 vendor_boot → KernelSU 模块 → LSPosed APK 与作用域 → 完整重启</b>。</p>\n\n<h3>1. 备份当前镜像</h3>\n\n<p>在系统中执行：</p>\n\n<pre>adb shell su -c 'dd if=/dev/block/by-name/boot_a of=/sdcard/boot_a.bak'\nadb shell su -c 'dd if=/dev/block/by-name/vendor_boot_a of=/sdcard/vendor_boot_a.bak'</pre>\n\n<p>请将备份拉取到电脑或其他安全位置。</p>\n\n<h3>2. 刷入配套内核</h3>\n\n<p>正常安装应成对刷入 Release 中的 boot 与阻塞版 vendor_boot，<b>不要</b>刷入回退用的原始 vendor_boot：</p>\n\n<pre>adb reboot bootloader\nfastboot flash boot boot-ACLaniakea-SM8650Q-droidspaces-r3.img\nfastboot flash vendor_boot vendor_boot-hyperSched-stub.img\nfastboot reboot</pre>\n\n<p>不要将实验内核、旧 BSP 模块与 4.1.3 内核混用。启动后可用以下命令确认内核版本：</p>\n\n<pre>adb shell uname -r</pre>\n\n<h3>3. 安装 KernelSU 模块</h3>\n\n<p>在 KernelSU 管理器中安装以下模块，全部安装完成后再重启：</p>\n\n<li>`FixModule-v4.1.3.zip`（内置 CryptoEng）</li>\n<li>`OplusBSP-Modules-v4.1.3.zip`</li>\n<li>按需：`PenBridge-Module-v4.1.3.zip`</li>\n<li>按需：`SM8650Q-Scene-Scheduler-v4.1.3.zip`</li>\n<li>按需：`LenovoPadProGT-ZUI-Camera-Port-v4.1.3.zip`</li>\n\n<p>命令行安装示例：</p>\n\n<pre>adb push FixModule-v4.1.3.zip /sdcard/\nadb shell su -c 'ksud module install /sdcard/FixModule-v4.1.3.zip'</pre>\n\n<h3>4. 安装并启用 LSPosed 模块</h3>\n\n<pre>adb install -r BaseFix-Hook-v4.1.3.apk\nadb install -r PenBridge-Hook-v4.1.3.apk       # 使用手写笔时\nadb install -r PenHidCtl-v4.1.3.apk            # 使用手写笔时\nadb install -r ZUI-Camera-Compat-v4.1.3.apk    # 使用 ZUI 相机时</pre>\n\n<p>在 LSPosed 管理器中启用模块，并使用 APK 显示的<b>推荐作用域</b>。<code>FixModule</code> 会补齐必需作用域的白名单记录，但不会替代你在 LSPosed 中启用模块的操作。</p>\n\n<p>基础修复的常用作用域包括 <code>android</code>、<code>SystemUI</code>、设置、AON、手写笔与配件相关进程；小布唤醒已关闭，不应再勾选语音唤醒相关进程。ZUI 相机兼容 Hook 只应作用于 <code>com.zui.camera</code>。不要把 ZUI Hook 勾选到其他应用。</p>\n\n<p>完成后执行<b>完整重启</b>，不要仅重启 zygote。</p>\n\n<h2>升级与回退</h2>\n\n<h3>升级</h3>\n\n<li>从同一 Release 下载全套镜像、模块和 APK。</li>\n<li>成对刷入新的配套 `boot` 与 `vendor_boot-hyperSched-stub`。</li>\n<li>覆盖安装模块和 APK。</li>\n<li>完整重启后再检查 KernelSU 与 LSPosed 状态。</li>\n\n<h3>回退</h3>\n\n<li>优先进入 KernelSU 安全模式，停用最近安装的模块。</li>\n<li>如需完整回退引导链，刷回自己备份的 `boot` 与 `vendor_boot`。Release 的原始 vendor_boot 仅应与同来源的原始 ColorOS boot 一同使用：</li>\n\n<p>   ```bash</p>\n<p>   fastboot flash boot boot_a.bak</p>\n<p>   fastboot flash vendor_boot vendor_boot_a.bak</p>\n<p>   ```</p>\n\n<li>仍无法恢复时，请参考 [刷机事故与救援手册](kernel-compat/刷机事故与救援手册.md)。</li>\n\n<h2>兼容性</h2>\n\n<p>| 项目 | 状态 |</p>\n<p>|---|---|</p>\n<p>| 联想小新 Pad Pro GT（TB710FU / SM8650Q / pineapple） | 支持 |</p>\n<p>| ColorOS 16 移植系统 OPD2513 | 支持 |</p>\n<p>| 其他联想设备、其他 SoC、原生 ZUI | 不支持 |</p>\n<p>| ZUI 相机移植 | 仅限 TB710FU 的原厂相机资源 |</p>\n\n<p>模块会检查目标平台；不匹配时跳过执行。仍请勿将本项目用于其他设备或 ROM。</p>\n\n<h2>常见问题</h2>\n\n<p><b>需要全部安装吗？</b></p>\n\n<p>完整 4.1.3 方案需要配套 boot、主修复、BaseFix Hook 和 OPlus BSP。手写笔、Scene 与 ZUI 相机均按需安装；CryptoEng 已内置于主修复。</p>\n\n<p><b>可以不刷 boot/vendor_boot 吗？</b></p>\n\n<p>不建议。4.1.3 的 BSP 依赖配套 boot 内核提供的符号和接口，也依赖成套阻塞版 <code>vendor_boot</code> 的启动配置。只想使用纯模块方案时请改用 v2.0.15。</p>\n\n<p><b>ZUI 相机是否替换底层相机 HAL？</b></p>\n\n<p>不会。ZUI 相机模块部署原厂相机应用及应用级兼容层；不替换 CamX、camera provider、内核驱动或全局设备身份。</p>\n\n<p><b>模块是否直接修改 system 或 vendor 分区？</b></p>\n\n<p>KernelSU 模块采用 systemless 挂载和运行时绑定，不改写 <code>system</code>、<code>vendor</code> 分区内容；但完整方案会明确刷写 <code>boot</code> 与 <code>vendor_boot</code>，两者不可混淆。</p>\n\n<h2>构建</h2>\n\n<p>构建产物输出至 <code>releases/</code>。SDK、签名文件、厂商镜像、原厂运行时和临时分析数据不随源码仓库分发。</p>\n\n<pre>export ANDROID_SDK=/path/to/android-sdk\nexport XPOSED_STUBS=/path/to/xposed-stubs\nexport ACL_KS=/path/to/signing-key.jks\n\nbash tools/build_all.sh</pre>\n\n<p>各模块的构建入口位于相应目录的 <code>tools/</code> 中；内核模块、ABI 要求及构建说明见 <a href=\"kernel-compat/\">kernel-compat</a>。</p>\n\n<h2>文档</h2>\n\n<p>全部文档收在 <a href=\"docs/\"><code>docs/</code></a>，索引见 <a href=\"docs/README.md\">docs/README.md</a>。</p>\n\n<li>[变更记录 CHANGELOG](CHANGELOG.md) — 每版一句话摘要</li>\n<li>[发布说明](docs/release-notes/) — 每版改了什么、怎么验证、已知问题</li>\n<li>[排查记录](docs/investigations/) — 完整定位过程与实测数据，含被排除的假设</li>\n<li>[参考资料](docs/reference/) — 修复汇总、内核兼容性、主线内核可行性、LSPosed 收敛方案</li>\n<li>[刷机事故与救援手册](kernel-compat/刷机事故与救援手册.md) — 变砖时怎么救</li>\n\n<h2>维护状态</h2>\n\n<p>本项目已停止维护。历史源码、文档和 Release 继续保留供学习与参考。</p>\n\n<h2>免责声明</h2>\n\n<p>本项目仅供个人学习、设备适配与研究。刷机和 root 操作可能导致数据丢失、无法启动或失去保修；请自行评估风险并做好备份。</p>\n\n<h2>许可证与第三方材料</h2>\n\n<p>本项目作者编写的代码默认采用 <a href=\"LICENSE\">GPL-3.0</a>。<code>kernel-compat/</code> 中标注的内核模块源码采用 <a href=\"kernel-compat/LICENSE\">GPL-2.0</a>。</p>\n\n<p>仓库或 Release 中可能包含用于兼容研究的第三方/原厂材料，例如联想 ZUI 相机 APK、配置、资源、签名关联内容、厂商二进制接口，以及从原厂或第三方实现观察到的 CryptoEng 协议字段和样本。这些材料不因随本项目分发而获得 GPL 再授权，相关权利仍归原权利人所有；本项目不授予复制、再分发、修改、商业使用或绕过设备、账号及服务安全机制的许可。使用者应自行确认拥有合法来源并遵守适用许可与法律。</p>\n\n<p>CryptoEng 的分流、HKDF、AIDL 调用和互操作代码属于本项目代码并适用 GPL-3.0；厂商密钥材料、二进制、服务数据及其引用不在该授权范围内。</p>\n\n<h2>致谢</h2>\n\n<p>感谢所有测试者、上游开发者和开源社区的支持。</p>",
+  "homepageUrl": "https://github.com/ACLaniakea/coloros-pad-fixes",
+  "sourceUrl": "https://github.com/ACLaniakea/coloros-pad-fixes",
+  "url": "https://github.com/ACLaniakea/coloros-pad-fixes",
+  "latestRelease": {
+    "name": "v4.1.3",
+    "version": "v4.1.3",
+    "time": "2026-09-16T17:04:01Z",
+    "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/FixModule-v4.1.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.1.3",
+      "tagName": "v4.1.3",
+      "publishedAt": "2026-09-16T17:04:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.1.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/BaseFix-Hook-v4.1.3.apk",
+          "size": 213594,
+          "downloadCount": 159
+        },
+        {
+          "name": "boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "size": 34451456,
+          "downloadCount": 168
+        },
+        {
+          "name": "FixModule-v4.1.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/FixModule-v4.1.3.zip",
+          "size": 151780699,
+          "downloadCount": 174
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.1.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/LenovoPadProGT-ZUI-Camera-Port-v4.1.3.zip",
+          "size": 194625280,
+          "downloadCount": 130
+        },
+        {
+          "name": "OplusBSP-Modules-v4.1.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/OplusBSP-Modules-v4.1.3.zip",
+          "size": 9376347,
+          "downloadCount": 124
+        },
+        {
+          "name": "PenBridge-Hook-v4.1.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/PenBridge-Hook-v4.1.3.apk",
+          "size": 348785,
+          "downloadCount": 114
+        },
+        {
+          "name": "PenBridge-Module-v4.1.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/PenBridge-Module-v4.1.3.zip",
+          "size": 391765,
+          "downloadCount": 110
+        },
+        {
+          "name": "PenHidCtl-v4.1.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/PenHidCtl-v4.1.3.apk",
+          "size": 16787,
+          "downloadCount": 97
+        },
+        {
+          "name": "SHA256SUMS-v4.1.3.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/SHA256SUMS-v4.1.3.txt",
+          "size": 1164,
+          "downloadCount": 64
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.1.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/SM8650Q-Scene-Scheduler-v4.1.3.zip",
+          "size": 14352,
+          "downloadCount": 123
+        },
+        {
+          "name": "vendor_boot-ColorOS16-original-TB710FU.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/vendor_boot-ColorOS16-original-TB710FU.img",
+          "size": 100663296,
+          "downloadCount": 69
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 119
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.1.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.3/ZUI-Camera-Compat-v4.1.3.apk",
+          "size": 21082,
+          "downloadCount": 84
+        }
+      ]
+    },
+    {
+      "name": "v4.1.2",
+      "tagName": "v4.1.2",
+      "publishedAt": "2026-09-16T15:12:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.1.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/BaseFix-Hook-v4.1.2.apk",
+          "size": 213601,
+          "downloadCount": 11
+        },
+        {
+          "name": "boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "size": 34451456,
+          "downloadCount": 13
+        },
+        {
+          "name": "FixModule-v4.1.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/FixModule-v4.1.2.zip",
+          "size": 151781119,
+          "downloadCount": 11
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.1.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/LenovoPadProGT-ZUI-Camera-Port-v4.1.2.zip",
+          "size": 194625288,
+          "downloadCount": 7
+        },
+        {
+          "name": "OplusBSP-Modules-v4.1.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/OplusBSP-Modules-v4.1.2.zip",
+          "size": 9376347,
+          "downloadCount": 14
+        },
+        {
+          "name": "PenBridge-Hook-v4.1.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/PenBridge-Hook-v4.1.2.apk",
+          "size": 348785,
+          "downloadCount": 7
+        },
+        {
+          "name": "PenBridge-Module-v4.1.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/PenBridge-Module-v4.1.2.zip",
+          "size": 392411,
+          "downloadCount": 7
+        },
+        {
+          "name": "PenHidCtl-v4.1.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/PenHidCtl-v4.1.2.apk",
+          "size": 16787,
+          "downloadCount": 5
+        },
+        {
+          "name": "SHA256SUMS-v4.1.2.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/SHA256SUMS-v4.1.2.txt",
+          "size": 1164,
+          "downloadCount": 2
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.1.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/SM8650Q-Scene-Scheduler-v4.1.2.zip",
+          "size": 14351,
+          "downloadCount": 9
+        },
+        {
+          "name": "vendor_boot-ColorOS16-original-TB710FU.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/vendor_boot-ColorOS16-original-TB710FU.img",
+          "size": 100663296,
+          "downloadCount": 7
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 9
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.1.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.2/ZUI-Camera-Compat-v4.1.2.apk",
+          "size": 21082,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v4.1.1",
+      "tagName": "v4.1.1",
+      "publishedAt": "2026-09-15T13:08:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.1.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/BaseFix-Hook-v4.1.1.apk",
+          "size": 205409,
+          "downloadCount": 18
+        },
+        {
+          "name": "boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/boot-ACLaniakea-SM8650Q-droidspaces-r3.img",
+          "size": 34451456,
+          "downloadCount": 24
+        },
+        {
+          "name": "FixModule-v4.1.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/FixModule-v4.1.1.zip",
+          "size": 151773154,
+          "downloadCount": 12
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.1.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/LenovoPadProGT-ZUI-Camera-Port-v4.1.1.zip",
+          "size": 194625289,
+          "downloadCount": 11
+        },
+        {
+          "name": "OplusBSP-Modules-v4.1.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/OplusBSP-Modules-v4.1.1.zip",
+          "size": 9224436,
+          "downloadCount": 14
+        },
+        {
+          "name": "PenBridge-Hook-v4.1.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/PenBridge-Hook-v4.1.1.apk",
+          "size": 348786,
+          "downloadCount": 11
+        },
+        {
+          "name": "PenBridge-Module-v4.1.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/PenBridge-Module-v4.1.1.zip",
+          "size": 392397,
+          "downloadCount": 13
+        },
+        {
+          "name": "PenHidCtl-v4.1.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/PenHidCtl-v4.1.1.apk",
+          "size": 16794,
+          "downloadCount": 10
+        },
+        {
+          "name": "SHA256SUMS-v4.1.1.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/SHA256SUMS-v4.1.1.txt",
+          "size": 1164,
+          "downloadCount": 6
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.1.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/SM8650Q-Scene-Scheduler-v4.1.1.zip",
+          "size": 14350,
+          "downloadCount": 11
+        },
+        {
+          "name": "vendor_boot-ColorOS16-original-TB710FU.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/vendor_boot-ColorOS16-original-TB710FU.img",
+          "size": 100663296,
+          "downloadCount": 5
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 10
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.1.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.1/ZUI-Camera-Compat-v4.1.1.apk",
+          "size": 21082,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v4.1.0",
+      "tagName": "v4.1.0",
+      "publishedAt": "2026-09-14T09:08:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/BaseFix-Hook-v4.1.0.apk",
+          "size": 201306,
+          "downloadCount": 27
+        },
+        {
+          "name": "boot-ACLaniakea-SM8650Q-droidspaces-r2.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/boot-ACLaniakea-SM8650Q-droidspaces-r2.img",
+          "size": 34451456,
+          "downloadCount": 32
+        },
+        {
+          "name": "FixModule-v4.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/FixModule-v4.1.0.zip",
+          "size": 151860394,
+          "downloadCount": 27
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/LenovoPadProGT-ZUI-Camera-Port-v4.1.0.zip",
+          "size": 194624378,
+          "downloadCount": 20
+        },
+        {
+          "name": "OplusBSP-Modules-v4.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/OplusBSP-Modules-v4.1.0.zip",
+          "size": 9050525,
+          "downloadCount": 20
+        },
+        {
+          "name": "PenBridge-Hook-v4.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/PenBridge-Hook-v4.1.0.apk",
+          "size": 348784,
+          "downloadCount": 18
+        },
+        {
+          "name": "PenBridge-Module-v4.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/PenBridge-Module-v4.1.0.zip",
+          "size": 390752,
+          "downloadCount": 19
+        },
+        {
+          "name": "PenHidCtl-v4.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/PenHidCtl-v4.1.0.apk",
+          "size": 16787,
+          "downloadCount": 16
+        },
+        {
+          "name": "SHA256SUMS-v4.1.0.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/SHA256SUMS-v4.1.0.txt",
+          "size": 1164,
+          "downloadCount": 10
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/SM8650Q-Scene-Scheduler-v4.1.0.zip",
+          "size": 14349,
+          "downloadCount": 19
+        },
+        {
+          "name": "vendor_boot-ColorOS16-original-TB710FU.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/vendor_boot-ColorOS16-original-TB710FU.img",
+          "size": 100663296,
+          "downloadCount": 18
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 31
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.1.0/ZUI-Camera-Compat-v4.1.0.apk",
+          "size": 21082,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v4.0.4",
+      "tagName": "v4.0.4",
+      "publishedAt": "2026-09-12T13:55:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.0.4.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/BaseFix-Hook-v4.0.4.apk",
+          "size": 201312,
+          "downloadCount": 57
+        },
+        {
+          "name": "FixModule-v4.0.4.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/FixModule-v4.0.4.zip",
+          "size": 151863453,
+          "downloadCount": 85
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.0.4.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/LenovoPadProGT-ZUI-Camera-Port-v4.0.4.zip",
+          "size": 194624375,
+          "downloadCount": 51
+        },
+        {
+          "name": "OplusBSP-Modules-v4.0.4.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/OplusBSP-Modules-v4.0.4.zip",
+          "size": 8698618,
+          "downloadCount": 63
+        },
+        {
+          "name": "PenBridge-Hook-v4.0.4.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/PenBridge-Hook-v4.0.4.apk",
+          "size": 348785,
+          "downloadCount": 38
+        },
+        {
+          "name": "PenBridge-Module-v4.0.4.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/PenBridge-Module-v4.0.4.zip",
+          "size": 390750,
+          "downloadCount": 39
+        },
+        {
+          "name": "PenHidCtl-v4.0.4.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/PenHidCtl-v4.0.4.apk",
+          "size": 16787,
+          "downloadCount": 40
+        },
+        {
+          "name": "SHA256SUMS-v4.0.4.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/SHA256SUMS-v4.0.4.txt",
+          "size": 848,
+          "downloadCount": 21
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.0.4.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/SM8650Q-Scene-Scheduler-v4.0.4.zip",
+          "size": 14349,
+          "downloadCount": 50
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.0.4.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.4/ZUI-Camera-Compat-v4.0.4.apk",
+          "size": 21082,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "v4.0.3",
+      "tagName": "v4.0.3",
+      "publishedAt": "2026-09-11T12:43:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.0.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/BaseFix-Hook-v4.0.3.apk",
+          "size": 201311,
+          "downloadCount": 30
+        },
+        {
+          "name": "FixModule-v4.0.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/FixModule-v4.0.3.zip",
+          "size": 134103945,
+          "downloadCount": 24
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.0.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/LenovoPadProGT-ZUI-Camera-Port-v4.0.3.zip",
+          "size": 194624469,
+          "downloadCount": 26
+        },
+        {
+          "name": "OplusBSP-Modules-v4.0.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/OplusBSP-Modules-v4.0.3.zip",
+          "size": 8591994,
+          "downloadCount": 26
+        },
+        {
+          "name": "PenBridge-Hook-v4.0.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/PenBridge-Hook-v4.0.3.apk",
+          "size": 348784,
+          "downloadCount": 21
+        },
+        {
+          "name": "PenBridge-Module-v4.0.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/PenBridge-Module-v4.0.3.zip",
+          "size": 390755,
+          "downloadCount": 26
+        },
+        {
+          "name": "PenHidCtl-v4.0.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/PenHidCtl-v4.0.3.apk",
+          "size": 16787,
+          "downloadCount": 19
+        },
+        {
+          "name": "SHA256SUMS-v4.0.3.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/SHA256SUMS-v4.0.3.txt",
+          "size": 936,
+          "downloadCount": 10
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.0.3.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/SM8650Q-Scene-Scheduler-v4.0.3.zip",
+          "size": 14350,
+          "downloadCount": 26
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.0.3.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.3/ZUI-Camera-Compat-v4.0.3.apk",
+          "size": 21082,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v4.0.2",
+      "tagName": "v4.0.2",
+      "publishedAt": "2026-09-09T15:05:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/BaseFix-Hook-v4.0.2.apk",
+          "size": 201312,
+          "downloadCount": 9
+        },
+        {
+          "name": "FixModule-v4.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/FixModule-v4.0.2.zip",
+          "size": 134101594,
+          "downloadCount": 20
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/LenovoPadProGT-ZUI-Camera-Port-v4.0.2.zip",
+          "size": 194624526,
+          "downloadCount": 12
+        },
+        {
+          "name": "OplusBSP-Modules-v4.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/OplusBSP-Modules-v4.0.2.zip",
+          "size": 8457925,
+          "downloadCount": 12
+        },
+        {
+          "name": "PenBridge-Hook-v4.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/PenBridge-Hook-v4.0.2.apk",
+          "size": 348785,
+          "downloadCount": 10
+        },
+        {
+          "name": "PenBridge-Module-v4.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/PenBridge-Module-v4.0.2.zip",
+          "size": 390755,
+          "downloadCount": 9
+        },
+        {
+          "name": "PenHidCtl-v4.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/PenHidCtl-v4.0.2.apk",
+          "size": 16787,
+          "downloadCount": 7
+        },
+        {
+          "name": "SHA256SUMS-v4.0.2.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/SHA256SUMS-v4.0.2.txt",
+          "size": 848,
+          "downloadCount": 6
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/SM8650Q-Scene-Scheduler-v4.0.2.zip",
+          "size": 14349,
+          "downloadCount": 6
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.2/ZUI-Camera-Compat-v4.0.2.apk",
+          "size": 21082,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v4.0.1",
+      "tagName": "v4.0.1",
+      "publishedAt": "2026-09-09T02:17:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/BaseFix-Hook-v4.0.1.apk",
+          "size": 201312,
+          "downloadCount": 16
+        },
+        {
+          "name": "FixModule-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/FixModule-v4.0.1.zip",
+          "size": 134096890,
+          "downloadCount": 11
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/LenovoPadProGT-ZUI-Camera-Port-v4.0.1.zip",
+          "size": 194624362,
+          "downloadCount": 12
+        },
+        {
+          "name": "OplusBSP-Modules-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/OplusBSP-Modules-v4.0.1.zip",
+          "size": 8457925,
+          "downloadCount": 15
+        },
+        {
+          "name": "PenBridge-Hook-v4.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/PenBridge-Hook-v4.0.1.apk",
+          "size": 348785,
+          "downloadCount": 10
+        },
+        {
+          "name": "PenBridge-Module-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/PenBridge-Module-v4.0.1.zip",
+          "size": 389839,
+          "downloadCount": 10
+        },
+        {
+          "name": "PenBridge-Root-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/PenBridge-Root-v4.0.1.zip",
+          "size": 389839,
+          "downloadCount": 12
+        },
+        {
+          "name": "PenHidCtl-v4.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/PenHidCtl-v4.0.1.apk",
+          "size": 16787,
+          "downloadCount": 11
+        },
+        {
+          "name": "SHA256SUMS-v4.0.1.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/SHA256SUMS-v4.0.1.txt",
+          "size": 940,
+          "downloadCount": 11
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/SM8650Q-Scene-Scheduler-v4.0.1.zip",
+          "size": 13715,
+          "downloadCount": 13
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.1/ZUI-Camera-Compat-v4.0.1.apk",
+          "size": 21082,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2026-09-07T09:15:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v4.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/BaseFix-Hook-v4.0.0.apk",
+          "size": 152154,
+          "downloadCount": 34
+        },
+        {
+          "name": "boot-ACLaniakea-SM8650Q-droidspaces-r1.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/boot-ACLaniakea-SM8650Q-droidspaces-r1.img",
+          "size": 100663296,
+          "downloadCount": 127
+        },
+        {
+          "name": "FixModule-v4.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/FixModule-v4.0.0.zip",
+          "size": 94059752,
+          "downloadCount": 45
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v4.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/LenovoPadProGT-ZUI-Camera-Port-v4.0.0.zip",
+          "size": 194624385,
+          "downloadCount": 34
+        },
+        {
+          "name": "OplusBSP-Modules-v4.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/OplusBSP-Modules-v4.0.0.zip",
+          "size": 8229269,
+          "downloadCount": 39
+        },
+        {
+          "name": "PenBridge-Hook-v4.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/PenBridge-Hook-v4.0.0.apk",
+          "size": 336498,
+          "downloadCount": 30
+        },
+        {
+          "name": "PenBridge-Root-v4.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/PenBridge-Root-v4.0.0.zip",
+          "size": 377537,
+          "downloadCount": 37
+        },
+        {
+          "name": "PenHidCtl-v4.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/PenHidCtl-v4.0.0.apk",
+          "size": 16787,
+          "downloadCount": 27
+        },
+        {
+          "name": "SHA256SUMS-v4.0.0.txt",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/SHA256SUMS-v4.0.0.txt",
+          "size": 1309,
+          "downloadCount": 26
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v4.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/SM8650Q-Scene-Scheduler-v4.0.0.zip",
+          "size": 13713,
+          "downloadCount": 34
+        },
+        {
+          "name": "vendor_boot-ColorOS16-original-TB710FU.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/vendor_boot-ColorOS16-original-TB710FU.img",
+          "size": 100663296,
+          "downloadCount": 59
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 99
+        },
+        {
+          "name": "ZUI-Camera-Compat-v4.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v4.0.0/ZUI-Camera-Compat-v4.0.0.apk",
+          "size": 21082,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v3.2.1",
+      "tagName": "v3.2.1",
+      "publishedAt": "2026-09-03T05:20:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.2.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/BaseFix-Hook-v3.2.1.apk",
+          "size": 160351,
+          "downloadCount": 43
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 47
+        },
+        {
+          "name": "FixModule-v3.2.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/FixModule-v3.2.1.zip",
+          "size": 103125689,
+          "downloadCount": 55
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v3.2.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/LenovoPadProGT-ZUI-Camera-Port-v3.2.1.zip",
+          "size": 194623957,
+          "downloadCount": 40
+        },
+        {
+          "name": "OplusBSP-Modules-v3.2.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/OplusBSP-Modules-v3.2.1.zip",
+          "size": 8229015,
+          "downloadCount": 42
+        },
+        {
+          "name": "PenBridge-Hook-v3.2.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/PenBridge-Hook-v3.2.1.apk",
+          "size": 336496,
+          "downloadCount": 29
+        },
+        {
+          "name": "PenBridge-Module-v3.2.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/PenBridge-Module-v3.2.1.zip",
+          "size": 376360,
+          "downloadCount": 32
+        },
+        {
+          "name": "PenHidCtl-v3.2.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/PenHidCtl-v3.2.1.apk",
+          "size": 16787,
+          "downloadCount": 23
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.2.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/SM8650Q-Scene-Scheduler-v3.2.1.zip",
+          "size": 13718,
+          "downloadCount": 43
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 38
+        },
+        {
+          "name": "ZUI-Camera-Compat-v3.2.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.1/ZUI-Camera-Compat-v3.2.1.apk",
+          "size": 21082,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v3.2.0",
+      "tagName": "v3.2.0",
+      "publishedAt": "2026-09-02T14:17:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.2.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/BaseFix-Hook-v3.2.0.apk",
+          "size": 152159,
+          "downloadCount": 16
+        },
+        {
+          "name": "BaseFix-Module-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/BaseFix-Module-v3.2.0.zip",
+          "size": 92659702,
+          "downloadCount": 24
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 13
+        },
+        {
+          "name": "CryptoengHAL-Module-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/CryptoengHAL-Module-v3.2.0.zip",
+          "size": 2296652,
+          "downloadCount": 14
+        },
+        {
+          "name": "FixModule-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/FixModule-v3.2.0.zip",
+          "size": 98535206,
+          "downloadCount": 22
+        },
+        {
+          "name": "LenovoPadProGT-ZUI-Camera-Port-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/LenovoPadProGT-ZUI-Camera-Port-v3.2.0.zip",
+          "size": 194623950,
+          "downloadCount": 32
+        },
+        {
+          "name": "OplusBSP-Modules-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/OplusBSP-Modules-v3.2.0.zip",
+          "size": 8229014,
+          "downloadCount": 17
+        },
+        {
+          "name": "PenBridge-Hook-v3.2.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/PenBridge-Hook-v3.2.0.apk",
+          "size": 336496,
+          "downloadCount": 10
+        },
+        {
+          "name": "PenBridge-Module-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/PenBridge-Module-v3.2.0.zip",
+          "size": 376357,
+          "downloadCount": 14
+        },
+        {
+          "name": "PenHidCtl-v3.2.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/PenHidCtl-v3.2.0.apk",
+          "size": 16787,
+          "downloadCount": 9
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/SM8650Q-Scene-Scheduler-v3.2.0.zip",
+          "size": 13717,
+          "downloadCount": 14
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 11
+        },
+        {
+          "name": "ZUI-Camera-Compat-v3.2.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.2.0/ZUI-Camera-Compat-v3.2.0.apk",
+          "size": 21082,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v3.1.0",
+      "tagName": "v3.1.0",
+      "publishedAt": "2026-09-01T07:42:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/BaseFix-Hook-v3.1.0.apk",
+          "size": 131680,
+          "downloadCount": 5
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 6
+        },
+        {
+          "name": "CryptoengHAL-Module-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/CryptoengHAL-Module-v3.1.0.zip",
+          "size": 2296643,
+          "downloadCount": 14
+        },
+        {
+          "name": "FixModule-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/FixModule-v3.1.0.zip",
+          "size": 93037703,
+          "downloadCount": 5
+        },
+        {
+          "name": "OplusBSP-Modules-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/OplusBSP-Modules-v3.1.0.zip",
+          "size": 8229016,
+          "downloadCount": 13
+        },
+        {
+          "name": "PenBridge-Hook-v3.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/PenBridge-Hook-v3.1.0.apk",
+          "size": 336491,
+          "downloadCount": 11
+        },
+        {
+          "name": "PenBridge-Module-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/PenBridge-Module-v3.1.0.zip",
+          "size": 376218,
+          "downloadCount": 12
+        },
+        {
+          "name": "PenHidCtl-v3.1.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/PenHidCtl-v3.1.0.apk",
+          "size": 16793,
+          "downloadCount": 9
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/SM8650Q-Scene-Scheduler-v3.1.0.zip",
+          "size": 13709,
+          "downloadCount": 15
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.1.0/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.0.2",
+      "tagName": "v3.0.2",
+      "publishedAt": "2026-08-31T09:13:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/BaseFix-Hook-v3.0.2.apk",
+          "size": 160283,
+          "downloadCount": 29
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 23
+        },
+        {
+          "name": "FixModule-v3.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/FixModule-v3.0.2.zip",
+          "size": 93064748,
+          "downloadCount": 30
+        },
+        {
+          "name": "OplusBSP-Modules-v3.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/OplusBSP-Modules-v3.0.2.zip",
+          "size": 8229016,
+          "downloadCount": 27
+        },
+        {
+          "name": "PenBridge-Hook-v3.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/PenBridge-Hook-v3.0.2.apk",
+          "size": 336498,
+          "downloadCount": 16
+        },
+        {
+          "name": "PenBridge-Module-v3.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/PenBridge-Module-v3.0.2.zip",
+          "size": 376214,
+          "downloadCount": 18
+        },
+        {
+          "name": "PenHidCtl-v3.0.2.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/PenHidCtl-v3.0.2.apk",
+          "size": 16793,
+          "downloadCount": 14
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.0.2.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/SM8650Q-Scene-Scheduler-v3.0.2.zip",
+          "size": 13709,
+          "downloadCount": 22
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.2/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2026-08-31T04:39:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/BaseFix-Hook-v3.0.1.apk",
+          "size": 160288,
+          "downloadCount": 11
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 12
+        },
+        {
+          "name": "FixModule-v3.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/FixModule-v3.0.1.zip",
+          "size": 93061437,
+          "downloadCount": 9
+        },
+        {
+          "name": "OplusBSP-Modules-v3.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/OplusBSP-Modules-v3.0.1.zip",
+          "size": 8229016,
+          "downloadCount": 10
+        },
+        {
+          "name": "PenBridge-Hook-v3.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/PenBridge-Hook-v3.0.1.apk",
+          "size": 336498,
+          "downloadCount": 7
+        },
+        {
+          "name": "PenBridge-Module-v3.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/PenBridge-Module-v3.0.1.zip",
+          "size": 376207,
+          "downloadCount": 9
+        },
+        {
+          "name": "PenHidCtl-v3.0.1.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/PenHidCtl-v3.0.1.apk",
+          "size": 16787,
+          "downloadCount": 8
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.0.1.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/SM8650Q-Scene-Scheduler-v3.0.1.zip",
+          "size": 13709,
+          "downloadCount": 11
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.1/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-08-29T18:51:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v3.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/BaseFix-Hook-v3.0.0.apk",
+          "size": 160290,
+          "downloadCount": 6
+        },
+        {
+          "name": "boot-ACLaniakea-6.1.128-13.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/boot-ACLaniakea-6.1.128-13.img",
+          "size": 34844672,
+          "downloadCount": 20
+        },
+        {
+          "name": "FixModule-v3.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/FixModule-v3.0.0.zip",
+          "size": 93061436,
+          "downloadCount": 0
+        },
+        {
+          "name": "OplusBSP-Modules-v3.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/OplusBSP-Modules-v3.0.0.zip",
+          "size": 8229015,
+          "downloadCount": 8
+        },
+        {
+          "name": "PenBridge-Hook-v3.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/PenBridge-Hook-v3.0.0.apk",
+          "size": 336498,
+          "downloadCount": 4
+        },
+        {
+          "name": "PenBridge-Module-v3.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/PenBridge-Module-v3.0.0.zip",
+          "size": 376105,
+          "downloadCount": 6
+        },
+        {
+          "name": "PenHidCtl-v3.0.0.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/PenHidCtl-v3.0.0.apk",
+          "size": 16794,
+          "downloadCount": 3
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v3.0.0.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/SM8650Q-Scene-Scheduler-v3.0.0.zip",
+          "size": 13706,
+          "downloadCount": 8
+        },
+        {
+          "name": "vendor_boot-hyperSched-stub.img",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v3.0.0/vendor_boot-hyperSched-stub.img",
+          "size": 12402688,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v2.0.15",
+      "tagName": "v2.0.15",
+      "publishedAt": "2026-08-24T17:35:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BaseFix-Hook-v1.1.12.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v2.0.15/BaseFix-Hook-v1.1.12.apk",
+          "size": 143906,
+          "downloadCount": 53
+        },
+        {
+          "name": "FixModule-v2.0.15.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v2.0.15/FixModule-v2.0.15.zip",
+          "size": 93071122,
+          "downloadCount": 61
+        },
+        {
+          "name": "PenBridge-Hook-v1.1.20.apk",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v2.0.15/PenBridge-Hook-v1.1.20.apk",
+          "size": 336491,
+          "downloadCount": 42
+        },
+        {
+          "name": "PenBridge-Module-v1.1.21.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v2.0.15/PenBridge-Module-v1.1.21.zip",
+          "size": 389576,
+          "downloadCount": 47
+        },
+        {
+          "name": "SM8650Q-Scene-Scheduler-v1.0.9.zip",
+          "downloadUrl": "https://github.com/ACLaniakea/coloros-pad-fixes/releases/download/v2.0.15/SM8650Q-Scene-Scheduler-v1.0.9.zip",
+          "size": 12319,
+          "downloadCount": 55
+        }
+      ]
+    }
+  ]
+}

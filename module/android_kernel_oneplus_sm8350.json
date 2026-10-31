@@ -1,0 +1,265 @@
+{
+  "readme": "# Custom OnePlus 9/9 Pro Linux Kernel 5.4\nFor all features see [FEATURES.md](./Documentation/FEATURES.md)\n\n\n# How do I submit patches to Android Common Kernels\n\n1. BEST: Make all of your changes to upstream Linux. If appropriate, backport to the stable releases.\n   These patches will be merged automatically in the corresponding common kernels. If the patch is already\n   in upstream Linux, post a backport of the patch that conforms to the patch requirements below.\n\n2. LESS GOOD: Develop your patches out-of-tree (from an upstream Linux point-of-view). Unless these are\n   fixing an Android-specific bug, these are very unlikely to be accepted unless they have been\n   coordinated with kernel-team@android.com. If you want to proceed, post a patch that conforms to the\n   patch requirements below.\n\n# Common Kernel patch requirements\n\n- All patches must conform to the Linux kernel coding standards and pass `script/checkpatch.pl`\n- Patches shall not break gki_defconfig or allmodconfig builds for arm, arm64, x86, x86_64 architectures\n(see  https://source.android.com/setup/build/building-kernels)\n- If the patch is not merged from an upstream branch, the subject must be tagged with the type of patch:\n`UPSTREAM:`, `BACKPORT:`, `FROMGIT:`, `FROMLIST:`, or `ANDROID:`.\n- All patches must have a `Change-Id:` tag (see https://gerrit-review.googlesource.com/Documentation/user-changeid.html)\n- If an Android bug has been assigned, there must be a `Bug:` tag.\n- All patches must have a `Signed-off-by:` tag by the author and the submitter\n\nAdditional requirements are listed below based on patch type\n\n## Requirements for backports from mainline Linux: `UPSTREAM:`, `BACKPORT:`\n\n- If the patch is a cherry-pick from Linux mainline with no changes at all\n    - tag the patch subject with `UPSTREAM:`.\n    - add upstream commit information with a `(cherry-picked from ...)` line\n    - Example:\n        - if the upstream commit message is\n```\n        important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n```\n        - then Joe Smith would upload the patch for the common kernel as\n```\n        UPSTREAM: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n\n        Bug: 135791357\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)\n        Signed-off-by: Joe Smith <joe.smith@foo.org>\n```\n\n- If the patch requires any changes from the upstream version, tag the patch with `BACKPORT:`\ninstead of `UPSTREAM:`.\n    - use the same tags as `UPSTREAM:`\n    - add comments about the changes under the `(cherry-picked from ...)` line\n    - Example:\n```\n        BACKPORT: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n\n        Bug: 135791357\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)\n        [ Resolved minor conflict in drivers/foo/bar.c ]\n        Signed-off-by: Joe Smith <joe.smith@foo.org>\n```\n\n## Requirements for other backports: `FROMGIT:`, `FROMLIST:`,\n\n- If the patch has been merged into an upstream maintainer tree, but has not yet\nbeen merged into Linux mainline\n    - tag the patch subject with `FROMGIT:`\n    - add info on where the patch came from as `(cherry picked from commit <sha1> <repo> <branch>)`. This\nmust be a stable maintainer branch (not rebased, so don't use `linux-next` for example).\n    - if changes were required, use `BACKPORT: FROMGIT:`\n    - Example:\n        - if the commit message in the maintainer tree is\n```\n        important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n```\n        - then Joe Smith would upload the patch for the common kernel as\n```\n        FROMGIT: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n\n        Bug: 135791357\n        (cherry picked from commit 878a2fd9de10b03d11d2f622250285c7e63deace\n         https://git.kernel.org/pub/scm/linux/kernel/git/foo/bar.git test-branch)\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith <joe.smith@foo.org>\n```\n\n\n- If the patch has been submitted to LKML, but not accepted into any maintainer tree\n    - tag the patch subject with `FROMLIST:`\n    - add a `Link:` tag with a link to the submittal on lore.kernel.org\n    - if changes were required, use `BACKPORT: FROMLIST:`\n    - Example:\n```\n        FROMLIST: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones <fred.jones@foo.org>\n\n        Bug: 135791357\n        Link: https://lore.kernel.org/lkml/20190619171517.GA17557@someone.com/\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith <joe.smith@foo.org>\n```\n\n## Requirements for Android-specific patches: `ANDROID:`\n\n- If the patch is fixing a bug to Android-specific code\n    - tag the patch subject with `ANDROID:`\n    - add a `Fixes:` tag that cites the patch with the bug\n    - Example:\n```\n        ANDROID: fix android-specific bug in foobar.c\n\n        This is the detailed description of the important fix\n\n        Fixes: 1234abcd2468 (\"foobar: add cool feature\")\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith <joe.smith@foo.org>\n```\n\n- If the patch is a new feature\n    - tag the patch subject with `ANDROID:`\n    - add a `Bug:` tag with the Android bug (required for android-specific features)\n\n# Vibrator driver for HHG device\n## How to merge the driver into kernel source tree\n\n 1. Copy \\${this_project}/drivers/hid/hid-aksys.c into \\${your_kernel_root}/drivers/hid/\n\n 2. Compare and merge \\${this_project}/drivers/hid/hid-ids.h into \\${your_kernel_root}/drivers/hid/hid-ids.h :\n Add the following code before the last line of this file\n\n    ```c\n\t\t#define USB_VENDER_ID_QUALCOMM  0x0a12\n\t\t#define USB_VENDER_ID_TEMP_HHG_AKSY 0x1234\n\t\t#define USB_PRODUCT_ID_AKSYS_HHG  0x1000\n    ```\n\n 3. Merge \\${this_project}/drivers/hid/Kconfig into \\${your_kernel_root}/drivers/hid/Kconfig :\nAdd the following code before the last line of this file\n\n\t\tconfig HID_AKSYS_QRD\n    \t\ttristate \"AKSys gamepad USB adapter support\"\n    \t\tdepends on HID\n    \t\t---help---\n    \t\tSupport for AKSys gamepad USB adapter\n\n    \tconfig AKSYS_QRD_FF\n    \t\tbool \"AKSys gamepad USB adapter force feedback support\"\n    \t\tdepends on HID_AKSYS_QRD\n    \t\tselect INPUT_FF_MEMLESS\n    \t\t---help---\n    \t\tSay Y here if you have a AKSys gamepad USB adapter and want to\n    \t\tenable force feedback support for it.\n    \t\t\n 4. Merge \\${this_project}/drivers/hid/Makefile into \\${your_kernel_root}/drivers/hid/Makefile :\n Add the following code at the end of this file\n\n\t\tobj-$(CONFIG_HID_AKSYS_QRD)\t+= hid-aksys.o\n\t\t\n 5. Modify your kernel's default build configuration file. Add the following two lines:\n\n        CONFIG_HID_AKSYS_QRD=m\n        CONFIG_AKSYS_QRD_FF=y\n",
+  "readmeHTML": "<h1>Custom OnePlus 9/9 Pro Linux Kernel 5.4</h1>\n<p>For all features see <a href=\"./Documentation/FEATURES.md\">FEATURES.md</a></p>\n\n\n<h1>How do I submit patches to Android Common Kernels</h1>\n\n<li>BEST: Make all of your changes to upstream Linux. If appropriate, backport to the stable releases.</li>\n<p>   These patches will be merged automatically in the corresponding common kernels. If the patch is already</p>\n<p>   in upstream Linux, post a backport of the patch that conforms to the patch requirements below.</p>\n\n<li>LESS GOOD: Develop your patches out-of-tree (from an upstream Linux point-of-view). Unless these are</li>\n<p>   fixing an Android-specific bug, these are very unlikely to be accepted unless they have been</p>\n<p>   coordinated with kernel-team@android.com. If you want to proceed, post a patch that conforms to the</p>\n<p>   patch requirements below.</p>\n\n<h1>Common Kernel patch requirements</h1>\n\n<li>All patches must conform to the Linux kernel coding standards and pass `script/checkpatch.pl`</li>\n<li>Patches shall not break gki_defconfig or allmodconfig builds for arm, arm64, x86, x86_64 architectures</li>\n<p>(see  https://source.android.com/setup/build/building-kernels)</p>\n<li>If the patch is not merged from an upstream branch, the subject must be tagged with the type of patch:</li>\n<p><code>UPSTREAM:</code>, <code>BACKPORT:</code>, <code>FROMGIT:</code>, <code>FROMLIST:</code>, or <code>ANDROID:</code>.</p>\n<li>All patches must have a `Change-Id:` tag (see https://gerrit-review.googlesource.com/Documentation/user-changeid.html)</li>\n<li>If an Android bug has been assigned, there must be a `Bug:` tag.</li>\n<li>All patches must have a `Signed-off-by:` tag by the author and the submitter</li>\n\n<p>Additional requirements are listed below based on patch type</p>\n\n<h2>Requirements for backports from mainline Linux: `UPSTREAM:`, `BACKPORT:`</h2>\n\n<li>If the patch is a cherry-pick from Linux mainline with no changes at all</li>\n<p>    - tag the patch subject with <code>UPSTREAM:</code>.</p>\n<p>    - add upstream commit information with a <code>(cherry-picked from ...)</code> line</p>\n<p>    - Example:</p>\n<p>        - if the upstream commit message is</p>\n<pre>        important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;</pre>\n<p>        - then Joe Smith would upload the patch for the common kernel as</p>\n<pre>        UPSTREAM: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;\n\n        Bug: 135791357\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)\n        Signed-off-by: Joe Smith &lt;joe.smith@foo.org&gt;</pre>\n\n<li>If the patch requires any changes from the upstream version, tag the patch with `BACKPORT:`</li>\n<p>instead of <code>UPSTREAM:</code>.</p>\n<p>    - use the same tags as <code>UPSTREAM:</code></p>\n<p>    - add comments about the changes under the <code>(cherry-picked from ...)</code> line</p>\n<p>    - Example:</p>\n<pre>        BACKPORT: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;\n\n        Bug: 135791357\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)\n        [ Resolved minor conflict in drivers/foo/bar.c ]\n        Signed-off-by: Joe Smith &lt;joe.smith@foo.org&gt;</pre>\n\n<h2>Requirements for other backports: `FROMGIT:`, `FROMLIST:`,</h2>\n\n<li>If the patch has been merged into an upstream maintainer tree, but has not yet</li>\n<p>been merged into Linux mainline</p>\n<p>    - tag the patch subject with <code>FROMGIT:</code></p>\n<p>    - add info on where the patch came from as <code>(cherry picked from commit <sha1> <repo> <branch>)</code>. This</p>\n<p>must be a stable maintainer branch (not rebased, so don't use <code>linux-next</code> for example).</p>\n<p>    - if changes were required, use <code>BACKPORT: FROMGIT:</code></p>\n<p>    - Example:</p>\n<p>        - if the commit message in the maintainer tree is</p>\n<pre>        important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;</pre>\n<p>        - then Joe Smith would upload the patch for the common kernel as</p>\n<pre>        FROMGIT: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;\n\n        Bug: 135791357\n        (cherry picked from commit 878a2fd9de10b03d11d2f622250285c7e63deace\n         https://git.kernel.org/pub/scm/linux/kernel/git/foo/bar.git test-branch)\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith &lt;joe.smith@foo.org&gt;</pre>\n\n\n<li>If the patch has been submitted to LKML, but not accepted into any maintainer tree</li>\n<p>    - tag the patch subject with <code>FROMLIST:</code></p>\n<p>    - add a <code>Link:</code> tag with a link to the submittal on lore.kernel.org</p>\n<p>    - if changes were required, use <code>BACKPORT: FROMLIST:</code></p>\n<p>    - Example:</p>\n<pre>        FROMLIST: important patch from upstream\n\n        This is the detailed description of the important patch\n\n        Signed-off-by: Fred Jones &lt;fred.jones@foo.org&gt;\n\n        Bug: 135791357\n        Link: https://lore.kernel.org/lkml/20190619171517.GA17557@someone.com/\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith &lt;joe.smith@foo.org&gt;</pre>\n\n<h2>Requirements for Android-specific patches: `ANDROID:`</h2>\n\n<li>If the patch is fixing a bug to Android-specific code</li>\n<p>    - tag the patch subject with <code>ANDROID:</code></p>\n<p>    - add a <code>Fixes:</code> tag that cites the patch with the bug</p>\n<p>    - Example:</p>\n<pre>        ANDROID: fix android-specific bug in foobar.c\n\n        This is the detailed description of the important fix\n\n        Fixes: 1234abcd2468 (\"foobar: add cool feature\")\n        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01\n        Signed-off-by: Joe Smith &lt;joe.smith@foo.org&gt;</pre>\n\n<li>If the patch is a new feature</li>\n<p>    - tag the patch subject with <code>ANDROID:</code></p>\n<p>    - add a <code>Bug:</code> tag with the Android bug (required for android-specific features)</p>\n\n<h1>Vibrator driver for HHG device</h1>\n<h2>How to merge the driver into kernel source tree</h2>\n\n<p> 1. Copy \\${this_project}/drivers/hid/hid-aksys.c into \\${your_kernel_root}/drivers/hid/</p>\n\n<p> 2. Compare and merge \\${this_project}/drivers/hid/hid-ids.h into \\${your_kernel_root}/drivers/hid/hid-ids.h :</p>\n<p> Add the following code before the last line of this file</p>\n\n<p>    ```c</p>\n<p>\t\t#define USB_VENDER_ID_QUALCOMM  0x0a12</p>\n<p>\t\t#define USB_VENDER_ID_TEMP_HHG_AKSY 0x1234</p>\n<p>\t\t#define USB_PRODUCT_ID_AKSYS_HHG  0x1000</p>\n<p>    ```</p>\n\n<p> 3. Merge \\${this_project}/drivers/hid/Kconfig into \\${your_kernel_root}/drivers/hid/Kconfig :</p>\n<p>Add the following code before the last line of this file</p>\n\n<p>\t\tconfig HID_AKSYS_QRD</p>\n<p>    \t\ttristate \"AKSys gamepad USB adapter support\"</p>\n<p>    \t\tdepends on HID</p>\n<p>    \t\t---help---</p>\n<p>    \t\tSupport for AKSys gamepad USB adapter</p>\n\n<p>    \tconfig AKSYS_QRD_FF</p>\n<p>    \t\tbool \"AKSys gamepad USB adapter force feedback support\"</p>\n<p>    \t\tdepends on HID_AKSYS_QRD</p>\n<p>    \t\tselect INPUT_FF_MEMLESS</p>\n<p>    \t\t---help---</p>\n<p>    \t\tSay Y here if you have a AKSys gamepad USB adapter and want to</p>\n<p>    \t\tenable force feedback support for it.</p>\n\n<p> 4. Merge \\${this_project}/drivers/hid/Makefile into \\${your_kernel_root}/drivers/hid/Makefile :</p>\n<p> Add the following code at the end of this file</p>\n\n<p>\t\tobj-$(CONFIG_HID_AKSYS_QRD)\t+= hid-aksys.o</p>\n\n<p> 5. Modify your kernel's default build configuration file. Add the following two lines:</p>\n\n<p>        CONFIG_HID_AKSYS_QRD=m</p>\n<p>        CONFIG_AKSYS_QRD_FF=y</p>",
+  "homepageUrl": "https://github.com/LineageOS/android_kernel_oneplus_sm8350.git",
+  "sourceUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350",
+  "url": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350",
+  "latestRelease": {
+    "name": "2.1.0-a17-20261025",
+    "version": "2.1.0-a17-20261025",
+    "time": "2026-10-25T14:19:52Z",
+    "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2.1.0-a17-20261025/kernel-oneplus-sm8350-2.1.0-a17-20261025-bakasu.zip"
+  },
+  "releases": [
+    {
+      "name": "2.1.0-a17-20261025",
+      "tagName": "2.1.0-a17-20261025",
+      "publishedAt": "2026-10-25T14:19:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-2.1.0-a17-20261025-bakasu.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2.1.0-a17-20261025/kernel-oneplus-sm8350-2.1.0-a17-20261025-bakasu.zip",
+          "size": 32804333,
+          "downloadCount": 1
+        },
+        {
+          "name": "kernel-oneplus-sm8350-2.1.0-a17-20261025-ksun.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2.1.0-a17-20261025/kernel-oneplus-sm8350-2.1.0-a17-20261025-ksun.zip",
+          "size": 32813761,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "2.0.0-a17-20261014",
+      "tagName": "2.0.0-a17-20261014",
+      "publishedAt": "2026-10-14T03:53:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-2.0.0-a17-20261014-bakasu.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2.0.0-a17-20261014/kernel-oneplus-sm8350-2.0.0-a17-20261014-bakasu.zip",
+          "size": 32703022,
+          "downloadCount": 18
+        },
+        {
+          "name": "kernel-oneplus-sm8350-2.0.0-a17-20261014-ksun.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2.0.0-a17-20261014/kernel-oneplus-sm8350-2.0.0-a17-20261014-ksun.zip",
+          "size": 32715955,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "1.4.2-a16-20260930",
+      "tagName": "1.4.2-a16-20260930",
+      "publishedAt": "2026-09-30T03:08:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.4.2-a16-20260930.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.4.2-a16-20260930/kernel-oneplus-sm8350-1.4.2-a16-20260930.zip",
+          "size": 32600637,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "1.4.2-a16-20260927",
+      "tagName": "1.4.2-a16-20260927",
+      "publishedAt": "2026-09-27T02:10:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.4.2-a16-20260927.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.4.2-a16-20260927/kernel-oneplus-sm8350-1.4.2-a16-20260927.zip",
+          "size": 32598824,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "1.4.1-a16-20260924",
+      "tagName": "1.4.1-a16-20260924",
+      "publishedAt": "2026-09-24T06:34:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.4.1-a16-20260924.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.4.1-a16-20260924/kernel-oneplus-sm8350-1.4.1-a16-20260924.zip",
+          "size": 32596099,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "1.4.0-a16-20260912",
+      "tagName": "1.4.0-a16-20260912",
+      "publishedAt": "2026-09-12T00:44:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.4.0-a16-20260912.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.4.0-a16-20260912/kernel-oneplus-sm8350-1.4.0-a16-20260912.zip",
+          "size": 32674493,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "1.3.1-a16-20260901",
+      "tagName": "1.3.1-a16-20260901",
+      "publishedAt": "2026-09-01T02:49:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.3.1-a16-20260901.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.3.1-a16-20260901/kernel-oneplus-sm8350-1.3.1-a16-20260901.zip",
+          "size": 32672383,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "1.3.1-a16-20260829",
+      "tagName": "1.3.1-a16-20260829",
+      "publishedAt": "2026-08-29T05:01:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.3.1-a16-20260829.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.3.1-a16-20260829/kernel-oneplus-sm8350-1.3.1-a16-20260829.zip",
+          "size": 32673724,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "1.3.1-a16-20260828",
+      "tagName": "1.3.1-a16-20260828",
+      "publishedAt": "2026-08-28T13:15:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.3.1-a16-20260828.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.3.1-a16-20260828/kernel-oneplus-sm8350-1.3.1-a16-20260828.zip",
+          "size": 32673608,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "1.3-a16-20260815",
+      "tagName": "1.3-a16-20260815",
+      "publishedAt": "2026-08-15T01:04:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.3-a16-20260815.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.3-a16-20260815/kernel-oneplus-sm8350-1.3-a16-20260815.zip",
+          "size": 32673065,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "1.3-a16-20260807",
+      "tagName": "1.3-a16-20260807",
+      "publishedAt": "2026-08-07T03:14:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350-1.3-a16-20260807.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.3-a16-20260807/kernel-oneplus-sm8350-1.3-a16-20260807.zip",
+          "size": 32670387,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "1.2-a16_2026-07-11",
+      "tagName": "1.2-a16_2026-07-11",
+      "publishedAt": "2026-07-11T17:46:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350_2026-07-11.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.2-a16_2026-07-11/kernel-oneplus-sm8350_2026-07-11.zip",
+          "size": 32662268,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "1.2-a16_2026-07-06",
+      "tagName": "1.2-a16_2026-07-06",
+      "publishedAt": "2026-07-06T04:08:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350_2026-07-06.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.2-a16_2026-07-06/kernel-oneplus-sm8350_2026-07-06.zip",
+          "size": 32659652,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "1.1-a16_2026-05-31",
+      "tagName": "1.1-a16_2026-05-31",
+      "publishedAt": "2026-05-31T06:30:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350_2026-05-31.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.1-a16_2026-05-31/kernel-oneplus-sm8350_2026-05-31.zip",
+          "size": 32656526,
+          "downloadCount": 54
+        }
+      ]
+    },
+    {
+      "name": "1.0-a16_2026-05-28",
+      "tagName": "1.0-a16_2026-05-28",
+      "publishedAt": "2026-05-28T19:08:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350_2026-05-28.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.0-a16_2026-05-28/kernel-oneplus-sm8350_2026-05-28.zip",
+          "size": 32640967,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "1.0-a16_2026-05-26",
+      "tagName": "1.0-a16_2026-05-26",
+      "publishedAt": "2026-05-26T01:08:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350_2026-05-26.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/1.0-a16_2026-05-26/kernel-oneplus-sm8350_2026-05-26.zip",
+          "size": 32644208,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "2026-05-24",
+      "tagName": "2026-05-24",
+      "publishedAt": "2026-05-24T01:02:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-oneplus-sm8350.zip",
+          "downloadUrl": "https://github.com/Gamesmes90/android_kernel_oneplus_sm8350/releases/download/2026-05-24/kernel-oneplus-sm8350.zip",
+          "size": 32600237,
+          "downloadCount": 9
+        }
+      ]
+    }
+  ]
+}

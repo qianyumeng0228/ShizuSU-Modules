@@ -1,0 +1,43 @@
+{
+  "readme": "# DNSResolve-Termux\n\n[![KernelSU](https://img.shields.io/badge/KernelSU-Compatible-green.svg)](https://kernelsu.org/)\n[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)\n[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://www.android.com/)\n\n**A KernelSU module that provides `/etc/resolv.conf` on Android so Go binaries inside Termux can resolve DNS.**\n\n## Problem\n\nGo-based CLI tools (crane, gh, docker CLI, etc.) use the Go resolver, which reads `/etc/resolv.conf` directly. On Android:\n\n- There is no `/etc/resolv.conf` (it's a ramdisk rootfs, read-only)\n- Termux keeps its own resolver under `$PREFIX/etc/resolv.conf`, which Go **never reads**\n- Result: Go binaries fail with `lookup example.com on [::1]:53: connection refused`\n\n## Solution\n\nThis module adds a `resolv.conf` via the standard KernelSU overlay mechanism:\n\n```\n/etc -> /system/etc   (Android symlink)\n```\n\nThe module ships `system/etc/resolv.conf`, which KernelSU overlays onto `/system/etc`. Because `/etc` is a symlink to `/system/etc`, the file automatically appears at `/etc/resolv.conf` — where the Go resolver looks.\n\n**Android's own DNS (netd/DnsResolver) is NOT affected** — it never reads this file.\n\n## DNS servers\n\n```\nnameserver 8.8.8.8\nnameserver 8.8.4.4\nnameserver 1.1.1.1\n```\n\nEdit `system/etc/resolv.conf` inside the module to customize.\n\n## Requirements\n\n- Android with KernelSU (Next) — Magisk should also work via the fallback installer\n- Termux\n\n## Installation\n\n1. Download the release zip from [Releases](../../releases)\n2. KernelSU Manager (or Magisk app) → Modules → Install from storage\n3. Reboot\n4. Verify:\n\n```sh\ncat /etc/resolv.conf          # should show 3 nameservers\n# or check module log\ncat /data/local/tmp/dnsresolve.log\n```\n\n## Verification\n\nAfter reboot, test with any Go binary:\n\n```sh\n# Before: fails with [::1]:53 connection refused\n./crane digest alpine:latest\n\n# After: resolves fine\n./crane digest alpine:latest\n# sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b\n```\n\n## How it works\n\n| Path | Purpose |\n|---|---|\n| `module.prop` | Module metadata for KernelSU/Magisk |\n| `system/etc/resolv.conf` | The DNS file — overlaid to `/system/etc`, visible at `/etc` via symlink |\n| `post-fs-data.sh` | Logs & verifies the overlay at boot |\n| `customize.sh` | KernelSU installer |\n| `META-INF/com/google/android/` | Magisk-compatible installer fallback |\n\n## License\n\nMIT",
+  "readmeHTML": "<h1>DNSResolve-Termux</h1>\n\n<p><a href=\"https://img.shields.io/badge/KernelSU-Compatible-green.svg\">![KernelSU</a>](https://kernelsu.org/)</p>\n<p><a href=\"https://img.shields.io/badge/License-MIT-blue.svg\">![License</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Platform-Android-green.svg\">![Android</a>](https://www.android.com/)</p>\n\n<p><b>A KernelSU module that provides <code>/etc/resolv.conf</code> on Android so Go binaries inside Termux can resolve DNS.</b></p>\n\n<h2>Problem</h2>\n\n<p>Go-based CLI tools (crane, gh, docker CLI, etc.) use the Go resolver, which reads <code>/etc/resolv.conf</code> directly. On Android:</p>\n\n<li>There is no `/etc/resolv.conf` (it's a ramdisk rootfs, read-only)</li>\n<li>Termux keeps its own resolver under `$PREFIX/etc/resolv.conf`, which Go **never reads**</li>\n<li>Result: Go binaries fail with `lookup example.com on [::1]:53: connection refused`</li>\n\n<h2>Solution</h2>\n\n<p>This module adds a <code>resolv.conf</code> via the standard KernelSU overlay mechanism:</p>\n\n<pre>/etc -&gt; /system/etc   (Android symlink)</pre>\n\n<p>The module ships <code>system/etc/resolv.conf</code>, which KernelSU overlays onto <code>/system/etc</code>. Because <code>/etc</code> is a symlink to <code>/system/etc</code>, the file automatically appears at <code>/etc/resolv.conf</code> — where the Go resolver looks.</p>\n\n<p><b>Android's own DNS (netd/DnsResolver) is NOT affected</b> — it never reads this file.</p>\n\n<h2>DNS servers</h2>\n\n<pre>nameserver 8.8.8.8\nnameserver 8.8.4.4\nnameserver 1.1.1.1</pre>\n\n<p>Edit <code>system/etc/resolv.conf</code> inside the module to customize.</p>\n\n<h2>Requirements</h2>\n\n<li>Android with KernelSU (Next) — Magisk should also work via the fallback installer</li>\n<li>Termux</li>\n\n<h2>Installation</h2>\n\n<li>Download the release zip from [Releases](../../releases)</li>\n<li>KernelSU Manager (or Magisk app) → Modules → Install from storage</li>\n<li>Reboot</li>\n<li>Verify:</li>\n\n<pre>cat /etc/resolv.conf          # should show 3 nameservers\n# or check module log\ncat /data/local/tmp/dnsresolve.log</pre>\n\n<h2>Verification</h2>\n\n<p>After reboot, test with any Go binary:</p>\n\n<pre># Before: fails with [::1]:53 connection refused\n./crane digest alpine:latest\n\n# After: resolves fine\n./crane digest alpine:latest\n# sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b</pre>\n\n<h2>How it works</h2>\n\n<p>| Path | Purpose |</p>\n<p>|---|---|</p>\n<p>| <code>module.prop</code> | Module metadata for KernelSU/Magisk |</p>\n<p>| <code>system/etc/resolv.conf</code> | The DNS file — overlaid to <code>/system/etc</code>, visible at <code>/etc</code> via symlink |</p>\n<p>| <code>post-fs-data.sh</code> | Logs & verifies the overlay at boot |</p>\n<p>| <code>customize.sh</code> | KernelSU installer |</p>\n<p>| <code>META-INF/com/google/android/</code> | Magisk-compatible installer fallback |</p>\n\n<h2>License</h2>\n\n<p>MIT</p>",
+  "homepageUrl": "https://github.com/GegeDevs/DNSResolve-Termux",
+  "sourceUrl": "https://github.com/GegeDevs/DNSResolve-Termux",
+  "url": "https://github.com/GegeDevs/DNSResolve-Termux",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-09-12T04:20:50Z",
+    "downloadUrl": "https://github.com/GegeDevs/DNSResolve-Termux/releases/download/v1.0.1/dnsresolve-v1.0.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-09-12T04:20:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnsresolve-v1.0.1.zip",
+          "downloadUrl": "https://github.com/GegeDevs/DNSResolve-Termux/releases/download/v1.0.1/dnsresolve-v1.0.1.zip",
+          "size": 3223,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-09-12T04:17:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DNSResolve-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GegeDevs/DNSResolve-Termux/releases/download/v1.0.0/DNSResolve-v1.0.0.zip",
+          "size": 3223,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

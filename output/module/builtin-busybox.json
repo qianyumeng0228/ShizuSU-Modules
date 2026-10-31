@@ -1,0 +1,113 @@
+{
+  "readme": "# Magisk built-in BusyBox\n\n### Description\nSystemless Magisk module to install **BusyBox** binary with its applets (**UNIX/Linux command-line utilities**).\nBusyBox and applets are installed by and symlinked to the Magisk built-in busybox binary.\nFor more info, see:\nhttps://github.com/topjohnwu/ndk-busybox\n\n**Tip**: For even more interesting applets, install also the **ToyBox-Ext** module:\nhttps://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext\n\n##### TEST\n\n**Install** the module and **reboot**. Use **Terminal Emulator** - **BusyBox applets** are for Terminal and **shell scripts**.\n\nMake sure that `/system/bin` and `/system/xbin` (the latter might not available on some devices) are in the `PATH`.\nCheck e.g. with (all commands are **case sensitive**):\n```\nsu\necho $PATH\n```\nCheck if `busybox` was properly installed and is it installed to `/system/xbin` or `/system/bin`:\n```\nbusybox --help\nwhich busybox\n```\nIf the responded busybox path was `/system/xbin` then check:\n```\nls -l /system/xbin | grep busybox\n```\nwhereas if the busybox path was `/system/bin` then use:\n```\nls -l /system/bin | grep busybox\n```\nThe command will show all the busybox applets as installed (symlinked to the busybox binary).\nUsually, `whois` will be one of them, hence you can try:\n```\nwhois --help\nbusybox whois --help\n```\n\n#### Source \n\n[My Repo:](https://github.com/zgfg/BuiltIn-BusyBox)\n\n![GitHub release (latest by date)](https://img.shields.io/github/v/release/zgfg/BuiltIn-BusyBox?label=Release&style=plastic) ![GitHub Release Date](https://img.shields.io/github/release-date/zgfg/BuiltIn-BusyBox?label=Release%20Date&style=plastic) \n![GitHub Releases](https://img.shields.io/github/downloads/zgfg/BuiltIn-BusyBox/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic)\n![GitHub All Releases](https://img.shields.io/github/downloads/zgfg/BuiltIn-BusyBox/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic)\n\n[Alt-Repo:](https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox)\n\n![GitHub release (latest by date)](https://img.shields.io/github/v/release/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox?label=Release&style=plastic) ![GitHub Release Date](https://img.shields.io/github/release-date/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox?label=Release%20Date&style=plastic) \n![GitHub Releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic)\n![GitHub All Releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic)\n\n#### Copyright (c) zgfg @ xda, 2022-\n<p align=\"left\">\n<a href=\"https://github.com/zgfg/BuiltIn-BusyBox/blob/0f6c6c079f7837470d89ac443a73d716e10ef0f2/LICENSE\"> <img src=\"https://img.shields.io/github/license/zgfg/BuiltIn-BusyBox?label=License&logo=gnu&logoColor=orange\" alt=\"GNU General Public License\">\n</a>\n<a href=\"https://zgfg.github.io/PayPal.html\"> <img src=\"https://img.shields.io/badge/-Donate%20a%20coffee-FFDD00?logo=CoffeeScript&logoColor=black\" alt=\"Donate a coffee\">\n</a> \n</p>\n",
+  "readmeHTML": "<h1>Magisk built-in BusyBox</h1>\n\n<h3>Description</h3>\n<p>Systemless Magisk module to install <b>BusyBox</b> binary with its applets (<b>UNIX/Linux command-line utilities</b>).</p>\n<p>BusyBox and applets are installed by and symlinked to the Magisk built-in busybox binary.</p>\n<p>For more info, see:</p>\n<p>https://github.com/topjohnwu/ndk-busybox</p>\n\n<p><b>Tip</b>: For even more interesting applets, install also the <b>ToyBox-Ext</b> module:</p>\n<p>https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext</p>\n\n<p>##### TEST</p>\n\n<p><b>Install</b> the module and <b>reboot</b>. Use <b>Terminal Emulator</b> - <b>BusyBox applets</b> are for Terminal and <b>shell scripts</b>.</p>\n\n<p>Make sure that <code>/system/bin</code> and <code>/system/xbin</code> (the latter might not available on some devices) are in the <code>PATH</code>.</p>\n<p>Check e.g. with (all commands are <b>case sensitive</b>):</p>\n<pre>su\necho $PATH</pre>\n<p>Check if <code>busybox</code> was properly installed and is it installed to <code>/system/xbin</code> or <code>/system/bin</code>:</p>\n<pre>busybox --help\nwhich busybox</pre>\n<p>If the responded busybox path was <code>/system/xbin</code> then check:</p>\n<pre>ls -l /system/xbin | grep busybox</pre>\n<p>whereas if the busybox path was <code>/system/bin</code> then use:</p>\n<pre>ls -l /system/bin | grep busybox</pre>\n<p>The command will show all the busybox applets as installed (symlinked to the busybox binary).</p>\n<p>Usually, <code>whois</code> will be one of them, hence you can try:</p>\n<pre>whois --help\nbusybox whois --help</pre>\n\n<p>#### Source</p>\n\n<p><a href=\"https://github.com/zgfg/BuiltIn-BusyBox\">My Repo:</a></p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/zgfg/BuiltIn-BusyBox?label=Release&style=plastic\">GitHub release (latest by date)</a> !<a href=\"https://img.shields.io/github/release-date/zgfg/BuiltIn-BusyBox?label=Release%20Date&style=plastic\">GitHub Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/zgfg/BuiltIn-BusyBox/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic\">GitHub Releases</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/zgfg/BuiltIn-BusyBox/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic\">GitHub All Releases</a></p>\n\n<p><a href=\"https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox\">Alt-Repo:</a></p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox?label=Release&style=plastic\">GitHub release (latest by date)</a> !<a href=\"https://img.shields.io/github/release-date/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox?label=Release%20Date&style=plastic\">GitHub Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic\">GitHub Releases</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic\">GitHub All Releases</a></p>\n\n<p>#### Copyright (c) zgfg @ xda, 2022-</p>\n<p><p align=\"left\"></p>\n<p><a href=\"https://github.com/zgfg/BuiltIn-BusyBox/blob/0f6c6c079f7837470d89ac443a73d716e10ef0f2/LICENSE\"> <img src=\"https://img.shields.io/github/license/zgfg/BuiltIn-BusyBox?label=License&logo=gnu&logoColor=orange\" alt=\"GNU General Public License\"></p>\n<p></a></p>\n<p><a href=\"https://zgfg.github.io/PayPal.html\"> <img src=\"https://img.shields.io/badge/-Donate%20a%20coffee-FFDD00?logo=CoffeeScript&logoColor=black\" alt=\"Donate a coffee\"></p>\n<p></a></p>\n<p></p></p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox",
+  "latestRelease": {
+    "name": "107",
+    "version": "107",
+    "time": "2023-08-08T20:40:47Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/107/BuiltIn-BusyBox_v1.0.7.zip"
+  },
+  "releases": [
+    {
+      "name": "107",
+      "tagName": "107",
+      "publishedAt": "2023-08-08T20:40:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/107/BuiltIn-BusyBox_v1.0.7.zip",
+          "size": 10031,
+          "downloadCount": 138143
+        }
+      ]
+    },
+    {
+      "name": "106",
+      "tagName": "106",
+      "publishedAt": "2023-06-08T06:18:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/106/BuiltIn-BusyBox_v1.0.6.zip",
+          "size": 9601,
+          "downloadCount": 10261
+        }
+      ]
+    },
+    {
+      "name": "105",
+      "tagName": "105",
+      "publishedAt": "2023-06-05T14:48:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/105/BuiltIn-BusyBox_v1.0.5.zip",
+          "size": 8585,
+          "downloadCount": 1088
+        }
+      ]
+    },
+    {
+      "name": "104",
+      "tagName": "104",
+      "publishedAt": "2023-01-27T15:56:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/104/BuiltIn-BusyBox_v1.0.4.zip",
+          "size": 9086,
+          "downloadCount": 20964
+        }
+      ]
+    },
+    {
+      "name": "103",
+      "tagName": "103",
+      "publishedAt": "2022-02-17T17:09:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/103/BuiltIn-BusyBox_v1.0.3.zip",
+          "size": 9629,
+          "downloadCount": 13702
+        }
+      ]
+    },
+    {
+      "name": "102",
+      "tagName": "102",
+      "publishedAt": "2022-02-16T08:58:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BuiltIn-BusyBox_v1.0.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/102/BuiltIn-BusyBox_v1.0.2.zip",
+          "size": 9312,
+          "downloadCount": 266
+        }
+      ]
+    },
+    {
+      "name": "101",
+      "tagName": "101",
+      "publishedAt": "2022-02-14T14:47:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Built-in.BusyBox.v1.0.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/BuiltIn-BusyBox/releases/download/101/Built-in.BusyBox.v1.0.1.zip",
+          "size": 14513,
+          "downloadCount": 394
+        }
+      ]
+    }
+  ]
+}

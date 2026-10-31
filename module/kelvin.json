@@ -1,0 +1,271 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"docs/assets/kelvin-banner.png\" alt=\"Kelvin — AI-aware thermal governor and gaming performance engine for rooted Android\" width=\"840\">\n</p>\n\n<h1 align=\"center\">Kelvin</h1>\n\n<p align=\"center\">\n  <b>AI-aware thermal governor + gaming engine + on-device AI studio for rooted Android.</b><br>\n  A tiny root daemon that sustains on-device LLM inference and maximizes game FPS — safely —\n  plus a private, offline <b>AI studio</b> (local chat + image generation) and a RAM manager,\n  wrapped in a neo-brutalist app with a floating performance HUD.\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/Anonym0usWork1221/Kelvin/releases/latest\"><img src=\"https://img.shields.io/github/v/release/Anonym0usWork1221/Kelvin?display_name=tag&color=F5A623&label=release\" alt=\"Latest release\"></a>\n  <img src=\"https://img.shields.io/badge/license-MIT-22D3EE\" alt=\"MIT License\">\n  <img src=\"https://img.shields.io/badge/platform-Android%2014%2B-A3E635\" alt=\"Android 14+\">\n  <img src=\"https://img.shields.io/badge/root-Magisk%20·%20KernelSU%20·%20APatch-F5A623\" alt=\"Magisk / KernelSU / APatch\">\n  <img src=\"https://img.shields.io/badge/SoC-Snapdragon%208%20Gen%202%20/%208%20Elite-FF3B30\" alt=\"Snapdragon 8 Gen 2 / 8 Elite\">\n  <img src=\"https://img.shields.io/badge/app-Kotlin%20·%20Compose-8B98A9\" alt=\"Kotlin + Jetpack Compose\">\n</p>\n\n<p align=\"center\">\n  <a href=\"#-install\">Install</a> ·\n  <a href=\"#-on-device-ai-studio\">AI studio</a> ·\n  <a href=\"#-using-the-kelvin-app\">Using the app</a> ·\n  <a href=\"#%EF%B8%8F-how-it-works\">How it works</a> ·\n  <a href=\"#-build\">Build</a> ·\n  <a href=\"docs/architecture.md\">Architecture</a> ·\n  <a href=\"docs/safety.md\">Safety</a>\n</p>\n\n---\n\nOn-device AI is throttled by thermals: run a local **LLM** (`llama.cpp`, MediaPipe, ONNX\nRuntime, QNN Genie) for a minute and GPU/CPU clocks collapse (680 → 300 MHz) as the phone\nprotects itself. Gaming thermal mods exist, but they chase **short FPS bursts**, not\n**sustained** AI workloads — and nobody ships a governor that reshapes thermal behaviour\nspecifically for NPU/CPU-heavy inference.\n\n**Kelvin does both.** It loads the right frequency curve for what you're actually doing:\n\n> **How each one gets picked, honestly.** Inference is **auto-detected** — the daemon scans for\n> engine processes and Kelvin's own AI studio announces itself, so AI-Sustained loads on its own.\n> Games are **not** auto-detected: you assign a profile to a package once in the Apps tab and it\n> loads whenever that game comes to the foreground. I'd rather you set one rule than have a\n> heuristic guess wrong and pin your clocks during a video call.\n\n- 🎮 **Game** — burst: raise the GPU + big-core floors for frame stability.\n- 🧠 **AI-Sustained** — soak: hold clocks flat at a raised-but-bounded ceiling so inference\n  throughput doesn't cliff after a few runs. *(The genuinely new part.)*\n- ⚖️ **Balanced** / 🔋 **Battery** — stock-ish / efficiency.\n\nAll behind a **hard temperature ceiling**, a **stock-config backup**, and a **bootloop\nwatchdog** — Kelvin *reshapes* the thermal curve, it never removes the safety net.\n\n<p align=\"center\">\n  <img src=\"docs/assets/kelvin-hero.png\" alt=\"Kelvin — sustained on-device AI inference on one side, mobile gaming burst performance on the other\" width=\"820\">\n</p>\n\n## 📱 The app\n\nA neo-brutalist Kotlin + Compose companion: live telemetry, one-tap profiles, per-app rules,\na safety panel, a draggable floating **HUD** you can pin over any game or LLM front-end, plus a\nfull **[on-device AI studio](#-on-device-ai-studio)** (local chat + image generation) and a **RAM\nmanager**. Smallest-possible APK — no analytics, offline-first.\n\n<p align=\"center\">\n  <img src=\"docs/assets/screenshots/dashboard.png\" width=\"200\" alt=\"Kelvin dashboard — live skin/SoC/GPU temperature, thermal headroom, and one-tap Game / AI-Sustained / Balanced / Battery profiles\">\n  &nbsp;\n  <img src=\"docs/assets/screenshots/telemetry.png\" width=\"200\" alt=\"Kelvin live telemetry — per-cluster CPU clocks, GPU frequency and busy percent, RAM, and engine detection toggles\">\n  &nbsp;\n  <img src=\"docs/assets/screenshots/safety.png\" width=\"200\" alt=\"Kelvin safety panel — bootloop watchdog status, editable skin-temperature ceiling, hard thermal limits, and restore-stock\">\n  &nbsp;\n</p>\n<p align=\"center\"><sub>Dashboard · Live sensors · Safety · Per-app profiles — all streaming from the root daemon over a local socket.</sub></p>\n\n## 🧠 On-device AI studio\n\nKelvin isn't just a governor — it ships a **fully local, private AI studio** that runs entirely\non your phone. No cloud, no account, no data leaves the device. And because Kelvin *is* the\nthermal governor, it flips itself into **AI-Sustained** the moment inference starts, so your\ntokens/sec and image steps don't thermally cliff.\n\n<p align=\"center\">\n  <img src=\"docs/assets/screenshots/ai-hub.png\" width=\"200\" alt=\"Kelvin AI hub — installed on-device models, one-tap chat and image generation, model manager, device RAM and NPU readout\">\n  &nbsp;\n  <img src=\"docs/assets/screenshots/ai-chat.png\" width=\"200\" alt=\"Kelvin local LLM chat — streaming tokens from a llama.cpp GGUF model with load, stop, offload and AI-Sustained controls\">\n  &nbsp;\n  <img src=\"docs/assets/screenshots/image-studio.png\" width=\"200\" alt=\"Kelvin image studio — on-device Stable Diffusion with a per-device CPU/GPU backend selector and explicit load-then-generate flow\">\n  &nbsp;\n</p>\n<p align=\"center\"><sub>AI hub · Local chat (llama.cpp) · Image studio (Stable Diffusion) — 100% offline, on-device.</sub></p>\n\n- 💬 **Local LLM chat (`llama.cpp` / GGUF).** Real streaming chat with any GGUF model, token by\n  token, over a bundled `llama-server`. Multi-turn history that **persists to disk**, a searchable\n  **History** screen (rename / delete), a **Stop** button, and **Offload** to free RAM. Tool-calling\n  is wired so the model can ask the image engine to *draw* a picture mid-conversation.\n- 🎨 **On-device image generation (Stable Diffusion 1.5 / stable-diffusion.cpp).** Type a prompt,\n  get a real image — no gradient placeholders. A **persistent server** loads the model **once**\n  (device-specific compute compiled at load, like a warmed-up LLM), then generations run instantly\n  after. A **per-device backend picker (Auto / GPU / CPU)** is discovered from your actual hardware,\n  with **load → generate**, **Reload / Offload**, **Stop**, and one-tap **Save to Photos**. Private\n  gallery — nothing touches your camera roll until you export it.\n- ⚡ **Chat on the Hexagon NPU.** llama.cpp has an upstream Hexagon backend, and Kelvin ships it. On a\n  Snapdragon **8 Gen 2 or newer** with a **Q4_0** model, flip the accelerator to NPU in Runtime and the\n  work moves off the CPU. The catch is real and Kelvin says so up front: only Q4_0 (and Q8_0/MXFP4)\n  can be repacked for the DSP, so a Q4_K_M model stays on the cores. The toggle stays greyed out —\n  with the reason — unless your build, your chip and your model all line up. Details, numbers and the\n  parts that *don't* work: [docs/npu.md](docs/npu.md).\n- 🔁 **Convert a model on your own GitHub Actions minutes.** Most of HuggingFace is raw safetensors,\n  which no phone runtime loads. Your phone can't convert it either — no Python, no RAM, no disk. So\n  fork Kelvin, paste a token, and the app dispatches a conversion job **in your fork**, watches it,\n  and downloads the finished GGUF straight back. Q4_0 output is what makes a model NPU-ready, which\n  closes the loop.\n- 📦 **Model manager that recognises more than GGUF.** Paste any **HuggingFace** repo and Kelvin\n  classifies it: GGUF, diffusion checkpoints, **QNN context binaries** (with a Hexagon version check\n  before you spend a gigabyte), Nexa, LiteRT, `.task`, ExecuTorch, MNN, SNPE. Whole-folder models\n  install with their directory layout intact. Downloads are **resumable, cancellable, foregrounded**,\n  with an optional **token for gated models**. Anything it can't run says why, and offers conversion\n  when that's the answer.\n- 🧮 **RAM manager (root).** Real per-process **PSS/USS** from `smaps_rollup`, safe **force-stop** of a\n  heavy app behind a server-side deny-list (system-critical processes are protected), and a genuine\n  **Clear cached RAM** (`drop_caches` + compact) — the honest \"free RAM\", not a fake booster.\n\n> **Why root helps AI:** Android's phantom-process killer SIGKILLs a CPU-heavy inference child the\n> instant it spikes; Kelvin launches its engines as a **root-owned process** that survives, and holds\n> **AI-Sustained** clocks so throughput stays flat. Everything degrades gracefully without root —\n> chat and images still run, you just lose the governor + full RAM manager.\n\n## 🧩 Two planes, one product\n\nA root module can't draw a UI; an app can't write `/sys`. So Kelvin is split, and the two\nhalves talk over a **root-owned abstract `AF_UNIX` socket** (`@kelvin`, line-delimited JSON):\n\n- **`kelvind`** — a tiny (~31 KB) native **C** daemon in a Magisk/KernelSU/APatch module: the\n  workload detector, profile engine, safety layer, and per-SoC path providers.\n- **Kelvin app** — a **Kotlin + Compose** companion: floating HUD (FPS, clocks, temps,\n  tokens/sec, RAM), one-tap profiles, per-app rules, a safety panel, and launcher-icon\n  hide/show. It renders what the daemon reports and sends it commands — it never touches `/sys`.\n\nSee [docs/architecture.md](docs/architecture.md) and the socket contract in\n[protocol/README.md](protocol/README.md).\n\n## 📦 Repository layout\n\n```\nkelvin/\n├── daemon/     native C governor (kelvind) + RAM manager + per-SoC providers   ← the core\n├── module/     Magisk/KernelSU/APatch packaging\n├── app/        Kotlin + Compose companion — HUD, dashboard, per-app profiles, safety,\n│               AI studio (local chat + image gen), RAM manager\n├── protocol/   daemon↔app control-socket contract\n├── docs/       architecture · safety · SoC matrix · AI studio · NPU · tooling\n├── scripts/    build-daemon.sh · build-sd.sh (NDK cross-compile)\n└── .github/    CI: daemon build · app build · tag → signed release\n```\n\n## ⚙️ How it works\n\nEach ~5 Hz tick, the daemon: reads sensors → detects the workload (foreground app + a `/proc`\nscan for inference-engine signatures) → runs the **safety interlock** → resolves a profile\n(with hysteresis to avoid clock thrash) → applies **only safe, reversible knobs** (cpufreq\n`scaling_min/max`, GPU devfreq `min/max`) → publishes stats to the app. Full write-safety\nrules: [docs/safety.md](docs/safety.md).\n\n> **On-device finding:** the vendor thermal-engine continuously rewrites `scaling_max`, so\n> max-caps are best-effort — **raising the floor (`scaling_min`) is the authoritative lever**,\n> which is exactly why the AI-Sustained curve holds.\n\n## 📲 Install\n\n1. Download **`kelvin.zip`** from [Releases](https://github.com/Anonym0usWork1221/Kelvin/releases/latest).\n2. Flash it in **Magisk / KernelSU / APatch** Manager.\n3. **Reboot.**\n4. *(Recommended)* install the companion app: grab **`Kelvin-<version>.apk`** from the same\n   release and open it. It's signed and offline — no Play Store, no internet permission.\n\nRequires root (Magisk 20.4+, KernelSU, or APatch). Fully systemless and reversible —\ndisable or remove the module to restore stock.\n\n## 🚀 Using the Kelvin app\n\n1. **Onboarding.** On first launch Kelvin checks that the root daemon is reachable\n   (`kelvind detected — you're linked`), then walks you through granting the **display-over-\n   other-apps** permission (for the HUD) and the notification permission.\n2. **Dashboard.** See live **skin / SoC / GPU** temperature, thermal **headroom** against the\n   ceiling, and per-cluster clocks. Leave **Auto-Switch** on to let the daemon pick the profile\n   from the detected workload, or tap **Game / AI-Sustained / Balanced / Battery** to pin one.\n3. **Floating HUD.** From the **HUD** tab, launch the overlay: a draggable, snap-to-edge strip\n   of FPS · clocks · temps · tokens/sec · RAM. Tap it to toggle compact/expanded; tune opacity,\n   corner, refresh rate, and which stats show.\n4. **Per-app profiles.** In **Apps**, assign a profile to any package — it auto-loads whenever\n   that game or your llama.cpp front-end comes to the foreground.\n5. **Safety.** View the bootloop-watchdog / interlock status, **lower** the skin-temp ceiling\n   within the daemon's hard limit, and one-tap **Restore stock**.\n6. **AI studio** *(AI tab)*. Tap **Add model** to download a GGUF chat model or a Stable Diffusion\n   image model (or paste a HuggingFace link). Open a model to **chat** (streaming, saved history),\n   or the **Image** studio to pick a compute **backend (Auto / GPU / CPU)**, **Load** the model once,\n   then **Generate** — save to Photos when you like it. **RAM** tab: stop a heavy app or **clear\n   cached RAM**.\n7. **Hide the icon** *(Settings)*. Kelvin can drop its launcher icon; reopen it with the\n   **Quick Settings tile** or the dialer secret code **`*#*#5358#*#*`**.\n\n## 🔨 Build\n\nToolchain setup (Ubuntu): [docs/tooling.md](docs/tooling.md).\n\n**Daemon** (module):\n\n```bash\nexport ANDROID_NDK_HOME=/path/to/ndk\nbash scripts/build-daemon.sh          # → module/bin/{arm64-v8a,armeabi-v7a}/kelvind\ncd module && zip -r ../kelvin.zip .   # package (CI does this on a v* tag)\n```\n\nHost sanity build (no NDK): `gcc -std=c11 -D_GNU_SOURCE -Wall -Wextra -Idaemon/include daemon/src/*.c daemon/soc/*.c -o kelvind`.\n\n**App:**\n\n```bash\ncd app && ./gradlew assembleDebug     # or assembleRelease (signed when a keystore is present)\n```\n\n**AI engine binaries** (bundled in the APK, **git-ignored + CI-built** like `kelvind`): the chat\nengine is llama.cpp's `llama-server` and the image engine is stable-diffusion.cpp's `sd-server`.\nReproduce the image one with `scripts/build-sd.sh [cpu|vulkan]` → `app/src/main/jniLibs/arm64-v8a/\nlibstable-diffusion-server.so`.\n\nTag a version (`git tag v0.6.0 && git push --tags`) and CI cross-compiles both ABIs, packages\n`kelvin.zip`, builds a **signed** `Kelvin-<version>.apk`, and publishes the GitHub Release.\n\n## 🖥️ Supported hardware\n\nKelvin used to be Snapdragon-or-nothing. It isn't any more — there are four providers now, and the\nlast one catches everything with a cpufreq policy, which is every Android phone made this decade.\n\n| Provider | Chips | What you get |\n|---|---|---|\n| `qcom` | Snapdragon (8 Gen 2 SM8550 is my test bench; 8 Gen 3, 8 Elite, 8 Elite Gen 5) | CPU clocks, governor, Adreno GPU + busy%, gaming-phone fans |\n| `mediatek` | Dimensity / Helio | CPU clocks, governor, Mali GPU, PPM user limits so MediaTek's power manager cooperates |\n| `exynos-tensor` | Exynos 2100→2600, Google Tensor G1→G5 | CPU clocks, governor, Mali GPU via devfreq or `/sys/kernel/gpu` |\n| `generic` | anything else | CPU clocks, governor, GPU if it uses devfreq, temperatures, a fan if it's a cooling device |\n\nYou lose the vendor extras on `generic`, not the product. Full detail, including every path and every\nnode I refuse to touch: [docs/soc-matrix.md](docs/soc-matrix.md).\n\n**Changing the CPU governor** is new too — `schedutil`, `performance`, `powersave` and friends, from\nthe Tuning screen, behind a daemon-side allow-list. `userspace` isn't on it, and\n[docs/safety.md](docs/safety.md) explains why.\n\n## 🛡️ Safety\n\nKelvin runs as root and writes `/sys`. It enforces an absolute skin (48 °C) and SoC junction\n(95 °C) ceiling in a path no profile can override, backs up your stock config before the first\nwrite, restores it on exit or thermal interlock, and holds stock for a whole boot if the previous\none looked unstable. It **never** writes `emul_temp`, **never** disables a critical thermal zone,\nand **never** touches thermal trip points at all.\n\n[docs/safety.md](docs/safety.md) is the full contract — every node it writes, every node it refuses\nto, and why. Worth reading before you trust any root thermal tool on your daily driver.\n\n## 📚 Documentation\n\n| | |\n|---|---|\n| [docs/ai-studio.md](docs/ai-studio.md) | Using the on-device AI: models, chat, images, the fit gate, the RAM manager |\n| [docs/npu.md](docs/npu.md) | Running models on the Hexagon NPU, and converting the ones that won't |\n| [docs/soc-matrix.md](docs/soc-matrix.md) | Which chips are supported, every sysfs path, governor control |\n| [docs/safety.md](docs/safety.md) | The write contract and the four rules behind it |\n| [docs/architecture.md](docs/architecture.md) | How the two planes fit together |\n| [docs/tooling.md](docs/tooling.md) | Building everything from scratch on Ubuntu |\n| [protocol/README.md](protocol/README.md) | The daemon socket, if you want to drive it yourself |\n\n## 🤝 Contributing\n\nConfirm or request your chipset via the\n[device-support template](.github/ISSUE_TEMPLATE/device-support.md) (include the sysfs probe).\nA new SoC is one file in `daemon/soc/` plus one line in the registry — most of the work is already\ndone by the shared layer. See [docs/soc-matrix.md](docs/soc-matrix.md).\n\n## 📄 License\n\nMIT © 2026 **Abdul Moez** ([@Anonym0usWork1221](https://github.com/Anonym0usWork1221)). See [LICENSE](LICENSE).\n\nSome components Kelvin builds against or downloads are under other licences — notably Qualcomm's QNN\nruntime, which the app fetches from Maven Central and which the MIT text does not cover. See\n[NOTICE.md](NOTICE.md).\n\n> ⚠️ Kelvin changes CPU/GPU/thermal behaviour on rooted devices. It ships extensive\n> safeguards, but you run it at your own risk.\n\n<p align=\"center\"><sub>\n<b>Keywords:</b> on-device AI · local LLM · offline AI chat · llama.cpp · GGUF · on-device Stable\nDiffusion · stable-diffusion.cpp · local image generation · Magisk module · KernelSU · APatch ·\nAI thermal governor · CPU/GPU frequency scaling · sustained inference · gaming performance · FPS\nboost · tokens/sec · Snapdragon 8 Gen 2 / 8 Elite · Adreno · Hexagon NPU · QNN · rooted Android ·\nAndroid RAM manager · drop_caches · floating performance HUD · Kotlin Jetpack Compose.\n</sub></p>\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"docs/assets/kelvin-banner.png\" alt=\"Kelvin — AI-aware thermal governor and gaming performance engine for rooted Android\" width=\"840\"></p>\n<p></p></p>\n\n<p><h1 align=\"center\">Kelvin</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <b>AI-aware thermal governor + gaming engine + on-device AI studio for rooted Android.</b><br></p>\n<p>  A tiny root daemon that sustains on-device LLM inference and maximizes game FPS — safely —</p>\n<p>  plus a private, offline <b>AI studio</b> (local chat + image generation) and a RAM manager,</p>\n<p>  wrapped in a neo-brutalist app with a floating performance HUD.</p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/Anonym0usWork1221/Kelvin/releases/latest\"><img src=\"https://img.shields.io/github/v/release/Anonym0usWork1221/Kelvin?display_name=tag&color=F5A623&label=release\" alt=\"Latest release\"></a></p>\n<p>  <img src=\"https://img.shields.io/badge/license-MIT-22D3EE\" alt=\"MIT License\"></p>\n<p>  <img src=\"https://img.shields.io/badge/platform-Android%2014%2B-A3E635\" alt=\"Android 14+\"></p>\n<p>  <img src=\"https://img.shields.io/badge/root-Magisk%20·%20KernelSU%20·%20APatch-F5A623\" alt=\"Magisk / KernelSU / APatch\"></p>\n<p>  <img src=\"https://img.shields.io/badge/SoC-Snapdragon%208%20Gen%202%20/%208%20Elite-FF3B30\" alt=\"Snapdragon 8 Gen 2 / 8 Elite\"></p>\n<p>  <img src=\"https://img.shields.io/badge/app-Kotlin%20·%20Compose-8B98A9\" alt=\"Kotlin + Jetpack Compose\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"#-install\">Install</a> ·</p>\n<p>  <a href=\"#-on-device-ai-studio\">AI studio</a> ·</p>\n<p>  <a href=\"#-using-the-kelvin-app\">Using the app</a> ·</p>\n<p>  <a href=\"#%EF%B8%8F-how-it-works\">How it works</a> ·</p>\n<p>  <a href=\"#-build\">Build</a> ·</p>\n<p>  <a href=\"docs/architecture.md\">Architecture</a> ·</p>\n<p>  <a href=\"docs/safety.md\">Safety</a></p>\n<p></p></p>\n\n<p>---</p>\n\n<p>On-device AI is throttled by thermals: run a local <b>LLM</b> (<code>llama.cpp</code>, MediaPipe, ONNX</p>\n<p>Runtime, QNN Genie) for a minute and GPU/CPU clocks collapse (680 → 300 MHz) as the phone</p>\n<p>protects itself. Gaming thermal mods exist, but they chase <b>short FPS bursts</b>, not</p>\n<p><b>sustained</b> AI workloads — and nobody ships a governor that reshapes thermal behaviour</p>\n<p>specifically for NPU/CPU-heavy inference.</p>\n\n<p><b>Kelvin does both.</b> It loads the right frequency curve for what you're actually doing:</p>\n\n<p>> <b>How each one gets picked, honestly.</b> Inference is <b>auto-detected</b> — the daemon scans for</p>\n<p>> engine processes and Kelvin's own AI studio announces itself, so AI-Sustained loads on its own.</p>\n<p>> Games are <b>not</b> auto-detected: you assign a profile to a package once in the Apps tab and it</p>\n<p>> loads whenever that game comes to the foreground. I'd rather you set one rule than have a</p>\n<p>> heuristic guess wrong and pin your clocks during a video call.</p>\n\n<li>🎮 **Game** — burst: raise the GPU + big-core floors for frame stability.</li>\n<li>🧠 **AI-Sustained** — soak: hold clocks flat at a raised-but-bounded ceiling so inference</li>\n<p>  throughput doesn't cliff after a few runs. *(The genuinely new part.)*</p>\n<li>⚖️ **Balanced** / 🔋 **Battery** — stock-ish / efficiency.</li>\n\n<p>All behind a <b>hard temperature ceiling</b>, a <b>stock-config backup</b>, and a **bootloop</p>\n<p>watchdog** — Kelvin *reshapes* the thermal curve, it never removes the safety net.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/assets/kelvin-hero.png\" alt=\"Kelvin — sustained on-device AI inference on one side, mobile gaming burst performance on the other\" width=\"820\"></p>\n<p></p></p>\n\n<h2>📱 The app</h2>\n\n<p>A neo-brutalist Kotlin + Compose companion: live telemetry, one-tap profiles, per-app rules,</p>\n<p>a safety panel, a draggable floating <b>HUD</b> you can pin over any game or LLM front-end, plus a</p>\n<p>full <b><a href=\"#-on-device-ai-studio\">on-device AI studio</a></b> (local chat + image generation) and a **RAM</p>\n<p>manager**. Smallest-possible APK — no analytics, offline-first.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/assets/screenshots/dashboard.png\" width=\"200\" alt=\"Kelvin dashboard — live skin/SoC/GPU temperature, thermal headroom, and one-tap Game / AI-Sustained / Balanced / Battery profiles\"></p>\n<p>  &nbsp;</p>\n<p>  <img src=\"docs/assets/screenshots/telemetry.png\" width=\"200\" alt=\"Kelvin live telemetry — per-cluster CPU clocks, GPU frequency and busy percent, RAM, and engine detection toggles\"></p>\n<p>  &nbsp;</p>\n<p>  <img src=\"docs/assets/screenshots/safety.png\" width=\"200\" alt=\"Kelvin safety panel — bootloop watchdog status, editable skin-temperature ceiling, hard thermal limits, and restore-stock\"></p>\n<p>  &nbsp;</p>\n<p></p></p>\n<p><p align=\"center\"><sub>Dashboard · Live sensors · Safety · Per-app profiles — all streaming from the root daemon over a local socket.</sub></p></p>\n\n<h2>🧠 On-device AI studio</h2>\n\n<p>Kelvin isn't just a governor — it ships a <b>fully local, private AI studio</b> that runs entirely</p>\n<p>on your phone. No cloud, no account, no data leaves the device. And because Kelvin *is* the</p>\n<p>thermal governor, it flips itself into <b>AI-Sustained</b> the moment inference starts, so your</p>\n<p>tokens/sec and image steps don't thermally cliff.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/assets/screenshots/ai-hub.png\" width=\"200\" alt=\"Kelvin AI hub — installed on-device models, one-tap chat and image generation, model manager, device RAM and NPU readout\"></p>\n<p>  &nbsp;</p>\n<p>  <img src=\"docs/assets/screenshots/ai-chat.png\" width=\"200\" alt=\"Kelvin local LLM chat — streaming tokens from a llama.cpp GGUF model with load, stop, offload and AI-Sustained controls\"></p>\n<p>  &nbsp;</p>\n<p>  <img src=\"docs/assets/screenshots/image-studio.png\" width=\"200\" alt=\"Kelvin image studio — on-device Stable Diffusion with a per-device CPU/GPU backend selector and explicit load-then-generate flow\"></p>\n<p>  &nbsp;</p>\n<p></p></p>\n<p><p align=\"center\"><sub>AI hub · Local chat (llama.cpp) · Image studio (Stable Diffusion) — 100% offline, on-device.</sub></p></p>\n\n<li>💬 **Local LLM chat (`llama.cpp` / GGUF).** Real streaming chat with any GGUF model, token by</li>\n<p>  token, over a bundled <code>llama-server</code>. Multi-turn history that <b>persists to disk</b>, a searchable</p>\n<p>  <b>History</b> screen (rename / delete), a <b>Stop</b> button, and <b>Offload</b> to free RAM. Tool-calling</p>\n<p>  is wired so the model can ask the image engine to *draw* a picture mid-conversation.</p>\n<li>🎨 **On-device image generation (Stable Diffusion 1.5 / stable-diffusion.cpp).** Type a prompt,</li>\n<p>  get a real image — no gradient placeholders. A <b>persistent server</b> loads the model <b>once</b></p>\n<p>  (device-specific compute compiled at load, like a warmed-up LLM), then generations run instantly</p>\n<p>  after. A <b>per-device backend picker (Auto / GPU / CPU)</b> is discovered from your actual hardware,</p>\n<p>  with <b>load → generate</b>, <b>Reload / Offload</b>, <b>Stop</b>, and one-tap <b>Save to Photos</b>. Private</p>\n<p>  gallery — nothing touches your camera roll until you export it.</p>\n<li>⚡ **Chat on the Hexagon NPU.** llama.cpp has an upstream Hexagon backend, and Kelvin ships it. On a</li>\n<p>  Snapdragon <b>8 Gen 2 or newer</b> with a <b>Q4_0</b> model, flip the accelerator to NPU in Runtime and the</p>\n<p>  work moves off the CPU. The catch is real and Kelvin says so up front: only Q4_0 (and Q8_0/MXFP4)</p>\n<p>  can be repacked for the DSP, so a Q4_K_M model stays on the cores. The toggle stays greyed out —</p>\n<p>  with the reason — unless your build, your chip and your model all line up. Details, numbers and the</p>\n<p>  parts that *don't* work: <a href=\"docs/npu.md\">docs/npu.md</a>.</p>\n<li>🔁 **Convert a model on your own GitHub Actions minutes.** Most of HuggingFace is raw safetensors,</li>\n<p>  which no phone runtime loads. Your phone can't convert it either — no Python, no RAM, no disk. So</p>\n<p>  fork Kelvin, paste a token, and the app dispatches a conversion job <b>in your fork</b>, watches it,</p>\n<p>  and downloads the finished GGUF straight back. Q4_0 output is what makes a model NPU-ready, which</p>\n<p>  closes the loop.</p>\n<li>📦 **Model manager that recognises more than GGUF.** Paste any **HuggingFace** repo and Kelvin</li>\n<p>  classifies it: GGUF, diffusion checkpoints, <b>QNN context binaries</b> (with a Hexagon version check</p>\n<p>  before you spend a gigabyte), Nexa, LiteRT, <code>.task</code>, ExecuTorch, MNN, SNPE. Whole-folder models</p>\n<p>  install with their directory layout intact. Downloads are <b>resumable, cancellable, foregrounded</b>,</p>\n<p>  with an optional <b>token for gated models</b>. Anything it can't run says why, and offers conversion</p>\n<p>  when that's the answer.</p>\n<li>🧮 **RAM manager (root).** Real per-process **PSS/USS** from `smaps_rollup`, safe **force-stop** of a</li>\n<p>  heavy app behind a server-side deny-list (system-critical processes are protected), and a genuine</p>\n<p>  <b>Clear cached RAM</b> (<code>drop_caches</code> + compact) — the honest \"free RAM\", not a fake booster.</p>\n\n<p>> <b>Why root helps AI:</b> Android's phantom-process killer SIGKILLs a CPU-heavy inference child the</p>\n<p>> instant it spikes; Kelvin launches its engines as a <b>root-owned process</b> that survives, and holds</p>\n<p>> <b>AI-Sustained</b> clocks so throughput stays flat. Everything degrades gracefully without root —</p>\n<p>> chat and images still run, you just lose the governor + full RAM manager.</p>\n\n<h2>🧩 Two planes, one product</h2>\n\n<p>A root module can't draw a UI; an app can't write <code>/sys</code>. So Kelvin is split, and the two</p>\n<p>halves talk over a <b>root-owned abstract <code>AF_UNIX</code> socket</b> (<code>@kelvin</code>, line-delimited JSON):</p>\n\n<li>**`kelvind`** — a tiny (~31 KB) native **C** daemon in a Magisk/KernelSU/APatch module: the</li>\n<p>  workload detector, profile engine, safety layer, and per-SoC path providers.</p>\n<li>**Kelvin app** — a **Kotlin + Compose** companion: floating HUD (FPS, clocks, temps,</li>\n<p>  tokens/sec, RAM), one-tap profiles, per-app rules, a safety panel, and launcher-icon</p>\n<p>  hide/show. It renders what the daemon reports and sends it commands — it never touches <code>/sys</code>.</p>\n\n<p>See <a href=\"docs/architecture.md\">docs/architecture.md</a> and the socket contract in</p>\n<p><a href=\"protocol/README.md\">protocol/README.md</a>.</p>\n\n<h2>📦 Repository layout</h2>\n\n<pre>kelvin/\n├── daemon/     native C governor (kelvind) + RAM manager + per-SoC providers   ← the core\n├── module/     Magisk/KernelSU/APatch packaging\n├── app/        Kotlin + Compose companion — HUD, dashboard, per-app profiles, safety,\n│               AI studio (local chat + image gen), RAM manager\n├── protocol/   daemon↔app control-socket contract\n├── docs/       architecture · safety · SoC matrix · AI studio · NPU · tooling\n├── scripts/    build-daemon.sh · build-sd.sh (NDK cross-compile)\n└── .github/    CI: daemon build · app build · tag → signed release</pre>\n\n<h2>⚙️ How it works</h2>\n\n<p>Each ~5 Hz tick, the daemon: reads sensors → detects the workload (foreground app + a <code>/proc</code></p>\n<p>scan for inference-engine signatures) → runs the <b>safety interlock</b> → resolves a profile</p>\n<p>(with hysteresis to avoid clock thrash) → applies <b>only safe, reversible knobs</b> (cpufreq</p>\n<p><code>scaling_min/max</code>, GPU devfreq <code>min/max</code>) → publishes stats to the app. Full write-safety</p>\n<p>rules: <a href=\"docs/safety.md\">docs/safety.md</a>.</p>\n\n<p>> <b>On-device finding:</b> the vendor thermal-engine continuously rewrites <code>scaling_max</code>, so</p>\n<p>> max-caps are best-effort — <b>raising the floor (<code>scaling_min</code>) is the authoritative lever</b>,</p>\n<p>> which is exactly why the AI-Sustained curve holds.</p>\n\n<h2>📲 Install</h2>\n\n<li>Download **`kelvin.zip`** from [Releases](https://github.com/Anonym0usWork1221/Kelvin/releases/latest).</li>\n<li>Flash it in **Magisk / KernelSU / APatch** Manager.</li>\n<li>**Reboot.**</li>\n<li>*(Recommended)* install the companion app: grab **`Kelvin-<version>.apk`** from the same</li>\n<p>   release and open it. It's signed and offline — no Play Store, no internet permission.</p>\n\n<p>Requires root (Magisk 20.4+, KernelSU, or APatch). Fully systemless and reversible —</p>\n<p>disable or remove the module to restore stock.</p>\n\n<h2>🚀 Using the Kelvin app</h2>\n\n<li>**Onboarding.** On first launch Kelvin checks that the root daemon is reachable</li>\n<p>   (<code>kelvind detected — you're linked</code>), then walks you through granting the **display-over-</p>\n<p>   other-apps** permission (for the HUD) and the notification permission.</p>\n<li>**Dashboard.** See live **skin / SoC / GPU** temperature, thermal **headroom** against the</li>\n<p>   ceiling, and per-cluster clocks. Leave <b>Auto-Switch</b> on to let the daemon pick the profile</p>\n<p>   from the detected workload, or tap <b>Game / AI-Sustained / Balanced / Battery</b> to pin one.</p>\n<li>**Floating HUD.** From the **HUD** tab, launch the overlay: a draggable, snap-to-edge strip</li>\n<p>   of FPS · clocks · temps · tokens/sec · RAM. Tap it to toggle compact/expanded; tune opacity,</p>\n<p>   corner, refresh rate, and which stats show.</p>\n<li>**Per-app profiles.** In **Apps**, assign a profile to any package — it auto-loads whenever</li>\n<p>   that game or your llama.cpp front-end comes to the foreground.</p>\n<li>**Safety.** View the bootloop-watchdog / interlock status, **lower** the skin-temp ceiling</li>\n<p>   within the daemon's hard limit, and one-tap <b>Restore stock</b>.</p>\n<li>**AI studio** *(AI tab)*. Tap **Add model** to download a GGUF chat model or a Stable Diffusion</li>\n<p>   image model (or paste a HuggingFace link). Open a model to <b>chat</b> (streaming, saved history),</p>\n<p>   or the <b>Image</b> studio to pick a compute <b>backend (Auto / GPU / CPU)</b>, <b>Load</b> the model once,</p>\n<p>   then <b>Generate</b> — save to Photos when you like it. <b>RAM</b> tab: stop a heavy app or **clear</p>\n<p>   cached RAM**.</p>\n<li>**Hide the icon** *(Settings)*. Kelvin can drop its launcher icon; reopen it with the</li>\n<p>   <b>Quick Settings tile</b> or the dialer secret code **<code>*#*#5358#*#*</code>**.</p>\n\n<h2>🔨 Build</h2>\n\n<p>Toolchain setup (Ubuntu): <a href=\"docs/tooling.md\">docs/tooling.md</a>.</p>\n\n<p><b>Daemon</b> (module):</p>\n\n<pre>export ANDROID_NDK_HOME=/path/to/ndk\nbash scripts/build-daemon.sh          # → module/bin/{arm64-v8a,armeabi-v7a}/kelvind\ncd module &amp;&amp; zip -r ../kelvin.zip .   # package (CI does this on a v* tag)</pre>\n\n<p>Host sanity build (no NDK): <code>gcc -std=c11 -D_GNU_SOURCE -Wall -Wextra -Idaemon/include daemon/src/*.c daemon/soc/*.c -o kelvind</code>.</p>\n\n<p><b>App:</b></p>\n\n<pre>cd app &amp;&amp; ./gradlew assembleDebug     # or assembleRelease (signed when a keystore is present)</pre>\n\n<p><b>AI engine binaries</b> (bundled in the APK, <b>git-ignored + CI-built</b> like <code>kelvind</code>): the chat</p>\n<p>engine is llama.cpp's <code>llama-server</code> and the image engine is stable-diffusion.cpp's <code>sd-server</code>.</p>\n<p>Reproduce the image one with <code>scripts/build-sd.sh [cpu|vulkan]</code> → `app/src/main/jniLibs/arm64-v8a/</p>\n<p>libstable-diffusion-server.so`.</p>\n\n<p>Tag a version (<code>git tag v0.6.0 && git push --tags</code>) and CI cross-compiles both ABIs, packages</p>\n<p><code>kelvin.zip</code>, builds a <b>signed</b> <code>Kelvin-<version>.apk</code>, and publishes the GitHub Release.</p>\n\n<h2>🖥️ Supported hardware</h2>\n\n<p>Kelvin used to be Snapdragon-or-nothing. It isn't any more — there are four providers now, and the</p>\n<p>last one catches everything with a cpufreq policy, which is every Android phone made this decade.</p>\n\n<p>| Provider | Chips | What you get |</p>\n<p>|---|---|---|</p>\n<p>| <code>qcom</code> | Snapdragon (8 Gen 2 SM8550 is my test bench; 8 Gen 3, 8 Elite, 8 Elite Gen 5) | CPU clocks, governor, Adreno GPU + busy%, gaming-phone fans |</p>\n<p>| <code>mediatek</code> | Dimensity / Helio | CPU clocks, governor, Mali GPU, PPM user limits so MediaTek's power manager cooperates |</p>\n<p>| <code>exynos-tensor</code> | Exynos 2100→2600, Google Tensor G1→G5 | CPU clocks, governor, Mali GPU via devfreq or <code>/sys/kernel/gpu</code> |</p>\n<p>| <code>generic</code> | anything else | CPU clocks, governor, GPU if it uses devfreq, temperatures, a fan if it's a cooling device |</p>\n\n<p>You lose the vendor extras on <code>generic</code>, not the product. Full detail, including every path and every</p>\n<p>node I refuse to touch: <a href=\"docs/soc-matrix.md\">docs/soc-matrix.md</a>.</p>\n\n<p><b>Changing the CPU governor</b> is new too — <code>schedutil</code>, <code>performance</code>, <code>powersave</code> and friends, from</p>\n<p>the Tuning screen, behind a daemon-side allow-list. <code>userspace</code> isn't on it, and</p>\n<p><a href=\"docs/safety.md\">docs/safety.md</a> explains why.</p>\n\n<h2>🛡️ Safety</h2>\n\n<p>Kelvin runs as root and writes <code>/sys</code>. It enforces an absolute skin (48 °C) and SoC junction</p>\n<p>(95 °C) ceiling in a path no profile can override, backs up your stock config before the first</p>\n<p>write, restores it on exit or thermal interlock, and holds stock for a whole boot if the previous</p>\n<p>one looked unstable. It <b>never</b> writes <code>emul_temp</code>, <b>never</b> disables a critical thermal zone,</p>\n<p>and <b>never</b> touches thermal trip points at all.</p>\n\n<p><a href=\"docs/safety.md\">docs/safety.md</a> is the full contract — every node it writes, every node it refuses</p>\n<p>to, and why. Worth reading before you trust any root thermal tool on your daily driver.</p>\n\n<h2>📚 Documentation</h2>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| <a href=\"docs/ai-studio.md\">docs/ai-studio.md</a> | Using the on-device AI: models, chat, images, the fit gate, the RAM manager |</p>\n<p>| <a href=\"docs/npu.md\">docs/npu.md</a> | Running models on the Hexagon NPU, and converting the ones that won't |</p>\n<p>| <a href=\"docs/soc-matrix.md\">docs/soc-matrix.md</a> | Which chips are supported, every sysfs path, governor control |</p>\n<p>| <a href=\"docs/safety.md\">docs/safety.md</a> | The write contract and the four rules behind it |</p>\n<p>| <a href=\"docs/architecture.md\">docs/architecture.md</a> | How the two planes fit together |</p>\n<p>| <a href=\"docs/tooling.md\">docs/tooling.md</a> | Building everything from scratch on Ubuntu |</p>\n<p>| <a href=\"protocol/README.md\">protocol/README.md</a> | The daemon socket, if you want to drive it yourself |</p>\n\n<h2>🤝 Contributing</h2>\n\n<p>Confirm or request your chipset via the</p>\n<p><a href=\".github/ISSUE_TEMPLATE/device-support.md\">device-support template</a> (include the sysfs probe).</p>\n<p>A new SoC is one file in <code>daemon/soc/</code> plus one line in the registry — most of the work is already</p>\n<p>done by the shared layer. See <a href=\"docs/soc-matrix.md\">docs/soc-matrix.md</a>.</p>\n\n<h2>📄 License</h2>\n\n<p>MIT © 2026 <b>Abdul Moez</b> (<a href=\"https://github.com/Anonym0usWork1221\">@Anonym0usWork1221</a>). See <a href=\"LICENSE\">LICENSE</a>.</p>\n\n<p>Some components Kelvin builds against or downloads are under other licences — notably Qualcomm's QNN</p>\n<p>runtime, which the app fetches from Maven Central and which the MIT text does not cover. See</p>\n<p><a href=\"NOTICE.md\">NOTICE.md</a>.</p>\n\n<p>> ⚠️ Kelvin changes CPU/GPU/thermal behaviour on rooted devices. It ships extensive</p>\n<p>> safeguards, but you run it at your own risk.</p>\n\n<p><p align=\"center\"><sub></p>\n<p><b>Keywords:</b> on-device AI · local LLM · offline AI chat · llama.cpp · GGUF · on-device Stable</p>\n<p>Diffusion · stable-diffusion.cpp · local image generation · Magisk module · KernelSU · APatch ·</p>\n<p>AI thermal governor · CPU/GPU frequency scaling · sustained inference · gaming performance · FPS</p>\n<p>boost · tokens/sec · Snapdragon 8 Gen 2 / 8 Elite · Adreno · Hexagon NPU · QNN · rooted Android ·</p>\n<p>Android RAM manager · drop_caches · floating performance HUD · Kotlin Jetpack Compose.</p>\n<p></sub></p></p>",
+  "homepageUrl": "https://github.com/Anonym0usWork1221/Kelvin",
+  "sourceUrl": "https://github.com/Anonym0usWork1221/Kelvin",
+  "url": "https://github.com/Anonym0usWork1221/Kelvin",
+  "latestRelease": {
+    "name": "v0.10.0",
+    "version": "v0.10.0",
+    "time": "2026-07-28T01:44:30Z",
+    "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.10.0/kelvin.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.10.0",
+      "tagName": "v0.10.0",
+      "publishedAt": "2026-07-28T01:44:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.10.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.10.0/Kelvin-v0.10.0.apk",
+          "size": 1283805,
+          "downloadCount": 501
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.10.0/kelvin.zip",
+          "size": 61716,
+          "downloadCount": 265
+        }
+      ]
+    },
+    {
+      "name": "v0.9.0",
+      "tagName": "v0.9.0",
+      "publishedAt": "2026-07-27T13:59:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.9.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.9.0/Kelvin-v0.9.0.apk",
+          "size": 1275889,
+          "downloadCount": 8
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.9.0/kelvin.zip",
+          "size": 61723,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v0.8.0",
+      "tagName": "v0.8.0",
+      "publishedAt": "2026-07-26T15:35:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.8.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.8.0/Kelvin-v0.8.0.apk",
+          "size": 30829960,
+          "downloadCount": 140
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.8.0/kelvin.zip",
+          "size": 51417,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "engines",
+      "tagName": "engines",
+      "publishedAt": "2026-07-26T15:24:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "llama-cpu-arm64-v8a-5e365c74d175.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-cpu-arm64-v8a-5e365c74d175.tar.gz",
+          "size": 6448774,
+          "downloadCount": 133
+        },
+        {
+          "name": "llama-hexagon-v68-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v68-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5254159,
+          "downloadCount": 0
+        },
+        {
+          "name": "llama-hexagon-v69-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v69-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5255789,
+          "downloadCount": 0
+        },
+        {
+          "name": "llama-hexagon-v73-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v73-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5286056,
+          "downloadCount": 2
+        },
+        {
+          "name": "llama-hexagon-v75-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v75-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5266300,
+          "downloadCount": 12
+        },
+        {
+          "name": "llama-hexagon-v79-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v79-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5276285,
+          "downloadCount": 8
+        },
+        {
+          "name": "llama-hexagon-v81-arm64-v8a-1f3b3b591a72.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/llama-hexagon-v81-arm64-v8a-1f3b3b591a72.tar.gz",
+          "size": 5276581,
+          "downloadCount": 12
+        },
+        {
+          "name": "manifest.json",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/manifest.json",
+          "size": 2516,
+          "downloadCount": 690
+        },
+        {
+          "name": "sd-cpu-arm64-v8a-e32d3633f651.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/sd-cpu-arm64-v8a-e32d3633f651.tar.gz",
+          "size": 23160414,
+          "downloadCount": 147
+        },
+        {
+          "name": "sd-qnn-arm64-v8a-d42d55bf323c.tar.gz",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/engines/sd-qnn-arm64-v8a-d42d55bf323c.tar.gz",
+          "size": 1086828,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.7.0",
+      "tagName": "v0.7.0",
+      "publishedAt": "2026-07-10T16:43:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.7.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.7.0/Kelvin-v0.7.0.apk",
+          "size": 30829960,
+          "downloadCount": 75
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.7.0/kelvin.zip",
+          "size": 51417,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v0.6.0",
+      "tagName": "v0.6.0",
+      "publishedAt": "2026-07-10T14:13:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.6.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.6.0/Kelvin-v0.6.0.apk",
+          "size": 30804276,
+          "downloadCount": 0
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.6.0/kelvin.zip",
+          "size": 51413,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.5.0",
+      "tagName": "v0.5.0",
+      "publishedAt": "2026-07-09T16:46:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.5.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.5.0/Kelvin-v0.5.0.apk",
+          "size": 1054261,
+          "downloadCount": 1
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.5.0/kelvin.zip",
+          "size": 44995,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-07-09T16:12:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.4.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.4.0/Kelvin-v0.4.0.apk",
+          "size": 1054261,
+          "downloadCount": 0
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.4.0/kelvin.zip",
+          "size": 42280,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-07-08T18:34:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kelvin-v0.3.0.apk",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.3.0/Kelvin-v0.3.0.apk",
+          "size": 1054261,
+          "downloadCount": 2
+        },
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.3.0/kelvin.zip",
+          "size": 37665,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-07-08T12:43:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.1.1/kelvin.zip",
+          "size": 32950,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-07-08T12:08:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kelvin.zip",
+          "downloadUrl": "https://github.com/Anonym0usWork1221/Kelvin/releases/download/v0.1.0/kelvin.zip",
+          "size": 32886,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

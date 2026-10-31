@@ -1,0 +1,43 @@
+{
+  "readme": "# Cromite SystemWebView — Magisk Module\n\n![Build Status](https://github.com/hddq/magisk-cromite-webview/actions/workflows/build.yml/badge.svg)\n![Latest Release](https://img.shields.io/github/v/release/hddq/magisk-cromite-webview)\n![Downloads](https://img.shields.io/github/downloads/hddq/magisk-cromite-webview/total)\n\nA Magisk module that replaces the stock Android System WebView with [Cromite WebView](https://github.com/uazo/cromite).\n\n## Requirements\n- arm64-v8a architecture\n- Magisk v20.4+\n\n## Features\n\n- **Drop-in WebView replacement** — overlays the stock WebView at `/system/app/webview/`\n- **Automatic updates** — Magisk Manager detects new versions via `updateJson`\n- **Zero-touch CI/CD** — GitHub Actions checks for new Cromite releases every 24 hours\n\n## Installation\n\n### From GitHub Releases (recommended)\n\n1. Download the latest `CromiteSystemWebView-*.zip` from [Releases](../../releases)\n2. Open **Magisk Manager** → Modules → Install from storage\n3. Select the downloaded zip\n4. Reboot\n\n### Auto-updates\n\nOnce installed, Magisk Manager will automatically detect new versions in the **Modules** tab. Just tap \"Update\" when prompted.\n\n## Module Structure\n\n```\nmodule/\n├── META-INF/\n│   └── com/google/android/\n│       ├── update-binary        # Magisk installer bootstrap\n│       └── updater-script       # Required placeholder\n├── system/\n│   └── app/\n│       └── webview/\n│           └── webview.apk      # Cromite SystemWebView (placed by CI)\n├── module.prop                  # Module metadata + updateJson\n├── customize.sh                 # Install-time script\n├── service.sh                   # Late-start service (permission fix)\n└── post-fs-data.sh              # Early boot (SELinux context)\n```\n\n## CI/CD Pipeline\n\nThe GitHub Actions workflow (`.github/workflows/build.yml`):\n\n1. Runs on a 24-hour schedule (04:00 UTC daily) + manual dispatch\n2. Queries the [Cromite releases API](https://api.github.com/repos/uazo/cromite/releases/latest) for the latest tag\n3. Checks if a GitHub Release with that tag already exists\n4. If a new version exists:\n   - Downloads `arm64_SystemWebView.apk`\n   - Patches `module.prop` with the new version/versionCode\n   - Packages the Magisk module zip\n   - Updates `update.json` for Magisk Manager auto-updates\n   - Publishes a GitHub Release with the zip attached\n5. If already up-to-date, exits cleanly\n",
+  "readmeHTML": "<h1>Cromite SystemWebView — Magisk Module</h1>\n\n<p>!<a href=\"https://github.com/hddq/magisk-cromite-webview/actions/workflows/build.yml/badge.svg\">Build Status</a></p>\n<p>!<a href=\"https://img.shields.io/github/v/release/hddq/magisk-cromite-webview\">Latest Release</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/hddq/magisk-cromite-webview/total\">Downloads</a></p>\n\n<p>A Magisk module that replaces the stock Android System WebView with <a href=\"https://github.com/uazo/cromite\">Cromite WebView</a>.</p>\n\n<h2>Requirements</h2>\n<li>arm64-v8a architecture</li>\n<li>Magisk v20.4+</li>\n\n<h2>Features</h2>\n\n<li>**Drop-in WebView replacement** — overlays the stock WebView at `/system/app/webview/`</li>\n<li>**Automatic updates** — Magisk Manager detects new versions via `updateJson`</li>\n<li>**Zero-touch CI/CD** — GitHub Actions checks for new Cromite releases every 24 hours</li>\n\n<h2>Installation</h2>\n\n<h3>From GitHub Releases (recommended)</h3>\n\n<li>Download the latest `CromiteSystemWebView-*.zip` from [Releases](../../releases)</li>\n<li>Open **Magisk Manager** → Modules → Install from storage</li>\n<li>Select the downloaded zip</li>\n<li>Reboot</li>\n\n<h3>Auto-updates</h3>\n\n<p>Once installed, Magisk Manager will automatically detect new versions in the <b>Modules</b> tab. Just tap \"Update\" when prompted.</p>\n\n<h2>Module Structure</h2>\n\n<pre>module/\n├── META-INF/\n│   └── com/google/android/\n│       ├── update-binary        # Magisk installer bootstrap\n│       └── updater-script       # Required placeholder\n├── system/\n│   └── app/\n│       └── webview/\n│           └── webview.apk      # Cromite SystemWebView (placed by CI)\n├── module.prop                  # Module metadata + updateJson\n├── customize.sh                 # Install-time script\n├── service.sh                   # Late-start service (permission fix)\n└── post-fs-data.sh              # Early boot (SELinux context)</pre>\n\n<h2>CI/CD Pipeline</h2>\n\n<p>The GitHub Actions workflow (<code>.github/workflows/build.yml</code>):</p>\n\n<li>Runs on a 24-hour schedule (04:00 UTC daily) + manual dispatch</li>\n<li>Queries the [Cromite releases API](https://api.github.com/repos/uazo/cromite/releases/latest) for the latest tag</li>\n<li>Checks if a GitHub Release with that tag already exists</li>\n<li>If a new version exists:</li>\n<p>   - Downloads <code>arm64_SystemWebView.apk</code></p>\n<p>   - Patches <code>module.prop</code> with the new version/versionCode</p>\n<p>   - Packages the Magisk module zip</p>\n<p>   - Updates <code>update.json</code> for Magisk Manager auto-updates</p>\n<p>   - Publishes a GitHub Release with the zip attached</p>\n<li>If already up-to-date, exits cleanly</li>",
+  "homepageUrl": "https://github.com/hddq/magisk-cromite-webview",
+  "sourceUrl": "https://github.com/hddq/magisk-cromite-webview",
+  "url": "https://github.com/hddq/magisk-cromite-webview",
+  "latestRelease": {
+    "name": "v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a",
+    "version": "v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a",
+    "time": "2026-09-16T09:11:17Z",
+    "downloadUrl": "https://github.com/hddq/magisk-cromite-webview/releases/download/v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a/CromiteSystemWebView-v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a.zip"
+  },
+  "releases": [
+    {
+      "name": "v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a",
+      "tagName": "v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a",
+      "publishedAt": "2026-09-16T09:11:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CromiteSystemWebView-v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a.zip",
+          "downloadUrl": "https://github.com/hddq/magisk-cromite-webview/releases/download/v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a/CromiteSystemWebView-v153.0.8010.37-11507ac1061b5ea227806f5e84db5a57df6ccf6a.zip",
+          "size": 151540575,
+          "downloadCount": 1143
+        }
+      ]
+    },
+    {
+      "name": "v148.0.7778.168-cb3baf14f52eb4365d017f640f85310735c19b79",
+      "tagName": "v148.0.7778.168-cb3baf14f52eb4365d017f640f85310735c19b79",
+      "publishedAt": "2026-06-12T01:42:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CromiteSystemWebView-v148.0.7778.168-cb3baf14f52eb4365d017f640f85310735c19b79.zip",
+          "downloadUrl": "https://github.com/hddq/magisk-cromite-webview/releases/download/v148.0.7778.168-cb3baf14f52eb4365d017f640f85310735c19b79/CromiteSystemWebView-v148.0.7778.168-cb3baf14f52eb4365d017f640f85310735c19b79.zip",
+          "size": 146837768,
+          "downloadCount": 1169
+        }
+      ]
+    }
+  ]
+}

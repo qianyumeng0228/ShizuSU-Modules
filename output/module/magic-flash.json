@@ -1,0 +1,113 @@
+{
+  "readme": "## Magic ToolFlash\n\nAn android CLI flash tool without custom recoveries. Usage in Terminal Emulator or Termux with Root access: \n```\nflash [ZIP...]\n```\n\nIf some zips fail to flash, you can try:\n\n```\nexport NOSYSTEM=1; flash [ZIP...]\n```\n\nPath to ZIP should be full and multiple ZIP at same time are allowed. **Busybox must be installed!!**\n\n<img src=\"https://github.com/HuskyDG/huskydg.github.io/raw/main/img/Screenshot_20220411-162531_Terminal_Emulator.png\" width=\"500px\"/>\n\nFlash will not be processed in Android environment. Instead, Magic FlashTool will create a new environment and flashing will be performed in isolated chroot environment to match with Custom Recovery environment.\n\n**IMPORTANT: Only use this for flashing mods zip. It can be magisk module, magisk app, system mods zip, ... Do not use this tool to flash ROM while Android system is running because it will lead to bootloop**\n\nFor testing, you can open shell in chroot enviroment with this command:\n\n```\nvmshell\n```\n\n\n### Known issues\n\n- (Solved) ~~The flashable zip that uses `/tmp` as temporary directory will not work as `/tmp` does not exist on Android root directory. Please prefer to use `/dev/tmp` as temporary directory.~~\n- (Solved) ~~The flashable zip hardcoded `/sbin` in command might not work because `/sbin` doesn't always exist on Android 11+~~\n\n### Credits\n\n- [Busybox NDK](https://github.com/Magisk-Modules-Repo/busybox-ndk) by [osm0sis](http://github.com/osm0sis)\n",
+  "readmeHTML": "<h2>Magic ToolFlash</h2>\n\n<p>An android CLI flash tool without custom recoveries. Usage in Terminal Emulator or Termux with Root access:</p>\n<pre>flash [ZIP...]</pre>\n\n<p>If some zips fail to flash, you can try:</p>\n\n<pre>export NOSYSTEM=1; flash [ZIP...]</pre>\n\n<p>Path to ZIP should be full and multiple ZIP at same time are allowed. <b>Busybox must be installed!!</b></p>\n\n<p><img src=\"https://github.com/HuskyDG/huskydg.github.io/raw/main/img/Screenshot_20220411-162531_Terminal_Emulator.png\" width=\"500px\"/></p>\n\n<p>Flash will not be processed in Android environment. Instead, Magic FlashTool will create a new environment and flashing will be performed in isolated chroot environment to match with Custom Recovery environment.</p>\n\n<p><b>IMPORTANT: Only use this for flashing mods zip. It can be magisk module, magisk app, system mods zip, ... Do not use this tool to flash ROM while Android system is running because it will lead to bootloop</b></p>\n\n<p>For testing, you can open shell in chroot enviroment with this command:</p>\n\n<pre>vmshell</pre>\n\n\n<h3>Known issues</h3>\n\n<li>(Solved) ~~The flashable zip that uses `/tmp` as temporary directory will not work as `/tmp` does not exist on Android root directory. Please prefer to use `/dev/tmp` as temporary directory.~~</li>\n<li>(Solved) ~~The flashable zip hardcoded `/sbin` in command might not work because `/sbin` doesn't always exist on Android 11+~~</li>\n\n<h3>Credits</h3>\n\n<li>[Busybox NDK](https://github.com/Magisk-Modules-Repo/busybox-ndk) by [osm0sis](http://github.com/osm0sis)</li>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash",
+  "latestRelease": {
+    "name": "v1.6",
+    "version": "v1.6",
+    "time": "2022-05-19T04:23:18Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.6/magic-flash.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2022-05-19T04:23:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.6/magic-flash.zip",
+          "size": 5222754,
+          "downloadCount": 24093
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2022-05-09T13:31:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.5/magic-flash.zip",
+          "size": 5221811,
+          "downloadCount": 632
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2022-05-03T16:03:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.4/magic-flash.zip",
+          "size": 4149114,
+          "downloadCount": 345
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2022-04-24T16:55:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.3/magic-flash.zip",
+          "size": 4148912,
+          "downloadCount": 944
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2022-04-24T11:13:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.2/magic-flash.zip",
+          "size": 15297,
+          "downloadCount": 252
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2022-04-23T17:55:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.1/magic-flash.zip",
+          "size": 15297,
+          "downloadCount": 587
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2022-04-16T16:24:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magic-flash.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/magic-flash/releases/download/v1.0/magic-flash.zip",
+          "size": 15957,
+          "downloadCount": 542
+        }
+      ]
+    }
+  ]
+}

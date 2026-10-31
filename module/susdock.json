@@ -1,0 +1,71 @@
+{
+  "readme": "# SusDock\n\nSuSFS 的 LKM 管理器，跑在 KernelSU 上。不在本地编内核模块，按设备指纹去上游取预编译好的 `.ko`。\n\n## 功能\n\n- 查 [inforcqb/susfs4ksu-lkm](https://github.com/inforcqb/susfs4ksu-lkm) 的最新发布\n- 按 `<Android 版本>-<内核版本>` 选对应的 `.ko`，sha256 对得上才写进 `/data/adb/susdock/mod/`\n- 装完留下重启标记，重启后生效\n- WebUI 里可开关「开机优先加载」：默认用模块自带的 `post-fs-data.sh`；开启后改为 `/data/adb/post-fs-data.d/` 优先执行，并隐藏自带的脚本\n- 自带 WebUI：看状态、查更新、翻日志（可倒序）、清日志、调等级、换更新源\n\n## 要求\n\n- KernelSU，arm64，GKI 内核\n- Android 12 及以上\n- 查更新和下载驱动要联网；只看状态不用\n\n## 命令\n\n入口是 `entry.sh`，所有子命令从这里分发：\n\n```sh\nMODDIR=/data/adb/modules/susdock\n\nsh \"$MODDIR/entry.sh\" status quick        # 本机状态（不联网）\nsh \"$MODDIR/entry.sh\" mod release         # 输出上游 release JSON（联网）\nsh \"$MODDIR/entry.sh\" mod update v2.3.0-r18.5 <url> <sha256>  # 下载并安装\nsh \"$MODDIR/entry.sh\" mod autoload on     # 开机优先加载（off 关闭）\nsh \"$MODDIR/entry.sh\" log tail 200        # 日志尾部\nsh \"$MODDIR/entry.sh\" log set-level DEBUG # 改日志等级\n```\n\n`mod release` 只负责下载，JSON 由 WebUI 用 `JSON.parse` 解析；`mod update` 需要显式传版本、URL 和 sha256。\n\n参数、输出格式和退出码见 [docs/backend-api.md](docs/backend-api.md)。\n\n## 更新源\n\n默认走 GitHub API 取 releases。「检测更新」卡片右上角的齿轮可以换：\n\n| 选项     | 实际行为                                                        |\n| -------- | --------------------------------------------------------------- |\n| 官方     | 版本信息和驱动都直连 GitHub                                     |\n| 国内加速 | 版本信息仍走 GitHub API，`.ko` 下载套一层 `https://ghfast.top/` |\n| 自定义   | 自己填 Releases API 地址                                        |\n\nghfast.top 只代理文件下载，不接 `api.github.com`（实测返回 403），所以加速只作用在 `.ko` 上。\n\n设置存在浏览器 localStorage，不写进模块配置文件。脚本侧对应 `UPSTREAM_API` 和 `UPSTREAM_MIRROR` 两个环境变量。\n\n## 开发\n\n```sh\npnpm install\npnpm dev          # WebUI 开发服务器\npnpm build        # 构建模块，产物在 dist/source/\npnpm run pack     # 把 dist/source/ 压成 dist/<id>-v<version>-<versionCode>.zip\npnpm test         # 模块脚本回归测试（临时目录 + 假 ksud/ksu_susfs）\npnpm lint         # ESLint + shfmt + shellcheck\n```\n\n`dist/source/webroot/` 是 KernelSU 读取的 WebUI 目录，`dist/source/module.prop` 由构建脚本生成。\n\n`build` 和 `pack` 分开是有意的：`build` 只产出目录树，`pack` 只负责打归档，所以本地改完可以直接重打包，不必重跑 WebUI 构建。归档根目录就是 `dist/source/` 的内容，可以直接刷入。Release 工作流两步都会跑。\n\n提交前会自动跑一遍 ESLint（`.githooks/pre-commit`），`pnpm install` 时通过 `core.hooksPath` 挂上。\n\n## 许可\n\nGPL-2.0，见 [LICENSE](LICENSE)。\n",
+  "readmeHTML": "<h1>SusDock</h1>\n\n<p>SuSFS 的 LKM 管理器，跑在 KernelSU 上。不在本地编内核模块，按设备指纹去上游取预编译好的 <code>.ko</code>。</p>\n\n<h2>功能</h2>\n\n<li>查 [inforcqb/susfs4ksu-lkm](https://github.com/inforcqb/susfs4ksu-lkm) 的最新发布</li>\n<li>按 `<Android 版本>-<内核版本>` 选对应的 `.ko`，sha256 对得上才写进 `/data/adb/susdock/mod/`</li>\n<li>装完留下重启标记，重启后生效</li>\n<li>WebUI 里可开关「开机优先加载」：默认用模块自带的 `post-fs-data.sh`；开启后改为 `/data/adb/post-fs-data.d/` 优先执行，并隐藏自带的脚本</li>\n<li>自带 WebUI：看状态、查更新、翻日志（可倒序）、清日志、调等级、换更新源</li>\n\n<h2>要求</h2>\n\n<li>KernelSU，arm64，GKI 内核</li>\n<li>Android 12 及以上</li>\n<li>查更新和下载驱动要联网；只看状态不用</li>\n\n<h2>命令</h2>\n\n<p>入口是 <code>entry.sh</code>，所有子命令从这里分发：</p>\n\n<pre>MODDIR=/data/adb/modules/susdock\n\nsh \"$MODDIR/entry.sh\" status quick        # 本机状态（不联网）\nsh \"$MODDIR/entry.sh\" mod release         # 输出上游 release JSON（联网）\nsh \"$MODDIR/entry.sh\" mod update v2.3.0-r18.5 &lt;url&gt; &lt;sha256&gt;  # 下载并安装\nsh \"$MODDIR/entry.sh\" mod autoload on     # 开机优先加载（off 关闭）\nsh \"$MODDIR/entry.sh\" log tail 200        # 日志尾部\nsh \"$MODDIR/entry.sh\" log set-level DEBUG # 改日志等级</pre>\n\n<p><code>mod release</code> 只负责下载，JSON 由 WebUI 用 <code>JSON.parse</code> 解析；<code>mod update</code> 需要显式传版本、URL 和 sha256。</p>\n\n<p>参数、输出格式和退出码见 <a href=\"docs/backend-api.md\">docs/backend-api.md</a>。</p>\n\n<h2>更新源</h2>\n\n<p>默认走 GitHub API 取 releases。「检测更新」卡片右上角的齿轮可以换：</p>\n\n<p>| 选项     | 实际行为                                                        |</p>\n<p>| -------- | --------------------------------------------------------------- |</p>\n<p>| 官方     | 版本信息和驱动都直连 GitHub                                     |</p>\n<p>| 国内加速 | 版本信息仍走 GitHub API，<code>.ko</code> 下载套一层 <code>https://ghfast.top/</code> |</p>\n<p>| 自定义   | 自己填 Releases API 地址                                        |</p>\n\n<p>ghfast.top 只代理文件下载，不接 <code>api.github.com</code>（实测返回 403），所以加速只作用在 <code>.ko</code> 上。</p>\n\n<p>设置存在浏览器 localStorage，不写进模块配置文件。脚本侧对应 <code>UPSTREAM_API</code> 和 <code>UPSTREAM_MIRROR</code> 两个环境变量。</p>\n\n<h2>开发</h2>\n\n<pre>pnpm install\npnpm dev          # WebUI 开发服务器\npnpm build        # 构建模块，产物在 dist/source/\npnpm run pack     # 把 dist/source/ 压成 dist/&lt;id&gt;-v&lt;version&gt;-&lt;versionCode&gt;.zip\npnpm test         # 模块脚本回归测试（临时目录 + 假 ksud/ksu_susfs）\npnpm lint         # ESLint + shfmt + shellcheck</pre>\n\n<p><code>dist/source/webroot/</code> 是 KernelSU 读取的 WebUI 目录，<code>dist/source/module.prop</code> 由构建脚本生成。</p>\n\n<p><code>build</code> 和 <code>pack</code> 分开是有意的：<code>build</code> 只产出目录树，<code>pack</code> 只负责打归档，所以本地改完可以直接重打包，不必重跑 WebUI 构建。归档根目录就是 <code>dist/source/</code> 的内容，可以直接刷入。Release 工作流两步都会跑。</p>\n\n<p>提交前会自动跑一遍 ESLint（<code>.githooks/pre-commit</code>），<code>pnpm install</code> 时通过 <code>core.hooksPath</code> 挂上。</p>\n\n<h2>许可</h2>\n\n<p>GPL-2.0，见 <a href=\"LICENSE\">LICENSE</a>。</p>",
+  "homepageUrl": "https://github.com/Nixie24/susdock",
+  "sourceUrl": "https://github.com/Nixie24/susdock",
+  "url": "https://github.com/Nixie24/susdock",
+  "latestRelease": {
+    "name": "v0.3.5-305",
+    "version": "v0.3.5-305",
+    "time": "2026-10-28T17:13:55Z",
+    "downloadUrl": "https://github.com/Nixie24/susdock/releases/download/v0.3.5-305/susdock-v0.3.5-305.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.3.5-305",
+      "tagName": "v0.3.5-305",
+      "publishedAt": "2026-10-28T17:13:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susdock-v0.3.5-305.zip",
+          "downloadUrl": "https://github.com/Nixie24/susdock/releases/download/v0.3.5-305/susdock-v0.3.5-305.zip",
+          "size": 25623,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v0.3.4-304",
+      "tagName": "v0.3.4-304",
+      "publishedAt": "2026-10-28T14:28:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susdock-v0.3.4-304.zip",
+          "downloadUrl": "https://github.com/Nixie24/susdock/releases/download/v0.3.4-304/susdock-v0.3.4-304.zip",
+          "size": 25471,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v0.3.3-303",
+      "tagName": "v0.3.3-303",
+      "publishedAt": "2026-10-28T13:42:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susdock-v0.3.3-303.zip",
+          "downloadUrl": "https://github.com/Nixie24/susdock/releases/download/v0.3.3-303/susdock-v0.3.3-303.zip",
+          "size": 25136,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.3.2-302",
+      "tagName": "v0.3.2-302",
+      "publishedAt": "2026-10-28T11:43:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susdock-v0.3.2-302.zip",
+          "downloadUrl": "https://github.com/Nixie24/susdock/releases/download/v0.3.2-302/susdock-v0.3.2-302.zip",
+          "size": 21003,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

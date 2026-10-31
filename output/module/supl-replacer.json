@@ -1,0 +1,57 @@
+{
+  "readme": "# Magisk SUPL replacer\n\nMagisk module to replace the SUPL (Secure User-Plane Location) provider in Android's gps.conf.\n\n## Background\n\nSUPL is used as part of the A-GPS (Assisted GPS) system to get a faster Time to First Fix. The problem is that Android's implementation automatically sends the IMSI (ID of the SIM card) to the SUPL provider for no apparent reason. And because Google is the default provider it's a big breach of privacy.\n\nThis module replaces the SUPL provider with a proxy server provided by GrapheneOS. The non-profit open source project is known for its security and privacy involvement.\n\nThe other active alternative providers with port 7275 accessible that I know of are:\n\n- Orange: `agpss.orange.fr`\n- Telstra: `agps.supl.telstra.com`\n- T-Mobile: `lbs.geo.t-mobile.com`\n- Qianxun SI (China based): `supl.qxwz.com`\n\nAnother solution would simply be to disable SUPL altogether by replacing `supl.google.com` with `localhost`, but then the Time to First Fix can increase a lot, going from a couple of seconds to a couple of minutes.\n\nIf you want to learn more about the subject here's some reading material:\n\n- A series of blog posts from a telecom engineer on how he discovered that Android is \"leaking\" the IMSI to the SUPL provider: <https://blog.wirelessmoves.com/2014/08/supl-reveals-my-identity-and-location-to-google.html>\n- A blog post by a German security researcher that has done an in-depth analysis on to replace the SUPL provider: <https://www.kuketz-blog.de/android-imsi-leaking-bei-gps-positionsbestimmung/>\n- A post on the subreddit /r/degoogle describing other modification you can make to android in order to \"degoogle it\" more: <https://www.reddit.com/r/degoogle/comments/cldohl/how_to_degoogle_lineageos_in_2019/>\n\nThis module also replaces the NTP server specified in the same configuration file with `pool.ntp.org` which resolves to a nearby NTP server.\n\n## Installation\n\nSimply download the latest build from the [Release](https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases) section and install it with Magisk Manager!\n\nYou can also flash it in a custom recovery like TWRP but using Magisk Manager is definitely recommended.\n\n## Contributing\n\nContributions are welcome if you see any area of improvement!\n\n## Acknowledgments\n\n- John Wu for the creation of the wonderful tool that is Magisk.\n- The persons that have done analysis and written the blog posts linked above.\n\n## License\n\nThis project is released under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause). A copy of the license is available in this project folder.\n",
+  "readmeHTML": "<h1>Magisk SUPL replacer</h1>\n\n<p>Magisk module to replace the SUPL (Secure User-Plane Location) provider in Android's gps.conf.</p>\n\n<h2>Background</h2>\n\n<p>SUPL is used as part of the A-GPS (Assisted GPS) system to get a faster Time to First Fix. The problem is that Android's implementation automatically sends the IMSI (ID of the SIM card) to the SUPL provider for no apparent reason. And because Google is the default provider it's a big breach of privacy.</p>\n\n<p>This module replaces the SUPL provider with a proxy server provided by GrapheneOS. The non-profit open source project is known for its security and privacy involvement.</p>\n\n<p>The other active alternative providers with port 7275 accessible that I know of are:</p>\n\n<li>Orange: `agpss.orange.fr`</li>\n<li>Telstra: `agps.supl.telstra.com`</li>\n<li>T-Mobile: `lbs.geo.t-mobile.com`</li>\n<li>Qianxun SI (China based): `supl.qxwz.com`</li>\n\n<p>Another solution would simply be to disable SUPL altogether by replacing <code>supl.google.com</code> with <code>localhost</code>, but then the Time to First Fix can increase a lot, going from a couple of seconds to a couple of minutes.</p>\n\n<p>If you want to learn more about the subject here's some reading material:</p>\n\n<li>A series of blog posts from a telecom engineer on how he discovered that Android is \"leaking\" the IMSI to the SUPL provider: <https://blog.wirelessmoves.com/2014/08/supl-reveals-my-identity-and-location-to-google.html></li>\n<li>A blog post by a German security researcher that has done an in-depth analysis on to replace the SUPL provider: <https://www.kuketz-blog.de/android-imsi-leaking-bei-gps-positionsbestimmung/></li>\n<li>A post on the subreddit /r/degoogle describing other modification you can make to android in order to \"degoogle it\" more: <https://www.reddit.com/r/degoogle/comments/cldohl/how_to_degoogle_lineageos_in_2019/></li>\n\n<p>This module also replaces the NTP server specified in the same configuration file with <code>pool.ntp.org</code> which resolves to a nearby NTP server.</p>\n\n<h2>Installation</h2>\n\n<p>Simply download the latest build from the <a href=\"https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases\">Release</a> section and install it with Magisk Manager!</p>\n\n<p>You can also flash it in a custom recovery like TWRP but using Magisk Manager is definitely recommended.</p>\n\n<h2>Contributing</h2>\n\n<p>Contributions are welcome if you see any area of improvement!</p>\n\n<h2>Acknowledgments</h2>\n\n<li>John Wu for the creation of the wonderful tool that is Magisk.</li>\n<li>The persons that have done analysis and written the blog posts linked above.</li>\n\n<h2>License</h2>\n\n<p>This project is released under the <a href=\"https://opensource.org/licenses/BSD-3-Clause\">BSD 3-Clause License</a>. A copy of the license is available in this project folder.</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer",
+  "latestRelease": {
+    "name": "v2.3.1",
+    "version": "v2.3.1",
+    "time": "2025-11-06T10:24:26Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases/download/v2.3.1/supl-replacer-v2.3.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2025-11-06T10:24:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "supl-replacer-v2.3.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases/download/v2.3.1/supl-replacer-v2.3.1.zip",
+          "size": 4868,
+          "downloadCount": 4382
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2025-11-06T08:21:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "supl-replacer-v2.3.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases/download/v2.3.0/supl-replacer-v2.3.0.zip",
+          "size": 6317,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2023-03-15T12:14:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "supl-replacer-v2.2.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/supl-replacer/releases/download/v2.2.1/supl-replacer-v2.2.1.zip",
+          "size": 4660,
+          "downloadCount": 4096
+        }
+      ]
+    }
+  ]
+}

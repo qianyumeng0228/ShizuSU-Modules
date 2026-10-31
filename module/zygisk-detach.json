@@ -1,0 +1,127 @@
+{
+  "readme": "# zygisk-detach\n\nDetaches installed apps from Play Store against its aggressive updating policy which ignores the auto-update option user sets.\n\n### How\nHooks libbinder with zygisk\n\n### Usage\n* Enable zygisk in Magisk **or flash a Zygisk module if you are on KernelSU**\n* Flash zygisk-detach module\n* Reboot\n* Run the cli: `detach` (or `su -c /data/adb/modules/zygisk-detach/detach` if you are not using termux)  \n\tor use [zygisk-detach-app](https://github.com/j-hc/zygisk-detach-app) if you dont wanna use the terminal  \n\tor use the WebUI if you are on KernelSU\n* Select apps you wish to detach. Changes are applied immediately, no need to reboot.\n\n### Note\nAnother way to automatically detach any apps upon flashing the module is to put a `detach.txt` with the package names inside the module zip and the apps will be detached without using the cli once module is flashed.  \nAn example of the detach.txt that should go in the zygisk-detach zip:\n```\ncom.app1\norg.app2\n```\n",
+  "readmeHTML": "<h1>zygisk-detach</h1>\n\n<p>Detaches installed apps from Play Store against its aggressive updating policy which ignores the auto-update option user sets.</p>\n\n<h3>How</h3>\n<p>Hooks libbinder with zygisk</p>\n\n<h3>Usage</h3>\n<li>Enable zygisk in Magisk **or flash a Zygisk module if you are on KernelSU**</li>\n<li>Flash zygisk-detach module</li>\n<li>Reboot</li>\n<li>Run the cli: `detach` (or `su -c /data/adb/modules/zygisk-detach/detach` if you are not using termux)</li>\n<p>\tor use <a href=\"https://github.com/j-hc/zygisk-detach-app\">zygisk-detach-app</a> if you dont wanna use the terminal</p>\n<p>\tor use the WebUI if you are on KernelSU</p>\n<li>Select apps you wish to detach. Changes are applied immediately, no need to reboot.</li>\n\n<h3>Note</h3>\n<p>Another way to automatically detach any apps upon flashing the module is to put a <code>detach.txt</code> with the package names inside the module zip and the apps will be detached without using the cli once module is flashed.</p>\n<p>An example of the detach.txt that should go in the zygisk-detach zip:</p>\n<pre>com.app1\norg.app2</pre>",
+  "homepageUrl": "https://github.com/j-hc/zygisk-detach",
+  "sourceUrl": "https://github.com/j-hc/zygisk-detach",
+  "url": "https://github.com/j-hc/zygisk-detach",
+  "latestRelease": {
+    "name": "v1.24.0",
+    "version": "v1.24.0",
+    "time": "2026-09-20T20:30:39Z",
+    "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.24.0/zygisk-detach-v1.24.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.24.0",
+      "tagName": "v1.24.0",
+      "publishedAt": "2026-09-20T20:30:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.24.0.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.24.0/zygisk-detach-v1.24.0.zip",
+          "size": 371409,
+          "downloadCount": 37903
+        }
+      ]
+    },
+    {
+      "name": "v1.23.2",
+      "tagName": "v1.23.2",
+      "publishedAt": "2026-07-09T10:51:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.23.2.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.23.2/zygisk-detach-v1.23.2.zip",
+          "size": 370351,
+          "downloadCount": 46074
+        }
+      ]
+    },
+    {
+      "name": "v1.23.1",
+      "tagName": "v1.23.1",
+      "publishedAt": "2026-04-07T12:32:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.23.1.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.23.1/zygisk-detach-v1.23.1.zip",
+          "size": 370346,
+          "downloadCount": 60736
+        }
+      ]
+    },
+    {
+      "name": "v1.23.0",
+      "tagName": "v1.23.0",
+      "publishedAt": "2026-04-03T19:39:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.23.0.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.23.0/zygisk-detach-v1.23.0.zip",
+          "size": 370326,
+          "downloadCount": 8745
+        }
+      ]
+    },
+    {
+      "name": "v1.22.0",
+      "tagName": "v1.22.0",
+      "publishedAt": "2026-03-05T20:00:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.22.0.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.22.0/zygisk-detach-v1.22.0.zip",
+          "size": 369895,
+          "downloadCount": 13463
+        }
+      ]
+    },
+    {
+      "name": "v1.21.0",
+      "tagName": "v1.21.0",
+      "publishedAt": "2026-02-07T18:47:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.21.0.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.21.0/zygisk-detach-v1.21.0.zip",
+          "size": 367327,
+          "downloadCount": 26796
+        }
+      ]
+    },
+    {
+      "name": "v1.20.1",
+      "tagName": "v1.20.1",
+      "publishedAt": "2025-06-01T12:10:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.20.1.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.20.1/zygisk-detach-v1.20.1.zip",
+          "size": 178007,
+          "downloadCount": 137224
+        }
+      ]
+    },
+    {
+      "name": "v1.20.0",
+      "tagName": "v1.20.0",
+      "publishedAt": "2025-04-15T21:10:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zygisk-detach-v1.20.0.zip",
+          "downloadUrl": "https://github.com/j-hc/zygisk-detach/releases/download/v1.20.0/zygisk-detach-v1.20.0.zip",
+          "size": 176813,
+          "downloadCount": 57234
+        }
+      ]
+    }
+  ]
+}

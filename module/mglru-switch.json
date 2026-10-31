@@ -1,0 +1,29 @@
+{
+  "readme": "# MGLRU Switch\n\nA simple Android kernel module that enables **MGLRU** and ensures it is properly configured on devices or ROMs that do not handle it correctly by default.\n\nThis module works by writing to standard Linux kernel MGLRU sysfs nodes:\n\n/sys/kernel/mm/lru_gen/enabled  \n/sys/kernel/mm/lru_gen/min_ttl_ms\n\nPrimarily designed for modern Android kernels with MGLRU support.\n\n---\n\n## Features\n\n- Enable MGLRU if it is disabled\n- Fix `min_ttl_ms` when exposed but set to `0`\n- Persistent across reboots\n- Minimal, safe, and non-aggressive behavior\n\n---\n\n## Requirements\n\n- KernelSU / KernelSU Next / SukiSU / Wild KSU  \n- (Also compatible with Magisk)\n- Kernel with MGLRU support (Linux 5.15+)\n- Kernel exposes the following node:\n\n/sys/kernel/mm/lru_gen/enabled\n\nIf the node does not exist or is locked by the kernel, the module will exit safely.\n\n---\n\n## How It Works\n\nThe module follows a simple and safe logic:\n\n- If MGLRU is **not supported**, installation aborts\n- If MGLRU is **disabled**, the module enables it\n- If MGLRU is enabled but `min_ttl_ms` is `0`, the module fixes it\n- If MGLRU is already properly configured, the module does nothing and only verifies at boot\n\nThe module does **not** add new kernel features or override vendor memory policies.\n\n---\n\n## Usage\n\n1. Install the module via a KernelSU-compatible manager\n2. Reboot the device\n3. MGLRU will be enabled or verified automatically at boot\n\nNo user interaction is required.\n\n---\n\n## Versioning\n\nThis module uses date-based versioning:\n\nversion=user-YYYY.MM.DD  \nversionCode=YYYYMMDD\n\nTest builds use the `test-YYYY.MM.DD` format.\n\n---\n\n## Notes\n\n- Some ROMs already enable MGLRU by default; in this case, no performance change is expected\n- Many Android kernels do not expose MGLRU `stat` nodes — this is normal\n- This module is intentionally minimal and avoids aggressive tuning\n\n---\n\n## License\n\nDo whatever you want.  \nThis is just a simple, honest switch.",
+  "readmeHTML": "<h1>MGLRU Switch</h1>\n\n<p>A simple Android kernel module that enables <b>MGLRU</b> and ensures it is properly configured on devices or ROMs that do not handle it correctly by default.</p>\n\n<p>This module works by writing to standard Linux kernel MGLRU sysfs nodes:</p>\n\n<p>/sys/kernel/mm/lru_gen/enabled</p>\n<p>/sys/kernel/mm/lru_gen/min_ttl_ms</p>\n\n<p>Primarily designed for modern Android kernels with MGLRU support.</p>\n\n<p>---</p>\n\n<h2>Features</h2>\n\n<li>Enable MGLRU if it is disabled</li>\n<li>Fix `min_ttl_ms` when exposed but set to `0`</li>\n<li>Persistent across reboots</li>\n<li>Minimal, safe, and non-aggressive behavior</li>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<li>KernelSU / KernelSU Next / SukiSU / Wild KSU</li>\n<li>(Also compatible with Magisk)</li>\n<li>Kernel with MGLRU support (Linux 5.15+)</li>\n<li>Kernel exposes the following node:</li>\n\n<p>/sys/kernel/mm/lru_gen/enabled</p>\n\n<p>If the node does not exist or is locked by the kernel, the module will exit safely.</p>\n\n<p>---</p>\n\n<h2>How It Works</h2>\n\n<p>The module follows a simple and safe logic:</p>\n\n<li>If MGLRU is **not supported**, installation aborts</li>\n<li>If MGLRU is **disabled**, the module enables it</li>\n<li>If MGLRU is enabled but `min_ttl_ms` is `0`, the module fixes it</li>\n<li>If MGLRU is already properly configured, the module does nothing and only verifies at boot</li>\n\n<p>The module does <b>not</b> add new kernel features or override vendor memory policies.</p>\n\n<p>---</p>\n\n<h2>Usage</h2>\n\n<li>Install the module via a KernelSU-compatible manager</li>\n<li>Reboot the device</li>\n<li>MGLRU will be enabled or verified automatically at boot</li>\n\n<p>No user interaction is required.</p>\n\n<p>---</p>\n\n<h2>Versioning</h2>\n\n<p>This module uses date-based versioning:</p>\n\n<p>version=user-YYYY.MM.DD</p>\n<p>versionCode=YYYYMMDD</p>\n\n<p>Test builds use the <code>test-YYYY.MM.DD</code> format.</p>\n\n<p>---</p>\n\n<h2>Notes</h2>\n\n<li>Some ROMs already enable MGLRU by default; in this case, no performance change is expected</li>\n<li>Many Android kernels do not expose MGLRU `stat` nodes — this is normal</li>\n<li>This module is intentionally minimal and avoids aggressive tuning</li>\n\n<p>---</p>\n\n<h2>License</h2>\n\n<p>Do whatever you want.</p>\n<p>This is just a simple, honest switch.</p>",
+  "homepageUrl": "https://github.com/superuseryu/mglru-switch",
+  "sourceUrl": "https://github.com/superuseryu/mglru-switch",
+  "url": "https://github.com/superuseryu/mglru-switch",
+  "latestRelease": {
+    "name": "v2025.11.10-user",
+    "version": "v2025.11.10-user",
+    "time": "2026-01-25T21:53:47Z",
+    "downloadUrl": "https://github.com/superuseryu/mglru-switch/releases/download/v2025.11.10-user/mglru-switch.zip"
+  },
+  "releases": [
+    {
+      "name": "v2025.11.10-user",
+      "tagName": "v2025.11.10-user",
+      "publishedAt": "2026-01-25T21:53:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mglru-switch.zip",
+          "downloadUrl": "https://github.com/superuseryu/mglru-switch/releases/download/v2025.11.10-user/mglru-switch.zip",
+          "size": 2467,
+          "downloadCount": 128
+        }
+      ]
+    }
+  ]
+}

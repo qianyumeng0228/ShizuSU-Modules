@@ -1,0 +1,93 @@
+{
+  "readme": "# ResonanceFX\n\nCreated by **Xeloria**.\n\nA free and open-source, privacy-respecting system-wide audio effects suite for rooted Android:\na hardened DSP engine, a universal root module that installs it on any Android 5+ device, and a\nmodern Material You app.\n\n## Highlights\n\n- **28 effect modules**: 10-band equalizer (56 presets), 15/31-band graphic EQ, parametric EQ\n  (up to 32 bands), AutoEQ (thousands of headphones), loudness compensation (ISO 226, follows\n  the volume), multiband compressor, dynamic EQ, de-esser, vocals & ambience (centre\n  extraction), spatial audio (MIT KEMAR HRTF, head tracking on Android 13+), convolver (impulse responses,\n  auto-resampled to the live output rate), headphone correction (`.vdc` profiles), FET\n  compressor, playback gain control, bass and clarity enhancers, field/differential surround,\n  headphone surround, reverb, dynamic system (103 headphone profiles), tube simulator, analog\n  coloration, crossfeed, output gain/balance/limiter.\n- **Made for speakers too**: speaker correction (phone, tablet, laptop, Bluetooth, car and TV\n  profiles), **measure your own speaker** with the phone's microphone and get a correction fitted\n  to it, speaker protection (an excursion limiter that holds back bass a small driver can't\n  play, or limited at each band's measured distortion point) and speaker widening (crosstalk\n  cancellation for closely spaced speakers, following how the device is held).\n- **Blind test**: a built-in ABX test, loudness-matched and time-aligned, to check whether you\n  really hear an effect.\n- **Measured, not claimed**: every effect's measured response, distortion and loudness change\n  ships in the app and with each release.\n- **Per-device profiles** that switch automatically for speaker, wired, every Bluetooth device\n  and USB DAC; JSON presets with import/export.\n- **Live status**: see whether the engine is registered, attached and processing, with a\n  built-in test tone and a copyable diagnostics report.\n- **Robust engine**: any channel layout (1–28 ch), PCM 16/24/32-bit, 8.24 and float, saturating\n  output (no wrap-around crackle), real-time-safe locking, bounds-checked commands; arm, arm64,\n  x86, x86_64, 16 KB pages.\n- **Self-healing**: re-attaches after audioserver restarts and re-uploads impulse responses when\n  the output sample rate changes.\n- **Private**: no ads, no analytics, no network permission. The microphone is only used when\n  you measure a speaker, and the recording never leaves memory.\n\n## Install\n\nDownload both files from the [latest release](https://github.com/xeloria/ResonanceFX/releases/latest).\n\n1. Flash `ResonanceFX-<version>.zip` in Magisk, KernelSU or APatch and reboot.\n2. Install `ResonanceFX.apk`, open it and turn effects on.\n3. The **Status** tab confirms: engine registered → attached → stream accepted → processing.\n\nIf the engine doesn't load, tap the module's **Action** button in your root manager: it\nre-patches every config, re-applies mounts, restarts the audio services and prints what it found.\nLogs: `/data/adb/resonancefx/logs/` (`install.log`, `boot.log`, `logcat.txt`, `action.log`).\nAfter every boot the module description shows a ✅/⚠️/❌ verdict, confirmed against the audio\nHAL's list of registered effects.\n\n## How the module loads reliably\n\n- Finds every `audio_effects*.xml|.conf` (HIDL, AIDL `audio_effects_config.xml`, SKU variants,\n  vendor-specific names) on `/odm`, `/vendor`, `/system_ext`, `/product`, `/my_product`,\n  `/mi_ext` (and `/system` on Android 7 and older), and adds the effect to all of them: which\n  files a HAL loads is vendor-specific.\n- Re-generates the patched copies from the *current* stock files on every boot, so OTA updates\n  never leave stale configs.\n- Patching is idempotent and tolerant: removes stale entries, handles inline and self-closing\n  `<libraries/>`, ignores commented-out tags, reuses the soundfx path in legacy `.conf` files.\n- Uses the root manager's own overlay first, verifies after mounting and bind-mounts only what's\n  missing, with SELinux labels copied from the originals.\n- Installs the 32-bit engine too when the device has 32-bit userspace (many 64-bit phones still\n  run a 32-bit audio HAL).\n\n## Build\n\nRequirements: Android SDK with NDK 27+, CMake 3.22+, JDK 21; Linux/WSL g++ for engine tests.\n\n```sh\nscripts/build-engine.sh                  # out/engine/<abi>/libresonancefx.so\nscripts/build-module.sh                  # out/ResonanceFX-<version>.zip\n(cd app && ./gradlew assembleRelease)    # app/app/build/outputs/apk/release/\n\ntests/test-patch.sh                      # config patcher (add \"busybox sh\" to run under busybox)\ntests/run-engine-tests.sh                # engine through AELI with ASan/UBSan (Linux/WSL)\ntests/measure-engine.sh                  # per-effect measurements (Linux/WSL)\ntests/emulator-test.sh                   # end to end on a rooted emulator/device over adb\n(cd app && ./gradlew testDebugUnitTest lintDebug)\n```\n\nRelease APKs are signed with the key given in `RFX_KEYSTORE`, `RFX_KEYSTORE_PASSWORD`,\n`RFX_KEY_ALIAS` and `RFX_KEY_PASSWORD`; without them the debug key is used. Pushing a `v*` tag\nbuilds the module and app on GitHub Actions and publishes a release (see\n[`CONTRIBUTING.md`](CONTRIBUTING.md#releases)).\n\n## Layout\n\n- `engine/` — engine (`src/android/` effect glue, `src/core/` DSP core, `src/fx/` effects),\n  `engine/tests/` host harness\n- `module/` — root module scripts (`common.sh` holds all logic)\n- `app/` — Android app (Kotlin, Jetpack Compose)\n- `docs/` — licensing notes\n- `.github/` — CI, release workflow, issue templates\n- `tests/` — patcher fixtures and test runners\n\n## License\n\nGPL-3.0-or-later. See [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) for third-party data\nattributions, and [`docs/LICENSING.md`](docs/LICENSING.md) for how the engine was written.\n",
+  "readmeHTML": "<h1>ResonanceFX</h1>\n\n<p>Created by <b>Xeloria</b>.</p>\n\n<p>A free and open-source, privacy-respecting system-wide audio effects suite for rooted Android:</p>\n<p>a hardened DSP engine, a universal root module that installs it on any Android 5+ device, and a</p>\n<p>modern Material You app.</p>\n\n<h2>Highlights</h2>\n\n<li>**28 effect modules**: 10-band equalizer (56 presets), 15/31-band graphic EQ, parametric EQ</li>\n<p>  (up to 32 bands), AutoEQ (thousands of headphones), loudness compensation (ISO 226, follows</p>\n<p>  the volume), multiband compressor, dynamic EQ, de-esser, vocals & ambience (centre</p>\n<p>  extraction), spatial audio (MIT KEMAR HRTF, head tracking on Android 13+), convolver (impulse responses,</p>\n<p>  auto-resampled to the live output rate), headphone correction (<code>.vdc</code> profiles), FET</p>\n<p>  compressor, playback gain control, bass and clarity enhancers, field/differential surround,</p>\n<p>  headphone surround, reverb, dynamic system (103 headphone profiles), tube simulator, analog</p>\n<p>  coloration, crossfeed, output gain/balance/limiter.</p>\n<li>**Made for speakers too**: speaker correction (phone, tablet, laptop, Bluetooth, car and TV</li>\n<p>  profiles), <b>measure your own speaker</b> with the phone's microphone and get a correction fitted</p>\n<p>  to it, speaker protection (an excursion limiter that holds back bass a small driver can't</p>\n<p>  play, or limited at each band's measured distortion point) and speaker widening (crosstalk</p>\n<p>  cancellation for closely spaced speakers, following how the device is held).</p>\n<li>**Blind test**: a built-in ABX test, loudness-matched and time-aligned, to check whether you</li>\n<p>  really hear an effect.</p>\n<li>**Measured, not claimed**: every effect's measured response, distortion and loudness change</li>\n<p>  ships in the app and with each release.</p>\n<li>**Per-device profiles** that switch automatically for speaker, wired, every Bluetooth device</li>\n<p>  and USB DAC; JSON presets with import/export.</p>\n<li>**Live status**: see whether the engine is registered, attached and processing, with a</li>\n<p>  built-in test tone and a copyable diagnostics report.</p>\n<li>**Robust engine**: any channel layout (1–28 ch), PCM 16/24/32-bit, 8.24 and float, saturating</li>\n<p>  output (no wrap-around crackle), real-time-safe locking, bounds-checked commands; arm, arm64,</p>\n<p>  x86, x86_64, 16 KB pages.</p>\n<li>**Self-healing**: re-attaches after audioserver restarts and re-uploads impulse responses when</li>\n<p>  the output sample rate changes.</p>\n<li>**Private**: no ads, no analytics, no network permission. The microphone is only used when</li>\n<p>  you measure a speaker, and the recording never leaves memory.</p>\n\n<h2>Install</h2>\n\n<p>Download both files from the <a href=\"https://github.com/xeloria/ResonanceFX/releases/latest\">latest release</a>.</p>\n\n<li>Flash `ResonanceFX-<version>.zip` in Magisk, KernelSU or APatch and reboot.</li>\n<li>Install `ResonanceFX.apk`, open it and turn effects on.</li>\n<li>The **Status** tab confirms: engine registered → attached → stream accepted → processing.</li>\n\n<p>If the engine doesn't load, tap the module's <b>Action</b> button in your root manager: it</p>\n<p>re-patches every config, re-applies mounts, restarts the audio services and prints what it found.</p>\n<p>Logs: <code>/data/adb/resonancefx/logs/</code> (<code>install.log</code>, <code>boot.log</code>, <code>logcat.txt</code>, <code>action.log</code>).</p>\n<p>After every boot the module description shows a ✅/⚠️/❌ verdict, confirmed against the audio</p>\n<p>HAL's list of registered effects.</p>\n\n<h2>How the module loads reliably</h2>\n\n<li>Finds every `audio_effects*.xml|.conf` (HIDL, AIDL `audio_effects_config.xml`, SKU variants,</li>\n<p>  vendor-specific names) on <code>/odm</code>, <code>/vendor</code>, <code>/system_ext</code>, <code>/product</code>, <code>/my_product</code>,</p>\n<p>  <code>/mi_ext</code> (and <code>/system</code> on Android 7 and older), and adds the effect to all of them: which</p>\n<p>  files a HAL loads is vendor-specific.</p>\n<li>Re-generates the patched copies from the *current* stock files on every boot, so OTA updates</li>\n<p>  never leave stale configs.</p>\n<li>Patching is idempotent and tolerant: removes stale entries, handles inline and self-closing</li>\n<p>  <code><libraries/></code>, ignores commented-out tags, reuses the soundfx path in legacy <code>.conf</code> files.</p>\n<li>Uses the root manager's own overlay first, verifies after mounting and bind-mounts only what's</li>\n<p>  missing, with SELinux labels copied from the originals.</p>\n<li>Installs the 32-bit engine too when the device has 32-bit userspace (many 64-bit phones still</li>\n<p>  run a 32-bit audio HAL).</p>\n\n<h2>Build</h2>\n\n<p>Requirements: Android SDK with NDK 27+, CMake 3.22+, JDK 21; Linux/WSL g++ for engine tests.</p>\n\n<pre>scripts/build-engine.sh                  # out/engine/&lt;abi&gt;/libresonancefx.so\nscripts/build-module.sh                  # out/ResonanceFX-&lt;version&gt;.zip\n(cd app &amp;&amp; ./gradlew assembleRelease)    # app/app/build/outputs/apk/release/\n\ntests/test-patch.sh                      # config patcher (add \"busybox sh\" to run under busybox)\ntests/run-engine-tests.sh                # engine through AELI with ASan/UBSan (Linux/WSL)\ntests/measure-engine.sh                  # per-effect measurements (Linux/WSL)\ntests/emulator-test.sh                   # end to end on a rooted emulator/device over adb\n(cd app &amp;&amp; ./gradlew testDebugUnitTest lintDebug)</pre>\n\n<p>Release APKs are signed with the key given in <code>RFX_KEYSTORE</code>, <code>RFX_KEYSTORE_PASSWORD</code>,</p>\n<p><code>RFX_KEY_ALIAS</code> and <code>RFX_KEY_PASSWORD</code>; without them the debug key is used. Pushing a <code>v*</code> tag</p>\n<p>builds the module and app on GitHub Actions and publishes a release (see</p>\n<p><a href=\"CONTRIBUTING.md#releases\"><code>CONTRIBUTING.md</code></a>).</p>\n\n<h2>Layout</h2>\n\n<li>`engine/` — engine (`src/android/` effect glue, `src/core/` DSP core, `src/fx/` effects),</li>\n<p>  <code>engine/tests/</code> host harness</p>\n<li>`module/` — root module scripts (`common.sh` holds all logic)</li>\n<li>`app/` — Android app (Kotlin, Jetpack Compose)</li>\n<li>`docs/` — licensing notes</li>\n<li>`.github/` — CI, release workflow, issue templates</li>\n<li>`tests/` — patcher fixtures and test runners</li>\n\n<h2>License</h2>\n\n<p>GPL-3.0-or-later. See <a href=\"LICENSE\"><code>LICENSE</code></a>, <a href=\"NOTICE\"><code>NOTICE</code></a> for third-party data</p>\n<p>attributions, and <a href=\"docs/LICENSING.md\"><code>docs/LICENSING.md</code></a> for how the engine was written.</p>",
+  "homepageUrl": "https://github.com/xeloria/ResonanceFX",
+  "sourceUrl": "https://github.com/xeloria/ResonanceFX",
+  "url": "https://github.com/xeloria/ResonanceFX",
+  "latestRelease": {
+    "name": "2.2.0",
+    "version": "2.2.0",
+    "time": "2026-10-30T23:48:14Z",
+    "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.2.0/ResonanceFX-v2.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "2.2.0",
+      "tagName": "2.2.0",
+      "publishedAt": "2026-10-30T23:48:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ResonanceFX-v2.2.0.apk",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.2.0/ResonanceFX-v2.2.0.apk",
+          "size": 2143832,
+          "downloadCount": 2
+        },
+        {
+          "name": "ResonanceFX-v2.2.0.zip",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.2.0/ResonanceFX-v2.2.0.zip",
+          "size": 881791,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.2.0/SHA256SUMS.txt",
+          "size": 180,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "2.1.0",
+      "tagName": "2.1.0",
+      "publishedAt": "2026-10-23T23:03:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ResonanceFX-v2.1.0.apk",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.1.0/ResonanceFX-v2.1.0.apk",
+          "size": 2105544,
+          "downloadCount": 78
+        },
+        {
+          "name": "ResonanceFX-v2.1.0.zip",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.1.0/ResonanceFX-v2.1.0.zip",
+          "size": 855075,
+          "downloadCount": 72
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.1.0/SHA256SUMS.txt",
+          "size": 178,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "2.0.0",
+      "tagName": "2.0.0",
+      "publishedAt": "2026-10-19T01:54:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ResonanceFX-v2.0.0.apk",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.0.0/ResonanceFX-v2.0.0.apk",
+          "size": 2089132,
+          "downloadCount": 39
+        },
+        {
+          "name": "ResonanceFX-v2.0.0.zip",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.0.0/ResonanceFX-v2.0.0.zip",
+          "size": 833667,
+          "downloadCount": 37
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/xeloria/ResonanceFX/releases/download/2.0.0/SHA256SUMS.txt",
+          "size": 178,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "readme": "# Beszel Agent Magisk Module\n\nRuns [beszel-agent](https://github.com/henrygd/beszel) as a systemless service on Android via Magisk, KernelSU or another modern root solution. \n\nTo keep the module lightweight and always up-to-date, binaries are not bundled. The installer automatically detects your device's architecture and downloads the latest official `beszel-agent` release directly from GitHub during installation.\n\n## Requirements\n\n- **Magisk v28.0+**, **KernelSU**, or **APatch**\n- Device ABI: `arm64-v8a`, `armeabi-v7a`, `x86_64`, or `x86`\n- **An active internet connection** during module installation (to download the agent binary)\n- A reachable Beszel Hub and valid agent credentials (`KEY`, `TOKEN`, `HUB_URL`)\n\n## Install\n\n1. *(Optional but recommended)* Download the `beszel.txt` template from the latest release, fill in your credentials, and place it in your internal storage (`/sdcard/beszel.txt`) **before** installation.\n2. Flash `beszel-agent-magisk-vX.Y.Z.zip` in your root manager (Modules → Install from storage). \n   *(The installer will automatically fetch the correct binary for your architecture and copy the config if found).*\n3. If you didn't use step 1, manually edit the config:\n   ```text\n   /data/adb/beszel-agent/.env\n   ```\n   ```env\n   KEY=ssh-ed25519 AAAA...\n   TOKEN=your-token\n   HUB_URL=http://your-hub:8090\n   ```\n4. Reboot your device. The agent starts automatically after `sys.boot_completed`.\n\n## Action Button (Update & Restart)\n\nThe module includes an **Action** button in the Magisk/KernelSU manager interface. Pressing it will:\n1. Check the GitHub API for a newer version of `beszel-agent`.\n2. If an update is available, it safely stops the current agent, downloads, and replaces the binary.\n3. Restarts the agent with the new binary (or simply restarts it if no update was found).\n4. Display the last few lines of the log to confirm successful startup.\n\n## Architecture Selection\n\nHandled dynamically in `customize.sh` at install time. The script maps the manager's `$ARCH` variable to the official Beszel release assets:\n\n| Manager `$ARCH` | Typical ABIs                      | Beszel Asset Downloaded           |\n|-----------------|-----------------------------------|-----------------------------------|\n| `arm64`         | `arm64-v8a`, `aarch64`            | `beszel-agent_linux_arm64.tar.gz` |\n| `arm`           | `armeabi-v7a`, `armv7l`, `armv8l` | `beszel-agent_linux_armv7.tar.gz` |\n| `x64`           | `x86_64`, `amd64`                 | `beszel-agent_linux_amd64.tar.gz` |\n| `x86`           | `i386`, `i686`                    | `beszel-agent_linux_amd64.tar.gz` *(fallback)* |\n| `riscv64`       | `riscv64`                         | `beszel-agent_linux_riscv64.tar.gz` |\n\n## Runtime Behavior\n\n`service.sh` runs in the `late_start` (non-blocking) stage:\n\n1. Waits for `sys.boot_completed` to ensure the system is fully ready.\n2. Parses `KEY`, `TOKEN`, and `HUB_URL` from `/data/adb/beszel-agent/.env`.\n3. Sets `HOME=/data/adb/beszel-agent` to ensure the agent can persist its fingerprint and state files without permission issues on Android.\n4. Spawns the agent directly in the background.\n\n**Important:** The agent's state (fingerprint) is stored in `/data/adb/beszel-agent/`. Because this directory is outside the module's mount point, your agent identity persists seamlessly across module updates and reboots, preventing \"fingerprint mismatch\" errors on the Hub.\n\n- **Config:** `/data/adb/beszel-agent/.env`\n- **Logs:** `/data/adb/beszel-agent/beszel-agent.log`\n- **Boot Log:** `/data/adb/beszel-agent/boot.log`\n- **PID File:** `/data/adb/beszel-agent/beszel-agent.pid`\n\n## Project Layout\n\n```text\nmodule/\n  module.prop\n  customize.sh          # Arch detection, version check, and dynamic binary download\n  service.sh            # late_start launcher\n  post-fs-data.sh       # Early boot directory preparation\n  action.sh             # Update checker and manual restart handler\n  uninstall.sh          # Cleanup script\n  .env.example          # Configuration template\n  bin/                  # Populated at install time\n```\n\n## License\n\nThis Magisk module packaging is released under the **AGPL-3.0 license** (see [LICENSE](LICENSE)).\n\nUpstream `beszel-agent` binaries are dynamically downloaded from [henrygd/beszel](https://github.com/henrygd/beszel) and remain under that project’s original license (MIT).\n",
+  "readmeHTML": "<h1>Beszel Agent Magisk Module</h1>\n\n<p>Runs <a href=\"https://github.com/henrygd/beszel\">beszel-agent</a> as a systemless service on Android via Magisk, KernelSU or another modern root solution.</p>\n\n<p>To keep the module lightweight and always up-to-date, binaries are not bundled. The installer automatically detects your device's architecture and downloads the latest official <code>beszel-agent</code> release directly from GitHub during installation.</p>\n\n<h2>Requirements</h2>\n\n<li>**Magisk v28.0+**, **KernelSU**, or **APatch**</li>\n<li>Device ABI: `arm64-v8a`, `armeabi-v7a`, `x86_64`, or `x86`</li>\n<li>**An active internet connection** during module installation (to download the agent binary)</li>\n<li>A reachable Beszel Hub and valid agent credentials (`KEY`, `TOKEN`, `HUB_URL`)</li>\n\n<h2>Install</h2>\n\n<li>*(Optional but recommended)* Download the `beszel.txt` template from the latest release, fill in your credentials, and place it in your internal storage (`/sdcard/beszel.txt`) **before** installation.</li>\n<li>Flash `beszel-agent-magisk-vX.Y.Z.zip` in your root manager (Modules → Install from storage).</li>\n<p>   *(The installer will automatically fetch the correct binary for your architecture and copy the config if found).*</p>\n<li>If you didn't use step 1, manually edit the config:</li>\n<p>   ```text</p>\n<p>   /data/adb/beszel-agent/.env</p>\n<p>   ```</p>\n<p>   ```env</p>\n<p>   KEY=ssh-ed25519 AAAA...</p>\n<p>   TOKEN=your-token</p>\n<p>   HUB_URL=http://your-hub:8090</p>\n<p>   ```</p>\n<li>Reboot your device. The agent starts automatically after `sys.boot_completed`.</li>\n\n<h2>Action Button (Update & Restart)</h2>\n\n<p>The module includes an <b>Action</b> button in the Magisk/KernelSU manager interface. Pressing it will:</p>\n<li>Check the GitHub API for a newer version of `beszel-agent`.</li>\n<li>If an update is available, it safely stops the current agent, downloads, and replaces the binary.</li>\n<li>Restarts the agent with the new binary (or simply restarts it if no update was found).</li>\n<li>Display the last few lines of the log to confirm successful startup.</li>\n\n<h2>Architecture Selection</h2>\n\n<p>Handled dynamically in <code>customize.sh</code> at install time. The script maps the manager's <code>$ARCH</code> variable to the official Beszel release assets:</p>\n\n<p>| Manager <code>$ARCH</code> | Typical ABIs                      | Beszel Asset Downloaded           |</p>\n<p>|-----------------|-----------------------------------|-----------------------------------|</p>\n<p>| <code>arm64</code>         | <code>arm64-v8a</code>, <code>aarch64</code>            | <code>beszel-agent_linux_arm64.tar.gz</code> |</p>\n<p>| <code>arm</code>           | <code>armeabi-v7a</code>, <code>armv7l</code>, <code>armv8l</code> | <code>beszel-agent_linux_armv7.tar.gz</code> |</p>\n<p>| <code>x64</code>           | <code>x86_64</code>, <code>amd64</code>                 | <code>beszel-agent_linux_amd64.tar.gz</code> |</p>\n<p>| <code>x86</code>           | <code>i386</code>, <code>i686</code>                    | <code>beszel-agent_linux_amd64.tar.gz</code> *(fallback)* |</p>\n<p>| <code>riscv64</code>       | <code>riscv64</code>                         | <code>beszel-agent_linux_riscv64.tar.gz</code> |</p>\n\n<h2>Runtime Behavior</h2>\n\n<p><code>service.sh</code> runs in the <code>late_start</code> (non-blocking) stage:</p>\n\n<li>Waits for `sys.boot_completed` to ensure the system is fully ready.</li>\n<li>Parses `KEY`, `TOKEN`, and `HUB_URL` from `/data/adb/beszel-agent/.env`.</li>\n<li>Sets `HOME=/data/adb/beszel-agent` to ensure the agent can persist its fingerprint and state files without permission issues on Android.</li>\n<li>Spawns the agent directly in the background.</li>\n\n<p><b>Important:</b> The agent's state (fingerprint) is stored in <code>/data/adb/beszel-agent/</code>. Because this directory is outside the module's mount point, your agent identity persists seamlessly across module updates and reboots, preventing \"fingerprint mismatch\" errors on the Hub.</p>\n\n<li>**Config:** `/data/adb/beszel-agent/.env`</li>\n<li>**Logs:** `/data/adb/beszel-agent/beszel-agent.log`</li>\n<li>**Boot Log:** `/data/adb/beszel-agent/boot.log`</li>\n<li>**PID File:** `/data/adb/beszel-agent/beszel-agent.pid`</li>\n\n<h2>Project Layout</h2>\n\n<pre>module/\n  module.prop\n  customize.sh          # Arch detection, version check, and dynamic binary download\n  service.sh            # late_start launcher\n  post-fs-data.sh       # Early boot directory preparation\n  action.sh             # Update checker and manual restart handler\n  uninstall.sh          # Cleanup script\n  .env.example          # Configuration template\n  bin/                  # Populated at install time</pre>\n\n<h2>License</h2>\n\n<p>This Magisk module packaging is released under the <b>AGPL-3.0 license</b> (see <a href=\"LICENSE\">LICENSE</a>).</p>\n\n<p>Upstream <code>beszel-agent</code> binaries are dynamically downloaded from <a href=\"https://github.com/henrygd/beszel\">henrygd/beszel</a> and remain under that project’s original license (MIT).</p>",
+  "homepageUrl": "https://github.com/LordArrin/beszel-agent-magisk",
+  "sourceUrl": "https://github.com/LordArrin/beszel-agent-magisk",
+  "url": "https://github.com/LordArrin/beszel-agent-magisk",
+  "latestRelease": {
+    "name": "v1.2.4",
+    "version": "v1.2.4",
+    "time": "2026-09-29T02:40:21Z",
+    "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/v1.2.4/beszel-agent-magisk-v1.2.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2026-09-29T02:40:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "beszel-agent-magisk-v1.2.4.zip",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/v1.2.4/beszel-agent-magisk-v1.2.4.zip",
+          "size": 8352,
+          "downloadCount": 4
+        },
+        {
+          "name": "beszel.txt",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/v1.2.4/beszel.txt",
+          "size": 609,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.2.3",
+      "tagName": "v1.2.3",
+      "publishedAt": "2026-09-29T02:31:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "beszel-agent-magisk-v1.2.3.zip",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/v1.2.3/beszel-agent-magisk-v1.2.3.zip",
+          "size": 7976,
+          "downloadCount": 1
+        },
+        {
+          "name": "beszel.txt",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/v1.2.3/beszel.txt",
+          "size": 609,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "@1",
+      "tagName": "@1",
+      "publishedAt": "2026-09-27T01:18:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "1.0.0.zip",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/%401/1.0.0.zip",
+          "size": 4349,
+          "downloadCount": 0
+        },
+        {
+          "name": "beszel.txt",
+          "downloadUrl": "https://github.com/LordArrin/beszel-agent-magisk/releases/download/%401/beszel.txt",
+          "size": 819,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

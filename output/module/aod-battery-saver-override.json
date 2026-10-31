@@ -1,0 +1,117 @@
+{
+  "readme": "# AOD Battery Saver Override\n\nA script-only KernelSU / Magisk module that keeps Always On Display available while Battery Saver is enabled.\n\n## How it works\n\nAfter boot, the module sets `disable_aod=false` in Android's global `battery_saver_constants` setting and in the `battery_saver` DeviceConfig namespace. It also adds a local DeviceConfig override. It preserves the other policy entries and leaves Battery Saver enabled. Some ROMs clear `battery_saver_constants` when Battery Saver turns off; DeviceConfig synchronization can remove an ordinary flag value. The override protects against those updates, while writing the ordinary flag notifies Android's Battery Saver policy listener. It does not turn AOD on: enable AOD in your phone's settings.\n\nNo Zygisk, LSPosed, APK, system mounts, or resident process is required. The shared `service.sh` entry point waits for boot completion, applies the policy once, and exits. It supports KernelSU, KernelSU Next, and Magisk.\n\nThe ROM must honor the AOSP `disable_aod` policy. Tested on a POCO F5 running Android 17 (SDK 37): the effective policy remained `disable_aod=false` through Battery Saver toggles, while other saver restrictions stayed active. An explicit `disable_aod=true` in the global setting takes precedence over DeviceConfig if another writer adds it after boot. The module reapplies the global setting at boot, not continuously.\n\n## Install\n\n1. Enable AOD in Android settings.\n2. Install the module ZIP from KernelSU or Magisk's **Modules** page.\n3. Reboot.\n\nInstall through the root manager, not recovery. No KernelSU mounting metamodule is needed.\n\n### Migrating from 0.1.x\n\nDisable or uninstall the old `dev.mirsella.aodsaveroverride` Xposed APK, install this ZIP, and reboot to unload its hook. Version 0.2.0 replaces the APK architecture entirely. Keep LSPosed or Zygisk installed if other modules need them.\n\nIf you previously set `disable_aod=false` manually, restore your original AOD policy before the first module boot. Otherwise, the module correctly records `false` as the value to restore later.\n\n## Restore or uninstall\n\nUse the module's **Action** button to restore the previous global policy, DeviceConfig value, and local override, then disable the module. Re-enable it in the manager and reboot to apply again.\n\nSimply switching the module off prevents its boot script from running but does not undo the persistent Android settings. Use **Action** when you want to undo them.\n\nUninstall also restores the previous AOD entry, DeviceConfig value, and local override, preserving changes to other policy entries. If another writer has already changed one of these away from the module's value, it leaves that change alone. When removal happens early in boot, a short-lived background task waits for Android before restoring them; it times out after six minutes.\n\nThe original global policy, DeviceConfig value, and local override are saved once in `/data/adb/aod-battery-saver-override/`, outside the module directory so updates retain them. Successful uninstall removes this backup. If Android never finishes booting or restoration fails, the backup remains for recovery. Logs use the `AodSaverOverride` logcat tag.\n\n## Build and check\n\nBuilding needs a POSIX shell and `zip`. Checks also need ShellCheck. No SDK, Gradle, signing key, or secrets are required.\n\n```sh\nsh tests/policy.sh\nshellcheck -x -s sh module/*.sh scripts/*.sh tests/*.sh\nsh scripts/build.sh\n```\n\nOr use `just check` and `just build`.\n\nOutput: `dist/aod-battery-saver-override-0.2.1.zip`. GitHub Actions runs the same checks and uploads the ZIP as an artifact.\n",
+  "readmeHTML": "<h1>AOD Battery Saver Override</h1>\n\n<p>A script-only KernelSU / Magisk module that keeps Always On Display available while Battery Saver is enabled.</p>\n\n<h2>How it works</h2>\n\n<p>After boot, the module sets <code>disable_aod=false</code> in Android's global <code>battery_saver_constants</code> setting and in the <code>battery_saver</code> DeviceConfig namespace. It also adds a local DeviceConfig override. It preserves the other policy entries and leaves Battery Saver enabled. Some ROMs clear <code>battery_saver_constants</code> when Battery Saver turns off; DeviceConfig synchronization can remove an ordinary flag value. The override protects against those updates, while writing the ordinary flag notifies Android's Battery Saver policy listener. It does not turn AOD on: enable AOD in your phone's settings.</p>\n\n<p>No Zygisk, LSPosed, APK, system mounts, or resident process is required. The shared <code>service.sh</code> entry point waits for boot completion, applies the policy once, and exits. It supports KernelSU, KernelSU Next, and Magisk.</p>\n\n<p>The ROM must honor the AOSP <code>disable_aod</code> policy. Tested on a POCO F5 running Android 17 (SDK 37): the effective policy remained <code>disable_aod=false</code> through Battery Saver toggles, while other saver restrictions stayed active. An explicit <code>disable_aod=true</code> in the global setting takes precedence over DeviceConfig if another writer adds it after boot. The module reapplies the global setting at boot, not continuously.</p>\n\n<h2>Install</h2>\n\n<li>Enable AOD in Android settings.</li>\n<li>Install the module ZIP from KernelSU or Magisk's **Modules** page.</li>\n<li>Reboot.</li>\n\n<p>Install through the root manager, not recovery. No KernelSU mounting metamodule is needed.</p>\n\n<h3>Migrating from 0.1.x</h3>\n\n<p>Disable or uninstall the old <code>dev.mirsella.aodsaveroverride</code> Xposed APK, install this ZIP, and reboot to unload its hook. Version 0.2.0 replaces the APK architecture entirely. Keep LSPosed or Zygisk installed if other modules need them.</p>\n\n<p>If you previously set <code>disable_aod=false</code> manually, restore your original AOD policy before the first module boot. Otherwise, the module correctly records <code>false</code> as the value to restore later.</p>\n\n<h2>Restore or uninstall</h2>\n\n<p>Use the module's <b>Action</b> button to restore the previous global policy, DeviceConfig value, and local override, then disable the module. Re-enable it in the manager and reboot to apply again.</p>\n\n<p>Simply switching the module off prevents its boot script from running but does not undo the persistent Android settings. Use <b>Action</b> when you want to undo them.</p>\n\n<p>Uninstall also restores the previous AOD entry, DeviceConfig value, and local override, preserving changes to other policy entries. If another writer has already changed one of these away from the module's value, it leaves that change alone. When removal happens early in boot, a short-lived background task waits for Android before restoring them; it times out after six minutes.</p>\n\n<p>The original global policy, DeviceConfig value, and local override are saved once in <code>/data/adb/aod-battery-saver-override/</code>, outside the module directory so updates retain them. Successful uninstall removes this backup. If Android never finishes booting or restoration fails, the backup remains for recovery. Logs use the <code>AodSaverOverride</code> logcat tag.</p>\n\n<h2>Build and check</h2>\n\n<p>Building needs a POSIX shell and <code>zip</code>. Checks also need ShellCheck. No SDK, Gradle, signing key, or secrets are required.</p>\n\n<pre>sh tests/policy.sh\nshellcheck -x -s sh module/*.sh scripts/*.sh tests/*.sh\nsh scripts/build.sh</pre>\n\n<p>Or use <code>just check</code> and <code>just build</code>.</p>\n\n<p>Output: <code>dist/aod-battery-saver-override-0.2.1.zip</code>. GitHub Actions runs the same checks and uploads the ZIP as an artifact.</p>",
+  "homepageUrl": "https://github.com/mirsella/aod-battery-saver-override/issues",
+  "sourceUrl": "https://github.com/mirsella/aod-battery-saver-override",
+  "url": "https://github.com/mirsella/aod-battery-saver-override",
+  "latestRelease": {
+    "name": "6-0.2.1",
+    "version": "6-0.2.1",
+    "time": "2026-09-23T20:06:58Z",
+    "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/6-0.2.1/aod-battery-saver-override-0.2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "6-0.2.1",
+      "tagName": "6-0.2.1",
+      "publishedAt": "2026-09-23T20:06:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-0.2.1.zip",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/6-0.2.1/aod-battery-saver-override-0.2.1.zip",
+          "size": 9787,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "5-0.2.0",
+      "tagName": "5-0.2.0",
+      "publishedAt": "2026-09-22T12:39:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-0.2.0.zip",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/5-0.2.0/aod-battery-saver-override-0.2.0.zip",
+          "size": 8854,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "4-0.1.3",
+      "tagName": "4-0.1.3",
+      "publishedAt": "2026-09-22T10:02:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-debug.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/4-0.1.3/aod-battery-saver-override-debug.apk",
+          "size": 2440885,
+          "downloadCount": 0
+        },
+        {
+          "name": "aod-battery-saver-override-release.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/4-0.1.3/aod-battery-saver-override-release.apk",
+          "size": 2101589,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "3-0.1.2",
+      "tagName": "3-0.1.2",
+      "publishedAt": "2026-09-22T09:19:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-debug.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/3-0.1.2/aod-battery-saver-override-debug.apk",
+          "size": 2440721,
+          "downloadCount": 0
+        },
+        {
+          "name": "aod-battery-saver-override-release.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/3-0.1.2/aod-battery-saver-override-release.apk",
+          "size": 2101429,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "1-0.1.1",
+      "tagName": "1-0.1.1",
+      "publishedAt": "2026-04-12T20:42:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-debug.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/1-0.1.1/aod-battery-saver-override-debug.apk",
+          "size": 2440717,
+          "downloadCount": 30
+        },
+        {
+          "name": "aod-battery-saver-override-release.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/1-0.1.1/aod-battery-saver-override-release.apk",
+          "size": 2101429,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "1-0.1.0",
+      "tagName": "1-0.1.0",
+      "publishedAt": "2026-03-23T09:00:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "aod-battery-saver-override-release.apk",
+          "downloadUrl": "https://github.com/mirsella/aod-battery-saver-override/releases/download/1-0.1.0/aod-battery-saver-override-release.apk",
+          "size": 2102197,
+          "downloadCount": 17
+        }
+      ]
+    }
+  ]
+}

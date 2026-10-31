@@ -1,0 +1,355 @@
+{
+  "readme": "# MTB Tool — Magisk / KernelSU Module\n\n> EFS NV manager for Xiaomi Qualcomm modems as a Magisk/KernelSU module.\n> Port of [h3nnes/mtbtool-android-app](https://github.com/h3nnes/mtbtool-android-app) (MIT) —\n> the original Android app is preserved in [`app/`](app/) for reference and attribution.\n\nManage modem EFS NV items directly from a module WebUI: read/write/delete NV\nitems, bulk import, band lock (LTE / NR NSA / NR SA), disable modem features,\nlive cell monitor, and one-tap emergency restore. No APK needed — the module\ntalks to the Qualcomm vendor tool `/vendor/bin/mtb` that already exists on\nsupported devices.\n\n**The module does NOT bundle or overwrite `/vendor/bin/mtb`.** If your device\ndoes not ship it, the module refuses to install (customize.sh check).\n\n| | |\n|---|---|\n| **WebUI** | Svelte 5 + TypeScript + Vite, Linear-inspired dark theme (see [frontend/DESIGN.md](frontend/DESIGN.md)) |\n| **Backend** | `mtbctl` — single Rust binary (validation, backups, masking, RPC) |\n| **Root** | KernelSU (native WebUI `exec`) · Magisk (WebUI host with exec bridge, e.g. WebUI X) |\n| **Storage** | `/data/adb/mtbtool` (config + backups) |\n| **Target** | POCO F6 (HyperOS, Qualcomm modem), Android 13+, arm64 |\n\n---\n\n## Features\n\n- **Dashboard** — compatibility probe (`/vendor/bin/mtb` presence, model, Android), quick actions, danger notice.\n- **Band lock** — detect hardware-supported bands via modem DIAG, or configure\n  bands manually; build the LTE / NR NSA / NR SA masks, preview old → new bytes,\n  apply with two-step confirmation, restart modem. NOTE: on peridot (POCO F6)\n  the DIAG request format returns an 11-byte response that cannot be decoded —\n  band detection reports \"unsupported\" and manual configuration is used\n  instead (no fallback guessing).\n- **Modem features** — disable/restore 12 known NR features (UL Tx switching,\n  UL MIMO, NR CA, DSS, segmentation, …) with original-value restore, plus the\n  5G mode selector (SA/NSA / NSA only / SA only).\n- **NV read / import** — read any NV item as a colour-coded hex dump; bulk-import\n  the JSON format from the original app (`sim0`/`sim1`/`dualsim`, `op: w/d`)\n  with preview before applying.\n- **Cells** — live LTE/NR cell monitor (signal metrics + uplink TX power),\n  poll interval 1–30 s, stale-value suppression.\n- **Backups** — every write/delete is backed up first (`/data/adb/mtbtool/backups`)\n  with restore per backup and an emergency restore (module menu / `action.sh`).\n\n## Safety model\n\n1. **Never auto-applies** anything at boot — no band lock, no NV write. Changes\n   only happen when you press a button in the WebUI.\n2. **Backup before every write/delete.** A failed backup or a read error\n   aborts the operation (read errors are never mistaken for \"item absent\").\n   Band lock, features, and imports run as ONE transactional backup + apply\n   with verified rollback on any failure — a partial state is never left.\n3. **Preview + two-step confirmation** for destructive changes.\n4. **Backend validation** — the WebUI can only call the fixed\n   `mtbctl rpc --b64 <payload>` entry point: method allowlist, NV path\n   allowlist, SIM slot bounds, hex/size caps, band-number validation, a\n   single-writer lock, and backup-before-write. `ok` is only reported after\n   read-back verification. No shell interpolation ever reaches the backend.\n   There is no network API — no daemon, no port, no HTTP.\n5. **Emergency restore** — module menu action (volume-key confirmed)\n   restores the latest backup; success is only reported when every item\n   passes checksum verification and read-back comparison.\n6. Wrong band masks can cause connectivity loss until restored; the backups tab\n   is your undo button.\n\n## Requirements\n\n- Xiaomi device with Qualcomm modem and executable `/vendor/bin/mtb`\n  (checked at install time).\n- KernelSU / ReSukiSU / APatch / Magisk with module support.\n- arm64 (aarch64) only.\n\n## Install\n\n1. Download the release ZIP (`MTB-Tool-vX.Y.Z.zip` + verify `.sha256`).\n2. Install via your root manager (KernelSU Manager → modules → install from\n   storage, or Magisk → modules → install from storage).\n3. Open the module's **WebUI**:\n   - KernelSU/ReSukiSU/APatch: native module WebUI button — the official\n     `kernelsu` bridge package is bundled with the WebUI.\n   - Magisk: use a WebUI host that exposes a kernelsu-compatible exec bridge\n     (e.g. **WebUI X**). The bridge adapter is detected at startup and shown\n     in the Dashboard diagnostics panel; all mutation controls fail closed\n     until the bridge self-test (`mtbctl probe`) succeeds.\n4. Dashboard shows the compatibility probe; if `/vendor/bin/mtb` is missing\n   the module refuses to install in the first place.\n\n## Testing\n\n- `cargo test` (backend) + `npm test` (frontend) run in CI (`ci.yml`).\n- `tests/smoke.sh` runs `mtbctl` against `tests/fake-mtb.sh` — a\n  protocol-faithful simulation of `/vendor/bin/mtb` (one tagged byte per line,\n  `ASDIV DATA:`/`TX INFO:` cell lines, `rsp data:` DIAG payloads, absent-item =\n  exit 0 + empty, exactly as the original app's parsers expect).\n- **Debian ≠ Android.** The harness verifies logic, wire formats and the RPC bridge (RPC) — not the device. On-phone differences (toybox vs GNU tools, `getprop`,\n  real mtb output quirks per ROM) are handled defensively in code: empty/odd\n  output → item treated as absent, `getprop` failure → `unknown`, paths and\n  slots re-validated at the backend. Always test on your device before trusting\n  a release.\n\n## Emergency restore\n\n- **WebUI** — Backups tab → restore latest.\n- **Terminal / module menu** — the module's action (action.sh) restores the\n  latest backup automatically.\n\n## Uninstall\n\nRemoving the module keeps `/data/adb/mtbtool` (backups + config) untouched —\ndelete that directory manually for a full wipe.\n\n## Build from source\n\nAll builds run in GitHub Actions (no local toolchain needed for release):\n\n```bash\n# CI checks (cargo test + WebUI build/test)\n# auto-release: bump versionCode in module.prop on main → tag + release\n```\n\n```mermaid\nflowchart LR\n    W[WebUI Svelte 5] -->|exec rpc --b64| B[mtbctl Rust]\n    B -->|validation + backup + lock| M[/vendor/bin/mtb/]\n    M --> E[EFS NV modem]\n    B --> D[/data/adb/mtbtool/]\n```\n\n## Repository layout\n\n```\n├── app/            # original Android app (reference, not built)\n├── backend/        # mtbctl — Rust CLI + RPC layer\n├── frontend/       # Svelte 5 WebUI source (built only in GA → webroot/)\n│   └── DESIGN.md   # MTB Control design system (Linear-inspired)\n├── docs/design-md/ # vendored design references (VoltAgent/awesome-design-md)\n├── bin/            # release artifact (gitignored)\n├── webroot/        # WebUI build output (gitignored, built by GA)\n├── module.prop / customize.sh / action.sh / uninstall.sh\n├── tools/          # original import tools (nv_import_tool.py, format docs)\n└── .github/workflows/  # ci.yml (tests) + release.yml (auto-release)\n```\n\n## Roadmap\n\n- [x] v1.0.0 — full feature parity port (band lock, features, NV/import, cells, backups)\n- [ ] Playwright E2E for WebUI flows\n- [ ] Cell history logging\n- [ ] Module settings (theme, poll interval)\n\n## Status & device validation\n\n**Source-level blockers: FIXED** (verified by host build + tests). **Runtime\nAndroid validation: PENDING** — the vendor modem (`/vendor/bin/mtb`), SELinux\npolicy, KernelSU WebUI execution, dual-SIM behavior and hardware rollback have\nNOT yet been exercised on a device. This release is a **device-test candidate**,\nnot a stable release.\n\n| Layer | Status |\n|---|---|\n| Source audit blockers | FIXED |\n| Svelte production build / svelte-check / tsc | PASS |\n| Rust tests / fake-mtb protocol smoke | PASS |\n| Release packaging (GA) | PASS |\n| Android ARM64 execution | NOT YET VERIFIED |\n| KernelSU WebUI runtime | NOT YET VERIFIED |\n| Vendor SELinux / QIPCRTR | NOT YET VERIFIED |\n| Real `/vendor/bin/mtb` output format | NOT YET VERIFIED |\n| SIM 0 / SIM 1 behavior | NOT YET VERIFIED |\n| Hardware rollback | NOT YET VERIFIED |\n\n### Device validation staircase (recommended order)\n\n1. Install module, open WebUI, probe `/vendor/bin/mtb`.\n2. All read-only operations (NV read, bandlock get, features check, cells).\n3. Save the RAW mtb output of each read — compare against the parsers.\n4. Backup without dangerous writes (verify `backup list`).\n5. One controlled write of a fully understood item → read-back verification.\n6. Restore that item from backup → verify bytes.\n7. Band lock apply → rollback test.\n8. SIM 1 paths last.\n\nAnything that misbehaves on the device: capture `mtbctl <cmd>` output + the\nraw mtb output, and report it — the fix goes through the normal\nCI + release pipeline (versionCode bump → auto release).\n\n## Credits & License\n\n- Original app & algorithms: [h3nnes/mtbtool-android-app](https://github.com/h3nnes/mtbtool-android-app)\n  — MIT License (see [LICENSE](LICENSE)).\n- This module: MIT License, © Alfnnnnyy.\n- Design language inspired by [Linear](https://linear.app) via\n  [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md).\n",
+  "readmeHTML": "<h1>MTB Tool — Magisk / KernelSU Module</h1>\n\n<p>> EFS NV manager for Xiaomi Qualcomm modems as a Magisk/KernelSU module.</p>\n<p>> Port of <a href=\"https://github.com/h3nnes/mtbtool-android-app\">h3nnes/mtbtool-android-app</a> (MIT) —</p>\n<p>> the original Android app is preserved in <a href=\"app/\"><code>app/</code></a> for reference and attribution.</p>\n\n<p>Manage modem EFS NV items directly from a module WebUI: read/write/delete NV</p>\n<p>items, bulk import, band lock (LTE / NR NSA / NR SA), disable modem features,</p>\n<p>live cell monitor, and one-tap emergency restore. No APK needed — the module</p>\n<p>talks to the Qualcomm vendor tool <code>/vendor/bin/mtb</code> that already exists on</p>\n<p>supported devices.</p>\n\n<p><b>The module does NOT bundle or overwrite <code>/vendor/bin/mtb</code>.</b> If your device</p>\n<p>does not ship it, the module refuses to install (customize.sh check).</p>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| <b>WebUI</b> | Svelte 5 + TypeScript + Vite, Linear-inspired dark theme (see <a href=\"frontend/DESIGN.md\">frontend/DESIGN.md</a>) |</p>\n<p>| <b>Backend</b> | <code>mtbctl</code> — single Rust binary (validation, backups, masking, RPC) |</p>\n<p>| <b>Root</b> | KernelSU (native WebUI <code>exec</code>) · Magisk (WebUI host with exec bridge, e.g. WebUI X) |</p>\n<p>| <b>Storage</b> | <code>/data/adb/mtbtool</code> (config + backups) |</p>\n<p>| <b>Target</b> | POCO F6 (HyperOS, Qualcomm modem), Android 13+, arm64 |</p>\n\n<p>---</p>\n\n<h2>Features</h2>\n\n<li>**Dashboard** — compatibility probe (`/vendor/bin/mtb` presence, model, Android), quick actions, danger notice.</li>\n<li>**Band lock** — detect hardware-supported bands via modem DIAG, or configure</li>\n<p>  bands manually; build the LTE / NR NSA / NR SA masks, preview old → new bytes,</p>\n<p>  apply with two-step confirmation, restart modem. NOTE: on peridot (POCO F6)</p>\n<p>  the DIAG request format returns an 11-byte response that cannot be decoded —</p>\n<p>  band detection reports \"unsupported\" and manual configuration is used</p>\n<p>  instead (no fallback guessing).</p>\n<li>**Modem features** — disable/restore 12 known NR features (UL Tx switching,</li>\n<p>  UL MIMO, NR CA, DSS, segmentation, …) with original-value restore, plus the</p>\n<p>  5G mode selector (SA/NSA / NSA only / SA only).</p>\n<li>**NV read / import** — read any NV item as a colour-coded hex dump; bulk-import</li>\n<p>  the JSON format from the original app (<code>sim0</code>/<code>sim1</code>/<code>dualsim</code>, <code>op: w/d</code>)</p>\n<p>  with preview before applying.</p>\n<li>**Cells** — live LTE/NR cell monitor (signal metrics + uplink TX power),</li>\n<p>  poll interval 1–30 s, stale-value suppression.</p>\n<li>**Backups** — every write/delete is backed up first (`/data/adb/mtbtool/backups`)</li>\n<p>  with restore per backup and an emergency restore (module menu / <code>action.sh</code>).</p>\n\n<h2>Safety model</h2>\n\n<li>**Never auto-applies** anything at boot — no band lock, no NV write. Changes</li>\n<p>   only happen when you press a button in the WebUI.</p>\n<li>**Backup before every write/delete.** A failed backup or a read error</li>\n<p>   aborts the operation (read errors are never mistaken for \"item absent\").</p>\n<p>   Band lock, features, and imports run as ONE transactional backup + apply</p>\n<p>   with verified rollback on any failure — a partial state is never left.</p>\n<li>**Preview + two-step confirmation** for destructive changes.</li>\n<li>**Backend validation** — the WebUI can only call the fixed</li>\n<p>   <code>mtbctl rpc --b64 <payload></code> entry point: method allowlist, NV path</p>\n<p>   allowlist, SIM slot bounds, hex/size caps, band-number validation, a</p>\n<p>   single-writer lock, and backup-before-write. <code>ok</code> is only reported after</p>\n<p>   read-back verification. No shell interpolation ever reaches the backend.</p>\n<p>   There is no network API — no daemon, no port, no HTTP.</p>\n<li>**Emergency restore** — module menu action (volume-key confirmed)</li>\n<p>   restores the latest backup; success is only reported when every item</p>\n<p>   passes checksum verification and read-back comparison.</p>\n<li>Wrong band masks can cause connectivity loss until restored; the backups tab</li>\n<p>   is your undo button.</p>\n\n<h2>Requirements</h2>\n\n<li>Xiaomi device with Qualcomm modem and executable `/vendor/bin/mtb`</li>\n<p>  (checked at install time).</p>\n<li>KernelSU / ReSukiSU / APatch / Magisk with module support.</li>\n<li>arm64 (aarch64) only.</li>\n\n<h2>Install</h2>\n\n<li>Download the release ZIP (`MTB-Tool-vX.Y.Z.zip` + verify `.sha256`).</li>\n<li>Install via your root manager (KernelSU Manager → modules → install from</li>\n<p>   storage, or Magisk → modules → install from storage).</p>\n<li>Open the module's **WebUI**:</li>\n<p>   - KernelSU/ReSukiSU/APatch: native module WebUI button — the official</p>\n<p>     <code>kernelsu</code> bridge package is bundled with the WebUI.</p>\n<p>   - Magisk: use a WebUI host that exposes a kernelsu-compatible exec bridge</p>\n<p>     (e.g. <b>WebUI X</b>). The bridge adapter is detected at startup and shown</p>\n<p>     in the Dashboard diagnostics panel; all mutation controls fail closed</p>\n<p>     until the bridge self-test (<code>mtbctl probe</code>) succeeds.</p>\n<li>Dashboard shows the compatibility probe; if `/vendor/bin/mtb` is missing</li>\n<p>   the module refuses to install in the first place.</p>\n\n<h2>Testing</h2>\n\n<li>`cargo test` (backend) + `npm test` (frontend) run in CI (`ci.yml`).</li>\n<li>`tests/smoke.sh` runs `mtbctl` against `tests/fake-mtb.sh` — a</li>\n<p>  protocol-faithful simulation of <code>/vendor/bin/mtb</code> (one tagged byte per line,</p>\n<p>  <code>ASDIV DATA:</code>/<code>TX INFO:</code> cell lines, <code>rsp data:</code> DIAG payloads, absent-item =</p>\n<p>  exit 0 + empty, exactly as the original app's parsers expect).</p>\n<li>**Debian ≠ Android.** The harness verifies logic, wire formats and the RPC bridge (RPC) — not the device. On-phone differences (toybox vs GNU tools, `getprop`,</li>\n<p>  real mtb output quirks per ROM) are handled defensively in code: empty/odd</p>\n<p>  output → item treated as absent, <code>getprop</code> failure → <code>unknown</code>, paths and</p>\n<p>  slots re-validated at the backend. Always test on your device before trusting</p>\n<p>  a release.</p>\n\n<h2>Emergency restore</h2>\n\n<li>**WebUI** — Backups tab → restore latest.</li>\n<li>**Terminal / module menu** — the module's action (action.sh) restores the</li>\n<p>  latest backup automatically.</p>\n\n<h2>Uninstall</h2>\n\n<p>Removing the module keeps <code>/data/adb/mtbtool</code> (backups + config) untouched —</p>\n<p>delete that directory manually for a full wipe.</p>\n\n<h2>Build from source</h2>\n\n<p>All builds run in GitHub Actions (no local toolchain needed for release):</p>\n\n<pre># CI checks (cargo test + WebUI build/test)\n# auto-release: bump versionCode in module.prop on main → tag + release</pre>\n\n<pre>flowchart LR\n    W[WebUI Svelte 5] --&gt;|exec rpc --b64| B[mtbctl Rust]\n    B --&gt;|validation + backup + lock| M[/vendor/bin/mtb/]\n    M --&gt; E[EFS NV modem]\n    B --&gt; D[/data/adb/mtbtool/]</pre>\n\n<h2>Repository layout</h2>\n\n<pre>├── app/            # original Android app (reference, not built)\n├── backend/        # mtbctl — Rust CLI + RPC layer\n├── frontend/       # Svelte 5 WebUI source (built only in GA → webroot/)\n│   └── DESIGN.md   # MTB Control design system (Linear-inspired)\n├── docs/design-md/ # vendored design references (VoltAgent/awesome-design-md)\n├── bin/            # release artifact (gitignored)\n├── webroot/        # WebUI build output (gitignored, built by GA)\n├── module.prop / customize.sh / action.sh / uninstall.sh\n├── tools/          # original import tools (nv_import_tool.py, format docs)\n└── .github/workflows/  # ci.yml (tests) + release.yml (auto-release)</pre>\n\n<h2>Roadmap</h2>\n\n<li>[x] v1.0.0 — full feature parity port (band lock, features, NV/import, cells, backups)</li>\n<li>[ ] Playwright E2E for WebUI flows</li>\n<li>[ ] Cell history logging</li>\n<li>[ ] Module settings (theme, poll interval)</li>\n\n<h2>Status & device validation</h2>\n\n<p><b>Source-level blockers: FIXED</b> (verified by host build + tests). **Runtime</p>\n<p>Android validation: PENDING** — the vendor modem (<code>/vendor/bin/mtb</code>), SELinux</p>\n<p>policy, KernelSU WebUI execution, dual-SIM behavior and hardware rollback have</p>\n<p>NOT yet been exercised on a device. This release is a <b>device-test candidate</b>,</p>\n<p>not a stable release.</p>\n\n<p>| Layer | Status |</p>\n<p>|---|---|</p>\n<p>| Source audit blockers | FIXED |</p>\n<p>| Svelte production build / svelte-check / tsc | PASS |</p>\n<p>| Rust tests / fake-mtb protocol smoke | PASS |</p>\n<p>| Release packaging (GA) | PASS |</p>\n<p>| Android ARM64 execution | NOT YET VERIFIED |</p>\n<p>| KernelSU WebUI runtime | NOT YET VERIFIED |</p>\n<p>| Vendor SELinux / QIPCRTR | NOT YET VERIFIED |</p>\n<p>| Real <code>/vendor/bin/mtb</code> output format | NOT YET VERIFIED |</p>\n<p>| SIM 0 / SIM 1 behavior | NOT YET VERIFIED |</p>\n<p>| Hardware rollback | NOT YET VERIFIED |</p>\n\n<h3>Device validation staircase (recommended order)</h3>\n\n<li>Install module, open WebUI, probe `/vendor/bin/mtb`.</li>\n<li>All read-only operations (NV read, bandlock get, features check, cells).</li>\n<li>Save the RAW mtb output of each read — compare against the parsers.</li>\n<li>Backup without dangerous writes (verify `backup list`).</li>\n<li>One controlled write of a fully understood item → read-back verification.</li>\n<li>Restore that item from backup → verify bytes.</li>\n<li>Band lock apply → rollback test.</li>\n<li>SIM 1 paths last.</li>\n\n<p>Anything that misbehaves on the device: capture <code>mtbctl <cmd></code> output + the</p>\n<p>raw mtb output, and report it — the fix goes through the normal</p>\n<p>CI + release pipeline (versionCode bump → auto release).</p>\n\n<h2>Credits & License</h2>\n\n<li>Original app & algorithms: [h3nnes/mtbtool-android-app](https://github.com/h3nnes/mtbtool-android-app)</li>\n<p>  — MIT License (see <a href=\"LICENSE\">LICENSE</a>).</p>\n<li>This module: MIT License, © Alfnnnnyy.</li>\n<li>Design language inspired by [Linear](https://linear.app) via</li>\n<p>  <a href=\"https://github.com/VoltAgent/awesome-design-md\">VoltAgent/awesome-design-md</a>.</p>",
+  "homepageUrl": "https://github.com/Alfnnnnyy/mtbtool-module",
+  "sourceUrl": "https://github.com/Alfnnnnyy/mtbtool-module",
+  "url": "https://github.com/Alfnnnnyy/mtbtool-module",
+  "latestRelease": {
+    "name": "v17",
+    "version": "v17",
+    "time": "2026-08-04T13:14:57Z",
+    "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v17/MTB-Tool-v1.0.16.zip"
+  },
+  "releases": [
+    {
+      "name": "v17",
+      "tagName": "v17",
+      "publishedAt": "2026-08-04T13:14:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.16.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v17/MTB-Tool-v1.0.16.zip",
+          "size": 498547,
+          "downloadCount": 21
+        },
+        {
+          "name": "MTB-Tool-v1.0.16.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v17/MTB-Tool-v1.0.16.zip.sha256",
+          "size": 87,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v16",
+      "tagName": "v16",
+      "publishedAt": "2026-08-04T12:45:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.15.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v16/MTB-Tool-v1.0.15.zip",
+          "size": 497931,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.15.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v16/MTB-Tool-v1.0.15.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v15",
+      "tagName": "v15",
+      "publishedAt": "2026-08-04T11:34:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.14.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v15/MTB-Tool-v1.0.14.zip",
+          "size": 495694,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.14.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v15/MTB-Tool-v1.0.14.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v14",
+      "tagName": "v14",
+      "publishedAt": "2026-08-04T11:15:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.13.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v14/MTB-Tool-v1.0.13.zip",
+          "size": 493752,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.13.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v14/MTB-Tool-v1.0.13.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v13",
+      "tagName": "v13",
+      "publishedAt": "2026-08-04T10:46:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.12.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v13/MTB-Tool-v1.0.12.zip",
+          "size": 493619,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.12.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v13/MTB-Tool-v1.0.12.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v12",
+      "tagName": "v12",
+      "publishedAt": "2026-08-04T10:23:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.11.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v12/MTB-Tool-v1.0.11.zip",
+          "size": 493371,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.11.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v12/MTB-Tool-v1.0.11.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v11",
+      "tagName": "v11",
+      "publishedAt": "2026-08-04T09:58:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.10.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v11/MTB-Tool-v1.0.10.zip",
+          "size": 492311,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.10.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v11/MTB-Tool-v1.0.10.zip.sha256",
+          "size": 87,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v10",
+      "tagName": "v10",
+      "publishedAt": "2026-08-04T07:54:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.9.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v10/MTB-Tool-v1.0.9.zip",
+          "size": 492265,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.9.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v10/MTB-Tool-v1.0.9.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v9",
+      "tagName": "v9",
+      "publishedAt": "2026-08-04T04:56:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.8.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v9/MTB-Tool-v1.0.8.zip",
+          "size": 482392,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.8.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v9/MTB-Tool-v1.0.8.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v8",
+      "tagName": "v8",
+      "publishedAt": "2026-08-04T04:23:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.7.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v8/MTB-Tool-v1.0.7.zip",
+          "size": 479513,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.7.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v8/MTB-Tool-v1.0.7.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v7",
+      "tagName": "v7",
+      "publishedAt": "2026-08-04T03:24:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.6.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v7/MTB-Tool-v1.0.6.zip",
+          "size": 478631,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.6.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v7/MTB-Tool-v1.0.6.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v6",
+      "tagName": "v6",
+      "publishedAt": "2026-08-04T02:11:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.5.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v6/MTB-Tool-v1.0.5.zip",
+          "size": 478073,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.5.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v6/MTB-Tool-v1.0.5.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2026-08-04T02:06:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.4.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v5/MTB-Tool-v1.0.4.zip",
+          "size": 477594,
+          "downloadCount": 0
+        },
+        {
+          "name": "MTB-Tool-v1.0.4.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v5/MTB-Tool-v1.0.4.zip.sha256",
+          "size": 86,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2026-08-04T01:24:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.3.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v4/MTB-Tool-v1.0.3.zip",
+          "size": 474632,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.3.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v4/MTB-Tool-v1.0.3.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2026-08-04T00:49:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.2.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v3/MTB-Tool-v1.0.2.zip",
+          "size": 455747,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.2.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v3/MTB-Tool-v1.0.2.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2026-08-04T00:02:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.1.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v2/MTB-Tool-v1.0.1.zip",
+          "size": 447714,
+          "downloadCount": 1
+        },
+        {
+          "name": "MTB-Tool-v1.0.1.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v2/MTB-Tool-v1.0.1.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2026-08-03T16:25:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MTB-Tool-v1.0.0.zip",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v1/MTB-Tool-v1.0.0.zip",
+          "size": 442954,
+          "downloadCount": 2
+        },
+        {
+          "name": "MTB-Tool-v1.0.0.zip.sha256",
+          "downloadUrl": "https://github.com/Alfnnnnyy/mtbtool-module/releases/download/v1/MTB-Tool-v1.0.0.zip.sha256",
+          "size": 86,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,287 @@
+{
+  "readme": "# MEIZU21GKI\n\n魅族21（SM8650 / Qualcomm Pineapple）的 **GKI 内核**自包含构建仓库：\n**ReSukiSU（+ SUSFS）+ AnyKernel3**，目标 `android14-6.1 / 6.1.25 / os_patch 2023-10`。\n\n> 本仓库把原先分散在多个 fork 里的东西合并到一处：构建流水线、魅族21 设备树、\n> KernelSU 源码（ReSukiSU）、SUSFS 补丁快照。构建时**只**联网取 Google 内核源码与几个公开工具，\n> KernelSU/SUSFS 直接用仓库内的快照。\n\n---\n\n## 目录结构\n\n| 路径 | 内容 |\n| --- | --- |\n| `.github/workflows/build.yml` | 主构建流水线（`workflow_call`，1700+ 行：源码同步/tag 回退/KSU 集成/SUSFS/defconfig/编译/AK3/失败日志/产物） |\n| `.github/workflows/meizu21.yml` | **主入口**：push `main` 自动构建 + 手动 dispatch；成功 → 预览版 release + `dist` 分支 |\n| `.github/workflows/meizu21-bisect.yml` | 开机循环二分定位（L0 禁用KSU / L1 禁用SUSFS / L2 全开） |\n| `kernelsu/` | **内置 ReSukiSU 源码**（见 `kernelsu/SOURCE.txt`；接线方式同其官方 `kernel/setup.sh`） |\n| `susfs4ksu/` | **内置 SUSFS 补丁快照** `gki-android14-6.1`（见 `susfs4ksu/SOURCE.txt`） |\n| `device/meizu21/` | 魅族21 设备树快照（从本机 9008 备份提取，见 `device/meizu21/SOURCE.txt`） |\n| `config/` | `stock_defconfig`（可选伪装）/ `config` / `zram.config` 等 |\n| `scripts/susfs_fixes/apply.sh` | SUSFS 补丁应用脚本（含 fuzz/修偏） |\n| `security_patch/` | CVE-2026-43499 rtmutex 修复链 |\n| `zram/` | ZRAM LZ4/NEON 增强补丁（默认关闭） |\n| `log/` | **构建失败日志**（CI 自动提交，见 `log/README.md`） |\n| `tools/` | 本地校验脚本（workflow 结构断言、失败日志通道断言） |\n\n---\n\n## 工作流行为\n\n**触发**：push 到 `main`（仅 workflow/config/scripts/zram/kernelsu/susfs4ksu 相关路径）或手动\n`workflow_dispatch`（可选变体/SUSFS 模式/LTO/ZRAM/BBG/KPM/上传模式）。\n\n**失败** → 自动把日志提交进仓库 `log/<run号>-run<runid>/`（含每次编译尝试的完整日志、`.rej`\n冲突文件、磁盘/ccache 状态、运行页面链接）。提交 `log/**` **不会**再次触发构建。\n\n**成功** → 自动创建 **预览版（prerelease）** release：\n\n- `meizu21-sukisu-<run_number>`：每次构建的历史版本（只保留最近 3 个）；\n- `meizu21-latest`：恒指向最新成功构建的稳定入口（同样是预览版标记）；\n- 同时把产物 force-push 到 **`dist` 分支**——本机 `objects.githubusercontent.com` 不可达，\n  `dist` 是取回产物的可靠通道。\n\n**取回产物（本地）**：\n\n```powershell\n$f='<本地克隆>'\ngit -C $f fetch origin dist\n$tmp=\"$env:TEMP\\dist_extract\"\ngit -C $f worktree add --detach $tmp FETCH_HEAD\nCopy-Item \"$tmp\\*\" \"<目标目录>\\\" -Recurse      # 先 copy\ngit -C $f worktree remove $tmp --force         # 再 remove\n```\n\n---\n\n",
+  "readmeHTML": "<h1>MEIZU21GKI</h1>\n\n<p>魅族21（SM8650 / Qualcomm Pineapple）的 <b>GKI 内核</b>自包含构建仓库：</p>\n<p><b>ReSukiSU（+ SUSFS）+ AnyKernel3</b>，目标 <code>android14-6.1 / 6.1.25 / os_patch 2023-10</code>。</p>\n\n<p>> 本仓库把原先分散在多个 fork 里的东西合并到一处：构建流水线、魅族21 设备树、</p>\n<p>> KernelSU 源码（ReSukiSU）、SUSFS 补丁快照。构建时<b>只</b>联网取 Google 内核源码与几个公开工具，</p>\n<p>> KernelSU/SUSFS 直接用仓库内的快照。</p>\n\n<p>---</p>\n\n<h2>目录结构</h2>\n\n<p>| 路径 | 内容 |</p>\n<p>| --- | --- |</p>\n<p>| <code>.github/workflows/build.yml</code> | 主构建流水线（<code>workflow_call</code>，1700+ 行：源码同步/tag 回退/KSU 集成/SUSFS/defconfig/编译/AK3/失败日志/产物） |</p>\n<p>| <code>.github/workflows/meizu21.yml</code> | <b>主入口</b>：push <code>main</code> 自动构建 + 手动 dispatch；成功 → 预览版 release + <code>dist</code> 分支 |</p>\n<p>| <code>.github/workflows/meizu21-bisect.yml</code> | 开机循环二分定位（L0 禁用KSU / L1 禁用SUSFS / L2 全开） |</p>\n<p>| <code>kernelsu/</code> | <b>内置 ReSukiSU 源码</b>（见 <code>kernelsu/SOURCE.txt</code>；接线方式同其官方 <code>kernel/setup.sh</code>） |</p>\n<p>| <code>susfs4ksu/</code> | <b>内置 SUSFS 补丁快照</b> <code>gki-android14-6.1</code>（见 <code>susfs4ksu/SOURCE.txt</code>） |</p>\n<p>| <code>device/meizu21/</code> | 魅族21 设备树快照（从本机 9008 备份提取，见 <code>device/meizu21/SOURCE.txt</code>） |</p>\n<p>| <code>config/</code> | <code>stock_defconfig</code>（可选伪装）/ <code>config</code> / <code>zram.config</code> 等 |</p>\n<p>| <code>scripts/susfs_fixes/apply.sh</code> | SUSFS 补丁应用脚本（含 fuzz/修偏） |</p>\n<p>| <code>security_patch/</code> | CVE-2026-43499 rtmutex 修复链 |</p>\n<p>| <code>zram/</code> | ZRAM LZ4/NEON 增强补丁（默认关闭） |</p>\n<p>| <code>log/</code> | <b>构建失败日志</b>（CI 自动提交，见 <code>log/README.md</code>） |</p>\n<p>| <code>tools/</code> | 本地校验脚本（workflow 结构断言、失败日志通道断言） |</p>\n\n<p>---</p>\n\n<h2>工作流行为</h2>\n\n<p><b>触发</b>：push 到 <code>main</code>（仅 workflow/config/scripts/zram/kernelsu/susfs4ksu 相关路径）或手动</p>\n<p><code>workflow_dispatch</code>（可选变体/SUSFS 模式/LTO/ZRAM/BBG/KPM/上传模式）。</p>\n\n<p><b>失败</b> → 自动把日志提交进仓库 <code>log/<run号>-run<runid>/</code>（含每次编译尝试的完整日志、<code>.rej</code></p>\n<p>冲突文件、磁盘/ccache 状态、运行页面链接）。提交 <code>log/<b></code> </b>不会**再次触发构建。</p>\n\n<p><b>成功</b> → 自动创建 <b>预览版（prerelease）</b> release：</p>\n\n<li>`meizu21-sukisu-<run_number>`：每次构建的历史版本（只保留最近 3 个）；</li>\n<li>`meizu21-latest`：恒指向最新成功构建的稳定入口（同样是预览版标记）；</li>\n<li>同时把产物 force-push 到 **`dist` 分支**——本机 `objects.githubusercontent.com` 不可达，</li>\n<p>  <code>dist</code> 是取回产物的可靠通道。</p>\n\n<p><b>取回产物（本地）</b>：</p>\n\n<pre>$f='&lt;本地克隆&gt;'\ngit -C $f fetch origin dist\n$tmp=\"$env:TEMP\\dist_extract\"\ngit -C $f worktree add --detach $tmp FETCH_HEAD\nCopy-Item \"$tmp\\*\" \"&lt;目标目录&gt;\\\" -Recurse      # 先 copy\ngit -C $f worktree remove $tmp --force         # 再 remove</pre>\n\n<p>---</p>\n",
+  "homepageUrl": "https://github.com/FengFaQ/MEIZU21GKI",
+  "sourceUrl": "https://github.com/FengFaQ/MEIZU21GKI",
+  "url": "https://github.com/FengFaQ/MEIZU21GKI",
+  "latestRelease": {
+    "name": "meizu21-latest",
+    "version": "meizu21-latest",
+    "time": "2026-10-16T07:13:52Z",
+    "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/android14-6.1.25-2023-10-AnyKernel3.zip"
+  },
+  "releases": [
+    {
+      "name": "meizu21-sukisu-26",
+      "tagName": "meizu21-sukisu-26",
+      "publishedAt": "2026-10-16T07:13:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android14-6.1.25-2023-10-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/android14-6.1.25-2023-10-AnyKernel3.zip",
+          "size": 17434445,
+          "downloadCount": 5
+        },
+        {
+          "name": "android14-6.1.25-2023-10-boot.img",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/android14-6.1.25-2023-10-boot.img",
+          "size": 100663296,
+          "downloadCount": 2
+        },
+        {
+          "name": "cfi_typeids.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/cfi_typeids.txt",
+          "size": 110043,
+          "downloadCount": 0
+        },
+        {
+          "name": "config_vs_stock.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/config_vs_stock.txt",
+          "size": 2632,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/Module.symvers",
+          "size": 892929,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers.patched",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/Module.symvers.patched",
+          "size": 892164,
+          "downloadCount": 0
+        },
+        {
+          "name": "module_compat.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/module_compat.txt",
+          "size": 3760,
+          "downloadCount": 0
+        },
+        {
+          "name": "patch_crc_report.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/patch_crc_report.txt",
+          "size": 42046,
+          "downloadCount": 0
+        },
+        {
+          "name": "ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "size": 9379362,
+          "downloadCount": 4
+        },
+        {
+          "name": "source_revision.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-26/source_revision.txt",
+          "size": 486,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "meizu21-latest",
+      "tagName": "meizu21-latest",
+      "publishedAt": "2026-10-16T07:13:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android14-6.1.25-2023-10-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/android14-6.1.25-2023-10-AnyKernel3.zip",
+          "size": 17434445,
+          "downloadCount": 0
+        },
+        {
+          "name": "android14-6.1.25-2023-10-boot.img",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/android14-6.1.25-2023-10-boot.img",
+          "size": 100663296,
+          "downloadCount": 0
+        },
+        {
+          "name": "cfi_typeids.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/cfi_typeids.txt",
+          "size": 110043,
+          "downloadCount": 0
+        },
+        {
+          "name": "config_vs_stock.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/config_vs_stock.txt",
+          "size": 2632,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/Module.symvers",
+          "size": 892929,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers.patched",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/Module.symvers.patched",
+          "size": 892164,
+          "downloadCount": 0
+        },
+        {
+          "name": "module_compat.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/module_compat.txt",
+          "size": 3760,
+          "downloadCount": 0
+        },
+        {
+          "name": "patch_crc_report.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/patch_crc_report.txt",
+          "size": 42046,
+          "downloadCount": 0
+        },
+        {
+          "name": "ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "size": 9379362,
+          "downloadCount": 0
+        },
+        {
+          "name": "source_revision.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-latest/source_revision.txt",
+          "size": 486,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "meizu21-sukisu-23",
+      "tagName": "meizu21-sukisu-23",
+      "publishedAt": "2026-10-03T05:05:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android14-6.1.25-2023-10-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/android14-6.1.25-2023-10-AnyKernel3.zip",
+          "size": 17434663,
+          "downloadCount": 13
+        },
+        {
+          "name": "android14-6.1.25-2023-10-boot.img",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/android14-6.1.25-2023-10-boot.img",
+          "size": 100663296,
+          "downloadCount": 4
+        },
+        {
+          "name": "cfi_typeids.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/cfi_typeids.txt",
+          "size": 110043,
+          "downloadCount": 0
+        },
+        {
+          "name": "config_vs_stock.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/config_vs_stock.txt",
+          "size": 2644,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/Module.symvers",
+          "size": 892929,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers.patched",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/Module.symvers.patched",
+          "size": 892164,
+          "downloadCount": 0
+        },
+        {
+          "name": "module_compat.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/module_compat.txt",
+          "size": 3760,
+          "downloadCount": 0
+        },
+        {
+          "name": "patch_crc_report.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/patch_crc_report.txt",
+          "size": 42046,
+          "downloadCount": 0
+        },
+        {
+          "name": "ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "size": 9379362,
+          "downloadCount": 8
+        },
+        {
+          "name": "source_revision.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-23/source_revision.txt",
+          "size": 486,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "meizu21-sukisu-22",
+      "tagName": "meizu21-sukisu-22",
+      "publishedAt": "2026-10-03T04:39:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android14-6.1.25-2023-10-AnyKernel3.zip",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/android14-6.1.25-2023-10-AnyKernel3.zip",
+          "size": 17434898,
+          "downloadCount": 5
+        },
+        {
+          "name": "android14-6.1.25-2023-10-boot.img",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/android14-6.1.25-2023-10-boot.img",
+          "size": 100663296,
+          "downloadCount": 10
+        },
+        {
+          "name": "cfi_typeids.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/cfi_typeids.txt",
+          "size": 110043,
+          "downloadCount": 0
+        },
+        {
+          "name": "config_vs_stock.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/config_vs_stock.txt",
+          "size": 2644,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/Module.symvers",
+          "size": 892929,
+          "downloadCount": 0
+        },
+        {
+          "name": "Module.symvers.patched",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/Module.symvers.patched",
+          "size": 892164,
+          "downloadCount": 0
+        },
+        {
+          "name": "module_compat.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/module_compat.txt",
+          "size": 3760,
+          "downloadCount": 0
+        },
+        {
+          "name": "patch_crc_report.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/patch_crc_report.txt",
+          "size": 42046,
+          "downloadCount": 0
+        },
+        {
+          "name": "ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/ReSukiSU_v4.2.0-rc3_35171-arm64-v8a-release.apk",
+          "size": 9379362,
+          "downloadCount": 6
+        },
+        {
+          "name": "source_revision.txt",
+          "downloadUrl": "https://github.com/FengFaQ/MEIZU21GKI/releases/download/meizu21-sukisu-22/source_revision.txt",
+          "size": 486,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

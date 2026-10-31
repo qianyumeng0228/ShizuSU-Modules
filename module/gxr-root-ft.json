@@ -1,0 +1,239 @@
+{
+  "readme": "# gxr-root-ft\n\nGalaxy XR -> PC **full face/eye tracking** for VRChat. A rooted headset streams its\ncomplete face/eye parameter set to a PC running **VRCFaceTracking**, so your\navatar's face and eyes follow yours.\n\nThis repo is the **headset side** - the sender and the KernelSU module that runs\nit at boot. The PC side is a separate VRCFaceTracking module (installed in step 2\nbelow).\n\n> ### ALVR is NOT required\n> You do **not** need the ALVR streamer, the ALVR app, or any ALVR setup.\n> \"ALVR\" appears in these names only because we reuse ALVR's `UniExpr` packet\n> *format*. No ALVR software is involved.\n\n## What you need\n\n- **Headset:** Galaxy XR (`SM-I610`) with **root** (KernelSU or DFRoot) and the\n  **KernelSU Manager** installed.\n- **PC:** [VRCFaceTracking](https://github.com/benaclejames/VRCFaceTracking)\n  installed and working.\n- Headset and PC on the **same Wi-Fi / LAN**.\n\nNo ALVR. No adb. No terminal.\n\n### v1.4.0\n\nv1.4.0 retains the Manager-start VD-freeze mitigation that the owner reports\nworking in v1.3.14. It also corrects gaze-filter timing and addresses wink/squint\ngaze transitions. The offline suite passes 142 checks; the new eye\nbehavior has not yet been validated on a headset. See\n[release notes](NOTES-v1.4.0.md).\n\n\n## Install (normal user)\n\nTwo installs, one per machine. Nothing to configure afterwards.\n\n1. **Headset - install the KernelSU module.** Download `gxr-alvr-vX.Y.Z.zip` from\n   the **Releases** page, install it in the KernelSU Manager, then **reboot**.\n   The sender starts by itself at boot. (Installing on its own does not restart\n   the relay - the reboot is what starts it.)\n2. **PC - install the VRCFaceTracking module.** Download `ALVRModule.zip` from the\n   [VRCFT module's latest release](https://github.com/compdoge/VRCFT-ALVR-UE/releases/latest),\n   unzip it, and copy **`ALVRModule.dll`** into\n   `%APPDATA%\\VRCFaceTracking\\CustomLibs` (paste that path into the Explorer\n   address bar). Restart VRCFaceTracking and check that **ALVR Module** is listed\n   and enabled. It shows up as *ALVR Module* - that is the face-tracking module,\n   **not** the ALVR streamer.\n3. **Play.** Launch VRChat with face tracking enabled. There is **no PC IP to\n   type**: the headset finds the PC by broadcasting.\n\n\n## If it doesn't work\n\n- **Nothing arrives, or it worked and then stopped.** Check the inbox is open:\n  Windows Firewall must allow inbound **UDP 41463** for VRCFaceTracking, and the\n  headset and PC must be on the same network.\n- **Auto-connect is flaky.** Some access points filter broadcast, and a PC on\n  another subnet will never hear it. Pin the PC's IP to switch to unicast ->\n  [Set a custom PC IP](#set-a-custom-pc-ip).\n- **Wi-Fi trackers or a stream (e.g. Steam Link) stutter.** While it is feeding\n  you, the relay sends up to 60 datagrams/s, and to the LAN broadcast address if\n  you have not pinned the PC - broadcast is the expensive kind of Wi-Fi traffic.\n  Idle it drops to a 10 Hz keepalive, and a pinned PC IP makes the stream unicast.\n  If it still stutters, lower the rate in the module's **Developer options ->\n  `--tx-hz`**.\n\n\n## Does it make the headset hotter?\n\nShort answer: it is a small, honest addition, and you can measure it on your own\ndevice.\n\nThe module only *reads*. It attaches 5 read-only uprobes to functions the headset\nalready calls for its own face/eye tracking, and parses the events they emit. In a\nreal session that is about **330 probe hits a second** in total (roughly 4.6 per\nframe at 72 Hz), plus 50-60 small UDP datagrams/s. When nothing is tracking it\nidles: a 10 Hz loop and a 10 Hz keepalive. Its trace ring buffer is 6 MB (before\nv1.3.8 it was about 96 MB of unreclaimable kernel memory, held for the whole\nsession).\n\nThe Galaxy XR is thermally marginal, and VR streaming already runs it at its\nlimit - so any extra work can be the straw rather than the bale, and a difference\nof a few percent is easy to feel and hard to attribute. If you want to know what\nthis module costs on *your* headset, use the WebUI: run the same game, in the same\nplace, with the same stream settings, once with **Pause** and once running, and\ncompare the headset's temperature and FPS. Pause really does stop it - the relay\ndisables its probes on the way out - so it is a fair comparison, and it needs no\nreboot.\n\n\n## Set a custom PC IP\n\n**Auto-connect is the default** - with no config the sender broadcasts to the LAN\nbroadcast address, and the PC module (bound `0.0.0.0:41463`) receives that. Set a\nPC explicitly if auto-connect is flaky, if the PC is on another subnet, or to\nswitch the stream to unicast.\n\n**Easiest: the module's WebUI.** KernelSU Manager -> **Modules** -> *Galaxy XR face\ntracking relay* -> tap the **Open** button (or tap the card itself). Enter the PC's\nIPv4 address and tap **Save & restart relay**. Leave the field empty and Save to\ngo back to auto/broadcast. The page also shows live status (target, pid, headset\nIP, log tail), a **Test** button that pings the PC from the headset, **Refresh**,\na **Pause** / **Resume** pair that stops and starts face tracking without a\nreboot (handy for the comparison below), and **Export logs**, which copies the\ncurrent log, the previous run and the install log to `/sdcard/Download`.\n\n**Or by hand (root):**\n\n```sh\necho 192.168.1.50 > /data/adb/modules/gxr-alvr/pc     # as root\necho 41463        > /data/adb/modules/gxr-alvr/port    # optional\n# then tap the module's Action button in the KernelSU Manager (or reboot)\n```\n\nDelete `pc` to return to auto/broadcast. `port` defaults to `41463`. These option\nfiles (`pc`, `port`, `mirror`, `tongue`, `verbose`, `devopts`, `dev`) are\n**preserved across module updates**; the WebUI's `paused` marker is not, so a\nreboot always starts the relay.\n\n\n## Benefits\n\nUsing this sender over a generic OpenXR route currently gives you:\n\n1. Eye dilation\n2. Individual eye gaze\n3. Jaw open not being clamped to >0.5 when tongue out\n4. Tongue roll\n\nWith hopefully more to come!\n\n\n## For developers\n\nEverything below is about building and modifying the sender. If you just want to\nuse it, stop here.\n\n### How it works\n\nThe headset runs `gxr_alvr` as **root**. It reads the Galaxy XR perception host\nthrough **read-only ftrace uprobes** - it only *reads*; it never patches or\ninjects into vendor code, and it carries numeric signals only (no camera imagery).\n\nRepo layout:\n\n- `headset/` - the C sender `gxr_alvr` (+ build script, wire-format doc, tools).\n- `ksu-module/gxr-alvr/` - the KernelSU module that starts the sender at boot.\n\n### Wire format\n\nOne UDP datagram to port **41463** (`0xA1F7`) = `\"UniExpr\\0\"` + 88 `float32`\nUnified-Expression weights + an 11-float eye tail -> **404 bytes**.\n\nThe 88 weights are indexed by VRCFaceTracking's `UnifiedExpressions` (`Max = 88`).\nThe eye tail, in order:\n`Version, LOpen, ROpen, LPupil, RPupil, MinDil, MaxDil, LPitch, LYaw, RPitch, RYaw`.\n\nRead `headset/ALVR-SENDER.md` for the signal notes, and the VRCFT-ALVR-UE module\nfor the receiving side.\n\n### Build the sender\n\nRequires an Android NDK (r29 tested):\n\n```sh\nNDK=/path/to/android-ndk-r29 headset/build_alvr.sh   # -> headset/gxr_alvr\n```\n\n### Build the module zip\n\nThe module has a prebuilt `gxr_alvr`. To rebuild it from source, copy the new\nbuilt binary in first, then zip the module dir (with `module.prop` at the zip\nroot):\n\n```sh\ncp headset/gxr_alvr ksu-module/gxr-alvr/gxr_alvr\npython tools/make_module_zip.py ksu-module/gxr-alvr gxr-alvr.zip   # any OS\n# or, on Linux/macOS:\n( cd ksu-module/gxr-alvr && zip -r ../gxr-alvr.zip . )\n```\n\n**Entry names must use forward slashes.** KernelSU extracts the zip on Linux, so a\nWindows tool that writes `webroot\\index.html` (e.g. `ZipFile.CreateFromDirectory`\nor `Compress-Archive`) creates a *literal file with a backslash* at the module\nroot instead of a `webroot/` directory - ksud then reports `web=false` and the\nmodule's WebUI never shows. Use `tools/make_module_zip.py` (writes `/` explicitly)\nor POSIX `zip`.\n\nThe bundled binary is committed so users can install without a toolchain; if you\nchange `headset/gxr_alvr.c`, rebuild and re-copy it into `ksu-module/gxr-alvr/`.\nThe `armed` line in the log prints the binary's own version, so it is the proof\nthat the rebuilt binary is the one running.\n\n### Notes\n\n- Uprobe offsets are **firmware-specific** (developed on Galaxy XR `SM-I610`,\n  firmware `I610UEU2AZF3`); the four optional probes fail soft, while the pupil\n  probe (`pten`) is mandatory and an arm failure exits `rc=3`.\n- The sender refuses to start a second copy (`flock`) and self-heals if tracefs is\n  cleared under it. A read failure is reported as unknown, never as missing\n  probes; clearing the device-wide uprobe set (which also drops other tools'\n  probes) needs three consecutive confirmed misses of a probe this run had\n  armed - the startup set is the baseline, so an optional probe that never armed\n  cannot trigger a re-arm loop - with a 30 s floor counted from startup that\n  backs off up to 10 minutes while re-arms keep failing, and at most 5 failed\n  attempts before it stops and waits for an explicit restart. A main-loop gap\n  longer than 15 s is logged as\n  \"not scheduled or was blocked ... resuming\" and the relay keeps running (its\n  probes and learned range survive); a 5-15 s gap is treated as a real loop\n  stall and still exits for the supervisor to restart. The log also records the\n  process's parent chain, cgroup and `oom_score_adj`, so an exported log shows\n  whether a start ran in the Manager's app context or at boot.\n- If something **outside** the module kills the relay (`rc=137`, usually the\n  low-memory killer), the supervisor does not restart it: it logs why and stops,\n  and you start it again from the Manager **Action** button or the WebUI. Putting\n  back the probes and the ring buffer after the system decided to shed this\n  process would only re-add the load it was shedding.\n- Eyes can be slightly jittery on the current host DNN output.\n\n\n## License\n\nMIT: see [`LICENSE`](LICENSE).\n",
+  "readmeHTML": "<h1>gxr-root-ft</h1>\n\n<p>Galaxy XR -> PC <b>full face/eye tracking</b> for VRChat. A rooted headset streams its</p>\n<p>complete face/eye parameter set to a PC running <b>VRCFaceTracking</b>, so your</p>\n<p>avatar's face and eyes follow yours.</p>\n\n<p>This repo is the <b>headset side</b> - the sender and the KernelSU module that runs</p>\n<p>it at boot. The PC side is a separate VRCFaceTracking module (installed in step 2</p>\n<p>below).</p>\n\n<p>> ### ALVR is NOT required</p>\n<p>> You do <b>not</b> need the ALVR streamer, the ALVR app, or any ALVR setup.</p>\n<p>> \"ALVR\" appears in these names only because we reuse ALVR's <code>UniExpr</code> packet</p>\n<p>> *format*. No ALVR software is involved.</p>\n\n<h2>What you need</h2>\n\n<li>**Headset:** Galaxy XR (`SM-I610`) with **root** (KernelSU or DFRoot) and the</li>\n<p>  <b>KernelSU Manager</b> installed.</p>\n<li>**PC:** [VRCFaceTracking](https://github.com/benaclejames/VRCFaceTracking)</li>\n<p>  installed and working.</p>\n<li>Headset and PC on the **same Wi-Fi / LAN**.</li>\n\n<p>No ALVR. No adb. No terminal.</p>\n\n<h3>v1.4.0</h3>\n\n<p>v1.4.0 retains the Manager-start VD-freeze mitigation that the owner reports</p>\n<p>working in v1.3.14. It also corrects gaze-filter timing and addresses wink/squint</p>\n<p>gaze transitions. The offline suite passes 142 checks; the new eye</p>\n<p>behavior has not yet been validated on a headset. See</p>\n<p><a href=\"NOTES-v1.4.0.md\">release notes</a>.</p>\n\n\n<h2>Install (normal user)</h2>\n\n<p>Two installs, one per machine. Nothing to configure afterwards.</p>\n\n<li>**Headset - install the KernelSU module.** Download `gxr-alvr-vX.Y.Z.zip` from</li>\n<p>   the <b>Releases</b> page, install it in the KernelSU Manager, then <b>reboot</b>.</p>\n<p>   The sender starts by itself at boot. (Installing on its own does not restart</p>\n<p>   the relay - the reboot is what starts it.)</p>\n<li>**PC - install the VRCFaceTracking module.** Download `ALVRModule.zip` from the</li>\n<p>   <a href=\"https://github.com/compdoge/VRCFT-ALVR-UE/releases/latest\">VRCFT module's latest release</a>,</p>\n<p>   unzip it, and copy <b><code>ALVRModule.dll</code></b> into</p>\n<p>   <code>%APPDATA%\\VRCFaceTracking\\CustomLibs</code> (paste that path into the Explorer</p>\n<p>   address bar). Restart VRCFaceTracking and check that <b>ALVR Module</b> is listed</p>\n<p>   and enabled. It shows up as *ALVR Module* - that is the face-tracking module,</p>\n<p>   <b>not</b> the ALVR streamer.</p>\n<li>**Play.** Launch VRChat with face tracking enabled. There is **no PC IP to</li>\n<p>   type**: the headset finds the PC by broadcasting.</p>\n\n\n<h2>If it doesn't work</h2>\n\n<li>**Nothing arrives, or it worked and then stopped.** Check the inbox is open:</li>\n<p>  Windows Firewall must allow inbound <b>UDP 41463</b> for VRCFaceTracking, and the</p>\n<p>  headset and PC must be on the same network.</p>\n<li>**Auto-connect is flaky.** Some access points filter broadcast, and a PC on</li>\n<p>  another subnet will never hear it. Pin the PC's IP to switch to unicast -></p>\n<p>  <a href=\"#set-a-custom-pc-ip\">Set a custom PC IP</a>.</p>\n<li>**Wi-Fi trackers or a stream (e.g. Steam Link) stutter.** While it is feeding</li>\n<p>  you, the relay sends up to 60 datagrams/s, and to the LAN broadcast address if</p>\n<p>  you have not pinned the PC - broadcast is the expensive kind of Wi-Fi traffic.</p>\n<p>  Idle it drops to a 10 Hz keepalive, and a pinned PC IP makes the stream unicast.</p>\n<p>  If it still stutters, lower the rate in the module's **Developer options -></p>\n<p>  <code>--tx-hz</code>**.</p>\n\n\n<h2>Does it make the headset hotter?</h2>\n\n<p>Short answer: it is a small, honest addition, and you can measure it on your own</p>\n<p>device.</p>\n\n<p>The module only *reads*. It attaches 5 read-only uprobes to functions the headset</p>\n<p>already calls for its own face/eye tracking, and parses the events they emit. In a</p>\n<p>real session that is about <b>330 probe hits a second</b> in total (roughly 4.6 per</p>\n<p>frame at 72 Hz), plus 50-60 small UDP datagrams/s. When nothing is tracking it</p>\n<p>idles: a 10 Hz loop and a 10 Hz keepalive. Its trace ring buffer is 6 MB (before</p>\n<p>v1.3.8 it was about 96 MB of unreclaimable kernel memory, held for the whole</p>\n<p>session).</p>\n\n<p>The Galaxy XR is thermally marginal, and VR streaming already runs it at its</p>\n<p>limit - so any extra work can be the straw rather than the bale, and a difference</p>\n<p>of a few percent is easy to feel and hard to attribute. If you want to know what</p>\n<p>this module costs on *your* headset, use the WebUI: run the same game, in the same</p>\n<p>place, with the same stream settings, once with <b>Pause</b> and once running, and</p>\n<p>compare the headset's temperature and FPS. Pause really does stop it - the relay</p>\n<p>disables its probes on the way out - so it is a fair comparison, and it needs no</p>\n<p>reboot.</p>\n\n\n<h2>Set a custom PC IP</h2>\n\n<p><b>Auto-connect is the default</b> - with no config the sender broadcasts to the LAN</p>\n<p>broadcast address, and the PC module (bound <code>0.0.0.0:41463</code>) receives that. Set a</p>\n<p>PC explicitly if auto-connect is flaky, if the PC is on another subnet, or to</p>\n<p>switch the stream to unicast.</p>\n\n<p><b>Easiest: the module's WebUI.</b> KernelSU Manager -> <b>Modules</b> -> *Galaxy XR face</p>\n<p>tracking relay* -> tap the <b>Open</b> button (or tap the card itself). Enter the PC's</p>\n<p>IPv4 address and tap <b>Save & restart relay</b>. Leave the field empty and Save to</p>\n<p>go back to auto/broadcast. The page also shows live status (target, pid, headset</p>\n<p>IP, log tail), a <b>Test</b> button that pings the PC from the headset, <b>Refresh</b>,</p>\n<p>a <b>Pause</b> / <b>Resume</b> pair that stops and starts face tracking without a</p>\n<p>reboot (handy for the comparison below), and <b>Export logs</b>, which copies the</p>\n<p>current log, the previous run and the install log to <code>/sdcard/Download</code>.</p>\n\n<p><b>Or by hand (root):</b></p>\n\n<pre>echo 192.168.1.50 &gt; /data/adb/modules/gxr-alvr/pc     # as root\necho 41463        &gt; /data/adb/modules/gxr-alvr/port    # optional\n# then tap the module's Action button in the KernelSU Manager (or reboot)</pre>\n\n<p>Delete <code>pc</code> to return to auto/broadcast. <code>port</code> defaults to <code>41463</code>. These option</p>\n<p>files (<code>pc</code>, <code>port</code>, <code>mirror</code>, <code>tongue</code>, <code>verbose</code>, <code>devopts</code>, <code>dev</code>) are</p>\n<p><b>preserved across module updates</b>; the WebUI's <code>paused</code> marker is not, so a</p>\n<p>reboot always starts the relay.</p>\n\n\n<h2>Benefits</h2>\n\n<p>Using this sender over a generic OpenXR route currently gives you:</p>\n\n<li>Eye dilation</li>\n<li>Individual eye gaze</li>\n<li>Jaw open not being clamped to >0.5 when tongue out</li>\n<li>Tongue roll</li>\n\n<p>With hopefully more to come!</p>\n\n\n<h2>For developers</h2>\n\n<p>Everything below is about building and modifying the sender. If you just want to</p>\n<p>use it, stop here.</p>\n\n<h3>How it works</h3>\n\n<p>The headset runs <code>gxr_alvr</code> as <b>root</b>. It reads the Galaxy XR perception host</p>\n<p>through <b>read-only ftrace uprobes</b> - it only *reads*; it never patches or</p>\n<p>injects into vendor code, and it carries numeric signals only (no camera imagery).</p>\n\n<p>Repo layout:</p>\n\n<li>`headset/` - the C sender `gxr_alvr` (+ build script, wire-format doc, tools).</li>\n<li>`ksu-module/gxr-alvr/` - the KernelSU module that starts the sender at boot.</li>\n\n<h3>Wire format</h3>\n\n<p>One UDP datagram to port <b>41463</b> (<code>0xA1F7</code>) = <code>\"UniExpr\\0\"</code> + 88 <code>float32</code></p>\n<p>Unified-Expression weights + an 11-float eye tail -> <b>404 bytes</b>.</p>\n\n<p>The 88 weights are indexed by VRCFaceTracking's <code>UnifiedExpressions</code> (<code>Max = 88</code>).</p>\n<p>The eye tail, in order:</p>\n<p><code>Version, LOpen, ROpen, LPupil, RPupil, MinDil, MaxDil, LPitch, LYaw, RPitch, RYaw</code>.</p>\n\n<p>Read <code>headset/ALVR-SENDER.md</code> for the signal notes, and the VRCFT-ALVR-UE module</p>\n<p>for the receiving side.</p>\n\n<h3>Build the sender</h3>\n\n<p>Requires an Android NDK (r29 tested):</p>\n\n<pre>NDK=/path/to/android-ndk-r29 headset/build_alvr.sh   # -&gt; headset/gxr_alvr</pre>\n\n<h3>Build the module zip</h3>\n\n<p>The module has a prebuilt <code>gxr_alvr</code>. To rebuild it from source, copy the new</p>\n<p>built binary in first, then zip the module dir (with <code>module.prop</code> at the zip</p>\n<p>root):</p>\n\n<pre>cp headset/gxr_alvr ksu-module/gxr-alvr/gxr_alvr\npython tools/make_module_zip.py ksu-module/gxr-alvr gxr-alvr.zip   # any OS\n# or, on Linux/macOS:\n( cd ksu-module/gxr-alvr &amp;&amp; zip -r ../gxr-alvr.zip . )</pre>\n\n<p><b>Entry names must use forward slashes.</b> KernelSU extracts the zip on Linux, so a</p>\n<p>Windows tool that writes <code>webroot\\index.html</code> (e.g. <code>ZipFile.CreateFromDirectory</code></p>\n<p>or <code>Compress-Archive</code>) creates a *literal file with a backslash* at the module</p>\n<p>root instead of a <code>webroot/</code> directory - ksud then reports <code>web=false</code> and the</p>\n<p>module's WebUI never shows. Use <code>tools/make_module_zip.py</code> (writes <code>/</code> explicitly)</p>\n<p>or POSIX <code>zip</code>.</p>\n\n<p>The bundled binary is committed so users can install without a toolchain; if you</p>\n<p>change <code>headset/gxr_alvr.c</code>, rebuild and re-copy it into <code>ksu-module/gxr-alvr/</code>.</p>\n<p>The <code>armed</code> line in the log prints the binary's own version, so it is the proof</p>\n<p>that the rebuilt binary is the one running.</p>\n\n<h3>Notes</h3>\n\n<li>Uprobe offsets are **firmware-specific** (developed on Galaxy XR `SM-I610`,</li>\n<p>  firmware <code>I610UEU2AZF3</code>); the four optional probes fail soft, while the pupil</p>\n<p>  probe (<code>pten</code>) is mandatory and an arm failure exits <code>rc=3</code>.</p>\n<li>The sender refuses to start a second copy (`flock`) and self-heals if tracefs is</li>\n<p>  cleared under it. A read failure is reported as unknown, never as missing</p>\n<p>  probes; clearing the device-wide uprobe set (which also drops other tools'</p>\n<p>  probes) needs three consecutive confirmed misses of a probe this run had</p>\n<p>  armed - the startup set is the baseline, so an optional probe that never armed</p>\n<p>  cannot trigger a re-arm loop - with a 30 s floor counted from startup that</p>\n<p>  backs off up to 10 minutes while re-arms keep failing, and at most 5 failed</p>\n<p>  attempts before it stops and waits for an explicit restart. A main-loop gap</p>\n<p>  longer than 15 s is logged as</p>\n<p>  \"not scheduled or was blocked ... resuming\" and the relay keeps running (its</p>\n<p>  probes and learned range survive); a 5-15 s gap is treated as a real loop</p>\n<p>  stall and still exits for the supervisor to restart. The log also records the</p>\n<p>  process's parent chain, cgroup and <code>oom_score_adj</code>, so an exported log shows</p>\n<p>  whether a start ran in the Manager's app context or at boot.</p>\n<li>If something **outside** the module kills the relay (`rc=137`, usually the</li>\n<p>  low-memory killer), the supervisor does not restart it: it logs why and stops,</p>\n<p>  and you start it again from the Manager <b>Action</b> button or the WebUI. Putting</p>\n<p>  back the probes and the ring buffer after the system decided to shed this</p>\n<p>  process would only re-add the load it was shedding.</p>\n<li>Eyes can be slightly jittery on the current host DNN output.</li>\n\n\n<h2>License</h2>\n\n<p>MIT: see <a href=\"LICENSE\"><code>LICENSE</code></a>.</p>",
+  "homepageUrl": "https://github.com/compdoge/gxr-root-ft",
+  "sourceUrl": "https://github.com/compdoge/gxr-root-ft",
+  "url": "https://github.com/compdoge/gxr-root-ft",
+  "latestRelease": {
+    "name": "v1.4.0",
+    "version": "v1.4.0",
+    "time": "2026-10-27T04:32:36Z",
+    "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.4.0/gxr-alvr-v1.4.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-10-27T04:32:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.4.0.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.4.0/gxr-alvr-v1.4.0.zip",
+          "size": 168369,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "v1.3.14",
+      "tagName": "v1.3.14",
+      "publishedAt": "2026-10-25T05:27:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.14.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.14/gxr-alvr-v1.3.14.zip",
+          "size": 165923,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v1.3.13",
+      "tagName": "v1.3.13",
+      "publishedAt": "2026-10-24T18:29:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.13.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.13/gxr-alvr-v1.3.13.zip",
+          "size": 165220,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.3.12",
+      "tagName": "v1.3.12",
+      "publishedAt": "2026-10-22T00:41:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.12.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.12/gxr-alvr-v1.3.12.zip",
+          "size": 158834,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v1.3.11",
+      "tagName": "v1.3.11",
+      "publishedAt": "2026-10-21T02:22:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.11.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.11/gxr-alvr-v1.3.11.zip",
+          "size": 151169,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v1.3.9",
+      "tagName": "v1.3.9",
+      "publishedAt": "2026-10-17T00:24:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.9.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.9/gxr-alvr-v1.3.9.zip",
+          "size": 142990,
+          "downloadCount": 43
+        }
+      ]
+    },
+    {
+      "name": "v1.3.8",
+      "tagName": "v1.3.8",
+      "publishedAt": "2026-10-15T23:35:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.8.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.8/gxr-alvr-v1.3.8.zip",
+          "size": 140810,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v1.3.7",
+      "tagName": "v1.3.7",
+      "publishedAt": "2026-10-14T23:40:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.7.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.7/gxr-alvr-v1.3.7.zip",
+          "size": 137333,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v1.3.6",
+      "tagName": "v1.3.6",
+      "publishedAt": "2026-10-14T21:22:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.6.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.6/gxr-alvr-v1.3.6.zip",
+          "size": 134834,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5",
+      "tagName": "v1.3.5",
+      "publishedAt": "2026-10-13T23:58:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.3.5.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.3.5/gxr-alvr-v1.3.5.zip",
+          "size": 135395,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.2.9",
+      "tagName": "v1.2.9",
+      "publishedAt": "2026-10-13T03:07:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.2.9.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.2.9/gxr-alvr-v1.2.9.zip",
+          "size": 131252,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2026-10-13T01:54:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.2.4.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.2.4/gxr-alvr-v1.2.4.zip",
+          "size": 127197,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-10-12T21:23:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.2.1.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.2.1/gxr-alvr-v1.2.1.zip",
+          "size": 126266,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.1.7",
+      "tagName": "v1.1.7",
+      "publishedAt": "2026-10-12T03:26:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.1.7.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.1.7/gxr-alvr-v1.1.7.zip",
+          "size": 119552,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2026-10-12T02:59:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.1.2.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.1.2/gxr-alvr-v1.1.2.zip",
+          "size": 118380,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-10-12T01:45:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-alvr-v1.1.0.zip",
+          "downloadUrl": "https://github.com/compdoge/gxr-root-ft/releases/download/v1.1.0/gxr-alvr-v1.1.0.zip",
+          "size": 16221,
+          "downloadCount": 12
+        }
+      ]
+    }
+  ]
+}

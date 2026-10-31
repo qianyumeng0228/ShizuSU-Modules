@@ -1,0 +1,115 @@
+{
+  "readme": "<p align=\"center\"><img src=\"./NHDD-cpp-modular/assets/nhdd-mark.svg\" alt=\"NHDD\" width=\"96\"></p>\n<h1 align=\"center\">NHDD</h1>\n<p align=\"center\"><strong>Runtime DEX / SO capture for rooted Android. No in-process injection.</strong></p>\n<p align=\"center\">\n  <img alt=\"Android · Root\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-root.svg\">\n  <img alt=\"ARM64 / ARMv7\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-abi.svg\">\n  <img alt=\"No Hook\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-no-hook.svg\">\n  <img alt=\"C++17\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-cpp.svg\">\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/Fruit-Guardians/NHDD/releases/latest\">Download</a> ·\n  <a href=\"./NHDD-cpp-modular/README.md\">Usage</a> ·\n  <a href=\"./NHDD-cpp-modular/docs/design.md\">Design</a> ·\n  <a href=\"./README.zh-CN.md\">简体中文</a>\n</p>\n\n## What it does\n\n- Captures resident DEX across rounds, with coverage, holes and content revisions.\n- Discovers DEX through supported ART object layouts; safely combines short-lived method windows with provenance and conflict detection.\n- Reconstructs ELF32/64 SO files using PT_LOAD and load bias.\n- Supports cold launch, package process following, tracefs events and incremental maps scanning.\n- Preserves CompactDex / VDEX / OAT evidence, including OAT 279; provides offline structural checks.\n- Offers a standalone Android CLI, a Python TUI and a Windows desktop GUI. Controllers do not expose every advanced CLI option.\n\n## Quick start\n\nDownload the matching package from Releases and check SHA256SUMS.txt. The main device target is ARM64, built for API 34+. ADB, Root and permission to read the target process are required.\n\n~~~bash\nadb shell \"su -c id\"\nadb push nhdd /data/local/tmp/nhdd\nadb shell chmod 755 /data/local/tmp/nhdd\nadb shell \"su -c '/data/local/tmp/nhdd com.example.app /data/local/tmp/nhdd_run01 --all --watch 3'\"\nadb pull /data/local/tmp/nhdd_run01 ./nhdd_run01\n~~~\n\nReplace com.example.app with your own or explicitly authorized app. Use a fresh output directory: default runs may clear earlier artifacts. See the [full guide](./NHDD-cpp-modular/README.md) for ART, spawn, event modes and output semantics.\n\n## Interface\n\n### Windows GUI\n\n![NHDD desktop GUI](./NHDD-cpp-modular/assets/screenshots/gui.png)\n\nBuilt GUI frontend in a browser preview, before connecting a device; no private device identifiers or dumps are shown. This does not substitute for native WebView2 testing.\n\n### Python TUI\n\n![NHDD TUI live progress dashboard](./NHDD-cpp-modular/assets/screenshots/tui.svg)\n\nApp selection → configuration → live watch dashboard → results. Install rich and run `python nhdd_tui.py`, or select a target directly with `python nhdd_tui.py com.example.app`.\n\n<details>\n<summary>App selection and configuration</summary>\n\n![NHDD TUI app selection and configuration](./NHDD-cpp-modular/assets/screenshots/tui-setup.svg)\n</details>\n\nBoth TUI views use the real Rich UI functions with synthetic packages, input and logs—not Root device results. Reproduce them with `python scripts/capture_tui.py`.\n\n## Architecture\n\n~~~mermaid\nflowchart LR\n  UI[\"TUI / GUI\"] -->|\"ADB + su\"| CLI[\"Root C++ CLI\"]\n  CLI --> CAP[\"Fast capture / DEX-SO-JNI scans\"]\n  APP[\"App memory / ART\"] -->|\"External reads\"| CAP\n  EV[\"tracefs / maps diff\"] --> CAP\n  CAP --> CHECK[\"Identity / coverage / format checks\"]\n  CHECK --> REC[\"PT_LOAD rebuild / safe ART merge\"]\n  REC --> OUT[\"DEX / SO / metadata / timeline\"]\n~~~\n\nThe scanner runs outside the target app. Checks are path-specific; recovered method composites are recorded as cross-time evidence, not atomic snapshots. [Implementation and safety boundaries](./NHDD-cpp-modular/docs/design.md).\n\n## Packages and documentation\n\n| Component | Start here |\n|---|---|\n| Android CLI | [Features, commands and outputs](./NHDD-cpp-modular/README.md) |\n| Python TUI | Install Python 3.10+ and rich; run nhdd_tui.py |\n| Windows GUI | ADB + WebView2 Runtime; keep the bundled Android engine beside the EXE |\n| Build / security | [Build notes](./BUILD_WINDOWS.md) · [Dependency audit](./NHDD-cpp-modular/docs/dependency-security.md) |\n\nARMv7 is cross-compiled only; 16KiB-page devices are not validated. ART recovery requires a supported Build ID, and short windows can still be missed. No-hook is not undetectable; structural validity is not proof of decrypted methods or a runnable APK.\n\n[MIT](./LICENSE). Third-party notices are preserved. Project: [Fruit-Guardians/NHDD](https://github.com/Fruit-Guardians/NHDD). Authorized research and your own apps only.\n",
+  "readmeHTML": "<p><p align=\"center\"><img src=\"./NHDD-cpp-modular/assets/nhdd-mark.svg\" alt=\"NHDD\" width=\"96\"></p></p>\n<p><h1 align=\"center\">NHDD</h1></p>\n<p><p align=\"center\"><strong>Runtime DEX / SO capture for rooted Android. No in-process injection.</strong></p></p>\n<p><p align=\"center\"></p>\n<p>  <img alt=\"Android · Root\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-root.svg\"></p>\n<p>  <img alt=\"ARM64 / ARMv7\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-abi.svg\"></p>\n<p>  <img alt=\"No Hook\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-no-hook.svg\"></p>\n<p>  <img alt=\"C++17\" src=\"./NHDD-cpp-modular/assets/badges/nhdd-cpp.svg\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/Fruit-Guardians/NHDD/releases/latest\">Download</a> ·</p>\n<p>  <a href=\"./NHDD-cpp-modular/README.md\">Usage</a> ·</p>\n<p>  <a href=\"./NHDD-cpp-modular/docs/design.md\">Design</a> ·</p>\n<p>  <a href=\"./README.zh-CN.md\">简体中文</a></p>\n<p></p></p>\n\n<h2>What it does</h2>\n\n<li>Captures resident DEX across rounds, with coverage, holes and content revisions.</li>\n<li>Discovers DEX through supported ART object layouts; safely combines short-lived method windows with provenance and conflict detection.</li>\n<li>Reconstructs ELF32/64 SO files using PT_LOAD and load bias.</li>\n<li>Supports cold launch, package process following, tracefs events and incremental maps scanning.</li>\n<li>Preserves CompactDex / VDEX / OAT evidence, including OAT 279; provides offline structural checks.</li>\n<li>Offers a standalone Android CLI, a Python TUI and a Windows desktop GUI. Controllers do not expose every advanced CLI option.</li>\n\n<h2>Quick start</h2>\n\n<p>Download the matching package from Releases and check SHA256SUMS.txt. The main device target is ARM64, built for API 34+. ADB, Root and permission to read the target process are required.</p>\n\n<p>~~~bash</p>\n<p>adb shell \"su -c id\"</p>\n<p>adb push nhdd /data/local/tmp/nhdd</p>\n<p>adb shell chmod 755 /data/local/tmp/nhdd</p>\n<p>adb shell \"su -c '/data/local/tmp/nhdd com.example.app /data/local/tmp/nhdd_run01 --all --watch 3'\"</p>\n<p>adb pull /data/local/tmp/nhdd_run01 ./nhdd_run01</p>\n<p>~~~</p>\n\n<p>Replace com.example.app with your own or explicitly authorized app. Use a fresh output directory: default runs may clear earlier artifacts. See the <a href=\"./NHDD-cpp-modular/README.md\">full guide</a> for ART, spawn, event modes and output semantics.</p>\n\n<h2>Interface</h2>\n\n<h3>Windows GUI</h3>\n\n<p>!<a href=\"./NHDD-cpp-modular/assets/screenshots/gui.png\">NHDD desktop GUI</a></p>\n\n<p>Built GUI frontend in a browser preview, before connecting a device; no private device identifiers or dumps are shown. This does not substitute for native WebView2 testing.</p>\n\n<h3>Python TUI</h3>\n\n<p>!<a href=\"./NHDD-cpp-modular/assets/screenshots/tui.svg\">NHDD TUI live progress dashboard</a></p>\n\n<p>App selection → configuration → live watch dashboard → results. Install rich and run <code>python nhdd_tui.py</code>, or select a target directly with <code>python nhdd_tui.py com.example.app</code>.</p>\n\n<p><details></p>\n<p><summary>App selection and configuration</summary></p>\n\n<p>!<a href=\"./NHDD-cpp-modular/assets/screenshots/tui-setup.svg\">NHDD TUI app selection and configuration</a></p>\n<p></details></p>\n\n<p>Both TUI views use the real Rich UI functions with synthetic packages, input and logs—not Root device results. Reproduce them with <code>python scripts/capture_tui.py</code>.</p>\n\n<h2>Architecture</h2>\n\n<p>~~~mermaid</p>\n<p>flowchart LR</p>\n<p>  UI[\"TUI / GUI\"] -->|\"ADB + su\"| CLI[\"Root C++ CLI\"]</p>\n<p>  CLI --> CAP[\"Fast capture / DEX-SO-JNI scans\"]</p>\n<p>  APP[\"App memory / ART\"] -->|\"External reads\"| CAP</p>\n<p>  EV[\"tracefs / maps diff\"] --> CAP</p>\n<p>  CAP --> CHECK[\"Identity / coverage / format checks\"]</p>\n<p>  CHECK --> REC[\"PT_LOAD rebuild / safe ART merge\"]</p>\n<p>  REC --> OUT[\"DEX / SO / metadata / timeline\"]</p>\n<p>~~~</p>\n\n<p>The scanner runs outside the target app. Checks are path-specific; recovered method composites are recorded as cross-time evidence, not atomic snapshots. <a href=\"./NHDD-cpp-modular/docs/design.md\">Implementation and safety boundaries</a>.</p>\n\n<h2>Packages and documentation</h2>\n\n<p>| Component | Start here |</p>\n<p>|---|---|</p>\n<p>| Android CLI | <a href=\"./NHDD-cpp-modular/README.md\">Features, commands and outputs</a> |</p>\n<p>| Python TUI | Install Python 3.10+ and rich; run nhdd_tui.py |</p>\n<p>| Windows GUI | ADB + WebView2 Runtime; keep the bundled Android engine beside the EXE |</p>\n<p>| Build / security | <a href=\"./BUILD_WINDOWS.md\">Build notes</a> · <a href=\"./NHDD-cpp-modular/docs/dependency-security.md\">Dependency audit</a> |</p>\n\n<p>ARMv7 is cross-compiled only; 16KiB-page devices are not validated. ART recovery requires a supported Build ID, and short windows can still be missed. No-hook is not undetectable; structural validity is not proof of decrypted methods or a runnable APK.</p>\n\n<p><a href=\"./LICENSE\">MIT</a>. Third-party notices are preserved. Project: <a href=\"https://github.com/Fruit-Guardians/NHDD\">Fruit-Guardians/NHDD</a>. Authorized research and your own apps only.</p>",
+  "homepageUrl": "https://github.com/Fruit-Guardians/NHDD/releases/latest",
+  "sourceUrl": "https://github.com/Fruit-Guardians/NHDD",
+  "url": "https://github.com/Fruit-Guardians/NHDD",
+  "latestRelease": {
+    "name": "v9.0.2",
+    "version": "v9.0.2",
+    "time": "2026-10-22T09:50:45Z",
+    "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-android-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "v9.0.2",
+      "tagName": "v9.0.2",
+      "publishedAt": "2026-10-22T09:50:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-manifest.json",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/build-manifest.json",
+          "size": 1621,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.2-android-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-android-arm64-v8a.zip",
+          "size": 640200,
+          "downloadCount": 4
+        },
+        {
+          "name": "NHDD-v9.0.2-android-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-android-armeabi-v7a.zip",
+          "size": 567618,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.2-source.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-source.zip",
+          "size": 729259,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.2-tui.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-tui.zip",
+          "size": 694313,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.2-windows-amd64-gui.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/NHDD-v9.0.2-windows-amd64-gui.zip",
+          "size": 5443962,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.2/SHA256SUMS.txt",
+          "size": 482,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v9.0.1",
+      "tagName": "v9.0.1",
+      "publishedAt": "2026-10-21T12:20:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-manifest.json",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/build-manifest.json",
+          "size": 1621,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.1-android-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/NHDD-v9.0.1-android-arm64-v8a.zip",
+          "size": 640196,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.1-android-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/NHDD-v9.0.1-android-armeabi-v7a.zip",
+          "size": 567614,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.1-source.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/NHDD-v9.0.1-source.zip",
+          "size": 676743,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.1-tui.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/NHDD-v9.0.1-tui.zip",
+          "size": 694313,
+          "downloadCount": 1
+        },
+        {
+          "name": "NHDD-v9.0.1-windows-amd64-gui.zip",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/NHDD-v9.0.1-windows-amd64-gui.zip",
+          "size": 5421594,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/Fruit-Guardians/NHDD/releases/download/v9.0.1/SHA256SUMS.txt",
+          "size": 482,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

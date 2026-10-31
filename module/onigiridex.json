@@ -1,0 +1,389 @@
+{
+  "readme": "# OnigiriDeX\n\nOnigiri is a custom system for the **Galaxy Z Flip5 (SM-F731B)**. It's built on Android 15 / One UI 7 and based on [UN1CA](https://github.com/salvogiangri/UN1CA/tree/fifteen).\n\n## What it does\n\n- Runs the whole phone on the **small outside screen** because this uses the software from the **Galaxy Z Fold5**, so the outside screen works like a full phone screen.\n  With auto-rotate on, it also turns upside down, so you can hold the phone\n  hinge down with the cameras on top. The inside screen stays off unless you\n  turn on **Use inner screen when open**.\n- Lets you plug the phone into a monitor and use **Samsung DeX** (a desktop mode, like a small computer).\n  A live wallpaper you set for the home screen, like one from Wallpaper\n  Engine, shows on the DeX desktop too. Pick a wallpaper in DeX's own\n  settings to go back to a picture there.\n- Can split the DeX desktop into **zones** and open your favourite apps in them.\n- Can work as a **car screen**: it turns on with the car and sleeps when the car turns off.\n- Bluetooth headphones, speakers and cars no longer start your music by\n  themselves when they connect. Start it on the phone; after that, their play\n  and pause buttons work as usual.\n- Media stays on a connected Bluetooth device when a monitor connects, instead\n  of switching to the monitor. You can still pick another output in Media\n  output.\n- Skips the **unlocked bootloader warning** when it starts, so it boots about\n  9 seconds sooner and also starts while the power key is held down (for a\n  build without a battery that uses a power-on board). The warning still\n  shows when updating and on the first start after an update.\n- Comes with root access (KernelSU + susFS) and\n  [built-in app privacy components](#built-in-components).\n\n## Please read first\n\n**Most of this project was written by AI, and only part of it has been checked\nby a person.** The maintainer doesn't have time to review every change.\n\nInstalling it can wipe your phone or stop it from starting up. Before you try:\n\n- Back up everything you care about.\n- Keep a copy of the original Samsung software so you can go back.\n\n**Use it at your own risk.**\n\n## Installing\n\n**You need:**\n\n- A Galaxy Z Flip5 **SM-F731B**. Other Flip5 models haven't been tested.\n- An **unlocked bootloader**. You can only unlock it on Android 15 / One UI 7\n  or older; some early Android 16 / One UI 8 builds can still be downgraded\n  first.\n- The original Samsung software [F731BXXS5EYI1](https://samfw.com/firmware/SM-F731B/XXV/F731BXXS5EYI1) for the SM-F731B. You only need its BL, CP and CSC files.\n- Something to flash with, one of:\n  - a computer: **Odin3** on Windows, **odin4** on Linux and macOS, or\n    [brokkr](https://github.com/Gabriel2392/brokkr-flash) on any of them;\n  - another Android phone with brokkr and a USB-C cable or OTG adapter between the two phones.\n\n**1. Download Onigiri.** From the [latest release](https://github.com/Kinue72/OnigiriDeX/releases/latest),\ndownload every `Onigiri_AP_….tar.md5.0`, `.1`, `.2`… part. GitHub can't hold\nthe whole 8 GB file in one piece, so join the parts\nback into one file with the same name, minus the number at the end. The\nrelease notes show the exact command for Windows, macOS and Linux; on an\nAndroid phone, run the Linux command in [Termux](https://termux.dev).\n\n**2. Check the download (optional).** To make sure nothing got corrupted,\ndownload the `.sha256` file too and run `sha256sum -c Onigiri_AP_*.sha256` (Linux and\nTermux) or `shasum -a 256 -c Onigiri_AP_*.sha256` (macOS); it should say `OK`.\nOn Windows, compare `certutil -hashfile <file> SHA256` with the number in the\n`.sha256` file.\n\n**3. Flash it.** Turn the Flip5 off, hold both volume keys while you plug in\nUSB, then press Volume Up to enter Download Mode. Put the Onigiri file in\n**AP** and the Samsung BL, CP and CSC files in their slots.\n\n- **Odin3 (Windows):** press Start.\n- **odin4 (Linux, macOS):** follow [docs/flashing.md](docs/flashing.md). It\n  needs two small fixes to odin4, explained there.\n- **brokkr (Windows, macOS, Linux, Android):** start the flash. On Android,\n  connect the two phones first.\n\nOnly odin4 has been tested with Onigiri so far. If the phone keeps restarting\nafter Odin3 or brokkr, flash it again with odin4.\n\nUse **CSC** the first time: it wipes the phone, which a phone coming from\nSamsung's own software needs. Never flash Fold5 files. The first start takes a\nfew minutes.\n\n**Updating.** Open **Settings → Onigiri Software → Software update** and tap\nit. When a new version is out, tap again: the phone downloads only what\nchanged, restarts, installs it in about a minute and starts again. Your data\nstays. If it says the new version needs a full flash, flash just the new AP\n(no BL, CP or CSC), which keeps your data too.\n\n<details>\n<summary><b>Building it yourself</b></summary>\n\nYou need a Linux computer with Bash, Python 3 and Java 17.\n\n**1. Get the code and tools**\n\n```sh\ngit clone --recurse-submodules https://github.com/Kinue72/OnigiriDeX.git\ncd OnigiriDeX\nbash\nsource ./buildenv.sh SM-F731B\nonigiri build_dependencies\n```\n\n**2. Download the original Samsung software**\n\nPut these full firmware ZIP files in the `firmware/` folder:\n\n- Flip5: SM-F731B / XXV / F731BXXS5EYI1\n- Fold5: SM-F946B / XXV / F946BXXS5EYI1\n- Galaxy S24 (only used for screen colours): SM-S921B / S921BXXS9BYH1\n\n**3. Build**\n\nChange the file names below to match the files you downloaded:\n\n```sh\npython3 scripts/import_fw.py target firmware/flip5.zip\npython3 scripts/import_fw.py donor firmware/fold5.zip\nonigiri extract_fw\nonigiri extract_fw --ignore-source --ignore-target SM-F946B/XXV\npython3 scripts/extract_adaptive_display.py firmware/s24.zip\nsource ./buildenv.sh SM-F731B\nonigiri build_kernel\nonigiri make_rom\nonigiri build_odin\n```\n\nThe finished files show up in the `out/` folder.\n\n**4. Install it on the phone**\n\nFlash `out/Onigiri_AP_….tar.md5` as in [Installing](#installing), or follow\n[docs/flashing.md](docs/flashing.md) for odin4. [docs/releasing.md](docs/releasing.md)\nexplains how releases and over-the-air updates are made.\n\nA few things to keep in mind:\n\n- The build creates two private keys, `security/onigiri_platform.pk8` and\n  `security/onigiri_ota.pk8` (recovery only installs updates signed with it).\n  Keep them safe, don't share them, and use the same ones for every future update.\n- Only install the Flip5's own low-level parts (bootloader, modem and\n  hardware files). Never put Fold5 ones on the phone.\n- Parts of the build are made for this exact Samsung software version. If you\n  use a newer version, the build will stop on purpose so nothing breaks\n  quietly.\n\n</details>\n\n## Extra features\n\nOnigiri's own settings live in **Settings → Onigiri Software**, in English or\nVietnamese following the phone's language. Here's what each part does.\n\n### DeX zones\n\n![Zone layouts in Onigiri Software](docs/images/onigiri-settings-zones.png)\n\nOff by default. Zones split the monitor into fixed areas, like a map on one\nside and other apps next to it. You can pick a map on the left or right, three\ncolumns, a grid, or a priority grid.\n\n- **Snap windows**: drag a window to the edge of the screen and it fills the\n  zone there.\n- **New windows** open in the main zone.\n- **Zone apps**: pick an app for each zone. It opens in its zone every time it\n  starts, even if you left it maximized, and all of them open by themselves\n  each time DeX starts on a wired monitor (handy in the car). Each app can\n  only have one zone.\n\n![DeX desktop with the Map left layout](docs/images/dex-zones-map-left.jpg)\n\n![Zone apps opened in the Map and Main zones](docs/images/dex-zone-apps.jpg)\n\n### Phone settings\n\n![Sleep when folded, power on and standby switches, and the standby shutdown time](docs/images/onigiri-settings-car.png)\n\n- **Use inner screen when open** (off by default, under Display settings): the\n  phone works like a stock Flip5. Opening it shows the inside screen and turns\n  the outside one off, and closing it goes back to the outside screen. It\n  takes effect the next time you open the phone.\n- **Power on when power connected**: when the phone is off and gets power, it\n  turns on by itself once the battery reaches 5%. With this off, a phone that\n  is off and gets plugged in starts for about 15 seconds before it shows the\n  charging screen.\n- **Standby when unplugged**: when the car turns off, the screen turns off\n  right away. The phone waits a minute and then goes into a deep sleep to save\n  battery. It turns on airplane mode, turns off Wi-Fi, Bluetooth and location,\n  closes apps and stops powering the monitor. It checks every 30 seconds\n  whether the car is back (less often after a long time, or right away if you\n  press the power button), and turns everything back on when it is. If the car\n  stays off longer than **Shut down after** (1 hour to 4 days, 4 days by\n  default), or the battery drops below 10%, the phone shuts down.\n\n### Monitor settings\n\n![DeX monitor settings](docs/images/onigiri-settings-display.png)\n\nWhen the phone restarts on a powered dock (like Samsung's DeX Pad), some docks\nkeep the monitor dark until the cable is plugged in again. If the monitor\nhasn't come on about 15 seconds after the phone starts, Onigiri reconnects the\nUSB-C port by itself. USB devices and charging drop out for a moment.\n\n- **External display mode**: pick the resolution and refresh rate for your\n  monitor. The list shows what your monitor supports. Unplug and plug the\n  cable back in after changing it. **Automatic** uses the monitor's default,\n  or its fastest refresh rate while **DeX high refresh rate** or **Mirroring\n  high refresh rate** is on.\n- **External display rotation**: turns the desktop on the monitor. It changes\n  right away.\n- **Monitor brightness**: sets the monitor's own brightness from the phone over\n  DDC/CI, the way BetterDisplay does on a Mac. In DeX, the quick panel (tap\n  the clock and battery corner of the taskbar) gets a brightness slider for\n  the monitor, styled like DeX's volume slider; the page has the same\n  **Brightness** slider. With **Auto** on (off by default), the monitor\n  follows the light sensor beside the screen in use: the inside one while the\n  inside screen is on, otherwise the one on the outside, which faces the cabin\n  when the phone sits folded in a car. Like a phone's own auto brightness, it\n  learns from the slider: move it in the dark and nights stay that way, move\n  it in sunlight and days do, without changing the rest. It brightens within\n  about 2 seconds and dims over about 8, so a tunnel or a shadow doesn't make\n  it flicker, and it waits for the light to change by 10% brighter or 20%\n  darker, so steady light holds a steady level. Auto's changes fade over a\n  second and a half, while the slider changes the monitor within about half a\n  second and teaches Auto where it stops. The page shows\n  the light and the monitor's level live. The monitor needs DDC/CI turned on\n  in its own menu; some USB-C to HDMI adapters don't pass it through, and then\n  the row says the monitor isn't supported.\n- **DeX high refresh rate** (experimental, off by default): lets the desktop\n  run smoother than 60 frames per second on fast monitors. In testing, a\n  144 Hz monitor reached about 120 frames per second instead of 60, with the\n  outside screen on or off. Unplug and plug the cable back in after turning it\n  on. The outside screen can stay on, but it updates less often while the\n  monitor runs faster. Starting DeX right after mirroring on the inside screen\n  runs about 100 instead; plug the cable back in for the full rate. Some apps\n  may still run slower. Overheating protection still works as usual.\n- **Mirroring high refresh rate** (experimental, off by default): the outside\n  screen only runs at 60 Hz, which holds a mirrored monitor to 60 frames per\n  second too. With this on, opening the phone while it mirrors a monitor (DeX\n  off) shows the 120 Hz inside screen instead, shaped to fill the monitor, and\n  turns the outside one off. Plug the cable back in after turning it on, so\n  the monitor switches to its fastest refresh rate.\n  Closing the phone goes back to the outside screen. In testing, scrolling\n  reached about 118 frames per second on a 144 Hz monitor, the most the\n  inside screen can show. Web browsers still run at 60 there.\n\nPower saving holds every screen to 60 Hz, so the phone turns it off while it\ncharges and back on when charging stops, if it was on before.\n\n**Stay awake** in Developer options keeps the screen at its normal brightness\nwhile the phone charges. In stock Android it only stops the screen from\nturning off, and the screen still dims at the screen timeout.\n\nThe experimental [High performance option](docs/thermal.md) in Onigiri Software is\noff by default, with English and Vietnamese text. With an external cooler, it\nkeeps DeX at a steady 144 Hz (143 fps instead of 127–131 in TestUFO) and holds\nhigher clocks under sustained load, without raising peak clocks. Restart to apply.\n\n<details>\n<summary><b>Boring stuffs</b></summary>\n\n- **Allow secure screenshot**: lets you take screenshots in apps that normally\n  block them.\n- **Disable screenshot detection**: apps are no longer told when you take a\n  screenshot.\n- **Unlock higher FPS in games**: some games only offer their smoothest\n  settings on certain phones. This makes them think you have one of those\n  phones.\n- **Hide developer status from apps**: some apps, often banking apps, refuse\n  to work when developer options are turned on. This hides it from them.\n- **Sleep when folded**: turns the screen off and locks the phone when you\n  close it.\n- **Play Integrity Fix**: helps apps that check whether your phone has been\n  changed, like Google Wallet or banking apps, keep working. The date shows\n  which version you have. Tap the name to check for a newer one.\n- **Play power on sound effect**: plays Samsung's sound when the phone starts.\n  Off by default.\n- **Enable live blur effect**: gives menus and panels a frosted-glass look.\n  The phone needs a restart after you change it.\n- **Keep apps in cover rotation**: apps that only work upright, like TikTok\n  and Messenger, no longer turn the outside screen sideways. They follow the\n  screen's rotation instead. Off by default.\n- **Allow application downgrade**: lets you install an older version of an\n  app over a newer one.\n- **Disable low target SDK block**: lets you install very old apps that\n  Android 15 normally refuses.\n- **Disable ASKS**: turns off a Samsung security check that can stop some\n  apps from installing or running.\n\n</details>\n\n### Built-in components\n\n**Settings → Onigiri Software** has a switch and a page for each component.\nThe switch saves your choice; Status shows what is running. Switch changes\nand component updates take effect after a restart.\n\n- **[HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**: hides your other apps\n  from the apps you pick. It comes set up for common banking, shopping,\n  root checker and driver apps (Grab Driver, Green SM Driver, ShopeeFood\n  Driver and beDriver/bePartner). **App rules** opens the original HMA app.\n  Its backend loads directly in Android without Vector or Zygisk.\n- **[TEESimulator](https://github.com/JingMatrix/TEESimulator)**: runs its\n  standalone key-attestation service. Existing keys and app targets are kept.\n  New installations use upstream's AOSP software key, which does not\n  guarantee passing Play Integrity or any particular app's checks.\n- **[BRENE](https://github.com/rrr333nnn333/BRENE)**: provides its essential\n  **Hide custom ROM paths** and **Hide /system/addon.d** features through susFS.\n  Both default to on. Its other features are not ported; developer options\n  and USB or wireless debugging stay under your control.\n\nTap the version inside a component's page to check for an update, like PIF.\nOnigiri's update feed selects compatible upstream releases and verifies\ntheir hashes. Updates wait for a restart and keep the previous payload for\nrecovery. A release needing a different loader or configuration format\nreports that a ROM update is required; TEESimulator v4 currently needs one.\n\nThe old first-boot module installer is disabled. Vector, NeoZygisk, Hybrid\nMount and Tricky Addon are no longer installed by the ROM. Existing modules\nand their data remain untouched, and upgrades default the built-in switches\nto off. A built-in component stays unavailable while its module copy is\nenabled. Turn that copy off in KernelSU, enable the built-in switch, and\nrestart when you are ready to migrate. Keep the disabled module while testing;\nBRENE's uninstall script deletes its saved configuration.\n\nThese adapters have host build and recovery tests. Loading hooks and the\nnative Settings pages still need validation on the Flip5 before release.\nSee [component integration and recovery](docs/essential-components.md).\n\n## For contributors\n\nThe kernel (the core of the system) comes from\n[GoRhanHee's kernel](https://github.com/GoRhanHee/android_kernel_samsung_sm8550) and lives in `external/kernel`. Our own changes are kept as numbered patch\nfiles in `external/patches/kernel/`. The build adds them in and removes them\nagain when it's done. Please put your kernel changes there and leave\n`external/kernel` itself untouched.\n\n## Help and feedback\n\nFound a problem or have an idea? [Open an issue](https://github.com/Kinue72/OnigiriDeX/issues) or [send a pull request](https://github.com/Kinue72/OnigiriDeX/pulls).\n\nSee [LICENSE](LICENSE) and [NOTICE](NOTICE) for license and credits.\n",
+  "readmeHTML": "<h1>OnigiriDeX</h1>\n\n<p>Onigiri is a custom system for the <b>Galaxy Z Flip5 (SM-F731B)</b>. It's built on Android 15 / One UI 7 and based on <a href=\"https://github.com/salvogiangri/UN1CA/tree/fifteen\">UN1CA</a>.</p>\n\n<h2>What it does</h2>\n\n<li>Runs the whole phone on the **small outside screen** because this uses the software from the **Galaxy Z Fold5**, so the outside screen works like a full phone screen.</li>\n<p>  With auto-rotate on, it also turns upside down, so you can hold the phone</p>\n<p>  hinge down with the cameras on top. The inside screen stays off unless you</p>\n<p>  turn on <b>Use inner screen when open</b>.</p>\n<li>Lets you plug the phone into a monitor and use **Samsung DeX** (a desktop mode, like a small computer).</li>\n<p>  A live wallpaper you set for the home screen, like one from Wallpaper</p>\n<p>  Engine, shows on the DeX desktop too. Pick a wallpaper in DeX's own</p>\n<p>  settings to go back to a picture there.</p>\n<li>Can split the DeX desktop into **zones** and open your favourite apps in them.</li>\n<li>Can work as a **car screen**: it turns on with the car and sleeps when the car turns off.</li>\n<li>Bluetooth headphones, speakers and cars no longer start your music by</li>\n<p>  themselves when they connect. Start it on the phone; after that, their play</p>\n<p>  and pause buttons work as usual.</p>\n<li>Media stays on a connected Bluetooth device when a monitor connects, instead</li>\n<p>  of switching to the monitor. You can still pick another output in Media</p>\n<p>  output.</p>\n<li>Skips the **unlocked bootloader warning** when it starts, so it boots about</li>\n<p>  9 seconds sooner and also starts while the power key is held down (for a</p>\n<p>  build without a battery that uses a power-on board). The warning still</p>\n<p>  shows when updating and on the first start after an update.</p>\n<li>Comes with root access (KernelSU + susFS) and</li>\n<p>  <a href=\"#built-in-components\">built-in app privacy components</a>.</p>\n\n<h2>Please read first</h2>\n\n<p>**Most of this project was written by AI, and only part of it has been checked</p>\n<p>by a person.** The maintainer doesn't have time to review every change.</p>\n\n<p>Installing it can wipe your phone or stop it from starting up. Before you try:</p>\n\n<li>Back up everything you care about.</li>\n<li>Keep a copy of the original Samsung software so you can go back.</li>\n\n<p><b>Use it at your own risk.</b></p>\n\n<h2>Installing</h2>\n\n<p><b>You need:</b></p>\n\n<li>A Galaxy Z Flip5 **SM-F731B**. Other Flip5 models haven't been tested.</li>\n<li>An **unlocked bootloader**. You can only unlock it on Android 15 / One UI 7</li>\n<p>  or older; some early Android 16 / One UI 8 builds can still be downgraded</p>\n<p>  first.</p>\n<li>The original Samsung software [F731BXXS5EYI1](https://samfw.com/firmware/SM-F731B/XXV/F731BXXS5EYI1) for the SM-F731B. You only need its BL, CP and CSC files.</li>\n<li>Something to flash with, one of:</li>\n<p>  - a computer: <b>Odin3</b> on Windows, <b>odin4</b> on Linux and macOS, or</p>\n<p>    <a href=\"https://github.com/Gabriel2392/brokkr-flash\">brokkr</a> on any of them;</p>\n<p>  - another Android phone with brokkr and a USB-C cable or OTG adapter between the two phones.</p>\n\n<p><b>1. Download Onigiri.</b> From the <a href=\"https://github.com/Kinue72/OnigiriDeX/releases/latest\">latest release</a>,</p>\n<p>download every <code>Onigiri_AP_….tar.md5.0</code>, <code>.1</code>, <code>.2</code>… part. GitHub can't hold</p>\n<p>the whole 8 GB file in one piece, so join the parts</p>\n<p>back into one file with the same name, minus the number at the end. The</p>\n<p>release notes show the exact command for Windows, macOS and Linux; on an</p>\n<p>Android phone, run the Linux command in <a href=\"https://termux.dev\">Termux</a>.</p>\n\n<p><b>2. Check the download (optional).</b> To make sure nothing got corrupted,</p>\n<p>download the <code>.sha256</code> file too and run <code>sha256sum -c Onigiri_AP_*.sha256</code> (Linux and</p>\n<p>Termux) or <code>shasum -a 256 -c Onigiri_AP_*.sha256</code> (macOS); it should say <code>OK</code>.</p>\n<p>On Windows, compare <code>certutil -hashfile <file> SHA256</code> with the number in the</p>\n<p><code>.sha256</code> file.</p>\n\n<p><b>3. Flash it.</b> Turn the Flip5 off, hold both volume keys while you plug in</p>\n<p>USB, then press Volume Up to enter Download Mode. Put the Onigiri file in</p>\n<p><b>AP</b> and the Samsung BL, CP and CSC files in their slots.</p>\n\n<li>**Odin3 (Windows):** press Start.</li>\n<li>**odin4 (Linux, macOS):** follow [docs/flashing.md](docs/flashing.md). It</li>\n<p>  needs two small fixes to odin4, explained there.</p>\n<li>**brokkr (Windows, macOS, Linux, Android):** start the flash. On Android,</li>\n<p>  connect the two phones first.</p>\n\n<p>Only odin4 has been tested with Onigiri so far. If the phone keeps restarting</p>\n<p>after Odin3 or brokkr, flash it again with odin4.</p>\n\n<p>Use <b>CSC</b> the first time: it wipes the phone, which a phone coming from</p>\n<p>Samsung's own software needs. Never flash Fold5 files. The first start takes a</p>\n<p>few minutes.</p>\n\n<p><b>Updating.</b> Open <b>Settings → Onigiri Software → Software update</b> and tap</p>\n<p>it. When a new version is out, tap again: the phone downloads only what</p>\n<p>changed, restarts, installs it in about a minute and starts again. Your data</p>\n<p>stays. If it says the new version needs a full flash, flash just the new AP</p>\n<p>(no BL, CP or CSC), which keeps your data too.</p>\n\n<p><details></p>\n<p><summary><b>Building it yourself</b></summary></p>\n\n<p>You need a Linux computer with Bash, Python 3 and Java 17.</p>\n\n<p><b>1. Get the code and tools</b></p>\n\n<pre>git clone --recurse-submodules https://github.com/Kinue72/OnigiriDeX.git\ncd OnigiriDeX\nbash\nsource ./buildenv.sh SM-F731B\nonigiri build_dependencies</pre>\n\n<p><b>2. Download the original Samsung software</b></p>\n\n<p>Put these full firmware ZIP files in the <code>firmware/</code> folder:</p>\n\n<li>Flip5: SM-F731B / XXV / F731BXXS5EYI1</li>\n<li>Fold5: SM-F946B / XXV / F946BXXS5EYI1</li>\n<li>Galaxy S24 (only used for screen colours): SM-S921B / S921BXXS9BYH1</li>\n\n<p><b>3. Build</b></p>\n\n<p>Change the file names below to match the files you downloaded:</p>\n\n<pre>python3 scripts/import_fw.py target firmware/flip5.zip\npython3 scripts/import_fw.py donor firmware/fold5.zip\nonigiri extract_fw\nonigiri extract_fw --ignore-source --ignore-target SM-F946B/XXV\npython3 scripts/extract_adaptive_display.py firmware/s24.zip\nsource ./buildenv.sh SM-F731B\nonigiri build_kernel\nonigiri make_rom\nonigiri build_odin</pre>\n\n<p>The finished files show up in the <code>out/</code> folder.</p>\n\n<p><b>4. Install it on the phone</b></p>\n\n<p>Flash <code>out/Onigiri_AP_….tar.md5</code> as in <a href=\"#installing\">Installing</a>, or follow</p>\n<p><a href=\"docs/flashing.md\">docs/flashing.md</a> for odin4. <a href=\"docs/releasing.md\">docs/releasing.md</a></p>\n<p>explains how releases and over-the-air updates are made.</p>\n\n<p>A few things to keep in mind:</p>\n\n<li>The build creates two private keys, `security/onigiri_platform.pk8` and</li>\n<p>  <code>security/onigiri_ota.pk8</code> (recovery only installs updates signed with it).</p>\n<p>  Keep them safe, don't share them, and use the same ones for every future update.</p>\n<li>Only install the Flip5's own low-level parts (bootloader, modem and</li>\n<p>  hardware files). Never put Fold5 ones on the phone.</p>\n<li>Parts of the build are made for this exact Samsung software version. If you</li>\n<p>  use a newer version, the build will stop on purpose so nothing breaks</p>\n<p>  quietly.</p>\n\n<p></details></p>\n\n<h2>Extra features</h2>\n\n<p>Onigiri's own settings live in <b>Settings → Onigiri Software</b>, in English or</p>\n<p>Vietnamese following the phone's language. Here's what each part does.</p>\n\n<h3>DeX zones</h3>\n\n<p>!<a href=\"docs/images/onigiri-settings-zones.png\">Zone layouts in Onigiri Software</a></p>\n\n<p>Off by default. Zones split the monitor into fixed areas, like a map on one</p>\n<p>side and other apps next to it. You can pick a map on the left or right, three</p>\n<p>columns, a grid, or a priority grid.</p>\n\n<li>**Snap windows**: drag a window to the edge of the screen and it fills the</li>\n<p>  zone there.</p>\n<li>**New windows** open in the main zone.</li>\n<li>**Zone apps**: pick an app for each zone. It opens in its zone every time it</li>\n<p>  starts, even if you left it maximized, and all of them open by themselves</p>\n<p>  each time DeX starts on a wired monitor (handy in the car). Each app can</p>\n<p>  only have one zone.</p>\n\n<p>!<a href=\"docs/images/dex-zones-map-left.jpg\">DeX desktop with the Map left layout</a></p>\n\n<p>!<a href=\"docs/images/dex-zone-apps.jpg\">Zone apps opened in the Map and Main zones</a></p>\n\n<h3>Phone settings</h3>\n\n<p>!<a href=\"docs/images/onigiri-settings-car.png\">Sleep when folded, power on and standby switches, and the standby shutdown time</a></p>\n\n<li>**Use inner screen when open** (off by default, under Display settings): the</li>\n<p>  phone works like a stock Flip5. Opening it shows the inside screen and turns</p>\n<p>  the outside one off, and closing it goes back to the outside screen. It</p>\n<p>  takes effect the next time you open the phone.</p>\n<li>**Power on when power connected**: when the phone is off and gets power, it</li>\n<p>  turns on by itself once the battery reaches 5%. With this off, a phone that</p>\n<p>  is off and gets plugged in starts for about 15 seconds before it shows the</p>\n<p>  charging screen.</p>\n<li>**Standby when unplugged**: when the car turns off, the screen turns off</li>\n<p>  right away. The phone waits a minute and then goes into a deep sleep to save</p>\n<p>  battery. It turns on airplane mode, turns off Wi-Fi, Bluetooth and location,</p>\n<p>  closes apps and stops powering the monitor. It checks every 30 seconds</p>\n<p>  whether the car is back (less often after a long time, or right away if you</p>\n<p>  press the power button), and turns everything back on when it is. If the car</p>\n<p>  stays off longer than <b>Shut down after</b> (1 hour to 4 days, 4 days by</p>\n<p>  default), or the battery drops below 10%, the phone shuts down.</p>\n\n<h3>Monitor settings</h3>\n\n<p>!<a href=\"docs/images/onigiri-settings-display.png\">DeX monitor settings</a></p>\n\n<p>When the phone restarts on a powered dock (like Samsung's DeX Pad), some docks</p>\n<p>keep the monitor dark until the cable is plugged in again. If the monitor</p>\n<p>hasn't come on about 15 seconds after the phone starts, Onigiri reconnects the</p>\n<p>USB-C port by itself. USB devices and charging drop out for a moment.</p>\n\n<li>**External display mode**: pick the resolution and refresh rate for your</li>\n<p>  monitor. The list shows what your monitor supports. Unplug and plug the</p>\n<p>  cable back in after changing it. <b>Automatic</b> uses the monitor's default,</p>\n<p>  or its fastest refresh rate while <b>DeX high refresh rate</b> or **Mirroring</p>\n<p>  high refresh rate** is on.</p>\n<li>**External display rotation**: turns the desktop on the monitor. It changes</li>\n<p>  right away.</p>\n<li>**Monitor brightness**: sets the monitor's own brightness from the phone over</li>\n<p>  DDC/CI, the way BetterDisplay does on a Mac. In DeX, the quick panel (tap</p>\n<p>  the clock and battery corner of the taskbar) gets a brightness slider for</p>\n<p>  the monitor, styled like DeX's volume slider; the page has the same</p>\n<p>  <b>Brightness</b> slider. With <b>Auto</b> on (off by default), the monitor</p>\n<p>  follows the light sensor beside the screen in use: the inside one while the</p>\n<p>  inside screen is on, otherwise the one on the outside, which faces the cabin</p>\n<p>  when the phone sits folded in a car. Like a phone's own auto brightness, it</p>\n<p>  learns from the slider: move it in the dark and nights stay that way, move</p>\n<p>  it in sunlight and days do, without changing the rest. It brightens within</p>\n<p>  about 2 seconds and dims over about 8, so a tunnel or a shadow doesn't make</p>\n<p>  it flicker, and it waits for the light to change by 10% brighter or 20%</p>\n<p>  darker, so steady light holds a steady level. Auto's changes fade over a</p>\n<p>  second and a half, while the slider changes the monitor within about half a</p>\n<p>  second and teaches Auto where it stops. The page shows</p>\n<p>  the light and the monitor's level live. The monitor needs DDC/CI turned on</p>\n<p>  in its own menu; some USB-C to HDMI adapters don't pass it through, and then</p>\n<p>  the row says the monitor isn't supported.</p>\n<li>**DeX high refresh rate** (experimental, off by default): lets the desktop</li>\n<p>  run smoother than 60 frames per second on fast monitors. In testing, a</p>\n<p>  144 Hz monitor reached about 120 frames per second instead of 60, with the</p>\n<p>  outside screen on or off. Unplug and plug the cable back in after turning it</p>\n<p>  on. The outside screen can stay on, but it updates less often while the</p>\n<p>  monitor runs faster. Starting DeX right after mirroring on the inside screen</p>\n<p>  runs about 100 instead; plug the cable back in for the full rate. Some apps</p>\n<p>  may still run slower. Overheating protection still works as usual.</p>\n<li>**Mirroring high refresh rate** (experimental, off by default): the outside</li>\n<p>  screen only runs at 60 Hz, which holds a mirrored monitor to 60 frames per</p>\n<p>  second too. With this on, opening the phone while it mirrors a monitor (DeX</p>\n<p>  off) shows the 120 Hz inside screen instead, shaped to fill the monitor, and</p>\n<p>  turns the outside one off. Plug the cable back in after turning it on, so</p>\n<p>  the monitor switches to its fastest refresh rate.</p>\n<p>  Closing the phone goes back to the outside screen. In testing, scrolling</p>\n<p>  reached about 118 frames per second on a 144 Hz monitor, the most the</p>\n<p>  inside screen can show. Web browsers still run at 60 there.</p>\n\n<p>Power saving holds every screen to 60 Hz, so the phone turns it off while it</p>\n<p>charges and back on when charging stops, if it was on before.</p>\n\n<p><b>Stay awake</b> in Developer options keeps the screen at its normal brightness</p>\n<p>while the phone charges. In stock Android it only stops the screen from</p>\n<p>turning off, and the screen still dims at the screen timeout.</p>\n\n<p>The experimental <a href=\"docs/thermal.md\">High performance option</a> in Onigiri Software is</p>\n<p>off by default, with English and Vietnamese text. With an external cooler, it</p>\n<p>keeps DeX at a steady 144 Hz (143 fps instead of 127–131 in TestUFO) and holds</p>\n<p>higher clocks under sustained load, without raising peak clocks. Restart to apply.</p>\n\n<p><details></p>\n<p><summary><b>Boring stuffs</b></summary></p>\n\n<li>**Allow secure screenshot**: lets you take screenshots in apps that normally</li>\n<p>  block them.</p>\n<li>**Disable screenshot detection**: apps are no longer told when you take a</li>\n<p>  screenshot.</p>\n<li>**Unlock higher FPS in games**: some games only offer their smoothest</li>\n<p>  settings on certain phones. This makes them think you have one of those</p>\n<p>  phones.</p>\n<li>**Hide developer status from apps**: some apps, often banking apps, refuse</li>\n<p>  to work when developer options are turned on. This hides it from them.</p>\n<li>**Sleep when folded**: turns the screen off and locks the phone when you</li>\n<p>  close it.</p>\n<li>**Play Integrity Fix**: helps apps that check whether your phone has been</li>\n<p>  changed, like Google Wallet or banking apps, keep working. The date shows</p>\n<p>  which version you have. Tap the name to check for a newer one.</p>\n<li>**Play power on sound effect**: plays Samsung's sound when the phone starts.</li>\n<p>  Off by default.</p>\n<li>**Enable live blur effect**: gives menus and panels a frosted-glass look.</li>\n<p>  The phone needs a restart after you change it.</p>\n<li>**Keep apps in cover rotation**: apps that only work upright, like TikTok</li>\n<p>  and Messenger, no longer turn the outside screen sideways. They follow the</p>\n<p>  screen's rotation instead. Off by default.</p>\n<li>**Allow application downgrade**: lets you install an older version of an</li>\n<p>  app over a newer one.</p>\n<li>**Disable low target SDK block**: lets you install very old apps that</li>\n<p>  Android 15 normally refuses.</p>\n<li>**Disable ASKS**: turns off a Samsung security check that can stop some</li>\n<p>  apps from installing or running.</p>\n\n<p></details></p>\n\n<h3>Built-in components</h3>\n\n<p><b>Settings → Onigiri Software</b> has a switch and a page for each component.</p>\n<p>The switch saves your choice; Status shows what is running. Switch changes</p>\n<p>and component updates take effect after a restart.</p>\n\n<li>**[HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**: hides your other apps</li>\n<p>  from the apps you pick. It comes set up for common banking, shopping,</p>\n<p>  root checker and driver apps (Grab Driver, Green SM Driver, ShopeeFood</p>\n<p>  Driver and beDriver/bePartner). <b>App rules</b> opens the original HMA app.</p>\n<p>  Its backend loads directly in Android without Vector or Zygisk.</p>\n<li>**[TEESimulator](https://github.com/JingMatrix/TEESimulator)**: runs its</li>\n<p>  standalone key-attestation service. Existing keys and app targets are kept.</p>\n<p>  New installations use upstream's AOSP software key, which does not</p>\n<p>  guarantee passing Play Integrity or any particular app's checks.</p>\n<li>**[BRENE](https://github.com/rrr333nnn333/BRENE)**: provides its essential</li>\n<p>  <b>Hide custom ROM paths</b> and <b>Hide /system/addon.d</b> features through susFS.</p>\n<p>  Both default to on. Its other features are not ported; developer options</p>\n<p>  and USB or wireless debugging stay under your control.</p>\n\n<p>Tap the version inside a component's page to check for an update, like PIF.</p>\n<p>Onigiri's update feed selects compatible upstream releases and verifies</p>\n<p>their hashes. Updates wait for a restart and keep the previous payload for</p>\n<p>recovery. A release needing a different loader or configuration format</p>\n<p>reports that a ROM update is required; TEESimulator v4 currently needs one.</p>\n\n<p>The old first-boot module installer is disabled. Vector, NeoZygisk, Hybrid</p>\n<p>Mount and Tricky Addon are no longer installed by the ROM. Existing modules</p>\n<p>and their data remain untouched, and upgrades default the built-in switches</p>\n<p>to off. A built-in component stays unavailable while its module copy is</p>\n<p>enabled. Turn that copy off in KernelSU, enable the built-in switch, and</p>\n<p>restart when you are ready to migrate. Keep the disabled module while testing;</p>\n<p>BRENE's uninstall script deletes its saved configuration.</p>\n\n<p>These adapters have host build and recovery tests. Loading hooks and the</p>\n<p>native Settings pages still need validation on the Flip5 before release.</p>\n<p>See <a href=\"docs/essential-components.md\">component integration and recovery</a>.</p>\n\n<h2>For contributors</h2>\n\n<p>The kernel (the core of the system) comes from</p>\n<p><a href=\"https://github.com/GoRhanHee/android_kernel_samsung_sm8550\">GoRhanHee's kernel</a> and lives in <code>external/kernel</code>. Our own changes are kept as numbered patch</p>\n<p>files in <code>external/patches/kernel/</code>. The build adds them in and removes them</p>\n<p>again when it's done. Please put your kernel changes there and leave</p>\n<p><code>external/kernel</code> itself untouched.</p>\n\n<h2>Help and feedback</h2>\n\n<p>Found a problem or have an idea? <a href=\"https://github.com/Kinue72/OnigiriDeX/issues\">Open an issue</a> or <a href=\"https://github.com/Kinue72/OnigiriDeX/pulls\">send a pull request</a>.</p>\n\n<p>See <a href=\"LICENSE\">LICENSE</a> and <a href=\"NOTICE\">NOTICE</a> for license and credits.</p>",
+  "homepageUrl": "https://github.com/Kinue72/OnigiriDeX",
+  "sourceUrl": "https://github.com/Kinue72/OnigiriDeX",
+  "url": "https://github.com/Kinue72/OnigiriDeX",
+  "latestRelease": {
+    "name": "2026.10.29",
+    "version": "2026.10.29",
+    "time": "2026-10-29T13:50:58Z",
+    "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_OTA_6caca09.zip"
+  },
+  "releases": [
+    {
+      "name": "2026.10.29",
+      "tagName": "2026.10.29",
+      "publishedAt": "2026-10-29T13:50:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 5
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.4",
+          "size": 346634329,
+          "downloadCount": 5
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_AP_SM-F731B_F731BXXS5EYI1_8b0c002_20261029.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 2
+        },
+        {
+          "name": "Onigiri_OTA_6caca09.zip",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/Onigiri_OTA_6caca09.zip",
+          "size": 31358213,
+          "downloadCount": 17
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.29/version.txt",
+          "size": 19,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "2026.10.27",
+      "tagName": "2026.10.27",
+      "publishedAt": "2026-10-26T21:51:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 17
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 16
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 13
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 12
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.4",
+          "size": 346654809,
+          "downloadCount": 12
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_AP_SM-F731B_F731BXXS5EYI1_6caca09_20261026.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 10
+        },
+        {
+          "name": "Onigiri_OTA_cad8639.zip",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/Onigiri_OTA_cad8639.zip",
+          "size": 41701787,
+          "downloadCount": 11
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.27/version.txt",
+          "size": 19,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "2026.10.25",
+      "tagName": "2026.10.25",
+      "publishedAt": "2026-10-25T12:57:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 5
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 6
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 8
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.4",
+          "size": 346624089,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_AP_SM-F731B_F731BXXS5EYI1_cad8639_20261025.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_OTA_5764772.zip",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/Onigiri_OTA_5764772.zip",
+          "size": 106346922,
+          "downloadCount": 10
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.25/version.txt",
+          "size": 19,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "2026.10.22.1",
+      "tagName": "2026.10.22.1",
+      "publishedAt": "2026-10-22T13:35:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 17
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 15
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 13
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 15
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.4",
+          "size": 376545369,
+          "downloadCount": 16
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/Onigiri_AP_SM-F731B_F731BXXS5EYI1_5764772_20261022.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 12
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22.1/version.txt",
+          "size": 21,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "2026.10.22",
+      "tagName": "2026.10.22",
+      "publishedAt": "2026-10-21T21:19:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.4",
+          "size": 339671129,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_AP_SM-F731B_F731BXXS5EYI1_64e2bae_20261021.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 3
+        },
+        {
+          "name": "Onigiri_OTA_aa2a08c.zip",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/Onigiri_OTA_aa2a08c.zip",
+          "size": 33931421,
+          "downloadCount": 5
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.22/version.txt",
+          "size": 19,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "2026.10.21",
+      "tagName": "2026.10.21",
+      "publishedAt": "2026-10-20T23:36:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 9
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 10
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 11
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 11
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.4",
+          "size": 339671129,
+          "downloadCount": 10
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/Onigiri_AP_SM-F731B_F731BXXS5EYI1_aa2a08c_20261020.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 9
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.21/version.txt",
+          "size": 19,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "2026.10.20",
+      "tagName": "2026.10.20",
+      "publishedAt": "2026-10-20T16:17:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.0",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.0",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.1",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.1",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.2",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.2",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.3",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.3",
+          "size": 1992294400,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.4",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.4",
+          "size": 349050969,
+          "downloadCount": 4
+        },
+        {
+          "name": "Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.sha256",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/Onigiri_AP_SM-F731B_F731BXXS5EYI1_48a514d_20261020.tar.md5.sha256",
+          "size": 125,
+          "downloadCount": 3
+        },
+        {
+          "name": "version.txt",
+          "downloadUrl": "https://github.com/Kinue72/OnigiriDeX/releases/download/2026.10.20/version.txt",
+          "size": 19,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

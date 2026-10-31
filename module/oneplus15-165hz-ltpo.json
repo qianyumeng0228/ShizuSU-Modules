@@ -1,0 +1,71 @@
+{
+  "readme": "# OnePlus 15 — 165 Hz with working LTPO\n\nA Magisk/KernelSU module for the OnePlus 15 (`infinity`, CPH2747) on OxygenOS 16.\nIt runs the panel at **165 Hz while you interact** and lets it fall back to the stock\nADFR mode — down to **1 Hz** — when the screen is idle.\n\nРусская версия: [README.ru.md](README.ru.md)\n\n## Why not just pin 165 Hz\n\nThe panel physically cannot do both. Proven from the firmware, not guessed:\n\n* In `dtbo.img` the panel timings `sdc_fhd_144` and `sdc_fhd_165` carry **zero**\n  `qcom,mdss-dsi-adfr-min-fps-*` commands and no `oplus,adfr-min-fps-mapping-table`.\n  The 120/90/60 timings do — with the ladder `[120, 60, 30, 20, 10, 1]`.\n* The mode class shown by `dumpsys SurfaceFlinger` (`SA`/`SM`/`OA`) is the DT property\n  `qcom,mdss-dsi-h-sync-skew` (`oplus_adfr_h_skew` in the kernel):\n  0 = SDC_ADFR, 1 = SDC_MFR, 2 = OPLUS_ADFR.\n* At 165 Hz `min_fps` reads 55 — that is `mvt_render` (165/3) from `oplus_vrr_config.json`.\n  Writing 33, 15, 5 or 1 into it sticks but changes nothing: measured current stays\n  136–148 mA, while the 120→60 Hz idle state draws **78 mA**. The panel keeps scanning\n  at 165 regardless.\n\nSo the only way to get a low idle rate is to leave the 165 Hz mode when idle.\nThat is what this module does.\n\n## How it works\n\n1. **Patches `refresh_rate_config.xml`** so that the system refresh-rate setting becomes\n   a switch: value `7` selects 165 Hz, value `1` selects the stock ADFR-capable 120 Hz mode.\n   Every `rateId=\"a-b-c-d\"` entry gets its 2nd slot set to `d` (144/165 lowered to 120)\n   and its 4th slot set to `7`.\n2. **Unlocks the boost paths** with `defaultMaxRate=\"165\"`. Without that attribute its\n   default is 120 (`PRIORITY_PAD_MIRAGE_TBL`), and `adjustRefreshForDefaultMax()` clamps\n   app-switch animations, window overrides and floating windows down to 120.\n3. **Frees the camera viewfinders.** Two independent caps are lifted for every app that\n   holds `android.permission.CAMERA` — see [README.ru.md](README.ru.md) for the details.\n4. **`vrrd.sh`** blocks on the touchscreen input device and flips the setting:\n   touch → 165 Hz, `IDLE_TIMEOUT` seconds without touches → 120 Hz, after which the\n   stock OTI/ADFR machinery takes the panel down to 1 Hz on its own.\n   While idle the daemon does not wake at all — it sits in a blocking read, no polling.\n\n## Not tied to a firmware version\n\nThe patch is generated on the device from whatever `refresh_rate_config.xml` is there.\nNo checksums, no version pins — after an OTA it simply rebuilds on the next boot.\nBefore mounting it verifies the file looks right, that the line count is unchanged and\nthat the patch actually produced 165 Hz entries. If anything fails, nothing is mounted\nand the reason goes to `vrrd.log`.\n\nThe KernelSU **action button** rebuilds the patch on demand and prints a report.\n\n## Measured\n\n| state | mode | `min_fps` | current |\n|---|---|---|---|\n| interacting | 165 Hz (`crtc/fps` 165.4) | 55 | 136 mA |\n| idle | 120 Hz, then 60 Hz | **1** | **78 mA** |\n\nNote: OPlus gates the idle drop on brightness (`hw_nit_limit: 30`), so on a dim screen\n`min_fps` stays high — that is stock behaviour, not this module.\n\n## Credits and licence\n\nBased on the idea and the original module by\n[barsikus007 & 天伞桜](https://github.com/barsikus007/OnePlus15-165HZ) (MIT).\nThis rewrite is licensed under **GPL-3.0** — see [LICENSE](LICENSE).\n",
+  "readmeHTML": "<h1>OnePlus 15 — 165 Hz with working LTPO</h1>\n\n<p>A Magisk/KernelSU module for the OnePlus 15 (<code>infinity</code>, CPH2747) on OxygenOS 16.</p>\n<p>It runs the panel at <b>165 Hz while you interact</b> and lets it fall back to the stock</p>\n<p>ADFR mode — down to <b>1 Hz</b> — when the screen is idle.</p>\n\n<p>Русская версия: <a href=\"README.ru.md\">README.ru.md</a></p>\n\n<h2>Why not just pin 165 Hz</h2>\n\n<p>The panel physically cannot do both. Proven from the firmware, not guessed:</p>\n\n<li>In `dtbo.img` the panel timings `sdc_fhd_144` and `sdc_fhd_165` carry **zero**</li>\n<p>  <code>qcom,mdss-dsi-adfr-min-fps-*</code> commands and no <code>oplus,adfr-min-fps-mapping-table</code>.</p>\n<p>  The 120/90/60 timings do — with the ladder <code>[120, 60, 30, 20, 10, 1]</code>.</p>\n<li>The mode class shown by `dumpsys SurfaceFlinger` (`SA`/`SM`/`OA`) is the DT property</li>\n<p>  <code>qcom,mdss-dsi-h-sync-skew</code> (<code>oplus_adfr_h_skew</code> in the kernel):</p>\n<p>  0 = SDC_ADFR, 1 = SDC_MFR, 2 = OPLUS_ADFR.</p>\n<li>At 165 Hz `min_fps` reads 55 — that is `mvt_render` (165/3) from `oplus_vrr_config.json`.</li>\n<p>  Writing 33, 15, 5 or 1 into it sticks but changes nothing: measured current stays</p>\n<p>  136–148 mA, while the 120→60 Hz idle state draws <b>78 mA</b>. The panel keeps scanning</p>\n<p>  at 165 regardless.</p>\n\n<p>So the only way to get a low idle rate is to leave the 165 Hz mode when idle.</p>\n<p>That is what this module does.</p>\n\n<h2>How it works</h2>\n\n<li>**Patches `refresh_rate_config.xml`** so that the system refresh-rate setting becomes</li>\n<p>   a switch: value <code>7</code> selects 165 Hz, value <code>1</code> selects the stock ADFR-capable 120 Hz mode.</p>\n<p>   Every <code>rateId=\"a-b-c-d\"</code> entry gets its 2nd slot set to <code>d</code> (144/165 lowered to 120)</p>\n<p>   and its 4th slot set to <code>7</code>.</p>\n<li>**Unlocks the boost paths** with `defaultMaxRate=\"165\"`. Without that attribute its</li>\n<p>   default is 120 (<code>PRIORITY_PAD_MIRAGE_TBL</code>), and <code>adjustRefreshForDefaultMax()</code> clamps</p>\n<p>   app-switch animations, window overrides and floating windows down to 120.</p>\n<li>**Frees the camera viewfinders.** Two independent caps are lifted for every app that</li>\n<p>   holds <code>android.permission.CAMERA</code> — see <a href=\"README.ru.md\">README.ru.md</a> for the details.</p>\n<li>**`vrrd.sh`** blocks on the touchscreen input device and flips the setting:</li>\n<p>   touch → 165 Hz, <code>IDLE_TIMEOUT</code> seconds without touches → 120 Hz, after which the</p>\n<p>   stock OTI/ADFR machinery takes the panel down to 1 Hz on its own.</p>\n<p>   While idle the daemon does not wake at all — it sits in a blocking read, no polling.</p>\n\n<h2>Not tied to a firmware version</h2>\n\n<p>The patch is generated on the device from whatever <code>refresh_rate_config.xml</code> is there.</p>\n<p>No checksums, no version pins — after an OTA it simply rebuilds on the next boot.</p>\n<p>Before mounting it verifies the file looks right, that the line count is unchanged and</p>\n<p>that the patch actually produced 165 Hz entries. If anything fails, nothing is mounted</p>\n<p>and the reason goes to <code>vrrd.log</code>.</p>\n\n<p>The KernelSU <b>action button</b> rebuilds the patch on demand and prints a report.</p>\n\n<h2>Measured</h2>\n\n<p>| state | mode | <code>min_fps</code> | current |</p>\n<p>|---|---|---|---|</p>\n<p>| interacting | 165 Hz (<code>crtc/fps</code> 165.4) | 55 | 136 mA |</p>\n<p>| idle | 120 Hz, then 60 Hz | <b>1</b> | <b>78 mA</b> |</p>\n\n<p>Note: OPlus gates the idle drop on brightness (<code>hw_nit_limit: 30</code>), so on a dim screen</p>\n<p><code>min_fps</code> stays high — that is stock behaviour, not this module.</p>\n\n<h2>Credits and licence</h2>\n\n<p>Based on the idea and the original module by</p>\n<p><a href=\"https://github.com/barsikus007/OnePlus15-165HZ\">barsikus007 & 天伞桜</a> (MIT).</p>\n<p>This rewrite is licensed under <b>GPL-3.0</b> — see <a href=\"LICENSE\">LICENSE</a>.</p>",
+  "homepageUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO",
+  "sourceUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO",
+  "url": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO",
+  "latestRelease": {
+    "name": "v1.8",
+    "version": "v1.8",
+    "time": "2026-08-30T13:40:29Z",
+    "downloadUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO/releases/download/v1.8/OnePlus15-165HZ-LTPO.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2026-08-30T13:40:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus15-165HZ-LTPO.zip",
+          "downloadUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO/releases/download/v1.8/OnePlus15-165HZ-LTPO.zip",
+          "size": 14292,
+          "downloadCount": 144
+        }
+      ]
+    },
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2026-08-30T13:23:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus15-165HZ-LTPO.zip",
+          "downloadUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO/releases/download/v1.7/OnePlus15-165HZ-LTPO.zip",
+          "size": 13516,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.6.1",
+      "tagName": "v1.6.1",
+      "publishedAt": "2026-08-26T18:13:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus15-165HZ-LTPO.zip",
+          "downloadUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO/releases/download/v1.6.1/OnePlus15-165HZ-LTPO.zip",
+          "size": 13237,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-08-26T18:06:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus15-165HZ-LTPO.zip",
+          "downloadUrl": "https://github.com/mrFrok/OnePlus15-165HZ-LTPO/releases/download/v1.6/OnePlus15-165HZ-LTPO.zip",
+          "size": 15289,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

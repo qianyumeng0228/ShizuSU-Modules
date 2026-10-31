@@ -1,0 +1,267 @@
+{
+  "readme": "**Русский** | [English](README_EN.md)\n\n# 🧩 KernelSU GKI2 Patcher\n\n**KernelSU GKI2 Auto-Patcher** — это модуль для **KernelSU Next**, который упрощает установку и обновление ядер AnyKernel3 на устройства с поддержкой GKI2-ядер.\nОн определяет версию ядра, скачивает подходящую сборку **AnyKernel3** из выбранного репозитория и устанавливает её одним нажатием.\n\n---\n\n## 🔧 Возможности\n\n- 🔍 **Автоматическое определение версии ядра** (GKI2)\n- 📥 **Загрузка нужного AnyKernel3** с GitHub\n- ⚡ **Установка в один клик** через менеджер (KernelSU-Next, WildKSU и т.д.)\n- 🖱 **Ручной выбор версии ядра** через WebUI\n- ✅ Поддержка большинства устройств с GKI2\n\n---\n\n## 📦 Установка\n\n1. **Скачайте модуль** самоновейшая версия находится [тут](https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/latest)  \n2. **Установите его** через менеджер (KernelSU-Next, WildKSU и т.д.)\n3. **Перезагрузите устройство**  \n\n---\n\n## 🚀 Использование\n\nПеред использованием убедитесь, что вы используете самую новую версию модуля\n<details>\n<summary>Текущую версию модуля можно узнать так</summary>\n<IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/version.png\"/>\n</details>\n\n## Использование через WebUI\n<details>\n<summary>скриншот с положением кнопки</summary>\n<IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui.png\"/>\n</details>\n<details>\n<summary>1. Выбирите репозитарий ядер</summary>\n<IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui_repo_sel.png\"/>\n</details>\n<details>\n<summary>2. Выбирите ядро</summary>\n<IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui_kernel_sel.png\"/>\n</details>\n3. Нажмите кнопку \"Старт\"<br/>\n4. После установки ядра перезагрузитесь<br/>\n\nПосле выбора репозитарий ядер, модуль попытается найти в нем наиболее подходящие для вас ядро. Если у него это получится, он автоматически предложит его к установке. <br/>\nЕсли выбрать ядро автоматически не получилось, вам необходимо будет выбрать ядро самостоятельно. Ядра с версией KMI не совпадающей с вашей текущей версией KMI (то есть совсем неподходящие для устройства) будут исключены из списка. <br/>\nЕсли перечень доступных ядер пуст - попробуйте переключиться на другой репозиторий. <br/>\n\n---\n\n## Доступные репозитории ядер\n\n1. WildKernels(OnePlus-WKSU) - в этом репозитарии находятся ядра предназначенные для ограниченного перечня устройств брендов OnePlus/Realme на которых не работают чистые GKI2-ядра. Если у вас устройство из данного перечня модуль автоматически определит это и предложит использование данного репозитария по умолчанию.\n2. KernelSU-Next(KernelSU-Next) - в этом репозитарии находятся ядра предназначенные для использования с менеджером KernelSU-Next **в них нет поддержки SUSFS**\n3. WildKernels(GKI-WKSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером WildKSU (поддерживаются и другие менеджеры). Следует с осторожностью подходить к выбору версии ядра для установки, новейшие версии (новее чем 13861) могут нестабильно работать на некоторых устройствах. \n4. ShirkNeko(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra\n5. MiRinFork(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra\n6. zzh20188(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra\n\n---\n\n## 📄 Требования и ограничения\n\n- Устройство с **KernelSU** совместимым менеджером (KernelSU-Next, WildKSU, SukiSU Ultra)\n- Поддержка **GKI2**\n- Интернет-соединение\n\n---\n\n## ⚠️ Важные предупреждения\n\n- Если версия ядра выбрана **вручную** и выбрана **неправильно** — это может привести к бутлупу.  \n- Пользователь обязан заранее подготовить способ восстановления устройства (например, fastboot/adb, бэкап boot.img, доступ к recovery).  \n- Модуль **не запускается автоматически** — требуется ручной запуск через WebUI или кнопку действия в KernelSU Next.\n\n---\n\n## 🙏 Благодарности\n\n- 💡 Оригинальная идея модуля принадлежит [gl_hf](https://4pda.to/forum/index.php?showuser=2137182) с 4PDA  \n\n- 📦 AnyKernel3 сборки: [WildKernels/GKI_KernelSU_SUSFS](https://github.com/WildKernels/GKI_KernelSU_SUSFS/releases)\n\n - 💎 [KernelSu Next](https://github.com/KernelSU-Next/KernelSU-Next)\n",
+  "readmeHTML": "<p><b>Русский</b> | <a href=\"README_EN.md\">English</a></p>\n\n<h1>🧩 KernelSU GKI2 Patcher</h1>\n\n<p><b>KernelSU GKI2 Auto-Patcher</b> — это модуль для <b>KernelSU Next</b>, который упрощает установку и обновление ядер AnyKernel3 на устройства с поддержкой GKI2-ядер.</p>\n<p>Он определяет версию ядра, скачивает подходящую сборку <b>AnyKernel3</b> из выбранного репозитория и устанавливает её одним нажатием.</p>\n\n<p>---</p>\n\n<h2>🔧 Возможности</h2>\n\n<li>🔍 **Автоматическое определение версии ядра** (GKI2)</li>\n<li>📥 **Загрузка нужного AnyKernel3** с GitHub</li>\n<li>⚡ **Установка в один клик** через менеджер (KernelSU-Next, WildKSU и т.д.)</li>\n<li>🖱 **Ручной выбор версии ядра** через WebUI</li>\n<li>✅ Поддержка большинства устройств с GKI2</li>\n\n<p>---</p>\n\n<h2>📦 Установка</h2>\n\n<li>**Скачайте модуль** самоновейшая версия находится [тут](https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/latest)</li>\n<li>**Установите его** через менеджер (KernelSU-Next, WildKSU и т.д.)</li>\n<li>**Перезагрузите устройство**</li>\n\n<p>---</p>\n\n<h2>🚀 Использование</h2>\n\n<p>Перед использованием убедитесь, что вы используете самую новую версию модуля</p>\n<p><details></p>\n<p><summary>Текущую версию модуля можно узнать так</summary></p>\n<p><IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/version.png\"/></p>\n<p></details></p>\n\n<h2>Использование через WebUI</h2>\n<p><details></p>\n<p><summary>скриншот с положением кнопки</summary></p>\n<p><IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui.png\"/></p>\n<p></details></p>\n<p><details></p>\n<p><summary>1. Выбирите репозитарий ядер</summary></p>\n<p><IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui_repo_sel.png\"/></p>\n<p></details></p>\n<p><details></p>\n<p><summary>2. Выбирите ядро</summary></p>\n<p><IMG src=\"https://raw.githubusercontent.com/CMiSSioN/GKI_patcher_curl_ui/refs/heads/master/docs/images/webui_kernel_sel.png\"/></p>\n<p></details></p>\n<li>Нажмите кнопку \"Старт\"<br/></li>\n<li>После установки ядра перезагрузитесь<br/></li>\n\n<p>После выбора репозитарий ядер, модуль попытается найти в нем наиболее подходящие для вас ядро. Если у него это получится, он автоматически предложит его к установке. <br/></p>\n<p>Если выбрать ядро автоматически не получилось, вам необходимо будет выбрать ядро самостоятельно. Ядра с версией KMI не совпадающей с вашей текущей версией KMI (то есть совсем неподходящие для устройства) будут исключены из списка. <br/></p>\n<p>Если перечень доступных ядер пуст - попробуйте переключиться на другой репозиторий. <br/></p>\n\n<p>---</p>\n\n<h2>Доступные репозитории ядер</h2>\n\n<li>WildKernels(OnePlus-WKSU) - в этом репозитарии находятся ядра предназначенные для ограниченного перечня устройств брендов OnePlus/Realme на которых не работают чистые GKI2-ядра. Если у вас устройство из данного перечня модуль автоматически определит это и предложит использование данного репозитария по умолчанию.</li>\n<li>KernelSU-Next(KernelSU-Next) - в этом репозитарии находятся ядра предназначенные для использования с менеджером KernelSU-Next **в них нет поддержки SUSFS**</li>\n<li>WildKernels(GKI-WKSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером WildKSU (поддерживаются и другие менеджеры). Следует с осторожностью подходить к выбору версии ядра для установки, новейшие версии (новее чем 13861) могут нестабильно работать на некоторых устройствах.</li>\n<li>ShirkNeko(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra</li>\n<li>MiRinFork(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra</li>\n<li>zzh20188(GKI-SukiSU) - в этом репозитарии находятся ядра предназначенные для использования с менеджером SukiSU Ultra</li>\n\n<p>---</p>\n\n<h2>📄 Требования и ограничения</h2>\n\n<li>Устройство с **KernelSU** совместимым менеджером (KernelSU-Next, WildKSU, SukiSU Ultra)</li>\n<li>Поддержка **GKI2**</li>\n<li>Интернет-соединение</li>\n\n<p>---</p>\n\n<h2>⚠️ Важные предупреждения</h2>\n\n<li>Если версия ядра выбрана **вручную** и выбрана **неправильно** — это может привести к бутлупу.</li>\n<li>Пользователь обязан заранее подготовить способ восстановления устройства (например, fastboot/adb, бэкап boot.img, доступ к recovery).</li>\n<li>Модуль **не запускается автоматически** — требуется ручной запуск через WebUI или кнопку действия в KernelSU Next.</li>\n\n<p>---</p>\n\n<h2>🙏 Благодарности</h2>\n\n<li>💡 Оригинальная идея модуля принадлежит [gl_hf](https://4pda.to/forum/index.php?showuser=2137182) с 4PDA</li>\n\n<li>📦 AnyKernel3 сборки: [WildKernels/GKI_KernelSU_SUSFS](https://github.com/WildKernels/GKI_KernelSU_SUSFS/releases)</li>\n\n<p> - 💎 <a href=\"https://github.com/KernelSU-Next/KernelSU-Next\">KernelSu Next</a></p>",
+  "homepageUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui",
+  "sourceUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui",
+  "url": "https://github.com/CMiSSioN/GKI_patcher_curl_ui",
+  "latestRelease": {
+    "name": "4.5",
+    "version": "4.5",
+    "time": "2026-06-22T11:40:10Z",
+    "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.5/GKI_patcher_curl_ui.zip"
+  },
+  "releases": [
+    {
+      "name": "4.5",
+      "tagName": "4.5",
+      "publishedAt": "2026-06-22T11:40:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.5/GKI_patcher_curl_ui.zip",
+          "size": 10442594,
+          "downloadCount": 675
+        }
+      ]
+    },
+    {
+      "name": "4.4",
+      "tagName": "4.4",
+      "publishedAt": "2026-01-31T08:48:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.4/GKI_patcher_curl_ui.zip",
+          "size": 9502734,
+          "downloadCount": 926
+        }
+      ]
+    },
+    {
+      "name": "4.3",
+      "tagName": "4.3",
+      "publishedAt": "2026-01-29T06:31:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.3/GKI_patcher_curl_ui.zip",
+          "size": 9502322,
+          "downloadCount": 101
+        }
+      ]
+    },
+    {
+      "name": "4.2",
+      "tagName": "4.2",
+      "publishedAt": "2026-01-29T04:35:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.2/GKI_patcher_curl_ui.zip",
+          "size": 9502012,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "4.1",
+      "tagName": "4.1",
+      "publishedAt": "2025-10-24T07:53:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.1/GKI_patcher_curl_ui.zip",
+          "size": 9501840,
+          "downloadCount": 1133
+        }
+      ]
+    },
+    {
+      "name": "4.0",
+      "tagName": "4.0",
+      "publishedAt": "2025-10-20T16:58:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/4.0/GKI_patcher_curl_ui.zip",
+          "size": 9501776,
+          "downloadCount": 119
+        }
+      ]
+    },
+    {
+      "name": "3.9",
+      "tagName": "3.9",
+      "publishedAt": "2025-10-10T16:46:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.9/GKI_patcher_curl_ui.zip",
+          "size": 9501203,
+          "downloadCount": 95
+        }
+      ]
+    },
+    {
+      "name": "3.8",
+      "tagName": "3.8",
+      "publishedAt": "2025-10-01T08:59:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.8/GKI_patcher_curl_ui.zip",
+          "size": 9495447,
+          "downloadCount": 134
+        }
+      ]
+    },
+    {
+      "name": "3.7",
+      "tagName": "3.7",
+      "publishedAt": "2025-09-28T09:44:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.7/GKI_patcher_curl_ui.zip",
+          "size": 9495289,
+          "downloadCount": 54
+        }
+      ]
+    },
+    {
+      "name": "3.6",
+      "tagName": "3.6",
+      "publishedAt": "2025-09-25T16:22:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.6/GKI_patcher_curl_ui.zip",
+          "size": 9494832,
+          "downloadCount": 51
+        }
+      ]
+    },
+    {
+      "name": "3.5",
+      "tagName": "3.5",
+      "publishedAt": "2025-09-25T10:54:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.5/GKI_patcher_curl_ui.zip",
+          "size": 9494516,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "3.4",
+      "tagName": "3.4",
+      "publishedAt": "2025-09-24T18:10:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.4/GKI_patcher_curl_ui.zip",
+          "size": 9494188,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "3.3",
+      "tagName": "3.3",
+      "publishedAt": "2025-09-23T08:53:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.3/GKI_patcher_curl_ui.zip",
+          "size": 9493474,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "3.2.1",
+      "tagName": "3.2.1",
+      "publishedAt": "2025-09-21T10:58:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.2.1/GKI_patcher_curl_ui.zip",
+          "size": 9489946,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "3.2",
+      "tagName": "3.2",
+      "publishedAt": "2025-09-20T19:07:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.2/GKI_patcher_curl_ui.zip",
+          "size": 9486749,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "3.1.6.1",
+      "tagName": "3.1.6.1",
+      "publishedAt": "2025-09-20T12:31:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.1.6.1/GKI_patcher_curl_ui.zip",
+          "size": 9484543,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "3.1.6",
+      "tagName": "3.1.6",
+      "publishedAt": "2025-09-20T12:16:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GKI_patcher_curl_ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/3.1.6/GKI_patcher_curl_ui.zip",
+          "size": 9484484,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "0.0.1",
+      "tagName": "0.0.1",
+      "publishedAt": "2025-09-20T12:02:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KSU_Next_GKI_patcher_3.1+curl+ui.zip",
+          "downloadUrl": "https://github.com/CMiSSioN/GKI_patcher_curl_ui/releases/download/0.0.1/KSU_Next_GKI_patcher_3.1%2Bcurl%2Bui.zip",
+          "size": 9472528,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ]
+}

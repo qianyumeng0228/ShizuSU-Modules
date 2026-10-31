@@ -1,0 +1,237 @@
+{
+  "readme": "# Droidspaces LKM\n\n> AI Slop Warning，这个项目仅有这句警告是我自己写的，适用于 GKI 的 .ko 不保证可用于每个设备，**出了问题建议先问 Agent**，比问我高效很多，欢迎提交适配对应机型的 PR\n\n为 Android 内核动态补充 Droidspaces 所需的 PID / IPC namespace、devtmpfs 及 Sandboxing（user namespace）能力。\n通过 KernelSU 的 `ksud insmod` 加载，无需刷写内核，设备运行时无需内核源码。\n\nv0.1.5 是 PLZ110 指定 6.12.69 内核的设备版本，提供 PID / IPC + devtmpfs +\nSandboxing、沙箱 FUSE，以及 Docker 所需的 `xt_addrtype` / nftables 扩展。\n本版还修复厂商信号回调导致的 namespace 引用泄漏，并避免子 user namespace 的原生 OverlayFS 告警。已在真机 SELinux Enforcing 环境中，通过身份与权限隔离测试，以及\n实际 Droidspaces 容器内的 Bubblewrap 工作负载。实现和验证范围见\n[user namespace 移植状态](docs/userns-status.md)。\n\nv0.2.0 是此前发布的独立 GKI 实验版本，提供六份 PID / IPC 构建，不含\ndevtmpfs；它不替代 PLZ110 专用版本。同一 KMI 不代表厂商内部 ABI 兼容。\n\n## PLZ110 v0.1.5\n\n仅支持 `qcom,canoe`、ARM64、4 KiB 页面及完整内核版本：\n\n```text\n6.12.69-android16-6-g242e1a07f878-ab15865446-4k\n```\n\n从 [v0.1.5 Release](https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.1.5)\n下载 `Droidspaces-LKM-KernelSU-v0.1.5-PLZ110.zip`，在 KernelSU 管理器中安装后\n重启。安装包使用相同的 `droidspaces_lkm` 模块 ID，可替换已安装的旧版本；\n安装和每次开机均要求设备、完整内核版本及 BTF 指纹与验证目标匹配。\n\n开机依次加载 namespace、devtmpfs、厂商 PID 引用修复和 netfilter 四个 `.ko`，\n随后以普通 UID 检查真实身份映射与权限拒绝行为，简介显示实际结果：\n\n| 状态 | 含义 |\n| --- | --- |\n| `[已加载]` | PID / IPC、devtmpfs 和 Sandboxing 检查通过，PID 引用修复与 netfilter 已加载 |\n| `[部分加载]` | namespace 已激活，但 devtmpfs、Sandboxing 或 Docker 扩展检查失败 |\n| `[需重启]` | 当前仍是旧 namespace 模块，需重启应用更新 |\n| `[加载失败]` | 载荷损坏、加载器失败或已有模块状态异常 |\n| `[不兼容]` / `[不支持]` | 内核指纹或设备不匹配，停止加载 |\n\n日志保存在 `/data/adb/modules/droidspaces_lkm/load.log`。状态反映开机加载时的\n检查结果；后续 devtmpfs 错误可通过其 `errors` 模块参数查看。\n已激活模块需重启才能替换或移除。\n\nRelease 同时提供四个独立 `.ko` 与 `SHA256SUMS`，建议使用包含目标校验的\n完整 KernelSU ZIP。版本说明见 [v0.1.5 验证与安装](docs/releases-v0.1.5.md)。\n已验证 HMA UID Fake 0.4.0+1c71b6c 和 NoMount 共存；未知入口修改会拒绝加载。\nDroidspaces 容器需启用 `--allow-sandboxing`；不会自动更改现有容器设置。\n沙箱内使用 FUSE 还需设备访问和 mount 权限；支持范围与配置见 [FUSE 适配](docs/userns-fuse.md)。\n\n## GKI v0.2.0\n\n下列六组构建和通用安装流程属于 v0.2.0，仅提供 PID / IPC namespace。\n\n## 构建范围\n\n所有产物均面向 ARM64、4 KiB 页面。KMI 中的 Android 代际取自 `uname -r`，\n与设备当前运行的 Android 系统版本可能不同。\n\n| KMI | 独立载荷 | 源码 |\n| --- | --- | --- |\n| android17-6.18 | `droidspaces_ns-android17-6.18-gki.ko` | `src/port618/` |\n| android16-6.12 | `droidspaces_ns-android16-6.12-gki.ko` | `src/port/` |\n| android15-6.6 | `droidspaces_ns-android15-6.6-gki.ko` | `src/port66/` |\n| android14-6.1 | `droidspaces_ns-android14-6.1-gki.ko` | `src/port61/` |\n| android13-5.15 | `droidspaces_ns-android13-5.15-gki.ko` | `src/port515/` |\n| android12-5.10 | `droidspaces_ns-android12-5.10-gki.ko` | `src/port510/` |\n\n每个目标使用独立源码和固定 DDK；镜像摘要见\n[构建清单](build/gki-targets.json)，具体基线与验证范围见\n[GKI 构建与验证](docs/gki-builds.md)。\n\n同一 KMI 不代表所有内部 ABI 都兼容。启动脚本会检查结构布局与函数原型；\n检查通过也不能替代厂商设备上的功能与稳定性测试。\n\n## 功能\n\n- PID namespace：创建、嵌套、切换、PID 1、procfs、孤儿回收及容器 reboot。\n- IPC namespace：SysV 消息队列、信号量、共享内存及 POSIX 消息队列。\n- namespace 引用管理：perf、FUSE、cgroup-v1 pidlist，以及基线支持的 BPF task iterator。\n- 按基线提供 memfd namespace 策略、pidfd namespace ioctl 和 IPC proc/sysctl 接口。\n- KernelSU：开机选取载荷、校验文件与 ABI、显示加载状态并保存日志。\n\n6.1 基线已启用 IPC namespace 和 POSIX mqueue，因此沿用原生对象并补入 SysV IPC；\n加载前已存在的 namespace、文件描述符及队列会保留。其他五组基线补入 PID / IPC\nnamespace 及消息队列后端。具体差异列于验证文档。\n\n## 安装与使用\n\n从 [v0.2.0 Release](https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.2.0)\n下载 `Droidspaces-LKM-KernelSU-v0.2.0.zip`。同一页面提供六个独立 `.ko` 和\n`SHA256SUMS`。\n\n1. 在支持 `ksud insmod` 的 KernelSU 管理器中安装 ZIP。\n2. 重启设备，模块在 `service.sh` 阶段选择当前 KMI 对应的载荷并加载。\n3. 刷新模块列表，确认简介显示 **`[已加载]`**。\n4. 执行 `droidspaces check` 检查运行环境。\n\n安装过程不立即加载内核模块。模块不替换系统文件，不需要 metamodule，也不修改\nSELinux 策略。每次启动仅尝试加载一次，失败后保存原因，不循环重试。\n\n加载前优先比较 `/sys/kernel/btf/vmlinux` 与随包约束；BTF 不可读时，只有\n`/sys/kernel/notes` 与已验证基线完全相同才允许继续。BTF 检查失败不会退回指纹匹配。\n不匹配的设备会停止加载，避免仅凭 KMI 强行使用不兼容的内部结构。\n\n### 状态与日志\n\n| 简介状态 | 含义 |\n| --- | --- |\n| `[待加载]` | 本次启动尚未执行加载 |\n| `[加载中]` | 正在调用 `ksud insmod` |\n| `[已加载]` | `activate=Y`，PID、pid_for_children、IPC namespace 接口存在 |\n| `[加载失败]` | 文件校验、加载器、insmod 或激活检查失败 |\n| `[不支持]` | 无法识别 KMI、架构不符或未包含对应载荷 |\n| `[不兼容]` | 内核 ABI 或构建指纹检查失败 |\n\n简介优先通过 KernelSU 临时 `override.description` 更新；不支持该接口时更新\n`module.prop`，并在下一次 `post-fs-data.sh` 重置。模块目录\n`/data/adb/modules/droidspaces_lkm/` 中包含 `load.log`、`load.log.previous` 和 `status.txt`。\n\n**激活后的内核模块不能热卸载。** 禁用、卸载或更新安装包后，必须重启才能移除\n当前内核中的模块。初次测试前请保存工作；发生重启时可保留 `/sys/fs/pstore/` 日志。\n\n### 独立 .ko\n\n独立模块供已核对目标内核的手动测试使用。例如，在 root shell 中加载 6.6：\n\n```sh\n/data/adb/ksud insmod /data/local/tmp/droidspaces_ns-android15-6.6-gki.ko gki=1 activate=1\n```\n\n该方式绕过安装包的用户态 ABI 检查。推荐通过完整 KernelSU ZIP 加载。\n省略 `activate=1` 时仅执行入口预检和可卸载的核心对象自测；自测仍会临时注册\nproc/sysctl 和 mqueue 接口。不要对已加载的模块重复执行 insmod。\n\n## 构建与验证\n\n需要 Docker 和 Python 3.9 或更新版本。先准备测试镜像与静态 ABI 检查器：\n\n```sh\ndocker build --platform linux/arm64 -t droidspaces-lkm-vm:local tests/vm\npython3 scripts/build-abi-check.py\n```\n\n每个目标独立构建和验证，以 6.6 为例：\n\n```sh\npython3 scripts/build-gki.py 6.6 -j2\npython3 scripts/prepare-gki-vm.py 6.6\npython3 tests/vm/run-gki.py 6.6\n```\n\n完成六个目标后运行加载器与 ABI 检查器测试，再打包：\n\n```sh\npython3 tests/module/test_loader.py\npython3 tests/abi/test_check.py\npython3 scripts/package-module.py --output out/release-v0.2.0\n```\n\n打包器核对源码、二进制、ABI 约束和完整 VM 回归的哈希，拒绝缺失、未验证或\n已变化的产物。ZIP 内的 `validation.json` 保存各目标的来源与验证证据。\n完整流程见 [GKI 构建与验证](docs/gki-builds.md)。\n\nQEMU 回归覆盖 namespace 创建与销毁、隔离、权限、IPC 阻塞、SEM_UNDO、消息通知、\n保留 FD 和卸载行为。它使用固定 GKI Image 与无磁盘、无网络 initramfs；\n不能证明 Android 开机流程、设备驱动或完整 Droidspaces 容器的长期稳定性。\n\n## 历史设备验证\n\n[v0.1.0](https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.1.0) 的固定\nPLZ110 / canoe 6.12.69 载荷曾在真机 SELinux Enforcing 环境下通过功能测试和\nDroidspaces 能力检查。该结果仅适用于当时的二进制，不能代替 v0.2.0 的真机验证。\n详见 [原始移植状态](docs/port-status.md)。\n\nPLC110 的指定 6.6.118 内核另有 [手动测试包说明](docs/plc110-device-test.md)，\n已完成该 boot image 内核上的 QEMU 验证，真机结果待反馈。\n\n## 限制\n\n- 使用未导出的内核接口和实验性入口替换，不保证跨厂商或跨内核构建兼容。\n- 不支持 32 位 IPC 兼容系统调用；`SHM_HUGETLB` 返回 `EOPNOTSUPP`。\n- 已验证指定 PLZ110 上 Debian / systemd 和 rootful Docker 的部分工作负载；未覆盖长期高并发、OOM 和所有 SELinux 域。\n- user namespace、devtmpfs 与 Docker 扩展请使用 PLZ110 专用 v0.1.5；通用 GKI v0.2.0 不包含这些扩展。\n- PLZ110 专用版本支持普通沙箱 FUSE；原生 OverlayFS 在子 user namespace 中返回 `EOPNOTSUPP`，可使用 fuse-overlayfs。\n- rootless Docker 的 seccomp / capability 限制未解决；未补入 br_netfilter，不支持关闭 Docker userland proxy 的已测路径。\n- 不补充额外 cgroup 控制器。尚未覆盖 idmapped mount、全部内联权限路径及长期高负载，\n  已验证 Bubblewrap 场景不代表完整 Linux USER_NS 等价性或所有沙箱应用均兼容。\n- 原生已支持 PID namespace 的内核不属于本补丁的适用范围。\n\n## 许可证与来源\n\n项目采用 [GPL-2.0](LICENSE)，保留移植代码和依赖的版权声明。\n各源码目录的 `ORIGIN` 记录 Android common kernel 原始文件哈希与改动。\n\n- [KallRecon](https://github.com/Dere3046/KallRecon)：内核符号解析。\n- [Android common kernel](https://android.googlesource.com/kernel/common/)：namespace 及相关实现。\n- [KernelSU](https://github.com/tiann/KernelSU)：内核模块加载与启动框架。\n",
+  "readmeHTML": "<h1>Droidspaces LKM</h1>\n\n<p>> AI Slop Warning，这个项目仅有这句警告是我自己写的，适用于 GKI 的 .ko 不保证可用于每个设备，<b>出了问题建议先问 Agent</b>，比问我高效很多，欢迎提交适配对应机型的 PR</p>\n\n<p>为 Android 内核动态补充 Droidspaces 所需的 PID / IPC namespace、devtmpfs 及 Sandboxing（user namespace）能力。</p>\n<p>通过 KernelSU 的 <code>ksud insmod</code> 加载，无需刷写内核，设备运行时无需内核源码。</p>\n\n<p>v0.1.5 是 PLZ110 指定 6.12.69 内核的设备版本，提供 PID / IPC + devtmpfs +</p>\n<p>Sandboxing、沙箱 FUSE，以及 Docker 所需的 <code>xt_addrtype</code> / nftables 扩展。</p>\n<p>本版还修复厂商信号回调导致的 namespace 引用泄漏，并避免子 user namespace 的原生 OverlayFS 告警。已在真机 SELinux Enforcing 环境中，通过身份与权限隔离测试，以及</p>\n<p>实际 Droidspaces 容器内的 Bubblewrap 工作负载。实现和验证范围见</p>\n<p><a href=\"docs/userns-status.md\">user namespace 移植状态</a>。</p>\n\n<p>v0.2.0 是此前发布的独立 GKI 实验版本，提供六份 PID / IPC 构建，不含</p>\n<p>devtmpfs；它不替代 PLZ110 专用版本。同一 KMI 不代表厂商内部 ABI 兼容。</p>\n\n<h2>PLZ110 v0.1.5</h2>\n\n<p>仅支持 <code>qcom,canoe</code>、ARM64、4 KiB 页面及完整内核版本：</p>\n\n<pre>6.12.69-android16-6-g242e1a07f878-ab15865446-4k</pre>\n\n<p>从 <a href=\"https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.1.5\">v0.1.5 Release</a></p>\n<p>下载 <code>Droidspaces-LKM-KernelSU-v0.1.5-PLZ110.zip</code>，在 KernelSU 管理器中安装后</p>\n<p>重启。安装包使用相同的 <code>droidspaces_lkm</code> 模块 ID，可替换已安装的旧版本；</p>\n<p>安装和每次开机均要求设备、完整内核版本及 BTF 指纹与验证目标匹配。</p>\n\n<p>开机依次加载 namespace、devtmpfs、厂商 PID 引用修复和 netfilter 四个 <code>.ko</code>，</p>\n<p>随后以普通 UID 检查真实身份映射与权限拒绝行为，简介显示实际结果：</p>\n\n<p>| 状态 | 含义 |</p>\n<p>| --- | --- |</p>\n<p>| <code>[已加载]</code> | PID / IPC、devtmpfs 和 Sandboxing 检查通过，PID 引用修复与 netfilter 已加载 |</p>\n<p>| <code>[部分加载]</code> | namespace 已激活，但 devtmpfs、Sandboxing 或 Docker 扩展检查失败 |</p>\n<p>| <code>[需重启]</code> | 当前仍是旧 namespace 模块，需重启应用更新 |</p>\n<p>| <code>[加载失败]</code> | 载荷损坏、加载器失败或已有模块状态异常 |</p>\n<p>| <code>[不兼容]</code> / <code>[不支持]</code> | 内核指纹或设备不匹配，停止加载 |</p>\n\n<p>日志保存在 <code>/data/adb/modules/droidspaces_lkm/load.log</code>。状态反映开机加载时的</p>\n<p>检查结果；后续 devtmpfs 错误可通过其 <code>errors</code> 模块参数查看。</p>\n<p>已激活模块需重启才能替换或移除。</p>\n\n<p>Release 同时提供四个独立 <code>.ko</code> 与 <code>SHA256SUMS</code>，建议使用包含目标校验的</p>\n<p>完整 KernelSU ZIP。版本说明见 <a href=\"docs/releases-v0.1.5.md\">v0.1.5 验证与安装</a>。</p>\n<p>已验证 HMA UID Fake 0.4.0+1c71b6c 和 NoMount 共存；未知入口修改会拒绝加载。</p>\n<p>Droidspaces 容器需启用 <code>--allow-sandboxing</code>；不会自动更改现有容器设置。</p>\n<p>沙箱内使用 FUSE 还需设备访问和 mount 权限；支持范围与配置见 <a href=\"docs/userns-fuse.md\">FUSE 适配</a>。</p>\n\n<h2>GKI v0.2.0</h2>\n\n<p>下列六组构建和通用安装流程属于 v0.2.0，仅提供 PID / IPC namespace。</p>\n\n<h2>构建范围</h2>\n\n<p>所有产物均面向 ARM64、4 KiB 页面。KMI 中的 Android 代际取自 <code>uname -r</code>，</p>\n<p>与设备当前运行的 Android 系统版本可能不同。</p>\n\n<p>| KMI | 独立载荷 | 源码 |</p>\n<p>| --- | --- | --- |</p>\n<p>| android17-6.18 | <code>droidspaces_ns-android17-6.18-gki.ko</code> | <code>src/port618/</code> |</p>\n<p>| android16-6.12 | <code>droidspaces_ns-android16-6.12-gki.ko</code> | <code>src/port/</code> |</p>\n<p>| android15-6.6 | <code>droidspaces_ns-android15-6.6-gki.ko</code> | <code>src/port66/</code> |</p>\n<p>| android14-6.1 | <code>droidspaces_ns-android14-6.1-gki.ko</code> | <code>src/port61/</code> |</p>\n<p>| android13-5.15 | <code>droidspaces_ns-android13-5.15-gki.ko</code> | <code>src/port515/</code> |</p>\n<p>| android12-5.10 | <code>droidspaces_ns-android12-5.10-gki.ko</code> | <code>src/port510/</code> |</p>\n\n<p>每个目标使用独立源码和固定 DDK；镜像摘要见</p>\n<p><a href=\"build/gki-targets.json\">构建清单</a>，具体基线与验证范围见</p>\n<p><a href=\"docs/gki-builds.md\">GKI 构建与验证</a>。</p>\n\n<p>同一 KMI 不代表所有内部 ABI 都兼容。启动脚本会检查结构布局与函数原型；</p>\n<p>检查通过也不能替代厂商设备上的功能与稳定性测试。</p>\n\n<h2>功能</h2>\n\n<li>PID namespace：创建、嵌套、切换、PID 1、procfs、孤儿回收及容器 reboot。</li>\n<li>IPC namespace：SysV 消息队列、信号量、共享内存及 POSIX 消息队列。</li>\n<li>namespace 引用管理：perf、FUSE、cgroup-v1 pidlist，以及基线支持的 BPF task iterator。</li>\n<li>按基线提供 memfd namespace 策略、pidfd namespace ioctl 和 IPC proc/sysctl 接口。</li>\n<li>KernelSU：开机选取载荷、校验文件与 ABI、显示加载状态并保存日志。</li>\n\n<p>6.1 基线已启用 IPC namespace 和 POSIX mqueue，因此沿用原生对象并补入 SysV IPC；</p>\n<p>加载前已存在的 namespace、文件描述符及队列会保留。其他五组基线补入 PID / IPC</p>\n<p>namespace 及消息队列后端。具体差异列于验证文档。</p>\n\n<h2>安装与使用</h2>\n\n<p>从 <a href=\"https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.2.0\">v0.2.0 Release</a></p>\n<p>下载 <code>Droidspaces-LKM-KernelSU-v0.2.0.zip</code>。同一页面提供六个独立 <code>.ko</code> 和</p>\n<p><code>SHA256SUMS</code>。</p>\n\n<li>在支持 `ksud insmod` 的 KernelSU 管理器中安装 ZIP。</li>\n<li>重启设备，模块在 `service.sh` 阶段选择当前 KMI 对应的载荷并加载。</li>\n<li>刷新模块列表，确认简介显示 **`[已加载]`**。</li>\n<li>执行 `droidspaces check` 检查运行环境。</li>\n\n<p>安装过程不立即加载内核模块。模块不替换系统文件，不需要 metamodule，也不修改</p>\n<p>SELinux 策略。每次启动仅尝试加载一次，失败后保存原因，不循环重试。</p>\n\n<p>加载前优先比较 <code>/sys/kernel/btf/vmlinux</code> 与随包约束；BTF 不可读时，只有</p>\n<p><code>/sys/kernel/notes</code> 与已验证基线完全相同才允许继续。BTF 检查失败不会退回指纹匹配。</p>\n<p>不匹配的设备会停止加载，避免仅凭 KMI 强行使用不兼容的内部结构。</p>\n\n<h3>状态与日志</h3>\n\n<p>| 简介状态 | 含义 |</p>\n<p>| --- | --- |</p>\n<p>| <code>[待加载]</code> | 本次启动尚未执行加载 |</p>\n<p>| <code>[加载中]</code> | 正在调用 <code>ksud insmod</code> |</p>\n<p>| <code>[已加载]</code> | <code>activate=Y</code>，PID、pid_for_children、IPC namespace 接口存在 |</p>\n<p>| <code>[加载失败]</code> | 文件校验、加载器、insmod 或激活检查失败 |</p>\n<p>| <code>[不支持]</code> | 无法识别 KMI、架构不符或未包含对应载荷 |</p>\n<p>| <code>[不兼容]</code> | 内核 ABI 或构建指纹检查失败 |</p>\n\n<p>简介优先通过 KernelSU 临时 <code>override.description</code> 更新；不支持该接口时更新</p>\n<p><code>module.prop</code>，并在下一次 <code>post-fs-data.sh</code> 重置。模块目录</p>\n<p><code>/data/adb/modules/droidspaces_lkm/</code> 中包含 <code>load.log</code>、<code>load.log.previous</code> 和 <code>status.txt</code>。</p>\n\n<p><b>激活后的内核模块不能热卸载。</b> 禁用、卸载或更新安装包后，必须重启才能移除</p>\n<p>当前内核中的模块。初次测试前请保存工作；发生重启时可保留 <code>/sys/fs/pstore/</code> 日志。</p>\n\n<h3>独立 .ko</h3>\n\n<p>独立模块供已核对目标内核的手动测试使用。例如，在 root shell 中加载 6.6：</p>\n\n<pre>/data/adb/ksud insmod /data/local/tmp/droidspaces_ns-android15-6.6-gki.ko gki=1 activate=1</pre>\n\n<p>该方式绕过安装包的用户态 ABI 检查。推荐通过完整 KernelSU ZIP 加载。</p>\n<p>省略 <code>activate=1</code> 时仅执行入口预检和可卸载的核心对象自测；自测仍会临时注册</p>\n<p>proc/sysctl 和 mqueue 接口。不要对已加载的模块重复执行 insmod。</p>\n\n<h2>构建与验证</h2>\n\n<p>需要 Docker 和 Python 3.9 或更新版本。先准备测试镜像与静态 ABI 检查器：</p>\n\n<pre>docker build --platform linux/arm64 -t droidspaces-lkm-vm:local tests/vm\npython3 scripts/build-abi-check.py</pre>\n\n<p>每个目标独立构建和验证，以 6.6 为例：</p>\n\n<pre>python3 scripts/build-gki.py 6.6 -j2\npython3 scripts/prepare-gki-vm.py 6.6\npython3 tests/vm/run-gki.py 6.6</pre>\n\n<p>完成六个目标后运行加载器与 ABI 检查器测试，再打包：</p>\n\n<pre>python3 tests/module/test_loader.py\npython3 tests/abi/test_check.py\npython3 scripts/package-module.py --output out/release-v0.2.0</pre>\n\n<p>打包器核对源码、二进制、ABI 约束和完整 VM 回归的哈希，拒绝缺失、未验证或</p>\n<p>已变化的产物。ZIP 内的 <code>validation.json</code> 保存各目标的来源与验证证据。</p>\n<p>完整流程见 <a href=\"docs/gki-builds.md\">GKI 构建与验证</a>。</p>\n\n<p>QEMU 回归覆盖 namespace 创建与销毁、隔离、权限、IPC 阻塞、SEM_UNDO、消息通知、</p>\n<p>保留 FD 和卸载行为。它使用固定 GKI Image 与无磁盘、无网络 initramfs；</p>\n<p>不能证明 Android 开机流程、设备驱动或完整 Droidspaces 容器的长期稳定性。</p>\n\n<h2>历史设备验证</h2>\n\n<p><a href=\"https://github.com/Shikochin/Droidspaces-LKM/releases/tag/v0.1.0\">v0.1.0</a> 的固定</p>\n<p>PLZ110 / canoe 6.12.69 载荷曾在真机 SELinux Enforcing 环境下通过功能测试和</p>\n<p>Droidspaces 能力检查。该结果仅适用于当时的二进制，不能代替 v0.2.0 的真机验证。</p>\n<p>详见 <a href=\"docs/port-status.md\">原始移植状态</a>。</p>\n\n<p>PLC110 的指定 6.6.118 内核另有 <a href=\"docs/plc110-device-test.md\">手动测试包说明</a>，</p>\n<p>已完成该 boot image 内核上的 QEMU 验证，真机结果待反馈。</p>\n\n<h2>限制</h2>\n\n<li>使用未导出的内核接口和实验性入口替换，不保证跨厂商或跨内核构建兼容。</li>\n<li>不支持 32 位 IPC 兼容系统调用；`SHM_HUGETLB` 返回 `EOPNOTSUPP`。</li>\n<li>已验证指定 PLZ110 上 Debian / systemd 和 rootful Docker 的部分工作负载；未覆盖长期高并发、OOM 和所有 SELinux 域。</li>\n<li>user namespace、devtmpfs 与 Docker 扩展请使用 PLZ110 专用 v0.1.5；通用 GKI v0.2.0 不包含这些扩展。</li>\n<li>PLZ110 专用版本支持普通沙箱 FUSE；原生 OverlayFS 在子 user namespace 中返回 `EOPNOTSUPP`，可使用 fuse-overlayfs。</li>\n<li>rootless Docker 的 seccomp / capability 限制未解决；未补入 br_netfilter，不支持关闭 Docker userland proxy 的已测路径。</li>\n<li>不补充额外 cgroup 控制器。尚未覆盖 idmapped mount、全部内联权限路径及长期高负载，</li>\n<p>  已验证 Bubblewrap 场景不代表完整 Linux USER_NS 等价性或所有沙箱应用均兼容。</p>\n<li>原生已支持 PID namespace 的内核不属于本补丁的适用范围。</li>\n\n<h2>许可证与来源</h2>\n\n<p>项目采用 <a href=\"LICENSE\">GPL-2.0</a>，保留移植代码和依赖的版权声明。</p>\n<p>各源码目录的 <code>ORIGIN</code> 记录 Android common kernel 原始文件哈希与改动。</p>\n\n<li>[KallRecon](https://github.com/Dere3046/KallRecon)：内核符号解析。</li>\n<li>[Android common kernel](https://android.googlesource.com/kernel/common/)：namespace 及相关实现。</li>\n<li>[KernelSU](https://github.com/tiann/KernelSU)：内核模块加载与启动框架。</li>",
+  "homepageUrl": "https://github.com/Shikochin/Droidspaces-LKM",
+  "sourceUrl": "https://github.com/Shikochin/Droidspaces-LKM",
+  "url": "https://github.com/Shikochin/Droidspaces-LKM",
+  "latestRelease": {
+    "name": "v0.1.5",
+    "version": "v0.1.5",
+    "time": "2026-10-10T06:39:57Z",
+    "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/Droidspaces-LKM-KernelSU-v0.1.5-PLZ110.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.5",
+      "tagName": "v0.1.5",
+      "publishedAt": "2026-10-10T06:39:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.1.5-PLZ110.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/Droidspaces-LKM-KernelSU-v0.1.5-PLZ110.zip",
+          "size": 10057649,
+          "downloadCount": 35
+        },
+        {
+          "name": "droidspaces_compat-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/droidspaces_compat-6.12.69-plz110.ko",
+          "size": 198687,
+          "downloadCount": 4
+        },
+        {
+          "name": "droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "size": 532589,
+          "downloadCount": 4
+        },
+        {
+          "name": "droidspaces_netfilter-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/droidspaces_netfilter-6.12.69-plz110.ko",
+          "size": 10634250,
+          "downloadCount": 4
+        },
+        {
+          "name": "droidspaces_ns-6.12.69-canoe.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/droidspaces_ns-6.12.69-canoe.ko",
+          "size": 10517723,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.5/SHA256SUMS",
+          "size": 521,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.1.4",
+      "tagName": "v0.1.4",
+      "publishedAt": "2026-10-10T04:45:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.1.4-PLZ110.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.4/Droidspaces-LKM-KernelSU-v0.1.4-PLZ110.zip",
+          "size": 5297787,
+          "downloadCount": 5
+        },
+        {
+          "name": "droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.4/droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "size": 532589,
+          "downloadCount": 3
+        },
+        {
+          "name": "droidspaces_ns-6.12.69-canoe.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.4/droidspaces_ns-6.12.69-canoe.ko",
+          "size": 10517467,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.4/SHA256SUMS",
+          "size": 312,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.1.3",
+      "tagName": "v0.1.3",
+      "publishedAt": "2026-10-10T04:03:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.1.3-PLZ110.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.3/Droidspaces-LKM-KernelSU-v0.1.3-PLZ110.zip",
+          "size": 4854177,
+          "downloadCount": 8
+        },
+        {
+          "name": "droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.3/droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "size": 532589,
+          "downloadCount": 4
+        },
+        {
+          "name": "droidspaces_ns-6.12.69-canoe.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.3/droidspaces_ns-6.12.69-canoe.ko",
+          "size": 9541651,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.3/SHA256SUMS",
+          "size": 312,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-10-09T20:05:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.2.0.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/Droidspaces-LKM-KernelSU-v0.2.0.zip",
+          "size": 12763420,
+          "downloadCount": 42
+        },
+        {
+          "name": "droidspaces_ns-android12-5.10-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android12-5.10-gki.ko",
+          "size": 7954592,
+          "downloadCount": 14
+        },
+        {
+          "name": "droidspaces_ns-android13-5.15-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android13-5.15-gki.ko",
+          "size": 8235560,
+          "downloadCount": 9
+        },
+        {
+          "name": "droidspaces_ns-android14-6.1-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android14-6.1-gki.ko",
+          "size": 5801912,
+          "downloadCount": 14
+        },
+        {
+          "name": "droidspaces_ns-android15-6.6-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android15-6.6-gki.ko",
+          "size": 3990000,
+          "downloadCount": 7
+        },
+        {
+          "name": "droidspaces_ns-android16-6.12-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android16-6.12-gki.ko",
+          "size": 4924376,
+          "downloadCount": 14
+        },
+        {
+          "name": "droidspaces_ns-android17-6.18-gki.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/droidspaces_ns-android17-6.18-gki.ko",
+          "size": 5366008,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.2.0/SHA256SUMS",
+          "size": 718,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-10-09T20:43:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.1.1-PLZ110.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.1/Droidspaces-LKM-KernelSU-v0.1.1-PLZ110.zip",
+          "size": 2497846,
+          "downloadCount": 6
+        },
+        {
+          "name": "droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.1/droidspaces_devtmpfs-6.12.69-plz110.ko",
+          "size": 532589,
+          "downloadCount": 3
+        },
+        {
+          "name": "droidspaces_ns-6.12.69-canoe.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.1/droidspaces_ns-6.12.69-canoe.ko",
+          "size": 4923672,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.1/SHA256SUMS",
+          "size": 312,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-10-09T18:13:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Droidspaces-LKM-KernelSU-v0.1.0.zip",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.0/Droidspaces-LKM-KernelSU-v0.1.0.zip",
+          "size": 2237435,
+          "downloadCount": 11
+        },
+        {
+          "name": "droidspaces_ns-6.12.69-canoe.ko",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.0/droidspaces_ns-6.12.69-canoe.ko",
+          "size": 4923672,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Shikochin/Droidspaces-LKM/releases/download/v0.1.0/SHA256SUMS",
+          "size": 200,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

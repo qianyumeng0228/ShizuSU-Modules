@@ -1,0 +1,43 @@
+{
+  "readme": "# PermKeeper\n\n[简体中文](README.md) | [English](README_EN.md)\n\n一个 Magisk / KernelSU / SukiSU 的 Zygisk 模块。应用执行“清除数据”后，自动把它清除前的设置恢复回来；另支持导出配置，导入后批量恢复全部应用的权限与设置。\n\n## 恢复内容\n\n- 运行时权限\n- AppOps（含厂商自定义 op，如小米 `MIUIOP`：自启动、联网、后台弹出等）\n- 通知（总开关与各通知渠道）\n- 省电策略（Doze 白名单）\n- 自启动\n\n按每个应用**自身已有的状态**记录与恢复，不是固定清单，所以不同应用互不影响。\n\n## 原理\n\n模块注入 `system_server`，监听系统的 `PACKAGE_DATA_CLEARED` 广播；在系统完成权限重置后，按此前记录的状态回补。部分系统（如 HyperOS）会先发广播、后重置权限，模块会等权限存储稳定后再恢复，并校验重试。\n\n## 环境要求\n\n- 已 Root：Magisk / KernelSU / SukiSU，且启用 Zygisk\n- 实测：一加 ColorOS 16、红米 HyperOS 4（Android 17）\n\n## 安装\n\n1. 在 Root 管理器中安装 `permkeeper-zygisk.zip`\n2. 重启设备\n\n## 使用\n\n1. 打开模块的 WebUI（KsuWebUI，或管理器自带的 WebUI 入口）\n2. 在“选择应用”里勾选需要保护的应用。默认全部保护，取消勾选即为“排除”\n3. 改动即时生效并自动保存\n4. 导出 / 导入在 WebUI 内：\n   - **导出配置**：导出到 `/sdcard/Download/permkeeper/`\n   - **导入并恢复权限设置**：按导出的快照覆盖各应用权限（权限集有变化的应用会跳过）\n\n## 卸载\n\n在管理器中卸载模块并重启。卸载会清除模块生成的缓存（图标等），保留 `config.json` 与导出的配置文件。\n\n## 目录结构\n\n```\nzsrc/         注入 system_server 的 Java 源码\nzygisk/       Zygisk 入口（C++）与 API 头\nwebroot/      WebUI（index.html）\nmodule/       module.prop、post-fs-data.sh、uninstall.sh、permkeeper.sh\nbuild_zygisk.py   离线构建脚本\n```\n\n## 构建\n\n```\npython build_zygisk.py\n```\n\n依赖：JDK、Android SDK build-tools、NDK（路径见 `build_zygisk.py` 顶部）。产物输出到 `out/permkeeper-zygisk.zip`。\n\n## 已测试范围\n\n- 系统：一加 ColorOS 16（Android 16）、红米 HyperOS 4（Android 17）\n- 恢复内容：运行时权限、特殊权限（如“显示悬浮窗”）、AppOps（含小米 `MIUIOP`：自启动 / 联网 / 后台弹出等）、通知（总开关与渠道）、省电（Doze 白名单）、自启动\n\n## 已知限制\n\n- 上述范围**之外**（其它厂商 / 系统版本、未列出的 OEM 设置）**未经验证，可能不生效或表现不同**，请以实际设备为准。\n- 无障碍服务、默认应用、通知使用权等**非 AppOps** 项暂不覆盖。\n- Doze 白名单、厂商自启动的实现随系统而异（小米走 AppOps，一加走 XML 文件）。\n\n## 第三方\n\n- `zygisk/zygisk.hpp` 为 Zygisk 模块 API 头文件，版权归 John \"topjohnwu\" Wu，采用宽松许可（见文件头），原始版权声明予以保留。\n\n## 许可证\n\n本项目采用 [GPL-3.0](LICENSE) 许可证。\n\n\n",
+  "readmeHTML": "<h1>PermKeeper</h1>\n\n<p><a href=\"README.md\">简体中文</a> | <a href=\"README_EN.md\">English</a></p>\n\n<p>一个 Magisk / KernelSU / SukiSU 的 Zygisk 模块。应用执行“清除数据”后，自动把它清除前的设置恢复回来；另支持导出配置，导入后批量恢复全部应用的权限与设置。</p>\n\n<h2>恢复内容</h2>\n\n<li>运行时权限</li>\n<li>AppOps（含厂商自定义 op，如小米 `MIUIOP`：自启动、联网、后台弹出等）</li>\n<li>通知（总开关与各通知渠道）</li>\n<li>省电策略（Doze 白名单）</li>\n<li>自启动</li>\n\n<p>按每个应用<b>自身已有的状态</b>记录与恢复，不是固定清单，所以不同应用互不影响。</p>\n\n<h2>原理</h2>\n\n<p>模块注入 <code>system_server</code>，监听系统的 <code>PACKAGE_DATA_CLEARED</code> 广播；在系统完成权限重置后，按此前记录的状态回补。部分系统（如 HyperOS）会先发广播、后重置权限，模块会等权限存储稳定后再恢复，并校验重试。</p>\n\n<h2>环境要求</h2>\n\n<li>已 Root：Magisk / KernelSU / SukiSU，且启用 Zygisk</li>\n<li>实测：一加 ColorOS 16、红米 HyperOS 4（Android 17）</li>\n\n<h2>安装</h2>\n\n<li>在 Root 管理器中安装 `permkeeper-zygisk.zip`</li>\n<li>重启设备</li>\n\n<h2>使用</h2>\n\n<li>打开模块的 WebUI（KsuWebUI，或管理器自带的 WebUI 入口）</li>\n<li>在“选择应用”里勾选需要保护的应用。默认全部保护，取消勾选即为“排除”</li>\n<li>改动即时生效并自动保存</li>\n<li>导出 / 导入在 WebUI 内：</li>\n<p>   - <b>导出配置</b>：导出到 <code>/sdcard/Download/permkeeper/</code></p>\n<p>   - <b>导入并恢复权限设置</b>：按导出的快照覆盖各应用权限（权限集有变化的应用会跳过）</p>\n\n<h2>卸载</h2>\n\n<p>在管理器中卸载模块并重启。卸载会清除模块生成的缓存（图标等），保留 <code>config.json</code> 与导出的配置文件。</p>\n\n<h2>目录结构</h2>\n\n<pre>zsrc/         注入 system_server 的 Java 源码\nzygisk/       Zygisk 入口（C++）与 API 头\nwebroot/      WebUI（index.html）\nmodule/       module.prop、post-fs-data.sh、uninstall.sh、permkeeper.sh\nbuild_zygisk.py   离线构建脚本</pre>\n\n<h2>构建</h2>\n\n<pre>python build_zygisk.py</pre>\n\n<p>依赖：JDK、Android SDK build-tools、NDK（路径见 <code>build_zygisk.py</code> 顶部）。产物输出到 <code>out/permkeeper-zygisk.zip</code>。</p>\n\n<h2>已测试范围</h2>\n\n<li>系统：一加 ColorOS 16（Android 16）、红米 HyperOS 4（Android 17）</li>\n<li>恢复内容：运行时权限、特殊权限（如“显示悬浮窗”）、AppOps（含小米 `MIUIOP`：自启动 / 联网 / 后台弹出等）、通知（总开关与渠道）、省电（Doze 白名单）、自启动</li>\n\n<h2>已知限制</h2>\n\n<li>上述范围**之外**（其它厂商 / 系统版本、未列出的 OEM 设置）**未经验证，可能不生效或表现不同**，请以实际设备为准。</li>\n<li>无障碍服务、默认应用、通知使用权等**非 AppOps** 项暂不覆盖。</li>\n<li>Doze 白名单、厂商自启动的实现随系统而异（小米走 AppOps，一加走 XML 文件）。</li>\n\n<h2>第三方</h2>\n\n<li>`zygisk/zygisk.hpp` 为 Zygisk 模块 API 头文件，版权归 John \"topjohnwu\" Wu，采用宽松许可（见文件头），原始版权声明予以保留。</li>\n\n<h2>许可证</h2>\n\n<p>本项目采用 <a href=\"LICENSE\">GPL-3.0</a> 许可证。</p>\n\n",
+  "homepageUrl": "https://github.com/qover12/permkeeper",
+  "sourceUrl": "https://github.com/qover12/permkeeper",
+  "url": "https://github.com/qover12/permkeeper",
+  "latestRelease": {
+    "name": "v0.2",
+    "version": "v0.2",
+    "time": "2026-10-09T10:18:26Z",
+    "downloadUrl": "https://github.com/qover12/permkeeper/releases/download/v0.2/permkeeper-zygisk.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2",
+      "tagName": "v0.2",
+      "publishedAt": "2026-10-09T10:18:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "permkeeper-zygisk.zip",
+          "downloadUrl": "https://github.com/qover12/permkeeper/releases/download/v0.2/permkeeper-zygisk.zip",
+          "size": 156941,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v0.1",
+      "tagName": "v0.1",
+      "publishedAt": "2026-10-09T10:08:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "permkeeper-zygisk.zip",
+          "downloadUrl": "https://github.com/qover12/permkeeper/releases/download/v0.1/permkeeper-zygisk.zip",
+          "size": 161571,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

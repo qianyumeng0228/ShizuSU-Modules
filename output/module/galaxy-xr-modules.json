@@ -1,0 +1,113 @@
+{
+  "readme": "# Galaxy XR KernelSU Modules\n\nKernelSU modules for the Samsung Galaxy XR (SM-I610) running AndroidXR. All modules are non-invasive — none modify system files.\nRequires a rooted Samsung Galaxy XR with [KernelSU-GXR](https://github.com/4uva4ek/KernelSU-GXR).  \n\nAdd this repository as a source within KernelSU with the url: ``https://github.com/BreadDoesStuff/galaxy-xr-modules``.\n\n## CAUTION\nModules marked with (*) are experimental and may either have negative **performance impacts** or unintended effects. Further testing is required.\n\nThat being said, Rooting your headset also carries these risks.\n\n## Modules\n\n### [Galaxy XR Fan Control (`gxr-fanctl`)](modules/gxr-fanctl/README.md)\nOverrides the system fan speed (default: **max speed**). Includes a built-in configuration WebUI within KernelSU. You can set a custom fan step (0–7, where 0 is off and 7 is max) or a temperature-based fan speed curve.\n\n### [Galaxy XR No Low-Light Toast (`gxr-no-lowlight-toast`)](modules/gxr-no-lowlight-toast/README.md)\nDisables the ambient light sensor pipeline so the **\"Brighten your area for better performance.\"** low-light popup never appears.\n\n### * [Galaxy XR Passthrough Anywhere (`gxr-passthrough-anywhere`)](modules/gxr-passthrough-anywhere/README.md)\nUses the headset's physical double-tap to toggle passthrough inside **any** XR app (full-space/OpenXR) without minimizing it. Double-tap again to return to the app.\n* Performance issues may occur while streaming PCVR. Further testing required. A possible refactor may be in order.\n\n### * [Galaxy XR Camera Debug WebStream (`gxr-xrcam`)](modules/gxr-xrcam/README.md)\nStreams all **13 physical headset cameras** as MJPEG over HTTP on port 8080 (`http://<headset-ip>:8080/`). All streams run simultaneously at the sensors' native rates (RGB ~65–68 fps, tracking 60 fps, eye 30 fps, ToF 10 fps). Starts at boot.\n* Running camera streams may have a performance impact on the headset. Further testing required. Purely for debug purposes.\n\n### * [Galaxy XR Mic Gain Boost (`gxr-mic-gain-boost`)](modules/gxr-mic-gain-boost/README.md)\n+15 dB mic gain only while Virtual Desktop records (VOICE_PERFORMANCE source). Event-driven, no polling. Screen recording / other apps alone are untouched. MODE in config.conf.\n* Needs more testing.",
+  "readmeHTML": "<h1>Galaxy XR KernelSU Modules</h1>\n\n<p>KernelSU modules for the Samsung Galaxy XR (SM-I610) running AndroidXR. All modules are non-invasive — none modify system files.</p>\n<p>Requires a rooted Samsung Galaxy XR with <a href=\"https://github.com/4uva4ek/KernelSU-GXR\">KernelSU-GXR</a>.</p>\n\n<p>Add this repository as a source within KernelSU with the url: `<code>https://github.com/BreadDoesStuff/galaxy-xr-modules</code>`.</p>\n\n<h2>CAUTION</h2>\n<p>Modules marked with (*) are experimental and may either have negative <b>performance impacts</b> or unintended effects. Further testing is required.</p>\n\n<p>That being said, Rooting your headset also carries these risks.</p>\n\n<h2>Modules</h2>\n\n<h3>[Galaxy XR Fan Control (`gxr-fanctl`)](modules/gxr-fanctl/README.md)</h3>\n<p>Overrides the system fan speed (default: <b>max speed</b>). Includes a built-in configuration WebUI within KernelSU. You can set a custom fan step (0–7, where 0 is off and 7 is max) or a temperature-based fan speed curve.</p>\n\n<h3>[Galaxy XR No Low-Light Toast (`gxr-no-lowlight-toast`)](modules/gxr-no-lowlight-toast/README.md)</h3>\n<p>Disables the ambient light sensor pipeline so the <b>\"Brighten your area for better performance.\"</b> low-light popup never appears.</p>\n\n<h3>* [Galaxy XR Passthrough Anywhere (`gxr-passthrough-anywhere`)](modules/gxr-passthrough-anywhere/README.md)</h3>\n<p>Uses the headset's physical double-tap to toggle passthrough inside <b>any</b> XR app (full-space/OpenXR) without minimizing it. Double-tap again to return to the app.</p>\n<li>Performance issues may occur while streaming PCVR. Further testing required. A possible refactor may be in order.</li>\n\n<h3>* [Galaxy XR Camera Debug WebStream (`gxr-xrcam`)](modules/gxr-xrcam/README.md)</h3>\n<p>Streams all <b>13 physical headset cameras</b> as MJPEG over HTTP on port 8080 (<code>http://<headset-ip>:8080/</code>). All streams run simultaneously at the sensors' native rates (RGB ~65–68 fps, tracking 60 fps, eye 30 fps, ToF 10 fps). Starts at boot.</p>\n<li>Running camera streams may have a performance impact on the headset. Further testing required. Purely for debug purposes.</li>\n\n<h3>* [Galaxy XR Mic Gain Boost (`gxr-mic-gain-boost`)](modules/gxr-mic-gain-boost/README.md)</h3>\n<p>+15 dB mic gain only while Virtual Desktop records (VOICE_PERFORMANCE source). Event-driven, no polling. Screen recording / other apps alone are untouched. MODE in config.conf.</p>\n<li>Needs more testing.</li>",
+  "homepageUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules",
+  "sourceUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules",
+  "url": "https://github.com/BreadDoesStuff/galaxy-xr-modules",
+  "latestRelease": {
+    "name": "gxr-mic-gain-boost/v1.1.0",
+    "version": "gxr-mic-gain-boost/v1.1.0",
+    "time": "2026-10-14T02:35:54Z",
+    "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-mic-gain-boost/v1.1.0/gxr-mic-gain-boost-v1.1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "gxr-passthrough-anywhere/v1.1.0",
+      "tagName": "gxr-passthrough-anywhere/v1.1.0",
+      "publishedAt": "2026-10-14T02:32:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-passthrough-anywhere-v1.1.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-passthrough-anywhere/v1.1.0/gxr-passthrough-anywhere-v1.1.0.zip",
+          "size": 9034,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "gxr-mic-gain-boost/v1.1.0",
+      "tagName": "gxr-mic-gain-boost/v1.1.0",
+      "publishedAt": "2026-10-14T02:35:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-mic-gain-boost-v1.1.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-mic-gain-boost/v1.1.0/gxr-mic-gain-boost-v1.1.0.zip",
+          "size": 6488,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "gxr-xrcam/v1.0.0",
+      "tagName": "gxr-xrcam/v1.0.0",
+      "publishedAt": "2026-10-12T19:13:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-xrcam-v1.0.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-xrcam/v1.0.0/gxr-xrcam-v1.0.0.zip",
+          "size": 21485,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "gxr-passthrough-anywhere/v1.0.0",
+      "tagName": "gxr-passthrough-anywhere/v1.0.0",
+      "publishedAt": "2026-10-12T19:11:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-passthrough-anywhere-v1.0.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-passthrough-anywhere/v1.0.0/gxr-passthrough-anywhere-v1.0.0.zip",
+          "size": 9035,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "gxr-no-lowlight-toast/v1.0.0",
+      "tagName": "gxr-no-lowlight-toast/v1.0.0",
+      "publishedAt": "2026-10-12T18:57:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-no-lowlight-toast-v1.0.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-no-lowlight-toast/v1.0.0/gxr-no-lowlight-toast-v1.0.0.zip",
+          "size": 818,
+          "downloadCount": 30
+        }
+      ]
+    },
+    {
+      "name": "gxr-mic-gain-boost/v1.0.0",
+      "tagName": "gxr-mic-gain-boost/v1.0.0",
+      "publishedAt": "2026-10-12T23:26:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-mic-gain-boost-v1.0.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-mic-gain-boost/v1.0.0/gxr-mic-gain-boost-v1.0.0.zip",
+          "size": 1675,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "gxr-fanctl/v1.0.0",
+      "tagName": "gxr-fanctl/v1.0.0",
+      "publishedAt": "2026-10-12T18:55:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-fanctl-v1.0.0.zip",
+          "downloadUrl": "https://github.com/BreadDoesStuff/galaxy-xr-modules/releases/download/gxr-fanctl/v1.0.0/gxr-fanctl-v1.0.0.zip",
+          "size": 7370,
+          "downloadCount": 21
+        }
+      ]
+    }
+  ]
+}

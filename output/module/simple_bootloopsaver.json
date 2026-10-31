@@ -1,0 +1,29 @@
+{
+  "readme": "# Simple BootloopSaver\n\n\n## About\nProtect your system from bootloop caused by Magisk modules.\nIn case the data partition is encrypted and you cannot access `/data/adb/modules`, or you don't want to turn off **force encryption** to protect your private data.\n\n\n## Requirements\n- Magisk 20.4+ is installed\n\n\n## Installation\nIt's Magisk module, flash it in **Magisk** app\n\n\n## Usage\n\n### Auto detect\nUsually, bootloop occurs because zygote doesn't start properly or is stuck restarting.\nThe script runs in `late_start` mode. It will check Zygote's Process ID 3 times every 15 seconds.\nAnd if Zygote's Process ID doesn't match for 3 times, check the Process ID for next 15 seconds to make sure, and if it's different again, the script will disable all modules and reboot the your device.\n\n\n## Attribution\nModule originally made by [HuskyDG](https://github.com/HuskyDG), but I didn't like how large it was for something that looked like it could be done in less code, so I forked it and made it into just one script.\nThis involved removing the custom recovery parts, but for me the AutoDetect has worked.\n",
+  "readmeHTML": "<h1>Simple BootloopSaver</h1>\n\n\n<h2>About</h2>\n<p>Protect your system from bootloop caused by Magisk modules.</p>\n<p>In case the data partition is encrypted and you cannot access <code>/data/adb/modules</code>, or you don't want to turn off <b>force encryption</b> to protect your private data.</p>\n\n\n<h2>Requirements</h2>\n<li>Magisk 20.4+ is installed</li>\n\n\n<h2>Installation</h2>\n<p>It's Magisk module, flash it in <b>Magisk</b> app</p>\n\n\n<h2>Usage</h2>\n\n<h3>Auto detect</h3>\n<p>Usually, bootloop occurs because zygote doesn't start properly or is stuck restarting.</p>\n<p>The script runs in <code>late_start</code> mode. It will check Zygote's Process ID 3 times every 15 seconds.</p>\n<p>And if Zygote's Process ID doesn't match for 3 times, check the Process ID for next 15 seconds to make sure, and if it's different again, the script will disable all modules and reboot the your device.</p>\n\n\n<h2>Attribution</h2>\n<p>Module originally made by <a href=\"https://github.com/HuskyDG\">HuskyDG</a>, but I didn't like how large it was for something that looked like it could be done in less code, so I forked it and made it into just one script.</p>\n<p>This involved removing the custom recovery parts, but for me the AutoDetect has worked.</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/Simple_BootloopSaver",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/Simple_BootloopSaver",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/Simple_BootloopSaver",
+  "latestRelease": {
+    "name": "v2",
+    "version": "v2",
+    "time": "2025-06-15T04:13:45Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/Simple_BootloopSaver/releases/download/v2/Simple_BootloopSaver.zip"
+  },
+  "releases": [
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2025-06-15T04:13:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Simple_BootloopSaver.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/Simple_BootloopSaver/releases/download/v2/Simple_BootloopSaver.zip",
+          "size": 15151,
+          "downloadCount": 5371
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,495 @@
+{
+  "readme": "# YukiZygisk\n\n<img align=\"right\" src=\"webui/icon.svg\" width=\"220\" alt=\"YukiZygisk logo\">\n\n**English** | [简体中文](README.zh-CN.md)\n\nYukiZygisk is a standalone, kernel-based Zygisk implementation for rooted Android devices. It runs Zygisk and ZN native modules, with a built-in WebUI for checking status and changing settings.\n\n[Download](https://github.com/Rouyashiki/YukiZygisk/releases/latest) · [Report an issue](https://github.com/Rouyashiki/YukiZygisk/issues)\n\n## Requirements\n\n- An ARM64 device with a supported GKI kernel. Packages cover supported variants of 5.10, 5.15, 6.1, 6.6, 6.12 and 6.18; the installer checks for a matching kernel automatically.\n- KernelSU, YukiSU or APatch. Magisk and devices running multiple root implementations are currently unsupported.\n- A manager with module WebUI support to use the settings interface.\n\n## Installation\n\n1. Disable any other Zygisk implementation, including YukiSU's built-in YukiZygisk if enabled.\n2. Download `YukiZygisk-…-all-kmi-arm64-v8a.zip` from [Releases](https://github.com/Rouyashiki/YukiZygisk/releases/latest). Choose the module ZIP, not the source code archive.\n3. Open your root manager, go to **Modules**, and install the ZIP from local storage.\n4. Reboot, then open YukiZygisk's **WebUI** from the module page to check its status.\n\nIf the installer cannot identify your kernel's KMI, use **Volume Up** to cycle through the packaged KMIs and **Volume Down** to confirm. After installation, only the selected KMI's kernel module is kept to save space. Reinstall after switching kernels if the KMI changes or needs manual selection again.\n\n## Usage\n\n- Install the Zygisk or ZN native modules you want through your root manager, then reboot.\n- Use the WebUI to view loaded modules, check injection status and adjust settings.\n- Use the module's **Action** button to view its current status and recent startup logs.\n- Update, disable or uninstall YukiZygisk through your root manager, then reboot to apply the change.\n\nIf something goes wrong, [open an issue](https://github.com/Rouyashiki/YukiZygisk/issues) with your device model, Android and kernel versions, root implementation, steps to reproduce and the output from the Action button.\n\n## License\n\nOriginal work is licensed under [Apache-2.0](LICENSE); [GPL-2.0](LICENSE-GPL-2.0) applies when used with the Linux kernel. Third-party components retain their original licenses. See [NOTICE](NOTICE) for credits and details.\n",
+  "readmeHTML": "<h1>YukiZygisk</h1>\n\n<p><img align=\"right\" src=\"webui/icon.svg\" width=\"220\" alt=\"YukiZygisk logo\"></p>\n\n<p><b>English</b> | <a href=\"README.zh-CN.md\">简体中文</a></p>\n\n<p>YukiZygisk is a standalone, kernel-based Zygisk implementation for rooted Android devices. It runs Zygisk and ZN native modules, with a built-in WebUI for checking status and changing settings.</p>\n\n<p><a href=\"https://github.com/Rouyashiki/YukiZygisk/releases/latest\">Download</a> · <a href=\"https://github.com/Rouyashiki/YukiZygisk/issues\">Report an issue</a></p>\n\n<h2>Requirements</h2>\n\n<li>An ARM64 device with a supported GKI kernel. Packages cover supported variants of 5.10, 5.15, 6.1, 6.6, 6.12 and 6.18; the installer checks for a matching kernel automatically.</li>\n<li>KernelSU, YukiSU or APatch. Magisk and devices running multiple root implementations are currently unsupported.</li>\n<li>A manager with module WebUI support to use the settings interface.</li>\n\n<h2>Installation</h2>\n\n<li>Disable any other Zygisk implementation, including YukiSU's built-in YukiZygisk if enabled.</li>\n<li>Download `YukiZygisk-…-all-kmi-arm64-v8a.zip` from [Releases](https://github.com/Rouyashiki/YukiZygisk/releases/latest). Choose the module ZIP, not the source code archive.</li>\n<li>Open your root manager, go to **Modules**, and install the ZIP from local storage.</li>\n<li>Reboot, then open YukiZygisk's **WebUI** from the module page to check its status.</li>\n\n<p>If the installer cannot identify your kernel's KMI, use <b>Volume Up</b> to cycle through the packaged KMIs and <b>Volume Down</b> to confirm. After installation, only the selected KMI's kernel module is kept to save space. Reinstall after switching kernels if the KMI changes or needs manual selection again.</p>\n\n<h2>Usage</h2>\n\n<li>Install the Zygisk or ZN native modules you want through your root manager, then reboot.</li>\n<li>Use the WebUI to view loaded modules, check injection status and adjust settings.</li>\n<li>Use the module's **Action** button to view its current status and recent startup logs.</li>\n<li>Update, disable or uninstall YukiZygisk through your root manager, then reboot to apply the change.</li>\n\n<p>If something goes wrong, <a href=\"https://github.com/Rouyashiki/YukiZygisk/issues\">open an issue</a> with your device model, Android and kernel versions, root implementation, steps to reproduce and the output from the Action button.</p>\n\n<h2>License</h2>\n\n<p>Original work is licensed under <a href=\"LICENSE\">Apache-2.0</a>; <a href=\"LICENSE-GPL-2.0\">GPL-2.0</a> applies when used with the Linux kernel. Third-party components retain their original licenses. See <a href=\"NOTICE\">NOTICE</a> for credits and details.</p>",
+  "homepageUrl": "https://t.me/manosaba",
+  "sourceUrl": "https://github.com/Rouyashiki/YukiZygisk",
+  "url": "https://github.com/Rouyashiki/YukiZygisk",
+  "latestRelease": {
+    "name": "ci-40911949456",
+    "version": "ci-40911949456",
+    "time": "2026-10-29T16:35:47Z",
+    "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40911949456/YukiZygisk-v0.2.0-10126-all-kmi-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "ci-40911949456",
+      "tagName": "ci-40911949456",
+      "publishedAt": "2026-10-29T16:35:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40911949456/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 12
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10126-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40911949456/YukiZygisk-v0.2.0-10126-all-kmi-arm64-v8a.zip",
+          "size": 3125732,
+          "downloadCount": 395
+        }
+      ]
+    },
+    {
+      "name": "ci-40866698598",
+      "tagName": "ci-40866698598",
+      "publishedAt": "2026-10-29T11:40:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40866698598/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 4
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10124-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40866698598/YukiZygisk-v0.2.0-10124-all-kmi-arm64-v8a.zip",
+          "size": 3124589,
+          "downloadCount": 80
+        }
+      ]
+    },
+    {
+      "name": "ci-40263138076",
+      "tagName": "ci-40263138076",
+      "publishedAt": "2026-10-26T03:19:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40263138076/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 8
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10122-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40263138076/YukiZygisk-v0.2.0-10122-all-kmi-arm64-v8a.zip",
+          "size": 3129773,
+          "downloadCount": 523
+        }
+      ]
+    },
+    {
+      "name": "ci-40131096223",
+      "tagName": "ci-40131096223",
+      "publishedAt": "2026-10-24T20:47:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40131096223/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 4
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10117-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40131096223/YukiZygisk-v0.2.0-10117-all-kmi-arm64-v8a.zip",
+          "size": 3096835,
+          "downloadCount": 209
+        }
+      ]
+    },
+    {
+      "name": "ci-40113272047",
+      "tagName": "ci-40113272047",
+      "publishedAt": "2026-10-24T16:52:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40113272047/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10116-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40113272047/YukiZygisk-v0.2.0-10116-all-kmi-arm64-v8a.zip",
+          "size": 3082665,
+          "downloadCount": 64
+        }
+      ]
+    },
+    {
+      "name": "ci-40094185645",
+      "tagName": "ci-40094185645",
+      "publishedAt": "2026-10-24T12:33:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40094185645/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10115-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40094185645/YukiZygisk-v0.2.0-10115-all-kmi-arm64-v8a.zip",
+          "size": 2961283,
+          "downloadCount": 68
+        }
+      ]
+    },
+    {
+      "name": "ci-40077144057",
+      "tagName": "ci-40077144057",
+      "publishedAt": "2026-10-24T08:16:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40077144057/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10114-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-40077144057/YukiZygisk-v0.2.0-10114-all-kmi-arm64-v8a.zip",
+          "size": 2959913,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "ci-39870055007",
+      "tagName": "ci-39870055007",
+      "publishedAt": "2026-10-22T23:15:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39870055007/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 7
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10113-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39870055007/YukiZygisk-v0.2.0-10113-all-kmi-arm64-v8a.zip",
+          "size": 2961463,
+          "downloadCount": 236
+        }
+      ]
+    },
+    {
+      "name": "ci-39660213828",
+      "tagName": "ci-39660213828",
+      "publishedAt": "2026-10-21T19:20:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39660213828/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 6
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10112-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39660213828/YukiZygisk-v0.2.0-10112-all-kmi-arm64-v8a.zip",
+          "size": 2957573,
+          "downloadCount": 234
+        }
+      ]
+    },
+    {
+      "name": "ci-39563784180",
+      "tagName": "ci-39563784180",
+      "publishedAt": "2026-10-21T07:45:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39563784180/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 4
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10111-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-39563784180/YukiZygisk-v0.2.0-10111-all-kmi-arm64-v8a.zip",
+          "size": 2909451,
+          "downloadCount": 107
+        }
+      ]
+    },
+    {
+      "name": "ci-38138854923",
+      "tagName": "ci-38138854923",
+      "publishedAt": "2026-10-11T12:23:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-38138854923/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 8
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10100-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-38138854923/YukiZygisk-v0.2.0-10100-all-kmi-arm64-v8a.zip",
+          "size": 2736776,
+          "downloadCount": 495
+        }
+      ]
+    },
+    {
+      "name": "ci-38135296301",
+      "tagName": "ci-38135296301",
+      "publishedAt": "2026-10-11T11:25:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-38135296301/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10099-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-38135296301/YukiZygisk-v0.2.0-10099-all-kmi-arm64-v8a.zip",
+          "size": 2732995,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "ci-37576404782",
+      "tagName": "ci-37576404782",
+      "publishedAt": "2026-10-07T05:31:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37576404782/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10098-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37576404782/YukiZygisk-v0.2.0-10098-all-kmi-arm64-v8a.zip",
+          "size": 2732994,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "ci-37378070369",
+      "tagName": "ci-37378070369",
+      "publishedAt": "2026-10-05T21:52:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37378070369/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10097-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37378070369/YukiZygisk-v0.2.0-10097-all-kmi-arm64-v8a.zip",
+          "size": 2732549,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "ci-37226243417",
+      "tagName": "ci-37226243417",
+      "publishedAt": "2026-10-04T18:58:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37226243417/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 3
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10095-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37226243417/YukiZygisk-v0.2.0-10095-all-kmi-arm64-v8a.zip",
+          "size": 2704962,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "ci-37188916368",
+      "tagName": "ci-37188916368",
+      "publishedAt": "2026-10-04T08:29:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37188916368/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10088-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37188916368/YukiZygisk-v0.2.0-10088-all-kmi-arm64-v8a.zip",
+          "size": 2404825,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "ci-37168260657",
+      "tagName": "ci-37168260657",
+      "publishedAt": "2026-10-04T01:34:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37168260657/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 4
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10086-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37168260657/YukiZygisk-v0.2.0-10086-all-kmi-arm64-v8a.zip",
+          "size": 2400874,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "ci-37157561005",
+      "tagName": "ci-37157561005",
+      "publishedAt": "2026-10-03T22:14:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37157561005/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10080-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37157561005/YukiZygisk-v0.2.0-10080-all-kmi-arm64-v8a.zip",
+          "size": 2236537,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "ci-37151317837",
+      "tagName": "ci-37151317837",
+      "publishedAt": "2026-10-03T20:26:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37151317837/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10079-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37151317837/YukiZygisk-v0.2.0-10079-all-kmi-arm64-v8a.zip",
+          "size": 2224571,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-37150999266",
+      "tagName": "ci-37150999266",
+      "publishedAt": "2026-10-03T20:20:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37150999266/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10084-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37150999266/YukiZygisk-v0.2.0-10084-all-kmi-arm64-v8a.zip",
+          "size": 2224536,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "ci-37148665277",
+      "tagName": "ci-37148665277",
+      "publishedAt": "2026-10-03T19:42:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37148665277/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 3
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10083-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-37148665277/YukiZygisk-v0.2.0-10083-all-kmi-arm64-v8a.zip",
+          "size": 2224503,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-36967780601",
+      "tagName": "ci-36967780601",
+      "publishedAt": "2026-10-02T05:13:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36967780601/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10078-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36967780601/YukiZygisk-v0.2.0-10078-all-kmi-arm64-v8a.zip",
+          "size": 1675753,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "ci-36965536151",
+      "tagName": "ci-36965536151",
+      "publishedAt": "2026-10-02T04:42:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36965536151/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10077-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36965536151/YukiZygisk-v0.2.0-10077-all-kmi-arm64-v8a.zip",
+          "size": 1675753,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "ci-36964925968",
+      "tagName": "ci-36964925968",
+      "publishedAt": "2026-10-02T04:34:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36964925968/SHA256SUMS",
+          "size": 112,
+          "downloadCount": 3
+        },
+        {
+          "name": "YukiZygisk-v0.2.0-10076-all-kmi-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/Rouyashiki/YukiZygisk/releases/download/ci-36964925968/YukiZygisk-v0.2.0-10076-all-kmi-arm64-v8a.zip",
+          "size": 1675755,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

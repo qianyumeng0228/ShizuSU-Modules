@@ -1,0 +1,43 @@
+{
+  "readme": "# Soter Key Fixer\n\nKernelSU module that repairs SOTER Key issues on OnePlus Snapdragon devices with unlocked bootloader.\n\n## Credits\nThis module is a fork of the original work by **酷安@小黄泊**:\n- Original repo: https://github.com/xiaohuangbo/SoterFixer\n- License: GPL-2.0\n\n## What's different in this fork\nThe original module uses a simple repair loop that runs at boot but is unreliable due to TEE initialization timing. This fork moves the repair logic to `boot-completed.sh` with:\n- 90 second delay after boot to allow TEE stabilization\n- 25 repair attempts at 10 second intervals (~4 minutes total)\n- Execution log at `/data/local/tmp/soterfix.log`\n\n## Compatibility\n- KernelSU / KernelSU Next\n- OnePlus Snapdragon devices with unlocked bootloader\n\n## Usage\nInstall via KernelSU module manager, then reboot. The fix runs automatically in the background. To manually trigger the fix, use the Action button in KernelSU.\n\n## Disclaimer\nThis module is free. Based on GPL-2.0 licensed work.\n",
+  "readmeHTML": "<h1>Soter Key Fixer</h1>\n\n<p>KernelSU module that repairs SOTER Key issues on OnePlus Snapdragon devices with unlocked bootloader.</p>\n\n<h2>Credits</h2>\n<p>This module is a fork of the original work by <b>酷安@小黄泊</b>:</p>\n<li>Original repo: https://github.com/xiaohuangbo/SoterFixer</li>\n<li>License: GPL-2.0</li>\n\n<h2>What's different in this fork</h2>\n<p>The original module uses a simple repair loop that runs at boot but is unreliable due to TEE initialization timing. This fork moves the repair logic to <code>boot-completed.sh</code> with:</p>\n<li>90 second delay after boot to allow TEE stabilization</li>\n<li>25 repair attempts at 10 second intervals (~4 minutes total)</li>\n<li>Execution log at `/data/local/tmp/soterfix.log`</li>\n\n<h2>Compatibility</h2>\n<li>KernelSU / KernelSU Next</li>\n<li>OnePlus Snapdragon devices with unlocked bootloader</li>\n\n<h2>Usage</h2>\n<p>Install via KernelSU module manager, then reboot. The fix runs automatically in the background. To manually trigger the fix, use the Action button in KernelSU.</p>\n\n<h2>Disclaimer</h2>\n<p>This module is free. Based on GPL-2.0 licensed work.</p>",
+  "homepageUrl": "https://github.com/luigimak/SoterKeyFixer",
+  "sourceUrl": "https://github.com/luigimak/SoterKeyFixer",
+  "url": "https://github.com/luigimak/SoterKeyFixer",
+  "latestRelease": {
+    "name": "v1.3",
+    "version": "v1.3",
+    "time": "2026-06-07T16:25:09Z",
+    "downloadUrl": "https://github.com/luigimak/SoterKeyFixer/releases/download/v1.3/SoterFix-v1.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-06-07T16:25:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SoterFix-v1.3.zip",
+          "downloadUrl": "https://github.com/luigimak/SoterKeyFixer/releases/download/v1.3/SoterFix-v1.3.zip",
+          "size": 434642,
+          "downloadCount": 110
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-06-07T12:19:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SoterFix-v1.2.zip",
+          "downloadUrl": "https://github.com/luigimak/SoterKeyFixer/releases/download/v1.2/SoterFix-v1.2.zip",
+          "size": 434454,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

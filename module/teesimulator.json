@@ -1,0 +1,255 @@
+{
+  "readme": "# TEESimulator\n\n*TEESimulator* defeats hardware-backed [Key Attestation](https://developer.android.com/privacy-and-security/security-key-attestation) by serving selected apps from a software KeyMint that runs *inside* the real keystore daemon, while every other key stays on the device's real hardware.\n\nRather than patch certificates after the fact, it embeds AOSP's own reference KeyMint trusted application ([`kmr-ta`](https://cs.android.com/android/platform/superproject/main/+/main:system/keymint/)) and signs attestations with a user-provided keybox. The certificates are generated the same way a real TEE generates them, so they are internally consistent by construction.\n\n## How it works\n\nA privileged control daemon owns the configuration and the real device identity; the injected native library is a pure crypto-and-routing engine. The daemon launches at boot, harvests the device's real attestation parameters (verified-boot state, patch levels, OS version) from a throwaway hardware key, resolves the configured profiles against the live device, injects the interceptor into the keystore daemon, and pushes the resolved configuration over a local socket. Editing the configuration re-pushes without a reboot.\n\nThe daemon that guards keys — and the way apps reach it — changed across Android versions, so the module hooks each generation at the point that suits it, and both paths lead to the same reference TA and keybox:\n\n* *Android 12 and newer* use `keystore2`, which reaches the KeyMint HAL over Binder. The module injects a native library into `keystore2` and PLT-hooks `AIBinder_transact`; a KeyMint transaction for a *targeted app* (or a key the module created) is redirected to a *local, in-process `IKeyMintDevice`* that wraps the TA, and everything else is forwarded to the real hardware.\n* *Android 10 and 11* use the legacy `keystore` daemon, which apps reach over `IKeystoreService`. The module injects into `keystore`, hooks `ioctl` on libbinder, and redirects that service to a local stub handled in-process. For a targeted app it generates the key itself, hands back its public key, and at attestation time imports that key into the TA with the app's challenge, so the TA issues a keybox-signed chain over it. Other callers pass through.\n\nKeys the simulator creates are tagged (Android 12+) or tracked by caller (Android 10/11) so only they are served; real hardware keys are never intercepted. If no keybox is loaded the interceptor stays a no-op, so a misconfigured module is inert rather than a hazard.\n\n### Profiles and device identity\n\nConfiguration is organised into **profiles**: a named bundle of a keybox, an operation mode, patch and OS levels, and optional device-identity values (brand, model, IMEI, …), assigned to a set of apps. Each targeted app belongs to exactly one profile, and its attestations are signed and shaped by that profile.\n\nThe root of trust — verified-boot key, verified-boot state, device-locked flag — is deliberately *not* configurable. The daemon harvests the device's real values once and freezes them: they make the attested root of trust authentic, and because those fields also seed KeyMint's key-encryption-key derivation, freezing them gives a stable per-device key that keeps stored keys decryptable across reboots.\n\n## Requirements\n\n* *Android 10 or newer*\n* A *64-bit* device — *arm64-v8a* or *x86_64* (the keystore daemon is 64-bit)\n* Root (Magisk, KernelSU, or APatch)\n\n## Installation\n\n1. Flash the module with the root manager and reboot.\n2. Place a hardware-backed `keybox.xml` at `/data/adb/teesim/keybox.xml`.\n3. List the apps to simulate under a profile in `/data/adb/teesim/config.json`, or edit the profile in the WebUI.\n4. Save. The daemon watches the configuration and applies changes live; no reboot is needed.\n\nThe module ships a default `config.json` that targets Google Play services and the Play Store. The keybox is private and is never shipped with the module, so until one is placed the interceptor does nothing.\n\nKilling the keystore daemon (`su -c 'kill $(pidof keystore2)'` on Android 12+, `keystore` on 10/11) is the recovery path: a fresh daemon starts clean, with no interception, until the module re-injects it.\n\n## Configuration\n\nEverything lives in `/data/adb/teesim/`, owned and validated by the daemon. The keybox files carry private keys and are never shipped with the module.\n\n### `config.json`\n\nA schema version and a map of named profiles. Each targeted package must appear in exactly one profile:\n\n```jsonc\n{\n  \"version\": 1,\n  \"profiles\": {\n    \"default\": {\n      \"keybox\": \"keybox.xml\",                // relative to /data/adb/teesim; must parse (rsa + ecdsa, chains >= 2)\n      \"patchLevel\": { \"system\": \"today\", \"vendor\": \"YYYY-MM-05\", \"boot\": \"YYYY-MM-05\" },\n      \"osVersion\": \"\",                       // empty = harvested | system_property | \"16\" | \"16.0.0\" | 160000\n      \"brand\": \"\", \"device\": \"\", \"product\": \"\",\n      \"manufacturer\": \"\", \"model\": \"\",\n      \"serial\": \"\", \"imei\": \"\", \"meid\": \"\", \"imei2\": \"\",\n      \"apps\": [\"com.google.android.gms\", \"com.android.vending\"]\n    }\n  }\n}\n```\n\nPatch and OS levels accept a small mini-language the daemon resolves against the device. `harvested` reuses the value captured from the real TEE at harvest time; `system_property` reads the matching build property from `getprop` and nothing else. Both report *nothing* when their source has no value — the tag is omitted rather than sent as a made-up default. `today` is the current month; `YYYY-MM-DD` / `YYYY-MM` an explicit date; `no` suppresses the level. A date may also use the tokens `YYYY` / `MM` / `DD`, resolved to today, so `YYYY-MM-05` means the 5th of the current month (the shipped default for the vendor and boot patch levels, which tracks the calendar). Device-identity fields fall back to the values captured from the real TEE at harvest, so an app that asks the keystore to attest the device's real ids gets a matching answer; a non-empty field overrides that, and both are omitted only when neither is set. The root of trust is never listed here — it comes from the harvest.\n\n### `keybox.xml`\n\nA keybox carries the private keys and certificate chains the simulator signs with. It must contain *both* an RSA and an ECDSA key (the EC key on NIST P-256), each with a PEM `PrivateKey` and its `CertificateChain`:\n\n```xml\n<?xml version=\"1.0\"?>\n<AndroidAttestation>\n  <Keybox DeviceID=\"...\">\n    <Key algorithm=\"rsa\">\n      <PrivateKey format=\"pem\">-----BEGIN PRIVATE KEY-----...</PrivateKey>\n      <CertificateChain>\n        <Certificate format=\"pem\">-----BEGIN CERTIFICATE-----...</Certificate>\n        <!-- ...intermediate and root... -->\n      </CertificateChain>\n    </Key>\n    <Key algorithm=\"ecdsa\">\n      <PrivateKey format=\"pem\">-----BEGIN EC PRIVATE KEY-----...</PrivateKey>\n      <CertificateChain>\n        <Certificate format=\"pem\">-----BEGIN CERTIFICATE-----...</Certificate>\n      </CertificateChain>\n    </Key>\n  </Keybox>\n</AndroidAttestation>\n```\n\nA profile names its keybox by relative path, so several profiles can sign with different keyboxes. An app that is in no profile is transparent to the module — its keys go straight to the real hardware.\n\n### WebUI\n\nWhere the root manager supports it (KernelSU, APatch), the module ships a WebUI that edits profiles without a text editor: create and assign profiles, import and rename keyboxes, choose the operation mode, and set the patch/OS levels and device identity. It also manages the keys the simulator has stored — list, inspect the attestation record, and delete — surfaces the harvest and injection status and live daemon logs, and can download and flash a newer canary build in place.\n\n## Building from source\n\nThe build depends on no device: `libbinder_ndk` and `liblog` come from the NDK, and BoringSSL is either resolved at runtime (Android 12+) or built as a static library from the submodule (Android 10/11). It needs only the SDK (for `aidl`) and the NDK.\n\n```sh\ngit clone --recurse-submodules <repo> TEESimulator\ncd TEESimulator\n\nexport ANDROID_HOME=/path/to/android/sdk        # SDK: aidl, cmake, the daemon's AGP build\nexport ANDROID_NDK_HOME=/path/to/android/ndk    # or the newest NDK under $ANDROID_HOME/ndk\n\n./gradlew zipRelease                            # -> out/TEESimulator-<version>-<count>-<hash>-Release.zip\n```\n\nThe whole build is one Gradle graph. `zipRelease` (or `zipDebug`, which bundles extra logging) builds the Rust TA, both native interceptors for `arm64-v8a` and `x86_64` (via CMake `externalNativeBuild`), and the control daemon's dex, then assembles the flashable module. With a device attached, `./gradlew installMagisk` (or `installKsu` / `installApatch`) pushes and installs it; append `AndReboot` to reboot after, and set `ANDROID_SERIAL=<serial>` to pick a device when several are connected.\n\n## Project layout\n\n| Path | What it is |\n| --- | --- |\n| `app/` | The Kotlin control daemon: harvests the real device parameters, resolves profiles, injects the interceptor, serves the WebUI, and pushes configuration over the control socket. |\n| `injector/` | A `ptrace`-based tool that loads an interceptor into a running process. |\n| `keymint/` | The Android 12+ interceptor: the `AIBinder_transact` hook and the router that decides, per request, whether to simulate or forward. |\n| `keystore/` | The Android 10/11 interceptor: the libbinder `ioctl` hook and the `IKeystoreService` handler that serves a target's key lifecycle from the TA. |\n| `rust/teesim-km/` | The in-process TA — the reference KeyMint TA wired to BoringSSL and keybox-based attestation, behind a small C ABI. |\n| `module/` | The flashable module: boot service, installer, `sepolicy.rule`, the default configuration, and the WebUI. |\n| `third_party/` | Submodules: the reference KeyMint, the AIDL interfaces, `frameworks/native`, BoringSSL, and LSPlt. |\n\n## License\n\nTEESimulator is free software, licensed under the [GNU General Public License v3.0](LICENSE) or\nany later version. The third-party code it builds on — the AOSP submodules, BoringSSL, LSPlt and\nthe vendored platform headers — is listed with its own terms in [NOTICE](NOTICE).\n",
+  "readmeHTML": "<h1>TEESimulator</h1>\n\n<p>*TEESimulator* defeats hardware-backed <a href=\"https://developer.android.com/privacy-and-security/security-key-attestation\">Key Attestation</a> by serving selected apps from a software KeyMint that runs *inside* the real keystore daemon, while every other key stays on the device's real hardware.</p>\n\n<p>Rather than patch certificates after the fact, it embeds AOSP's own reference KeyMint trusted application (<a href=\"https://cs.android.com/android/platform/superproject/main/+/main:system/keymint/\"><code>kmr-ta</code></a>) and signs attestations with a user-provided keybox. The certificates are generated the same way a real TEE generates them, so they are internally consistent by construction.</p>\n\n<h2>How it works</h2>\n\n<p>A privileged control daemon owns the configuration and the real device identity; the injected native library is a pure crypto-and-routing engine. The daemon launches at boot, harvests the device's real attestation parameters (verified-boot state, patch levels, OS version) from a throwaway hardware key, resolves the configured profiles against the live device, injects the interceptor into the keystore daemon, and pushes the resolved configuration over a local socket. Editing the configuration re-pushes without a reboot.</p>\n\n<p>The daemon that guards keys — and the way apps reach it — changed across Android versions, so the module hooks each generation at the point that suits it, and both paths lead to the same reference TA and keybox:</p>\n\n<li>*Android 12 and newer* use `keystore2`, which reaches the KeyMint HAL over Binder. The module injects a native library into `keystore2` and PLT-hooks `AIBinder_transact`; a KeyMint transaction for a *targeted app* (or a key the module created) is redirected to a *local, in-process `IKeyMintDevice`* that wraps the TA, and everything else is forwarded to the real hardware.</li>\n<li>*Android 10 and 11* use the legacy `keystore` daemon, which apps reach over `IKeystoreService`. The module injects into `keystore`, hooks `ioctl` on libbinder, and redirects that service to a local stub handled in-process. For a targeted app it generates the key itself, hands back its public key, and at attestation time imports that key into the TA with the app's challenge, so the TA issues a keybox-signed chain over it. Other callers pass through.</li>\n\n<p>Keys the simulator creates are tagged (Android 12+) or tracked by caller (Android 10/11) so only they are served; real hardware keys are never intercepted. If no keybox is loaded the interceptor stays a no-op, so a misconfigured module is inert rather than a hazard.</p>\n\n<h3>Profiles and device identity</h3>\n\n<p>Configuration is organised into <b>profiles</b>: a named bundle of a keybox, an operation mode, patch and OS levels, and optional device-identity values (brand, model, IMEI, …), assigned to a set of apps. Each targeted app belongs to exactly one profile, and its attestations are signed and shaped by that profile.</p>\n\n<p>The root of trust — verified-boot key, verified-boot state, device-locked flag — is deliberately *not* configurable. The daemon harvests the device's real values once and freezes them: they make the attested root of trust authentic, and because those fields also seed KeyMint's key-encryption-key derivation, freezing them gives a stable per-device key that keeps stored keys decryptable across reboots.</p>\n\n<h2>Requirements</h2>\n\n<li>*Android 10 or newer*</li>\n<li>A *64-bit* device — *arm64-v8a* or *x86_64* (the keystore daemon is 64-bit)</li>\n<li>Root (Magisk, KernelSU, or APatch)</li>\n\n<h2>Installation</h2>\n\n<li>Flash the module with the root manager and reboot.</li>\n<li>Place a hardware-backed `keybox.xml` at `/data/adb/teesim/keybox.xml`.</li>\n<li>List the apps to simulate under a profile in `/data/adb/teesim/config.json`, or edit the profile in the WebUI.</li>\n<li>Save. The daemon watches the configuration and applies changes live; no reboot is needed.</li>\n\n<p>The module ships a default <code>config.json</code> that targets Google Play services and the Play Store. The keybox is private and is never shipped with the module, so until one is placed the interceptor does nothing.</p>\n\n<p>Killing the keystore daemon (<code>su -c 'kill $(pidof keystore2)'</code> on Android 12+, <code>keystore</code> on 10/11) is the recovery path: a fresh daemon starts clean, with no interception, until the module re-injects it.</p>\n\n<h2>Configuration</h2>\n\n<p>Everything lives in <code>/data/adb/teesim/</code>, owned and validated by the daemon. The keybox files carry private keys and are never shipped with the module.</p>\n\n<h3>`config.json`</h3>\n\n<p>A schema version and a map of named profiles. Each targeted package must appear in exactly one profile:</p>\n\n<pre>{\n  \"version\": 1,\n  \"profiles\": {\n    \"default\": {\n      \"keybox\": \"keybox.xml\",                // relative to /data/adb/teesim; must parse (rsa + ecdsa, chains &gt;= 2)\n      \"patchLevel\": { \"system\": \"today\", \"vendor\": \"YYYY-MM-05\", \"boot\": \"YYYY-MM-05\" },\n      \"osVersion\": \"\",                       // empty = harvested | system_property | \"16\" | \"16.0.0\" | 160000\n      \"brand\": \"\", \"device\": \"\", \"product\": \"\",\n      \"manufacturer\": \"\", \"model\": \"\",\n      \"serial\": \"\", \"imei\": \"\", \"meid\": \"\", \"imei2\": \"\",\n      \"apps\": [\"com.google.android.gms\", \"com.android.vending\"]\n    }\n  }\n}</pre>\n\n<p>Patch and OS levels accept a small mini-language the daemon resolves against the device. <code>harvested</code> reuses the value captured from the real TEE at harvest time; <code>system_property</code> reads the matching build property from <code>getprop</code> and nothing else. Both report *nothing* when their source has no value — the tag is omitted rather than sent as a made-up default. <code>today</code> is the current month; <code>YYYY-MM-DD</code> / <code>YYYY-MM</code> an explicit date; <code>no</code> suppresses the level. A date may also use the tokens <code>YYYY</code> / <code>MM</code> / <code>DD</code>, resolved to today, so <code>YYYY-MM-05</code> means the 5th of the current month (the shipped default for the vendor and boot patch levels, which tracks the calendar). Device-identity fields fall back to the values captured from the real TEE at harvest, so an app that asks the keystore to attest the device's real ids gets a matching answer; a non-empty field overrides that, and both are omitted only when neither is set. The root of trust is never listed here — it comes from the harvest.</p>\n\n<h3>`keybox.xml`</h3>\n\n<p>A keybox carries the private keys and certificate chains the simulator signs with. It must contain *both* an RSA and an ECDSA key (the EC key on NIST P-256), each with a PEM <code>PrivateKey</code> and its <code>CertificateChain</code>:</p>\n\n<pre>&lt;?xml version=\"1.0\"?&gt;\n&lt;AndroidAttestation&gt;\n  &lt;Keybox DeviceID=\"...\"&gt;\n    &lt;Key algorithm=\"rsa\"&gt;\n      &lt;PrivateKey format=\"pem\"&gt;-----BEGIN PRIVATE KEY-----...&lt;/PrivateKey&gt;\n      &lt;CertificateChain&gt;\n        &lt;Certificate format=\"pem\"&gt;-----BEGIN CERTIFICATE-----...&lt;/Certificate&gt;\n        &lt;!-- ...intermediate and root... --&gt;\n      &lt;/CertificateChain&gt;\n    &lt;/Key&gt;\n    &lt;Key algorithm=\"ecdsa\"&gt;\n      &lt;PrivateKey format=\"pem\"&gt;-----BEGIN EC PRIVATE KEY-----...&lt;/PrivateKey&gt;\n      &lt;CertificateChain&gt;\n        &lt;Certificate format=\"pem\"&gt;-----BEGIN CERTIFICATE-----...&lt;/Certificate&gt;\n      &lt;/CertificateChain&gt;\n    &lt;/Key&gt;\n  &lt;/Keybox&gt;\n&lt;/AndroidAttestation&gt;</pre>\n\n<p>A profile names its keybox by relative path, so several profiles can sign with different keyboxes. An app that is in no profile is transparent to the module — its keys go straight to the real hardware.</p>\n\n<h3>WebUI</h3>\n\n<p>Where the root manager supports it (KernelSU, APatch), the module ships a WebUI that edits profiles without a text editor: create and assign profiles, import and rename keyboxes, choose the operation mode, and set the patch/OS levels and device identity. It also manages the keys the simulator has stored — list, inspect the attestation record, and delete — surfaces the harvest and injection status and live daemon logs, and can download and flash a newer canary build in place.</p>\n\n<h2>Building from source</h2>\n\n<p>The build depends on no device: <code>libbinder_ndk</code> and <code>liblog</code> come from the NDK, and BoringSSL is either resolved at runtime (Android 12+) or built as a static library from the submodule (Android 10/11). It needs only the SDK (for <code>aidl</code>) and the NDK.</p>\n\n<pre>git clone --recurse-submodules &lt;repo&gt; TEESimulator\ncd TEESimulator\n\nexport ANDROID_HOME=/path/to/android/sdk        # SDK: aidl, cmake, the daemon's AGP build\nexport ANDROID_NDK_HOME=/path/to/android/ndk    # or the newest NDK under $ANDROID_HOME/ndk\n\n./gradlew zipRelease                            # -&gt; out/TEESimulator-&lt;version&gt;-&lt;count&gt;-&lt;hash&gt;-Release.zip</pre>\n\n<p>The whole build is one Gradle graph. <code>zipRelease</code> (or <code>zipDebug</code>, which bundles extra logging) builds the Rust TA, both native interceptors for <code>arm64-v8a</code> and <code>x86_64</code> (via CMake <code>externalNativeBuild</code>), and the control daemon's dex, then assembles the flashable module. With a device attached, <code>./gradlew installMagisk</code> (or <code>installKsu</code> / <code>installApatch</code>) pushes and installs it; append <code>AndReboot</code> to reboot after, and set <code>ANDROID_SERIAL=<serial></code> to pick a device when several are connected.</p>\n\n<h2>Project layout</h2>\n\n<p>| Path | What it is |</p>\n<p>| --- | --- |</p>\n<p>| <code>app/</code> | The Kotlin control daemon: harvests the real device parameters, resolves profiles, injects the interceptor, serves the WebUI, and pushes configuration over the control socket. |</p>\n<p>| <code>injector/</code> | A <code>ptrace</code>-based tool that loads an interceptor into a running process. |</p>\n<p>| <code>keymint/</code> | The Android 12+ interceptor: the <code>AIBinder_transact</code> hook and the router that decides, per request, whether to simulate or forward. |</p>\n<p>| <code>keystore/</code> | The Android 10/11 interceptor: the libbinder <code>ioctl</code> hook and the <code>IKeystoreService</code> handler that serves a target's key lifecycle from the TA. |</p>\n<p>| <code>rust/teesim-km/</code> | The in-process TA — the reference KeyMint TA wired to BoringSSL and keybox-based attestation, behind a small C ABI. |</p>\n<p>| <code>module/</code> | The flashable module: boot service, installer, <code>sepolicy.rule</code>, the default configuration, and the WebUI. |</p>\n<p>| <code>third_party/</code> | Submodules: the reference KeyMint, the AIDL interfaces, <code>frameworks/native</code>, BoringSSL, and LSPlt. |</p>\n\n<h2>License</h2>\n\n<p>TEESimulator is free software, licensed under the <a href=\"LICENSE\">GNU General Public License v3.0</a> or</p>\n<p>any later version. The third-party code it builds on — the AOSP submodules, BoringSSL, LSPlt and</p>\n<p>the vendored platform headers — is listed with its own terms in <a href=\"NOTICE\">NOTICE</a>.</p>",
+  "homepageUrl": "https://github.com/JingMatrix/TEESimulator",
+  "sourceUrl": "https://github.com/JingMatrix/TEESimulator",
+  "url": "https://github.com/JingMatrix/TEESimulator",
+  "latestRelease": {
+    "name": "v4.0",
+    "version": "v4.0",
+    "time": "2026-08-11T09:02:26Z",
+    "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v4.0/TEESimulator-v4.0-34-Debug.zip"
+  },
+  "releases": [
+    {
+      "name": "canary-76",
+      "tagName": "canary-76",
+      "publishedAt": "2026-10-23T17:45:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-76-06f9f2e-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-76/TEESimulator-v4.0-76-06f9f2e-Debug.zip",
+          "size": 36602373,
+          "downloadCount": 324
+        },
+        {
+          "name": "TEESimulator-v4.0-76-06f9f2e-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-76/TEESimulator-v4.0-76-06f9f2e-Release.zip",
+          "size": 18160200,
+          "downloadCount": 5023
+        }
+      ]
+    },
+    {
+      "name": "canary-75",
+      "tagName": "canary-75",
+      "publishedAt": "2026-10-21T13:27:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-75-fcf1738-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-75/TEESimulator-v4.0-75-fcf1738-Debug.zip",
+          "size": 36629417,
+          "downloadCount": 157
+        },
+        {
+          "name": "TEESimulator-v4.0-75-fcf1738-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-75/TEESimulator-v4.0-75-fcf1738-Release.zip",
+          "size": 18171694,
+          "downloadCount": 1765
+        }
+      ]
+    },
+    {
+      "name": "canary-74",
+      "tagName": "canary-74",
+      "publishedAt": "2026-10-19T18:04:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-74-2fda3b1-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-74/TEESimulator-v4.0-74-2fda3b1-Debug.zip",
+          "size": 35730470,
+          "downloadCount": 29
+        },
+        {
+          "name": "TEESimulator-v4.0-74-2fda3b1-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-74/TEESimulator-v4.0-74-2fda3b1-Release.zip",
+          "size": 17722891,
+          "downloadCount": 149
+        }
+      ]
+    },
+    {
+      "name": "canary-73",
+      "tagName": "canary-73",
+      "publishedAt": "2026-10-19T17:30:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-73-159a65c-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-73/TEESimulator-v4.0-73-159a65c-Debug.zip",
+          "size": 35730996,
+          "downloadCount": 13
+        },
+        {
+          "name": "TEESimulator-v4.0-73-159a65c-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-73/TEESimulator-v4.0-73-159a65c-Release.zip",
+          "size": 17722912,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "canary-72",
+      "tagName": "canary-72",
+      "publishedAt": "2026-10-19T11:21:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-72-f3fbd12-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-72/TEESimulator-v4.0-72-f3fbd12-Debug.zip",
+          "size": 35698646,
+          "downloadCount": 39
+        },
+        {
+          "name": "TEESimulator-v4.0-72-f3fbd12-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/canary-72/TEESimulator-v4.0-72-f3fbd12-Release.zip",
+          "size": 17712824,
+          "downloadCount": 443
+        }
+      ]
+    },
+    {
+      "name": "v4.0",
+      "tagName": "v4.0",
+      "publishedAt": "2026-08-11T09:02:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-34-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v4.0/TEESimulator-v4.0-34-Debug.zip",
+          "size": 35021678,
+          "downloadCount": 10508
+        },
+        {
+          "name": "TEESimulator-v4.0-34-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v4.0/TEESimulator-v4.0-34-Release.zip",
+          "size": 16702783,
+          "downloadCount": 45786
+        }
+      ]
+    },
+    {
+      "name": "v3.2",
+      "tagName": "v3.2",
+      "publishedAt": "2026-03-07T11:40:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v3.2-67-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.2/TEESimulator-v3.2-67-Debug.zip",
+          "size": 7870362,
+          "downloadCount": 16242
+        },
+        {
+          "name": "TEESimulator-v3.2-67-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.2/TEESimulator-v3.2-67-Release.zip",
+          "size": 1883723,
+          "downloadCount": 42330
+        }
+      ]
+    },
+    {
+      "name": "v3.1",
+      "tagName": "v3.1",
+      "publishedAt": "2026-01-31T21:54:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v3.1-59-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.1/TEESimulator-v3.1-59-Debug.zip",
+          "size": 8106925,
+          "downloadCount": 1679
+        },
+        {
+          "name": "TEESimulator-v3.1-59-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.1/TEESimulator-v3.1-59-Release.zip",
+          "size": 1942370,
+          "downloadCount": 8798
+        }
+      ]
+    },
+    {
+      "name": "v3.0",
+      "tagName": "v3.0",
+      "publishedAt": "2025-12-06T16:06:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v3.0-38-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.0/TEESimulator-v3.0-38-Debug.zip",
+          "size": 7075773,
+          "downloadCount": 696
+        },
+        {
+          "name": "TEESimulator-v3.0-38-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v3.0/TEESimulator-v3.0-38-Release.zip",
+          "size": 1659708,
+          "downloadCount": 7306
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2025-11-28T19:06:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v2.1-20-debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v2.1/TEESimulator-v2.1-20-debug.zip",
+          "size": 7046980,
+          "downloadCount": 162
+        },
+        {
+          "name": "TEESimulator-v2.1-20-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v2.1/TEESimulator-v2.1-20-release.zip",
+          "size": 1649734,
+          "downloadCount": 1099
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2025-11-26T17:40:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v2.0-14-Debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v2.0/TEESimulator-v2.0-14-Debug.zip",
+          "size": 7038427,
+          "downloadCount": 50
+        },
+        {
+          "name": "TEESimulator-v2.0-14-Release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v2.0/TEESimulator-v2.0-14-Release.zip",
+          "size": 1646743,
+          "downloadCount": 240
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-11-02T17:53:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v1.0-74-debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v1.0/TEESimulator-v1.0-74-debug.zip",
+          "size": 4694388,
+          "downloadCount": 167
+        },
+        {
+          "name": "TEESimulator-v1.0-74-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/TEESimulator/releases/download/v1.0/TEESimulator-v1.0-74-release.zip",
+          "size": 1215224,
+          "downloadCount": 1006
+        }
+      ]
+    }
+  ]
+}

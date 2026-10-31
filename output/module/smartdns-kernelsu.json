@@ -1,0 +1,43 @@
+{
+  "readme": "## 如何使用\n> [!WARNING]\n> magisk 环境未经测试  \n> 仅支持aarch64架构的设备\n\n安装模块后正常重启, 此时smartdns启动, 证书生成\n\n再次重启设备, 此时证书被挂载进系统信任的根证书目录, 可以正常使用DoH请求SmartDNS  \n//其实实测挺玄学的, 一会儿信任一会儿不信任, ~~灵车说是~~ 也许是我设备的问题...?\n\n配置文件位于 `/data/adb/smartdns/config/smartdns.conf`  \n// 显然, 你可以无视项目的配置文件自己写, 但路径相关 ~~最好~~ 别改（\n## 关于项目\n因为写这个项目的原因是[原项目](https://github.com/x4455/smartdns-Android)太久没更新以及我不需要dns劫持, 广告过滤[^1]和arm架构的二进制文件[^2]，所以需要的话自己参照原项目改改罢（\n## 项目使用的其他项目内容\n原项目(启发, bin/ca-certificates.zip): [smartdns-Android](https://github.com/x4455/smartdns-Android)\n\nbin/smartdns-aarch64 : [SmartDNS](https://github.com/pymumu/smartdns)\n\nuninstall.sh : [box_for_magisk](https://github.com/taamarin/box_for_magisk)\n\npost-fs-data.sh : [Magisk-ProxyPinCA](https://gitee.com/wanghongenpin/Magisk-ProxyPinCA)\n\ncustomize.sh : [zerotier-magisk](https://github.com/eventlOwOp/zerotier-magisk)\n\n[^1]: 那是mihomo该干的（\n[^2]: 好吧有空还是整一下arm的支持吧(别急, 或者反正改起来很简单你自己改算了(确信))\n",
+  "readmeHTML": "<h2>如何使用</h2>\n<p>> [!WARNING]</p>\n<p>> magisk 环境未经测试</p>\n<p>> 仅支持aarch64架构的设备</p>\n\n<p>安装模块后正常重启, 此时smartdns启动, 证书生成</p>\n\n<p>再次重启设备, 此时证书被挂载进系统信任的根证书目录, 可以正常使用DoH请求SmartDNS</p>\n<p>//其实实测挺玄学的, 一会儿信任一会儿不信任, ~~灵车说是~~ 也许是我设备的问题...?</p>\n\n<p>配置文件位于 <code>/data/adb/smartdns/config/smartdns.conf</code></p>\n<p>// 显然, 你可以无视项目的配置文件自己写, 但路径相关 ~~最好~~ 别改（</p>\n<h2>关于项目</h2>\n<p>因为写这个项目的原因是<a href=\"https://github.com/x4455/smartdns-Android\">原项目</a>太久没更新以及我不需要dns劫持, 广告过滤[^1]和arm架构的二进制文件[^2]，所以需要的话自己参照原项目改改罢（</p>\n<h2>项目使用的其他项目内容</h2>\n<p>原项目(启发, bin/ca-certificates.zip): <a href=\"https://github.com/x4455/smartdns-Android\">smartdns-Android</a></p>\n\n<p>bin/smartdns-aarch64 : <a href=\"https://github.com/pymumu/smartdns\">SmartDNS</a></p>\n\n<p>uninstall.sh : <a href=\"https://github.com/taamarin/box_for_magisk\">box_for_magisk</a></p>\n\n<p>post-fs-data.sh : <a href=\"https://gitee.com/wanghongenpin/Magisk-ProxyPinCA\">Magisk-ProxyPinCA</a></p>\n\n<p>customize.sh : <a href=\"https://github.com/eventlOwOp/zerotier-magisk\">zerotier-magisk</a></p>\n\n<p>[^1]: 那是mihomo该干的（</p>\n<p>[^2]: 好吧有空还是整一下arm的支持吧(别急, 或者反正改起来很简单你自己改算了(确信))</p>",
+  "homepageUrl": "https://github.com/1465ghdg/smartdns-kernelsu",
+  "sourceUrl": "https://github.com/1465ghdg/smartdns-kernelsu",
+  "url": "https://github.com/1465ghdg/smartdns-kernelsu",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-02-22T09:53:00Z",
+    "downloadUrl": "https://github.com/1465ghdg/smartdns-kernelsu/releases/download/v1.0.1/smartdns.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-02-22T09:53:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "smartdns.zip",
+          "downloadUrl": "https://github.com/1465ghdg/smartdns-kernelsu/releases/download/v1.0.1/smartdns.zip",
+          "size": 2226956,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-02-22T05:31:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "smartdns.zip",
+          "downloadUrl": "https://github.com/1465ghdg/smartdns-kernelsu/releases/download/v1.0.0/smartdns.zip",
+          "size": 2240212,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

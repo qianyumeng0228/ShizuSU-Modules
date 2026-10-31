@@ -1,0 +1,819 @@
+{
+  "readme": "# ReVanced Magisk Module\n[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/rvc_magisk)\n[![CI](https://github.com/j-hc/revanced-magisk-module/actions/workflows/ci.yml/badge.svg?event=schedule)](https://github.com/j-hc/revanced-magisk-module/actions/workflows/ci.yml)\n\nExtensive ReVanced builder  \n\nGet the [latest CI release](https://github.com/j-hc/revanced-magisk-module/releases).\n\nUse [**zygisk-detach**](https://github.com/j-hc/zygisk-detach) to detach YouTube and YT Music from Play Store if you are using magisk modules. \n\n<details><summary><big>Features</big></summary>\n<ul>\n <li> Supports all present and future ReVanced apps (including projects implementing the same interface like Morphe)</li>\n <li> Receives in-app updates</li>\n <li> Can build modules and non-root APKs</li>\n <li> Updated daily with the latest versions of apps and patches</li>\n <li> Optimizes APKs and modules for size</li>\n <li> Modules</li>\n    <ul>\n     <li> handle installation of the correct version of the stock app and all that</li>\n     <li> do not trigger root detections</li>\n     <li> receive updates from Magisk/KernelSU app</li>\n     <li> recompile invalidated odex for faster usage</li>\n    </ul>\n</ul>\n</details>\n\n## To include/exclude patches or patch other apps\n\n * Star the repo :eyes:\n * Use the repo as a [template](https://github.com/new?template_name=revanced-magisk-module&template_owner=j-hc)\n * Customize [`config.toml`](./config.toml) using [rvmm-config-gen](https://j-hc.github.io/rvmm-config-gen/)\n * Run the build [workflow](../../actions/workflows/build.yml)\n * Grab your modules and APKs from [releases](../../releases)\n\nalso see here [`CONFIG.md`](./CONFIG.md)\n\n## If you are having trouble with the classic mount method of the modules\nsuch as,\n- **\"Reflash needed\"** error after reboots\n- **\"Suspicious mount detected\"** warnings from root detector apps\n\nYou can consider using [rvmm-zygisk-mount](https://github.com/j-hc/rvmm-zygisk-mount)\n\n## Building Locally\n### On Termux\n```console\nbash <(curl -sSf https://raw.githubusercontent.com/j-hc/revanced-magisk-module/main/build-termux.sh)\n```\n\n### On Linux\n```console\n$ git clone https://github.com/j-hc/revanced-magisk-module --depth 1\n$ cd revanced-magisk-module\n$ ./build.sh\n```\n",
+  "readmeHTML": "<h1>ReVanced Magisk Module</h1>\n<p><a href=\"https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram</a>](https://t.me/rvc_magisk)</p>\n<p><a href=\"https://github.com/j-hc/revanced-magisk-module/actions/workflows/ci.yml/badge.svg?event=schedule\">![CI</a>](https://github.com/j-hc/revanced-magisk-module/actions/workflows/ci.yml)</p>\n\n<p>Extensive ReVanced builder</p>\n\n<p>Get the <a href=\"https://github.com/j-hc/revanced-magisk-module/releases\">latest CI release</a>.</p>\n\n<p>Use <a href=\"https://github.com/j-hc/zygisk-detach\"><b>zygisk-detach</b></a> to detach YouTube and YT Music from Play Store if you are using magisk modules.</p>\n\n<p><details><summary><big>Features</big></summary></p>\n<p><ul></p>\n<p> <li> Supports all present and future ReVanced apps (including projects implementing the same interface like Morphe)</li></p>\n<p> <li> Receives in-app updates</li></p>\n<p> <li> Can build modules and non-root APKs</li></p>\n<p> <li> Updated daily with the latest versions of apps and patches</li></p>\n<p> <li> Optimizes APKs and modules for size</li></p>\n<p> <li> Modules</li></p>\n<p>    <ul></p>\n<p>     <li> handle installation of the correct version of the stock app and all that</li></p>\n<p>     <li> do not trigger root detections</li></p>\n<p>     <li> receive updates from Magisk/KernelSU app</li></p>\n<p>     <li> recompile invalidated odex for faster usage</li></p>\n<p>    </ul></p>\n<p></ul></p>\n<p></details></p>\n\n<h2>To include/exclude patches or patch other apps</h2>\n\n<p> * Star the repo :eyes:</p>\n<p> * Use the repo as a <a href=\"https://github.com/new?template_name=revanced-magisk-module&template_owner=j-hc\">template</a></p>\n<p> * Customize <a href=\"./config.toml\"><code>config.toml</code></a> using <a href=\"https://j-hc.github.io/rvmm-config-gen/\">rvmm-config-gen</a></p>\n<p> * Run the build <a href=\"../../actions/workflows/build.yml\">workflow</a></p>\n<p> * Grab your modules and APKs from <a href=\"../../releases\">releases</a></p>\n\n<p>also see here <a href=\"./CONFIG.md\"><code>CONFIG.md</code></a></p>\n\n<h2>If you are having trouble with the classic mount method of the modules</h2>\n<p>such as,</p>\n<li>**\"Reflash needed\"** error after reboots</li>\n<li>**\"Suspicious mount detected\"** warnings from root detector apps</li>\n\n<p>You can consider using <a href=\"https://github.com/j-hc/rvmm-zygisk-mount\">rvmm-zygisk-mount</a></p>\n\n<h2>Building Locally</h2>\n<h3>On Termux</h3>\n<pre>bash &lt;(curl -sSf https://raw.githubusercontent.com/j-hc/revanced-magisk-module/main/build-termux.sh)</pre>\n\n<h3>On Linux</h3>\n<pre>$ git clone https://github.com/j-hc/revanced-magisk-module --depth 1\n$ cd revanced-magisk-module\n$ ./build.sh</pre>",
+  "homepageUrl": "https://t.me/rvc_magisk",
+  "sourceUrl": "https://github.com/j-hc/revanced-magisk-module",
+  "url": "https://github.com/j-hc/revanced-magisk-module",
+  "latestRelease": {
+    "name": "20221123",
+    "version": "20221123",
+    "time": "2026-10-30T16:09:22Z",
+    "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/music-morphe-module-v9.30.53-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "20221123",
+      "tagName": "20221123",
+      "publishedAt": "2026-10-30T16:09:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.30.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/music-morphe-module-v9.30.53-arm64-v8a.zip",
+          "size": 68581180,
+          "downloadCount": 1037
+        },
+        {
+          "name": "music-morphe-v9.30.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/music-morphe-v9.30.53-arm64-v8a.apk",
+          "size": 80129119,
+          "downloadCount": 840
+        },
+        {
+          "name": "reddit-morphe-module-v2026.40.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/reddit-morphe-module-v2026.40.0-all.zip",
+          "size": 145782571,
+          "downloadCount": 184
+        },
+        {
+          "name": "reddit-morphe-v2026.40.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/reddit-morphe-v2026.40.0-all.apk",
+          "size": 99154696,
+          "downloadCount": 124
+        },
+        {
+          "name": "twitter-piko-v12.37.2-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/twitter-piko-v12.37.2-prod.01-all.apk",
+          "size": 210620520,
+          "downloadCount": 389
+        },
+        {
+          "name": "youtube-morphe-module-v21.30.216-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/youtube-morphe-module-v21.30.216-all.zip",
+          "size": 236247329,
+          "downloadCount": 2400
+        },
+        {
+          "name": "youtube-morphe-v21.30.216-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221123/youtube-morphe-v21.30.216-all.apk",
+          "size": 145967222,
+          "downloadCount": 3094
+        }
+      ]
+    },
+    {
+      "name": "20221122",
+      "tagName": "20221122",
+      "publishedAt": "2026-10-29T16:07:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221122/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 233789973,
+          "downloadCount": 542
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221122/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 159444809,
+          "downloadCount": 777
+        },
+        {
+          "name": "twitter-piko-v12.37.2-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221122/twitter-piko-v12.37.2-prod.01-all.apk",
+          "size": 210612328,
+          "downloadCount": 582
+        }
+      ]
+    },
+    {
+      "name": "20221121",
+      "tagName": "20221121",
+      "publishedAt": "2026-10-28T16:05:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.37.2-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221121/twitter-piko-v12.37.2-prod.01-all.apk",
+          "size": 210538600,
+          "downloadCount": 1344
+        }
+      ]
+    },
+    {
+      "name": "20221120",
+      "tagName": "20221120",
+      "publishedAt": "2026-10-27T16:12:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.37.2-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221120/twitter-piko-v12.37.2-prod.01-all.apk",
+          "size": 210538600,
+          "downloadCount": 1472
+        }
+      ]
+    },
+    {
+      "name": "20221119",
+      "tagName": "20221119",
+      "publishedAt": "2026-10-24T16:07:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221119/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 233789972,
+          "downloadCount": 1587
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221119/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 159444809,
+          "downloadCount": 2395
+        },
+        {
+          "name": "twitter-piko-v12.37.2-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221119/twitter-piko-v12.37.2-prod.01-all.apk",
+          "size": 210534504,
+          "downloadCount": 1340
+        }
+      ]
+    },
+    {
+      "name": "20221118",
+      "tagName": "20221118",
+      "publishedAt": "2026-10-23T16:10:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64974525,
+          "downloadCount": 276
+        },
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67724531,
+          "downloadCount": 5085
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 66435579,
+          "downloadCount": 468
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77703633,
+          "downloadCount": 7465
+        },
+        {
+          "name": "reddit-morphe-module-v2026.24.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/reddit-morphe-module-v2026.24.0-all.zip",
+          "size": 141243999,
+          "downloadCount": 802
+        },
+        {
+          "name": "reddit-morphe-v2026.24.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/reddit-morphe-v2026.24.0-all.apk",
+          "size": 97252460,
+          "downloadCount": 804
+        },
+        {
+          "name": "twitter-piko-v12.36.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/twitter-piko-v12.36.1-prod.01-all.apk",
+          "size": 207804896,
+          "downloadCount": 905
+        },
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219751944,
+          "downloadCount": 12928
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221118/youtube-morphe-v21.20.405-all.apk",
+          "size": 134306931,
+          "downloadCount": 31148
+        }
+      ]
+    },
+    {
+      "name": "20221117",
+      "tagName": "20221117",
+      "publishedAt": "2026-10-18T16:11:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 232952093,
+          "downloadCount": 1577
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 158568147,
+          "downloadCount": 2655
+        },
+        {
+          "name": "music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64416766,
+          "downloadCount": 414
+        },
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67165952,
+          "downloadCount": 4820
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 65223023,
+          "downloadCount": 557
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 76491077,
+          "downloadCount": 9201
+        },
+        {
+          "name": "reddit-morphe-module-v2026.24.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/reddit-morphe-module-v2026.24.0-all.zip",
+          "size": 139512209,
+          "downloadCount": 893
+        },
+        {
+          "name": "reddit-morphe-v2026.24.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/reddit-morphe-v2026.24.0-all.apk",
+          "size": 95323067,
+          "downloadCount": 975
+        },
+        {
+          "name": "twitter-piko-v12.35.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/twitter-piko-v12.35.0-prod.01-all.apk",
+          "size": 205334394,
+          "downloadCount": 1685
+        },
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 217917602,
+          "downloadCount": 12545
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221117/youtube-morphe-v21.20.405-all.apk",
+          "size": 131161917,
+          "downloadCount": 14350
+        }
+      ]
+    },
+    {
+      "name": "20221116",
+      "tagName": "20221116",
+      "publishedAt": "2026-10-17T16:06:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.34.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221116/twitter-piko-v12.34.0-prod.01-all.apk",
+          "size": 148582711,
+          "downloadCount": 1520
+        }
+      ]
+    },
+    {
+      "name": "20221115",
+      "tagName": "20221115",
+      "publishedAt": "2026-10-16T16:06:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.34.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221115/twitter-piko-v12.34.0-prod.01-all.apk",
+          "size": 148578615,
+          "downloadCount": 1668
+        }
+      ]
+    },
+    {
+      "name": "20221114",
+      "tagName": "20221114",
+      "publishedAt": "2026-10-12T16:07:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.33.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221114/twitter-piko-v12.33.1-prod.01-all.apk",
+          "size": 148085059,
+          "downloadCount": 4442
+        }
+      ]
+    },
+    {
+      "name": "20221113",
+      "tagName": "20221113",
+      "publishedAt": "2026-10-11T17:41:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64416692,
+          "downloadCount": 532
+        },
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67165874,
+          "downloadCount": 5392
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 65223023,
+          "downloadCount": 794
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 76491077,
+          "downloadCount": 8903
+        },
+        {
+          "name": "reddit-morphe-module-v2026.24.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/reddit-morphe-module-v2026.24.0-all.zip",
+          "size": 139512137,
+          "downloadCount": 1002
+        },
+        {
+          "name": "reddit-morphe-v2026.24.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/reddit-morphe-v2026.24.0-all.apk",
+          "size": 95323067,
+          "downloadCount": 1030
+        },
+        {
+          "name": "twitter-piko-v12.33.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/twitter-piko-v12.33.1-prod.01-all.apk",
+          "size": 148101443,
+          "downloadCount": 960
+        },
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 217917425,
+          "downloadCount": 12999
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221113/youtube-morphe-v21.20.405-all.apk",
+          "size": 131161917,
+          "downloadCount": 32279
+        }
+      ]
+    },
+    {
+      "name": "20221112",
+      "tagName": "20221112",
+      "publishedAt": "2026-10-10T16:07:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221112/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 144940657,
+          "downloadCount": 1605
+        }
+      ]
+    },
+    {
+      "name": "20221111",
+      "tagName": "20221111",
+      "publishedAt": "2026-10-09T16:07:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221111/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 144940657,
+          "downloadCount": 1583
+        }
+      ]
+    },
+    {
+      "name": "20221110",
+      "tagName": "20221110",
+      "publishedAt": "2026-10-07T16:07:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221110/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 144698993,
+          "downloadCount": 2543
+        }
+      ]
+    },
+    {
+      "name": "20221109",
+      "tagName": "20221109",
+      "publishedAt": "2026-10-06T17:51:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.20.53-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/music-morphe-module-v9.20.53-arm-v7a.zip",
+          "size": 64379866,
+          "downloadCount": 320
+        },
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67133932,
+          "downloadCount": 4188
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/music-morphe-v9.20.53-arm-v7a.apk",
+          "size": 65129440,
+          "downloadCount": 929
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 76401590,
+          "downloadCount": 9231
+        },
+        {
+          "name": "reddit-morphe-module-v2026.24.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/reddit-morphe-module-v2026.24.0-all.zip",
+          "size": 139500013,
+          "downloadCount": 852
+        },
+        {
+          "name": "reddit-morphe-v2026.24.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/reddit-morphe-v2026.24.0-all.apk",
+          "size": 95306775,
+          "downloadCount": 1004
+        },
+        {
+          "name": "youtube-morphe-module-v21.16.256-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/youtube-morphe-module-v21.16.256-all.zip",
+          "size": 215191828,
+          "downloadCount": 10704
+        },
+        {
+          "name": "youtube-morphe-v21.16.256-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221109/youtube-morphe-v21.16.256-all.apk",
+          "size": 129514024,
+          "downloadCount": 36576
+        }
+      ]
+    },
+    {
+      "name": "20221108",
+      "tagName": "20221108",
+      "publishedAt": "2026-10-04T17:25:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221108/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 232286904,
+          "downloadCount": 2084
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221108/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 157880145,
+          "downloadCount": 4702
+        },
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221108/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 142991150,
+          "downloadCount": 1424
+        }
+      ]
+    },
+    {
+      "name": "20221107",
+      "tagName": "20221107",
+      "publishedAt": "2026-10-03T17:24:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221107/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 232286796,
+          "downloadCount": 723
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221107/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 157880145,
+          "downloadCount": 1356
+        },
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221107/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 142950131,
+          "downloadCount": 837
+        }
+      ]
+    },
+    {
+      "name": "20221106",
+      "tagName": "20221106",
+      "publishedAt": "2026-10-02T16:15:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/music-morphe-module-v9.15.51-arm-v7a.zip",
+          "size": 65387893,
+          "downloadCount": 407
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 68437731,
+          "downloadCount": 4007
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/music-morphe-v9.15.51-arm-v7a.apk",
+          "size": 68306833,
+          "downloadCount": 597
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 82360167,
+          "downloadCount": 9377
+        },
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 142917363,
+          "downloadCount": 917
+        },
+        {
+          "name": "youtube-morphe-module-v21.16.256-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/youtube-morphe-module-v21.16.256-all.zip",
+          "size": 215664637,
+          "downloadCount": 9207
+        },
+        {
+          "name": "youtube-morphe-v21.16.256-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221106/youtube-morphe-v21.16.256-all.apk",
+          "size": 129880182,
+          "downloadCount": 38821
+        }
+      ]
+    },
+    {
+      "name": "20221105",
+      "tagName": "20221105",
+      "publishedAt": "2026-10-01T16:07:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221105/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 142925462,
+          "downloadCount": 1806
+        }
+      ]
+    },
+    {
+      "name": "20221104",
+      "tagName": "20221104",
+      "publishedAt": "2026-09-30T16:07:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.29.1-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221104/twitter-piko-v12.29.1-prod.01-all.apk",
+          "size": 141778464,
+          "downloadCount": 1745
+        }
+      ]
+    },
+    {
+      "name": "20221103",
+      "tagName": "20221103",
+      "publishedAt": "2026-09-29T16:07:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.28.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221103/twitter-piko-v12.28.0-prod.01-all.apk",
+          "size": 172068454,
+          "downloadCount": 1718
+        }
+      ]
+    },
+    {
+      "name": "20221102",
+      "tagName": "20221102",
+      "publishedAt": "2026-09-28T16:07:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.28.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221102/twitter-piko-v12.28.0-prod.01-all.apk",
+          "size": 172068454,
+          "downloadCount": 1443
+        }
+      ]
+    },
+    {
+      "name": "20221101",
+      "tagName": "20221101",
+      "publishedAt": "2026-09-27T16:07:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.28.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221101/twitter-piko-v12.28.0-prod.01-all.apk",
+          "size": 172068454,
+          "downloadCount": 1685
+        }
+      ]
+    },
+    {
+      "name": "20221100",
+      "tagName": "20221100",
+      "publishedAt": "2026-09-26T16:06:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.28.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221100/twitter-piko-v12.28.0-prod.01-all.apk",
+          "size": 172068454,
+          "downloadCount": 1528
+        }
+      ]
+    },
+    {
+      "name": "20221099",
+      "tagName": "20221099",
+      "publishedAt": "2026-09-25T16:14:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.28.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221099/twitter-piko-v12.28.0-prod.01-all.apk",
+          "size": 172146278,
+          "downloadCount": 1663
+        }
+      ]
+    },
+    {
+      "name": "20221098",
+      "tagName": "20221098",
+      "publishedAt": "2026-09-24T16:20:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.27.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221098/twitter-piko-v12.27.0-prod.01-all.apk",
+          "size": 171090797,
+          "downloadCount": 1937
+        }
+      ]
+    },
+    {
+      "name": "20221097",
+      "tagName": "20221097",
+      "publishedAt": "2026-09-23T16:21:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.27.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221097/twitter-piko-v12.27.0-prod.01-all.apk",
+          "size": 172671853,
+          "downloadCount": 1919
+        }
+      ]
+    },
+    {
+      "name": "20221096",
+      "tagName": "20221096",
+      "publishedAt": "2026-09-22T16:19:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "twitter-piko-v12.27.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221096/twitter-piko-v12.27.0-prod.01-all.apk",
+          "size": 172634989,
+          "downloadCount": 1817
+        }
+      ]
+    },
+    {
+      "name": "20221095",
+      "tagName": "20221095",
+      "publishedAt": "2026-09-21T18:04:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 232286796,
+          "downloadCount": 2050
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 157867857,
+          "downloadCount": 4807
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm-v7a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/music-morphe-module-v9.15.51-arm-v7a.zip",
+          "size": 65111151,
+          "downloadCount": 555
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 68160725,
+          "downloadCount": 6864
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm-v7a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/music-morphe-v9.15.51-arm-v7a.apk",
+          "size": 67765818,
+          "downloadCount": 849
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 81790480,
+          "downloadCount": 30479
+        },
+        {
+          "name": "reddit-morphe-module-v2026.14.0-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/reddit-morphe-module-v2026.14.0-all.zip",
+          "size": 133418694,
+          "downloadCount": 1332
+        },
+        {
+          "name": "reddit-morphe-v2026.14.0-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/reddit-morphe-v2026.14.0-all.apk",
+          "size": 83861750,
+          "downloadCount": 1378
+        },
+        {
+          "name": "twitter-piko-v12.27.0-prod.01-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/twitter-piko-v12.27.0-prod.01-all.apk",
+          "size": 172634989,
+          "downloadCount": 1058
+        },
+        {
+          "name": "youtube-morphe-module-v21.16.256-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/youtube-morphe-module-v21.16.256-all.zip",
+          "size": 215022122,
+          "downloadCount": 17335
+        },
+        {
+          "name": "youtube-morphe-v21.16.256-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221095/youtube-morphe-v21.16.256-all.apk",
+          "size": 128698604,
+          "downloadCount": 44889
+        }
+      ]
+    },
+    {
+      "name": "20221094",
+      "tagName": "20221094",
+      "publishedAt": "2026-09-20T16:19:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221094/googlephotos-devanced-module-v7.92.0.977185651-all.zip",
+          "size": 232286797,
+          "downloadCount": 795
+        },
+        {
+          "name": "googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/j-hc/revanced-magisk-module/releases/download/20221094/googlephotos-devanced-v7.92.0.977185651-all.apk",
+          "size": 157867857,
+          "downloadCount": 2702
+        }
+      ]
+    }
+  ]
+}

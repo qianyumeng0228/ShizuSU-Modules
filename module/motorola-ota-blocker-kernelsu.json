@@ -1,0 +1,43 @@
+{
+  "readme": "![KernelSU](https://img.shields.io/badge/KernelSU-supported-brightgreen)\n\n# Motorola OTA Notification Blocker (KernelSU)\n\nA clean, systemless KernelSU module that permanently disables Motorola software update notifications by bind-mounting empty directories over OTA components.\n\nNo services.  \nNo background processes.  \nNo RAM usage.\n\n---\n\n## 🔧 What This Module Does\n\nMotorola OTA components rely on specific system directories to run update checks and display notifications.  \nThis module **bind-mounts empty directories** over those paths at boot, causing OTA components to silently fail while keeping system paths intact.  \n\n- Safe for system integrity  \n- No bootloop risk  \n- Fully reversible  \n\n---\n\n## 🧩 Targeted Directories\n\n- /system/priv-app/3c_ota\n- /system/product/priv-app/3c_ota\n- /system/system_ext/priv-app/3c_ota\n\n---\n\n## ✅ Benefits\n\n- Silently blocks Motorola OTA notifications  \n- Keeps system paths intact  \n- Zero runtime overhead (no RAM usage)  \n- No background services running  \n- Safe to enable/disable at any time  \n\n---\n\n## 📲 Requirements\n\n- Motorola device  \n- KernelSU installed  \n- Android 11 or higher  \n\n---\n\n## 🚀 Installation\n\n1. Download the module ZIP from the [Releases page](https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU/releases)  \n2. Open KernelSU → Modules → Install  \n3. Select `Motorola-OTA-Blocker-KernelSU.zip`  \n4. Reboot  \n\n---\n\n## 🔍 Verification\n\nAfter reboot, the OTA directories will exist but be empty. The module silently prevents OTA notifications from appearing.\n\n```sh\nls /system/system_ext/priv-app/3c_ota\n```\n\n---\n\n## ⚠️ Notes\n\n- This module does **not** delete any system files  \n- OTA updates are blocked only while the module is active  \n- Safe and fully reversible    \n\n---\n\n## 👤 Author\n\njuic3b0x\n\n---\n\n## 📄 License\n\nMIT License – see [LICENSE](LICENSE)\n",
+  "readmeHTML": "<p>!<a href=\"https://img.shields.io/badge/KernelSU-supported-brightgreen\">KernelSU</a></p>\n\n<h1>Motorola OTA Notification Blocker (KernelSU)</h1>\n\n<p>A clean, systemless KernelSU module that permanently disables Motorola software update notifications by bind-mounting empty directories over OTA components.</p>\n\n<p>No services.</p>\n<p>No background processes.</p>\n<p>No RAM usage.</p>\n\n<p>---</p>\n\n<h2>🔧 What This Module Does</h2>\n\n<p>Motorola OTA components rely on specific system directories to run update checks and display notifications.</p>\n<p>This module <b>bind-mounts empty directories</b> over those paths at boot, causing OTA components to silently fail while keeping system paths intact.</p>\n\n<li>Safe for system integrity</li>\n<li>No bootloop risk</li>\n<li>Fully reversible</li>\n\n<p>---</p>\n\n<h2>🧩 Targeted Directories</h2>\n\n<li>/system/priv-app/3c_ota</li>\n<li>/system/product/priv-app/3c_ota</li>\n<li>/system/system_ext/priv-app/3c_ota</li>\n\n<p>---</p>\n\n<h2>✅ Benefits</h2>\n\n<li>Silently blocks Motorola OTA notifications</li>\n<li>Keeps system paths intact</li>\n<li>Zero runtime overhead (no RAM usage)</li>\n<li>No background services running</li>\n<li>Safe to enable/disable at any time</li>\n\n<p>---</p>\n\n<h2>📲 Requirements</h2>\n\n<li>Motorola device</li>\n<li>KernelSU installed</li>\n<li>Android 11 or higher</li>\n\n<p>---</p>\n\n<h2>🚀 Installation</h2>\n\n<li>Download the module ZIP from the [Releases page](https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU/releases)</li>\n<li>Open KernelSU → Modules → Install</li>\n<li>Select `Motorola-OTA-Blocker-KernelSU.zip`</li>\n<li>Reboot</li>\n\n<p>---</p>\n\n<h2>🔍 Verification</h2>\n\n<p>After reboot, the OTA directories will exist but be empty. The module silently prevents OTA notifications from appearing.</p>\n\n<pre>ls /system/system_ext/priv-app/3c_ota</pre>\n\n<p>---</p>\n\n<h2>⚠️ Notes</h2>\n\n<li>This module does **not** delete any system files</li>\n<li>OTA updates are blocked only while the module is active</li>\n<li>Safe and fully reversible</li>\n\n<p>---</p>\n\n<h2>👤 Author</h2>\n\n<p>juic3b0x</p>\n\n<p>---</p>\n\n<h2>📄 License</h2>\n\n<p>MIT License – see <a href=\"LICENSE\">LICENSE</a></p>",
+  "homepageUrl": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU",
+  "sourceUrl": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU",
+  "url": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU",
+  "latestRelease": {
+    "name": "v1.2",
+    "version": "v1.2",
+    "time": "2026-01-29T22:34:46Z",
+    "downloadUrl": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU/releases/download/v1.2/Motorola-OTA-Blocker-KernelSU-1.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-01-29T22:34:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Motorola-OTA-Blocker-KernelSU-1.2.zip",
+          "downloadUrl": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU/releases/download/v1.2/Motorola-OTA-Blocker-KernelSU-1.2.zip",
+          "size": 979,
+          "downloadCount": 191
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-01-29T06:11:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Motorola-OTA-Blocker-KernelSU.zip",
+          "downloadUrl": "https://github.com/juic3b0x/Motorola-OTA-Blocker-KernelSU/releases/download/v1.0/Motorola-OTA-Blocker-KernelSU.zip",
+          "size": 1001,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "readme": "## Audio jitter silencer\nThis module disables very large audio jitter generators (i.e., the adaptive battery draining and charging management, the adaptive wireless connectivity management, and battery usage optimizations for audio related apps including system ones) for reducing audio jitter distortion effectively on all digital audio outputs (especially on bluetooth earphones) so that you could enjoy very hi-fi audio music without very short reverb or foggy sound like audio jitter distortion as much as possible in a simple manner. \n<br/>\n\nAudio jitter has two types that one is for phase variations of a master clock and the other is for frequency variations of an audio data stream (an actual audio data rate) via a PLL. Only the latter is considered here. The normalized amount of such audio jitter can be defined as the standard deviation of an actual audio data rate (with a low-pass filter) divided by its average data rate. For example, the expected average audio data rate of a 16bit 44.1kHz stereo track is 1.4112Mbps (16 x 44.1 x 2 / 1000). If the standard deviation is 15.0kbps, then the (normalized) jitter is 1.06%. If assuming the adaptive mode (defined in the USB audio standard) is used between a host device and a USB DAC, and the PLL in this DAC attenuates the jitter down-to 1/2 times (this is usual for less than 10 Hz jitter such as the Doze and the battery draining management generate), then the standard 1kHz sine test signal will have the standard deviation of 5.3 Hz. This is the audio jitter distortion caused by the variation of an actual audio data rate.\n<br/>\n\nFinally, if you follow my request regarding to disabling battery optimizations written in README's of my other tools ([\"Audio misc. settings\"](https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings), [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer), [\"Hifi maximizer\"](https://github.com/yzyhk904/hifi-maximizer-mod)), this module isn't needed at all and you could disable them manually by yourself. In short, on behalf of those who don't like to read the README's in detail this module will disable them automatically (but not completely). But additionally please manually uninstall \"Digital Wellbeing\" (system app; if it exists) itself or change \"Battery usage\" from \"Optimized\" to \"Restricted\" (this is very harmful for audio like camera servers) because this module cannot.\n<br/>\n<br/>\n\nThis module behaves as follows:\n<ol>\n    <li>disables the adaptive battery drain monitoring feature of the battery manager,</li>\n    <li>disables the adaptive connectivity feature of the data network manager,</li>\n    <li>disables the WI-FI suspend optimizations feature of the WI-FI network manager,</li>\n    <li>merges your original Doze white-list \"/data/system/deviceidle.xml\" (you have made via the app section (the battery usage or battery optimization part) of the Android settings interface) with an audio specific Doze white-list while backing up the original one (so that it can be restored when uninstalling this module).</li>\n</ol>\n<br/>\n<br/>\n\n* This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (11 ~ 14, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations). \n<br/><br/>\n\n* Remark: This module merges the above Doze white-list's only once at the first boot after installation, and also restores the backup to its original at the first boot after uninstallation. Please reboot immediately once after this first boot-up because the Device Idle Controller (the Doze battery saver) may fail to load hot \"/data/system/deviceidle.xml\" shortly after modified by this module. If you modify any battery optimization of  this kind after the installation, the Android system will filter out the white-list merged except existing apps on your device. So you will need manually maintain battery opyimization of new apps, or uninstall (reboot twice immediately) and reinstall this module (reboot once immediately after this reinstallation).\n\n* Note: Entry class USB DAC's usually adopt an interface chip communicating with the adaptive mode or the synchronous one defined in the USB audio standard. As in these modes an Android host controller sends audio sampling rate clock signals to the DAC, jitter generated at the host side affects the audio quality of the DAC tremendously. Higher class DAC's communicate with the asynchronous mode (also defined in the standard) to a host controller, but they actually use a PLL to reduce jitter from the host not to stutter even in heavy jitter situations. As this result, they behave as the adaptive mode with a feedback loop to dynamically adjust the host side sampling clock signals while referring a DAC side clock in a real sense, so even with the asynchronous mode they are more or less affected by host side jitter. You can see the mode of your USB DAC by opening \"/proc/asound/card1/stream0\" on your phone while playing music. Please see a word in parentheses at \"Endpoint:\" lines; \"SYNC\", \"ADAPTIVE\" or \"ASYNC\" means that your DAC uses \"synchronous\", \"adaptive\" or \"asynchronous\" mode to communicate to your phone, respectively. Moreover, almost all audio peripherals, e.g., bluetooth earphones, internal DAC's, network audio devices have a PLL in themselves and are affected by host side jitter for the same reason.\n\n* See also my companion magisk module [\"Audio misc. settings\"](https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings) for simply improving audio quality with respect to the number of media volume steps and resampling distortion of the Android OS mixer (AudioFlinger), and my root script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, ringing and intermodulation) ultimately. If annoying (perhaps, for many people) DRC (Dynamic Range Control, i.e., a kind of compression) has been enabled on your device (e.g., smart phones and tablets having an SDM??? or SM???? model numbered SoC internally), you can disable DRC by this script. Or you can use my magisk module [\"DRC remover\"](https://github.com/Magisk-Modules-Alt-Repo/drc-remover) to simply disable DRC only.\n<br/><br/>\n\n\n## DISCLAIMER\n\n* I am not responsible for any damage that may occur to your device, so it is your own choice to attempt this module.\n<br/>\n\n##\n",
+  "readmeHTML": "<h2>Audio jitter silencer</h2>\n<p>This module disables very large audio jitter generators (i.e., the adaptive battery draining and charging management, the adaptive wireless connectivity management, and battery usage optimizations for audio related apps including system ones) for reducing audio jitter distortion effectively on all digital audio outputs (especially on bluetooth earphones) so that you could enjoy very hi-fi audio music without very short reverb or foggy sound like audio jitter distortion as much as possible in a simple manner.</p>\n<p><br/></p>\n\n<p>Audio jitter has two types that one is for phase variations of a master clock and the other is for frequency variations of an audio data stream (an actual audio data rate) via a PLL. Only the latter is considered here. The normalized amount of such audio jitter can be defined as the standard deviation of an actual audio data rate (with a low-pass filter) divided by its average data rate. For example, the expected average audio data rate of a 16bit 44.1kHz stereo track is 1.4112Mbps (16 x 44.1 x 2 / 1000). If the standard deviation is 15.0kbps, then the (normalized) jitter is 1.06%. If assuming the adaptive mode (defined in the USB audio standard) is used between a host device and a USB DAC, and the PLL in this DAC attenuates the jitter down-to 1/2 times (this is usual for less than 10 Hz jitter such as the Doze and the battery draining management generate), then the standard 1kHz sine test signal will have the standard deviation of 5.3 Hz. This is the audio jitter distortion caused by the variation of an actual audio data rate.</p>\n<p><br/></p>\n\n<p>Finally, if you follow my request regarding to disabling battery optimizations written in README's of my other tools (<a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings\">\"Audio misc. settings\"</a>, <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB_SampleRate_Changer\"</a>, <a href=\"https://github.com/yzyhk904/hifi-maximizer-mod\">\"Hifi maximizer\"</a>), this module isn't needed at all and you could disable them manually by yourself. In short, on behalf of those who don't like to read the README's in detail this module will disable them automatically (but not completely). But additionally please manually uninstall \"Digital Wellbeing\" (system app; if it exists) itself or change \"Battery usage\" from \"Optimized\" to \"Restricted\" (this is very harmful for audio like camera servers) because this module cannot.</p>\n<p><br/></p>\n<p><br/></p>\n\n<p>This module behaves as follows:</p>\n<p><ol></p>\n<p>    <li>disables the adaptive battery drain monitoring feature of the battery manager,</li></p>\n<p>    <li>disables the adaptive connectivity feature of the data network manager,</li></p>\n<p>    <li>disables the WI-FI suspend optimizations feature of the WI-FI network manager,</li></p>\n<p>    <li>merges your original Doze white-list \"/data/system/deviceidle.xml\" (you have made via the app section (the battery usage or battery optimization part) of the Android settings interface) with an audio specific Doze white-list while backing up the original one (so that it can be restored when uninstalling this module).</li></p>\n<p></ol></p>\n<p><br/></p>\n<p><br/></p>\n\n<li>This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (11 ~ 14, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations).</li>\n<p><br/><br/></p>\n\n<li>Remark: This module merges the above Doze white-list's only once at the first boot after installation, and also restores the backup to its original at the first boot after uninstallation. Please reboot immediately once after this first boot-up because the Device Idle Controller (the Doze battery saver) may fail to load hot \"/data/system/deviceidle.xml\" shortly after modified by this module. If you modify any battery optimization of  this kind after the installation, the Android system will filter out the white-list merged except existing apps on your device. So you will need manually maintain battery opyimization of new apps, or uninstall (reboot twice immediately) and reinstall this module (reboot once immediately after this reinstallation).</li>\n\n<li>Note: Entry class USB DAC's usually adopt an interface chip communicating with the adaptive mode or the synchronous one defined in the USB audio standard. As in these modes an Android host controller sends audio sampling rate clock signals to the DAC, jitter generated at the host side affects the audio quality of the DAC tremendously. Higher class DAC's communicate with the asynchronous mode (also defined in the standard) to a host controller, but they actually use a PLL to reduce jitter from the host not to stutter even in heavy jitter situations. As this result, they behave as the adaptive mode with a feedback loop to dynamically adjust the host side sampling clock signals while referring a DAC side clock in a real sense, so even with the asynchronous mode they are more or less affected by host side jitter. You can see the mode of your USB DAC by opening \"/proc/asound/card1/stream0\" on your phone while playing music. Please see a word in parentheses at \"Endpoint:\" lines; \"SYNC\", \"ADAPTIVE\" or \"ASYNC\" means that your DAC uses \"synchronous\", \"adaptive\" or \"asynchronous\" mode to communicate to your phone, respectively. Moreover, almost all audio peripherals, e.g., bluetooth earphones, internal DAC's, network audio devices have a PLL in themselves and are affected by host side jitter for the same reason.</li>\n\n<li>See also my companion magisk module [\"Audio misc. settings\"](https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings) for simply improving audio quality with respect to the number of media volume steps and resampling distortion of the Android OS mixer (AudioFlinger), and my root script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, ringing and intermodulation) ultimately. If annoying (perhaps, for many people) DRC (Dynamic Range Control, i.e., a kind of compression) has been enabled on your device (e.g., smart phones and tablets having an SDM??? or SM???? model numbered SoC internally), you can disable DRC by this script. Or you can use my magisk module [\"DRC remover\"](https://github.com/Magisk-Modules-Alt-Repo/drc-remover) to simply disable DRC only.</li>\n<p><br/><br/></p>\n\n\n<h2>DISCLAIMER</h2>\n\n<li>I am not responsible for any damage that may occur to your device, so it is your own choice to attempt this module.</li>\n<p><br/></p>\n\n<p>##</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer",
+  "latestRelease": {
+    "name": "v1.0.11",
+    "version": "v1.0.11",
+    "time": "2026-06-21T07:27:05Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.11/magisk-module-audio-jitter-silencer-v1.0.11.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.11",
+      "tagName": "v1.0.11",
+      "publishedAt": "2026-06-21T07:27:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.11.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.11/magisk-module-audio-jitter-silencer-v1.0.11.zip",
+          "size": 20466,
+          "downloadCount": 2431
+        }
+      ]
+    },
+    {
+      "name": "v1.0.10",
+      "tagName": "v1.0.10",
+      "publishedAt": "2025-06-07T14:45:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.10-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.10/magisk-module-audio-jitter-silencer-v1.0.10-1.zip",
+          "size": 20427,
+          "downloadCount": 4933
+        }
+      ]
+    },
+    {
+      "name": "v1.0.9",
+      "tagName": "v1.0.9",
+      "publishedAt": "2025-05-05T11:06:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.9/magisk-module-audio-jitter-silencer-v1.0.9.zip",
+          "size": 20354,
+          "downloadCount": 428
+        }
+      ]
+    },
+    {
+      "name": "v1.0.8",
+      "tagName": "v1.0.8",
+      "publishedAt": "2024-04-15T06:27:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.8.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.8/magisk-module-audio-jitter-silencer-v1.0.8.zip",
+          "size": 20317,
+          "downloadCount": 3960
+        }
+      ]
+    },
+    {
+      "name": "v1.0.7",
+      "tagName": "v1.0.7",
+      "publishedAt": "2024-02-26T11:17:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.7-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.7/magisk-module-audio-jitter-silencer-v1.0.7-2.zip",
+          "size": 20070,
+          "downloadCount": 502
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2024-01-30T07:20:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.6/magisk-module-audio-jitter-silencer-v1.0.6.zip",
+          "size": 19823,
+          "downloadCount": 560
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2023-08-29T09:43:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.5/magisk-module-audio-jitter-silencer-v1.0.5.zip",
+          "size": 19799,
+          "downloadCount": 2471
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2023-06-25T08:38:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.4/magisk-module-audio-jitter-silencer-v1.0.4.zip",
+          "size": 19717,
+          "downloadCount": 817
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2023-06-20T04:32:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.0.3/magisk-module-audio-jitter-silencer-v1.0.3.zip",
+          "size": 19714,
+          "downloadCount": 78
+        }
+      ]
+    },
+    {
+      "name": "v1.02",
+      "tagName": "v1.02",
+      "publishedAt": "2023-04-11T09:52:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-v1.0.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/v1.02/magisk-module-audio-jitter-silencer-v1.0.2.zip",
+          "size": 19451,
+          "downloadCount": 347
+        }
+      ]
+    },
+    {
+      "name": "V1.0.1",
+      "tagName": "V1.0.1",
+      "publishedAt": "2022-06-27T16:30:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-V1-0-1-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/V1.0.1/magisk-module-audio-jitter-silencer-V1-0-1-1.zip",
+          "size": 19174,
+          "downloadCount": 1188
+        }
+      ]
+    },
+    {
+      "name": "V1.0.0",
+      "tagName": "V1.0.0",
+      "publishedAt": "2022-06-23T11:10:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-jitter-silencer-V1-0-0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer/releases/download/V1.0.0/magisk-module-audio-jitter-silencer-V1-0-0.zip",
+          "size": 18647,
+          "downloadCount": 37
+        }
+      ]
+    }
+  ]
+}

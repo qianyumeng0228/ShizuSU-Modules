@@ -1,0 +1,169 @@
+{
+  "readme": "# Open WebView - [XDA Thread](https://xdaforums.com/t/magisk-module-webview-open-webview.4496119/)\n\n![Open WebView](https://raw.githubusercontent.com/Magisk-Modules-Alt-Repo/open_webview/master/img/logo.png)\n\nThis module helps you to replace your system webview though Magisk.\n\n## NOTICE\n> This for me is just a hobby that I do when I have some free time (very little). If you appreciate my work please let me know, thank you!\n\n>~~**ATTENTION!** There is a bug that still needs to be fixed where sometimes you may find that the installed webview doesn't work. To fix this bug you need to manually install the webview, to do this just:~~\n> - ~~download from sources the latest version of the webview you have choosen during module installation~~\n> - ~~install it~~\n\n## DISCLAIMER\n\n>I AM NOT RESPONSIBLE IF YOUR DEVICE DOES NOT WORK PROPERLY OR FOR ANY DAMAGE THAT MAY OCCUR TO YOUR DEVICE. BEFORE USING THIS MODULE, PLEASE READ THE CODE. YOU WHO DECIDE TO INSTALL THIS MODULE ASSUMES ALL RESPONSIBILITY FOR ANY PROBLEMS.\n\n## Compatibility\n\n- S.O.:\n    - minimum: Android 8+\n    - recommended: Android 13+\n- Magisk 20.4+\n- KernelSU 0.6+\n\n> Thanks to @amteza the module works fine with KernelSU but I personally use Magisk so I can't guarantee correct functioning with KernelSU\n\n## Tested Device ROM\n\n| API | OS | ROM | version |\n|:---:|:--:|:---:|:-------:|\n| `26` | `Android 8` |      | `AAPT` |\n| `27` | `Android 8.1` |       | `AAPT` |\n| `28` | `Android 9` |       | `AAPT` |\n| `29` | `Android 10` |       | `AAPT` |\n| `30` | `Android 11` |       | `AAPT` |\n| `31` | `Android 12` | `LOS 19` | `AAPT` |\n| `32` | `Android 12L` | `LOS 19.1` | `AAPT` |\n| `33` | `Android 13` | `LOS 20` | `AAPT` |\n| `34*` | `Android 14` | `crDroid 10.x`, `LOS 21` | `AAPT2` |\n| `35` | `Android 15` |       | `AAPT2` |\n\n\\* before the security patch update of june 2024 you can still use the AAPT version but if you have a newer version you need to use the AAPT2 version\n\n\nYou can easily add more ROM to this table opening a new issue with some basics info:\n- device\n- Android version\n- custom rom\n- rooting method\n- module version\n- AAPT or AAPT2\n\n```\nEs.\n- POCO F2 PRO\n- Android 14\n- LOS 21\n- Magisk 28.1\n- 2.5.0\n- AAPT2\n```\n\n## Support\n\nIf you find this project useful, please consider [supporting](https://www.paypal.me/f3ff0) the developer's mental health :)\nAlternatively, you can contribute directly to the project. All support is appreciated!\n\n## Features\n\n**ATTENTION!** This module cannot automatically update the webview, so if you want to update a webview installed through this module you must manually reinstall the module.\n\n- Works on any device running Android 8.0+ and Magisk 20.4+\n- Replace the webview with one of:\n    1. ~~[Bromite](https://github.com/bromite/bromite)~~ (Deprecated)\n    2. [Mulch](https://gitlab.com/divested-mobile/mulch)\n    3. [Vanadium](https://gitlab.com/grapheneos/platform_external_vanadium)\n    4. ~~[Thorium](https://github.com/Alex313031/Thorium-Android)~~ (Deprecated)\n    5. [Cromite](https://github.com/uazo/cromite)\n\n### Why did I deprecate webview?\n\nIn general because I no longer consider it adequate to my standard:\n- security reason\n- no more update for too long\n- no longer supported\n\nIn my opinion a webview is a very important part of the system and I don't want to make the system vulnerable with an outdate webview\n\n- **Bromite** -> last update in **12/2022** (**Bromite**'s successor is **Cromite**)\n- **Thorium** -> I don't like the update policy, too long between two update\n\n## Create module\n\n1. Clone the repository\n2. Run the script according to the OS:\n   - Unix/Linux: `./create-module.sh`\n   - Windows: `./create-module.ps1`\n\n## Credits\n\n- [Magisk by topjohnwu](https://github.com/topjohnwu/Magisk)\n- [MMT-Extended by Zackptg5](https://github.com/Zackptg5/MMT-Extended)\n- [Bromite](https://github.com/bromite/bromite)\n- [Vanadium by GrapheneOS](https://gitlab.com/grapheneos/platform_external_vanadium)\n- [Mulch by DivestOS](https://gitlab.com/divested-mobile/mulch)\n- [Thorium by Alex313031](https://github.com/Alex313031/thorium)\n- [cUrl](https://github.com/curl/curl)\n- [cUrl binary](https://github.com/F3FFO/compile_zlib_openssl_curl_android)\n- [Zipsigner by osm0sis](https://github.com/Magisk-Modules-Repo/zipsigner)\n- [Cromite by uazo](https://github.com/uazo/cromite)\n- [AAPT2 binaries](https://github.com/skittles9823/QuickSwitch)\n- [WebViewChanger](https://github.com/Lordify95/WebViewChanger)\n\n## License\n\nCopyright 2024 F3FFO\n\nThe source code is available under [GPL-3.0](https://github.com/Magisk-Modules-Alt-Repo/open_fonts/blob/master/LICENSE)\n\n## Change logs\n\n### v2.5.2 (see 2.5.0 changelog for more)\n\n- Prevent post-fs logic if Cromite is choosen as webview\n\nSee older release notes: [CHANGELOG.md](CHANGELOG.md)\n",
+  "readmeHTML": "<h1>Open WebView - [XDA Thread](https://xdaforums.com/t/magisk-module-webview-open-webview.4496119/)</h1>\n\n<p>!<a href=\"https://raw.githubusercontent.com/Magisk-Modules-Alt-Repo/open_webview/master/img/logo.png\">Open WebView</a></p>\n\n<p>This module helps you to replace your system webview though Magisk.</p>\n\n<h2>NOTICE</h2>\n<p>> This for me is just a hobby that I do when I have some free time (very little). If you appreciate my work please let me know, thank you!</p>\n\n<p>>~~<b>ATTENTION!</b> There is a bug that still needs to be fixed where sometimes you may find that the installed webview doesn't work. To fix this bug you need to manually install the webview, to do this just:~~</p>\n<p>> - ~~download from sources the latest version of the webview you have choosen during module installation~~</p>\n<p>> - ~~install it~~</p>\n\n<h2>DISCLAIMER</h2>\n\n<p>>I AM NOT RESPONSIBLE IF YOUR DEVICE DOES NOT WORK PROPERLY OR FOR ANY DAMAGE THAT MAY OCCUR TO YOUR DEVICE. BEFORE USING THIS MODULE, PLEASE READ THE CODE. YOU WHO DECIDE TO INSTALL THIS MODULE ASSUMES ALL RESPONSIBILITY FOR ANY PROBLEMS.</p>\n\n<h2>Compatibility</h2>\n\n<li>S.O.:</li>\n<p>    - minimum: Android 8+</p>\n<p>    - recommended: Android 13+</p>\n<li>Magisk 20.4+</li>\n<li>KernelSU 0.6+</li>\n\n<p>> Thanks to @amteza the module works fine with KernelSU but I personally use Magisk so I can't guarantee correct functioning with KernelSU</p>\n\n<h2>Tested Device ROM</h2>\n\n<p>| API | OS | ROM | version |</p>\n<p>|:---:|:--:|:---:|:-------:|</p>\n<p>| <code>26</code> | <code>Android 8</code> |      | <code>AAPT</code> |</p>\n<p>| <code>27</code> | <code>Android 8.1</code> |       | <code>AAPT</code> |</p>\n<p>| <code>28</code> | <code>Android 9</code> |       | <code>AAPT</code> |</p>\n<p>| <code>29</code> | <code>Android 10</code> |       | <code>AAPT</code> |</p>\n<p>| <code>30</code> | <code>Android 11</code> |       | <code>AAPT</code> |</p>\n<p>| <code>31</code> | <code>Android 12</code> | <code>LOS 19</code> | <code>AAPT</code> |</p>\n<p>| <code>32</code> | <code>Android 12L</code> | <code>LOS 19.1</code> | <code>AAPT</code> |</p>\n<p>| <code>33</code> | <code>Android 13</code> | <code>LOS 20</code> | <code>AAPT</code> |</p>\n<p>| <code>34*</code> | <code>Android 14</code> | <code>crDroid 10.x</code>, <code>LOS 21</code> | <code>AAPT2</code> |</p>\n<p>| <code>35</code> | <code>Android 15</code> |       | <code>AAPT2</code> |</p>\n\n<p>\\* before the security patch update of june 2024 you can still use the AAPT version but if you have a newer version you need to use the AAPT2 version</p>\n\n\n<p>You can easily add more ROM to this table opening a new issue with some basics info:</p>\n<li>device</li>\n<li>Android version</li>\n<li>custom rom</li>\n<li>rooting method</li>\n<li>module version</li>\n<li>AAPT or AAPT2</li>\n\n<pre>Es.\n- POCO F2 PRO\n- Android 14\n- LOS 21\n- Magisk 28.1\n- 2.5.0\n- AAPT2</pre>\n\n<h2>Support</h2>\n\n<p>If you find this project useful, please consider <a href=\"https://www.paypal.me/f3ff0\">supporting</a> the developer's mental health :)</p>\n<p>Alternatively, you can contribute directly to the project. All support is appreciated!</p>\n\n<h2>Features</h2>\n\n<p><b>ATTENTION!</b> This module cannot automatically update the webview, so if you want to update a webview installed through this module you must manually reinstall the module.</p>\n\n<li>Works on any device running Android 8.0+ and Magisk 20.4+</li>\n<li>Replace the webview with one of:</li>\n<p>    1. ~~<a href=\"https://github.com/bromite/bromite\">Bromite</a>~~ (Deprecated)</p>\n<p>    2. <a href=\"https://gitlab.com/divested-mobile/mulch\">Mulch</a></p>\n<p>    3. <a href=\"https://gitlab.com/grapheneos/platform_external_vanadium\">Vanadium</a></p>\n<p>    4. ~~<a href=\"https://github.com/Alex313031/Thorium-Android\">Thorium</a>~~ (Deprecated)</p>\n<p>    5. <a href=\"https://github.com/uazo/cromite\">Cromite</a></p>\n\n<h3>Why did I deprecate webview?</h3>\n\n<p>In general because I no longer consider it adequate to my standard:</p>\n<li>security reason</li>\n<li>no more update for too long</li>\n<li>no longer supported</li>\n\n<p>In my opinion a webview is a very important part of the system and I don't want to make the system vulnerable with an outdate webview</p>\n\n<li>**Bromite** -> last update in **12/2022** (**Bromite**'s successor is **Cromite**)</li>\n<li>**Thorium** -> I don't like the update policy, too long between two update</li>\n\n<h2>Create module</h2>\n\n<li>Clone the repository</li>\n<li>Run the script according to the OS:</li>\n<p>   - Unix/Linux: <code>./create-module.sh</code></p>\n<p>   - Windows: <code>./create-module.ps1</code></p>\n\n<h2>Credits</h2>\n\n<li>[Magisk by topjohnwu](https://github.com/topjohnwu/Magisk)</li>\n<li>[MMT-Extended by Zackptg5](https://github.com/Zackptg5/MMT-Extended)</li>\n<li>[Bromite](https://github.com/bromite/bromite)</li>\n<li>[Vanadium by GrapheneOS](https://gitlab.com/grapheneos/platform_external_vanadium)</li>\n<li>[Mulch by DivestOS](https://gitlab.com/divested-mobile/mulch)</li>\n<li>[Thorium by Alex313031](https://github.com/Alex313031/thorium)</li>\n<li>[cUrl](https://github.com/curl/curl)</li>\n<li>[cUrl binary](https://github.com/F3FFO/compile_zlib_openssl_curl_android)</li>\n<li>[Zipsigner by osm0sis](https://github.com/Magisk-Modules-Repo/zipsigner)</li>\n<li>[Cromite by uazo](https://github.com/uazo/cromite)</li>\n<li>[AAPT2 binaries](https://github.com/skittles9823/QuickSwitch)</li>\n<li>[WebViewChanger](https://github.com/Lordify95/WebViewChanger)</li>\n\n<h2>License</h2>\n\n<p>Copyright 2024 F3FFO</p>\n\n<p>The source code is available under <a href=\"https://github.com/Magisk-Modules-Alt-Repo/open_fonts/blob/master/LICENSE\">GPL-3.0</a></p>\n\n<h2>Change logs</h2>\n\n<h3>v2.5.2 (see 2.5.0 changelog for more)</h3>\n\n<li>Prevent post-fs logic if Cromite is choosen as webview</li>\n\n<p>See older release notes: <a href=\"CHANGELOG.md\">CHANGELOG.md</a></p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/open_webview",
+  "latestRelease": {
+    "name": "v2.5.2",
+    "version": "v2.5.2",
+    "time": "2024-12-16T22:29:53Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.5.2/open-webview.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.5.2",
+      "tagName": "v2.5.2",
+      "publishedAt": "2024-12-16T22:29:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.5.2/open-webview.zip",
+          "size": 22201610,
+          "downloadCount": 13971
+        }
+      ]
+    },
+    {
+      "name": "v2.5.1",
+      "tagName": "v2.5.1",
+      "publishedAt": "2024-12-16T22:11:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.5.1/open-webview.zip",
+          "size": 22201595,
+          "downloadCount": 146
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0",
+      "tagName": "v2.5.0",
+      "publishedAt": "2024-12-15T17:50:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.5.0/open-webview.zip",
+          "size": 22201595,
+          "downloadCount": 341
+        }
+      ]
+    },
+    {
+      "name": "v2.4.0",
+      "tagName": "v2.4.0",
+      "publishedAt": "2024-03-03T17:02:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.4.0/open-webview.zip",
+          "size": 16108753,
+          "downloadCount": 7491
+        }
+      ]
+    },
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2023-10-08T12:44:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.3.1/open-webview.zip",
+          "size": 15681540,
+          "downloadCount": 5297
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2023-09-23T14:27:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.3.0/open-webview.zip",
+          "size": 15681414,
+          "downloadCount": 1250
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2023-04-25T22:38:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.2.0/open-webview.zip",
+          "size": 15096147,
+          "downloadCount": 3465
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2023-04-23T13:31:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.1.0/open-webview.zip",
+          "size": 15095884,
+          "downloadCount": 2444
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2022-11-19T15:53:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v2.0.0/open-webview.zip",
+          "size": 15963220,
+          "downloadCount": 3520
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2022-10-11T16:13:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v1.1.0/open-webview.zip",
+          "size": 15962980,
+          "downloadCount": 1029
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2022-09-26T12:24:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "open-webview.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/open_webview/releases/download/v1.0.1/open-webview.zip",
+          "size": 6612843,
+          "downloadCount": 244
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "readme": "# Blue Light Filter\n\nA Magisk/KernelSU module that applies a system-wide blue light filter directly through SurfaceFlinger, Android's graphics compositor.\n\n## Why reduce blue light?\nScreens emit a high amount of blue light, which can cause eye strain, headaches, and difficulty sleeping, especially at night. Reducing blue light in the evening helps your eyes feel more comfortable and makes it easier to wind down before bed.\n\n## Features\n- Covers the entire screen, including status bar and navigation bar.\n- No overlay window. Works even on apps that block screen overlays.\n- Configurable RGB color via a built-in WebUI.\n- Auto-start on boot (optional).\n- No background process. Zero battery impact.\n- Works with Magisk and KernelSU.\n\n## What is this project?\nMost blue light filter apps draw a colored overlay on top of the screen, which has limitations, it doesn't cover the status bar, navigation bar, or apps with `FLAG_SECURE`. This module applies the filter at the compositor level using a SurfaceFlinger color transform matrix, so it covers everything with no exceptions.\n\n## Prerequisites\n- Android 8.0+ (API 26 or higher)\n- Magisk or KernelSU installed\n- MMRL or KSUWebUIStandalone installed (to access the WebUI)\n\n## Installation\n1. Download the latest release.\n2. Flash it in Magisk or KernelSU.\n3. Reboot your device.\n4. Open the WebUI via MMRL or KSUWebUIStandalone.\n5. Adjust the color sliders and tap **Apply & Save**.\n\n## Usage\n- **Blue Light Filter toggle** — enables or disables the filter.\n- **Custom Color** — set your own RGB values (Red minimum is 0.10 to avoid a black screen).\n- **Auto-start on boot** — re-applies the filter automatically after every reboot.\n- **Remove filter now** — clears the filter from the screen without changing your saved settings.\n\n## Known Issues\n- May not work on ROMs that restrict SurfaceFlinger binder access, such as some MIUI and One UI builds. Run `bluefilter diag` in a root shell to check.\n\n## License\nThis project is licensed under the GNU General Public License v3.0 (GPL-3.0).\nYou are free to modify and redistribute it under the same terms.\n\nSee the full [LICENSE](LICENSE) file for details.\n",
+  "readmeHTML": "<h1>Blue Light Filter</h1>\n\n<p>A Magisk/KernelSU module that applies a system-wide blue light filter directly through SurfaceFlinger, Android's graphics compositor.</p>\n\n<h2>Why reduce blue light?</h2>\n<p>Screens emit a high amount of blue light, which can cause eye strain, headaches, and difficulty sleeping, especially at night. Reducing blue light in the evening helps your eyes feel more comfortable and makes it easier to wind down before bed.</p>\n\n<h2>Features</h2>\n<li>Covers the entire screen, including status bar and navigation bar.</li>\n<li>No overlay window. Works even on apps that block screen overlays.</li>\n<li>Configurable RGB color via a built-in WebUI.</li>\n<li>Auto-start on boot (optional).</li>\n<li>No background process. Zero battery impact.</li>\n<li>Works with Magisk and KernelSU.</li>\n\n<h2>What is this project?</h2>\n<p>Most blue light filter apps draw a colored overlay on top of the screen, which has limitations, it doesn't cover the status bar, navigation bar, or apps with <code>FLAG_SECURE</code>. This module applies the filter at the compositor level using a SurfaceFlinger color transform matrix, so it covers everything with no exceptions.</p>\n\n<h2>Prerequisites</h2>\n<li>Android 8.0+ (API 26 or higher)</li>\n<li>Magisk or KernelSU installed</li>\n<li>MMRL or KSUWebUIStandalone installed (to access the WebUI)</li>\n\n<h2>Installation</h2>\n<li>Download the latest release.</li>\n<li>Flash it in Magisk or KernelSU.</li>\n<li>Reboot your device.</li>\n<li>Open the WebUI via MMRL or KSUWebUIStandalone.</li>\n<li>Adjust the color sliders and tap **Apply & Save**.</li>\n\n<h2>Usage</h2>\n<li>**Blue Light Filter toggle** — enables or disables the filter.</li>\n<li>**Custom Color** — set your own RGB values (Red minimum is 0.10 to avoid a black screen).</li>\n<li>**Auto-start on boot** — re-applies the filter automatically after every reboot.</li>\n<li>**Remove filter now** — clears the filter from the screen without changing your saved settings.</li>\n\n<h2>Known Issues</h2>\n<li>May not work on ROMs that restrict SurfaceFlinger binder access, such as some MIUI and One UI builds. Run `bluefilter diag` in a root shell to check.</li>\n\n<h2>License</h2>\n<p>This project is licensed under the GNU General Public License v3.0 (GPL-3.0).</p>\n<p>You are free to modify and redistribute it under the same terms.</p>\n\n<p>See the full <a href=\"LICENSE\">LICENSE</a> file for details.</p>",
+  "homepageUrl": "https://github.com/NoneBaiano/BlueLightFIlter",
+  "sourceUrl": "https://github.com/NoneBaiano/BlueLightFIlter",
+  "url": "https://github.com/NoneBaiano/BlueLightFIlter",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-02-24T04:16:15Z",
+    "downloadUrl": "https://github.com/NoneBaiano/BlueLightFIlter/releases/download/v1.0.0/BlueLIghtFilter_v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-02-24T04:16:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BlueLIghtFilter_v1.0.0.zip",
+          "downloadUrl": "https://github.com/NoneBaiano/BlueLightFIlter/releases/download/v1.0.0/BlueLIghtFilter_v1.0.0.zip",
+          "size": 12661,
+          "downloadCount": 723
+        }
+      ]
+    }
+  ]
+}

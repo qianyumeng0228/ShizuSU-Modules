@@ -1,0 +1,253 @@
+{
+  "readme": "# crond_start_jobs\n\n`模块刷入重启后查看`\n\n```\n管理器\n  └── /data\n     └── /adb\n        └── /start_jobs        <--- 模块生成的目录\n           │\n           ├── backup          <--- crond 运行目录\n           ├── cron_set.sh     <--- 在里面自定义参数\n           ├── Run_cron.sh     <--- cron_set.sh 文件配置好后执行\n           ├── log.md          <--- 日志文件: 每次重启设备或运行 Run_cron.sh 重新记录\n           └── 勿扰名单.prop    <--- 勿扰名单里的应用在前台时，不会启动应用(勿扰，类似游戏模式)\n```\n\n- Magisk 20.4+\n- 支持 Magisk Lite\n- 支持任何安卓设备\n\n## 参数设置\n\n[cron_set.sh](https://github.com/mengshouer/crond_start_jobs/blob/main/AndroidFile/cron_set.sh)\n\n## 为什么会有这个模块\n\n> 装了某些脚本插件之后，需要应用启动的时候才会运行，但是又不想让应用一直留在后台耗电，则定时打开应用，然后 sleep 指定时间后关闭/禁用应用，这样就可以达到节省电量的目的。\n\n> 或者定时执行自定义 shell 指令。\n\n## 鸣谢\n\n本模块基本就是改自 https://github.com/Petit-Abba/black_and_white_list/\n\n以及感谢其他二改作者的作者。@瘦鹏鹏 @焕晨 @懒猫\n",
+  "readmeHTML": "<h1>crond_start_jobs</h1>\n\n<p><code>模块刷入重启后查看</code></p>\n\n<pre>管理器\n  └── /data\n     └── /adb\n        └── /start_jobs        &lt;--- 模块生成的目录\n           │\n           ├── backup          &lt;--- crond 运行目录\n           ├── cron_set.sh     &lt;--- 在里面自定义参数\n           ├── Run_cron.sh     &lt;--- cron_set.sh 文件配置好后执行\n           ├── log.md          &lt;--- 日志文件: 每次重启设备或运行 Run_cron.sh 重新记录\n           └── 勿扰名单.prop    &lt;--- 勿扰名单里的应用在前台时，不会启动应用(勿扰，类似游戏模式)</pre>\n\n<li>Magisk 20.4+</li>\n<li>支持 Magisk Lite</li>\n<li>支持任何安卓设备</li>\n\n<h2>参数设置</h2>\n\n<p><a href=\"https://github.com/mengshouer/crond_start_jobs/blob/main/AndroidFile/cron_set.sh\">cron_set.sh</a></p>\n\n<h2>为什么会有这个模块</h2>\n\n<p>> 装了某些脚本插件之后，需要应用启动的时候才会运行，但是又不想让应用一直留在后台耗电，则定时打开应用，然后 sleep 指定时间后关闭/禁用应用，这样就可以达到节省电量的目的。</p>\n\n<p>> 或者定时执行自定义 shell 指令。</p>\n\n<h2>鸣谢</h2>\n\n<p>本模块基本就是改自 https://github.com/Petit-Abba/black_and_white_list/</p>\n\n<p>以及感谢其他二改作者的作者。@瘦鹏鹏 @焕晨 @懒猫</p>",
+  "homepageUrl": "https://github.com/mengshouer/crond_start_jobs",
+  "sourceUrl": "https://github.com/mengshouer/crond_start_jobs",
+  "url": "https://github.com/mengshouer/crond_start_jobs",
+  "latestRelease": {
+    "name": "v1.2.5",
+    "version": "v1.2.5",
+    "time": "2026-05-07T11:40:25Z",
+    "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.5/crond_start_jobs.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.5",
+      "tagName": "v1.2.5",
+      "publishedAt": "2026-05-07T11:40:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.5/crond_start_jobs.zip",
+          "size": 15198,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2026-05-07T11:06:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.4/crond_start_jobs.zip",
+          "size": 15193,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.2.3",
+      "tagName": "v1.2.3",
+      "publishedAt": "2025-08-19T13:16:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.3/crond_start_jobs.zip",
+          "size": 14312,
+          "downloadCount": 41
+        }
+      ]
+    },
+    {
+      "name": "v1.2.2",
+      "tagName": "v1.2.2",
+      "publishedAt": "2025-08-18T12:00:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.2/crond_start_jobs.zip",
+          "size": 14213,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2025-08-03T12:54:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.1/crond_start_jobs.zip",
+          "size": 13008,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2024-08-27T14:15:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.2.0/crond_start_jobs.zip",
+          "size": 12380,
+          "downloadCount": 69
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2024-08-07T13:49:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.1.1/crond_start_jobs.zip",
+          "size": 11265,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2024-07-20T18:09:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.1.0/crond_start_jobs.zip",
+          "size": 11267,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.0.10",
+      "tagName": "v1.0.10",
+      "publishedAt": "2024-07-16T17:36:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.10/crond_start_jobs.zip",
+          "size": 11575,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.0.9",
+      "tagName": "v1.0.9",
+      "publishedAt": "2024-07-11T16:22:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_jobs.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.9/crond_start_jobs.zip",
+          "size": 11700,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.0.7",
+      "tagName": "v1.0.7",
+      "publishedAt": "2024-07-03T17:02:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps_v1.0.7.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.7/crond_start_apps_v1.0.7.zip",
+          "size": 23549,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2024-07-03T16:30:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps_v1.0.6.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.6/crond_start_apps_v1.0.6.zip",
+          "size": 23529,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2024-07-02T15:32:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps_v1.0.5.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.5/crond_start_apps_v1.0.5.zip",
+          "size": 23335,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2024-06-28T15:18:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps_v1.0.4.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.4/crond_start_apps_v1.0.4.zip",
+          "size": 23237,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3_20240627",
+      "tagName": "v1.0.3_20240627",
+      "publishedAt": "2024-06-26T17:56:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.3_20240627/crond_start_apps.zip",
+          "size": 23200,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2_20240619",
+      "tagName": "v1.0.2_20240619",
+      "publishedAt": "2024-06-19T11:59:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "crond_start_apps_v1.0.2.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.2_20240619/crond_start_apps_v1.0.2.zip",
+          "size": 23151,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0_20240616",
+      "tagName": "v1.0.0_20240616",
+      "publishedAt": "2024-06-16T03:28:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v1.0.0_20240616.zip",
+          "downloadUrl": "https://github.com/mengshouer/crond_start_jobs/releases/download/v1.0.0_20240616/v1.0.0_20240616.zip",
+          "size": 22662,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

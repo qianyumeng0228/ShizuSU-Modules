@@ -1,0 +1,113 @@
+{
+  "readme": "# 開機動畫 for ColorOS / Boot animation for ColorOS\n\n[![Release](https://img.shields.io/github/v/release/yuzlyn/boot_animation_for_coloros16?label=release)](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest)\n[![License](https://img.shields.io/github/license/yuzlyn/boot_animation_for_coloros16)](LICENSE)\n\n適用於 ColorOS / realme UI / OxygenOS 的開機動畫模組。在 KernelSU / Magisk 的 WebUI 上傳影片或 GIF，自動轉換為開機動畫。\n\n[下載最新版本](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest)\n\n---\n\n## 繁體中文 (zh-TW)\n\n### 簡介\n適用於 ColorOS / realme UI / OxygenOS 的開機動畫模組：上傳影片或 GIF，自動轉換為水平居中、位於上黃金分割點的開機動畫。\n\n### 安裝\n1. 從 [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest) 下載最新版 zip。\n2. 在 KernelSU / Magisk 中刷入模組並重新啟動。\n3. 在模組頁面點擊 WebUI，上傳影片或 GIF，設定幀率、時長上限與輸出尺寸，點擊「開始轉換」。\n4. 轉換完成後重新啟動手機，新的開機動畫即生效。\n\n### 相容範圍\n- Android 8.0 及以上版本（API 26+）。\n- KernelSU / Magisk，或相容 WebUI 與 systemless 模組掛載的實作。\n- 適用於 ColorOS / realme UI / OxygenOS（OPPO / OnePlus / realme）。\n\n### 功能\n- 在 WebUI 上傳影片或 GIF，自動轉換為開機動畫。\n- 支援 mp4 / mov / webm / mkv / gif 等格式。\n- 影片使用 MediaCodec 硬解碼，GIF 使用系統解碼器，無需 ffmpeg。\n- 動畫水平居中，垂直位於上黃金分割點（距頂部約 0.382×畫面高）。\n- 可自訂動畫大小（10–100%），選擇檔案後即時預覽大小與位置。\n- 可設定循環次數（1–20 次），以拼接幀方式確保循環在所有裝置生效。\n- 可調播放速度（0.25–4×）。\n- 可旋轉影片 0–360°（可斜著擺放），選擇檔案後即時預覽旋轉效果。\n- 可截取影片片段：設定開始與結束時間，只轉換需要的部分。\n- 可自訂水平與垂直位置，或使用預設的居中上黃金分割點。\n- 可調幀率（10–60 fps）、時長上限與輸出尺寸。\n- WebUI 支援簡體中文、台灣繁體中文與英文。\n- 內建關於頁面與贊助作者頁面。\n\n### 工作方式\n轉換器將影片/GIF 解碼為逐幀 JPEG，打包為 ColorOS 格式的 bootanimation.zip，由模組掛載替換系統開機動畫；僅替換開機動畫，不影響關機動畫，不直接修改系統分區。\n\n### 原始碼\n轉換器原始碼位於 [`src/com/yuzlyn/bootanim/Video2Boot.java`](src/com/yuzlyn/bootanim/Video2Boot.java)，以 `javac` + `d8` 編譯為 `tools/video2boot.jar`（Java 8 位元碼，min-api 26）。\n\n### 故障恢復\n如果開機動畫無法顯示或系統啟動異常，請在 KernelSU / Magisk 中停用模組並重新啟動。保留 adb root 時也可以執行：\n\n```sh\nadb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot\n```\n\n### 版本歷史\n- **v1.8.2** — GIF 與總時長未知的影片也能使用截取；probe 可回報 GIF 總時長\n- **v1.8.1** — 旋轉範圍擴至 0–360°；所有參數滑桿皆可直接輸入數值\n- **v1.8.0** — 新增影片旋轉（0–360°，可斜放）與影片截取（選取開始 / 結束時間）；WebUI 即時預覽旋轉效果\n- **v1.7.1** — 循環次數上限提高至 20 次\n- **v1.7.0** — 循環改為次數設定（1–10 次），以幀拼接實現，不再依賴引擎循環\n- **v1.6.0** — 新增播放速度調節（0.25–4×）；修復 WebUI 預覽（怪異播放按鈕、畫面拉伸、循環失效）\n- **v1.5.0** — 新增自定義水平 / 垂直位置設定；重新排版上傳卡片（按鈕移至下一行右側）\n- **v1.4.0** — 新增動畫大小設定（10–100%）與即時預覽；新增循環 / 單次播放設定\n- **v1.3.0** — WebUI 全面多語支援（繁中 / 簡中 / 英文），三語 README\n- **v1.2.0** — 新增關於頁面、贊助作者頁面與原始碼儲存庫入口\n- **v1.1.0** — 新增 GIF 格式支援；動畫改為水平居中、垂直位於上黃金分割點\n- **v1.0.0** — 首版：影片轉開機動畫（MediaCodec 硬解碼）\n\n---\n\n## 简体中文 (zh-CN)\n\n### 简介\n适用于 ColorOS / realme UI / OxygenOS 的开机动画模块：上传视频或 GIF，自动转换为水平居中、位于上黄金分割点的开机动画。\n\n### 安装\n1. 从 [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest) 下载最新版 zip。\n2. 在 KernelSU / Magisk 中刷入模块并重启。\n3. 在模块页面点击 WebUI，上传视频或 GIF，设置帧率、时长上限与输出尺寸，点击「开始转换」。\n4. 转换完成后重启手机，新的开机动画即生效。\n\n### 兼容范围\n- Android 8.0 及以上版本（API 26+）。\n- KernelSU / Magisk，或兼容 WebUI 与 systemless 模块挂载的实现。\n- 适用于 ColorOS / realme UI / OxygenOS（OPPO / OnePlus / realme）。\n\n### 功能\n- 在 WebUI 上传视频或 GIF，自动转换为开机动画。\n- 支持 mp4 / mov / webm / mkv / gif 等格式。\n- 视频使用 MediaCodec 硬解码，GIF 使用系统解码器，无需 ffmpeg。\n- 动画水平居中，垂直位于上黄金分割点（距顶部约 0.382×画面高）。\n- 可自定义动画大小（10–100%），选择文件后即时预览大小与位置。\n- 可设置循环次数（1–20 次），以拼接帧方式确保循环在所有设备生效。\n- 可调播放速度（0.25–4×）。\n- 可旋转视频 0–360°（可斜着摆放），选择文件后即时预览旋转效果。\n- 可截取视频片段：设置开始与结束时间，只转换需要的部分。\n- 可自定义水平与垂直位置，或使用默认的居中上黄金分割点。\n- 可调帧率（10–60 fps）、时长上限与输出尺寸。\n- WebUI 支持简体中文、台湾繁体中文和英文。\n- 内置关于页面与赞助作者页面。\n\n### 工作方式\n转换器将视频/GIF 解码为逐帧 JPEG，打包为 ColorOS 格式的 bootanimation.zip，由模块挂载替换系统开机动画；仅替换开机动画，不影响关机动画，不直接修改系统分区。\n\n### 源码\n转换器源码位于 [`src/com/yuzlyn/bootanim/Video2Boot.java`](src/com/yuzlyn/bootanim/Video2Boot.java)，使用 `javac` + `d8` 编译为 `tools/video2boot.jar`（Java 8 字节码，min-api 26）。\n\n### 故障恢复\n如果开机动画无法显示或系统启动异常，请在 KernelSU / Magisk 中停用模块并重启。保留 adb root 时也可以执行：\n\n```sh\nadb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot\n```\n\n### 版本历史\n- **v1.8.2** — GIF 与总时长未知的视频也能使用截取；probe 可回报 GIF 总时长\n- **v1.8.1** — 旋转范围扩至 0–360°；所有参数滑块皆可直接输入数值\n- **v1.8.0** — 新增视频旋转（0–360°，可斜放）与视频截取（选择开始 / 结束时间）；WebUI 即时预览旋转效果\n- **v1.7.1** — 循环次数上限提高至 20 次\n- **v1.7.0** — 循环改为次数设置（1–10 次），以帧拼接实现，不再依赖引擎循环\n- **v1.6.0** — 新增播放速度调节（0.25–4×）；修复 WebUI 预览（怪异播放按钮、画面拉伸、循环失效）\n- **v1.5.0** — 新增自定义水平 / 垂直位置设置；重新排版上传卡片（按钮移至下一行右侧）\n- **v1.4.0** — 新增动画大小设置（10–100%）与即时预览；新增循环 / 单次播放设置\n- **v1.3.0** — WebUI 全面多语言支持（繁中 / 简中 / 英文），三语 README\n- **v1.2.0** — 新增关于页面、赞助作者页面与源码仓库入口\n- **v1.1.0** — 新增 GIF 格式支持；动画改为水平居中、垂直位于上黄金分割点\n- **v1.0.0** — 首版：视频转开机动画（MediaCodec 硬解码）\n\n---\n\n## English (en-US)\n\n### Overview\nA ColorOS / realme UI / OxygenOS boot animation module: upload a video or GIF in the WebUI and it is converted into a horizontally centered boot animation positioned at the upper golden-ratio point.\n\n### Installation\n1. Download the latest zip from [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest).\n2. Flash the module in KernelSU / Magisk and restart.\n3. Open the WebUI from the module page, upload a video or GIF, set the frame rate, duration cap and output size, then tap \"Start conversion\".\n4. Restart the phone after the conversion finishes and the new boot animation takes effect.\n\n### Compatibility\n- Android 8.0 or later (API 26+).\n- KernelSU / Magisk, or a compatible WebUI and systemless module implementation.\n- ColorOS / realme UI / OxygenOS (OPPO / OnePlus / realme).\n\n### Features\n- Upload a video or GIF in the WebUI to convert it into a boot animation.\n- Supports mp4 / mov / webm / mkv / gif and more.\n- MediaCodec hardware decoding for videos and the system decoder for GIFs — no ffmpeg required.\n- Horizontally centered, vertical center at the upper golden-ratio point (~0.382× screen height from the top).\n- Custom animation size (10–100%) with a live size-and-position preview after choosing a file.\n- Set the loop count (1-20); frames are spliced so looping works on every device.\n- Adjustable playback speed (0.25-4×).\n- Rotate the video 0-360° (tilt it), with a live preview of the rotation after choosing a file.\n- Clip the video to a segment (set start and end time) and convert only the part you need.\n- Custom horizontal and vertical position, or the default centered upper golden-ratio point.\n- Adjustable frame rate (10–60 fps), duration cap, and output size.\n- WebUI languages: Simplified Chinese, Traditional Chinese for Taiwan, and English.\n- Built-in About and donation pages.\n\n### How it works\nThe converter decodes the video/GIF into per-frame JPEGs and packs them into a ColorOS-format bootanimation.zip that the module mounts to replace the system boot animation. Only the boot animation is replaced — the shutdown animation is untouched and the system partition is never modified directly.\n\n### Source code\nThe converter source lives in [`src/com/yuzlyn/bootanim/Video2Boot.java`](src/com/yuzlyn/bootanim/Video2Boot.java) and is compiled with `javac` + `d8` into `tools/video2boot.jar` (Java 8 bytecode, min-api 26).\n\n### Recovery\nIf the boot animation fails to display or the system cannot start normally, disable the module in KernelSU / Magisk and restart. With adb root available:\n\n```sh\nadb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot\n```\n\n### Version history\n- **v1.8.2** — Clipping now also works for GIFs and videos with unknown duration; probe reports GIF duration\n- **v1.8.1** — Rotation range widened to 0-360°; every parameter slider now accepts typed values\n- **v1.8.0** — Video rotation (0-360°, tilt it) and video clipping (pick a start/end time); live rotation preview in the WebUI\n- **v1.7.1** — Loop count limit raised to 20\n- **v1.7.0** — Loop count setting (1-10) via frame splicing, no longer relying on engine looping\n- **v1.6.0** — Playback speed setting (0.25-4×); WebUI preview fixes (odd play button, stretched image, broken loop)\n- **v1.5.0** — Custom horizontal / vertical position setting; upload card re-layout (button on its own row, right-aligned)\n- **v1.4.0** — Animation size setting (10-100%) with live preview; loop / play-once playback\n- **v1.3.0** — Full WebUI multilingual support (zh-TW / zh-CN / en-US) and trilingual README\n- **v1.2.0** — About page, donation page, and source repository entry\n- **v1.1.0** — GIF format support; animation horizontally centered at the upper golden-ratio point\n- **v1.0.0** — Initial release: video to boot animation (MediaCodec hardware decoding)\n",
+  "readmeHTML": "<h1>開機動畫 for ColorOS / Boot animation for ColorOS</h1>\n\n<p><a href=\"https://img.shields.io/github/v/release/yuzlyn/boot_animation_for_coloros16?label=release\">![Release</a>](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/license/yuzlyn/boot_animation_for_coloros16\">![License</a>](LICENSE)</p>\n\n<p>適用於 ColorOS / realme UI / OxygenOS 的開機動畫模組。在 KernelSU / Magisk 的 WebUI 上傳影片或 GIF，自動轉換為開機動畫。</p>\n\n<p><a href=\"https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest\">下載最新版本</a></p>\n\n<p>---</p>\n\n<h2>繁體中文 (zh-TW)</h2>\n\n<h3>簡介</h3>\n<p>適用於 ColorOS / realme UI / OxygenOS 的開機動畫模組：上傳影片或 GIF，自動轉換為水平居中、位於上黃金分割點的開機動畫。</p>\n\n<h3>安裝</h3>\n<li>從 [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest) 下載最新版 zip。</li>\n<li>在 KernelSU / Magisk 中刷入模組並重新啟動。</li>\n<li>在模組頁面點擊 WebUI，上傳影片或 GIF，設定幀率、時長上限與輸出尺寸，點擊「開始轉換」。</li>\n<li>轉換完成後重新啟動手機，新的開機動畫即生效。</li>\n\n<h3>相容範圍</h3>\n<li>Android 8.0 及以上版本（API 26+）。</li>\n<li>KernelSU / Magisk，或相容 WebUI 與 systemless 模組掛載的實作。</li>\n<li>適用於 ColorOS / realme UI / OxygenOS（OPPO / OnePlus / realme）。</li>\n\n<h3>功能</h3>\n<li>在 WebUI 上傳影片或 GIF，自動轉換為開機動畫。</li>\n<li>支援 mp4 / mov / webm / mkv / gif 等格式。</li>\n<li>影片使用 MediaCodec 硬解碼，GIF 使用系統解碼器，無需 ffmpeg。</li>\n<li>動畫水平居中，垂直位於上黃金分割點（距頂部約 0.382×畫面高）。</li>\n<li>可自訂動畫大小（10–100%），選擇檔案後即時預覽大小與位置。</li>\n<li>可設定循環次數（1–20 次），以拼接幀方式確保循環在所有裝置生效。</li>\n<li>可調播放速度（0.25–4×）。</li>\n<li>可旋轉影片 0–360°（可斜著擺放），選擇檔案後即時預覽旋轉效果。</li>\n<li>可截取影片片段：設定開始與結束時間，只轉換需要的部分。</li>\n<li>可自訂水平與垂直位置，或使用預設的居中上黃金分割點。</li>\n<li>可調幀率（10–60 fps）、時長上限與輸出尺寸。</li>\n<li>WebUI 支援簡體中文、台灣繁體中文與英文。</li>\n<li>內建關於頁面與贊助作者頁面。</li>\n\n<h3>工作方式</h3>\n<p>轉換器將影片/GIF 解碼為逐幀 JPEG，打包為 ColorOS 格式的 bootanimation.zip，由模組掛載替換系統開機動畫；僅替換開機動畫，不影響關機動畫，不直接修改系統分區。</p>\n\n<h3>原始碼</h3>\n<p>轉換器原始碼位於 <a href=\"src/com/yuzlyn/bootanim/Video2Boot.java\"><code>src/com/yuzlyn/bootanim/Video2Boot.java</code></a>，以 <code>javac</code> + <code>d8</code> 編譯為 <code>tools/video2boot.jar</code>（Java 8 位元碼，min-api 26）。</p>\n\n<h3>故障恢復</h3>\n<p>如果開機動畫無法顯示或系統啟動異常，請在 KernelSU / Magisk 中停用模組並重新啟動。保留 adb root 時也可以執行：</p>\n\n<pre>adb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot</pre>\n\n<h3>版本歷史</h3>\n<li>**v1.8.2** — GIF 與總時長未知的影片也能使用截取；probe 可回報 GIF 總時長</li>\n<li>**v1.8.1** — 旋轉範圍擴至 0–360°；所有參數滑桿皆可直接輸入數值</li>\n<li>**v1.8.0** — 新增影片旋轉（0–360°，可斜放）與影片截取（選取開始 / 結束時間）；WebUI 即時預覽旋轉效果</li>\n<li>**v1.7.1** — 循環次數上限提高至 20 次</li>\n<li>**v1.7.0** — 循環改為次數設定（1–10 次），以幀拼接實現，不再依賴引擎循環</li>\n<li>**v1.6.0** — 新增播放速度調節（0.25–4×）；修復 WebUI 預覽（怪異播放按鈕、畫面拉伸、循環失效）</li>\n<li>**v1.5.0** — 新增自定義水平 / 垂直位置設定；重新排版上傳卡片（按鈕移至下一行右側）</li>\n<li>**v1.4.0** — 新增動畫大小設定（10–100%）與即時預覽；新增循環 / 單次播放設定</li>\n<li>**v1.3.0** — WebUI 全面多語支援（繁中 / 簡中 / 英文），三語 README</li>\n<li>**v1.2.0** — 新增關於頁面、贊助作者頁面與原始碼儲存庫入口</li>\n<li>**v1.1.0** — 新增 GIF 格式支援；動畫改為水平居中、垂直位於上黃金分割點</li>\n<li>**v1.0.0** — 首版：影片轉開機動畫（MediaCodec 硬解碼）</li>\n\n<p>---</p>\n\n<h2>简体中文 (zh-CN)</h2>\n\n<h3>简介</h3>\n<p>适用于 ColorOS / realme UI / OxygenOS 的开机动画模块：上传视频或 GIF，自动转换为水平居中、位于上黄金分割点的开机动画。</p>\n\n<h3>安装</h3>\n<li>从 [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest) 下载最新版 zip。</li>\n<li>在 KernelSU / Magisk 中刷入模块并重启。</li>\n<li>在模块页面点击 WebUI，上传视频或 GIF，设置帧率、时长上限与输出尺寸，点击「开始转换」。</li>\n<li>转换完成后重启手机，新的开机动画即生效。</li>\n\n<h3>兼容范围</h3>\n<li>Android 8.0 及以上版本（API 26+）。</li>\n<li>KernelSU / Magisk，或兼容 WebUI 与 systemless 模块挂载的实现。</li>\n<li>适用于 ColorOS / realme UI / OxygenOS（OPPO / OnePlus / realme）。</li>\n\n<h3>功能</h3>\n<li>在 WebUI 上传视频或 GIF，自动转换为开机动画。</li>\n<li>支持 mp4 / mov / webm / mkv / gif 等格式。</li>\n<li>视频使用 MediaCodec 硬解码，GIF 使用系统解码器，无需 ffmpeg。</li>\n<li>动画水平居中，垂直位于上黄金分割点（距顶部约 0.382×画面高）。</li>\n<li>可自定义动画大小（10–100%），选择文件后即时预览大小与位置。</li>\n<li>可设置循环次数（1–20 次），以拼接帧方式确保循环在所有设备生效。</li>\n<li>可调播放速度（0.25–4×）。</li>\n<li>可旋转视频 0–360°（可斜着摆放），选择文件后即时预览旋转效果。</li>\n<li>可截取视频片段：设置开始与结束时间，只转换需要的部分。</li>\n<li>可自定义水平与垂直位置，或使用默认的居中上黄金分割点。</li>\n<li>可调帧率（10–60 fps）、时长上限与输出尺寸。</li>\n<li>WebUI 支持简体中文、台湾繁体中文和英文。</li>\n<li>内置关于页面与赞助作者页面。</li>\n\n<h3>工作方式</h3>\n<p>转换器将视频/GIF 解码为逐帧 JPEG，打包为 ColorOS 格式的 bootanimation.zip，由模块挂载替换系统开机动画；仅替换开机动画，不影响关机动画，不直接修改系统分区。</p>\n\n<h3>源码</h3>\n<p>转换器源码位于 <a href=\"src/com/yuzlyn/bootanim/Video2Boot.java\"><code>src/com/yuzlyn/bootanim/Video2Boot.java</code></a>，使用 <code>javac</code> + <code>d8</code> 编译为 <code>tools/video2boot.jar</code>（Java 8 字节码，min-api 26）。</p>\n\n<h3>故障恢复</h3>\n<p>如果开机动画无法显示或系统启动异常，请在 KernelSU / Magisk 中停用模块并重启。保留 adb root 时也可以执行：</p>\n\n<pre>adb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot</pre>\n\n<h3>版本历史</h3>\n<li>**v1.8.2** — GIF 与总时长未知的视频也能使用截取；probe 可回报 GIF 总时长</li>\n<li>**v1.8.1** — 旋转范围扩至 0–360°；所有参数滑块皆可直接输入数值</li>\n<li>**v1.8.0** — 新增视频旋转（0–360°，可斜放）与视频截取（选择开始 / 结束时间）；WebUI 即时预览旋转效果</li>\n<li>**v1.7.1** — 循环次数上限提高至 20 次</li>\n<li>**v1.7.0** — 循环改为次数设置（1–10 次），以帧拼接实现，不再依赖引擎循环</li>\n<li>**v1.6.0** — 新增播放速度调节（0.25–4×）；修复 WebUI 预览（怪异播放按钮、画面拉伸、循环失效）</li>\n<li>**v1.5.0** — 新增自定义水平 / 垂直位置设置；重新排版上传卡片（按钮移至下一行右侧）</li>\n<li>**v1.4.0** — 新增动画大小设置（10–100%）与即时预览；新增循环 / 单次播放设置</li>\n<li>**v1.3.0** — WebUI 全面多语言支持（繁中 / 简中 / 英文），三语 README</li>\n<li>**v1.2.0** — 新增关于页面、赞助作者页面与源码仓库入口</li>\n<li>**v1.1.0** — 新增 GIF 格式支持；动画改为水平居中、垂直位于上黄金分割点</li>\n<li>**v1.0.0** — 首版：视频转开机动画（MediaCodec 硬解码）</li>\n\n<p>---</p>\n\n<h2>English (en-US)</h2>\n\n<h3>Overview</h3>\n<p>A ColorOS / realme UI / OxygenOS boot animation module: upload a video or GIF in the WebUI and it is converted into a horizontally centered boot animation positioned at the upper golden-ratio point.</p>\n\n<h3>Installation</h3>\n<li>Download the latest zip from [Releases](https://github.com/yuzlyn/boot_animation_for_coloros16/releases/latest).</li>\n<li>Flash the module in KernelSU / Magisk and restart.</li>\n<li>Open the WebUI from the module page, upload a video or GIF, set the frame rate, duration cap and output size, then tap \"Start conversion\".</li>\n<li>Restart the phone after the conversion finishes and the new boot animation takes effect.</li>\n\n<h3>Compatibility</h3>\n<li>Android 8.0 or later (API 26+).</li>\n<li>KernelSU / Magisk, or a compatible WebUI and systemless module implementation.</li>\n<li>ColorOS / realme UI / OxygenOS (OPPO / OnePlus / realme).</li>\n\n<h3>Features</h3>\n<li>Upload a video or GIF in the WebUI to convert it into a boot animation.</li>\n<li>Supports mp4 / mov / webm / mkv / gif and more.</li>\n<li>MediaCodec hardware decoding for videos and the system decoder for GIFs — no ffmpeg required.</li>\n<li>Horizontally centered, vertical center at the upper golden-ratio point (~0.382× screen height from the top).</li>\n<li>Custom animation size (10–100%) with a live size-and-position preview after choosing a file.</li>\n<li>Set the loop count (1-20); frames are spliced so looping works on every device.</li>\n<li>Adjustable playback speed (0.25-4×).</li>\n<li>Rotate the video 0-360° (tilt it), with a live preview of the rotation after choosing a file.</li>\n<li>Clip the video to a segment (set start and end time) and convert only the part you need.</li>\n<li>Custom horizontal and vertical position, or the default centered upper golden-ratio point.</li>\n<li>Adjustable frame rate (10–60 fps), duration cap, and output size.</li>\n<li>WebUI languages: Simplified Chinese, Traditional Chinese for Taiwan, and English.</li>\n<li>Built-in About and donation pages.</li>\n\n<h3>How it works</h3>\n<p>The converter decodes the video/GIF into per-frame JPEGs and packs them into a ColorOS-format bootanimation.zip that the module mounts to replace the system boot animation. Only the boot animation is replaced — the shutdown animation is untouched and the system partition is never modified directly.</p>\n\n<h3>Source code</h3>\n<p>The converter source lives in <a href=\"src/com/yuzlyn/bootanim/Video2Boot.java\"><code>src/com/yuzlyn/bootanim/Video2Boot.java</code></a> and is compiled with <code>javac</code> + <code>d8</code> into <code>tools/video2boot.jar</code> (Java 8 bytecode, min-api 26).</p>\n\n<h3>Recovery</h3>\n<p>If the boot animation fails to display or the system cannot start normally, disable the module in KernelSU / Magisk and restart. With adb root available:</p>\n\n<pre>adb shell su -c 'touch /data/adb/modules/coloros-bootanimation/disable'\nadb reboot</pre>\n\n<h3>Version history</h3>\n<li>**v1.8.2** — Clipping now also works for GIFs and videos with unknown duration; probe reports GIF duration</li>\n<li>**v1.8.1** — Rotation range widened to 0-360°; every parameter slider now accepts typed values</li>\n<li>**v1.8.0** — Video rotation (0-360°, tilt it) and video clipping (pick a start/end time); live rotation preview in the WebUI</li>\n<li>**v1.7.1** — Loop count limit raised to 20</li>\n<li>**v1.7.0** — Loop count setting (1-10) via frame splicing, no longer relying on engine looping</li>\n<li>**v1.6.0** — Playback speed setting (0.25-4×); WebUI preview fixes (odd play button, stretched image, broken loop)</li>\n<li>**v1.5.0** — Custom horizontal / vertical position setting; upload card re-layout (button on its own row, right-aligned)</li>\n<li>**v1.4.0** — Animation size setting (10-100%) with live preview; loop / play-once playback</li>\n<li>**v1.3.0** — Full WebUI multilingual support (zh-TW / zh-CN / en-US) and trilingual README</li>\n<li>**v1.2.0** — About page, donation page, and source repository entry</li>\n<li>**v1.1.0** — GIF format support; animation horizontally centered at the upper golden-ratio point</li>\n<li>**v1.0.0** — Initial release: video to boot animation (MediaCodec hardware decoding)</li>",
+  "homepageUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16",
+  "sourceUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16",
+  "url": "https://github.com/yuzlyn/boot_animation_for_coloros16",
+  "latestRelease": {
+    "name": "v1.8.2",
+    "version": "v1.8.2",
+    "time": "2026-09-08T00:14:37Z",
+    "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.8.2/boot_animation_for_coloros_v1.8.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.8.2",
+      "tagName": "v1.8.2",
+      "publishedAt": "2026-09-08T00:14:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.8.2.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.8.2/boot_animation_for_coloros_v1.8.2.zip",
+          "size": 351902,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v1.7.1",
+      "tagName": "v1.7.1",
+      "publishedAt": "2026-08-28T18:25:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.7.1.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.7.1/boot_animation_for_coloros_v1.7.1.zip",
+          "size": 344737,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "v1.7.0",
+      "tagName": "v1.7.0",
+      "publishedAt": "2026-08-28T18:15:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.7.0.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.7.0/boot_animation_for_coloros_v1.7.0.zip",
+          "size": 344682,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2026-08-28T17:50:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.6.0.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.6.0/boot_animation_for_coloros_v1.6.0.zip",
+          "size": 344256,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-08-28T17:40:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.5.0.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.5.0/boot_animation_for_coloros_v1.5.0.zip",
+          "size": 343362,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-08-28T17:32:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.4.0.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.4.0/boot_animation_for_coloros_v1.4.0.zip",
+          "size": 341958,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-08-28T17:19:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "boot_animation_for_coloros_v1.3.0.zip",
+          "downloadUrl": "https://github.com/yuzlyn/boot_animation_for_coloros16/releases/download/v1.3.0/boot_animation_for_coloros_v1.3.0.zip",
+          "size": 338600,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "readme": "# OPPO Pad Mini Root 与系统升级指南\n\n适用机型：**OPD2515 / OP6548L1**。这里提供 500 首次 root、500 升级 ColorOS 17.0.0.103 的已验证路线，以及后续 OTA 助手的源码与研究预览版。\n\n| 你的情况 | 从这里开始 | 验证情况 |\n|---|---|---|\n| 还在 16.0.10.500，准备首次 root | [500 Root 指南](docs/500-root.md) | 本机完成解锁、KSU root 和普通重启 |\n| 已有 GBL、真实解锁和 KSU，准备升 103 | [500 → 103 升级指南](docs/17-103-upgrade.md) | 本机首次启动、快照合并和再次重启通过 |\n| 已有 root，研究后续官方更新 | [OTA 助手使用说明](ota-helper/README.md) | 0.2.0-rc1 研究预览；离线验证，尚无真机安装及 OTA 验证 |\n\n首次解锁会清除数据，请先备份。后续升级方向由设备实际槽位决定；本机的 `b → a` 不是固定规则。\n\n## 获取工具和材料\n\n在 Windows 安装 [Python 3.11+](https://www.python.org/downloads/) 和 [ADB / Fastboot](https://developer.android.com/tools/releases/platform-tools)，下载或克隆本仓库，在仓库根目录打开 PowerShell：\n\n```powershell\ngit clone https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research.git\ncd OPPO-Pad-Mini-Root-Research\npython -m pip install -r requirements.txt\npython tools/fetch_materials.py\npython tools/verify_materials.py .\n```\n\n`fetch_materials.py` 下载固定版本的研究材料，并校验压缩包摘要；最后一条命令逐项核对材料。它们只操作电脑文件。也可从 [材料 Release](https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/tag/research-2026-10-22-r1) 手动下载、校验并解压到仓库根目录。\n\n- [工具索引](docs/tools.md)：每个文件的用途与完整路径。\n- [固件指纹](docs/firmware.md)：500 / 103 完整包的长度、SHA256 和检查工具。完整 ROM 需自行获取。\n- [OTA 助手预览版](https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/tag/ota-helper-v0.2.0-rc1)：模块下载、源码和构建摘要；不能保证所有未来更新保留 root。\n- [验证记录](evidence/README.md)：脱敏的 root、系统启动与重启结果。\n\n## 后续更新的工作方式\n\n每次更新都使用“**新的启动备份 + 当前完整包 + 目标完整包**”生成专用保留包。官方 OTA 安装完成并进入真正的待重启状态后，再手动检查和保留；模块不会自动切槽或重启。\n\n目前预览版仅接受 39 项底层固件、XBL / xbl_config、ABL 认证元数据和 KMI 均满足保守兼容条件的更新。底层固件变化需要单独研究，不能沿用旧批准包。本机 500 → 103 的成功属于专门适配的已验证路线，和这个新模块的验证情况分别记录。\n\n后续材料与更新通知：[Telegram @ByteJuno](https://t.me/ByteJuno)。\n\n原始研究代码采用 [GPL-3.0-or-later](LICENSE)。第三方工具、源码和固件材料按各自许可使用，见 [第三方声明](THIRD_PARTY_NOTICES.md)。公开材料不含 userdata、完整 persist、账号凭据、keybox 或私钥。\n",
+  "readmeHTML": "<h1>OPPO Pad Mini Root 与系统升级指南</h1>\n\n<p>适用机型：<b>OPD2515 / OP6548L1</b>。这里提供 500 首次 root、500 升级 ColorOS 17.0.0.103 的已验证路线，以及后续 OTA 助手的源码与研究预览版。</p>\n\n<p>| 你的情况 | 从这里开始 | 验证情况 |</p>\n<p>|---|---|---|</p>\n<p>| 还在 16.0.10.500，准备首次 root | <a href=\"docs/500-root.md\">500 Root 指南</a> | 本机完成解锁、KSU root 和普通重启 |</p>\n<p>| 已有 GBL、真实解锁和 KSU，准备升 103 | <a href=\"docs/17-103-upgrade.md\">500 → 103 升级指南</a> | 本机首次启动、快照合并和再次重启通过 |</p>\n<p>| 已有 root，研究后续官方更新 | <a href=\"ota-helper/README.md\">OTA 助手使用说明</a> | 0.2.0-rc1 研究预览；离线验证，尚无真机安装及 OTA 验证 |</p>\n\n<p>首次解锁会清除数据，请先备份。后续升级方向由设备实际槽位决定；本机的 <code>b → a</code> 不是固定规则。</p>\n\n<h2>获取工具和材料</h2>\n\n<p>在 Windows 安装 <a href=\"https://www.python.org/downloads/\">Python 3.11+</a> 和 <a href=\"https://developer.android.com/tools/releases/platform-tools\">ADB / Fastboot</a>，下载或克隆本仓库，在仓库根目录打开 PowerShell：</p>\n\n<pre>git clone https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research.git\ncd OPPO-Pad-Mini-Root-Research\npython -m pip install -r requirements.txt\npython tools/fetch_materials.py\npython tools/verify_materials.py .</pre>\n\n<p><code>fetch_materials.py</code> 下载固定版本的研究材料，并校验压缩包摘要；最后一条命令逐项核对材料。它们只操作电脑文件。也可从 <a href=\"https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/tag/research-2026-10-22-r1\">材料 Release</a> 手动下载、校验并解压到仓库根目录。</p>\n\n<li>[工具索引](docs/tools.md)：每个文件的用途与完整路径。</li>\n<li>[固件指纹](docs/firmware.md)：500 / 103 完整包的长度、SHA256 和检查工具。完整 ROM 需自行获取。</li>\n<li>[OTA 助手预览版](https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/tag/ota-helper-v0.2.0-rc1)：模块下载、源码和构建摘要；不能保证所有未来更新保留 root。</li>\n<li>[验证记录](evidence/README.md)：脱敏的 root、系统启动与重启结果。</li>\n\n<h2>后续更新的工作方式</h2>\n\n<p>每次更新都使用“<b>新的启动备份 + 当前完整包 + 目标完整包</b>”生成专用保留包。官方 OTA 安装完成并进入真正的待重启状态后，再手动检查和保留；模块不会自动切槽或重启。</p>\n\n<p>目前预览版仅接受 39 项底层固件、XBL / xbl_config、ABL 认证元数据和 KMI 均满足保守兼容条件的更新。底层固件变化需要单独研究，不能沿用旧批准包。本机 500 → 103 的成功属于专门适配的已验证路线，和这个新模块的验证情况分别记录。</p>\n\n<p>后续材料与更新通知：<a href=\"https://t.me/ByteJuno\">Telegram @ByteJuno</a>。</p>\n\n<p>原始研究代码采用 <a href=\"LICENSE\">GPL-3.0-or-later</a>。第三方工具、源码和固件材料按各自许可使用，见 <a href=\"THIRD_PARTY_NOTICES.md\">第三方声明</a>。公开材料不含 userdata、完整 persist、账号凭据、keybox 或私钥。</p>",
+  "homepageUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research",
+  "sourceUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research",
+  "url": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research",
+  "latestRelease": {
+    "name": "research-2026-10-22-r1",
+    "version": "research-2026-10-22-r1",
+    "time": "2026-10-22T08:21:22Z",
+    "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/research-2026-10-22-r1/OPD2515-research-materials-20261022.zip"
+  },
+  "releases": [
+    {
+      "name": "ota-helper-v0.2.0-rc1",
+      "tagName": "ota-helper-v0.2.0-rc1",
+      "publishedAt": "2026-10-23T06:30:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "build-manifest.json",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/ota-helper-v0.2.0-rc1/build-manifest.json",
+          "size": 1096,
+          "downloadCount": 2
+        },
+        {
+          "name": "OPD2515-OTA-Helper-0.2.0-rc1.zip",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/ota-helper-v0.2.0-rc1/OPD2515-OTA-Helper-0.2.0-rc1.zip",
+          "size": 26789,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/ota-helper-v0.2.0-rc1/SHA256SUMS.txt",
+          "size": 99,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "research-2026-10-22-r1",
+      "tagName": "research-2026-10-22-r1",
+      "publishedAt": "2026-10-22T08:21:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OPD2515-research-materials-20261022.zip",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/research-2026-10-22-r1/OPD2515-research-materials-20261022.zip",
+          "size": 97980526,
+          "downloadCount": 25
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/research-2026-10-22-r1/SHA256SUMS.txt",
+          "size": 107,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "research-2026-10-22",
+      "tagName": "research-2026-10-22",
+      "publishedAt": "2026-10-22T08:17:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OPD2515-research-materials-20261022.zip",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/research-2026-10-22/OPD2515-research-materials-20261022.zip",
+          "size": 97980538,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/ByteJuno/OPPO-Pad-Mini-Root-Research/releases/download/research-2026-10-22/SHA256SUMS.txt",
+          "size": 107,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

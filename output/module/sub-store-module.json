@@ -1,0 +1,975 @@
+{
+  "readme": "# Sub-Store for Android (Magisk / KernelSU / APatch 模块)\n\n在 Android 上以系统级服务运行 [Sub-Store](https://github.com/sub-store-org/Sub-Store)（含 HTTP-META），  \n并内置一键更新能力：\n- 在 Magisk / KernelSU / APatch 管理器中点击模块的 **[执行]** 按钮，即可用音量键选择更新项。\n- 在 KernelSU / Apatch 管理器中点击模块的 WebUI 按钮，即可进入 WebUI，更新页选择更新功能\n\n注意：\n- 本模块 ID 与旧版 `sub_store` 相同，但配置格式已变更（拆分为 `sub_store.config` + `sub_store.env`），\n  **不支持直接覆盖安装 xream 原版模块**；升级前请先卸载旧版并迁移配置\n- 开发严格遵循官方指南：[Magisk Developer Guides](https://topjohnwu.github.io/Magisk/guides.html) / [KernelSU Module Guide](https://kernelsu.org/guide/module.html) / [APatch APM Guide](https://apatch.dev/apm-guide.html)\n- 脚本基于 xream 的 [Sub-Store for Magisk, KernelSU & APatch](https://t.me/zhetengsha/1008) 重新开发（GPL-3.0）\n\n## 赞助我们\n\n请查看 [赞助方式](Sponsor.md)\n\n## 功能\n\n| 功能 | 说明 |\n| --- | --- |\n| 开机自启 | `service.sh` 在系统启动完成后自动拉起 Sub-Store 后端 / 前端 / HTTP-META |\n| 低权限运行 | node 默认以 `shell` (uid 2000) 较低权限运行（含 `inet` 组）；<br> 可选以 `root` 身份运行（会有安全警告）；<br> 数据目录位于 `/data/local/sub_store`（shell 域原生可访问，不暴露 root） |\n| 执行按钮 | 管理器内点击 **[执行]**，按音量键选择操作（音量下键 移动 / 音量上键 确认） |\n| WebUI | Vue 3 + Vite + [miuix-vue](https://github.com/YuKongA/miuix-vue) 构建的 WebUI <br> KSU/AP 管理器可直接使用管理器内置 WebUI 功能， <br> Magisk 用户可尝试：[KsuWebUIStandalone](https://github.com/KOWX712/KsuWebUIStandalone/releases) 或 [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable/releases) |\n| 全部更新 | Sub-Store 前后端 + http-meta 一次搞定 |\n| 拆分更新 | 后端 / 前端 / http-meta 可单独更新 |\n| http-meta 子菜单 | 全部更新 / 仅 js+tpl.yaml / 仅 mihomo 内核(稳定版) / 仅 mihomo 内核(预览版) |\n| 开关联动 | 禁用模块自动停止服务，启用自动重启 |\n| 配置保留 | 升级模块不覆盖 `/data/local/sub_store` 数据与配置 |\n| 合并端口 | 默认开启（与官方 Docker 一致）；后端按**非空即合并**判断，设 `\"false\"` 无效；分离模式=注释该行 |\n| 路径随机化 | 首次安装自动生成随机 `SUB_STORE_FRONTEND_BACKEND_PATH`（20~24 位字母数字）； <br> 检测到仍在使用模块默认值时 TUI 常驻告警，可一键重新生成（自动重启生效） |\n\n## 安装\n\n1. 执行 `./build.sh` 构建模块 zip，或使用已构建产物：\n   - stable/alpha/beta/rc: [GitHub Releases](https://github.com/Delusions6515/Sub-Store-Module/releases)\n   - canary: [GitHub Actions](https://github.com/Delusions6515/Sub-Store-Module/actions/workflows/build.yml?query=branch%3Adev+branch%3Amain)\n2. Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装\n3. 重启设备\n\n> **升级安装时**：检测到已有二进制会询问是否用包内新版本覆盖——\n> **音量+ = 覆盖**（用包内二进制替换现有）/ **其他键或 5 秒无按键 = 跳过**（保留现有，之后用 [执行] 按钮更新）。\n> 全新安装自动拷贝内置二进制，无需交互。\n\n> 管理器版本要求（执行按钮支持）：**Magisk >= 27008** / **KernelSU >= 10670** / **APatch >= 11039**\n> 已安装的模块可在管理器内直接检查更新（`updateJson` 按架构区分，发布新 tag 后自动生效）\n\n> ⚠️ **v2.0.0 破坏性变更**：数据/配置目录从 `/data/adb/sub_store` 迁移到 `/data/local/sub_store`\n> （低权限用户原生可访问且不暴露 root）。v1.x 升级需手动迁移旧数据，或卸载后全新安装。\n\n启动后访问（默认**合并模式**，单端口）：\n\n- Sub-Store：<http://127.0.0.1:3001>\n- HTTP-META：<http://127.0.0.1:9876>\n\n> 分离模式（注释 `sub_store.env` 里的 `SUB_STORE_BACKEND_MERGE` 后）：  \n> 前端 <http://127.0.0.1:3002> / 后端 <http://127.0.0.1:3001>\n\n局域网访问：修改 `sub_store.env` 中的 `SUB_STORE_BACKEND_API_HOST` 为 `0.0.0.0` 后重启服务。\n\n## 执行按钮（音量键菜单）\n\n管理器 → 模块 → Sub-Store for Android → **[执行]**\n\n```\n主菜单 (前后端直达地址常驻显示在顶部):\n  > 浏览器打开直达地址\n    启动 Sub-Store\n    停止 Sub-Store\n    重启 Sub-Store\n    生成并替换 SUB_STORE_FRONTEND_BACKEND_PATH\n    禁用/启用开机自启 (显示当前状态)\n    更新选项 ...\n    退出\n\n更新子菜单:\n  > 全部更新 (Sub-Store 前后端 + http-meta)\n    更新 Sub-Store 前后端\n    仅更新 Sub-Store 后端\n    仅更新 Sub-Store 前端\n    更新 http-meta ...\n    返回上一级\n\nhttp-meta 子菜单:\n  > [默认] 全部更新 (js + tpl.yaml + mihomo 内核)\n    只更新 http-meta (js + tpl.yaml)\n    只更新 mihomo 内核 (稳定版)\n    只更新 mihomo 内核 (Prerelease-Alpha 预览版)\n    返回上一级\n```\n\n- **直达地址**：TUI 顶部常驻显示前后端本机地址（合并模式显示单端口；配置了 `SUB_STORE_FRONTEND_BACKEND_PATH` 时，分离模式前端 `?api=` 指向前端端口+前缀、后端直连无前缀）\n- **浏览器打开直达地址**：调用默认浏览器打开直达地址（非合并模式打开前端），解决终端内不可复制的问题\n- 音量下键 切换到下一个选项，音量上键 确认\n- 操作完成后返回主菜单，选择**退出**结束；子菜单可用**返回上一级**回退\n- 5 分钟无按键自动退出\n\n## 配置\n\n配置文件位于 `/data/local/sub_store/scripts/`（修改后执行\n`su -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service restart\"`）：\n\n- **`sub_store.config`**：仅模块特有配置（路径、运行用户等）\n- **`sub_store.env`**：服务环境变量，全大写命名、与 Docker 版一致\n  （内容与注释参考 [xream/sub-store](https://hub.docker.com/r/xream/sub-store) Docker 介绍）；\n  **文件中定义的所有变量都会在服务启动时导入进程**，Sub-Store 新增环境变量直接加进文件即可，无需改脚本\n\n修改配置后请**重启服务生效**；服务启动时会自动修正低权限用户（`run/`、`http-meta/`）的目录所有权，\n若配置已修改但未重启，运行更新等操作时会收到提醒。\n\n> 🔒 **`SUB_STORE_FRONTEND_BACKEND_PATH`**：首次安装时会自动替换为随机值（20~24 位字母数字），  \n> 旧版默认值所有安装者都一样，等同公开路径。若 env 中仍为模块默认值，执行菜单顶部会常驻告警，  \n> 可用 **生成并替换 SUB_STORE_FRONTEND_BACKEND_PATH** 一键重新生成（生成后自动重启生效）。\n\n> ⚠️ http-meta 的 `inet` 权限与 VPN 路由相互独立：`run_http_meta_with_inet` 仅控制 Android 系统 DNS 权限；`run_http_meta_bypass_vpn` 默认开启，通过 `protectedFromVpn` 标记让 http-meta 绕过 Android VPN。\n\n`sub_store.config` 中的模块配置：\n\n| 配置变量 | 说明 |\n| --- | --- |\n| `sub_store_path` 等路径变量 | 模块路径（一般不需要修改） |\n| `run_as_user` | 运行用户： <br> `shell`(uid `2000` 低权限)  <br> `root`/置空=root |\n| `drop_priv_method` | shell 用户降权方式：<br> `su`：启动前经 `su 2000` 切换（KSU/APatch 推荐）；<br> `node`：Node preload 自降权（KSU/APatch 经 `su 0 -c` 启动；Magisk 推荐） |\n| `run_http_meta` | 是否运行 http-meta `true`(默认)/`false` |\n| `run_http_meta_with_inet` | http-meta 是否授予 `inet` 组（仅 `shell` 用户生效）：`false`(默认) 不授予；`true` 允许使用 Android 系统 DNS |\n| `run_http_meta_bypass_vpn` | http-meta 是否绕过 Android VPN（仅 `shell` 用户生效）：`true`(默认) 绕过 VPN；`false` 跟随系统 VPN 路由 |\n| `allow_nosafe_download` | 是否允许不安全的下载方式 `true`/`false`(默认) : 用于更新时在所有下载方式不可用时降级使用 root 环境提供的 `busybox wget` 下载 (可能存在安全风险) |\n\n## 手动操作\n\n```sh\nsu -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service start\"    # 启动\nsu -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service stop\"     # 停止\nsu -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service restart\"  # 重启\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_backend.sh\"          # 更新后端\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_frontend.sh\"         # 更新前端\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_http_meta.sh all\"    # 更新 http-meta\n```\n\n> 在 `/data/local/sub_store/manual` 创建空文件可禁止开机自启（手动控制）。\n\n## 卸载\n\n管理器删除模块即可：服务会自动停止，`/data/local/sub_store` 数据保留（如需彻底删除请手动删除该目录）。\n\n## 构建\n\n### GitHub Actions（推荐）\n\n- 手动触发：Actions → Build Sub-Store module → Run workflow，可选 ABI 与版本号\n- 推送 `v*` tag：自动构建并发布 release\n- workflow 会初始化根目录 `webui/` 的 [WebUI submodule](https://github.com/Delusions6515/Sub-Store-Module-WebUI)，构建主仓库锁定的提交，产物自动写入模块包内 `webroot/`\n- Dependabot 按 `daily` 频率（北京时间 09:00）检查 WebUI submodule 更新，向 `dev` 提 PR；合并后更新锁定的提交\n- 所有组件在线获取，无需本地参考文件\n  - node 二进制来自 [Delusions6515/node-android-build](https://github.com/Delusions6515/node-android-build) 的 release\n\n### 本地构建\n\n首次克隆时使用 `git clone --recurse-submodules`；已有仓库在构建前初始化或同步 WebUI：\n\n```sh\ngit submodule update --init --recursive\n./build.sh                    # 版本名取最近 git tag (如 v1.0.0), arm64-v8a\n./build.sh 1.0.0              # 指定版本名覆盖 tag\nTARGET_ABI=armeabi-v7a ./build.sh 1.0.0   # 指定 ABI\nBUILD_TYPE=hotfix ./build.sh 1.0.1-hotfix1\nNODE_BIN_PATH=~/node ./build.sh            # 本地 node 二进制 (调试用)\nWEBUI_REPO_DIR=../Sub-Store-Module-WebUI ./build.sh\nWEBUI_DIST_DIR=/path/to/webui/dist ./build.sh\n```\n\n- 版本命名参考 ZygiskNext（`module.prop` 中 `version`/`versionCode` 为占位符，不硬编码）：\n  构建时自动生成 `version=1.0.0 (<git提交数>-<短hash>-release)`、`versionCode=<git提交数>`；\n  版本名取最近 git tag（自动去 `v` 前缀），可用参数/`BUILD_TYPE` 覆盖\n\n- WebUI 集成：\n  - 默认使用根目录 `webui/` submodule，执行 `pnpm install` + `pnpm build`；可用 `WEBUI_REPO_DIR` 指定其他源码目录\n  - 构建产物会自动复制到模块最终包内的 `webroot/`\n  - 只想复用现成前端产物时，可用 `WEBUI_DIST_DIR=/path/to/dist` 直接指定 dist 目录\n  - 若未发现 WebUI 仓库/产物，则跳过 WebUI 打包，不影响纯模块构建\n  - 更新 WebUI 版本：执行 `git -C webui fetch origin`、`git -C webui checkout <提交或标签>`，再提交主仓库中的 `webui` 指针变更；CI 不会自动追踪 WebUI 最新提交\n\n- 组件来源：\n  - **node**：始终使用官方最新 LTS 版本——从 `nodejs.org` 解析当前 LTS（如 `24.19.0`），\n    再到 `NODE_REPO`（默认 [Delusions6515/node-android-build](https://github.com/Delusions6515/node-android-build)）的\n    `node-android-<arch>-<major>` release 取对应版本 asset（该仓库 release 按 `大版本`+`<arch>` 归档、\n    全部 4 架构、历史版本保留）；最新 LTS 尚未构建时回退该大版本已有最高版本并告警；\n    可用 `NODE_DIST_URL` / `NODE_BIN_PATH` 覆盖\n  - **后端**：[sub-store-org/Sub-Store](https://github.com/sub-store-org/Sub-Store) latest release\n  - **前端**：[sub-store-org/Sub-Store-Front-End](https://github.com/sub-store-org/Sub-Store-Front-End) latest release\n  - **http-meta**：[xream/http-meta](https://github.com/xream/http-meta) latest release + [MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo) 稳定版内核\n- 构建产物默认输出到当前目录的 `build/` 下（可用 `OUT_DIR` 覆盖）\n- `-hotfix` 后缀按稳定版修订处理：会进入正式 release/update JSON 渠道，不会被当成 prerelease\n- 自动下载官方 `module_installer.sh` 生成 META-INF（恢复模式刷入用），失败时跳过（管理器安装不受影响）\n\n## 许可\n\nGPL-3.0。本模块脚本基于 xream 的 [Sub-Store for Magisk, KernelSU & APatch](https://t.me/zhetengsha/1008) 重新开发；\nSub-Store / HTTP-META / mihomo 版权归其各自作者所有。\n",
+  "readmeHTML": "<h1>Sub-Store for Android (Magisk / KernelSU / APatch 模块)</h1>\n\n<p>在 Android 上以系统级服务运行 <a href=\"https://github.com/sub-store-org/Sub-Store\">Sub-Store</a>（含 HTTP-META），</p>\n<p>并内置一键更新能力：</p>\n<li>在 Magisk / KernelSU / APatch 管理器中点击模块的 **[执行]** 按钮，即可用音量键选择更新项。</li>\n<li>在 KernelSU / Apatch 管理器中点击模块的 WebUI 按钮，即可进入 WebUI，更新页选择更新功能</li>\n\n<p>注意：</p>\n<li>本模块 ID 与旧版 `sub_store` 相同，但配置格式已变更（拆分为 `sub_store.config` + `sub_store.env`），</li>\n<p>  <b>不支持直接覆盖安装 xream 原版模块</b>；升级前请先卸载旧版并迁移配置</p>\n<li>开发严格遵循官方指南：[Magisk Developer Guides](https://topjohnwu.github.io/Magisk/guides.html) / [KernelSU Module Guide](https://kernelsu.org/guide/module.html) / [APatch APM Guide](https://apatch.dev/apm-guide.html)</li>\n<li>脚本基于 xream 的 [Sub-Store for Magisk, KernelSU & APatch](https://t.me/zhetengsha/1008) 重新开发（GPL-3.0）</li>\n\n<h2>赞助我们</h2>\n\n<p>请查看 <a href=\"Sponsor.md\">赞助方式</a></p>\n\n<h2>功能</h2>\n\n<p>| 功能 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| 开机自启 | <code>service.sh</code> 在系统启动完成后自动拉起 Sub-Store 后端 / 前端 / HTTP-META |</p>\n<p>| 低权限运行 | node 默认以 <code>shell</code> (uid 2000) 较低权限运行（含 <code>inet</code> 组）；<br> 可选以 <code>root</code> 身份运行（会有安全警告）；<br> 数据目录位于 <code>/data/local/sub_store</code>（shell 域原生可访问，不暴露 root） |</p>\n<p>| 执行按钮 | 管理器内点击 <b>[执行]</b>，按音量键选择操作（音量下键 移动 / 音量上键 确认） |</p>\n<p>| WebUI | Vue 3 + Vite + <a href=\"https://github.com/YuKongA/miuix-vue\">miuix-vue</a> 构建的 WebUI <br> KSU/AP 管理器可直接使用管理器内置 WebUI 功能， <br> Magisk 用户可尝试：<a href=\"https://github.com/KOWX712/KsuWebUIStandalone/releases\">KsuWebUIStandalone</a> 或 <a href=\"https://github.com/MMRLApp/WebUI-X-Portable/releases\">WebUI X</a> |</p>\n<p>| 全部更新 | Sub-Store 前后端 + http-meta 一次搞定 |</p>\n<p>| 拆分更新 | 后端 / 前端 / http-meta 可单独更新 |</p>\n<p>| http-meta 子菜单 | 全部更新 / 仅 js+tpl.yaml / 仅 mihomo 内核(稳定版) / 仅 mihomo 内核(预览版) |</p>\n<p>| 开关联动 | 禁用模块自动停止服务，启用自动重启 |</p>\n<p>| 配置保留 | 升级模块不覆盖 <code>/data/local/sub_store</code> 数据与配置 |</p>\n<p>| 合并端口 | 默认开启（与官方 Docker 一致）；后端按<b>非空即合并</b>判断，设 <code>\"false\"</code> 无效；分离模式=注释该行 |</p>\n<p>| 路径随机化 | 首次安装自动生成随机 <code>SUB_STORE_FRONTEND_BACKEND_PATH</code>（20~24 位字母数字）； <br> 检测到仍在使用模块默认值时 TUI 常驻告警，可一键重新生成（自动重启生效） |</p>\n\n<h2>安装</h2>\n\n<li>执行 `./build.sh` 构建模块 zip，或使用已构建产物：</li>\n<p>   - stable/alpha/beta/rc: <a href=\"https://github.com/Delusions6515/Sub-Store-Module/releases\">GitHub Releases</a></p>\n<p>   - canary: <a href=\"https://github.com/Delusions6515/Sub-Store-Module/actions/workflows/build.yml?query=branch%3Adev+branch%3Amain\">GitHub Actions</a></p>\n<li>Magisk / KernelSU / APatch 管理器 → 模块 → 从本地安装</li>\n<li>重启设备</li>\n\n<p>> <b>升级安装时</b>：检测到已有二进制会询问是否用包内新版本覆盖——</p>\n<p>> <b>音量+ = 覆盖</b>（用包内二进制替换现有）/ <b>其他键或 5 秒无按键 = 跳过</b>（保留现有，之后用 [执行] 按钮更新）。</p>\n<p>> 全新安装自动拷贝内置二进制，无需交互。</p>\n\n<p>> 管理器版本要求（执行按钮支持）：<b>Magisk >= 27008</b> / <b>KernelSU >= 10670</b> / <b>APatch >= 11039</b></p>\n<p>> 已安装的模块可在管理器内直接检查更新（<code>updateJson</code> 按架构区分，发布新 tag 后自动生效）</p>\n\n<p>> ⚠️ <b>v2.0.0 破坏性变更</b>：数据/配置目录从 <code>/data/adb/sub_store</code> 迁移到 <code>/data/local/sub_store</code></p>\n<p>> （低权限用户原生可访问且不暴露 root）。v1.x 升级需手动迁移旧数据，或卸载后全新安装。</p>\n\n<p>启动后访问（默认<b>合并模式</b>，单端口）：</p>\n\n<li>Sub-Store：<http://127.0.0.1:3001></li>\n<li>HTTP-META：<http://127.0.0.1:9876></li>\n\n<p>> 分离模式（注释 <code>sub_store.env</code> 里的 <code>SUB_STORE_BACKEND_MERGE</code> 后）：</p>\n<p>> 前端 <http://127.0.0.1:3002> / 后端 <http://127.0.0.1:3001></p>\n\n<p>局域网访问：修改 <code>sub_store.env</code> 中的 <code>SUB_STORE_BACKEND_API_HOST</code> 为 <code>0.0.0.0</code> 后重启服务。</p>\n\n<h2>执行按钮（音量键菜单）</h2>\n\n<p>管理器 → 模块 → Sub-Store for Android → <b>[执行]</b></p>\n\n<pre>主菜单 (前后端直达地址常驻显示在顶部):\n  &gt; 浏览器打开直达地址\n    启动 Sub-Store\n    停止 Sub-Store\n    重启 Sub-Store\n    生成并替换 SUB_STORE_FRONTEND_BACKEND_PATH\n    禁用/启用开机自启 (显示当前状态)\n    更新选项 ...\n    退出\n\n更新子菜单:\n  &gt; 全部更新 (Sub-Store 前后端 + http-meta)\n    更新 Sub-Store 前后端\n    仅更新 Sub-Store 后端\n    仅更新 Sub-Store 前端\n    更新 http-meta ...\n    返回上一级\n\nhttp-meta 子菜单:\n  &gt; [默认] 全部更新 (js + tpl.yaml + mihomo 内核)\n    只更新 http-meta (js + tpl.yaml)\n    只更新 mihomo 内核 (稳定版)\n    只更新 mihomo 内核 (Prerelease-Alpha 预览版)\n    返回上一级</pre>\n\n<li>**直达地址**：TUI 顶部常驻显示前后端本机地址（合并模式显示单端口；配置了 `SUB_STORE_FRONTEND_BACKEND_PATH` 时，分离模式前端 `?api=` 指向前端端口+前缀、后端直连无前缀）</li>\n<li>**浏览器打开直达地址**：调用默认浏览器打开直达地址（非合并模式打开前端），解决终端内不可复制的问题</li>\n<li>音量下键 切换到下一个选项，音量上键 确认</li>\n<li>操作完成后返回主菜单，选择**退出**结束；子菜单可用**返回上一级**回退</li>\n<li>5 分钟无按键自动退出</li>\n\n<h2>配置</h2>\n\n<p>配置文件位于 <code>/data/local/sub_store/scripts/</code>（修改后执行</p>\n<p><code>su -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service restart\"</code>）：</p>\n\n<li>**`sub_store.config`**：仅模块特有配置（路径、运行用户等）</li>\n<li>**`sub_store.env`**：服务环境变量，全大写命名、与 Docker 版一致</li>\n<p>  （内容与注释参考 <a href=\"https://hub.docker.com/r/xream/sub-store\">xream/sub-store</a> Docker 介绍）；</p>\n<p>  <b>文件中定义的所有变量都会在服务启动时导入进程</b>，Sub-Store 新增环境变量直接加进文件即可，无需改脚本</p>\n\n<p>修改配置后请<b>重启服务生效</b>；服务启动时会自动修正低权限用户（<code>run/</code>、<code>http-meta/</code>）的目录所有权，</p>\n<p>若配置已修改但未重启，运行更新等操作时会收到提醒。</p>\n\n<p>> 🔒 <b><code>SUB_STORE_FRONTEND_BACKEND_PATH</code></b>：首次安装时会自动替换为随机值（20~24 位字母数字），</p>\n<p>> 旧版默认值所有安装者都一样，等同公开路径。若 env 中仍为模块默认值，执行菜单顶部会常驻告警，</p>\n<p>> 可用 <b>生成并替换 SUB_STORE_FRONTEND_BACKEND_PATH</b> 一键重新生成（生成后自动重启生效）。</p>\n\n<p>> ⚠️ http-meta 的 <code>inet</code> 权限与 VPN 路由相互独立：<code>run_http_meta_with_inet</code> 仅控制 Android 系统 DNS 权限；<code>run_http_meta_bypass_vpn</code> 默认开启，通过 <code>protectedFromVpn</code> 标记让 http-meta 绕过 Android VPN。</p>\n\n<p><code>sub_store.config</code> 中的模块配置：</p>\n\n<p>| 配置变量 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| <code>sub_store_path</code> 等路径变量 | 模块路径（一般不需要修改） |</p>\n<p>| <code>run_as_user</code> | 运行用户： <br> <code>shell</code>(uid <code>2000</code> 低权限)  <br> <code>root</code>/置空=root |</p>\n<p>| <code>drop_priv_method</code> | shell 用户降权方式：<br> <code>su</code>：启动前经 <code>su 2000</code> 切换（KSU/APatch 推荐）；<br> <code>node</code>：Node preload 自降权（KSU/APatch 经 <code>su 0 -c</code> 启动；Magisk 推荐） |</p>\n<p>| <code>run_http_meta</code> | 是否运行 http-meta <code>true</code>(默认)/<code>false</code> |</p>\n<p>| <code>run_http_meta_with_inet</code> | http-meta 是否授予 <code>inet</code> 组（仅 <code>shell</code> 用户生效）：<code>false</code>(默认) 不授予；<code>true</code> 允许使用 Android 系统 DNS |</p>\n<p>| <code>run_http_meta_bypass_vpn</code> | http-meta 是否绕过 Android VPN（仅 <code>shell</code> 用户生效）：<code>true</code>(默认) 绕过 VPN；<code>false</code> 跟随系统 VPN 路由 |</p>\n<p>| <code>allow_nosafe_download</code> | 是否允许不安全的下载方式 <code>true</code>/<code>false</code>(默认) : 用于更新时在所有下载方式不可用时降级使用 root 环境提供的 <code>busybox wget</code> 下载 (可能存在安全风险) |</p>\n\n<h2>手动操作</h2>\n\n<pre>su -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service start\"    # 启动\nsu -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service stop\"     # 停止\nsu -c \"sh /data/adb/modules/sub_store/scripts/sub_store.service restart\"  # 重启\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_backend.sh\"          # 更新后端\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_frontend.sh\"         # 更新前端\nsu -c \"sh /data/adb/modules/sub_store/scripts/update_http_meta.sh all\"    # 更新 http-meta</pre>\n\n<p>> 在 <code>/data/local/sub_store/manual</code> 创建空文件可禁止开机自启（手动控制）。</p>\n\n<h2>卸载</h2>\n\n<p>管理器删除模块即可：服务会自动停止，<code>/data/local/sub_store</code> 数据保留（如需彻底删除请手动删除该目录）。</p>\n\n<h2>构建</h2>\n\n<h3>GitHub Actions（推荐）</h3>\n\n<li>手动触发：Actions → Build Sub-Store module → Run workflow，可选 ABI 与版本号</li>\n<li>推送 `v*` tag：自动构建并发布 release</li>\n<li>workflow 会初始化根目录 `webui/` 的 [WebUI submodule](https://github.com/Delusions6515/Sub-Store-Module-WebUI)，构建主仓库锁定的提交，产物自动写入模块包内 `webroot/`</li>\n<li>Dependabot 按 `daily` 频率（北京时间 09:00）检查 WebUI submodule 更新，向 `dev` 提 PR；合并后更新锁定的提交</li>\n<li>所有组件在线获取，无需本地参考文件</li>\n<p>  - node 二进制来自 <a href=\"https://github.com/Delusions6515/node-android-build\">Delusions6515/node-android-build</a> 的 release</p>\n\n<h3>本地构建</h3>\n\n<p>首次克隆时使用 <code>git clone --recurse-submodules</code>；已有仓库在构建前初始化或同步 WebUI：</p>\n\n<pre>git submodule update --init --recursive\n./build.sh                    # 版本名取最近 git tag (如 v1.0.0), arm64-v8a\n./build.sh 1.0.0              # 指定版本名覆盖 tag\nTARGET_ABI=armeabi-v7a ./build.sh 1.0.0   # 指定 ABI\nBUILD_TYPE=hotfix ./build.sh 1.0.1-hotfix1\nNODE_BIN_PATH=~/node ./build.sh            # 本地 node 二进制 (调试用)\nWEBUI_REPO_DIR=../Sub-Store-Module-WebUI ./build.sh\nWEBUI_DIST_DIR=/path/to/webui/dist ./build.sh</pre>\n\n<li>版本命名参考 ZygiskNext（`module.prop` 中 `version`/`versionCode` 为占位符，不硬编码）：</li>\n<p>  构建时自动生成 <code>version=1.0.0 (<git提交数>-<短hash>-release)</code>、<code>versionCode=<git提交数></code>；</p>\n<p>  版本名取最近 git tag（自动去 <code>v</code> 前缀），可用参数/<code>BUILD_TYPE</code> 覆盖</p>\n\n<li>WebUI 集成：</li>\n<p>  - 默认使用根目录 <code>webui/</code> submodule，执行 <code>pnpm install</code> + <code>pnpm build</code>；可用 <code>WEBUI_REPO_DIR</code> 指定其他源码目录</p>\n<p>  - 构建产物会自动复制到模块最终包内的 <code>webroot/</code></p>\n<p>  - 只想复用现成前端产物时，可用 <code>WEBUI_DIST_DIR=/path/to/dist</code> 直接指定 dist 目录</p>\n<p>  - 若未发现 WebUI 仓库/产物，则跳过 WebUI 打包，不影响纯模块构建</p>\n<p>  - 更新 WebUI 版本：执行 <code>git -C webui fetch origin</code>、<code>git -C webui checkout <提交或标签></code>，再提交主仓库中的 <code>webui</code> 指针变更；CI 不会自动追踪 WebUI 最新提交</p>\n\n<li>组件来源：</li>\n<p>  - <b>node</b>：始终使用官方最新 LTS 版本——从 <code>nodejs.org</code> 解析当前 LTS（如 <code>24.19.0</code>），</p>\n<p>    再到 <code>NODE_REPO</code>（默认 <a href=\"https://github.com/Delusions6515/node-android-build\">Delusions6515/node-android-build</a>）的</p>\n<p>    <code>node-android-<arch>-<major></code> release 取对应版本 asset（该仓库 release 按 <code>大版本</code>+<code><arch></code> 归档、</p>\n<p>    全部 4 架构、历史版本保留）；最新 LTS 尚未构建时回退该大版本已有最高版本并告警；</p>\n<p>    可用 <code>NODE_DIST_URL</code> / <code>NODE_BIN_PATH</code> 覆盖</p>\n<p>  - <b>后端</b>：<a href=\"https://github.com/sub-store-org/Sub-Store\">sub-store-org/Sub-Store</a> latest release</p>\n<p>  - <b>前端</b>：<a href=\"https://github.com/sub-store-org/Sub-Store-Front-End\">sub-store-org/Sub-Store-Front-End</a> latest release</p>\n<p>  - <b>http-meta</b>：<a href=\"https://github.com/xream/http-meta\">xream/http-meta</a> latest release + <a href=\"https://github.com/MetaCubeX/mihomo\">MetaCubeX/mihomo</a> 稳定版内核</p>\n<li>构建产物默认输出到当前目录的 `build/` 下（可用 `OUT_DIR` 覆盖）</li>\n<li>`-hotfix` 后缀按稳定版修订处理：会进入正式 release/update JSON 渠道，不会被当成 prerelease</li>\n<li>自动下载官方 `module_installer.sh` 生成 META-INF（恢复模式刷入用），失败时跳过（管理器安装不受影响）</li>\n\n<h2>许可</h2>\n\n<p>GPL-3.0。本模块脚本基于 xream 的 <a href=\"https://t.me/zhetengsha/1008\">Sub-Store for Magisk, KernelSU & APatch</a> 重新开发；</p>\n<p>Sub-Store / HTTP-META / mihomo 版权归其各自作者所有。</p>",
+  "homepageUrl": "https://github.com/lanyi233/Sub-Store-Module",
+  "sourceUrl": "https://github.com/lanyi233/Sub-Store-Module",
+  "url": "https://github.com/lanyi233/Sub-Store-Module",
+  "latestRelease": {
+    "name": "v2.5.1",
+    "version": "v2.5.1",
+    "time": "2026-10-22T12:45:50Z",
+    "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.1/sub-store-module-2.5.1-125-5d29538-release-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.5.1",
+      "tagName": "v2.5.1",
+      "publishedAt": "2026-10-22T12:45:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.5.1-125-5d29538-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.1/sub-store-module-2.5.1-125-5d29538-release-arm64-v8a.zip",
+          "size": 66134209,
+          "downloadCount": 134
+        },
+        {
+          "name": "sub-store-module-2.5.1-125-5d29538-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.1/sub-store-module-2.5.1-125-5d29538-release-armeabi-v7a.zip",
+          "size": 65637826,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.5.1-125-5d29538-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.1/sub-store-module-2.5.1-125-5d29538-release-x86.zip",
+          "size": 68440014,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.5.1-125-5d29538-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.1/sub-store-module-2.5.1-125-5d29538-release-x86_64.zip",
+          "size": 68182171,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0",
+      "tagName": "v2.5.0",
+      "publishedAt": "2026-10-21T07:22:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.5.0-125-5d29538-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.0/sub-store-module-2.5.0-125-5d29538-release-arm64-v8a.zip",
+          "size": 65915927,
+          "downloadCount": 80
+        },
+        {
+          "name": "sub-store-module-2.5.0-125-5d29538-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.0/sub-store-module-2.5.0-125-5d29538-release-armeabi-v7a.zip",
+          "size": 65417148,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.5.0-125-5d29538-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.0/sub-store-module-2.5.0-125-5d29538-release-x86.zip",
+          "size": 68212599,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.5.0-125-5d29538-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.5.0/sub-store-module-2.5.0-125-5d29538-release-x86_64.zip",
+          "size": 67953870,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.4.0",
+      "tagName": "v2.4.0",
+      "publishedAt": "2026-09-20T10:36:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.4.0-119-8bef714-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.4.0/sub-store-module-2.4.0-119-8bef714-release-arm64-v8a.zip",
+          "size": 65822043,
+          "downloadCount": 329
+        },
+        {
+          "name": "sub-store-module-2.4.0-119-8bef714-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.4.0/sub-store-module-2.4.0-119-8bef714-release-armeabi-v7a.zip",
+          "size": 65322062,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.4.0-119-8bef714-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.4.0/sub-store-module-2.4.0-119-8bef714-release-x86.zip",
+          "size": 68115184,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.4.0-119-8bef714-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.4.0/sub-store-module-2.4.0-119-8bef714-release-x86_64.zip",
+          "size": 67854380,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2026-09-13T09:31:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.3.1-109-d08661e-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.1/sub-store-module-2.3.1-109-d08661e-release-arm64-v8a.zip",
+          "size": 61894541,
+          "downloadCount": 143
+        },
+        {
+          "name": "sub-store-module-2.3.1-109-d08661e-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.1/sub-store-module-2.3.1-109-d08661e-release-armeabi-v7a.zip",
+          "size": 61708046,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.3.1-109-d08661e-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.1/sub-store-module-2.3.1-109-d08661e-release-x86.zip",
+          "size": 64419377,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.3.1-109-d08661e-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.1/sub-store-module-2.3.1-109-d08661e-release-x86_64.zip",
+          "size": 63835927,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2026-09-13T08:31:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.3.0-109-d08661e-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.0/sub-store-module-2.3.0-109-d08661e-release-arm64-v8a.zip",
+          "size": 61910085,
+          "downloadCount": 19
+        },
+        {
+          "name": "sub-store-module-2.3.0-109-d08661e-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.0/sub-store-module-2.3.0-109-d08661e-release-armeabi-v7a.zip",
+          "size": 61723589,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.3.0-109-d08661e-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.0/sub-store-module-2.3.0-109-d08661e-release-x86.zip",
+          "size": 64434920,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.3.0-109-d08661e-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.3.0/sub-store-module-2.3.0-109-d08661e-release-x86_64.zip",
+          "size": 63851472,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.2.6",
+      "tagName": "v2.2.6",
+      "publishedAt": "2026-08-29T02:33:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.6-105-573b3af-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.6/sub-store-module-2.2.6-105-573b3af-release-arm64-v8a.zip",
+          "size": 61878764,
+          "downloadCount": 294
+        },
+        {
+          "name": "sub-store-module-2.2.6-105-573b3af-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.6/sub-store-module-2.2.6-105-573b3af-release-armeabi-v7a.zip",
+          "size": 61692268,
+          "downloadCount": 8
+        },
+        {
+          "name": "sub-store-module-2.2.6-105-573b3af-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.6/sub-store-module-2.2.6-105-573b3af-release-x86.zip",
+          "size": 64403599,
+          "downloadCount": 8
+        },
+        {
+          "name": "sub-store-module-2.2.6-105-573b3af-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.6/sub-store-module-2.2.6-105-573b3af-release-x86_64.zip",
+          "size": 63820151,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v2.2.5",
+      "tagName": "v2.2.5",
+      "publishedAt": "2026-08-16T01:15:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.5-103-b39aa75-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.5/sub-store-module-2.2.5-103-b39aa75-release-arm64-v8a.zip",
+          "size": 60795941,
+          "downloadCount": 197
+        },
+        {
+          "name": "sub-store-module-2.2.5-103-b39aa75-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.5/sub-store-module-2.2.5-103-b39aa75-release-armeabi-v7a.zip",
+          "size": 60543300,
+          "downloadCount": 16
+        },
+        {
+          "name": "sub-store-module-2.2.5-103-b39aa75-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.5/sub-store-module-2.2.5-103-b39aa75-release-x86.zip",
+          "size": 63168070,
+          "downloadCount": 18
+        },
+        {
+          "name": "sub-store-module-2.2.5-103-b39aa75-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.5/sub-store-module-2.2.5-103-b39aa75-release-x86_64.zip",
+          "size": 62677963,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v2.2.4",
+      "tagName": "v2.2.4",
+      "publishedAt": "2026-08-14T07:01:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.4-100-c283334-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.4/sub-store-module-2.2.4-100-c283334-release-arm64-v8a.zip",
+          "size": 60795031,
+          "downloadCount": 62
+        },
+        {
+          "name": "sub-store-module-2.2.4-100-c283334-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.4/sub-store-module-2.2.4-100-c283334-release-armeabi-v7a.zip",
+          "size": 60542390,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.2.4-100-c283334-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.4/sub-store-module-2.2.4-100-c283334-release-x86.zip",
+          "size": 63167159,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.4-100-c283334-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.4/sub-store-module-2.2.4-100-c283334-release-x86_64.zip",
+          "size": 62677052,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2.3",
+      "tagName": "v2.2.3",
+      "publishedAt": "2026-08-13T08:48:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.3-96-45513be-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.3/sub-store-module-2.2.3-96-45513be-release-arm64-v8a.zip",
+          "size": 60793952,
+          "downloadCount": 52
+        },
+        {
+          "name": "sub-store-module-2.2.3-96-45513be-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.3/sub-store-module-2.2.3-96-45513be-release-armeabi-v7a.zip",
+          "size": 60541311,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.2.3-96-45513be-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.3/sub-store-module-2.2.3-96-45513be-release-x86.zip",
+          "size": 63166081,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.2.3-96-45513be-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.3/sub-store-module-2.2.3-96-45513be-release-x86_64.zip",
+          "size": 62675974,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2.2",
+      "tagName": "v2.2.2",
+      "publishedAt": "2026-08-13T06:40:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.2-92-cdcc812-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.2/sub-store-module-2.2.2-92-cdcc812-release-arm64-v8a.zip",
+          "size": 60792926,
+          "downloadCount": 10
+        },
+        {
+          "name": "sub-store-module-2.2.2-92-cdcc812-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.2/sub-store-module-2.2.2-92-cdcc812-release-armeabi-v7a.zip",
+          "size": 60540285,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.2-92-cdcc812-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.2/sub-store-module-2.2.2-92-cdcc812-release-x86.zip",
+          "size": 63165054,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.2-92-cdcc812-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.2/sub-store-module-2.2.2-92-cdcc812-release-x86_64.zip",
+          "size": 62674947,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2026-08-13T03:31:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.1-90-de1e0a1-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.1/sub-store-module-2.2.1-90-de1e0a1-release-arm64-v8a.zip",
+          "size": 60792847,
+          "downloadCount": 22
+        },
+        {
+          "name": "sub-store-module-2.2.1-90-de1e0a1-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.1/sub-store-module-2.2.1-90-de1e0a1-release-armeabi-v7a.zip",
+          "size": 60540206,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.1-90-de1e0a1-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.1/sub-store-module-2.2.1-90-de1e0a1-release-x86.zip",
+          "size": 63164976,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.2.1-90-de1e0a1-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.1/sub-store-module-2.2.1-90-de1e0a1-release-x86_64.zip",
+          "size": 62674869,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-08-11T13:28:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.0-88-138cb92-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0/sub-store-module-2.2.0-88-138cb92-release-arm64-v8a.zip",
+          "size": 60784993,
+          "downloadCount": 74
+        },
+        {
+          "name": "sub-store-module-2.2.0-88-138cb92-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0/sub-store-module-2.2.0-88-138cb92-release-armeabi-v7a.zip",
+          "size": 60532352,
+          "downloadCount": 4
+        },
+        {
+          "name": "sub-store-module-2.2.0-88-138cb92-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0/sub-store-module-2.2.0-88-138cb92-release-x86.zip",
+          "size": 63157122,
+          "downloadCount": 5
+        },
+        {
+          "name": "sub-store-module-2.2.0-88-138cb92-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0/sub-store-module-2.2.0-88-138cb92-release-x86_64.zip",
+          "size": 62667014,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0-alpha.3",
+      "tagName": "v2.2.0-alpha.3",
+      "publishedAt": "2026-08-11T13:03:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.3/sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-arm64-v8a.zip",
+          "size": 60785001,
+          "downloadCount": 4
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.3/sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-armeabi-v7a.zip",
+          "size": 60532359,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.3/sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-x86.zip",
+          "size": 63157128,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.3/sub-store-module-2.2.0-alpha.3-88-138cb92-prerelease-x86_64.zip",
+          "size": 62667022,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0-alpha.2",
+      "tagName": "v2.2.0-alpha.2",
+      "publishedAt": "2026-08-11T10:31:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.2/sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-arm64-v8a.zip",
+          "size": 60695814,
+          "downloadCount": 5
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.2/sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-armeabi-v7a.zip",
+          "size": 60443174,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.2/sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-x86.zip",
+          "size": 63067943,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.2/sub-store-module-2.2.0-alpha.2-88-138cb92-prerelease-x86_64.zip",
+          "size": 62577836,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0-alpha.1",
+      "tagName": "v2.2.0-alpha.1",
+      "publishedAt": "2026-08-11T06:59:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.1/sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-arm64-v8a.zip",
+          "size": 60695652,
+          "downloadCount": 5
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.1/sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-armeabi-v7a.zip",
+          "size": 60443012,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.1/sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-x86.zip",
+          "size": 63067781,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.2.0-alpha.1/sub-store-module-2.2.0-alpha.1-87-63e19ca-prerelease-x86_64.zip",
+          "size": 62577674,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-08-10T00:13:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-74-768fd15-release-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0/sub-store-module-2.1.0-74-768fd15-release-arm64-v8a.zip",
+          "size": 60560184,
+          "downloadCount": 78
+        },
+        {
+          "name": "sub-store-module-2.1.0-74-768fd15-release-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0/sub-store-module-2.1.0-74-768fd15-release-armeabi-v7a.zip",
+          "size": 60307544,
+          "downloadCount": 8
+        },
+        {
+          "name": "sub-store-module-2.1.0-74-768fd15-release-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0/sub-store-module-2.1.0-74-768fd15-release-x86.zip",
+          "size": 62932313,
+          "downloadCount": 7
+        },
+        {
+          "name": "sub-store-module-2.1.0-74-768fd15-release-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0/sub-store-module-2.1.0-74-768fd15-release-x86_64.zip",
+          "size": 62442206,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-rc.2",
+      "tagName": "v2.1.0-rc.2",
+      "publishedAt": "2026-08-09T10:20:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.2/sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-arm64-v8a.zip",
+          "size": 60560190,
+          "downloadCount": 19
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.2/sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-armeabi-v7a.zip",
+          "size": 60307549,
+          "downloadCount": 6
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.2/sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-x86.zip",
+          "size": 62932319,
+          "downloadCount": 3
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.2/sub-store-module-2.1.0-rc.2-73-4d6e077-prerelease-x86_64.zip",
+          "size": 62442211,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-rc.1",
+      "tagName": "v2.1.0-rc.1",
+      "publishedAt": "2026-08-09T04:41:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.1/sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-arm64-v8a.zip",
+          "size": 60559947,
+          "downloadCount": 13
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.1/sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-armeabi-v7a.zip",
+          "size": 60307307,
+          "downloadCount": 10
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.1/sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-x86.zip",
+          "size": 62932075,
+          "downloadCount": 6
+        },
+        {
+          "name": "sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-rc.1/sub-store-module-2.1.0-rc.1-68-c2986d0-prerelease-x86_64.zip",
+          "size": 62441968,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-beta.3",
+      "tagName": "v2.1.0-beta.3",
+      "publishedAt": "2026-08-09T01:49:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.3/sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-arm64-v8a.zip",
+          "size": 60559495,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.3/sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-armeabi-v7a.zip",
+          "size": 60306855,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.3/sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-x86.zip",
+          "size": 62931623,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.3/sub-store-module-2.1.0-beta.3-66-66d19db-prerelease-x86_64.zip",
+          "size": 62441516,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-beta.2",
+      "tagName": "v2.1.0-beta.2",
+      "publishedAt": "2026-08-09T01:11:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.2/sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-arm64-v8a.zip",
+          "size": 60559185,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.2/sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-armeabi-v7a.zip",
+          "size": 60306545,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.2/sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-x86.zip",
+          "size": 62931314,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.2/sub-store-module-2.1.0-beta.2-65-5d0330f-prerelease-x86_64.zip",
+          "size": 62441207,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.0.7-hotfix.4",
+      "tagName": "v2.0.7-hotfix.4",
+      "publishedAt": "2026-08-09T01:48:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.4/sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-arm64-v8a.zip",
+          "size": 58250997,
+          "downloadCount": 25
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.4/sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-armeabi-v7a.zip",
+          "size": 57998357,
+          "downloadCount": 5
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.4/sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-x86.zip",
+          "size": 60623126,
+          "downloadCount": 5
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.4/sub-store-module-2.0.7-hotfix.4-60-9707a1c-hotfix-x86_64.zip",
+          "size": 60133018,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-beta.1",
+      "tagName": "v2.1.0-beta.1",
+      "publishedAt": "2026-08-08T14:10:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.1/sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-arm64-v8a.zip",
+          "size": 60559471,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.1/sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-armeabi-v7a.zip",
+          "size": 60306831,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.1/sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-x86.zip",
+          "size": 62931600,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-beta.1/sub-store-module-2.1.0-beta.1-64-5719caf-prerelease-x86_64.zip",
+          "size": 62441493,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-alpha.5",
+      "tagName": "v2.1.0-alpha.5",
+      "publishedAt": "2026-08-08T11:42:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.5/sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-arm64-v8a.zip",
+          "size": 60559178,
+          "downloadCount": 4
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.5/sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-armeabi-v7a.zip",
+          "size": 60306538,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.5/sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-x86.zip",
+          "size": 62931307,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.5/sub-store-module-2.1.0-alpha.5-61-d5ebb7c-prerelease-x86_64.zip",
+          "size": 62441200,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-alpha.4",
+      "tagName": "v2.1.0-alpha.4",
+      "publishedAt": "2026-08-08T07:09:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.4/sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-arm64-v8a.zip",
+          "size": 58362744,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.4/sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-armeabi-v7a.zip",
+          "size": 58110105,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.4/sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-x86.zip",
+          "size": 60734873,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.4/sub-store-module-2.1.0-alpha.4-58-0d80d63-prerelease-x86_64.zip",
+          "size": 60244766,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-alpha.3",
+      "tagName": "v2.1.0-alpha.3",
+      "publishedAt": "2026-08-08T05:01:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.3/sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-arm64-v8a.zip",
+          "size": 58362627,
+          "downloadCount": 4
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.3/sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-armeabi-v7a.zip",
+          "size": 58109986,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.3/sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-x86.zip",
+          "size": 60734756,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.3/sub-store-module-2.1.0-alpha.3-57-718f8e8-prerelease-x86_64.zip",
+          "size": 60244649,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-alpha.2",
+      "tagName": "v2.1.0-alpha.2",
+      "publishedAt": "2026-08-08T03:30:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.2/sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-arm64-v8a.zip",
+          "size": 58362158,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.2/sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-armeabi-v7a.zip",
+          "size": 58109518,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.2/sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-x86.zip",
+          "size": 60734287,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.2/sub-store-module-2.1.0-alpha.2-53-003a61d-prerelease-x86_64.zip",
+          "size": 60244180,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.0.7-hotfix.3",
+      "tagName": "v2.0.7-hotfix.3",
+      "publishedAt": "2026-08-08T11:32:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.3/sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-arm64-v8a.zip",
+          "size": 58250973,
+          "downloadCount": 3
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.3/sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-armeabi-v7a.zip",
+          "size": 57998332,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.3/sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-x86.zip",
+          "size": 60623101,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.3/sub-store-module-2.0.7-hotfix.3-57-8745b44-hotfix-x86_64.zip",
+          "size": 60132994,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.0.7-hotfix.2",
+      "tagName": "v2.0.7-hotfix.2",
+      "publishedAt": "2026-08-08T07:06:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.2/sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-arm64-v8a.zip",
+          "size": 58250351,
+          "downloadCount": 4
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.2/sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-armeabi-v7a.zip",
+          "size": 57997710,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.2/sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-x86.zip",
+          "size": 60622479,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.2/sub-store-module-2.0.7-hotfix.2-55-7c8160c-hotfix-x86_64.zip",
+          "size": 60132372,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0.7-hotfix.1",
+      "tagName": "v2.0.7-hotfix.1",
+      "publishedAt": "2026-08-08T04:48:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.1/sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-arm64-v8a.zip",
+          "size": 58250239,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.1/sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-armeabi-v7a.zip",
+          "size": 57997600,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.1/sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-x86.zip",
+          "size": 60622367,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.0.7-hotfix.1/sub-store-module-2.0.7-hotfix.1-54-94dc6a8-hotfix-x86_64.zip",
+          "size": 60132260,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0-alpha.1",
+      "tagName": "v2.1.0-alpha.1",
+      "publishedAt": "2026-08-08T02:29:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.1/sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-arm64-v8a.zip",
+          "size": 58361274,
+          "downloadCount": 2
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.1/sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-armeabi-v7a.zip",
+          "size": 58108634,
+          "downloadCount": 1
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-x86.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.1/sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-x86.zip",
+          "size": 60733404,
+          "downloadCount": 0
+        },
+        {
+          "name": "sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-x86_64.zip",
+          "downloadUrl": "https://github.com/lanyi233/Sub-Store-Module/releases/download/v2.1.0-alpha.1/sub-store-module-2.1.0-alpha.1-52-f630c64-prerelease-x86_64.zip",
+          "size": 60243297,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

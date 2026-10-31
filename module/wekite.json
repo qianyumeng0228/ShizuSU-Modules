@@ -1,0 +1,795 @@
+{
+  "readme": "# WeKite\n\n让微✉️更好用的轻量级增强模块 — 支持 LSPosed 与 Zygisk 双模式\n\n> 🙏 **致谢（原始上游 [WeKit](https://github.com/cwuom/WeKit)）**：本项目基于上游 WeKit 二次开发，感谢原作者的开源贡献。\n>\n> 🤖 **本项目由 AI 编写**。\n>\n> ✅ **编译状态：CI 构建成功（最近一次：2026-10-07，v3.66）**\n>\n> - **LSPosed 版本**：APK 已签名，可安装测试（见下方安装说明）\n> - **Zygisk 版本**：模块包可用，支持 Magisk / KernelSU（见下方安装说明）\n\nWeKite 是一套针对微✉️的模块化增强方案：**62 个可开关功能，分九大类**（另有 2 个常驻组件、35 个内部 API 项；三类合计 **99**，就是 App 主页「全部功能」显示的数字 —— 只有前 62 个会出现在「功能」Tab 里）。核心设计是「不打扰、可开关、低开销」：\n\n- **每个功能都有独立开关** —— 不需要的直接关掉，等于不存在；能调参数的会在设置里带一个齿轮图标，点进去就是详细配置。\n- **全部本地运行**，不上传任何数据。AI 相关功能需要自备 API Key，消息只发往你自己填写的地址。\n- **有账号风险的功能**（自动抢红包、自动接收转账、强制平板模式、检测单向删除好友）第一次开启会弹二次确认，需要你手动确认。\n\n> 下面「功能一览」的分类与 App 内「功能」Tab 的分类一一对应，方便对照查找。\n\n## 📱 界面预览\n\n**真机截图**（Zygisk 模式，微信 8.0.77，模块 3.66）\n\n<p align=\"center\">\n  <img src=\"docs/images/tab-home.jpg\" width=\"24%\" alt=\"主页\" />\n  <img src=\"docs/images/tab-features.jpg\" width=\"24%\" alt=\"功能\" />\n  <img src=\"docs/images/tab-logs.jpg\" width=\"24%\" alt=\"日志\" />\n  <img src=\"docs/images/tab-settings.jpg\" width=\"24%\" alt=\"设置\" />\n</p>\n\n<p align=\"center\"><sub>主页 · 功能 · 日志 · 设置</sub></p>\n\n**界面示意图**（UI 模拟，非真机截图；用来说明功能长什么样，图中聊天内容均为虚构示例）\n\n<p align=\"center\">\n  <img src=\"docs/images/mock-chat-category.jpg\" width=\"31%\" alt=\"「聊天」分类的功能列表\" />\n  <img src=\"docs/images/mock-ai-chat-settings.jpg\" width=\"31%\" alt=\"AI 聊天助手设置\" />\n  <img src=\"docs/images/mock-ai-analysis-card.jpg\" width=\"31%\" alt=\"聊天页的 AI 分析卡\" />\n</p>\n\n<p align=\"center\"><sub>「聊天」分类的功能列表 · AI 聊天助手设置 · 聊天页的分析卡（全自动模式，气泡下方那张即分析卡）</sub></p>\n\n## 🚀 快速上手\n\n1. **装**：LSPosed 模式装 APK；Zygisk 模式刷模块包（详见下方「📥 安装」）\n2. **开**：LSPosed 里启用模块并勾选微✉️作用域；Zygisk 模式在 Root 管理器的模块 WebUI 里为微✉️打开注入\n3. **进设置**：桌面 WeKite 图标，或 LSPosed 模块页里点 WeKite\n\n设置页共四个 Tab：\n\n| Tab | 内容 |\n|------|------|\n| **主页** | 模块是否已激活；已启用功能数 / 全部功能数；系统信息（微信版本、模块版本、构建时间、设备型号、Android 版本、当前加载器） |\n| **功能** | 顶部可按名称搜索功能，搜索时能直接开关；下面是分类列表，末尾还有一类「已启用功能」汇总当前开着哪些。**普通功能就是一个开关**；名称旁有齿轮图标的功能点进去是详细配置 |\n| **日志** | 运行日志 / 崩溃日志：查看、下拉刷新、分享、另存、清空 |\n| **设置** | 配色（主题模式、自定义颜色、动态壁纸取色、种子颜色、调色板样式、颜色规格、**同时对微信生效**）、详细日志、显示加载完成 Toast、禁用版本适配、重置适配信息、导出 / 导入 / 清除配置、版本与检查更新、构建提交时间、开放源代码许可 |\n\n⚠️ 界面类改动多数**需要完全退出微信再打开**才生效；个别功能会在设置里注明「重新进入聊天后生效」。\n\n## ✨ 功能一览\n\n### 💬 聊天（12 项）\n\n| 功能 | 说明 |\n|------|------|\n| 通知进化 | 让微信的新消息通知更好用：①通知栏**直接回复**消息（快捷回复后自动标记已读，可配\"回复后清空通知里的消息历史\"）；②通知栏**一键标为已读**；③升级为 Android 原生**对话样式**——会话头像、按人分的消息历史（最多 7 条）、群聊显示发送者名字，图片/表情消息能在通知里直接显示（缩略图/大图/贴纸等待策略可调）。点通知打开对应聊天，划掉通知自动清理。 |\n| AI 聊天助手 | 新消息自动分析并给出建议回复，也可以全自动回复。功能较大，单独写在下方的「🤖 AI 聊天助手」一节。 |\n| 防撤回 | 对方撤回的消息不消失，仍可查看；被撤回的位置会插一行提示，提示格式与时间格式都能自定义。⚠️ 设置里的「防撤回自己的消息」目前是坏的，App 内已标注，别开。 |\n| 自动语音转文字 | 收到的语音消息自动转成文字，不用逐条手动长按转换。 |\n| 禁止上传正在输入状态 | 不再向对方上传「对方正在输入…」，聊天时对方看不到你在打字。 |\n| 自动启用发送原图 | 发图片 / 视频时自动帮你勾选「原图」，不用每次手动点。 |\n| 自动查看原图 | 打开图片或视频时自动点开原图，直接看清晰版。 |\n| 自动缓存图片 | 收到图片就自动触发微信从 CDN 拉原图存到本地。可配白名单（只对这些人生效）/ 黑名单（对这些人跳过），改完需重启微信。 |\n| 自动缓存文件 | 对方的文件上传完成后自动触发下载并缓存到本地；同样支持白名单 / 黑名单。 |\n| 显示群成员身份 | 群聊里给成员名字旁加身份标签：**群主 / 管理员 / 成员**。三种标签的文字、前景色、背景色都能改，也可以关掉「成员」标签只显示群主和管理员。 |\n| 显示群成员实名尾字 | 通过转账接口查询并显示群成员的实名尾字（点一下即查，结果会缓存）；查不到时会区分「被删除 / 被拉黑 / 账号异常」。 |\n| 群聊消息分析 | 聊天页「N条新消息」胶囊旁边挂一个**同尺寸的「AI分析」胶囊**，点它把该群消息总结成一份中文报告（主要话题 / 讨论要点 / 待办与链接类信息）。接口、模型、Key 全部自填，内置 AgentRouter、DeepSeek、Kimi、智谱 GLM、通义千问、腾讯混元、硅基流动、百度千帆、阶跃星辰等预设，也可以填自建网关或反代；可选择只分析未读新消息，或按当天消息分析。 |\n\n### 🎨 界面美化（9 项）\n\n| 功能 | 说明 |\n|------|------|\n| 悬浮输入框 | 聊天底部输入框改成悬浮卡片（带圆角、阴影、侧边距）。圆角半径、侧边距、底部间距、阴影强度都可调。<br>附带修复：微信 8.0.79 起表情面板 / 键盘展开后点聊天区不自动收起（仅与悬浮输入框同时出现），开启本功能即自动兜底，无需额外开关。 |\n| 悬浮标题栏 | 聊天页顶部标题栏，以及标题下方的挂件（置顶消息、群通知栏等）都改成悬浮卡片；圆角半径、侧边距、顶部间距、下方卡片间距、阴影强度可调。改动后重新进入聊天生效。 |\n| 聊天界面沉浸 | 聊天界面 edge-to-edge：内容延伸到状态栏背后，消息可以滚到状态栏下方。 |\n| 半屏相册选择器 | 聊天「+」面板里的相册选择器、图片预览和搜索页改为半屏卡片，上方仍能看到聊天内容（高度占比可调）；图片编辑器保持全屏。 |\n| 消息时间增强 | 给每条消息显示精确发送时间。时间格式、字号、显示模板、亮色/暗色字体颜色、是否强制显示、是否居中都可调。模板支持 `$time` 与 `$type` 占位符，`$type` 会显示消息类型（群公告、@所有人、@我、@N人 等）。 |\n| 美化首页底部导航栏 | 把首页底部导航栏换成 Material Design / Backdrop 风格；可选**悬浮底栏**、液态玻璃效果（模糊半径可调）、点击标签时滑动切换页面而非直接跳转、页面切换动画、隐藏标签文字、显示「发现」标签角标（含朋友圈新通知数量）。 |\n| 圆角头像 | 自定义微信全局头像渲染的圆角弧度。 |\n| 隐藏对话列表分割线 | 隐藏主页对话列表里每条对话之间的分割线。 |\n| 隐藏其他设备横幅 | 隐藏主页顶部「其他设备已登录」横幅。 |\n\n### 🤖 AI 聊天助手\n\n「聊天」分类下的一个功能，因为选项较多，单独展开说明。核心：**收到新消息 → 分析情绪与意图 → 给出候选回复**，以卡片形式挂在对应消息下方（宽度与微信气泡对齐）。\n\n**三条线路 / 两种模式**\n\n- **对话模型（必填）**：任意 OpenAI 兼容接口，只填 base 网址或完整接口地址都行，配好后可点「测试」按钮验证连通性。\n- **JEV 决策线路（可选，有 OpenRouter Key 即可）**：负责情绪判断与回复优选。只配这一条也能用（卡片仍有情绪与解读，但没有建议回复）。\n- **手动模式**：卡片上列出候选回复（条数上限 1–6，默认 3），点一下填入输入框、长按复制、点「发」直接发送。\n- **全自动模式**：满足规则时自动把选中的那条发出去。\n\n**入口与开关**\n\n- 聊天页标题栏右上角有一个实时状态徽标：灰 `AI`=未开 / 蓝 `AI`=分析已开 / `AI…`=分析中 / 蓝 `AI+`=全自动已开。点它进设置，长按标题栏「…」出本聊天的快捷菜单。\n- 每个聊天（单聊 / 群聊）独立控制，可在**聊天详情页**或长按「…」菜单里开关三项：AI 自动分析并给建议 / 全自动回复 / 群里所有消息也处理。\n- 群聊默认**只处理 @我的消息**；打开「群里所有消息也处理」才会处理全部消息。\n\n**全自动回复的规则（都在设置里，括号内为默认值）**\n\n| 选项 | 范围 / 说明 |\n|------|------|\n| 允许全自动回复（全局总闸） | 默认**关**。不开这个总闸，任何聊天的全自动都不会发消息 |\n| 一次发送条数 | 1–3 条（默认 1） |\n| 发送前等待 | 3–60 秒（默认 5）—— 这段是「可撤回窗口」，发出去之前还来得及拦 |\n| 同一聊天冷却 | 10–600 秒（默认 60） |\n| 每日上限 | 1–200 条 / 聊天（默认 20） |\n| 免打扰时段 | 如 23:00 – 07:30，留空即不限制 |\n| 群聊触发关键词 | 只在「只回@我」模式生效：@我 **或** 含关键词即回 |\n| 高级设置 · 上下文条数 | 5–100 条（默认 30） |\n| 高级设置 · 上下文预算 | 1000–48000 字（默认 8000） |\n\n**其它**\n\n- **回复优选**：候选生成后由 JEV 再挑一次。自动模式发它选中的那条；手动模式在它选中的候选上标「⭐推荐 N%」，**位置不动**（只标记不重排，不打断你对「第几条」的记忆）。默认开，可关。\n- **人设与风格**：可以手写人设（对 AI 优先级最高，例如「我妈，说话随意但要有分寸」）；也可以让 AI 从你在该会话的历史发言里总结一份「风格画像」并模仿你的说话方式，画像可手动修正，还能设置过期自动重新生成（默认关）。\n- **锁屏补扫**：锁屏期间漏掉的消息，解锁后该聊天再收到新消息时会自动补分析。\n- **自动回复打标**：自动发出的回复会在消息列表里插一行只有你自己可见的系统提示，方便事后区分哪些是 AI 发的（对方看不到）。\n- **隐私**：所有 Key 与配置都存在本地；消息内容只会发给你自己填写的线路地址。不配 Key 就完全不发任何请求。\n\n### 👥 联系人与群组（9 项）\n\n| 功能 | 说明 |\n|------|------|\n| 隐藏联系人 | 隐藏指定联系人，共 **22 处**不显示：首页对话列表、通讯录联系人/群聊列表、首页搜索、锁屏与摇一摇自动关闭聊天、朋友圈信息流与消息列表、共同好友动态下的内联点赞评论、联系人选择页、音视频通话与群通话（来电横幅 / 铃声 / 通知 / 通话记录）、新的朋友（列表 / 头像 / 红点）、桌面角标与底栏未读数、发现页「N 位朋友的新动态」、新消息通知（含微信在 push 进程直接弹出的轻量推送）、群聊内 @成员选择器、群成员列表、收藏列表、视频号点赞列表、全局搜索、通讯录底部「N 位联系人」计数、拍一拍消息、微信运动排行榜。<br>支持**定时显示 / 隐藏**（按每周重复或单次自动切换）；也可临时显示：输入 `#hide` 恢复隐藏，或连续三击主页标题栏切换。<br>⚠️ 三点须知：① 临时显示只恢复界面上的显示，**不恢复通知**；② 除拍一拍外都是「不显示」而非删除，取消隐藏后内容原样回来；③ **拍一拍是唯一破坏性的** —— 消息在写入数据库前就被取消，取消隐藏也找不回来。 |\n| 查看群成员消息历史 | 在联系人与群组详情页加一个入口，查看任意群成员的全部历史消息。 |\n| 检测单向删除好友 | 批量扫描全部好友，检测谁把你单向删除了；扫描结果可以新建标签标记，也可以批量删除（删除不可逆、会清空聊天记录）。⚠️ 可能触发账号异常，开启前二次确认。 |\n| 添加自动备注 | 加好友时按模板自动填写备注。备注格式与时间格式都可自定义，支持点击插入占位符。 |\n| 加入群聊自动免打扰 | 加入新群后自动打开该群的消息免打扰。 |\n| 查看群成员邀请者 | 群成员详情页加入口，查这个成员是谁邀请进群的；没有记录时会指明「可能是群主 / 前群主 / 早期成员」或「扫码、自行进群」。 |\n| 群成员行为监控 | 监控群成员**退群**与**修改群昵称**，并在群里插入一行绿色提示（改名会显示「旧 → 新」）。 |\n| 导出群成员 | 群资料页一键复制全部成员到剪贴板，**TSV 制表符分隔**，粘贴进 Excel / WPS 自动分列：群昵称 ｜ 昵称 ｜ 备注 ｜ 微信号 ｜ wxId ｜ 邀请人。首行表头，第二行汇总（成员数 / 时间 / 群 ID）；设群昵称的排前面，其余按昵称。邀请人列微信只给部分群记录，缺失显示 `—`；非好友成员以 wxId 兜底。数据全部来自本机数据库，不上传。 |\n| 显示微信 ID | 联系人 / 群组详情页显示微信号，点击可复制。 |\n\n### 🧧 红包与支付（5 项）\n\n| 功能 | 说明 |\n|------|------|\n| 自动抢红包 | 监听到红包消息自动拆开，群聊与私聊可分别开关。⚠️ 可能触发账号异常，开启前二次确认。 |\n| 自动接收转账 | 监听到转账消息自动确认收款。⚠️ 可能触发账号异常，开启前二次确认。 |\n| 捡漏历史红包 | 在联系人与群组详情页加入口，批量扫描当前会话的历史红包并尝试领取（只扫 24 小时内的，更早的已过期）。可查看正在进行的任务、转后台运行或手动终止。 |\n| 红包页面详情 | 红包领取页显示更详细的领取情况（金额、数量、剩余、领取时间等）。 |\n| 允许领取私聊红包 | 允许打开私聊里自己发出的红包。⚠️ 可能导致发送红包时提示「请求不成功」。 |\n\n### 📸 朋友圈（5 项）\n\n| 功能 | 说明 |\n|------|------|\n| 朋友圈防撤回 | 好友删掉的朋友圈仍然可以查看，并加上「[拦截删除]」标记。 |\n| 朋友圈评论防撤回 | 被删除的评论保留显示并加上标记。 |\n| 自动点赞 | 浏览朋友圈时自动点赞。支持按内容关键词包含 / 排除，也能分联系人单独设置。 |\n| 自动刷新 | 定时自动刷新朋友圈列表，刷新间隔（分钟）可调。 |\n| 拦截朋友圈广告 | 屏蔽朋友圈信息流里的广告。 |\n\n### 📞 音视频通话（2 项）\n\n| 功能 | 说明 |\n|------|------|\n| 屏蔽铃声 | 屏蔽音视频通话铃声，呼出铃声与呼入铃声可分别开关。 |\n| 虚拟视频通话 | 视频通话时用本地视频或网络直播流（HTTP / HLS / RTSP）替换相机预览，可设竖屏 / 横屏 / 自动。没有选文件时会自动放行真实相机，不影响正常通话。 |\n\n### 📱 小程序（6 项）\n\n| 功能 | 说明 |\n|------|------|\n| 伪装宿主版本 | 伪装微信版本号，解决提示「版本较低」而无法使用的小程序。 |\n| 去除菜单限制 | 解除小程序右上角菜单的限制。 |\n| 移除开屏广告 | 跳过小程序开屏广告。 |\n| 移除视频广告 | 跳过小程序视频广告。 |\n| 跳过激励广告 | 跳过小程序激励广告 —— 广告展示后立即视为看完并发放奖励。 |\n| 跳过启动页面 | 跳过小程序启动页面，变相去广告（实验性）。 |\n\n### 📰 公众号（1 项）\n\n| 功能 | 说明 |\n|------|------|\n| 公众号去广告 | 清除公众号信息流中的广告内容（订阅号信息流 / 推荐流 / 聚合页的广告投放位）。 |\n\n### 🔧 系统与隐私（15 项）\n\n| 功能 | 说明 |\n|------|------|\n| 清理缓存垃圾 | 自动或手动清理微信缓存，清理间隔可选 1 小时 / 4 小时 / 1 天；也可以点「立即清理」，清完会提示释放了多少空间。 |\n| 自动清理日志 | 定期清理模块自身的日志，保留天数可选 1 / 3 / 7 天；同样支持「立即清理」。 |\n| 自动批准设备登录 | 其他设备请求登录时自动勾选并确认。是否「同步最近的消息」、是否「自动登录该设备」两项各自可控。 |\n| 禁止屏幕高亮度 | 禁止微信把屏幕亮度调得过高。 |\n| 禁用微信热更新 | 禁止微信热更新，避免被强制更新到不兼容的版本。 |\n| 修复文件预览状态栏遮挡 | 把文件预览页的内容压到状态栏下方，修好右上角菜单被顶进状态栏、点不到的问题。 |\n| 强制平板模式 | 让微信把当前设备识别为平板。⚠️ 可能触发账号异常，开启前二次确认。 |\n| 隐藏模块应用 | 在不影响模块功能的前提下，防止微信查询本模块的安装状态（实验性）。 |\n| 省电模式 | 通过一些措施减少微信的耗电量。 |\n| 阻止微信清理模块数据 | 阻止微信「设置 → 存储空间 → 清理」把模块数据删掉。 |\n| 禁止微信检测 Xposed | 阻止微信检测 Xposed 环境。Google Play 版微信没有这项检测，开启可能导致闪退 —— 模块检测到这种版本会自动关闭该功能并提示。 |\n| 二维码扫描记录 | 记录扫过的二维码链接，可查看、复制、清空。 |\n| 去除文章广告 | 清除文章中的广告数据。 |\n| 移除二维码扫描限制 | 移除长按图片与从相册选图时的二维码扫描限制。 |\n| 恢复旧版「我」界面卡包 | 「我」界面用回旧版「卡包」，而不是「小店与卡包」。 |\n\n### 🔌 常驻组件（无开关，自动生效）\n\n| 组件 | 说明 |\n|------|------|\n| 莫奈引擎 | 按「设置 → 自定义颜色 / 动态壁纸取色 / 种子颜色 / 调色板样式 / 颜色规格」里配好的配色，给微信原生组件上色（输入框、按钮、卡片、图标等）。**想让配色作用于微信本身，需要打开「设置 → 同时对微信生效」。** 它是常驻组件，本身没有开关。 |\n| 隐藏联系人通知抑制 | 被隐藏联系人的新消息通知在 push 进程里就被拦掉，避免\"界面藏了、通知还在弹\"。随「隐藏联系人」开关自动生效。 |\n\n## 📥 安装\n\n> ✅ **LSPosed 版本已可安装使用**（从 [Releases](https://github.com/SymonChu/WeKite/releases) 下载）。\n\n### 方式一：LSPosed（Xposed 模式）\n\n**适用**：已安装 LSPosed 框架的设备\n\n1. 安装 [LSPosed](https://github.com/LSPosed/LSPosed) 框架（Android 8.0+）\n2. 从 [Releases](https://github.com/SymonChu/WeKite/releases) 下载 APK 并安装\n3. 打开 LSPosed → 模块 → 启用 WeKite\n4. 勾选作用域：**微✉️（com.tencent.mm）**\n5. 完全退出微✉️并重新打开\n\n**设置入口**：桌面 WeKite 图标，或 LSPosed 模块页点击 WeKite。\n\n**注意事项**：\n\n- 支持微✉️ 8.0.65 ~ 8.0.76\n- 需在 LSPosed 中启用模块并勾选作用域，否则功能不生效\n- 部分功能修改微✉️界面，重启微✉️后生效\n\n### 方式二：Zygisk（Magisk / KernelSU）\n\n**适用**：已 Root 且启用 Zygisk 的设备（Magisk 或 KernelSU）\n\n1. 从 [Releases](https://github.com/SymonChu/WeKite/releases) 下载 `WeKite-*-release.zip`（Zygisk 模块包）\n2. 在 Magisk / KernelSU 中刷入模块\n3. 重启设备\n4. 打开 Root 管理器中的 WeKite 模块 WebUI，为微✉️打开注入开关\n\n**特点**：\n\n- 无需 Xposed 框架，Zygisk 原生注入\n- KernelSU WebUI 管理注入目标\n\n## 🛠 构建\n\n### 环境要求\n\n| 工具 | 版本 |\n|------|------|\n| JDK | 21 |\n| Android SDK | 含 NDK |\n| Rust | nightly + Android targets |\n\n### 构建命令\n\n```bash\n# 克隆（含子模块）\ngit clone https://github.com/SymonChu/WeKite.git --recursive\ncd WeKite\n\n# 构建 Xposed APK（release）\n./x build --release\n\n# 构建 Zygisk 模块\n./x zygisk build --apk-release --release\n```\n\n### 产物位置\n\n| 产物 | 路径 |\n|------|------|\n| Xposed APK | `app/build/outputs/apk/standard/release/` |\n| Zygisk 模块 | `wekite-zygisk/release/WeKite-*.zip` |\n\n## ❓ 常见问题\n\n**Q: 安装后找不到设置入口？**\nA: LSPosed 模式需在 LSPosed 中启用模块并勾选微✉️作用域；Zygisk 模式入口在 Root 管理器的模块 WebUI。两者入口不同，请确认你用的框架。\n\n**Q: 功能开关打开了，但没效果？**\nA: 依次检查：① LSPosed 里是否已启用模块并勾选了微✉️作用域；② 是否完全退出微✉️再重新打开（界面类功能基本都需要重启微信）；③ 该功能是否有额外前提 —— 例如「AI 聊天助手」需要先填接口地址与 Key，「自动回复」还需要打开全局总闸。\n\n**Q: 支持国内版微✉️吗？**\nA: 核心功能（Xposed 模式）支持 8.0.65~8.0.76 全部版本。\n\n**Q: 会不会上传我的聊天记录？**\nA: 不会。模块不联网上传任何数据。只有你自己开启的 AI 功能会发请求，且消息只会发往你在设置里填写的地址。\n\n**Q: 这些功能会造成账号异常吗？**\nA: 涉及账号风险的功能（自动抢红包、自动接收转账、强制平板模式、检测单向删除好友）第一次开启都会弹二次确认，请自行评估后使用。\n\n**Q: 换设备 / 重装后怎么保住配置？**\nA: 设置 Tab 里有「导出配置」与「导入配置」，也可以「清除配置」重来。\n\n**Q: 出问题要提供什么信息？**\nA: 设置 → 日志 Tab 里有「运行日志」与「崩溃日志」，可直接分享或另存；报问题时把日志一起附上。\n\n## 📄 许可\n\n[GPL-3.0 License](LICENSE)\n\n## 🙏 致谢\n\n- [WeKit](https://github.com/Ujhhgtg/WeKit) — 上游项目\n- [WeKit](https://github.com/cwuom/WeKit) — WeKit 原始上游\n- [WechatMonet](https://github.com/SaiOogcn/WechatMonet) — Overlay 主题参考\n- [WAuxiliary](https://github.com/HdShare/WAuxiliary_Public) · [QAuxiliary](https://github.com/cinit/QAuxiliary) · [FingerprintPay](https://github.com/eritpchy/FingerprintPay)\n",
+  "readmeHTML": "<h1>WeKite</h1>\n\n<p>让微✉️更好用的轻量级增强模块 — 支持 LSPosed 与 Zygisk 双模式</p>\n\n<p>> 🙏 <b>致谢（原始上游 <a href=\"https://github.com/cwuom/WeKit\">WeKit</a>）</b>：本项目基于上游 WeKit 二次开发，感谢原作者的开源贡献。</p>\n<p>></p>\n<p>> 🤖 <b>本项目由 AI 编写</b>。</p>\n<p>></p>\n<p>> ✅ <b>编译状态：CI 构建成功（最近一次：2026-10-07，v3.66）</b></p>\n<p>></p>\n<p>> - <b>LSPosed 版本</b>：APK 已签名，可安装测试（见下方安装说明）</p>\n<p>> - <b>Zygisk 版本</b>：模块包可用，支持 Magisk / KernelSU（见下方安装说明）</p>\n\n<p>WeKite 是一套针对微✉️的模块化增强方案：<b>62 个可开关功能，分九大类</b>（另有 2 个常驻组件、35 个内部 API 项；三类合计 <b>99</b>，就是 App 主页「全部功能」显示的数字 —— 只有前 62 个会出现在「功能」Tab 里）。核心设计是「不打扰、可开关、低开销」：</p>\n\n<li>**每个功能都有独立开关** —— 不需要的直接关掉，等于不存在；能调参数的会在设置里带一个齿轮图标，点进去就是详细配置。</li>\n<li>**全部本地运行**，不上传任何数据。AI 相关功能需要自备 API Key，消息只发往你自己填写的地址。</li>\n<li>**有账号风险的功能**（自动抢红包、自动接收转账、强制平板模式、检测单向删除好友）第一次开启会弹二次确认，需要你手动确认。</li>\n\n<p>> 下面「功能一览」的分类与 App 内「功能」Tab 的分类一一对应，方便对照查找。</p>\n\n<h2>📱 界面预览</h2>\n\n<p><b>真机截图</b>（Zygisk 模式，微信 8.0.77，模块 3.66）</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/images/tab-home.jpg\" width=\"24%\" alt=\"主页\" /></p>\n<p>  <img src=\"docs/images/tab-features.jpg\" width=\"24%\" alt=\"功能\" /></p>\n<p>  <img src=\"docs/images/tab-logs.jpg\" width=\"24%\" alt=\"日志\" /></p>\n<p>  <img src=\"docs/images/tab-settings.jpg\" width=\"24%\" alt=\"设置\" /></p>\n<p></p></p>\n\n<p><p align=\"center\"><sub>主页 · 功能 · 日志 · 设置</sub></p></p>\n\n<p><b>界面示意图</b>（UI 模拟，非真机截图；用来说明功能长什么样，图中聊天内容均为虚构示例）</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/images/mock-chat-category.jpg\" width=\"31%\" alt=\"「聊天」分类的功能列表\" /></p>\n<p>  <img src=\"docs/images/mock-ai-chat-settings.jpg\" width=\"31%\" alt=\"AI 聊天助手设置\" /></p>\n<p>  <img src=\"docs/images/mock-ai-analysis-card.jpg\" width=\"31%\" alt=\"聊天页的 AI 分析卡\" /></p>\n<p></p></p>\n\n<p><p align=\"center\"><sub>「聊天」分类的功能列表 · AI 聊天助手设置 · 聊天页的分析卡（全自动模式，气泡下方那张即分析卡）</sub></p></p>\n\n<h2>🚀 快速上手</h2>\n\n<li>**装**：LSPosed 模式装 APK；Zygisk 模式刷模块包（详见下方「📥 安装」）</li>\n<li>**开**：LSPosed 里启用模块并勾选微✉️作用域；Zygisk 模式在 Root 管理器的模块 WebUI 里为微✉️打开注入</li>\n<li>**进设置**：桌面 WeKite 图标，或 LSPosed 模块页里点 WeKite</li>\n\n<p>设置页共四个 Tab：</p>\n\n<p>| Tab | 内容 |</p>\n<p>|------|------|</p>\n<p>| <b>主页</b> | 模块是否已激活；已启用功能数 / 全部功能数；系统信息（微信版本、模块版本、构建时间、设备型号、Android 版本、当前加载器） |</p>\n<p>| <b>功能</b> | 顶部可按名称搜索功能，搜索时能直接开关；下面是分类列表，末尾还有一类「已启用功能」汇总当前开着哪些。<b>普通功能就是一个开关</b>；名称旁有齿轮图标的功能点进去是详细配置 |</p>\n<p>| <b>日志</b> | 运行日志 / 崩溃日志：查看、下拉刷新、分享、另存、清空 |</p>\n<p>| <b>设置</b> | 配色（主题模式、自定义颜色、动态壁纸取色、种子颜色、调色板样式、颜色规格、<b>同时对微信生效</b>）、详细日志、显示加载完成 Toast、禁用版本适配、重置适配信息、导出 / 导入 / 清除配置、版本与检查更新、构建提交时间、开放源代码许可 |</p>\n\n<p>⚠️ 界面类改动多数<b>需要完全退出微信再打开</b>才生效；个别功能会在设置里注明「重新进入聊天后生效」。</p>\n\n<h2>✨ 功能一览</h2>\n\n<h3>💬 聊天（12 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 通知进化 | 让微信的新消息通知更好用：①通知栏<b>直接回复</b>消息（快捷回复后自动标记已读，可配\"回复后清空通知里的消息历史\"）；②通知栏<b>一键标为已读</b>；③升级为 Android 原生<b>对话样式</b>——会话头像、按人分的消息历史（最多 7 条）、群聊显示发送者名字，图片/表情消息能在通知里直接显示（缩略图/大图/贴纸等待策略可调）。点通知打开对应聊天，划掉通知自动清理。 |</p>\n<p>| AI 聊天助手 | 新消息自动分析并给出建议回复，也可以全自动回复。功能较大，单独写在下方的「🤖 AI 聊天助手」一节。 |</p>\n<p>| 防撤回 | 对方撤回的消息不消失，仍可查看；被撤回的位置会插一行提示，提示格式与时间格式都能自定义。⚠️ 设置里的「防撤回自己的消息」目前是坏的，App 内已标注，别开。 |</p>\n<p>| 自动语音转文字 | 收到的语音消息自动转成文字，不用逐条手动长按转换。 |</p>\n<p>| 禁止上传正在输入状态 | 不再向对方上传「对方正在输入…」，聊天时对方看不到你在打字。 |</p>\n<p>| 自动启用发送原图 | 发图片 / 视频时自动帮你勾选「原图」，不用每次手动点。 |</p>\n<p>| 自动查看原图 | 打开图片或视频时自动点开原图，直接看清晰版。 |</p>\n<p>| 自动缓存图片 | 收到图片就自动触发微信从 CDN 拉原图存到本地。可配白名单（只对这些人生效）/ 黑名单（对这些人跳过），改完需重启微信。 |</p>\n<p>| 自动缓存文件 | 对方的文件上传完成后自动触发下载并缓存到本地；同样支持白名单 / 黑名单。 |</p>\n<p>| 显示群成员身份 | 群聊里给成员名字旁加身份标签：<b>群主 / 管理员 / 成员</b>。三种标签的文字、前景色、背景色都能改，也可以关掉「成员」标签只显示群主和管理员。 |</p>\n<p>| 显示群成员实名尾字 | 通过转账接口查询并显示群成员的实名尾字（点一下即查，结果会缓存）；查不到时会区分「被删除 / 被拉黑 / 账号异常」。 |</p>\n<p>| 群聊消息分析 | 聊天页「N条新消息」胶囊旁边挂一个<b>同尺寸的「AI分析」胶囊</b>，点它把该群消息总结成一份中文报告（主要话题 / 讨论要点 / 待办与链接类信息）。接口、模型、Key 全部自填，内置 AgentRouter、DeepSeek、Kimi、智谱 GLM、通义千问、腾讯混元、硅基流动、百度千帆、阶跃星辰等预设，也可以填自建网关或反代；可选择只分析未读新消息，或按当天消息分析。 |</p>\n\n<h3>🎨 界面美化（9 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 悬浮输入框 | 聊天底部输入框改成悬浮卡片（带圆角、阴影、侧边距）。圆角半径、侧边距、底部间距、阴影强度都可调。<br>附带修复：微信 8.0.79 起表情面板 / 键盘展开后点聊天区不自动收起（仅与悬浮输入框同时出现），开启本功能即自动兜底，无需额外开关。 |</p>\n<p>| 悬浮标题栏 | 聊天页顶部标题栏，以及标题下方的挂件（置顶消息、群通知栏等）都改成悬浮卡片；圆角半径、侧边距、顶部间距、下方卡片间距、阴影强度可调。改动后重新进入聊天生效。 |</p>\n<p>| 聊天界面沉浸 | 聊天界面 edge-to-edge：内容延伸到状态栏背后，消息可以滚到状态栏下方。 |</p>\n<p>| 半屏相册选择器 | 聊天「+」面板里的相册选择器、图片预览和搜索页改为半屏卡片，上方仍能看到聊天内容（高度占比可调）；图片编辑器保持全屏。 |</p>\n<p>| 消息时间增强 | 给每条消息显示精确发送时间。时间格式、字号、显示模板、亮色/暗色字体颜色、是否强制显示、是否居中都可调。模板支持 <code>$time</code> 与 <code>$type</code> 占位符，<code>$type</code> 会显示消息类型（群公告、@所有人、@我、@N人 等）。 |</p>\n<p>| 美化首页底部导航栏 | 把首页底部导航栏换成 Material Design / Backdrop 风格；可选<b>悬浮底栏</b>、液态玻璃效果（模糊半径可调）、点击标签时滑动切换页面而非直接跳转、页面切换动画、隐藏标签文字、显示「发现」标签角标（含朋友圈新通知数量）。 |</p>\n<p>| 圆角头像 | 自定义微信全局头像渲染的圆角弧度。 |</p>\n<p>| 隐藏对话列表分割线 | 隐藏主页对话列表里每条对话之间的分割线。 |</p>\n<p>| 隐藏其他设备横幅 | 隐藏主页顶部「其他设备已登录」横幅。 |</p>\n\n<h3>🤖 AI 聊天助手</h3>\n\n<p>「聊天」分类下的一个功能，因为选项较多，单独展开说明。核心：<b>收到新消息 → 分析情绪与意图 → 给出候选回复</b>，以卡片形式挂在对应消息下方（宽度与微信气泡对齐）。</p>\n\n<p><b>三条线路 / 两种模式</b></p>\n\n<li>**对话模型（必填）**：任意 OpenAI 兼容接口，只填 base 网址或完整接口地址都行，配好后可点「测试」按钮验证连通性。</li>\n<li>**JEV 决策线路（可选，有 OpenRouter Key 即可）**：负责情绪判断与回复优选。只配这一条也能用（卡片仍有情绪与解读，但没有建议回复）。</li>\n<li>**手动模式**：卡片上列出候选回复（条数上限 1–6，默认 3），点一下填入输入框、长按复制、点「发」直接发送。</li>\n<li>**全自动模式**：满足规则时自动把选中的那条发出去。</li>\n\n<p><b>入口与开关</b></p>\n\n<li>聊天页标题栏右上角有一个实时状态徽标：灰 `AI`=未开 / 蓝 `AI`=分析已开 / `AI…`=分析中 / 蓝 `AI+`=全自动已开。点它进设置，长按标题栏「…」出本聊天的快捷菜单。</li>\n<li>每个聊天（单聊 / 群聊）独立控制，可在**聊天详情页**或长按「…」菜单里开关三项：AI 自动分析并给建议 / 全自动回复 / 群里所有消息也处理。</li>\n<li>群聊默认**只处理 @我的消息**；打开「群里所有消息也处理」才会处理全部消息。</li>\n\n<p><b>全自动回复的规则（都在设置里，括号内为默认值）</b></p>\n\n<p>| 选项 | 范围 / 说明 |</p>\n<p>|------|------|</p>\n<p>| 允许全自动回复（全局总闸） | 默认<b>关</b>。不开这个总闸，任何聊天的全自动都不会发消息 |</p>\n<p>| 一次发送条数 | 1–3 条（默认 1） |</p>\n<p>| 发送前等待 | 3–60 秒（默认 5）—— 这段是「可撤回窗口」，发出去之前还来得及拦 |</p>\n<p>| 同一聊天冷却 | 10–600 秒（默认 60） |</p>\n<p>| 每日上限 | 1–200 条 / 聊天（默认 20） |</p>\n<p>| 免打扰时段 | 如 23:00 – 07:30，留空即不限制 |</p>\n<p>| 群聊触发关键词 | 只在「只回@我」模式生效：@我 <b>或</b> 含关键词即回 |</p>\n<p>| 高级设置 · 上下文条数 | 5–100 条（默认 30） |</p>\n<p>| 高级设置 · 上下文预算 | 1000–48000 字（默认 8000） |</p>\n\n<p><b>其它</b></p>\n\n<li>**回复优选**：候选生成后由 JEV 再挑一次。自动模式发它选中的那条；手动模式在它选中的候选上标「⭐推荐 N%」，**位置不动**（只标记不重排，不打断你对「第几条」的记忆）。默认开，可关。</li>\n<li>**人设与风格**：可以手写人设（对 AI 优先级最高，例如「我妈，说话随意但要有分寸」）；也可以让 AI 从你在该会话的历史发言里总结一份「风格画像」并模仿你的说话方式，画像可手动修正，还能设置过期自动重新生成（默认关）。</li>\n<li>**锁屏补扫**：锁屏期间漏掉的消息，解锁后该聊天再收到新消息时会自动补分析。</li>\n<li>**自动回复打标**：自动发出的回复会在消息列表里插一行只有你自己可见的系统提示，方便事后区分哪些是 AI 发的（对方看不到）。</li>\n<li>**隐私**：所有 Key 与配置都存在本地；消息内容只会发给你自己填写的线路地址。不配 Key 就完全不发任何请求。</li>\n\n<h3>👥 联系人与群组（9 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 隐藏联系人 | 隐藏指定联系人，共 <b>22 处</b>不显示：首页对话列表、通讯录联系人/群聊列表、首页搜索、锁屏与摇一摇自动关闭聊天、朋友圈信息流与消息列表、共同好友动态下的内联点赞评论、联系人选择页、音视频通话与群通话（来电横幅 / 铃声 / 通知 / 通话记录）、新的朋友（列表 / 头像 / 红点）、桌面角标与底栏未读数、发现页「N 位朋友的新动态」、新消息通知（含微信在 push 进程直接弹出的轻量推送）、群聊内 @成员选择器、群成员列表、收藏列表、视频号点赞列表、全局搜索、通讯录底部「N 位联系人」计数、拍一拍消息、微信运动排行榜。<br>支持<b>定时显示 / 隐藏</b>（按每周重复或单次自动切换）；也可临时显示：输入 <code>#hide</code> 恢复隐藏，或连续三击主页标题栏切换。<br>⚠️ 三点须知：① 临时显示只恢复界面上的显示，<b>不恢复通知</b>；② 除拍一拍外都是「不显示」而非删除，取消隐藏后内容原样回来；③ <b>拍一拍是唯一破坏性的</b> —— 消息在写入数据库前就被取消，取消隐藏也找不回来。 |</p>\n<p>| 查看群成员消息历史 | 在联系人与群组详情页加一个入口，查看任意群成员的全部历史消息。 |</p>\n<p>| 检测单向删除好友 | 批量扫描全部好友，检测谁把你单向删除了；扫描结果可以新建标签标记，也可以批量删除（删除不可逆、会清空聊天记录）。⚠️ 可能触发账号异常，开启前二次确认。 |</p>\n<p>| 添加自动备注 | 加好友时按模板自动填写备注。备注格式与时间格式都可自定义，支持点击插入占位符。 |</p>\n<p>| 加入群聊自动免打扰 | 加入新群后自动打开该群的消息免打扰。 |</p>\n<p>| 查看群成员邀请者 | 群成员详情页加入口，查这个成员是谁邀请进群的；没有记录时会指明「可能是群主 / 前群主 / 早期成员」或「扫码、自行进群」。 |</p>\n<p>| 群成员行为监控 | 监控群成员<b>退群</b>与<b>修改群昵称</b>，并在群里插入一行绿色提示（改名会显示「旧 → 新」）。 |</p>\n<p>| 导出群成员 | 群资料页一键复制全部成员到剪贴板，<b>TSV 制表符分隔</b>，粘贴进 Excel / WPS 自动分列：群昵称 ｜ 昵称 ｜ 备注 ｜ 微信号 ｜ wxId ｜ 邀请人。首行表头，第二行汇总（成员数 / 时间 / 群 ID）；设群昵称的排前面，其余按昵称。邀请人列微信只给部分群记录，缺失显示 <code>—</code>；非好友成员以 wxId 兜底。数据全部来自本机数据库，不上传。 |</p>\n<p>| 显示微信 ID | 联系人 / 群组详情页显示微信号，点击可复制。 |</p>\n\n<h3>🧧 红包与支付（5 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 自动抢红包 | 监听到红包消息自动拆开，群聊与私聊可分别开关。⚠️ 可能触发账号异常，开启前二次确认。 |</p>\n<p>| 自动接收转账 | 监听到转账消息自动确认收款。⚠️ 可能触发账号异常，开启前二次确认。 |</p>\n<p>| 捡漏历史红包 | 在联系人与群组详情页加入口，批量扫描当前会话的历史红包并尝试领取（只扫 24 小时内的，更早的已过期）。可查看正在进行的任务、转后台运行或手动终止。 |</p>\n<p>| 红包页面详情 | 红包领取页显示更详细的领取情况（金额、数量、剩余、领取时间等）。 |</p>\n<p>| 允许领取私聊红包 | 允许打开私聊里自己发出的红包。⚠️ 可能导致发送红包时提示「请求不成功」。 |</p>\n\n<h3>📸 朋友圈（5 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 朋友圈防撤回 | 好友删掉的朋友圈仍然可以查看，并加上「[拦截删除]」标记。 |</p>\n<p>| 朋友圈评论防撤回 | 被删除的评论保留显示并加上标记。 |</p>\n<p>| 自动点赞 | 浏览朋友圈时自动点赞。支持按内容关键词包含 / 排除，也能分联系人单独设置。 |</p>\n<p>| 自动刷新 | 定时自动刷新朋友圈列表，刷新间隔（分钟）可调。 |</p>\n<p>| 拦截朋友圈广告 | 屏蔽朋友圈信息流里的广告。 |</p>\n\n<h3>📞 音视频通话（2 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 屏蔽铃声 | 屏蔽音视频通话铃声，呼出铃声与呼入铃声可分别开关。 |</p>\n<p>| 虚拟视频通话 | 视频通话时用本地视频或网络直播流（HTTP / HLS / RTSP）替换相机预览，可设竖屏 / 横屏 / 自动。没有选文件时会自动放行真实相机，不影响正常通话。 |</p>\n\n<h3>📱 小程序（6 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 伪装宿主版本 | 伪装微信版本号，解决提示「版本较低」而无法使用的小程序。 |</p>\n<p>| 去除菜单限制 | 解除小程序右上角菜单的限制。 |</p>\n<p>| 移除开屏广告 | 跳过小程序开屏广告。 |</p>\n<p>| 移除视频广告 | 跳过小程序视频广告。 |</p>\n<p>| 跳过激励广告 | 跳过小程序激励广告 —— 广告展示后立即视为看完并发放奖励。 |</p>\n<p>| 跳过启动页面 | 跳过小程序启动页面，变相去广告（实验性）。 |</p>\n\n<h3>📰 公众号（1 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 公众号去广告 | 清除公众号信息流中的广告内容（订阅号信息流 / 推荐流 / 聚合页的广告投放位）。 |</p>\n\n<h3>🔧 系统与隐私（15 项）</h3>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 清理缓存垃圾 | 自动或手动清理微信缓存，清理间隔可选 1 小时 / 4 小时 / 1 天；也可以点「立即清理」，清完会提示释放了多少空间。 |</p>\n<p>| 自动清理日志 | 定期清理模块自身的日志，保留天数可选 1 / 3 / 7 天；同样支持「立即清理」。 |</p>\n<p>| 自动批准设备登录 | 其他设备请求登录时自动勾选并确认。是否「同步最近的消息」、是否「自动登录该设备」两项各自可控。 |</p>\n<p>| 禁止屏幕高亮度 | 禁止微信把屏幕亮度调得过高。 |</p>\n<p>| 禁用微信热更新 | 禁止微信热更新，避免被强制更新到不兼容的版本。 |</p>\n<p>| 修复文件预览状态栏遮挡 | 把文件预览页的内容压到状态栏下方，修好右上角菜单被顶进状态栏、点不到的问题。 |</p>\n<p>| 强制平板模式 | 让微信把当前设备识别为平板。⚠️ 可能触发账号异常，开启前二次确认。 |</p>\n<p>| 隐藏模块应用 | 在不影响模块功能的前提下，防止微信查询本模块的安装状态（实验性）。 |</p>\n<p>| 省电模式 | 通过一些措施减少微信的耗电量。 |</p>\n<p>| 阻止微信清理模块数据 | 阻止微信「设置 → 存储空间 → 清理」把模块数据删掉。 |</p>\n<p>| 禁止微信检测 Xposed | 阻止微信检测 Xposed 环境。Google Play 版微信没有这项检测，开启可能导致闪退 —— 模块检测到这种版本会自动关闭该功能并提示。 |</p>\n<p>| 二维码扫描记录 | 记录扫过的二维码链接，可查看、复制、清空。 |</p>\n<p>| 去除文章广告 | 清除文章中的广告数据。 |</p>\n<p>| 移除二维码扫描限制 | 移除长按图片与从相册选图时的二维码扫描限制。 |</p>\n<p>| 恢复旧版「我」界面卡包 | 「我」界面用回旧版「卡包」，而不是「小店与卡包」。 |</p>\n\n<h3>🔌 常驻组件（无开关，自动生效）</h3>\n\n<p>| 组件 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 莫奈引擎 | 按「设置 → 自定义颜色 / 动态壁纸取色 / 种子颜色 / 调色板样式 / 颜色规格」里配好的配色，给微信原生组件上色（输入框、按钮、卡片、图标等）。<b>想让配色作用于微信本身，需要打开「设置 → 同时对微信生效」。</b> 它是常驻组件，本身没有开关。 |</p>\n<p>| 隐藏联系人通知抑制 | 被隐藏联系人的新消息通知在 push 进程里就被拦掉，避免\"界面藏了、通知还在弹\"。随「隐藏联系人」开关自动生效。 |</p>\n\n<h2>📥 安装</h2>\n\n<p>> ✅ <b>LSPosed 版本已可安装使用</b>（从 <a href=\"https://github.com/SymonChu/WeKite/releases\">Releases</a> 下载）。</p>\n\n<h3>方式一：LSPosed（Xposed 模式）</h3>\n\n<p><b>适用</b>：已安装 LSPosed 框架的设备</p>\n\n<li>安装 [LSPosed](https://github.com/LSPosed/LSPosed) 框架（Android 8.0+）</li>\n<li>从 [Releases](https://github.com/SymonChu/WeKite/releases) 下载 APK 并安装</li>\n<li>打开 LSPosed → 模块 → 启用 WeKite</li>\n<li>勾选作用域：**微✉️（com.tencent.mm）**</li>\n<li>完全退出微✉️并重新打开</li>\n\n<p><b>设置入口</b>：桌面 WeKite 图标，或 LSPosed 模块页点击 WeKite。</p>\n\n<p><b>注意事项</b>：</p>\n\n<li>支持微✉️ 8.0.65 ~ 8.0.76</li>\n<li>需在 LSPosed 中启用模块并勾选作用域，否则功能不生效</li>\n<li>部分功能修改微✉️界面，重启微✉️后生效</li>\n\n<h3>方式二：Zygisk（Magisk / KernelSU）</h3>\n\n<p><b>适用</b>：已 Root 且启用 Zygisk 的设备（Magisk 或 KernelSU）</p>\n\n<li>从 [Releases](https://github.com/SymonChu/WeKite/releases) 下载 `WeKite-*-release.zip`（Zygisk 模块包）</li>\n<li>在 Magisk / KernelSU 中刷入模块</li>\n<li>重启设备</li>\n<li>打开 Root 管理器中的 WeKite 模块 WebUI，为微✉️打开注入开关</li>\n\n<p><b>特点</b>：</p>\n\n<li>无需 Xposed 框架，Zygisk 原生注入</li>\n<li>KernelSU WebUI 管理注入目标</li>\n\n<h2>🛠 构建</h2>\n\n<h3>环境要求</h3>\n\n<p>| 工具 | 版本 |</p>\n<p>|------|------|</p>\n<p>| JDK | 21 |</p>\n<p>| Android SDK | 含 NDK |</p>\n<p>| Rust | nightly + Android targets |</p>\n\n<h3>构建命令</h3>\n\n<pre># 克隆（含子模块）\ngit clone https://github.com/SymonChu/WeKite.git --recursive\ncd WeKite\n\n# 构建 Xposed APK（release）\n./x build --release\n\n# 构建 Zygisk 模块\n./x zygisk build --apk-release --release</pre>\n\n<h3>产物位置</h3>\n\n<p>| 产物 | 路径 |</p>\n<p>|------|------|</p>\n<p>| Xposed APK | <code>app/build/outputs/apk/standard/release/</code> |</p>\n<p>| Zygisk 模块 | <code>wekite-zygisk/release/WeKite-*.zip</code> |</p>\n\n<h2>❓ 常见问题</h2>\n\n<p><b>Q: 安装后找不到设置入口？</b></p>\n<p>A: LSPosed 模式需在 LSPosed 中启用模块并勾选微✉️作用域；Zygisk 模式入口在 Root 管理器的模块 WebUI。两者入口不同，请确认你用的框架。</p>\n\n<p><b>Q: 功能开关打开了，但没效果？</b></p>\n<p>A: 依次检查：① LSPosed 里是否已启用模块并勾选了微✉️作用域；② 是否完全退出微✉️再重新打开（界面类功能基本都需要重启微信）；③ 该功能是否有额外前提 —— 例如「AI 聊天助手」需要先填接口地址与 Key，「自动回复」还需要打开全局总闸。</p>\n\n<p><b>Q: 支持国内版微✉️吗？</b></p>\n<p>A: 核心功能（Xposed 模式）支持 8.0.65~8.0.76 全部版本。</p>\n\n<p><b>Q: 会不会上传我的聊天记录？</b></p>\n<p>A: 不会。模块不联网上传任何数据。只有你自己开启的 AI 功能会发请求，且消息只会发往你在设置里填写的地址。</p>\n\n<p><b>Q: 这些功能会造成账号异常吗？</b></p>\n<p>A: 涉及账号风险的功能（自动抢红包、自动接收转账、强制平板模式、检测单向删除好友）第一次开启都会弹二次确认，请自行评估后使用。</p>\n\n<p><b>Q: 换设备 / 重装后怎么保住配置？</b></p>\n<p>A: 设置 Tab 里有「导出配置」与「导入配置」，也可以「清除配置」重来。</p>\n\n<p><b>Q: 出问题要提供什么信息？</b></p>\n<p>A: 设置 → 日志 Tab 里有「运行日志」与「崩溃日志」，可直接分享或另存；报问题时把日志一起附上。</p>\n\n<h2>📄 许可</h2>\n\n<p><a href=\"LICENSE\">GPL-3.0 License</a></p>\n\n<h2>🙏 致谢</h2>\n\n<li>[WeKit](https://github.com/Ujhhgtg/WeKit) — 上游项目</li>\n<li>[WeKit](https://github.com/cwuom/WeKit) — WeKit 原始上游</li>\n<li>[WechatMonet](https://github.com/SaiOogcn/WechatMonet) — Overlay 主题参考</li>\n<li>[WAuxiliary](https://github.com/HdShare/WAuxiliary_Public) · [QAuxiliary](https://github.com/cinit/QAuxiliary) · [FingerprintPay](https://github.com/eritpchy/FingerprintPay)</li>",
+  "homepageUrl": "https://github.com/SymonChu/WeKite",
+  "sourceUrl": "https://github.com/SymonChu/WeKite",
+  "url": "https://github.com/SymonChu/WeKite",
+  "latestRelease": {
+    "name": "v3.98",
+    "version": "v3.98",
+    "time": "2026-10-30T16:04:47Z",
+    "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.98/WeKite-1219-3.98-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.98",
+      "tagName": "v3.98",
+      "publishedAt": "2026-10-30T16:04:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.98/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1219-3.98-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.98/WeKite-1219-3.98-release.zip",
+          "size": 8987418,
+          "downloadCount": 4
+        },
+        {
+          "name": "WeKite-3.98-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.98/WeKite-3.98-standard-release.apk",
+          "size": 17467594,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v3.97",
+      "tagName": "v3.97",
+      "publishedAt": "2026-10-28T07:18:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.97/update.json",
+          "size": 44,
+          "downloadCount": 7
+        },
+        {
+          "name": "WeKite-1217-3.97-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.97/WeKite-1217-3.97-release.zip",
+          "size": 8988465,
+          "downloadCount": 17
+        },
+        {
+          "name": "WeKite-3.97-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.97/WeKite-3.97-standard-release.apk",
+          "size": 17466378,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v3.96",
+      "tagName": "v3.96",
+      "publishedAt": "2026-10-22T16:02:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.96/update.json",
+          "size": 51,
+          "downloadCount": 22
+        },
+        {
+          "name": "WeKite-1215-3.96-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.96/WeKite-1215-3.96-release.zip",
+          "size": 8987842,
+          "downloadCount": 38
+        },
+        {
+          "name": "WeKite-3.96-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.96/WeKite-3.96-standard-release.apk",
+          "size": 17468366,
+          "downloadCount": 46
+        }
+      ]
+    },
+    {
+      "name": "v3.95",
+      "tagName": "v3.95",
+      "publishedAt": "2026-10-22T15:10:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.95/update.json",
+          "size": 51,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-1212-3.95-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.95/WeKite-1212-3.95-release.zip",
+          "size": 8987691,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.95-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.95/WeKite-3.95-standard-release.apk",
+          "size": 17468370,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.94",
+      "tagName": "v3.94",
+      "publishedAt": "2026-10-22T14:20:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.94/update.json",
+          "size": 51,
+          "downloadCount": 5
+        },
+        {
+          "name": "WeKite-1209-3.94-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.94/WeKite-1209-3.94-release.zip",
+          "size": 8988410,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-3.94-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.94/WeKite-3.94-standard-release.apk",
+          "size": 17468382,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.93",
+      "tagName": "v3.93",
+      "publishedAt": "2026-10-22T02:51:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.93/update.json",
+          "size": 51,
+          "downloadCount": 5
+        },
+        {
+          "name": "WeKite-1207-3.93-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.93/WeKite-1207-3.93-release.zip",
+          "size": 8988426,
+          "downloadCount": 5
+        },
+        {
+          "name": "WeKite-3.93-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.93/WeKite-3.93-standard-release.apk",
+          "size": 17468534,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v3.91",
+      "tagName": "v3.91",
+      "publishedAt": "2026-10-22T01:54:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.91/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1203-3.91-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.91/WeKite-1203-3.91-release.zip",
+          "size": 8988223,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-3.91-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.91/WeKite-3.91-standard-release.apk",
+          "size": 17468366,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.90",
+      "tagName": "v3.90",
+      "publishedAt": "2026-10-22T00:43:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.90/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1201-3.90-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.90/WeKite-1201-3.90-release.zip",
+          "size": 8988279,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.90-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.90/WeKite-3.90-standard-release.apk",
+          "size": 17468478,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.89",
+      "tagName": "v3.89",
+      "publishedAt": "2026-10-21T15:30:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.89/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1199-3.89-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.89/WeKite-1199-3.89-release.zip",
+          "size": 8986734,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.89-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.89/WeKite-3.89-standard-release.apk",
+          "size": 17452094,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.88",
+      "tagName": "v3.88",
+      "publishedAt": "2026-10-21T12:31:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.88/update.json",
+          "size": 51,
+          "downloadCount": 5
+        },
+        {
+          "name": "WeKite-1198-3.88-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.88/WeKite-1198-3.88-release.zip",
+          "size": 8986071,
+          "downloadCount": 7
+        },
+        {
+          "name": "WeKite-3.88-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.88/WeKite-3.88-standard-release.apk",
+          "size": 17452094,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.87",
+      "tagName": "v3.87",
+      "publishedAt": "2026-10-21T11:50:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.87/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1197-3.87-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.87/WeKite-1197-3.87-release.zip",
+          "size": 8985948,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-3.87-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.87/WeKite-3.87-standard-release.apk",
+          "size": 17452094,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.86",
+      "tagName": "v3.86",
+      "publishedAt": "2026-10-21T08:24:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.86/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1196-3.86-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.86/WeKite-1196-3.86-release.zip",
+          "size": 8986034,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.86-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.86/WeKite-3.86-standard-release.apk",
+          "size": 17452094,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.85",
+      "tagName": "v3.85",
+      "publishedAt": "2026-10-21T06:57:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.85/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1195-3.85-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.85/WeKite-1195-3.85-release.zip",
+          "size": 8985077,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-3.85-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.85/WeKite-3.85-standard-release.apk",
+          "size": 17452098,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.84",
+      "tagName": "v3.84",
+      "publishedAt": "2026-10-21T03:51:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.84/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1188-3.84-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.84/WeKite-1188-3.84-release.zip",
+          "size": 8984257,
+          "downloadCount": 4
+        },
+        {
+          "name": "WeKite-3.84-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.84/WeKite-3.84-standard-release.apk",
+          "size": 17452094,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.83",
+      "tagName": "v3.83",
+      "publishedAt": "2026-10-21T00:17:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.83/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1186-3.83-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.83/WeKite-1186-3.83-release.zip",
+          "size": 8983721,
+          "downloadCount": 4
+        },
+        {
+          "name": "WeKite-3.83-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.83/WeKite-3.83-standard-release.apk",
+          "size": 17452486,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.82",
+      "tagName": "v3.82",
+      "publishedAt": "2026-10-18T09:04:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.82/update.json",
+          "size": 51,
+          "downloadCount": 7
+        },
+        {
+          "name": "WeKite-1184-3.82-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.82/WeKite-1184-3.82-release.zip",
+          "size": 8960692,
+          "downloadCount": 17
+        },
+        {
+          "name": "WeKite-3.82-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.82/WeKite-3.82-standard-release.apk",
+          "size": 17403154,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v3.81",
+      "tagName": "v3.81",
+      "publishedAt": "2026-10-15T08:28:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.81/update.json",
+          "size": 51,
+          "downloadCount": 10
+        },
+        {
+          "name": "WeKite-1182-3.81-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.81/WeKite-1182-3.81-release.zip",
+          "size": 8960842,
+          "downloadCount": 20
+        },
+        {
+          "name": "WeKite-3.81-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.81/WeKite-3.81-standard-release.apk",
+          "size": 17403094,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v3.80",
+      "tagName": "v3.80",
+      "publishedAt": "2026-10-15T06:03:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.80/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1180-3.80-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.80/WeKite-1180-3.80-release.zip",
+          "size": 8960353,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.80-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.80/WeKite-3.80-standard-release.apk",
+          "size": 17403094,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.79",
+      "tagName": "v3.79",
+      "publishedAt": "2026-10-15T05:12:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.79/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1178-3.79-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.79/WeKite-1178-3.79-release.zip",
+          "size": 8959960,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-3.79-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.79/WeKite-3.79-standard-release.apk",
+          "size": 17403098,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.78",
+      "tagName": "v3.78",
+      "publishedAt": "2026-10-14T22:55:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.78/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1176-3.78-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.78/WeKite-1176-3.78-release.zip",
+          "size": 8961769,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.78-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.78/WeKite-3.78-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.77",
+      "tagName": "v3.77",
+      "publishedAt": "2026-10-14T16:59:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.77/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1174-3.77-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.77/WeKite-1174-3.77-release.zip",
+          "size": 8961119,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-3.77-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.77/WeKite-3.77-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.76",
+      "tagName": "v3.76",
+      "publishedAt": "2026-10-14T13:56:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.76/update.json",
+          "size": 51,
+          "downloadCount": 3
+        },
+        {
+          "name": "WeKite-1170-3.76-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.76/WeKite-1170-3.76-release.zip",
+          "size": 8957723,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.76-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.76/WeKite-3.76-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.75",
+      "tagName": "v3.75",
+      "publishedAt": "2026-10-14T12:58:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.75/update.json",
+          "size": 44,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-1168-3.75-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.75/WeKite-1168-3.75-release.zip",
+          "size": 8960831,
+          "downloadCount": 4
+        },
+        {
+          "name": "WeKite-3.75-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.75/WeKite-3.75-standard-release.apk",
+          "size": 17403738,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.74",
+      "tagName": "v3.74",
+      "publishedAt": "2026-10-14T13:03:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.74/update.json",
+          "size": 44,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-1167-3.74-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.74/WeKite-1167-3.74-release.zip",
+          "size": 8960261,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.74-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.74/WeKite-3.74-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.73",
+      "tagName": "v3.73",
+      "publishedAt": "2026-10-14T13:03:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.73/update.json",
+          "size": 44,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-1166-3.73-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.73/WeKite-1166-3.73-release.zip",
+          "size": 8960121,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-3.73-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.73/WeKite-3.73-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.72",
+      "tagName": "v3.72",
+      "publishedAt": "2026-10-14T12:12:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.72/update.json",
+          "size": 44,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-1165-3.72-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.72/WeKite-1165-3.72-release.zip",
+          "size": 8960272,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.72-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.72/WeKite-3.72-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.71",
+      "tagName": "v3.71",
+      "publishedAt": "2026-10-14T08:18:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.71/update.json",
+          "size": 51,
+          "downloadCount": 6
+        },
+        {
+          "name": "WeKite-1163-3.71-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.71/WeKite-1163-3.71-release.zip",
+          "size": 8959784,
+          "downloadCount": 12
+        },
+        {
+          "name": "WeKite-3.71-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.71/WeKite-3.71-standard-release.apk",
+          "size": 17403730,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v3.69",
+      "tagName": "v3.69",
+      "publishedAt": "2026-10-14T07:01:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.69/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1159-3.69-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.69/WeKite-1159-3.69-release.zip",
+          "size": 8955759,
+          "downloadCount": 1
+        },
+        {
+          "name": "WeKite-3.69-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.69/WeKite-3.69-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.68",
+      "tagName": "v3.68",
+      "publishedAt": "2026-10-14T05:21:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.68/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1157-3.68-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.68/WeKite-1157-3.68-release.zip",
+          "size": 8956174,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.68-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.68/WeKite-3.68-standard-release.apk",
+          "size": 17403734,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.67",
+      "tagName": "v3.67",
+      "publishedAt": "2026-10-14T03:38:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.67/update.json",
+          "size": 51,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-1155-3.67-release.zip",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.67/WeKite-1155-3.67-release.zip",
+          "size": 8955935,
+          "downloadCount": 2
+        },
+        {
+          "name": "WeKite-3.67-standard-release.apk",
+          "downloadUrl": "https://github.com/SymonChu/WeKite/releases/download/v3.67/WeKite-3.67-standard-release.apk",
+          "size": 17403730,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

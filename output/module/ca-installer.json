@@ -1,0 +1,43 @@
+{
+  "readme": "# CA Installer\n\n将多种抓包软件的CA证书安装到系统中的 Magisk/KernelSU/APatch 模块。\n\n## 功能特性\n\n- 📦 **自动检测和安装证书**\n- 🔐 **系统级证书安装**\n- 📱 **Android 14+ 支持**\n- 🔄 **多框架兼容**\n- 🌍 **多语言支持**\n\n## 支持的应用\n\n- **UserCertificateInstaller** - Android 系统证书安装器\n- **Reqable** - 抓包软件\n- **HttpCanary** - 抓包软件\n- **ProxyPin** - 抓包软件\n\n## 安装 | Installation\n\n1. 下载最新的 Module.zip 文件\n2. 安装模块\n3. 重启设备\n\n## 工作原理 | How it Works\n\n1. 从各个软件的私有目录提取证书\n2. 通过 SystemCertificateName.dex 计算证书的系统证书名\n3. 挂载证书\n\n### 安装流程 | Installation Process\n\n1. **customize.sh** - 在安装过程中提取模块文件并查找已安装的证书\n2. **post-fs-data.sh** - 启动时检测新增的证书并挂载到系统证书目录\n3. **SystemCertificateName.dex** - 计算证书的 MD5 哈希值以确定正确的证书文件名\n\n### 证书命名 | Certificate Naming\n\n系统证书使用 OpenSSL 风格的命名规则：\n\n``` Name\n[HASH].0\n```\n\n其中 `[HASH]` 是证书 Subject Name 的 MD5 哈希值的前 4 字节（little-endian 编码）。\n\nCertName.java 程序计算这个哈希值，确保证书被正确识别。\n\n### Android 14+ 支持\n\n由于 Android 14+ 使用 APEX 模块来管理系统证书，Magisk 无法直接注入文件。本模块采用以下方案：\n\n1. 创建 tmpfs 临时挂载点\n2. 复制系统证书和模块证书到临时目录\n3. 将临时目录绑定挂载到 `/apex/com.android.conscrypt/cacerts`\n4. 为 zygote 进程应用同样的挂载\n\n## 文件结构 | File Structure\n\n``` shell:tree\n .\n├── CHANGELOG.md\n├── SystemCertificateName.java              # 证书哈希计算程序\n├── LICENSE\n├── Module\n│   ├── META-INF   # Magisk支持\n│   │   └── com\n│   │       └── google\n│   │           └── android\n│   │               ├── update-binary\n│   │               └── updater-script\n│   ├── customize.sh  # 安装脚本\n│   ├── module.prop  # 模块信息\n│   ├── post-fs-data.sh  # 启动时执行脚本\n│   ├── system\n│   │   └── etc\n│   │       └── security\n│   │           └── cacerts\n│   │               └── .keep\n│   └── verify.sh   # 验证模块完整性\n├── README.md\n└── make.py    # 构建脚本\n```\n\n## 文件说明 | File Descriptions\n\n### CertName.java\n\n计算证书的系统级文件名。使用 MD5 哈希算法计算证书 Subject Name 的哈希值，取前 4 字节作为十六进制文件名前缀。\n\n### make.py\n\n构建脚本，执行以下操作：\n\n- 编译 CertName.java 为 dex 文件\n- 为所有文件生成 SHA256 校验和\n- 打包整个模块为 ZIP 文件\n\n### customize.sh\n\nMagisk 安装脚本，负责：\n\n- 验证 ZIP 文件完整性\n- 提取模块文件\n- 查找并复制用户已安装的证书到模块目录\n\n### post-fs-data.sh\n\n启动脚本，负责：\n\n- 检测系统中的证书\n- 设置正确的 SELinux 上下文\n- 对于 Android 14+，挂载证书目录到 APEX 模块\n\n### .ca_inst_state.sh\n\n服务脚本，检查模块是否被禁用并更新模块状态描述。\n\n## 日志 | Logs\n\n安装后的日志可以在以下位置找到：\n\n``` File\n/data/adb/modules/CA-Installer/CustomCACert.log\n```\n\n使用 `adb shell` 查看日志：\n\n```bash\nadb shell cat /data/adb/modules/CA-Installer/CustomCACert.log\n```\n\n## 常见问题 | FAQ\n\n**Q: 模块安装后需要重启吗？**\nA: 是的，需要重启设备以使证书生效。\n\n**Q: 如何卸载模块？**\nA: 在 Magisk/KernelSU/APatch/MMRL 管理器中找到 CA Installer 模块，点击卸载即可。\n\n**Q: 为什么某个应用的证书没有被安装？**\nA: 确保应用已经安装并且证书已经导入到应用中。检查日志文件了解详细信息。\n\n**Q: 支持自定义证书吗？**\nA: 当前模块仅支持从特定应用中查找证书。如需添加其他应用，请修改 post-fs-data.sh 中的检查逻辑。\n\n**Q: 模块与其他 root 管理器兼容吗？**\nA: 支持 Magisk、KernelSU 和 APatch 三种框架。\n\n## 构建 | Building\n\n使用提供的 make.py 脚本构建模块：\n\n```bash\n# 需要 Java 8+ 和 Android SDK Build Tools\npython3 make.py\n```\n\n这将生成 `Module.zip` 文件。\n\n### 构建要求\n\n- Python 3\n- Java 8 或更高版本\n- Android SDK Build Tools（dx 工具）\n\n## 许可证 | License\n\n[GPLv3](./LICENSE)\n\n## 贡献者 | Contributors\n\n- **Twilight** - 原始作者\n- **Lan** - 当前维护者\n- **tg@Squarelan** - 修复了目录权限问题\n\n## 支持 | Support\n\n如果遇到问题，请：\n\n1. 检查 `/data/adb/modules/CA-Installer/CustomCACert.log` 日志文件\n2. 确保使用最新版本的模块\n3. 提供详细的错误信息和日志内容\n\n## 更新日志 | Changelog\n\n请看 [CHANGELOG.md](./CHANGELOG.md)\n\n---\n\n**最后更新** | Last Updated: 2026-01-07\n",
+  "readmeHTML": "<h1>CA Installer</h1>\n\n<p>将多种抓包软件的CA证书安装到系统中的 Magisk/KernelSU/APatch 模块。</p>\n\n<h2>功能特性</h2>\n\n<li>📦 **自动检测和安装证书**</li>\n<li>🔐 **系统级证书安装**</li>\n<li>📱 **Android 14+ 支持**</li>\n<li>🔄 **多框架兼容**</li>\n<li>🌍 **多语言支持**</li>\n\n<h2>支持的应用</h2>\n\n<li>**UserCertificateInstaller** - Android 系统证书安装器</li>\n<li>**Reqable** - 抓包软件</li>\n<li>**HttpCanary** - 抓包软件</li>\n<li>**ProxyPin** - 抓包软件</li>\n\n<h2>安装 | Installation</h2>\n\n<li>下载最新的 Module.zip 文件</li>\n<li>安装模块</li>\n<li>重启设备</li>\n\n<h2>工作原理 | How it Works</h2>\n\n<li>从各个软件的私有目录提取证书</li>\n<li>通过 SystemCertificateName.dex 计算证书的系统证书名</li>\n<li>挂载证书</li>\n\n<h3>安装流程 | Installation Process</h3>\n\n<li>**customize.sh** - 在安装过程中提取模块文件并查找已安装的证书</li>\n<li>**post-fs-data.sh** - 启动时检测新增的证书并挂载到系统证书目录</li>\n<li>**SystemCertificateName.dex** - 计算证书的 MD5 哈希值以确定正确的证书文件名</li>\n\n<h3>证书命名 | Certificate Naming</h3>\n\n<p>系统证书使用 OpenSSL 风格的命名规则：</p>\n\n<pre>[HASH].0</pre>\n\n<p>其中 <code>[HASH]</code> 是证书 Subject Name 的 MD5 哈希值的前 4 字节（little-endian 编码）。</p>\n\n<p>CertName.java 程序计算这个哈希值，确保证书被正确识别。</p>\n\n<h3>Android 14+ 支持</h3>\n\n<p>由于 Android 14+ 使用 APEX 模块来管理系统证书，Magisk 无法直接注入文件。本模块采用以下方案：</p>\n\n<li>创建 tmpfs 临时挂载点</li>\n<li>复制系统证书和模块证书到临时目录</li>\n<li>将临时目录绑定挂载到 `/apex/com.android.conscrypt/cacerts`</li>\n<li>为 zygote 进程应用同样的挂载</li>\n\n<h2>文件结构 | File Structure</h2>\n\n<pre> .\n├── CHANGELOG.md\n├── SystemCertificateName.java              # 证书哈希计算程序\n├── LICENSE\n├── Module\n│   ├── META-INF   # Magisk支持\n│   │   └── com\n│   │       └── google\n│   │           └── android\n│   │               ├── update-binary\n│   │               └── updater-script\n│   ├── customize.sh  # 安装脚本\n│   ├── module.prop  # 模块信息\n│   ├── post-fs-data.sh  # 启动时执行脚本\n│   ├── system\n│   │   └── etc\n│   │       └── security\n│   │           └── cacerts\n│   │               └── .keep\n│   └── verify.sh   # 验证模块完整性\n├── README.md\n└── make.py    # 构建脚本</pre>\n\n<h2>文件说明 | File Descriptions</h2>\n\n<h3>CertName.java</h3>\n\n<p>计算证书的系统级文件名。使用 MD5 哈希算法计算证书 Subject Name 的哈希值，取前 4 字节作为十六进制文件名前缀。</p>\n\n<h3>make.py</h3>\n\n<p>构建脚本，执行以下操作：</p>\n\n<li>编译 CertName.java 为 dex 文件</li>\n<li>为所有文件生成 SHA256 校验和</li>\n<li>打包整个模块为 ZIP 文件</li>\n\n<h3>customize.sh</h3>\n\n<p>Magisk 安装脚本，负责：</p>\n\n<li>验证 ZIP 文件完整性</li>\n<li>提取模块文件</li>\n<li>查找并复制用户已安装的证书到模块目录</li>\n\n<h3>post-fs-data.sh</h3>\n\n<p>启动脚本，负责：</p>\n\n<li>检测系统中的证书</li>\n<li>设置正确的 SELinux 上下文</li>\n<li>对于 Android 14+，挂载证书目录到 APEX 模块</li>\n\n<h3>.ca_inst_state.sh</h3>\n\n<p>服务脚本，检查模块是否被禁用并更新模块状态描述。</p>\n\n<h2>日志 | Logs</h2>\n\n<p>安装后的日志可以在以下位置找到：</p>\n\n<pre>/data/adb/modules/CA-Installer/CustomCACert.log</pre>\n\n<p>使用 <code>adb shell</code> 查看日志：</p>\n\n<pre>adb shell cat /data/adb/modules/CA-Installer/CustomCACert.log</pre>\n\n<h2>常见问题 | FAQ</h2>\n\n<p><b>Q: 模块安装后需要重启吗？</b></p>\n<p>A: 是的，需要重启设备以使证书生效。</p>\n\n<p><b>Q: 如何卸载模块？</b></p>\n<p>A: 在 Magisk/KernelSU/APatch/MMRL 管理器中找到 CA Installer 模块，点击卸载即可。</p>\n\n<p><b>Q: 为什么某个应用的证书没有被安装？</b></p>\n<p>A: 确保应用已经安装并且证书已经导入到应用中。检查日志文件了解详细信息。</p>\n\n<p><b>Q: 支持自定义证书吗？</b></p>\n<p>A: 当前模块仅支持从特定应用中查找证书。如需添加其他应用，请修改 post-fs-data.sh 中的检查逻辑。</p>\n\n<p><b>Q: 模块与其他 root 管理器兼容吗？</b></p>\n<p>A: 支持 Magisk、KernelSU 和 APatch 三种框架。</p>\n\n<h2>构建 | Building</h2>\n\n<p>使用提供的 make.py 脚本构建模块：</p>\n\n<pre># 需要 Java 8+ 和 Android SDK Build Tools\npython3 make.py</pre>\n\n<p>这将生成 <code>Module.zip</code> 文件。</p>\n\n<h3>构建要求</h3>\n\n<li>Python 3</li>\n<li>Java 8 或更高版本</li>\n<li>Android SDK Build Tools（dx 工具）</li>\n\n<h2>许可证 | License</h2>\n\n<p><a href=\"./LICENSE\">GPLv3</a></p>\n\n<h2>贡献者 | Contributors</h2>\n\n<li>**Twilight** - 原始作者</li>\n<li>**Lan** - 当前维护者</li>\n<li>**tg@Squarelan** - 修复了目录权限问题</li>\n\n<h2>支持 | Support</h2>\n\n<p>如果遇到问题，请：</p>\n\n<li>检查 `/data/adb/modules/CA-Installer/CustomCACert.log` 日志文件</li>\n<li>确保使用最新版本的模块</li>\n<li>提供详细的错误信息和日志内容</li>\n\n<h2>更新日志 | Changelog</h2>\n\n<p>请看 <a href=\"./CHANGELOG.md\">CHANGELOG.md</a></p>\n\n<p>---</p>\n\n<p><b>最后更新</b> | Last Updated: 2026-01-07</p>",
+  "homepageUrl": "https://github.com/FRBLanApps/CA-Installer",
+  "sourceUrl": "https://github.com/FRBLanApps/CA-Installer",
+  "url": "https://github.com/FRBLanApps/CA-Installer",
+  "latestRelease": {
+    "name": "v1.6.0",
+    "version": "v1.6.0",
+    "time": "2025-10-28T01:56:59Z",
+    "downloadUrl": "https://github.com/FRBLanApps/CA-Installer/releases/download/v1.6.0/Module.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2025-10-28T01:56:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Module.zip",
+          "downloadUrl": "https://github.com/FRBLanApps/CA-Installer/releases/download/v1.6.0/Module.zip",
+          "size": 9000,
+          "downloadCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2025-10-10T14:15:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CA-Installer-v1.5-stable.zip",
+          "downloadUrl": "https://github.com/FRBLanApps/CA-Installer/releases/download/v1.5.0/CA-Installer-v1.5-stable.zip",
+          "size": 8880,
+          "downloadCount": 224
+        }
+      ]
+    }
+  ]
+}

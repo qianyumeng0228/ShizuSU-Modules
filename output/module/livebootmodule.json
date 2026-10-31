@@ -1,0 +1,323 @@
+{
+  "readme": "# LiveBoot Magisk & KernelSU & APatch Module\n\n## Description\n\n- A Magisk, KernelSU and APatch module that enables unix-style (verbose) boot animation for Android devices\n- Magisk, KernelSU and APatch module of [Chainfire](https://github.com/Chainfire)'s [LiveBoot](https://github.com/Chainfire/liveboot) app without any app or UI\n\nPreview: https://www.youtube.com/watch?v=N0tqzVWxpJk\n\n## Supported devices & ROMs\n\nIt has been successfully tested on many Android 16, 15, 14, 13 and 12 based ROMs. Should work all rooted devices via Magisk, KernelSU and APatch.\n\n## Download\n\n[Releases](https://github.com/symbuzzer/livebootmodule/releases)\n\n## Changelog\n\n[CHANGELOG.md](https://github.com/symbuzzer/livebootmodule/blob/main/CHANGELOG.md)\n\n## LiveBoot Customization Guide\n\n> [!NOTE]\n> `loader.sh`, `config` and `liveboot.apk` are in the directory `/data/adb/modules/livebootmagisk`.\n\n1. Open `config` file using a text editor.\n2. Modify the settings as per your requirements (listed below). **⚠️Warning: don't add anything else (even a comment line) to the file!⚠️**\n3. Save the files and reboot your device to apply the changes.\n\n#### Manual Customization Options\n\n- Background colors: ` ` (no character, it's the default LiveBoot app's gray-ish background color), `dark`, `transparent`\n- Logcat levels: `V` (Verbose), `D` (Debug), `I` (Info), `W` (Warning), `E` (Error), `F` (Fatal), `S` (Silent)\n- Logcat buffers: `M` (Main), `S` (System), `R` (Radio), `E` (Events), `C` (Crash)\n- Logcat formats: `brief`, `process`, `tag`, `thread`, `time`, `threadtime`\n- Logcat colors: `colors`, `logcatnocolors`\n- DMESG: `0--1` (off), `0-99` (on)\n- Lines: any value you want\n- Wordwrap: `wordwrap`, ` ` (no character)\n- Save logs: `save` (saves log in `/data/cache`, just like in the app), ` ` (no character)\n- Suicide delay: wait this many milliseconds before LiveBoot exits after boot is considered complete. Useful to cover black gaps after the stock boot animation disappears. 0 disables\n- Fallback width and fallback height: usually your device's screen resolution, but you can put other values to spoof another screen size\n\n#### Example Configuration\n\n```sh\ntransparent\nlogcatlevels=VDIWEFS\nlogcatbuffers=MSREC\nlogcatformat=threadtime\ncolors\ndmesg=0-99\nlines=80\nwordwrap\nsave\nsuicidedelay=0\nfallbackwidth=1080\nfallbackheight=2340\n```\n\n## Licenses\n\n- loader.sh (originally 0000liveboot), liveboot.apk, libdaemonize.so files* are licensed under the [GPLv3](https://github.com/Chainfire/liveboot/blob/master/LICENSE) by [Jorrit \"Chainfire\" Jongma](https://github.com/Chainfire).\n- For detailed licenses: [COPYING](https://github.com/Chainfire/liveboot/blob/master/COPYING), [LICENSE](https://github.com/Chainfire/liveboot/blob/master/LICENSE)\n- Other parts of this project are licensed under [GPLv3](https://github.com/symbuzzer/livebootmagisk/blob/main/LICENSE) too.\n\n**Source: https://github.com/Chainfire/liveboot/tree/master/liveBootAni2/src/main/java/eu/chainfire/liveboot*\n",
+  "readmeHTML": "<h1>LiveBoot Magisk & KernelSU & APatch Module</h1>\n\n<h2>Description</h2>\n\n<li>A Magisk, KernelSU and APatch module that enables unix-style (verbose) boot animation for Android devices</li>\n<li>Magisk, KernelSU and APatch module of [Chainfire](https://github.com/Chainfire)'s [LiveBoot](https://github.com/Chainfire/liveboot) app without any app or UI</li>\n\n<p>Preview: https://www.youtube.com/watch?v=N0tqzVWxpJk</p>\n\n<h2>Supported devices & ROMs</h2>\n\n<p>It has been successfully tested on many Android 16, 15, 14, 13 and 12 based ROMs. Should work all rooted devices via Magisk, KernelSU and APatch.</p>\n\n<h2>Download</h2>\n\n<p><a href=\"https://github.com/symbuzzer/livebootmodule/releases\">Releases</a></p>\n\n<h2>Changelog</h2>\n\n<p><a href=\"https://github.com/symbuzzer/livebootmodule/blob/main/CHANGELOG.md\">CHANGELOG.md</a></p>\n\n<h2>LiveBoot Customization Guide</h2>\n\n<p>> [!NOTE]</p>\n<p>> <code>loader.sh</code>, <code>config</code> and <code>liveboot.apk</code> are in the directory <code>/data/adb/modules/livebootmagisk</code>.</p>\n\n<li>Open `config` file using a text editor.</li>\n<li>Modify the settings as per your requirements (listed below). **⚠️Warning: don't add anything else (even a comment line) to the file!⚠️**</li>\n<li>Save the files and reboot your device to apply the changes.</li>\n\n<p>#### Manual Customization Options</p>\n\n<li>Background colors: ` ` (no character, it's the default LiveBoot app's gray-ish background color), `dark`, `transparent`</li>\n<li>Logcat levels: `V` (Verbose), `D` (Debug), `I` (Info), `W` (Warning), `E` (Error), `F` (Fatal), `S` (Silent)</li>\n<li>Logcat buffers: `M` (Main), `S` (System), `R` (Radio), `E` (Events), `C` (Crash)</li>\n<li>Logcat formats: `brief`, `process`, `tag`, `thread`, `time`, `threadtime`</li>\n<li>Logcat colors: `colors`, `logcatnocolors`</li>\n<li>DMESG: `0--1` (off), `0-99` (on)</li>\n<li>Lines: any value you want</li>\n<li>Wordwrap: `wordwrap`, ` ` (no character)</li>\n<li>Save logs: `save` (saves log in `/data/cache`, just like in the app), ` ` (no character)</li>\n<li>Suicide delay: wait this many milliseconds before LiveBoot exits after boot is considered complete. Useful to cover black gaps after the stock boot animation disappears. 0 disables</li>\n<li>Fallback width and fallback height: usually your device's screen resolution, but you can put other values to spoof another screen size</li>\n\n<p>#### Example Configuration</p>\n\n<pre>transparent\nlogcatlevels=VDIWEFS\nlogcatbuffers=MSREC\nlogcatformat=threadtime\ncolors\ndmesg=0-99\nlines=80\nwordwrap\nsave\nsuicidedelay=0\nfallbackwidth=1080\nfallbackheight=2340</pre>\n\n<h2>Licenses</h2>\n\n<li>loader.sh (originally 0000liveboot), liveboot.apk, libdaemonize.so files* are licensed under the [GPLv3](https://github.com/Chainfire/liveboot/blob/master/LICENSE) by [Jorrit \"Chainfire\" Jongma](https://github.com/Chainfire).</li>\n<li>For detailed licenses: [COPYING](https://github.com/Chainfire/liveboot/blob/master/COPYING), [LICENSE](https://github.com/Chainfire/liveboot/blob/master/LICENSE)</li>\n<li>Other parts of this project are licensed under [GPLv3](https://github.com/symbuzzer/livebootmagisk/blob/main/LICENSE) too.</li>\n\n<p>**Source: https://github.com/Chainfire/liveboot/tree/master/liveBootAni2/src/main/java/eu/chainfire/liveboot*</p>",
+  "homepageUrl": "https://github.com/symbuzzer/livebootmodule",
+  "sourceUrl": "https://github.com/symbuzzer/livebootmodule",
+  "url": "https://github.com/symbuzzer/livebootmodule",
+  "latestRelease": {
+    "name": "v6.0.1",
+    "version": "v6.0.1",
+    "time": "2026-09-03T09:57:00Z",
+    "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v6.0.1/livebootmodule.zip"
+  },
+  "releases": [
+    {
+      "name": "v6.0.1",
+      "tagName": "v6.0.1",
+      "publishedAt": "2026-09-03T09:57:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v6.0.1/livebootmodule.zip",
+          "size": 2253060,
+          "downloadCount": 4518
+        }
+      ]
+    },
+    {
+      "name": "v6.0.0",
+      "tagName": "v6.0.0",
+      "publishedAt": "2026-08-31T10:10:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v6.0.0/livebootmodule.zip",
+          "size": 2251965,
+          "downloadCount": 447
+        }
+      ]
+    },
+    {
+      "name": "v5.0.0",
+      "tagName": "v5.0.0",
+      "publishedAt": "2025-07-13T15:36:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v5.0.0/livebootmodule.zip",
+          "size": 497217,
+          "downloadCount": 15264
+        }
+      ]
+    },
+    {
+      "name": "v4.0.0",
+      "tagName": "v4.0.0",
+      "publishedAt": "2025-04-10T10:34:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v4.0.0/livebootmodule.zip",
+          "size": 501367,
+          "downloadCount": 2836
+        }
+      ]
+    },
+    {
+      "name": "v3.0.3",
+      "tagName": "v3.0.3",
+      "publishedAt": "2024-09-21T12:33:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v3.0.3/livebootmodule.zip",
+          "size": 511964,
+          "downloadCount": 4985
+        }
+      ]
+    },
+    {
+      "name": "v3.0.2",
+      "tagName": "v3.0.2",
+      "publishedAt": "2024-09-06T16:24:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v3.0.2/livebootmodule.zip",
+          "size": 506527,
+          "downloadCount": 1041
+        }
+      ]
+    },
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2024-09-06T06:43:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v3.0.1/livebootmodule.zip",
+          "size": 506504,
+          "downloadCount": 101
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2024-09-05T06:16:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v3.0.0/livebootmodule.zip",
+          "size": 505541,
+          "downloadCount": 184
+        }
+      ]
+    },
+    {
+      "name": "v2.0.4",
+      "tagName": "v2.0.4",
+      "publishedAt": "2024-08-31T05:29:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v2.0.4/livebootmodule.zip",
+          "size": 501282,
+          "downloadCount": 393
+        }
+      ]
+    },
+    {
+      "name": "v2.0.3",
+      "tagName": "v2.0.3",
+      "publishedAt": "2024-08-30T18:38:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v2.0.3/livebootmodule.zip",
+          "size": 500249,
+          "downloadCount": 79
+        }
+      ]
+    },
+    {
+      "name": "v2.0.2",
+      "tagName": "v2.0.2",
+      "publishedAt": "2024-04-15T11:43:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v2.0.2/livebootmodule.zip",
+          "size": 500199,
+          "downloadCount": 2371
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2024-03-18T13:01:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v2.0.1/livebootmodule.zip",
+          "size": 500150,
+          "downloadCount": 44
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2024-03-16T09:03:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v2.0.0/livebootmodule.zip",
+          "size": 499610,
+          "downloadCount": 127
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2024-03-15T12:20:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.1.2/livebootmodule.zip",
+          "size": 192897,
+          "downloadCount": 870
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2023-08-04T19:25:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.1.1/livebootmodule.zip",
+          "size": 192816,
+          "downloadCount": 1103
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2023-07-31T06:46:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmodule.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.1.0/livebootmodule.zip",
+          "size": 192766,
+          "downloadCount": 64
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2023-07-22T16:50:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.6/livebootmagisk.zip",
+          "size": 192731,
+          "downloadCount": 90
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2023-07-21T06:30:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.4/livebootmagisk.zip",
+          "size": 192666,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2023-06-27T07:10:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.3/livebootmagisk.zip",
+          "size": 192614,
+          "downloadCount": 139
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2023-05-21T08:20:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.2/livebootmagisk.zip",
+          "size": 192545,
+          "downloadCount": 160
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2023-05-09T06:20:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.1/livebootmagisk.zip",
+          "size": 192393,
+          "downloadCount": 66
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2023-05-08T16:46:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livebootmagisk.zip",
+          "downloadUrl": "https://github.com/symbuzzer/livebootmodule/releases/download/v1.0.0/livebootmagisk.zip",
+          "size": 192187,
+          "downloadCount": 48
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "readme": "# GlibClaw\n\nA Magisk/KernelSU module that installs [OpenClaw](https://openclaw.ai) on Android (aarch64) using a bundled glibc runtime.\n\n## What's New in v1.0.2\n\n- **No more heavy Node.js bundle!** — Downloads Node.js directly from [nodejs.org](https://nodejs.org) during flash\n- **Action button starts gateway** — Press Action in Magisk/KSU to start OpenClaw + open dashboard in one tap\n\n## Screenshots\n\n<table>\n  <tr>\n    <td width=\"50%\">\n      <img src=\"images/1.jpg\" alt=\"OpenClaw Terminal\">\n      <p align=\"center\"><b>Terminal Interface</b></p>\n    </td>\n    <td width=\"50%\">\n      <img src=\"images/2.jpg\" alt=\"OpenClaw Dashboard\">\n      <p align=\"center\"><b>Dashboard</b></p>\n    </td>\n  </tr>\n</table>\n\n## Requirements\n\n- Android device with root access (Magisk or KernelSU)\n- Architecture: **aarch64 only**\n- Internet connection required during flash\n\n## Installation\n\n1. Download `GlibClaw-v1.0.2.zip`\n2. Flash via Magisk / KernelSU\n3. Reboot\n\n## Setup\n\nAfter reboot, open a root terminal (via [Termux](https://github.com/termux/termux-app/releases/download/v0.119.0-beta.3/termux-app_v0.119.0-beta.3+apt-android-7-github-debug_arm64-v8a.apk)) and run:\n\n### Configure OpenClaw\n\n```sh\nsu -c /data/adb/openclaw/bin/openclaw configure\n```\n\n### Check Status\n\n```sh\nsu -c /data/adb/openclaw/bin/openclaw status\n```\n\n### View Logs\n\n```sh\nsu -c tail -f /data/adb/openclaw/openclaw.log\n```\n\n## Directory Layout\n\nAfter install, OpenClaw lives at:\n\n```\n/data/adb/openclaw/\n├── bin/openclaw          # main wrapper\n├── glibc-node/           # bundled Node.js runtime\n├── lib/node_modules/     # OpenClaw package\n└── home/.openclaw/       # user config & workspace\n```\n\n## Using the Action Button\n\nIf OpenClaw stops running (e.g. after crash), tap **Action** in Magisk or KernelSU Manager:\n1. It checks if the gateway is alive — starts it if not\n2. Opens the dashboard in your browser\n\n## Uninstall\n\nRemove the module from Magisk/KernelSU app. User data at `/data/adb/openclaw/home` is preserved.\n\n## License\n\nMIT © TDat\n",
+  "readmeHTML": "<h1>GlibClaw</h1>\n\n<p>A Magisk/KernelSU module that installs <a href=\"https://openclaw.ai\">OpenClaw</a> on Android (aarch64) using a bundled glibc runtime.</p>\n\n<h2>What's New in v1.0.2</h2>\n\n<li>**No more heavy Node.js bundle!** — Downloads Node.js directly from [nodejs.org](https://nodejs.org) during flash</li>\n<li>**Action button starts gateway** — Press Action in Magisk/KSU to start OpenClaw + open dashboard in one tap</li>\n\n<h2>Screenshots</h2>\n\n<p><table></p>\n<p>  <tr></p>\n<p>    <td width=\"50%\"></p>\n<p>      <img src=\"images/1.jpg\" alt=\"OpenClaw Terminal\"></p>\n<p>      <p align=\"center\"><b>Terminal Interface</b></p></p>\n<p>    </td></p>\n<p>    <td width=\"50%\"></p>\n<p>      <img src=\"images/2.jpg\" alt=\"OpenClaw Dashboard\"></p>\n<p>      <p align=\"center\"><b>Dashboard</b></p></p>\n<p>    </td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<h2>Requirements</h2>\n\n<li>Android device with root access (Magisk or KernelSU)</li>\n<li>Architecture: **aarch64 only**</li>\n<li>Internet connection required during flash</li>\n\n<h2>Installation</h2>\n\n<li>Download `GlibClaw-v1.0.2.zip`</li>\n<li>Flash via Magisk / KernelSU</li>\n<li>Reboot</li>\n\n<h2>Setup</h2>\n\n<p>After reboot, open a root terminal (via <a href=\"https://github.com/termux/termux-app/releases/download/v0.119.0-beta.3/termux-app_v0.119.0-beta.3+apt-android-7-github-debug_arm64-v8a.apk\">Termux</a>) and run:</p>\n\n<h3>Configure OpenClaw</h3>\n\n<pre>su -c /data/adb/openclaw/bin/openclaw configure</pre>\n\n<h3>Check Status</h3>\n\n<pre>su -c /data/adb/openclaw/bin/openclaw status</pre>\n\n<h3>View Logs</h3>\n\n<pre>su -c tail -f /data/adb/openclaw/openclaw.log</pre>\n\n<h2>Directory Layout</h2>\n\n<p>After install, OpenClaw lives at:</p>\n\n<pre>/data/adb/openclaw/\n├── bin/openclaw          # main wrapper\n├── glibc-node/           # bundled Node.js runtime\n├── lib/node_modules/     # OpenClaw package\n└── home/.openclaw/       # user config &amp; workspace</pre>\n\n<h2>Using the Action Button</h2>\n\n<p>If OpenClaw stops running (e.g. after crash), tap <b>Action</b> in Magisk or KernelSU Manager:</p>\n<li>It checks if the gateway is alive — starts it if not</li>\n<li>Opens the dashboard in your browser</li>\n\n<h2>Uninstall</h2>\n\n<p>Remove the module from Magisk/KernelSU app. User data at <code>/data/adb/openclaw/home</code> is preserved.</p>\n\n<h2>License</h2>\n\n<p>MIT © TDat</p>",
+  "homepageUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw",
+  "sourceUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw",
+  "url": "https://github.com/dat-hoangnguyentuandat/GlibClaw",
+  "latestRelease": {
+    "name": "v1.0.2",
+    "version": "v1.0.2",
+    "time": "2026-05-04T09:59:36Z",
+    "downloadUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw/releases/download/v1.0.2/GlibClaw-v1.0.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-05-04T09:59:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlibClaw-v1.0.2.zip",
+          "downloadUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw/releases/download/v1.0.2/GlibClaw-v1.0.2.zip",
+          "size": 7250623,
+          "downloadCount": 82
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-04-11T02:47:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlibClaw-online-v1.0.1.zip",
+          "downloadUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw/releases/download/v1.0.1/GlibClaw-online-v1.0.1.zip",
+          "size": 35946118,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-04-10T09:58:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "GlibClaw-offline-v1.0.0.zip",
+          "downloadUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw/releases/download/v1.0.0/GlibClaw-offline-v1.0.0.zip",
+          "size": 226281355,
+          "downloadCount": 11
+        },
+        {
+          "name": "GlibClaw-online-v1.0.0.zip",
+          "downloadUrl": "https://github.com/dat-hoangnguyentuandat/GlibClaw/releases/download/v1.0.0/GlibClaw-online-v1.0.0.zip",
+          "size": 35360759,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

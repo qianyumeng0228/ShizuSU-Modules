@@ -1,0 +1,143 @@
+{
+  "readme": "<h2 align=\"center\">Zygisk NoHello</h2>\n<p align=\"center\">\n  A Zygisk module to hide root.\n  </br>\n  </br>\n  <a href=\"https://github.com/MhmRdd/NoHello/actions/workflows/build.yml\">\n    <img src=\"https://github.com/MhmRdd/Il2Dump/actions/workflows/build.yml/badge.svg?branch=master\" alt=\"Android CI status\">\n  </a>\n  <a href=\"https://opensource.org/licenses/MIT\">\n    <img src=\"https://img.shields.io/badge/License-MIT-yellow.svg\" alt=\"License: MIT\">\n  </a>\n  </br>\n  <a href=\"https://github.com/MhmRdd/NoHello/issues\">Report Bug</a>\n    ·\n  <a href=\"https://github.com/MhmRdd/NoHello/issues\">Request Feature</a>\n    ·\n  <a href=\"https://github.com/MhmRdd/NoHello/releases\">Latest Release</a>\n</p>\n\n> [!NOTE]\n> This module currently focuses to hide root & zygisk from apps.\n> Updates will gradually implements changes and fixes.\n\n## About The Project\n\nUsing the **release** build is recommended over the debug build. Only use debug builds if you are going to make a bug report.\n\n## Usage\n\n### KernelSU & KernelSU Next users:\n1. Install ZygiskNext or ReZygisk.\n2. Make sure the unmount setting is enabled for the target app in the Manager.\n3. Disable Umount modules in settings for Manager (if exists).\n4. Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one.\n\n### APatch users:\n1. Install ZygiskNext or ReZygisk.\n2. Make sure the unmount setting is enabled for the target app in the Manager.\n3. Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one.\n\n### Magisk users:\n1. Update your Magisk to 28.0 or newer for better hiding capabilities. (optional)\n2. Turn on Zygisk in Magisk settings (unrecommended) or install ZygiskNext/ReZygisk.\n3. Turn off `Enforce DenyList` in Magisk settings.\n4. Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one. (if installed)\n5. Add the target app to the deny list unless you're using a Magisk fork with a white list instead.\n\n## Whitelisting (0.0.4+)\nYou can set the working mode to **whitelist** (instead of the default **blacklist**) by creating an empty regular file `/data/adb/nohello/whitelist`.\n>[!WARNING]\n> Using **Mount Rule System** with **whitelist**, can cause severe overheating & performance issues, due to how MRS being evaluated each time a process spawns.\n\nThis can be solved if you make NoHello evaluates Mount Rule System per boot/companion instance, by creating an empty regular file `/data/adb/nohello/umount_persist`/`data/adb/nohello/umount_persists`\n\n## Mount Rule System\n\n**Since version 0.0.5**, NoHello introduces **Mount Rule System**.</br>\nThis allows users to define **rules** that control how mount points are evaluated for **auto-unmounting**.</br>\nRules are fully configurable and match based on mount point properties like root path, mount path, filesystem type, or source.</br>\n**MountRules** can be customized via `/data/adb/nohello/umount`.\n\n### Rule Format\n\nA rule is made up of **sections**, each consisting of a **keyword**, followed by a list of values enclosed in `{}`:\n\n```\n<keyword> { <value1> <value2> ... }\n```\n\nValid **keywords** are:\n\n| Keyword  | Matches against         | Supports Wildcards                                       | Description |\n|----------|-------------------------|----------------------------------------------------------|-------------|\n| `root`   | Root path of the mount  | Yes (`*`, escape by `\\*`)                                | Root of the mount in `/proc/self/mountinfo` |\n| `point`  | Mount point path        | Yes (`*`, escape by `\\*` only at the beginning & ending) | Where the filesystem is mounted |\n| `fs`     | Filesystem type         | No                                                       | Matches exact filesystem type, e.g. `ext4`, `erofs`, etc |\n| `source` | Source device or file   | Yes (`*`, escape by `\\*`)                                | e.g., `/dev/block/xyz`, `magisk`, etc |\n\n### Example Rules\n\n#### Match all `tmpfs` filesystems mounted under `/data/adb`:\n```\nfs { \"tmpfs\" } point { \"/data/adb/*\" }\n```\n\n#### Match anything mounted from a `tmpfs` source:\n```\nsource { \"tmpfs\" }\n```\n\n#### Match a specific mount path exactly:\n```\npoint { \"/mnt/specific/path\" }\n```\n\n#### Match any source ending with `data`:\n```\nsource { \"*data\" }\n```\n\n#### Match root path starting with `/acct` and fs type `cgroup`:\n```\nroot { \"/acct*\" } fs { \"cgroup\" }\n```\n\n### Quoting Values\n\nYou can quote values with **single or double quotes**:\n\n```\npoint { \"/mnt/with space\" '/custom\\ path' }\n```\n\nYou may escape characters like `*`, `{`, `}`, and `\"` using backslashes (`\\`) if needed.\n\n### Wildcard Behavior\n\nWildcards are supported only in `root`, `point`, and `source`. The supported patterns are:\n\n- `*value*`: matches substring anywhere\n- `*value`: matches suffix\n- `value*`: matches prefix\n- Exact match without `*`\n\n\n>[!NOTE]\n> - You can define **multiple rules**, each as a separate line.\n> - All rules are evaluated independently.\n> - Matching is case-sensitive and optimized for performance.\n\n\n## Contributing\n\nContributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.\n\nIf you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag \"enhancement\".\nDon't forget to give the project a star! Thanks again!\n\n1. Fork the Project.\n2. Create your Feature Branch (`git checkout -b feature/FeatureName`)\n3. Commit your Changes (`git commit -m 'Add some FeatureName'`)\n4. Push to the Branch (`git push origin feature/FeatureName`)\n5. Open a Pull Request.\n\n\n## Acknowledgement\n\n- [Zygisk Assistant](https://github.com/snake-4/Zygisk-Assistant)\n\n## LICENSE\n\nThis project is licensed under the [MIT License](https://opensource.org/licenses/MIT).\n\n",
+  "readmeHTML": "<p><h2 align=\"center\">Zygisk NoHello</h2></p>\n<p><p align=\"center\"></p>\n<p>  A Zygisk module to hide root.</p>\n<p>  </br></p>\n<p>  </br></p>\n<p>  <a href=\"https://github.com/MhmRdd/NoHello/actions/workflows/build.yml\"></p>\n<p>    <img src=\"https://github.com/MhmRdd/Il2Dump/actions/workflows/build.yml/badge.svg?branch=master\" alt=\"Android CI status\"></p>\n<p>  </a></p>\n<p>  <a href=\"https://opensource.org/licenses/MIT\"></p>\n<p>    <img src=\"https://img.shields.io/badge/License-MIT-yellow.svg\" alt=\"License: MIT\"></p>\n<p>  </a></p>\n<p>  </br></p>\n<p>  <a href=\"https://github.com/MhmRdd/NoHello/issues\">Report Bug</a></p>\n<p>    ·</p>\n<p>  <a href=\"https://github.com/MhmRdd/NoHello/issues\">Request Feature</a></p>\n<p>    ·</p>\n<p>  <a href=\"https://github.com/MhmRdd/NoHello/releases\">Latest Release</a></p>\n<p></p></p>\n\n<p>> [!NOTE]</p>\n<p>> This module currently focuses to hide root & zygisk from apps.</p>\n<p>> Updates will gradually implements changes and fixes.</p>\n\n<h2>About The Project</h2>\n\n<p>Using the <b>release</b> build is recommended over the debug build. Only use debug builds if you are going to make a bug report.</p>\n\n<h2>Usage</h2>\n\n<h3>KernelSU & KernelSU Next users:</h3>\n<li>Install ZygiskNext or ReZygisk.</li>\n<li>Make sure the unmount setting is enabled for the target app in the Manager.</li>\n<li>Disable Umount modules in settings for Manager (if exists).</li>\n<li>Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one.</li>\n\n<h3>APatch users:</h3>\n<li>Install ZygiskNext or ReZygisk.</li>\n<li>Make sure the unmount setting is enabled for the target app in the Manager.</li>\n<li>Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one.</li>\n\n<h3>Magisk users:</h3>\n<li>Update your Magisk to 28.0 or newer for better hiding capabilities. (optional)</li>\n<li>Turn on Zygisk in Magisk settings (unrecommended) or install ZygiskNext/ReZygisk.</li>\n<li>Turn off `Enforce DenyList` in Magisk settings.</li>\n<li>Disable `Enforce DenyList` in ZygiskNext/ReZygisk settings if there is one. (if installed)</li>\n<li>Add the target app to the deny list unless you're using a Magisk fork with a white list instead.</li>\n\n<h2>Whitelisting (0.0.4+)</h2>\n<p>You can set the working mode to <b>whitelist</b> (instead of the default <b>blacklist</b>) by creating an empty regular file <code>/data/adb/nohello/whitelist</code>.</p>\n<p>>[!WARNING]</p>\n<p>> Using <b>Mount Rule System</b> with <b>whitelist</b>, can cause severe overheating & performance issues, due to how MRS being evaluated each time a process spawns.</p>\n\n<p>This can be solved if you make NoHello evaluates Mount Rule System per boot/companion instance, by creating an empty regular file <code>/data/adb/nohello/umount_persist</code>/<code>data/adb/nohello/umount_persists</code></p>\n\n<h2>Mount Rule System</h2>\n\n<p><b>Since version 0.0.5</b>, NoHello introduces <b>Mount Rule System</b>.</br></p>\n<p>This allows users to define <b>rules</b> that control how mount points are evaluated for <b>auto-unmounting</b>.</br></p>\n<p>Rules are fully configurable and match based on mount point properties like root path, mount path, filesystem type, or source.</br></p>\n<p><b>MountRules</b> can be customized via <code>/data/adb/nohello/umount</code>.</p>\n\n<h3>Rule Format</h3>\n\n<p>A rule is made up of <b>sections</b>, each consisting of a <b>keyword</b>, followed by a list of values enclosed in <code>{}</code>:</p>\n\n<pre>&lt;keyword&gt; { &lt;value1&gt; &lt;value2&gt; ... }</pre>\n\n<p>Valid <b>keywords</b> are:</p>\n\n<p>| Keyword  | Matches against         | Supports Wildcards                                       | Description |</p>\n<p>|----------|-------------------------|----------------------------------------------------------|-------------|</p>\n<p>| <code>root</code>   | Root path of the mount  | Yes (<code>*</code>, escape by <code>\\*</code>)                                | Root of the mount in <code>/proc/self/mountinfo</code> |</p>\n<p>| <code>point</code>  | Mount point path        | Yes (<code>*</code>, escape by <code>\\*</code> only at the beginning & ending) | Where the filesystem is mounted |</p>\n<p>| <code>fs</code>     | Filesystem type         | No                                                       | Matches exact filesystem type, e.g. <code>ext4</code>, <code>erofs</code>, etc |</p>\n<p>| <code>source</code> | Source device or file   | Yes (<code>*</code>, escape by <code>\\*</code>)                                | e.g., <code>/dev/block/xyz</code>, <code>magisk</code>, etc |</p>\n\n<h3>Example Rules</h3>\n\n<p>#### Match all <code>tmpfs</code> filesystems mounted under <code>/data/adb</code>:</p>\n<pre>fs { \"tmpfs\" } point { \"/data/adb/*\" }</pre>\n\n<p>#### Match anything mounted from a <code>tmpfs</code> source:</p>\n<pre>source { \"tmpfs\" }</pre>\n\n<p>#### Match a specific mount path exactly:</p>\n<pre>point { \"/mnt/specific/path\" }</pre>\n\n<p>#### Match any source ending with <code>data</code>:</p>\n<pre>source { \"*data\" }</pre>\n\n<p>#### Match root path starting with <code>/acct</code> and fs type <code>cgroup</code>:</p>\n<pre>root { \"/acct*\" } fs { \"cgroup\" }</pre>\n\n<h3>Quoting Values</h3>\n\n<p>You can quote values with <b>single or double quotes</b>:</p>\n\n<pre>point { \"/mnt/with space\" '/custom\\ path' }</pre>\n\n<p>You may escape characters like <code>*</code>, <code>{</code>, <code>}</code>, and <code>\"</code> using backslashes (<code>\\</code>) if needed.</p>\n\n<h3>Wildcard Behavior</h3>\n\n<p>Wildcards are supported only in <code>root</code>, <code>point</code>, and <code>source</code>. The supported patterns are:</p>\n\n<li>`*value*`: matches substring anywhere</li>\n<li>`*value`: matches suffix</li>\n<li>`value*`: matches prefix</li>\n<li>Exact match without `*`</li>\n\n\n<p>>[!NOTE]</p>\n<p>> - You can define <b>multiple rules</b>, each as a separate line.</p>\n<p>> - All rules are evaluated independently.</p>\n<p>> - Matching is case-sensitive and optimized for performance.</p>\n\n\n<h2>Contributing</h2>\n\n<p>Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are <b>greatly appreciated</b>.</p>\n\n<p>If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag \"enhancement\".</p>\n<p>Don't forget to give the project a star! Thanks again!</p>\n\n<li>Fork the Project.</li>\n<li>Create your Feature Branch (`git checkout -b feature/FeatureName`)</li>\n<li>Commit your Changes (`git commit -m 'Add some FeatureName'`)</li>\n<li>Push to the Branch (`git push origin feature/FeatureName`)</li>\n<li>Open a Pull Request.</li>\n\n\n<h2>Acknowledgement</h2>\n\n<li>[Zygisk Assistant](https://github.com/snake-4/Zygisk-Assistant)</li>\n\n<h2>LICENSE</h2>\n\n<p>This project is licensed under the <a href=\"https://opensource.org/licenses/MIT\">MIT License</a>.</p>\n",
+  "homepageUrl": "https://github.com/MhmRdd/NoHello",
+  "sourceUrl": "https://github.com/MhmRdd/NoHello",
+  "url": "https://github.com/MhmRdd/NoHello",
+  "latestRelease": {
+    "name": "0.0.7",
+    "version": "0.0.7",
+    "time": "2025-05-31T03:11:57Z",
+    "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.7/Nohello-v0.0.7-53-4d53ecf-debug.zip"
+  },
+  "releases": [
+    {
+      "name": "0.0.7",
+      "tagName": "0.0.7",
+      "publishedAt": "2025-05-31T03:11:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.7-53-4d53ecf-debug.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.7/Nohello-v0.0.7-53-4d53ecf-debug.zip",
+          "size": 1744598,
+          "downloadCount": 27415
+        },
+        {
+          "name": "Nohello-v0.0.7-53-4d53ecf-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.7/Nohello-v0.0.7-53-4d53ecf-release.zip",
+          "size": 568365,
+          "downloadCount": 105876
+        }
+      ]
+    },
+    {
+      "name": "0.0.6",
+      "tagName": "0.0.6",
+      "publishedAt": "2025-05-25T17:52:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.6-51-21676d4-debug.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.6/Nohello-v0.0.6-51-21676d4-debug.zip",
+          "size": 1800277,
+          "downloadCount": 1099
+        },
+        {
+          "name": "Nohello-v0.0.6-51-21676d4-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.6/Nohello-v0.0.6-51-21676d4-release.zip",
+          "size": 585373,
+          "downloadCount": 4015
+        }
+      ]
+    },
+    {
+      "name": "0.0.5",
+      "tagName": "0.0.5",
+      "publishedAt": "2025-05-17T17:44:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.5-48-86aa587-debug.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.5/Nohello-v0.0.5-48-86aa587-debug.zip",
+          "size": 1773023,
+          "downloadCount": 513
+        },
+        {
+          "name": "Nohello-v0.0.5-48-86aa587-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.5/Nohello-v0.0.5-48-86aa587-release.zip",
+          "size": 563970,
+          "downloadCount": 1547
+        }
+      ]
+    },
+    {
+      "name": "0.0.4",
+      "tagName": "0.0.4",
+      "publishedAt": "2025-05-15T19:02:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.4-32-606458c-debug.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.4/Nohello-v0.0.4-32-606458c-debug.zip",
+          "size": 1629131,
+          "downloadCount": 188
+        },
+        {
+          "name": "Nohello-v0.0.4-32-606458c-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.4/Nohello-v0.0.4-32-606458c-release.zip",
+          "size": 527975,
+          "downloadCount": 453
+        }
+      ]
+    },
+    {
+      "name": "0.0.3",
+      "tagName": "0.0.3",
+      "publishedAt": "2025-05-13T17:12:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.3-29-b771828-debug.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.3/Nohello-v0.0.3-29-b771828-debug.zip",
+          "size": 1576181,
+          "downloadCount": 253
+        },
+        {
+          "name": "Nohello-v0.0.3-29-b771828-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.3/Nohello-v0.0.3-29-b771828-release.zip",
+          "size": 523717,
+          "downloadCount": 526
+        }
+      ]
+    },
+    {
+      "name": "0.0.2",
+      "tagName": "0.0.2",
+      "publishedAt": "2025-05-12T20:17:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.2-22-1d6c3cf-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.2/Nohello-v0.0.2-22-1d6c3cf-release.zip",
+          "size": 496787,
+          "downloadCount": 257
+        }
+      ]
+    },
+    {
+      "name": "0.0.1",
+      "tagName": "0.0.1",
+      "publishedAt": "2025-05-12T16:26:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Nohello-v0.0.1-20-a572f3f-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/NoHello/releases/download/0.0.1/Nohello-v0.0.1-20-a572f3f-release.zip",
+          "size": 514498,
+          "downloadCount": 397
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "readme": "# Van Step\n\n> 将 SmartisanOS 的 **One Step** 侧边栏体验以**独立 App + Root 桥**的形式带入 HyperOS；可选 LSPosed 增强包恢复系统级效果。\n\n[![平台](https://img.shields.io/badge/platform-Android%2015--16-3DDC84?logo=android&logoColor=white)](#环境要求)\n[![HyperOS](https://img.shields.io/badge/HyperOS-2.0%20%7C%203.0-FF6900)](#环境要求)\n[![形态](https://img.shields.io/badge/%E5%BD%A2%E6%80%81-%E7%8B%AC%E7%AB%8B%20App%20%2B%20Root%20%E6%A1%A5-0A84FF)](#安装)\n[![可选增强](https://img.shields.io/badge/%E5%8F%AF%E9%80%89%E5%A2%9E%E5%BC%BA-LSPosed%20%E5%A2%9E%E5%BC%BA%E5%8C%85-6200EE)](https://github.com/LSPosed/LSPosed)\n[![许可证](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)\n\nSmartisan OS 已经远去，但它最好的创意不应被遗忘。Van Step 在现代小米 HyperOS 之上还原了 One Step 侧边栏——将任何内容拖拽到任何地方。：主 App 通过 Root 桥（KSU/Magisk 拉起的 `app_process` 守护进程）完成窗口与任务管理；，可恢复状态栏变换、全局手势接管等需要进程内 Hook 的系统级体验。\n\n## 功能\n\n### 侧边栏\n\n从屏幕边缘滑入，即可查看最近的图片、文件和剪贴板历史。将条目拖拽到应用图标上即可分享，或拖拽到窗口槽位即可在其中打开。\n\n- **最近图片 / 文件 / 剪贴板**，Smartisan三大区，原汁原味\n- **拖拽分享**至应用快捷方式，每次命中时提供触觉反馈\n- **媒体控制**位于顶部栏，重新打开时定位到你上次使用的页面\n- **任务切换**和自由窗口控制，包括主/副分屏互换\n\n\n整合**[HyperdragShare](https://github.com/Leaf-lsgtky/HyperDragShare)** 提供的分词拖拽功能基建，支持从绝大部分app拖拽提取识别到任意应用窗口中，并支持拖拽过程中预览。\n\n### 手势触发方式\n\n| 触发方式 | 工作原理 |\n| --- | --- |\n| 状态栏向斜内滑 | 顶部 overlay 热区判定：左半屏右滑 / 右半屏左滑（对侧映射开对侧小窗） |\n| 热区长按 | 路由到 `BigBangBridge` |\n\n## 环境要求\n\n- Android 15 – 16（`minSdk 33`，`targetSdk 36`）\n- HyperOS  2.0 / 3.0（已在小米 15 Pro、 和 K40 上测试）\n- Root 权限（Magisk / KernelSU / APatch）——Root 桥守护进程、持久化设置均需要\n- 可选：[LSPosed](https://github.com/LSPosed/LSPosed)（仅当需要安装 LSPosed 增强包以恢复系统级 Hook 效果时）\n！！！在使用前请备份数据 硬盘有价 数据无价！！！\n## 安装\n模块挂载是必要的！ 若selinux注入失败可尝试宽容selinux（不推荐）\n1. 安装 Van Step 主 APK（`com.hyper.onestep`），并刷入 KSU/Magisk 模块以拉起 Root 桥守护进程。模块同时把内置锤子桌面（`com.smartisanos.home`）作为系统应用挂载到 `/system/app/SmartisanHome`，工作区的\"嵌入桌面\"默认选择\"内置-锤子桌面\"，无需再走数据分区安装。\n2. 在 Root 管理器中授予本应用 **Root 权限**。设置通过 `su` 写入，如果没有 Root 权限，所有开关都会静默回退。\n3.  并在 LSPosed 中启用（作用域：`系统框架` / `系统界面` / `启动器`），重启\n\n### 活动调用\nsu -c 'am broadcast -a com.hyper.sidebar.ACTION_OFF_ONE_STEP'\n\nsu -c 'am broadcast -a com.hyper.sidebar.ACTION_ON_ONE_STEP'\n\nsu -c 'am broadcast -a com.hyper.sidebar.ACTION_TOGGLE_ONE_STEP'\n## 构建\n\n```sh\n./gradlew assembleDebug\n\n```\n\n需要 JDK 21。Gradle 8.7 会拒绝 JDK 24 并报 `Unsupported class file major version 68` 错误，因此如果你的默认 JVM 是 JDK 24，请将构建指向其他版本：\n\n```sh\nJAVA_HOME=\"/path/to/jdk-21\" ./gradlew assembleDebug\n\n```\n\n## 项目结构\n\n| 路径 | 内容 |\n| --- | --- |\n| `src/` | 侧边栏 UI、数据管理器与全部任务/窗口逻辑（运行于主 App 进程） |\n| `src-stubs/` | AOSP 中不存在的 SmartisanOS 框架类的桩代码 |\n| `lsp-enhance/` | 可选 LSPosed 增强包（独立 APK `com.hyper.onestep.enhance`，SystemUI / system_server / miui.home 三作用域 Hook） |\n| `zygisk/` | Zygisk 原生注入模块（图片拖拽、状态栏等 Hook 的载体） |\n| `packaging/` | KSU/Magisk 模块模板（customize.sh / service.sh / post-fs-data.sh 等）与内置锤子桌面 APK 源料 |\n| `scripts/` | Zygisk 编译、状态栏 overlay 与 KSU/Magisk 发行包打包脚本 |\n| `smartisan-launcher-maintained/` | 内置锤子桌面（`com.smartisanos.home`）的 smali 反编译维护工程 |\n| `res/` | 布局、绘图资源和字符串 |\n\n## 致谢\n\n**Smartisan Technology（锤子科技）**——感谢 One Step 和 BigBang，以及将它们开源。本项目是 [SmartisanTech/packages_apps_OneStep](https://github.com/SmartisanTech/packages_apps_OneStep) 的移植版本（上游以 Apache License 2.0 发布）；本仓库在其基础上继续开发，并依 Apache-2.0 与 GPL-3.0 的兼容条款，将本项目以 **GPL-3.0** 发布。这里每一个值得称道的交互都是他们的原创；本仓库所做的工作，主要是让这些创意在别人的 ROM 上跑起来。\n\n**BigBang 团队**，其原版 `com.smartisanos.textboom` 构建提供了精确的动画时序、碎片颜色和窗口参数。\n**[HyperdragShare](https://github.com/Leaf-lsgtky/HyperDragShare)**，其分词拖拽功能提供了从绝大部分app拖拽提取识别到任意应用窗口中，并支持拖拽过程中预览。\n**[LSPosed](https://github.com/LSPosed/LSPosed)** 和 [libxposed](https://github.com/libxposed/api) 的作者们——可选增强包仍基于该框架实现进程内 Hook。\n**[Onestep4](https://github.com/SangLuoCN/OneStep4)**，提供思路支持\n**[smartisan-launcher-maintained](https://github.com/rianlu/smartisan-launcher-maintained)**，提供锤子桌面源码支持内置锤子桌面还原启动器体验\n**[Lucide](https://lucide.dev)** 提供的图标集。完整声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。\n\n**[Miuix](https://github.com/compose-miuix-ui/miuix)**（compose-miuix-ui）——设置页面的 Compose UI 框架与主题组件基座。\n\n**[SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)**，其 Miuix 风格的管理界面是本模块设置页面的参考——悬浮胶囊底部栏、色调卡片和状态标签均是其 Compose 组件的 View 层移植。其液态玻璃效果则基于 [Kyant0/AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)。\n\n\n### 常见问题\n1. **Root 桥未就绪**：确认已刷入 KSU/Magisk 模块并重启；==模块是必不可少的环节 请不要自行精简==\n2. **权限不足**：检查 Root 管理器是否已授予本应用 **Root 权限**。\n\n33. 自行无法解决的问题 请提交issue至[https://github.com/LAOBILAXI233/onestep_on_hyper](https://github.com/LAOBILAXI233/onestep_on_hyper)\n   提交的issus应该包括但不限于:\n   1. 系统版本\n   2. HyperOS版本\n   3. LSPosed版本（若安装增强包）\n   4. 出现问题的具体操作\n   5. 出现问题的具体描述\n   6. 出现问题的具体截图\n   7. 出现问题的具体日志\n   日志的获取方式:/data/data/com.hyper.onestep/files/onestep/onestep.log\n### 简易操作指南\n1. **onestep启动**：从状态栏边缘斜向内滑动（左半屏右滑 / 右半屏左滑），即可打开侧边栏。在侧边栏中，你可以查看最近的图片、文件和剪贴板历史，并将条目拖拽到应用图标上即可分享，或拖拽到窗口槽位即可在其中打开。!![alt text](PixPin_2026-09-06_22-45-18.png)\n2. **嵌入桌面**：进入 Van Step 后，在主区上滑（Home 手势）即可唤出嵌入的桌面启动器；点开 app 会直接成为主区任务，退出 Van Step 则无缝回到真实桌面。\n3. **媒体控制**：在侧边栏的顶部栏，你可以找到媒体控制按钮，包括播放、暂停、上一首、下一首等操作。\n4.媒体控制与近期图片、文件、剪贴板历史切换! 向左滑动解锁三大金刚键（bushi）长按可与窗口互动\n5.**拖拽分享**当拖拽分享的前置权限都齐全的情况下 长按可提取文字/图片，文字在分词界面分词后继续长按可以与窗口互动\n6**solt操作**对对应槽位窗口向上滑动，即可将对应任务置于后台而不结束。同理向外侧滑动结束进程![alt text](PixPin_2026-09-06_22-48-28.png)\n\n\n应用列表支持置顶 自定义排序 使用频率排序\n未说明的功能请自行探索吧 : >\n\n\n## 贡献\n如果你有更好的想法，欢迎提交 Pull Request 或 Issue。\n欢迎提交 Pull Request 或 Issue。:)\n\n# 可以给我点个star吗？:)\n\n\n\n\n## 许可证\n\n**GPL-3.0**——详见 [LICENSE](LICENSE)。本项目基于 Apache-2.0 许可的 Smartisan OneStep 移植，依 Apache-2.0 与 GPL-3.0 的兼容条款以 GPL-3.0 继续发布；第三方组件（Miuix、Lucide、LSPosed 等）各自遵循其原始许可证，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。\n## Buy me a coffee\n如果你觉得这个项目对你有帮助，欢迎请我喝杯咖啡。\n![alt text](PixPin_2026-09-06_22-43-40-1.png)\n# 贡献者名单\n感谢各位贡献者对本项目的支持与贡献！能让我们走的更远",
+  "readmeHTML": "<h1>Van Step</h1>\n\n<p>> 将 SmartisanOS 的 <b>One Step</b> 侧边栏体验以<b>独立 App + Root 桥</b>的形式带入 HyperOS；可选 LSPosed 增强包恢复系统级效果。</p>\n\n<p><a href=\"https://img.shields.io/badge/platform-Android%2015--16-3DDC84?logo=android&logoColor=white\">![平台</a>](#环境要求)</p>\n<p><a href=\"https://img.shields.io/badge/HyperOS-2.0%20%7C%203.0-FF6900\">![HyperOS</a>](#环境要求)</p>\n<p><a href=\"https://img.shields.io/badge/%E5%BD%A2%E6%80%81-%E7%8B%AC%E7%AB%8B%20App%20%2B%20Root%20%E6%A1%A5-0A84FF\">![形态</a>](#安装)</p>\n<p><a href=\"https://img.shields.io/badge/%E5%8F%AF%E9%80%89%E5%A2%9E%E5%BC%BA-LSPosed%20%E5%A2%9E%E5%BC%BA%E5%8C%85-6200EE\">![可选增强</a>](https://github.com/LSPosed/LSPosed)</p>\n<p><a href=\"https://img.shields.io/badge/license-GPL--3.0-blue.svg\">![许可证</a>](LICENSE)</p>\n\n<p>Smartisan OS 已经远去，但它最好的创意不应被遗忘。Van Step 在现代小米 HyperOS 之上还原了 One Step 侧边栏——将任何内容拖拽到任何地方。：主 App 通过 Root 桥（KSU/Magisk 拉起的 <code>app_process</code> 守护进程）完成窗口与任务管理；，可恢复状态栏变换、全局手势接管等需要进程内 Hook 的系统级体验。</p>\n\n<h2>功能</h2>\n\n<h3>侧边栏</h3>\n\n<p>从屏幕边缘滑入，即可查看最近的图片、文件和剪贴板历史。将条目拖拽到应用图标上即可分享，或拖拽到窗口槽位即可在其中打开。</p>\n\n<li>**最近图片 / 文件 / 剪贴板**，Smartisan三大区，原汁原味</li>\n<li>**拖拽分享**至应用快捷方式，每次命中时提供触觉反馈</li>\n<li>**媒体控制**位于顶部栏，重新打开时定位到你上次使用的页面</li>\n<li>**任务切换**和自由窗口控制，包括主/副分屏互换</li>\n\n\n<p>整合<b><a href=\"https://github.com/Leaf-lsgtky/HyperDragShare\">HyperdragShare</a></b> 提供的分词拖拽功能基建，支持从绝大部分app拖拽提取识别到任意应用窗口中，并支持拖拽过程中预览。</p>\n\n<h3>手势触发方式</h3>\n\n<p>| 触发方式 | 工作原理 |</p>\n<p>| --- | --- |</p>\n<p>| 状态栏向斜内滑 | 顶部 overlay 热区判定：左半屏右滑 / 右半屏左滑（对侧映射开对侧小窗） |</p>\n<p>| 热区长按 | 路由到 <code>BigBangBridge</code> |</p>\n\n<h2>环境要求</h2>\n\n<li>Android 15 – 16（`minSdk 33`，`targetSdk 36`）</li>\n<li>HyperOS  2.0 / 3.0（已在小米 15 Pro、 和 K40 上测试）</li>\n<li>Root 权限（Magisk / KernelSU / APatch）——Root 桥守护进程、持久化设置均需要</li>\n<li>可选：[LSPosed](https://github.com/LSPosed/LSPosed)（仅当需要安装 LSPosed 增强包以恢复系统级 Hook 效果时）</li>\n<p>！！！在使用前请备份数据 硬盘有价 数据无价！！！</p>\n<h2>安装</h2>\n<p>模块挂载是必要的！ 若selinux注入失败可尝试宽容selinux（不推荐）</p>\n<li>安装 Van Step 主 APK（`com.hyper.onestep`），并刷入 KSU/Magisk 模块以拉起 Root 桥守护进程。模块同时把内置锤子桌面（`com.smartisanos.home`）作为系统应用挂载到 `/system/app/SmartisanHome`，工作区的\"嵌入桌面\"默认选择\"内置-锤子桌面\"，无需再走数据分区安装。</li>\n<li>在 Root 管理器中授予本应用 **Root 权限**。设置通过 `su` 写入，如果没有 Root 权限，所有开关都会静默回退。</li>\n<li> 并在 LSPosed 中启用（作用域：`系统框架` / `系统界面` / `启动器`），重启</li>\n\n<h3>活动调用</h3>\n<p>su -c 'am broadcast -a com.hyper.sidebar.ACTION_OFF_ONE_STEP'</p>\n\n<p>su -c 'am broadcast -a com.hyper.sidebar.ACTION_ON_ONE_STEP'</p>\n\n<p>su -c 'am broadcast -a com.hyper.sidebar.ACTION_TOGGLE_ONE_STEP'</p>\n<h2>构建</h2>\n\n<pre>./gradlew assembleDebug\n</pre>\n\n<p>需要 JDK 21。Gradle 8.7 会拒绝 JDK 24 并报 <code>Unsupported class file major version 68</code> 错误，因此如果你的默认 JVM 是 JDK 24，请将构建指向其他版本：</p>\n\n<pre>JAVA_HOME=\"/path/to/jdk-21\" ./gradlew assembleDebug\n</pre>\n\n<h2>项目结构</h2>\n\n<p>| 路径 | 内容 |</p>\n<p>| --- | --- |</p>\n<p>| <code>src/</code> | 侧边栏 UI、数据管理器与全部任务/窗口逻辑（运行于主 App 进程） |</p>\n<p>| <code>src-stubs/</code> | AOSP 中不存在的 SmartisanOS 框架类的桩代码 |</p>\n<p>| <code>lsp-enhance/</code> | 可选 LSPosed 增强包（独立 APK <code>com.hyper.onestep.enhance</code>，SystemUI / system_server / miui.home 三作用域 Hook） |</p>\n<p>| <code>zygisk/</code> | Zygisk 原生注入模块（图片拖拽、状态栏等 Hook 的载体） |</p>\n<p>| <code>packaging/</code> | KSU/Magisk 模块模板（customize.sh / service.sh / post-fs-data.sh 等）与内置锤子桌面 APK 源料 |</p>\n<p>| <code>scripts/</code> | Zygisk 编译、状态栏 overlay 与 KSU/Magisk 发行包打包脚本 |</p>\n<p>| <code>smartisan-launcher-maintained/</code> | 内置锤子桌面（<code>com.smartisanos.home</code>）的 smali 反编译维护工程 |</p>\n<p>| <code>res/</code> | 布局、绘图资源和字符串 |</p>\n\n<h2>致谢</h2>\n\n<p><b>Smartisan Technology（锤子科技）</b>——感谢 One Step 和 BigBang，以及将它们开源。本项目是 <a href=\"https://github.com/SmartisanTech/packages_apps_OneStep\">SmartisanTech/packages_apps_OneStep</a> 的移植版本（上游以 Apache License 2.0 发布）；本仓库在其基础上继续开发，并依 Apache-2.0 与 GPL-3.0 的兼容条款，将本项目以 <b>GPL-3.0</b> 发布。这里每一个值得称道的交互都是他们的原创；本仓库所做的工作，主要是让这些创意在别人的 ROM 上跑起来。</p>\n\n<p><b>BigBang 团队</b>，其原版 <code>com.smartisanos.textboom</code> 构建提供了精确的动画时序、碎片颜色和窗口参数。</p>\n<p><b><a href=\"https://github.com/Leaf-lsgtky/HyperDragShare\">HyperdragShare</a></b>，其分词拖拽功能提供了从绝大部分app拖拽提取识别到任意应用窗口中，并支持拖拽过程中预览。</p>\n<p><b><a href=\"https://github.com/LSPosed/LSPosed\">LSPosed</a></b> 和 <a href=\"https://github.com/libxposed/api\">libxposed</a> 的作者们——可选增强包仍基于该框架实现进程内 Hook。</p>\n<p><b><a href=\"https://github.com/SangLuoCN/OneStep4\">Onestep4</a></b>，提供思路支持</p>\n<p><b><a href=\"https://github.com/rianlu/smartisan-launcher-maintained\">smartisan-launcher-maintained</a></b>，提供锤子桌面源码支持内置锤子桌面还原启动器体验</p>\n<p><b><a href=\"https://lucide.dev\">Lucide</a></b> 提供的图标集。完整声明见 <a href=\"THIRD_PARTY_NOTICES.md\">THIRD_PARTY_NOTICES.md</a>。</p>\n\n<p><b><a href=\"https://github.com/compose-miuix-ui/miuix\">Miuix</a></b>（compose-miuix-ui）——设置页面的 Compose UI 框架与主题组件基座。</p>\n\n<p><b><a href=\"https://github.com/SukiSU-Ultra/SukiSU-Ultra\">SukiSU-Ultra</a></b>，其 Miuix 风格的管理界面是本模块设置页面的参考——悬浮胶囊底部栏、色调卡片和状态标签均是其 Compose 组件的 View 层移植。其液态玻璃效果则基于 <a href=\"https://github.com/Kyant0/AndroidLiquidGlass\">Kyant0/AndroidLiquidGlass</a>。</p>\n\n\n<h3>常见问题</h3>\n<li>**Root 桥未就绪**：确认已刷入 KSU/Magisk 模块并重启；==模块是必不可少的环节 请不要自行精简==</li>\n<li>**权限不足**：检查 Root 管理器是否已授予本应用 **Root 权限**。</li>\n\n<li>自行无法解决的问题 请提交issue至[https://github.com/LAOBILAXI233/onestep_on_hyper](https://github.com/LAOBILAXI233/onestep_on_hyper)</li>\n<p>   提交的issus应该包括但不限于:</p>\n<p>   1. 系统版本</p>\n<p>   2. HyperOS版本</p>\n<p>   3. LSPosed版本（若安装增强包）</p>\n<p>   4. 出现问题的具体操作</p>\n<p>   5. 出现问题的具体描述</p>\n<p>   6. 出现问题的具体截图</p>\n<p>   7. 出现问题的具体日志</p>\n<p>   日志的获取方式:/data/data/com.hyper.onestep/files/onestep/onestep.log</p>\n<h3>简易操作指南</h3>\n<li>**onestep启动**：从状态栏边缘斜向内滑动（左半屏右滑 / 右半屏左滑），即可打开侧边栏。在侧边栏中，你可以查看最近的图片、文件和剪贴板历史，并将条目拖拽到应用图标上即可分享，或拖拽到窗口槽位即可在其中打开。!![alt text](PixPin_2026-09-06_22-45-18.png)</li>\n<li>**嵌入桌面**：进入 Van Step 后，在主区上滑（Home 手势）即可唤出嵌入的桌面启动器；点开 app 会直接成为主区任务，退出 Van Step 则无缝回到真实桌面。</li>\n<li>**媒体控制**：在侧边栏的顶部栏，你可以找到媒体控制按钮，包括播放、暂停、上一首、下一首等操作。</li>\n<p>4.媒体控制与近期图片、文件、剪贴板历史切换! 向左滑动解锁三大金刚键（bushi）长按可与窗口互动</p>\n<p>5.<b>拖拽分享</b>当拖拽分享的前置权限都齐全的情况下 长按可提取文字/图片，文字在分词界面分词后继续长按可以与窗口互动</p>\n<p>6<b>solt操作</b>对对应槽位窗口向上滑动，即可将对应任务置于后台而不结束。同理向外侧滑动结束进程!<a href=\"PixPin_2026-09-06_22-48-28.png\">alt text</a></p>\n\n\n<p>应用列表支持置顶 自定义排序 使用频率排序</p>\n<p>未说明的功能请自行探索吧 : ></p>\n\n\n<h2>贡献</h2>\n<p>如果你有更好的想法，欢迎提交 Pull Request 或 Issue。</p>\n<p>欢迎提交 Pull Request 或 Issue。:)</p>\n\n<h1>可以给我点个star吗？:)</h1>\n\n\n\n\n<h2>许可证</h2>\n\n<p><b>GPL-3.0</b>——详见 <a href=\"LICENSE\">LICENSE</a>。本项目基于 Apache-2.0 许可的 Smartisan OneStep 移植，依 Apache-2.0 与 GPL-3.0 的兼容条款以 GPL-3.0 继续发布；第三方组件（Miuix、Lucide、LSPosed 等）各自遵循其原始许可证，详见 <a href=\"THIRD_PARTY_NOTICES.md\">THIRD_PARTY_NOTICES.md</a>。</p>\n<h2>Buy me a coffee</h2>\n<p>如果你觉得这个项目对你有帮助，欢迎请我喝杯咖啡。</p>\n<p>!<a href=\"PixPin_2026-09-06_22-43-40-1.png\">alt text</a></p>\n<h1>贡献者名单</h1>\n<p>感谢各位贡献者对本项目的支持与贡献！能让我们走的更远</p>",
+  "homepageUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper",
+  "sourceUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper",
+  "url": "https://github.com/LAOBILAXI233/onestep_on_hyper",
+  "latestRelease": {
+    "name": "v1.3.0(104+1)",
+    "version": "v1.3.0(104+1)",
+    "time": "2026-09-13T08:55:21Z",
+    "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%2B1%29/VanStep-1.3.0-ksu-20260913-164208.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.0(104+1)",
+      "tagName": "v1.3.0(104+1)",
+      "publishedAt": "2026-09-13T08:55:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStep-v1.3.0-debug.apk",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%2B1%29/OneStep-v1.3.0-debug.apk",
+          "size": 90129153,
+          "downloadCount": 250
+        },
+        {
+          "name": "VanStep-1.3.0-ksu-20260913-164208.zip",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%2B1%29/VanStep-1.3.0-ksu-20260913-164208.zip",
+          "size": 71440444,
+          "downloadCount": 121
+        },
+        {
+          "name": "VanStep-1.3.0-magisk-20260913-164304.zip",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%2B1%29/VanStep-1.3.0-magisk-20260913-164304.zip",
+          "size": 71441632,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0(104)",
+      "tagName": "v1.3.0(104)",
+      "publishedAt": "2026-09-08T16:47:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "com.hyper.onestep.apk",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%29/com.hyper.onestep.apk",
+          "size": 90129153,
+          "downloadCount": 70
+        },
+        {
+          "name": "VanStep-1.3.0-ksu-20260909-004146.zip",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%29/VanStep-1.3.0-ksu-20260909-004146.zip",
+          "size": 71440177,
+          "downloadCount": 45
+        },
+        {
+          "name": "VanStep-1.3.0-magisk-20260909-004231.zip",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.3.0%28104%29/VanStep-1.3.0-magisk-20260909-004231.zip",
+          "size": 71441365,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1.1-alpha",
+      "tagName": "v1.0.1.1-alpha",
+      "publishedAt": "2026-08-04T16:32:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStepLSP-debug.apk",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.0.1.1-alpha/OneStepLSP-debug.apk",
+          "size": 7176715,
+          "downloadCount": 246
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1-alpha",
+      "tagName": "v1.0.1-alpha",
+      "publishedAt": "2026-07-27T12:12:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStepLSP-debug.apk",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/v1.0.1-alpha/OneStepLSP-debug.apk",
+          "size": 6979623,
+          "downloadCount": 344
+        }
+      ]
+    },
+    {
+      "name": "release",
+      "tagName": "release",
+      "publishedAt": "2026-07-26T16:28:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OneStepLSP-debug.apk",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/release/OneStepLSP-debug.apk",
+          "size": 7361190,
+          "downloadCount": 60
+        },
+        {
+          "name": "OneStepTouchDaemon_onestep_touchd.v1.0.zip",
+          "downloadUrl": "https://github.com/LAOBILAXI233/onestep_on_hyper/releases/download/release/OneStepTouchDaemon_onestep_touchd.v1.0.zip",
+          "size": 4089,
+          "downloadCount": 24
+        }
+      ]
+    }
+  ]
+}

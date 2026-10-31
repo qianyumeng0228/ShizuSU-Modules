@@ -1,0 +1,43 @@
+{
+  "readme": "![Power11](module/banner.png)\n\n# Power11\n\n**Bring back the old gem from Android 11.** A KernelSU Next module that\nreplaces the HyperOS / MIUI power menu with the classic AOSP one, and lets you\nchoose exactly what goes in it.\n\n## Features\n\n- **AOSP power menu** on HyperOS / MIUI\n- **Any items, any order**: Recovery, Restart, Bootloader, Power off, SystemUI,\n  Soft reboot, Emergency, Lockdown, Screenshot, Airplane mode, Sound mode,\n  Settings, Bug report. Drag to reorder.\n- **Grid**: 2 or 3 columns, presets *Essential 2×2* and *All-in 2×3*\n- **Blur** behind the menu, with adjustable strength\n- **WebUI** with a live preview; changes apply the next time you open the menu\n- Survives OTA updates and uninstalls cleanly\n\n## Requirements\n\n- KernelSU Next\n- [Vector](https://github.com/JingMatrix/Vector) or LSPosed, for custom items\n  and order (the AOSP menu itself works without it)\n\n## Install\n\n1. Download the latest zip from [Releases](https://github.com/LuigiColantuono/Power11/releases/latest),\n   then KernelSU Next → Modules → Install from storage, and reboot.\n2. Vector → Modules → enable **Power11**, scope **System UI**.\n3. Power11 WebUI → *Restart* SystemUI, then pick your items.\n\nUpdating from *AOSP Power Menu* (v1/v2)? Just install Power11: it replaces the\nold module and keeps your settings. Later updates show up in KernelSU Next\nautomatically.\n\n## How it works\n\n| Part | What it does |\n|---|---|\n| `power11.sh` | Disables the `miui.systemui.plugin` service bound to `PLUGIN_GLOBAL_ACTIONS`, so SystemUI falls back to its AOSP `GlobalActionsDialogLite` |\n| Power11 APK (installed as a regular app) | Vector hook in SystemUI: sets the item list and order, grid columns, and adds the reboot entries. Reads `Settings.Global power11_items` / `power11_columns` on every menu open |\n| `watcher.sh` | SystemUI may not reboot to recovery/bootloader. The hook creates `power11_<cmd>` in SystemUI's data dir and this root process (busybox `inotifyd`, no polling) runs it |\n\n## Command line\n\n```sh\nsu -c sh /data/adb/modules/power11/power11.sh help\n```\n\n## Build\n\nRequirements: Python 3 with Pillow, a JDK, and the Android SDK (build-tools and\none platform) in `ANDROID_HOME`.\n\n```sh\npython build.py --all\n```\n\n## Preview\n<img width=\"460\" height=\"auto\" alt=\"image\" src=\"https://github.com/user-attachments/assets/dc930c6e-8c0a-4f1c-ba4f-590e9e31a08a\" />\n\n\n## Notes\n\n- Lockdown only appears if it is enabled in the lock screen settings.\n- If the WebUI says *Plugin not found*, this HyperOS build does not expose the\n  power menu as a SystemUI plugin.\n- Config and logs: `/data/adb/power11/`.\n\n## Credits\n\nMade by **Luigi Colantuono**.\n\n## License\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<p>!<a href=\"module/banner.png\">Power11</a></p>\n\n<h1>Power11</h1>\n\n<p><b>Bring back the old gem from Android 11.</b> A KernelSU Next module that</p>\n<p>replaces the HyperOS / MIUI power menu with the classic AOSP one, and lets you</p>\n<p>choose exactly what goes in it.</p>\n\n<h2>Features</h2>\n\n<li>**AOSP power menu** on HyperOS / MIUI</li>\n<li>**Any items, any order**: Recovery, Restart, Bootloader, Power off, SystemUI,</li>\n<p>  Soft reboot, Emergency, Lockdown, Screenshot, Airplane mode, Sound mode,</p>\n<p>  Settings, Bug report. Drag to reorder.</p>\n<li>**Grid**: 2 or 3 columns, presets *Essential 2×2* and *All-in 2×3*</li>\n<li>**Blur** behind the menu, with adjustable strength</li>\n<li>**WebUI** with a live preview; changes apply the next time you open the menu</li>\n<li>Survives OTA updates and uninstalls cleanly</li>\n\n<h2>Requirements</h2>\n\n<li>KernelSU Next</li>\n<li>[Vector](https://github.com/JingMatrix/Vector) or LSPosed, for custom items</li>\n<p>  and order (the AOSP menu itself works without it)</p>\n\n<h2>Install</h2>\n\n<li>Download the latest zip from [Releases](https://github.com/LuigiColantuono/Power11/releases/latest),</li>\n<p>   then KernelSU Next → Modules → Install from storage, and reboot.</p>\n<li>Vector → Modules → enable **Power11**, scope **System UI**.</li>\n<li>Power11 WebUI → *Restart* SystemUI, then pick your items.</li>\n\n<p>Updating from *AOSP Power Menu* (v1/v2)? Just install Power11: it replaces the</p>\n<p>old module and keeps your settings. Later updates show up in KernelSU Next</p>\n<p>automatically.</p>\n\n<h2>How it works</h2>\n\n<p>| Part | What it does |</p>\n<p>|---|---|</p>\n<p>| <code>power11.sh</code> | Disables the <code>miui.systemui.plugin</code> service bound to <code>PLUGIN_GLOBAL_ACTIONS</code>, so SystemUI falls back to its AOSP <code>GlobalActionsDialogLite</code> |</p>\n<p>| Power11 APK (installed as a regular app) | Vector hook in SystemUI: sets the item list and order, grid columns, and adds the reboot entries. Reads <code>Settings.Global power11_items</code> / <code>power11_columns</code> on every menu open |</p>\n<p>| <code>watcher.sh</code> | SystemUI may not reboot to recovery/bootloader. The hook creates <code>power11_<cmd></code> in SystemUI's data dir and this root process (busybox <code>inotifyd</code>, no polling) runs it |</p>\n\n<h2>Command line</h2>\n\n<pre>su -c sh /data/adb/modules/power11/power11.sh help</pre>\n\n<h2>Build</h2>\n\n<p>Requirements: Python 3 with Pillow, a JDK, and the Android SDK (build-tools and</p>\n<p>one platform) in <code>ANDROID_HOME</code>.</p>\n\n<pre>python build.py --all</pre>\n\n<h2>Preview</h2>\n<p><img width=\"460\" height=\"auto\" alt=\"image\" src=\"https://github.com/user-attachments/assets/dc930c6e-8c0a-4f1c-ba4f-590e9e31a08a\" /></p>\n\n\n<h2>Notes</h2>\n\n<li>Lockdown only appears if it is enabled in the lock screen settings.</li>\n<li>If the WebUI says *Plugin not found*, this HyperOS build does not expose the</li>\n<p>  power menu as a SystemUI plugin.</p>\n<li>Config and logs: `/data/adb/power11/`.</li>\n\n<h2>Credits</h2>\n\n<p>Made by <b>Luigi Colantuono</b>.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/LuigiColantuono/Power11",
+  "sourceUrl": "https://github.com/LuigiColantuono/Power11",
+  "url": "https://github.com/LuigiColantuono/Power11",
+  "latestRelease": {
+    "name": "v3.0.2",
+    "version": "v3.0.2",
+    "time": "2026-10-27T01:35:05Z",
+    "downloadUrl": "https://github.com/LuigiColantuono/Power11/releases/download/v3.0.2/Power11_v3.0.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0.2",
+      "tagName": "v3.0.2",
+      "publishedAt": "2026-10-27T01:35:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Power11_v3.0.2.zip",
+          "downloadUrl": "https://github.com/LuigiColantuono/Power11/releases/download/v3.0.2/Power11_v3.0.2.zip",
+          "size": 191673,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "3.0.1",
+      "tagName": "3.0.1",
+      "publishedAt": "2026-10-27T00:06:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Power11_v3.0.1.zip",
+          "downloadUrl": "https://github.com/LuigiColantuono/Power11/releases/download/3.0.1/Power11_v3.0.1.zip",
+          "size": 191681,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

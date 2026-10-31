@@ -1,0 +1,135 @@
+{
+  "readme": "# NFC 自动切换模块\n\n打开 Google Wallet 自动切换到 GPay 支付，关闭后切换回小米钱包。\n\n## 架构\n\n```\nWallet Activity 生命周期\n        │\n        ▼\n  LSPosed 模块 (hook onStart/onStop)\n        │\n        │  写 G/X 到 /data/local/tmp/nfc_signal\n        ▼\n  KSU 模块 (service.sh inotify 监听)\n        │\n        │  settings put secure nfc_payment_default_component\n        ▼\n  NFC 服务 (切换默认支付应用)\n```\n\n- **LSPosed 端**：事件驱动，hook Wallet 进程的 Activity 可见生命周期。进入 Wallet 立即切到 Google Wallet，可见期间每 5 秒发送一次心跳；所有 Wallet 界面不可见后保留 15 秒支付宽限期。每次写入都附带事件编号，确保 Wallet 进程异常退出后再次打开仍会触发切换。\n- **KSU 端**：使用内核 inotify 等待信号变化，空闲时不轮询；连续 20 秒收不到 Google Wallet 心跳时独立回切小米钱包，即使 Wallet 进程已被系统杀死也能恢复。\n- **资源占用**：空闲时由内核阻塞等待文件事件，不产生定时轮询；仅在 Google Wallet 可见时每 5 秒处理一次心跳。\n\n## 支持设备\n\n- LSPosed Vector 2.0.4+\n- KernelSU\n- Android 15+ (HyperOS 适配)\n- Google Wallet + Xiaomi NFC\n\n## 编译\n\n### LSPosed 模块\n```bash\ncd nfc-switcher\n./gradlew assembleDebug\n# 输出: app/build/outputs/apk/debug/app-debug.apk\n```\n\n需 `local.properties` 指定 Android SDK 路径：\n```\nsdk.dir=/path/to/android-sdk\n```\n\nGradle 会从 Maven Central 自动下载 libxposed API 101.0.1、service 101.0.0 和 interface 101.0.0。\n\n### KSU 模块\n```bash\ncd ksu && zip ../NFC_Switch_KSU.zip service.sh module.prop\n```\n\n## 安装\n\n### LSPosed\n1. 安装 APK\n2. LSPosed 管理器 → 启用模块 → 作用域勾选 `com.google.android.apps.walletnfcrel`\n\n### KSU\n1. 解压 `ksu/` 到 `/data/adb/modules/nfc_switch/`\n2. 确保 `service.sh` 可执行，删除 `disable`\n3. 重启手机\n\n## 文件\n\n```\napp/                          # LSPosed 模块\n├── src/main/\n│   ├── java/.../ModuleMain.java   # 核心代码\n│   ├── resources/META-INF/xposed/ # 模块元数据\n│   └── AndroidManifest.xml\n└── build.gradle\n\nksu/                          # KSU 模块\n├── service.sh                # inotify 事件监听脚本\n└── module.prop               # 模块信息\n```\n\n## 核心代码\n\n```java\npublic class ModuleMain extends XposedModule {\n    @Override\n    public void onPackageLoaded(PackageLoadedParam param) {\n        // 只在 Wallet 进程内执行\n        if (!\"com.google.android.apps.walletnfcrel\".equals(param.getPackageName())) return;\n\n        hook(Activity.class.getDeclaredMethod(\"onStart\"))\n            .intercept(chain -> {\n                mVisibleActivities++;\n                mSerial++;\n                mHandler.removeCallbacksAndMessages(null);\n                write(\"G\");\n                return chain.proceed();\n            });\n\n        hook(Activity.class.getDeclaredMethod(\"onStop\"))\n            .intercept(chain -> {\n                if (mVisibleActivities > 0) mVisibleActivities--;\n                if (mVisibleActivities > 0) return chain.proceed();\n                int s = ++mSerial;\n                mHandler.postDelayed(() -> {\n                    if (s == mSerial) write(\"X\"); // 防抖\n                }, 15000);\n                return chain.proceed();\n            });\n    }\n}\n```\n\n## 许可\n\nMIT © 1321B54 \n",
+  "readmeHTML": "<h1>NFC 自动切换模块</h1>\n\n<p>打开 Google Wallet 自动切换到 GPay 支付，关闭后切换回小米钱包。</p>\n\n<h2>架构</h2>\n\n<pre>Wallet Activity 生命周期\n        │\n        ▼\n  LSPosed 模块 (hook onStart/onStop)\n        │\n        │  写 G/X 到 /data/local/tmp/nfc_signal\n        ▼\n  KSU 模块 (service.sh inotify 监听)\n        │\n        │  settings put secure nfc_payment_default_component\n        ▼\n  NFC 服务 (切换默认支付应用)</pre>\n\n<li>**LSPosed 端**：事件驱动，hook Wallet 进程的 Activity 可见生命周期。进入 Wallet 立即切到 Google Wallet，可见期间每 5 秒发送一次心跳；所有 Wallet 界面不可见后保留 15 秒支付宽限期。每次写入都附带事件编号，确保 Wallet 进程异常退出后再次打开仍会触发切换。</li>\n<li>**KSU 端**：使用内核 inotify 等待信号变化，空闲时不轮询；连续 20 秒收不到 Google Wallet 心跳时独立回切小米钱包，即使 Wallet 进程已被系统杀死也能恢复。</li>\n<li>**资源占用**：空闲时由内核阻塞等待文件事件，不产生定时轮询；仅在 Google Wallet 可见时每 5 秒处理一次心跳。</li>\n\n<h2>支持设备</h2>\n\n<li>LSPosed Vector 2.0.4+</li>\n<li>KernelSU</li>\n<li>Android 15+ (HyperOS 适配)</li>\n<li>Google Wallet + Xiaomi NFC</li>\n\n<h2>编译</h2>\n\n<h3>LSPosed 模块</h3>\n<pre>cd nfc-switcher\n./gradlew assembleDebug\n# 输出: app/build/outputs/apk/debug/app-debug.apk</pre>\n\n<p>需 <code>local.properties</code> 指定 Android SDK 路径：</p>\n<pre>sdk.dir=/path/to/android-sdk</pre>\n\n<p>Gradle 会从 Maven Central 自动下载 libxposed API 101.0.1、service 101.0.0 和 interface 101.0.0。</p>\n\n<h3>KSU 模块</h3>\n<pre>cd ksu &amp;&amp; zip ../NFC_Switch_KSU.zip service.sh module.prop</pre>\n\n<h2>安装</h2>\n\n<h3>LSPosed</h3>\n<li>安装 APK</li>\n<li>LSPosed 管理器 → 启用模块 → 作用域勾选 `com.google.android.apps.walletnfcrel`</li>\n\n<h3>KSU</h3>\n<li>解压 `ksu/` 到 `/data/adb/modules/nfc_switch/`</li>\n<li>确保 `service.sh` 可执行，删除 `disable`</li>\n<li>重启手机</li>\n\n<h2>文件</h2>\n\n<pre>app/                          # LSPosed 模块\n├── src/main/\n│   ├── java/.../ModuleMain.java   # 核心代码\n│   ├── resources/META-INF/xposed/ # 模块元数据\n│   └── AndroidManifest.xml\n└── build.gradle\n\nksu/                          # KSU 模块\n├── service.sh                # inotify 事件监听脚本\n└── module.prop               # 模块信息</pre>\n\n<h2>核心代码</h2>\n\n<pre>public class ModuleMain extends XposedModule {\n    @Override\n    public void onPackageLoaded(PackageLoadedParam param) {\n        // 只在 Wallet 进程内执行\n        if (!\"com.google.android.apps.walletnfcrel\".equals(param.getPackageName())) return;\n\n        hook(Activity.class.getDeclaredMethod(\"onStart\"))\n            .intercept(chain -&gt; {\n                mVisibleActivities++;\n                mSerial++;\n                mHandler.removeCallbacksAndMessages(null);\n                write(\"G\");\n                return chain.proceed();\n            });\n\n        hook(Activity.class.getDeclaredMethod(\"onStop\"))\n            .intercept(chain -&gt; {\n                if (mVisibleActivities &gt; 0) mVisibleActivities--;\n                if (mVisibleActivities &gt; 0) return chain.proceed();\n                int s = ++mSerial;\n                mHandler.postDelayed(() -&gt; {\n                    if (s == mSerial) write(\"X\"); // 防抖\n                }, 15000);\n                return chain.proceed();\n            });\n    }\n}</pre>\n\n<h2>许可</h2>\n\n<p>MIT © 1321B54</p>",
+  "homepageUrl": "https://github.com/1321B54/nfc-switcher",
+  "sourceUrl": "https://github.com/1321B54/nfc-switcher",
+  "url": "https://github.com/1321B54/nfc-switcher",
+  "latestRelease": {
+    "name": "v3.5",
+    "version": "v3.5",
+    "time": "2026-08-13T18:10:49Z",
+    "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.5/nfc-switcher-ksu-v3.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.5",
+      "tagName": "v3.5",
+      "publishedAt": "2026-08-13T18:10:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nfc-switcher-ksu-v3.5.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.5/nfc-switcher-ksu-v3.5.zip",
+          "size": 2046,
+          "downloadCount": 3
+        },
+        {
+          "name": "nfc-switcher-lsposed-v3.5.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.5/nfc-switcher-lsposed-v3.5.apk",
+          "size": 2464218,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.4",
+      "tagName": "v3.4",
+      "publishedAt": "2026-07-11T17:58:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nfc-switcher-ksu-v3.4.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.4/nfc-switcher-ksu-v3.4.zip",
+          "size": 1630,
+          "downloadCount": 6
+        },
+        {
+          "name": "nfc-switcher-lsposed-v3.4.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.4/nfc-switcher-lsposed-v3.4.apk",
+          "size": 2464278,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.3.1",
+      "tagName": "v3.3.1",
+      "publishedAt": "2026-07-11T17:44:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nfc-switcher-ksu-v3.3.1.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.3.1/nfc-switcher-ksu-v3.3.1.zip",
+          "size": 1688,
+          "downloadCount": 1
+        },
+        {
+          "name": "nfc-switcher-lsposed-v3.3.1.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.3.1/nfc-switcher-lsposed-v3.3.1.apk",
+          "size": 2464278,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.3",
+      "tagName": "v3.3",
+      "publishedAt": "2026-07-11T17:15:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nfc-switcher-ksu-v3.3.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.3/nfc-switcher-ksu-v3.3.zip",
+          "size": 1189,
+          "downloadCount": 1
+        },
+        {
+          "name": "nfc-switcher-lsposed-v3.3.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v3.3/nfc-switcher-lsposed-v3.3.apk",
+          "size": 2464278,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-06-07T03:50:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NFC_Switch_KSU.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v1.1/NFC_Switch_KSU.zip",
+          "size": 746,
+          "downloadCount": 3
+        },
+        {
+          "name": "NFC_Switch_LSPosed.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v1.1/NFC_Switch_LSPosed.apk",
+          "size": 41109,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-06-06T12:34:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NFC_Switch_KSU.zip",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v1.0/NFC_Switch_KSU.zip",
+          "size": 746,
+          "downloadCount": 5
+        },
+        {
+          "name": "NFC_Switch_LSPosed.apk",
+          "downloadUrl": "https://github.com/1321B54/nfc-switcher/releases/download/v1.0/NFC_Switch_LSPosed.apk",
+          "size": 42521,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

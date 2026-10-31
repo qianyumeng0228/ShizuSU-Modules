@@ -1,0 +1,975 @@
+{
+  "readme": "[![GitHub last commit](https://img.shields.io/github/last-commit/symbuzzer/Turkish-Ad-Hosts)](https://github.com/symbuzzer/Turkish-Ad-Hosts/commits/main) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/symbuzzer/Turkish-Ad-Hosts?color=gr) [![shields.io Stars](https://img.shields.io/github/stars/symbuzzer/Turkish-Ad-Hosts?color=gr)](https://github.com/symbuzzer/Turkish-Ad-Hosts/stargazers) [![Github All Releases](https://img.shields.io/github/downloads/symbuzzer/Turkish-Ad-Hosts/total.svg)]() ![](https://img.shields.io/badge/first%20release-Nov%2017%2C%202022-brightgreen) \n\n# Turkish Ad Hosts - v26090418\n  \n- [İndir / Download](https://github.com/symbuzzer/Turkish-Ad-Hosts/releases)  \n- [Wiki](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki)\n- Hosts: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/hosts```  \n- Filter: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/adguard/filter.txt```  \n- Plain DNS list: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/dns```\n  \n------------------------------------------\n## [TR] MANİFESTO  \n- Türkiye'de yaygın kullanılan mobil uygulamalardaki (ve muhtemelen WEB sayfalarındaki) izleme (ve beraberinde muhtemelen reklam) ağlarını engellemek için gerekli hosts dosyası...  \n- Ayrıca Türkiye'de popüler olarak kullanılan yabancı uygulamalar ve WEB sayfalarını da olabildiğince eklemeye çalışıyorum.  \n- Bu listenin hazırlanmasındaki temel amaç, geliştiricilerin reklam gelirlerini ellerinden almak değil. Ancak izleme sistemlerini incelerken bir çok reklam sisteminin kullanıcı verilerini elde ettiğini ve işlediğini farkettik. Bu sebeple aslında bir çok reklam sistemi de bu listenin içerisinde engellenmek üzere yerini buldu. Eğer bir reklam sisteminin kullanıcı verisi elde etmediğini ve işlemediğini iddia ediyorsanız, listemizden kaldırmanız için her zaman bize yazabilirsiniz.  \n- Kendi şahsi kullanımım için hazırlanmıştır. Kullanmak kendi sorumluluğunuzdadır.  \n- Bu liste, bütün uygulamalar tek tek denenerek ortaya çıkan DNS adreslerinin MITM ve başkaca metotlarla incelenmesiyle oluşturulmuştur.  \n- Yükleme ve kullanma rehberini [Wiki sayfasından](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki) görebilirsiniz.  \n- Eğer bir siteyi engelleme listesine eklemek veya çıkarmak istiyorsanız veya taranması için uygulama önerecekseniz, [issue](https://github.com/symbuzzer/Turkish-Ad-Hosts/issues) oluşturun.  \n- Bu liste günlük olarak güncellenmeye çalışılacaktır.  \n- Resmi ekşisözlük başlığı: [turkish-ad-hosts projesi](https://eksisozluk.com/turkish-ad-hosts-projesi--7473699)\n  \n-------------------------------------------  \n## [EN] THE MANIFEST  \n- Necessary hosts file to block tracking (and possibly advertising) networks in commonly used mobile applications (and possibly WEB pages) in Turkey...  \n- I also try to add foreign applications and WEB pages that are popularly used in Turkey as much as possible.  \n- The main purpose of preparing this list is not to take away the advertising revenues of the developers. However, while examining the tracking systems, we noticed that many advertising systems obtain and process user data. For this reason, many advertising systems have found their place in this list to be blocked. If you claim that an ad system does not obtain and process user data, you can always write to us to have it removed from our list.  \n- Prepared for my own personal use. Use at your own risk.  \n- This list has been created by testing all applications one by one and examining the DNS addresses that have emerged by using MITM and other methods.    \n- You can see install and using guides from [Wiki page](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki).  \n- If you want to add or remove a site from the block list or suggest app for scanning, please create [issue](https://github.com/symbuzzer/Turkish-Ad-Hosts/issues).  \n- This list will try to be updated daily.  \n",
+  "readmeHTML": "<p><a href=\"https://img.shields.io/github/last-commit/symbuzzer/Turkish-Ad-Hosts\">![GitHub last commit</a>](https://github.com/symbuzzer/Turkish-Ad-Hosts/commits/main) !<a href=\"https://img.shields.io/github/commit-activity/y/symbuzzer/Turkish-Ad-Hosts?color=gr\">GitHub commit activity</a> <a href=\"https://img.shields.io/github/stars/symbuzzer/Turkish-Ad-Hosts?color=gr\">![shields.io Stars</a>](https://github.com/symbuzzer/Turkish-Ad-Hosts/stargazers) <a href=\"https://img.shields.io/github/downloads/symbuzzer/Turkish-Ad-Hosts/total.svg\">![Github All Releases</a>]() ![](https://img.shields.io/badge/first%20release-Nov%2017%2C%202022-brightgreen)</p>\n\n<h1>Turkish Ad Hosts - v26090418</h1>\n\n<li>[İndir / Download](https://github.com/symbuzzer/Turkish-Ad-Hosts/releases)</li>\n<li>[Wiki](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki)</li>\n<li>Hosts: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/hosts```</li>\n<li>Filter: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/adguard/filter.txt```</li>\n<li>Plain DNS list: ```https://raw.githubusercontent.com/symbuzzer/Turkish-Ad-Hosts/main/dns```</li>\n\n<p>------------------------------------------</p>\n<h2>[TR] MANİFESTO</h2>\n<li>Türkiye'de yaygın kullanılan mobil uygulamalardaki (ve muhtemelen WEB sayfalarındaki) izleme (ve beraberinde muhtemelen reklam) ağlarını engellemek için gerekli hosts dosyası...</li>\n<li>Ayrıca Türkiye'de popüler olarak kullanılan yabancı uygulamalar ve WEB sayfalarını da olabildiğince eklemeye çalışıyorum.</li>\n<li>Bu listenin hazırlanmasındaki temel amaç, geliştiricilerin reklam gelirlerini ellerinden almak değil. Ancak izleme sistemlerini incelerken bir çok reklam sisteminin kullanıcı verilerini elde ettiğini ve işlediğini farkettik. Bu sebeple aslında bir çok reklam sistemi de bu listenin içerisinde engellenmek üzere yerini buldu. Eğer bir reklam sisteminin kullanıcı verisi elde etmediğini ve işlemediğini iddia ediyorsanız, listemizden kaldırmanız için her zaman bize yazabilirsiniz.</li>\n<li>Kendi şahsi kullanımım için hazırlanmıştır. Kullanmak kendi sorumluluğunuzdadır.</li>\n<li>Bu liste, bütün uygulamalar tek tek denenerek ortaya çıkan DNS adreslerinin MITM ve başkaca metotlarla incelenmesiyle oluşturulmuştur.</li>\n<li>Yükleme ve kullanma rehberini [Wiki sayfasından](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki) görebilirsiniz.</li>\n<li>Eğer bir siteyi engelleme listesine eklemek veya çıkarmak istiyorsanız veya taranması için uygulama önerecekseniz, [issue](https://github.com/symbuzzer/Turkish-Ad-Hosts/issues) oluşturun.</li>\n<li>Bu liste günlük olarak güncellenmeye çalışılacaktır.</li>\n<li>Resmi ekşisözlük başlığı: [turkish-ad-hosts projesi](https://eksisozluk.com/turkish-ad-hosts-projesi--7473699)</li>\n\n<p>-------------------------------------------</p>\n<h2>[EN] THE MANIFEST</h2>\n<li>Necessary hosts file to block tracking (and possibly advertising) networks in commonly used mobile applications (and possibly WEB pages) in Turkey...</li>\n<li>I also try to add foreign applications and WEB pages that are popularly used in Turkey as much as possible.</li>\n<li>The main purpose of preparing this list is not to take away the advertising revenues of the developers. However, while examining the tracking systems, we noticed that many advertising systems obtain and process user data. For this reason, many advertising systems have found their place in this list to be blocked. If you claim that an ad system does not obtain and process user data, you can always write to us to have it removed from our list.</li>\n<li>Prepared for my own personal use. Use at your own risk.</li>\n<li>This list has been created by testing all applications one by one and examining the DNS addresses that have emerged by using MITM and other methods.</li>\n<li>You can see install and using guides from [Wiki page](https://github.com/symbuzzer/Turkish-Ad-Hosts/wiki).</li>\n<li>If you want to add or remove a site from the block list or suggest app for scanning, please create [issue](https://github.com/symbuzzer/Turkish-Ad-Hosts/issues).</li>\n<li>This list will try to be updated daily.</li>",
+  "homepageUrl": "https://symbuzzer.github.io/adtest",
+  "sourceUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts",
+  "url": "https://github.com/symbuzzer/Turkish-Ad-Hosts",
+  "latestRelease": {
+    "name": "v26090418",
+    "version": "v26090418",
+    "time": "2026-09-04T18:14:21Z",
+    "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26090418/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip"
+  },
+  "releases": [
+    {
+      "name": "v26090418",
+      "tagName": "v26090418",
+      "publishedAt": "2026-09-04T18:14:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26090418/filter.txt",
+          "size": 48360,
+          "downloadCount": 29
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26090418/hosts",
+          "size": 75728,
+          "downloadCount": 25
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26090418/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34614,
+          "downloadCount": 116
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26090418/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v26082914",
+      "tagName": "v26082914",
+      "publishedAt": "2026-08-29T14:43:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26082914/filter.txt",
+          "size": 48335,
+          "downloadCount": 6
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26082914/hosts",
+          "size": 75696,
+          "downloadCount": 7
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26082914/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34604,
+          "downloadCount": 44
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26082914/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v26052907",
+      "tagName": "v26052907",
+      "publishedAt": "2026-05-29T07:13:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26052907/filter.txt",
+          "size": 48307,
+          "downloadCount": 80
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26052907/hosts",
+          "size": 75548,
+          "downloadCount": 93
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26052907/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34564,
+          "downloadCount": 313
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26052907/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v26041007",
+      "tagName": "v26041007",
+      "publishedAt": "2026-04-10T07:09:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26041007/filter.txt",
+          "size": 48249,
+          "downloadCount": 106
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26041007/hosts",
+          "size": 75476,
+          "downloadCount": 226
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26041007/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34541,
+          "downloadCount": 259
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26041007/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v26032020",
+      "tagName": "v26032020",
+      "publishedAt": "2026-03-20T20:24:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26032020/filter.txt",
+          "size": 48190,
+          "downloadCount": 37
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26032020/hosts",
+          "size": 75402,
+          "downloadCount": 145
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26032020/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34527,
+          "downloadCount": 138
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26032020/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v26022010",
+      "tagName": "v26022010",
+      "publishedAt": "2026-02-20T10:01:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26022010/filter.txt",
+          "size": 48045,
+          "downloadCount": 13
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26022010/hosts",
+          "size": 75208,
+          "downloadCount": 238
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26022010/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34485,
+          "downloadCount": 53
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v26022010/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v25122419",
+      "tagName": "v25122419",
+      "publishedAt": "2025-12-24T19:49:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25122419/filter.txt",
+          "size": 47716,
+          "downloadCount": 21
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25122419/hosts",
+          "size": 74716,
+          "downloadCount": 31
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25122419/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34353,
+          "downloadCount": 122
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25122419/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v25102018",
+      "tagName": "v25102018",
+      "publishedAt": "2025-10-20T18:07:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25102018/filter.txt",
+          "size": 47261,
+          "downloadCount": 529
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25102018/hosts",
+          "size": 74107,
+          "downloadCount": 45
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25102018/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34188,
+          "downloadCount": 193
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25102018/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v25101709",
+      "tagName": "v25101709",
+      "publishedAt": "2025-10-17T09:12:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25101709/filter.txt",
+          "size": 47278,
+          "downloadCount": 8
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25101709/hosts",
+          "size": 74131,
+          "downloadCount": 8
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25101709/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34192,
+          "downloadCount": 47
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25101709/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v25100708",
+      "tagName": "v25100708",
+      "publishedAt": "2025-10-07T08:40:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100708/filter.txt",
+          "size": 46963,
+          "downloadCount": 72
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100708/hosts",
+          "size": 73711,
+          "downloadCount": 9
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100708/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34070,
+          "downloadCount": 69
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100708/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v25100318",
+      "tagName": "v25100318",
+      "publishedAt": "2025-10-03T18:49:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100318/filter.txt",
+          "size": 46695,
+          "downloadCount": 4
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100318/hosts",
+          "size": 73359,
+          "downloadCount": 8
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100318/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 34001,
+          "downloadCount": 37
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25100318/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v25093009",
+      "tagName": "v25093009",
+      "publishedAt": "2025-09-30T09:11:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25093009/filter.txt",
+          "size": 46592,
+          "downloadCount": 3
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25093009/hosts",
+          "size": 73228,
+          "downloadCount": 20
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25093009/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33982,
+          "downloadCount": 34
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25093009/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v25092606",
+      "tagName": "v25092606",
+      "publishedAt": "2025-09-26T06:16:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092606/filter.txt",
+          "size": 46444,
+          "downloadCount": 11
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092606/hosts",
+          "size": 73038,
+          "downloadCount": 15
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092606/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33922,
+          "downloadCount": 50
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092606/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v25092406",
+      "tagName": "v25092406",
+      "publishedAt": "2025-09-24T06:48:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092406/filter.txt",
+          "size": 46399,
+          "downloadCount": 3
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092406/hosts",
+          "size": 72939,
+          "downloadCount": 5
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092406/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33903,
+          "downloadCount": 28
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25092406/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v25060619",
+      "tagName": "v25060619",
+      "publishedAt": "2025-06-06T19:30:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25060619/filter.txt",
+          "size": 46335,
+          "downloadCount": 147
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25060619/hosts",
+          "size": 72820,
+          "downloadCount": 61
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25060619/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33879,
+          "downloadCount": 259
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25060619/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v25040706",
+      "tagName": "v25040706",
+      "publishedAt": "2025-04-07T06:06:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040706/filter.txt",
+          "size": 46355,
+          "downloadCount": 58
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040706/hosts",
+          "size": 72847,
+          "downloadCount": 38
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040706/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33884,
+          "downloadCount": 194
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040706/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v25040205",
+      "tagName": "v25040205",
+      "publishedAt": "2025-04-02T05:15:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040205/filter.txt",
+          "size": 46264,
+          "downloadCount": 6
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040205/hosts",
+          "size": 72735,
+          "downloadCount": 8
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040205/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33844,
+          "downloadCount": 61
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25040205/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v25011604",
+      "tagName": "v25011604",
+      "publishedAt": "2025-01-16T04:47:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011604/filter.txt",
+          "size": 46281,
+          "downloadCount": 55
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011604/hosts",
+          "size": 72758,
+          "downloadCount": 99
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011604/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33854,
+          "downloadCount": 287
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011604/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "v25011321",
+      "tagName": "v25011321",
+      "publishedAt": "2025-01-13T21:20:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011321/filter.txt",
+          "size": 46302,
+          "downloadCount": 5
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011321/hosts",
+          "size": 72786,
+          "downloadCount": 6
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011321/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33884,
+          "downloadCount": 37
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25011321/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v25010608",
+      "tagName": "v25010608",
+      "publishedAt": "2025-01-06T08:23:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25010608/filter.txt",
+          "size": 46351,
+          "downloadCount": 10
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25010608/hosts",
+          "size": 72809,
+          "downloadCount": 13
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25010608/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33897,
+          "downloadCount": 58
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v25010608/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v24112707",
+      "tagName": "v24112707",
+      "publishedAt": "2024-11-27T07:20:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112707/filter.txt",
+          "size": 46336,
+          "downloadCount": 22
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112707/hosts",
+          "size": 72834,
+          "downloadCount": 159
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112707/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33904,
+          "downloadCount": 225
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112707/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v24112218",
+      "tagName": "v24112218",
+      "publishedAt": "2024-11-22T18:06:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112218/filter.txt",
+          "size": 46361,
+          "downloadCount": 9
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112218/hosts",
+          "size": 72866,
+          "downloadCount": 10
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112218/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33914,
+          "downloadCount": 67
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24112218/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v24102202",
+      "tagName": "v24102202",
+      "publishedAt": "2024-10-22T02:52:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24102202/filter.txt",
+          "size": 46388,
+          "downloadCount": 21
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24102202/hosts",
+          "size": 72900,
+          "downloadCount": 26
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24102202/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33927,
+          "downloadCount": 194
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24102202/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v24101607",
+      "tagName": "v24101607",
+      "publishedAt": "2024-10-16T07:55:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24101607/filter.txt",
+          "size": 46404,
+          "downloadCount": 7
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24101607/hosts",
+          "size": 72923,
+          "downloadCount": 11
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24101607/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 33932,
+          "downloadCount": 81
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24101607/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v24082408",
+      "tagName": "v24082408",
+      "publishedAt": "2024-08-24T08:52:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082408/filter.txt",
+          "size": 46404,
+          "downloadCount": 71
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082408/hosts",
+          "size": 72888,
+          "downloadCount": 55
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082408/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39171,
+          "downloadCount": 309
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082408/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v24082307",
+      "tagName": "v24082307",
+      "publishedAt": "2024-08-23T07:00:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082307/filter.txt",
+          "size": 46259,
+          "downloadCount": 3
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082307/hosts",
+          "size": 72708,
+          "downloadCount": 6
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082307/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39125,
+          "downloadCount": 23
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24082307/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v24080906",
+      "tagName": "v24080906",
+      "publishedAt": "2024-08-09T06:44:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24080906/filter.txt",
+          "size": 46277,
+          "downloadCount": 11
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24080906/hosts",
+          "size": 72733,
+          "downloadCount": 15
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24080906/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39131,
+          "downloadCount": 113
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24080906/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v24072515",
+      "tagName": "v24072515",
+      "publishedAt": "2024-07-25T15:48:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24072515/filter.txt",
+          "size": 46302,
+          "downloadCount": 399
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24072515/hosts",
+          "size": 72765,
+          "downloadCount": 15
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24072515/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39137,
+          "downloadCount": 109
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24072515/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v24051207",
+      "tagName": "v24051207",
+      "publishedAt": "2024-05-12T07:00:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051207/filter.txt",
+          "size": 46328,
+          "downloadCount": 41
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051207/hosts",
+          "size": 72798,
+          "downloadCount": 171
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051207/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39148,
+          "downloadCount": 297
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051207/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v24051114",
+      "tagName": "v24051114",
+      "publishedAt": "2024-05-11T14:01:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "filter.txt",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051114/filter.txt",
+          "size": 46263,
+          "downloadCount": 7
+        },
+        {
+          "name": "hosts",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051114/hosts",
+          "size": 72712,
+          "downloadCount": 7
+        },
+        {
+          "name": "turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051114/turkish-ad-hosts-magisk-kernelsu-apatch-module.zip",
+          "size": 39132,
+          "downloadCount": 30
+        },
+        {
+          "name": "turkish-ad-hosts-windows.bat",
+          "downloadUrl": "https://github.com/symbuzzer/Turkish-Ad-Hosts/releases/download/v24051114/turkish-ad-hosts-windows.bat",
+          "size": 6863,
+          "downloadCount": 10
+        }
+      ]
+    }
+  ]
+}

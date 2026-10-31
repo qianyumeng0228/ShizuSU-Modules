@@ -1,0 +1,372 @@
+{
+  "readme": "# System App Nuker\n\nHides preinstalled system apps on Magisk, KernelSU, and APatch without touching the system partition.\n\n[![Release](https://img.shields.io/github/v/release/chisewaguri/systemapp_nuker?logo=github&label=Release)](https://github.com/chisewaguri/systemapp_nuker/releases/latest)\n[![Downloads](https://img.shields.io/github/downloads/chisewaguri/systemapp_nuker/total?logo=github&label=Downloads)](https://github.com/chisewaguri/systemapp_nuker/releases)\n[![Telegram](https://img.shields.io/badge/Telegram-group-26A5E4?logo=telegram&logoColor=fff)](https://t.me/systemapp_nuker)\n\n> [!WARNING]\n> Each app shows a removal level from UAD-ng. Treat it as advice. Removing an app marked Unsafe can stop your phone from booting.\n\n## Requirements\n\nOne of these:\n\n- [Magisk](https://github.com/topjohnwu/Magisk)\n- [KernelSU](https://github.com/tiann/KernelSU). Newer builds also need a metamodule such as [mountify](https://github.com/backslashxx/mountify).\n- [APatch](https://github.com/bmax121/APatch)\n\n## Usage\n\nOn KernelSU and APatch, open the WebUI from the module page.\n\nOn Magisk, press the module action button. It opens [KSUWebUIStandalone](https://github.com/KOWX712/KsuWebUIStandalone) or [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable). If neither is installed, it installs KSUWebUIStandalone first.\n\nTo hide apps, select them on **Home**, press the nuke button, and reboot. To bring apps back, do the same from **Restore**.\n\n## Features\n\n- Hides apps with overlay whiteouts. The APKs stay on the system partition, so restoring an app only needs a reboot.\n- Shows a description and removal level for each app, taken from [UAD-ng](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation).\n- Uninstall Only Mode runs `pm uninstall --user 0` instead of creating whiteouts.\n- Imports and exports nuke lists.\n- If two boots in a row fail, the module disables itself and removes its whiteouts.\n\n## Credits\n\n- [mountify](https://github.com/backslashxx/mountify) for the mounting scripts and whiteout work.\n- [UAD-ng](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation) for app descriptions and removal levels, licensed GPL-3.0.\n- [Tricky Addon](https://github.com/KOWX712/Tricky-Addon-Update-Target-List) for the WebUI it inspired.\n- [zygisk-detach](https://github.com/j-hc/zygisk-detach) for the earlier app list handling.\n- Everyone who sent code, logs, or bug reports.\n\nBuild instructions are in [CONTRIBUTING.md](CONTRIBUTING.md).\n\n## Links\n\n[![Download](https://custom-icon-badges.demolab.com/badge/-Download-F25278?style=for-the-badge&logo=download&logoColor=white)](https://github.com/chisewaguri/systemapp_nuker/releases/latest)\n[![Issue](https://custom-icon-badges.demolab.com/badge/-Open%20Issue-palegreen?style=for-the-badge&logoColor=black&logo=issue-opened)](https://github.com/chisewaguri/systemapp_nuker/issues)\n[![Changelog](https://custom-icon-badges.demolab.com/badge/-Changelog-orange?style=for-the-badge&logo=history&logoColor=white)](CHANGELOG.md)\n[![Telegram](https://custom-icon-badges.demolab.com/badge/-Telegram-blue?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/systemapp_nuker)\n\nLicensed under [GPL-3.0](LICENSE).\n",
+  "readmeHTML": "<h1>System App Nuker</h1>\n\n<p>Hides preinstalled system apps on Magisk, KernelSU, and APatch without touching the system partition.</p>\n\n<p><a href=\"https://img.shields.io/github/v/release/chisewaguri/systemapp_nuker?logo=github&label=Release\">![Release</a>](https://github.com/chisewaguri/systemapp_nuker/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/downloads/chisewaguri/systemapp_nuker/total?logo=github&label=Downloads\">![Downloads</a>](https://github.com/chisewaguri/systemapp_nuker/releases)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-group-26A5E4?logo=telegram&logoColor=fff\">![Telegram</a>](https://t.me/systemapp_nuker)</p>\n\n<p>> [!WARNING]</p>\n<p>> Each app shows a removal level from UAD-ng. Treat it as advice. Removing an app marked Unsafe can stop your phone from booting.</p>\n\n<h2>Requirements</h2>\n\n<p>One of these:</p>\n\n<li>[Magisk](https://github.com/topjohnwu/Magisk)</li>\n<li>[KernelSU](https://github.com/tiann/KernelSU). Newer builds also need a metamodule such as [mountify](https://github.com/backslashxx/mountify).</li>\n<li>[APatch](https://github.com/bmax121/APatch)</li>\n\n<h2>Usage</h2>\n\n<p>On KernelSU and APatch, open the WebUI from the module page.</p>\n\n<p>On Magisk, press the module action button. It opens <a href=\"https://github.com/KOWX712/KsuWebUIStandalone\">KSUWebUIStandalone</a> or <a href=\"https://github.com/MMRLApp/WebUI-X-Portable\">WebUI X</a>. If neither is installed, it installs KSUWebUIStandalone first.</p>\n\n<p>To hide apps, select them on <b>Home</b>, press the nuke button, and reboot. To bring apps back, do the same from <b>Restore</b>.</p>\n\n<h2>Features</h2>\n\n<li>Hides apps with overlay whiteouts. The APKs stay on the system partition, so restoring an app only needs a reboot.</li>\n<li>Shows a description and removal level for each app, taken from [UAD-ng](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation).</li>\n<li>Uninstall Only Mode runs `pm uninstall --user 0` instead of creating whiteouts.</li>\n<li>Imports and exports nuke lists.</li>\n<li>If two boots in a row fail, the module disables itself and removes its whiteouts.</li>\n\n<h2>Credits</h2>\n\n<li>[mountify](https://github.com/backslashxx/mountify) for the mounting scripts and whiteout work.</li>\n<li>[UAD-ng](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation) for app descriptions and removal levels, licensed GPL-3.0.</li>\n<li>[Tricky Addon](https://github.com/KOWX712/Tricky-Addon-Update-Target-List) for the WebUI it inspired.</li>\n<li>[zygisk-detach](https://github.com/j-hc/zygisk-detach) for the earlier app list handling.</li>\n<li>Everyone who sent code, logs, or bug reports.</li>\n\n<p>Build instructions are in <a href=\"CONTRIBUTING.md\">CONTRIBUTING.md</a>.</p>\n\n<h2>Links</h2>\n\n<p><a href=\"https://custom-icon-badges.demolab.com/badge/-Download-F25278?style=for-the-badge&logo=download&logoColor=white\">![Download</a>](https://github.com/chisewaguri/systemapp_nuker/releases/latest)</p>\n<p><a href=\"https://custom-icon-badges.demolab.com/badge/-Open%20Issue-palegreen?style=for-the-badge&logoColor=black&logo=issue-opened\">![Issue</a>](https://github.com/chisewaguri/systemapp_nuker/issues)</p>\n<p><a href=\"https://custom-icon-badges.demolab.com/badge/-Changelog-orange?style=for-the-badge&logo=history&logoColor=white\">![Changelog</a>](CHANGELOG.md)</p>\n<p><a href=\"https://custom-icon-badges.demolab.com/badge/-Telegram-blue?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram</a>](https://t.me/systemapp_nuker)</p>\n\n<p>Licensed under <a href=\"LICENSE\">GPL-3.0</a>.</p>",
+  "homepageUrl": "https://github.com/chisewaguri/systemapp_nuker",
+  "sourceUrl": "https://github.com/chisewaguri/systemapp_nuker",
+  "url": "https://github.com/chisewaguri/systemapp_nuker",
+  "latestRelease": {
+    "name": "v2.2.6",
+    "version": "v2.2.6",
+    "time": "2026-10-03T04:36:33Z",
+    "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.6/SAN_v2.2.6.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.2.6",
+      "tagName": "v2.2.6",
+      "publishedAt": "2026-10-03T04:36:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.6.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.6/SAN_v2.2.6.zip",
+          "size": 784050,
+          "downloadCount": 1437
+        }
+      ]
+    },
+    {
+      "name": "v2.2.5",
+      "tagName": "v2.2.5",
+      "publishedAt": "2026-10-02T19:33:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.5.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.5/SAN_v2.2.5.zip",
+          "size": 783295,
+          "downloadCount": 104
+        }
+      ]
+    },
+    {
+      "name": "v2.2.4",
+      "tagName": "v2.2.4",
+      "publishedAt": "2026-10-01T09:42:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.4.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.4/SAN_v2.2.4.zip",
+          "size": 500089,
+          "downloadCount": 240
+        }
+      ]
+    },
+    {
+      "name": "v2.2.3",
+      "tagName": "v2.2.3",
+      "publishedAt": "2026-09-30T13:46:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.3.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.3/SAN_v2.2.3.zip",
+          "size": 499469,
+          "downloadCount": 179
+        }
+      ]
+    },
+    {
+      "name": "v2.2.2",
+      "tagName": "v2.2.2",
+      "publishedAt": "2026-08-30T01:47:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.2.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.2/SAN_v2.2.2.zip",
+          "size": 495892,
+          "downloadCount": 1489
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2026-08-28T12:21:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.2.1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.2.1/SAN_v2.2.1.zip",
+          "size": 495879,
+          "downloadCount": 353
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-08-28T06:54:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v2.1.1",
+      "tagName": "v2.1.1",
+      "publishedAt": "2026-08-17T09:08:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.1.1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.1.1/SAN_v2.1.1.zip",
+          "size": 489003,
+          "downloadCount": 577
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-08-15T10:57:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.1.0.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.1.0/SAN_v2.1.0.zip",
+          "size": 488765,
+          "downloadCount": 229
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-07-07T14:14:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v2.0.0.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v2.0.0/SAN_v2.0.0.zip",
+          "size": 488280,
+          "downloadCount": 1376
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-05-09T04:55:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.2.1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.2.1/SAN_v1.2.1.zip",
+          "size": 1215187,
+          "downloadCount": 1692
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-04-13T11:31:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.2.0.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.2.0/SAN_v1.2.0.zip",
+          "size": 1215189,
+          "downloadCount": 996
+        }
+      ]
+    },
+    {
+      "name": "v1.1.9",
+      "tagName": "v1.1.9",
+      "publishedAt": "2025-10-12T18:29:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.9.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.9/SAN_v1.1.9.zip",
+          "size": 1213816,
+          "downloadCount": 3105
+        }
+      ]
+    },
+    {
+      "name": "v1.1.8",
+      "tagName": "v1.1.8",
+      "publishedAt": "2025-10-11T09:30:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.8.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.8/SAN_v1.1.8.zip",
+          "size": 1243178,
+          "downloadCount": 247
+        }
+      ]
+    },
+    {
+      "name": "v1.1.7",
+      "tagName": "v1.1.7",
+      "publishedAt": "2025-06-18T18:22:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.7.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.7/SAN_v1.1.7.zip",
+          "size": 1242016,
+          "downloadCount": 2434
+        }
+      ]
+    },
+    {
+      "name": "v1.1.6",
+      "tagName": "v1.1.6",
+      "publishedAt": "2025-06-07T15:57:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.6.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.6/SAN_v1.1.6.zip",
+          "size": 1241724,
+          "downloadCount": 570
+        }
+      ]
+    },
+    {
+      "name": "v1.1.5",
+      "tagName": "v1.1.5",
+      "publishedAt": "2025-05-08T04:45:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.5.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.5/SAN_v1.1.5.zip",
+          "size": 1242775,
+          "downloadCount": 813
+        }
+      ]
+    },
+    {
+      "name": "v1.1.4",
+      "tagName": "v1.1.4",
+      "publishedAt": "2025-04-21T11:01:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.4.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.4/SAN_v1.1.4.zip",
+          "size": 1210236,
+          "downloadCount": 539
+        }
+      ]
+    },
+    {
+      "name": "v1.1.3",
+      "tagName": "v1.1.3",
+      "publishedAt": "2025-04-04T13:01:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.3.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.3/SAN_v1.1.3.zip",
+          "size": 1208663,
+          "downloadCount": 641
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2025-03-29T18:45:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.2.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.2/SAN_v1.1.2.zip",
+          "size": 1205547,
+          "downloadCount": 352
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2025-03-25T19:44:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1.1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1.1/SAN_v1.1.1.zip",
+          "size": 1235280,
+          "downloadCount": 217
+        }
+      ]
+    },
+    {
+      "name": "v1.1-release",
+      "tagName": "v1.1-release",
+      "publishedAt": "2025-03-20T17:57:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.1-release.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.1-release/SAN_v1.1-release.zip",
+          "size": 1233712,
+          "downloadCount": 242
+        }
+      ]
+    },
+    {
+      "name": "v1.0-release",
+      "tagName": "v1.0-release",
+      "publishedAt": "2025-03-16T12:35:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.0-release.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.0-release/SAN_v1.0-release.zip",
+          "size": 1219312,
+          "downloadCount": 328
+        }
+      ]
+    },
+    {
+      "name": "v1.0-rc2",
+      "tagName": "v1.0-rc2",
+      "publishedAt": "2025-03-13T12:40:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SAN_v1.0-rc2.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.0-rc2/SAN_v1.0-rc2.zip",
+          "size": 1215587,
+          "downloadCount": 92
+        }
+      ]
+    },
+    {
+      "name": "v1.0-rc1",
+      "tagName": "v1.0-rc1",
+      "publishedAt": "2025-03-10T17:09:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemapp_nuker-v1.0-rc1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.0-rc1/systemapp_nuker-v1.0-rc1.zip",
+          "size": 1144147,
+          "downloadCount": 83
+        }
+      ]
+    },
+    {
+      "name": "v1.0-beta-r1",
+      "tagName": "v1.0-beta-r1",
+      "publishedAt": "2025-03-09T03:16:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "systemapp_nuker-v1.0-beta-r1.zip",
+          "downloadUrl": "https://github.com/chisewaguri/systemapp_nuker/releases/download/v1.0-beta-r1/systemapp_nuker-v1.0-beta-r1.zip",
+          "size": 1167848,
+          "downloadCount": 202
+        }
+      ]
+    }
+  ]
+}

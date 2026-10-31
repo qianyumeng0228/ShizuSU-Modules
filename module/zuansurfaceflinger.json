@@ -1,0 +1,29 @@
+{
+  "readme": "# ZuanSurfaceTweak\n\nZuanSurfaceTweak is a lightweight performance module for Android, designed to improve UI responsiveness by optimizing SurfaceFlinger, CPU scheduling, and I/O handling. Built with KernelSU support and zero UI — just pure backend tuning.\n\n---\n\n## 🔧 Features\n\n- **SurfaceFlinger Guard Module**\n  - Injects `ksu_surfaceflinger_guard.ko` via KernelSU\n  - Forces `uclamp.min/max` on SurfaceFlinger process\n  - Keeps rendering performance consistent\n\n- **Scheduler & CPU Tweaks**\n  - Sets CPU governor to `performance`\n  - Enables `sched_boost`\n  - Disables scheduling and migration delays\n\n- **Touch & I/O Tuning**\n  - Enables `touchboost` / `inputboost` (if supported)\n  - Sets I/O scheduler to `bfq`\n\n- **Fully Automated**\n  - Loads `.ko` automatically via `post-fs-data.sh`\n  - Self-healing script permissions (`chmod 0755 \"$0\"`)\n\n---\n\n## 📦 Installation\n\n- Flash via KernelSU Manager or Magisk (Zips properly structured)\n- No configuration needed\n- Compatible with GKI and non-GKI setups (as long as KernelSU is integrated)\n\n---\n\n## 📄 Changelog\n\n### v2\n\n- Injected `ksu_surfaceflinger_guard.ko` to force SurfaceFlinger priority\n- CPU set to `performance` governor by default\n- `sched_latency` and `migration_cost` tuned for lower scheduling overhead\n- Touch and input boost enabled where available\n- Applied `BFQ` scheduler on main block device\n- All scripts include self-permission fixes\n\n---\n\n## ⚠️ Disclaimer\n\n> Use at your own risk.  \n> If your device overheats, bootloops, or becomes sentient, we are not responsible.\n\n---\n\n## 🙌 Credits\n\n- Based on open kernel behavior via KernelSU  \n- Maintained by [Zuan](https://github.com/idovpn1321)\n",
+  "readmeHTML": "<h1>ZuanSurfaceTweak</h1>\n\n<p>ZuanSurfaceTweak is a lightweight performance module for Android, designed to improve UI responsiveness by optimizing SurfaceFlinger, CPU scheduling, and I/O handling. Built with KernelSU support and zero UI — just pure backend tuning.</p>\n\n<p>---</p>\n\n<h2>🔧 Features</h2>\n\n<li>**SurfaceFlinger Guard Module**</li>\n<p>  - Injects <code>ksu_surfaceflinger_guard.ko</code> via KernelSU</p>\n<p>  - Forces <code>uclamp.min/max</code> on SurfaceFlinger process</p>\n<p>  - Keeps rendering performance consistent</p>\n\n<li>**Scheduler & CPU Tweaks**</li>\n<p>  - Sets CPU governor to <code>performance</code></p>\n<p>  - Enables <code>sched_boost</code></p>\n<p>  - Disables scheduling and migration delays</p>\n\n<li>**Touch & I/O Tuning**</li>\n<p>  - Enables <code>touchboost</code> / <code>inputboost</code> (if supported)</p>\n<p>  - Sets I/O scheduler to <code>bfq</code></p>\n\n<li>**Fully Automated**</li>\n<p>  - Loads <code>.ko</code> automatically via <code>post-fs-data.sh</code></p>\n<p>  - Self-healing script permissions (<code>chmod 0755 \"$0\"</code>)</p>\n\n<p>---</p>\n\n<h2>📦 Installation</h2>\n\n<li>Flash via KernelSU Manager or Magisk (Zips properly structured)</li>\n<li>No configuration needed</li>\n<li>Compatible with GKI and non-GKI setups (as long as KernelSU is integrated)</li>\n\n<p>---</p>\n\n<h2>📄 Changelog</h2>\n\n<h3>v2</h3>\n\n<li>Injected `ksu_surfaceflinger_guard.ko` to force SurfaceFlinger priority</li>\n<li>CPU set to `performance` governor by default</li>\n<li>`sched_latency` and `migration_cost` tuned for lower scheduling overhead</li>\n<li>Touch and input boost enabled where available</li>\n<li>Applied `BFQ` scheduler on main block device</li>\n<li>All scripts include self-permission fixes</li>\n\n<p>---</p>\n\n<h2>⚠️ Disclaimer</h2>\n\n<p>> Use at your own risk.</p>\n<p>> If your device overheats, bootloops, or becomes sentient, we are not responsible.</p>\n\n<p>---</p>\n\n<h2>🙌 Credits</h2>\n\n<li>Based on open kernel behavior via KernelSU</li>\n<li>Maintained by [Zuan](https://github.com/idovpn1321)</li>",
+  "homepageUrl": "https://github.com/idovpn1321/ZuanSurfaceFlinger",
+  "sourceUrl": "https://github.com/idovpn1321/ZuanSurfaceFlinger",
+  "url": "https://github.com/idovpn1321/ZuanSurfaceFlinger",
+  "latestRelease": {
+    "name": "Modul",
+    "version": "Modul",
+    "time": "2025-06-22T03:48:58Z",
+    "downloadUrl": "https://github.com/idovpn1321/ZuanSurfaceFlinger/releases/download/Modul/ZuanSurfaceTweak_Modified.zip"
+  },
+  "releases": [
+    {
+      "name": "Modul",
+      "tagName": "Modul",
+      "publishedAt": "2025-06-22T03:48:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZuanSurfaceTweak_Modified.zip",
+          "downloadUrl": "https://github.com/idovpn1321/ZuanSurfaceFlinger/releases/download/Modul/ZuanSurfaceTweak_Modified.zip",
+          "size": 5806,
+          "downloadCount": 418
+        }
+      ]
+    }
+  ]
+}

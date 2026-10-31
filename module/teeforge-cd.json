@@ -1,0 +1,293 @@
+{
+  "readme": "# TeeForge-CD\n\n面向 Magisk、KernelSU 和 APatch 模块环境的 Android 工具，用于维护 TEE 目标模块的应用列表、执行 bootloader 属性弱化处理，并按需同步 Keybox。\n\n**目标配置开机更新，Keybox 按需同步。**\n\n> [!WARNING]\n> 现有三个对接目标的配置契约不同：Tricky Store 与 TEESimulator-RS 使用 `/data/adb/tricky_store/target.txt`，TEESimulator 使用 `/data/adb/teesim/config.json` 的 `profiles.teeforge.apps`；Keybox 分别位于对应目录。Oh My Keymint（OMK）仅适配应用作用域，安装时检测并固化启用状态，不接管其 Keybox 或服务配置。BL 弱化不等于重新锁定 bootloader，也不能保证通过任何外部检测。\n\n> [!NOTE]\n> 当前 `master` 构建基线为 Android 7.0（API 24）及以上，包含 `arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64` 四种 ABI。四架构自动化构建已经验证，真机与模拟器覆盖仍需分别验收；稳定 Release 可能晚于 `master`，实际支持范围以对应 Release 说明和安装输出为准。\n\n[下载稳定版](https://github.com/mcxiaochenn/TeeForge-CD/releases/latest) · [项目文档](docs/README.md)\n\n## 功能\n\n- **自动维护目标配置**：一次扫描用户安装的应用并分别更新已存在的兼容目标配置，失败时保留旧文件。\n- **弱化 BL 相关属性**：通过 resetprop 处理 bootloader、Verified Boot、调试和厂商相关属性，可按类别关闭。\n- **按需同步 Keybox**：来源由你显式选择——本机 RKP 产物或远程公共密钥池；远程池支持三个槽位；不自动回退，更新失败时保留已有文件。\n- **设备端 RKP 签发（独立功能）**：在高通 arm64 设备上调用本机 Keymint TA 向 Google RKP 申请本机专属证书链，产物单独保存在 `/data/adb/teeforge/RKP/`，与 Keybox 安装解耦。\n- **目标作用域可细调**：支持全量模式与手动模式；手动选择保存在本机，重启后保持，不会被开机全量覆盖。\n- **模块更新**：WebUI 内置更新检查，优先使用中国大陆可直连的自建 CDN，并校验清单中的 sha256。\n- **安装时架构选择**：模块包内置四种 ABI，安装器按设备 ABI 选择并校验对应 ELF，不使用其他架构兜底。\n- **配置与 Root 检测**：识别 Magisk、KernelSU 或 APatch 环境，用户配置在升级时默认保留。\n- **WebUI 与命令行**：支持模块 Action、兼容的模块 WebUI 以及设备端 CLI。\n\n开机服务会更新模块描述、执行 BL 弱化并更新目标配置；Keybox 下载只在用户主动运行 Action、WebUI 操作或 `--keybox` 时执行。\n\n## 兼容性与前置条件\n\n| 项目 | 当前 `master` 范围 |\n|---|---|\n| Android | Android 7.0 / API 24 及以上；Root 管理器自身可能有更高要求 |\n| Root 环境 | Magisk、KernelSU、APatch 的兼容 Magisk 模块环境；未设置硬编码最低管理器版本 |\n| ABI | `arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64` |\n| 目标模块 | Tricky Store、TEESimulator、TEESimulator-RS；Oh My Keymint 仅应用作用域 |\n| 目标配置 | Tricky Store/TEESimulator-RS：`/data/adb/tricky_store/target.txt`；TEESimulator：`/data/adb/teesim/config.json` 的 `profiles.teeforge.apps` |\n| OMK 作用域 | 安装时检测并固化；更新 `/data/misc/keystore/omk/injector.toml` 的 `scoop`；OMK 自身要求 Android 12+，真机待验收 |\n| Keybox | Tricky Store/TEESimulator-RS：`/data/adb/tricky_store/keybox.xml`；TEESimulator：`/data/adb/teesim/keybox.xml`；来源可选远程池或本机 RKP |\n| RKP 产物 | `/data/adb/teeforge/RKP/`（`keybox.xml`、`cert-chain.pem`、`meta.json`，权限 0600） |\n| 设备端 RKP | 仅 `arm64-v8a` + 高通 SoC + `/vendor/lib64/libkeymasterdeviceutils.so` + `/dev/smcinvoke`；其余环境只能使用远程 Keybox |\n| 属性工具 | 全架构统一使用 Root 环境提供的 standard resetprop |\n| WebUI | 需要支持 KernelSU 模块 WebUI 接口的管理器；其他环境可使用 Action 或终端 |\n\n安装前请确保：\n\n- 已从本仓库官方 Release 下载模块 ZIP，而不是 GitHub 自动生成的 Source code 压缩包。\n- 如需使用目标配置或 Keybox 功能，已安装并配置上述任一兼容目标模块；TeeForge 只更新实际存在的后端配置，不创建幽灵目录。\n- 知道当前 Root 管理器的模块禁用或安全模式入口，以便异常启动时恢复。\n- 需要保留旧配置时，提前备份 `/data/adb/teeforge/config.conf`。\n\n仓库当前没有宣称所有 Root 管理器版本、ROM 和设备组合都已完成真机验证。自动化结果与待验收项见[当前路线图](docs/maintenance/ROADMAP.md)。\n\n## 下载与安装\n\n普通用户应使用 [GitHub Releases](https://github.com/mcxiaochenn/TeeForge-CD/releases/latest) 中的正式模块 ZIP。\n\n> [!WARNING]\n> Dev 包和 GitHub Actions Artifact 仅用于测试，可能包含未发布行为，不能作为稳定版或长期回退包。稳定版与 Dev 版使用不同的更新渠道。\n\n1. 在 Magisk、KernelSU 或 APatch 管理器的“模块”页面选择从本地安装。\n2. 选择从官方 Release 下载的 TeeForge-CD ZIP，不要解压。\n3. 安装器先校验包内 `.sha256` 清单，再选择并验证当前设备 ABI；清单缺失、文件异常或 ABI 不支持时会中止安装。\n4. 检测到已有配置时：音量加保留配置，音量减清除全部 TeeForge 数据；10 秒无操作默认保留。\n5. 安装器统一使用 standard resetprop，并显示 OMK 作用域适配检测结果；OMK 待更新模块优先，禁用或待卸载时不启用适配。\n6. 安装完成后重启设备。\n\nRecovery 刷入未纳入当前验收范围，请优先使用 Root 管理器安装。\n\n## 安装后验证\n\n重启并等待系统完成启动后，在 Root 管理器的模块页面检查 TeeForge-CD 描述：正常情况下会由“等待重启”更新为包含 Root 类型、TeeForge-CD 版本、ABI 和 Keybox 状态的信息。`keybox: N/A` 表示尚无本地 Keybox 记录，不代表安装失败；描述仍停留在等待状态，则表示描述更新尚未完成。描述更新发生在其他开机动作之前，因此还需继续验证实际使用的功能。\n\n随后按已安装的后端检查目标配置。Tricky Store/TEESimulator-RS：\n\n```sh\nsu -c 'test -s /data/adb/tricky_store/target.txt && wc -l /data/adb/tricky_store/target.txt'\n```\n\n命令应成功返回非零行数。使用 TEESimulator 时检查受管 profile：\n\n```sh\nsu -c \"grep -n 'teeforge\\|_teeforgeManaged' /data/adb/teesim/config.json\"\n```\n\n文件不存在、为空、缺少受管 profile 或命令退出码非零时，应按“故障排查与反馈”收集信息。\n\n如果只使用 BL 弱化且未安装兼容目标模块，可跳过目标配置检查，改为执行以下命令；退出码为 0 表示本次属性命令均已成功执行：\n\n```sh\nsu -c '/data/adb/modules/teeforge_cd/teeforge --hide-bl'\n```\n\n还可以在 Root 管理器中运行模块 Action。Action 会依次同步 Keybox 和更新目标配置；两步均成功时输出 `完成 [Done]`，无需再次重启。任一步失败都会输出非零状态，不应视为成功。\n\n## 使用与配置\n\n### 常用入口\n\n- **开机自动执行**：更新模块描述、执行 BL 弱化、更新已存在的目标配置。\n- **模块 Action**：音量键两级菜单。音量下切换高亮、音量上确认、15 秒无操作取消；先询问是否执行，再选择“更新 Keybox”（本机 RKP / 远程池）或“更新目标作用域”。全过程写入 `/data/adb/teeforge/logs/action-*.log`。\n- **WebUI**：顶部是设备信息栏，下面是“更新目标作用域”“Keybox 配置”“本机 RKP 签发”“模块与更新”四个入口。\n- **CLI**：适用于终端操作和问题定位。\n\nKeybox 配置选择远程池后可选择槽位 1/2/3，默认槽位 1；安装成功后保存来源和槽位。普通应用跳过内容相同的文件，“强制拉取并替换”会重新请求并写入模块副本及所有已检测到的兼容后端，即使内容相同。下载、格式校验、写入回读或配置保存失败时保留或回滚旧数据，不自动换槽。格式有效不代表未吊销、后端接受或外部检测通过。\n\n常用 CLI 命令需要 Root：\n\n```sh\nsu -c '/data/adb/modules/teeforge_cd/teeforge --generate'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --hide-bl'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source remote --remote-slot 1 --save-selection'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source remote --remote-slot 2 --force --save-selection'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-status'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-issue'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-probe --json'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source rkp'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --target-list --json'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --self-update check'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --help'\n```\n\n`--rkp-status` 只做本地检查（SoC、厂商库、`/dev/smcinvoke`、fingerprint），不联网、不调用 TA，用于判断设备端 RKP 是否具备条件。`--rkp-probe` 是诊断命令：取一次 challenge 后，把缓冲区初始化、`security_level`、请求封装、厂商对象大小四组变量拆成 8 个变体，每个变体在独立子进程中调用一次 TA，输出对照数据。同时会解析 `/vendor/lib64/libkeymasterdeviceutils.so` 的动态符号表，列出 `KeymasterUtils` 与 `send_cmd` 相关入口——如果固件提供了必须先调用的初始化方法或别的重载，会在 `library_symbols` 里直接暴露。所有查询类命令都支持 `--json`，输出统一的 `{ok,data}` / `{ok,error}` 信封；`--json` 只能搭配一个命令。\n\n`--remote-slot` 与 `--force` 只用于远程 Keybox；不带 `--save-selection` 时参数仅对本次操作生效。可用 `--keybox-validate FILE --json` 对文件做只读格式检查，不联网、不安装；不要在反馈中粘贴 Keybox 正文。\n\nCLI 任一步失败都会返回非零退出码。完整参数见[项目概览](docs/project/OVERVIEW.md)。\n\n### 设备端 RKP\n\n设备端 RKP 用本机高通 Keymint TA 向 Google RKP 服务申请一把**本机专属**的证书链，输出仍是标准 Keybox，因此后续写入流程与远程 Keybox 完全一致。\n\n- 先运行 `--rkp-status` 确认条件；不满足时不会发起任何网络请求。\n- `--rkp-issue` 只产出产物，不改动任何后端 Keybox：`/data/adb/teeforge/RKP/` 下保存 `keybox.xml`、`cert-chain.pem`、`meta.json`（含生成时间、证书数量、device id、sha256），权限 0600。\n- 安装由 Keybox 一侧负责：`--keybox --source rkp` 读取上述产物并写入后端；`--source remote` 走远程池。两条路径不再互相回退。\n- 失败时透传阶段与原始码（例如 TA 返回 `-18`），WebUI 会给出对应原因与建议；帧类失败额外带 `head_hex` 与 `written`，可直接判断厂商封装格式。`--rkp-delete` 删除整个 RKP 目录。\n- 仅部分高通设备与固件支持；TA 返回非零状态、厂商库符号不匹配或网络不可达都会如实报错。\n\n> [!NOTE]\n> 该功能移植自 [Duck-ToolBox](https://github.com/eltavine/Duck-ToolBox) 的 Device RKP Issuer（MIT），并裁剪为 V2 路径。成功签发只代表获得了一把 RKP 证书链，不代表通过任何外部检测。\n\n### OMK 应用作用域\n\n先安装 OMK，再安装 TeeForge；同次重启前安装也可以被检测。后来安装或重新启用 OMK 时，重新安装 TeeForge 刷新检测结果。活动配置尚未生成时会输出 warning 并跳过，完成 OMK 初始化后再次运行 `--generate`。\n\nTeeForge 保留 `scoop` 中原有手动条目，只维护 `# BEGIN TeeForge-CD managed scoop` 与 `# END TeeForge-CD managed scoop` 之间的自动条目。需要长期固定的条目请放在区块外；自动条目会随应用安装、卸载更新。数组以外的配置保持原样，更新前备份为 `injector.toml.teeforge.bak`。\n\n使用 WebUI 的“更新目标作用域”或 CLI `--generate`。OMK 作用域更新不需要运行 Keybox 操作；模块 Action 会先询问操作类型，选择“更新目标作用域”时不会触碰 Keybox。成功输出只代表文件更新；OMK 加载和应用实际行为需另行确认。TeeForge 不自动重启 OMK；旧格式迁移由 OMK 完成。\n\n### 配置\n\n用户配置位于 `/data/adb/teeforge/config.conf`，升级时默认保留。常用总开关：\n\n```ini\ndebug=0\nblhide=1\nkeybox_source=remote\ntarget_mode=auto\nupdate_channel=stable\n```\n\n- `debug=1`：将运行日志写入 `/data/adb/teeforge/logs/`。\n- `blhide=0`：关闭全部 BL 弱化操作。\n- `keybox_source=remote|rkp`：Keybox 来源。`remote` 从 CDN 获取公共池，`rkp` 使用 `RKP/` 下的本机产物；默认 `remote` 保持旧行为。\n- `target_mode=auto|manual`：`auto` 每次写入全部已安装用户应用；`manual` 只写入 `/data/adb/teeforge/target-selection.json` 中的集合，WebUI 的手动勾选会写这里。\n- `update_channel=stable|dev`：WebUI 更新检查使用的通道；`update_base` 默认 `https://teeforge.mcxiaochen.top/files/update`。\n- `rkp_server`：默认 `https://remoteprovisioning.googleapis.com/v1`，仅用于调试或自建代理。\n- 旧 `rkp_mode`、`rkp_refresh_days` 仍可解析但不再生效，升级后统一由 `keybox_source` 决定来源。\n- 安装器生成的分类开关可分别设为 `0` 或 `1`。\n- `omk_enabled` 由安装器在系统配置中固化，默认 `0`；用户配置可覆盖，设为 `0` 停止更新 OMK。\n- `omk_injector_config` 默认 `/data/misc/keystore/omk/injector.toml`，仅覆盖作用域文件路径。\n- 旧 `prop_tool`、`blhide_compact` 键兼容忽略，不再生成，升级不改写已有用户配置。\n\n`/data/adb/teeforge/sys.conf` 由安装器维护，不应手动编辑。配置修改会在下一次相关命令或开机服务执行时读取。数据流与安全边界见[当前架构](docs/project/ARCHITECTURE.md)。\n\n## 更新、卸载与恢复\n\n### 更新\n\n- 从稳定 Release 或管理器的稳定更新入口安装新版。\n- 检测到已有 `config.conf` 时，安装器默认保留该文件并清理其他运行时数据。\n- 如果在安装提示中选择“全部清除”，`/data/adb/teeforge/` 下的配置、日志和缓存数据都会被删除。\n\n### 卸载\n\n在 Root 管理器中卸载 TeeForge-CD 后重启。卸载脚本会删除整个 `/data/adb/teeforge/` 数据目录，包括用户配置、日志和 TeeForge 的本地 Keybox 副本；需要保留配置时请先自行备份。\n\n卸载脚本不会删除目标目录中的 `/data/adb/tricky_store/target.txt`、`/data/adb/tricky_store/keybox.xml`、`/data/adb/teesim/config.json` 或 `/data/adb/teesim/keybox.xml`。OMK 的 `injector.toml` 及其 TeeForge 备份也会保留。上述文件可能仍被对应目标模块使用；如确认不再需要，应在卸载并重启后先备份，再自行清理。\n\n### 异常恢复\n\n- BL 弱化行为异常但系统仍可启动时，先将 `blhide=0`，再重启或手动重新执行相关命令。\n- 无法正常启动时，使用当前 Root 管理器的安全模式或模块禁用机制，进入系统后禁用或卸载 TeeForge-CD。\n\n官方恢复说明：[Magisk 模块安全模式](https://topjohnwu.github.io/Magisk/faq.html) · [KernelSU Bootloop 恢复](https://kernelsu.org/guide/rescue-from-bootloop.html) · [APatch Bootloop 恢复](https://apatch.dev/rescue-bootloop.html)\n\n## 故障排查与反馈\n\n### 常见情况\n\n- **安装提示校验失败**：删除当前 ZIP，从官方 Release 重新下载；不要修改或重新打包模块。\n- **提示 ABI 不支持或 ELF 不匹配**：确认设备报告的主 ABI 属于支持列表，不要用其他架构二进制强行替换。\n- **目标配置没有更新**：确认目标模块使用 `/data/adb/tricky_store/target.txt` 或 `/data/adb/teesim/config.json`，检查 `teeforge` 管理标记和手动运行 `--generate` 的真实退出码。没有任何兼容后端时，命令成功但只记录 warning。\n- **Keybox 同步失败**：检查网络和命令输出；失败时程序会保留已有文件，不要把非空响应直接视为有效结果。\n- **设备端 RKP 没有生效**：先运行 `--rkp-status` 确认前置条件；日志与 WebUI 会给出失败阶段、原始码与建议，不再有隐式回退。\n- **`--rkp-probe` 的判读方式**：每条结果包含 `status`（`send_cmd` 返回值）、`written`（响应最后一个非零字节位置）、`request_changed`（请求缓冲区是否被厂商改写）与 `response_head`。\n\n  | 观察 | 结论 |\n  |---|---|\n  | 只有 `baseline` 空、`zero-buffer` 有数据 | 前 4 字节的哨兵干扰了厂商逻辑，默认初始化应改为全 0 |\n  | 全部变体 `written` 均为 0 且 `request_changed` 为 false | 请求没有真正到达 TA，优先查 SELinux 拒绝与 TA 服务状态 |\n  | 某变体 `request_changed` 为 true | out 参数落在了请求缓冲区上，参数顺序需要调整 |\n  | `level-0` 有数据 | 该固件要求 `security_level = 0` |\n  | `length-prefix` 有数据 | 请求需要长度前缀 |\n  | `object-0x80` / `object-0x100` 有数据 | 厂商对象比 0x40 大，`baseline` 的构造写越界破坏了堆 |\n  | 多个变体进程崩溃（`crashed: true`） | 厂商对象布局与该固件不匹配 |\n  | `library_symbols` 里有 `init` / `initialize` / `connect` 之类入口 | 调用前需要先完成初始化 |\n- **报“无法识别 TA 响应帧”或“TA 未写入响应缓冲区”**：说明厂商 `send_cmd` 的返回封装与预期不同。`--rkp-issue --json` 的 `error.raw.head_hex` 是响应缓冲区开头 64 字节，`written` 是最后一个非零字节的位置：\n  - 前 8 位为 `00000080` 且 `written` 为 0：缓冲区完全未被写入，属于 ABI 或参数约定不匹配。\n  - 开头是 `82`、`a2`、`d2` 等 CBOR 首字节：厂商直接返回裸 payload。\n  - 前 4 字节全 `00`、随后才是长度：响应没有 status 字段。\n  - 前 4 字节是负值（如 `eeffffff`）：TA 明确返回了 KeyMint 错误码，按错误码排障。\n  签发成功时 `meta.json` 的 `frame_layout` 会记录实际命中的布局，可用来对比同型号固件。\n- **OMK 没有更新**：检查安装检测结果、`omk_enabled` 与活动配置是否已生成；无效 TOML、未知版本或文件元数据无法保留时会拒绝更新。不要将文件写入成功视为服务已加载。\n- **模块描述仍显示等待重启**：确认系统已经完成启动，运行 `--update-desc` 后检查退出码和日志。\n\n需要文件日志时，将 `config.conf` 中的 `debug` 改为 `1`，复现问题后查看 `/data/adb/teeforge/logs/`。分享前请移除设备标识、账号信息和其他隐私内容。\n\n提交 Issue 时请提供：\n\n- TeeForge-CD 版本及下载渠道（Release 或 Dev）。\n- Android 版本、设备 ABI、Root 实现及版本。\n- Tricky Store、TEESimulator、TEESimulator-RS 或其他相关模块的名称及版本。\n- 清晰的复现步骤、期望结果和实际结果。\n- 安装输出、相关命令退出码及已脱敏日志。\n\n[提交 GitHub Issue](https://github.com/mcxiaochenn/TeeForge-CD/issues)\n\n## 开发文档\n\n- [项目概览与 CLI](docs/project/OVERVIEW.md)\n- [当前技术架构](docs/project/ARCHITECTURE.md)\n- [构建、测试与发布](docs/development/BUILD_AND_RELEASE.md)\n- [安装与设备验收](docs/operations/INSTALLATION.md)\n- [当前路线图](docs/maintenance/ROADMAP.md)\n\n本 README 描述当前 `master` 的用户可见行为；正式包的具体内容以对应 Release 说明和安装输出为准。\n\n## License 与致谢\n\nTeeForge-CD 采用 [GNU GPL v3 或更高版本](LICENSE)发布。\n\n感谢以下项目提供模块接口、兼容目标或基础能力：\n\n- [Magisk](https://github.com/topjohnwu/Magisk)\n- [KernelSU](https://github.com/tiann/KernelSU)\n- [APatch](https://github.com/bmax121/APatch)\n- [Tricky Store](https://github.com/5ec1cff/TrickyStore)\n- [TEESimulator](https://github.com/JingMatrix/TEESimulator)\n- [TEESimulator-RS](https://github.com/Enginex0/TEESimulator-RS)\n- [Oh My Keymint](https://github.com/qwq233/OhMyKeymint)\n- [Duck-ToolBox](https://github.com/eltavine/Duck-ToolBox)：设备端 RKP 签发流程、CSR_V2 帧格式与证书链校验（MIT，见 `module/licenses/duck-toolbox.txt`）；WebUI 的 Material 3 分层与列表行布局参考其设计思路，代码与样式为独立实现\n\n第三方项目名称仅用于说明依赖与兼容关系，不代表官方合作或背书。\n",
+  "readmeHTML": "<h1>TeeForge-CD</h1>\n\n<p>面向 Magisk、KernelSU 和 APatch 模块环境的 Android 工具，用于维护 TEE 目标模块的应用列表、执行 bootloader 属性弱化处理，并按需同步 Keybox。</p>\n\n<p><b>目标配置开机更新，Keybox 按需同步。</b></p>\n\n<p>> [!WARNING]</p>\n<p>> 现有三个对接目标的配置契约不同：Tricky Store 与 TEESimulator-RS 使用 <code>/data/adb/tricky_store/target.txt</code>，TEESimulator 使用 <code>/data/adb/teesim/config.json</code> 的 <code>profiles.teeforge.apps</code>；Keybox 分别位于对应目录。Oh My Keymint（OMK）仅适配应用作用域，安装时检测并固化启用状态，不接管其 Keybox 或服务配置。BL 弱化不等于重新锁定 bootloader，也不能保证通过任何外部检测。</p>\n\n<p>> [!NOTE]</p>\n<p>> 当前 <code>master</code> 构建基线为 Android 7.0（API 24）及以上，包含 <code>arm64-v8a</code>、<code>armeabi-v7a</code>、<code>x86</code>、<code>x86_64</code> 四种 ABI。四架构自动化构建已经验证，真机与模拟器覆盖仍需分别验收；稳定 Release 可能晚于 <code>master</code>，实际支持范围以对应 Release 说明和安装输出为准。</p>\n\n<p><a href=\"https://github.com/mcxiaochenn/TeeForge-CD/releases/latest\">下载稳定版</a> · <a href=\"docs/README.md\">项目文档</a></p>\n\n<h2>功能</h2>\n\n<li>**自动维护目标配置**：一次扫描用户安装的应用并分别更新已存在的兼容目标配置，失败时保留旧文件。</li>\n<li>**弱化 BL 相关属性**：通过 resetprop 处理 bootloader、Verified Boot、调试和厂商相关属性，可按类别关闭。</li>\n<li>**按需同步 Keybox**：来源由你显式选择——本机 RKP 产物或远程公共密钥池；远程池支持三个槽位；不自动回退，更新失败时保留已有文件。</li>\n<li>**设备端 RKP 签发（独立功能）**：在高通 arm64 设备上调用本机 Keymint TA 向 Google RKP 申请本机专属证书链，产物单独保存在 `/data/adb/teeforge/RKP/`，与 Keybox 安装解耦。</li>\n<li>**目标作用域可细调**：支持全量模式与手动模式；手动选择保存在本机，重启后保持，不会被开机全量覆盖。</li>\n<li>**模块更新**：WebUI 内置更新检查，优先使用中国大陆可直连的自建 CDN，并校验清单中的 sha256。</li>\n<li>**安装时架构选择**：模块包内置四种 ABI，安装器按设备 ABI 选择并校验对应 ELF，不使用其他架构兜底。</li>\n<li>**配置与 Root 检测**：识别 Magisk、KernelSU 或 APatch 环境，用户配置在升级时默认保留。</li>\n<li>**WebUI 与命令行**：支持模块 Action、兼容的模块 WebUI 以及设备端 CLI。</li>\n\n<p>开机服务会更新模块描述、执行 BL 弱化并更新目标配置；Keybox 下载只在用户主动运行 Action、WebUI 操作或 <code>--keybox</code> 时执行。</p>\n\n<h2>兼容性与前置条件</h2>\n\n<p>| 项目 | 当前 <code>master</code> 范围 |</p>\n<p>|---|---|</p>\n<p>| Android | Android 7.0 / API 24 及以上；Root 管理器自身可能有更高要求 |</p>\n<p>| Root 环境 | Magisk、KernelSU、APatch 的兼容 Magisk 模块环境；未设置硬编码最低管理器版本 |</p>\n<p>| ABI | <code>arm64-v8a</code>、<code>armeabi-v7a</code>、<code>x86</code>、<code>x86_64</code> |</p>\n<p>| 目标模块 | Tricky Store、TEESimulator、TEESimulator-RS；Oh My Keymint 仅应用作用域 |</p>\n<p>| 目标配置 | Tricky Store/TEESimulator-RS：<code>/data/adb/tricky_store/target.txt</code>；TEESimulator：<code>/data/adb/teesim/config.json</code> 的 <code>profiles.teeforge.apps</code> |</p>\n<p>| OMK 作用域 | 安装时检测并固化；更新 <code>/data/misc/keystore/omk/injector.toml</code> 的 <code>scoop</code>；OMK 自身要求 Android 12+，真机待验收 |</p>\n<p>| Keybox | Tricky Store/TEESimulator-RS：<code>/data/adb/tricky_store/keybox.xml</code>；TEESimulator：<code>/data/adb/teesim/keybox.xml</code>；来源可选远程池或本机 RKP |</p>\n<p>| RKP 产物 | <code>/data/adb/teeforge/RKP/</code>（<code>keybox.xml</code>、<code>cert-chain.pem</code>、<code>meta.json</code>，权限 0600） |</p>\n<p>| 设备端 RKP | 仅 <code>arm64-v8a</code> + 高通 SoC + <code>/vendor/lib64/libkeymasterdeviceutils.so</code> + <code>/dev/smcinvoke</code>；其余环境只能使用远程 Keybox |</p>\n<p>| 属性工具 | 全架构统一使用 Root 环境提供的 standard resetprop |</p>\n<p>| WebUI | 需要支持 KernelSU 模块 WebUI 接口的管理器；其他环境可使用 Action 或终端 |</p>\n\n<p>安装前请确保：</p>\n\n<li>已从本仓库官方 Release 下载模块 ZIP，而不是 GitHub 自动生成的 Source code 压缩包。</li>\n<li>如需使用目标配置或 Keybox 功能，已安装并配置上述任一兼容目标模块；TeeForge 只更新实际存在的后端配置，不创建幽灵目录。</li>\n<li>知道当前 Root 管理器的模块禁用或安全模式入口，以便异常启动时恢复。</li>\n<li>需要保留旧配置时，提前备份 `/data/adb/teeforge/config.conf`。</li>\n\n<p>仓库当前没有宣称所有 Root 管理器版本、ROM 和设备组合都已完成真机验证。自动化结果与待验收项见<a href=\"docs/maintenance/ROADMAP.md\">当前路线图</a>。</p>\n\n<h2>下载与安装</h2>\n\n<p>普通用户应使用 <a href=\"https://github.com/mcxiaochenn/TeeForge-CD/releases/latest\">GitHub Releases</a> 中的正式模块 ZIP。</p>\n\n<p>> [!WARNING]</p>\n<p>> Dev 包和 GitHub Actions Artifact 仅用于测试，可能包含未发布行为，不能作为稳定版或长期回退包。稳定版与 Dev 版使用不同的更新渠道。</p>\n\n<li>在 Magisk、KernelSU 或 APatch 管理器的“模块”页面选择从本地安装。</li>\n<li>选择从官方 Release 下载的 TeeForge-CD ZIP，不要解压。</li>\n<li>安装器先校验包内 `.sha256` 清单，再选择并验证当前设备 ABI；清单缺失、文件异常或 ABI 不支持时会中止安装。</li>\n<li>检测到已有配置时：音量加保留配置，音量减清除全部 TeeForge 数据；10 秒无操作默认保留。</li>\n<li>安装器统一使用 standard resetprop，并显示 OMK 作用域适配检测结果；OMK 待更新模块优先，禁用或待卸载时不启用适配。</li>\n<li>安装完成后重启设备。</li>\n\n<p>Recovery 刷入未纳入当前验收范围，请优先使用 Root 管理器安装。</p>\n\n<h2>安装后验证</h2>\n\n<p>重启并等待系统完成启动后，在 Root 管理器的模块页面检查 TeeForge-CD 描述：正常情况下会由“等待重启”更新为包含 Root 类型、TeeForge-CD 版本、ABI 和 Keybox 状态的信息。<code>keybox: N/A</code> 表示尚无本地 Keybox 记录，不代表安装失败；描述仍停留在等待状态，则表示描述更新尚未完成。描述更新发生在其他开机动作之前，因此还需继续验证实际使用的功能。</p>\n\n<p>随后按已安装的后端检查目标配置。Tricky Store/TEESimulator-RS：</p>\n\n<pre>su -c 'test -s /data/adb/tricky_store/target.txt &amp;&amp; wc -l /data/adb/tricky_store/target.txt'</pre>\n\n<p>命令应成功返回非零行数。使用 TEESimulator 时检查受管 profile：</p>\n\n<pre>su -c \"grep -n 'teeforge\\|_teeforgeManaged' /data/adb/teesim/config.json\"</pre>\n\n<p>文件不存在、为空、缺少受管 profile 或命令退出码非零时，应按“故障排查与反馈”收集信息。</p>\n\n<p>如果只使用 BL 弱化且未安装兼容目标模块，可跳过目标配置检查，改为执行以下命令；退出码为 0 表示本次属性命令均已成功执行：</p>\n\n<pre>su -c '/data/adb/modules/teeforge_cd/teeforge --hide-bl'</pre>\n\n<p>还可以在 Root 管理器中运行模块 Action。Action 会依次同步 Keybox 和更新目标配置；两步均成功时输出 <code>完成 [Done]</code>，无需再次重启。任一步失败都会输出非零状态，不应视为成功。</p>\n\n<h2>使用与配置</h2>\n\n<h3>常用入口</h3>\n\n<li>**开机自动执行**：更新模块描述、执行 BL 弱化、更新已存在的目标配置。</li>\n<li>**模块 Action**：音量键两级菜单。音量下切换高亮、音量上确认、15 秒无操作取消；先询问是否执行，再选择“更新 Keybox”（本机 RKP / 远程池）或“更新目标作用域”。全过程写入 `/data/adb/teeforge/logs/action-*.log`。</li>\n<li>**WebUI**：顶部是设备信息栏，下面是“更新目标作用域”“Keybox 配置”“本机 RKP 签发”“模块与更新”四个入口。</li>\n<li>**CLI**：适用于终端操作和问题定位。</li>\n\n<p>Keybox 配置选择远程池后可选择槽位 1/2/3，默认槽位 1；安装成功后保存来源和槽位。普通应用跳过内容相同的文件，“强制拉取并替换”会重新请求并写入模块副本及所有已检测到的兼容后端，即使内容相同。下载、格式校验、写入回读或配置保存失败时保留或回滚旧数据，不自动换槽。格式有效不代表未吊销、后端接受或外部检测通过。</p>\n\n<p>常用 CLI 命令需要 Root：</p>\n\n<pre>su -c '/data/adb/modules/teeforge_cd/teeforge --generate'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --hide-bl'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source remote --remote-slot 1 --save-selection'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source remote --remote-slot 2 --force --save-selection'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-status'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-issue'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --rkp-probe --json'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --keybox --source rkp'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --target-list --json'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --self-update check'\nsu -c '/data/adb/modules/teeforge_cd/teeforge --help'</pre>\n\n<p><code>--rkp-status</code> 只做本地检查（SoC、厂商库、<code>/dev/smcinvoke</code>、fingerprint），不联网、不调用 TA，用于判断设备端 RKP 是否具备条件。<code>--rkp-probe</code> 是诊断命令：取一次 challenge 后，把缓冲区初始化、<code>security_level</code>、请求封装、厂商对象大小四组变量拆成 8 个变体，每个变体在独立子进程中调用一次 TA，输出对照数据。同时会解析 <code>/vendor/lib64/libkeymasterdeviceutils.so</code> 的动态符号表，列出 <code>KeymasterUtils</code> 与 <code>send_cmd</code> 相关入口——如果固件提供了必须先调用的初始化方法或别的重载，会在 <code>library_symbols</code> 里直接暴露。所有查询类命令都支持 <code>--json</code>，输出统一的 <code>{ok,data}</code> / <code>{ok,error}</code> 信封；<code>--json</code> 只能搭配一个命令。</p>\n\n<p><code>--remote-slot</code> 与 <code>--force</code> 只用于远程 Keybox；不带 <code>--save-selection</code> 时参数仅对本次操作生效。可用 <code>--keybox-validate FILE --json</code> 对文件做只读格式检查，不联网、不安装；不要在反馈中粘贴 Keybox 正文。</p>\n\n<p>CLI 任一步失败都会返回非零退出码。完整参数见<a href=\"docs/project/OVERVIEW.md\">项目概览</a>。</p>\n\n<h3>设备端 RKP</h3>\n\n<p>设备端 RKP 用本机高通 Keymint TA 向 Google RKP 服务申请一把<b>本机专属</b>的证书链，输出仍是标准 Keybox，因此后续写入流程与远程 Keybox 完全一致。</p>\n\n<li>先运行 `--rkp-status` 确认条件；不满足时不会发起任何网络请求。</li>\n<li>`--rkp-issue` 只产出产物，不改动任何后端 Keybox：`/data/adb/teeforge/RKP/` 下保存 `keybox.xml`、`cert-chain.pem`、`meta.json`（含生成时间、证书数量、device id、sha256），权限 0600。</li>\n<li>安装由 Keybox 一侧负责：`--keybox --source rkp` 读取上述产物并写入后端；`--source remote` 走远程池。两条路径不再互相回退。</li>\n<li>失败时透传阶段与原始码（例如 TA 返回 `-18`），WebUI 会给出对应原因与建议；帧类失败额外带 `head_hex` 与 `written`，可直接判断厂商封装格式。`--rkp-delete` 删除整个 RKP 目录。</li>\n<li>仅部分高通设备与固件支持；TA 返回非零状态、厂商库符号不匹配或网络不可达都会如实报错。</li>\n\n<p>> [!NOTE]</p>\n<p>> 该功能移植自 <a href=\"https://github.com/eltavine/Duck-ToolBox\">Duck-ToolBox</a> 的 Device RKP Issuer（MIT），并裁剪为 V2 路径。成功签发只代表获得了一把 RKP 证书链，不代表通过任何外部检测。</p>\n\n<h3>OMK 应用作用域</h3>\n\n<p>先安装 OMK，再安装 TeeForge；同次重启前安装也可以被检测。后来安装或重新启用 OMK 时，重新安装 TeeForge 刷新检测结果。活动配置尚未生成时会输出 warning 并跳过，完成 OMK 初始化后再次运行 <code>--generate</code>。</p>\n\n<p>TeeForge 保留 <code>scoop</code> 中原有手动条目，只维护 <code># BEGIN TeeForge-CD managed scoop</code> 与 <code># END TeeForge-CD managed scoop</code> 之间的自动条目。需要长期固定的条目请放在区块外；自动条目会随应用安装、卸载更新。数组以外的配置保持原样，更新前备份为 <code>injector.toml.teeforge.bak</code>。</p>\n\n<p>使用 WebUI 的“更新目标作用域”或 CLI <code>--generate</code>。OMK 作用域更新不需要运行 Keybox 操作；模块 Action 会先询问操作类型，选择“更新目标作用域”时不会触碰 Keybox。成功输出只代表文件更新；OMK 加载和应用实际行为需另行确认。TeeForge 不自动重启 OMK；旧格式迁移由 OMK 完成。</p>\n\n<h3>配置</h3>\n\n<p>用户配置位于 <code>/data/adb/teeforge/config.conf</code>，升级时默认保留。常用总开关：</p>\n\n<pre>debug=0\nblhide=1\nkeybox_source=remote\ntarget_mode=auto\nupdate_channel=stable</pre>\n\n<li>`debug=1`：将运行日志写入 `/data/adb/teeforge/logs/`。</li>\n<li>`blhide=0`：关闭全部 BL 弱化操作。</li>\n<li>`keybox_source=remote|rkp`：Keybox 来源。`remote` 从 CDN 获取公共池，`rkp` 使用 `RKP/` 下的本机产物；默认 `remote` 保持旧行为。</li>\n<li>`target_mode=auto|manual`：`auto` 每次写入全部已安装用户应用；`manual` 只写入 `/data/adb/teeforge/target-selection.json` 中的集合，WebUI 的手动勾选会写这里。</li>\n<li>`update_channel=stable|dev`：WebUI 更新检查使用的通道；`update_base` 默认 `https://teeforge.mcxiaochen.top/files/update`。</li>\n<li>`rkp_server`：默认 `https://remoteprovisioning.googleapis.com/v1`，仅用于调试或自建代理。</li>\n<li>旧 `rkp_mode`、`rkp_refresh_days` 仍可解析但不再生效，升级后统一由 `keybox_source` 决定来源。</li>\n<li>安装器生成的分类开关可分别设为 `0` 或 `1`。</li>\n<li>`omk_enabled` 由安装器在系统配置中固化，默认 `0`；用户配置可覆盖，设为 `0` 停止更新 OMK。</li>\n<li>`omk_injector_config` 默认 `/data/misc/keystore/omk/injector.toml`，仅覆盖作用域文件路径。</li>\n<li>旧 `prop_tool`、`blhide_compact` 键兼容忽略，不再生成，升级不改写已有用户配置。</li>\n\n<p><code>/data/adb/teeforge/sys.conf</code> 由安装器维护，不应手动编辑。配置修改会在下一次相关命令或开机服务执行时读取。数据流与安全边界见<a href=\"docs/project/ARCHITECTURE.md\">当前架构</a>。</p>\n\n<h2>更新、卸载与恢复</h2>\n\n<h3>更新</h3>\n\n<li>从稳定 Release 或管理器的稳定更新入口安装新版。</li>\n<li>检测到已有 `config.conf` 时，安装器默认保留该文件并清理其他运行时数据。</li>\n<li>如果在安装提示中选择“全部清除”，`/data/adb/teeforge/` 下的配置、日志和缓存数据都会被删除。</li>\n\n<h3>卸载</h3>\n\n<p>在 Root 管理器中卸载 TeeForge-CD 后重启。卸载脚本会删除整个 <code>/data/adb/teeforge/</code> 数据目录，包括用户配置、日志和 TeeForge 的本地 Keybox 副本；需要保留配置时请先自行备份。</p>\n\n<p>卸载脚本不会删除目标目录中的 <code>/data/adb/tricky_store/target.txt</code>、<code>/data/adb/tricky_store/keybox.xml</code>、<code>/data/adb/teesim/config.json</code> 或 <code>/data/adb/teesim/keybox.xml</code>。OMK 的 <code>injector.toml</code> 及其 TeeForge 备份也会保留。上述文件可能仍被对应目标模块使用；如确认不再需要，应在卸载并重启后先备份，再自行清理。</p>\n\n<h3>异常恢复</h3>\n\n<li>BL 弱化行为异常但系统仍可启动时，先将 `blhide=0`，再重启或手动重新执行相关命令。</li>\n<li>无法正常启动时，使用当前 Root 管理器的安全模式或模块禁用机制，进入系统后禁用或卸载 TeeForge-CD。</li>\n\n<p>官方恢复说明：<a href=\"https://topjohnwu.github.io/Magisk/faq.html\">Magisk 模块安全模式</a> · <a href=\"https://kernelsu.org/guide/rescue-from-bootloop.html\">KernelSU Bootloop 恢复</a> · <a href=\"https://apatch.dev/rescue-bootloop.html\">APatch Bootloop 恢复</a></p>\n\n<h2>故障排查与反馈</h2>\n\n<h3>常见情况</h3>\n\n<li>**安装提示校验失败**：删除当前 ZIP，从官方 Release 重新下载；不要修改或重新打包模块。</li>\n<li>**提示 ABI 不支持或 ELF 不匹配**：确认设备报告的主 ABI 属于支持列表，不要用其他架构二进制强行替换。</li>\n<li>**目标配置没有更新**：确认目标模块使用 `/data/adb/tricky_store/target.txt` 或 `/data/adb/teesim/config.json`，检查 `teeforge` 管理标记和手动运行 `--generate` 的真实退出码。没有任何兼容后端时，命令成功但只记录 warning。</li>\n<li>**Keybox 同步失败**：检查网络和命令输出；失败时程序会保留已有文件，不要把非空响应直接视为有效结果。</li>\n<li>**设备端 RKP 没有生效**：先运行 `--rkp-status` 确认前置条件；日志与 WebUI 会给出失败阶段、原始码与建议，不再有隐式回退。</li>\n<li>**`--rkp-probe` 的判读方式**：每条结果包含 `status`（`send_cmd` 返回值）、`written`（响应最后一个非零字节位置）、`request_changed`（请求缓冲区是否被厂商改写）与 `response_head`。</li>\n\n<p>  | 观察 | 结论 |</p>\n<p>  |---|---|</p>\n<p>  | 只有 <code>baseline</code> 空、<code>zero-buffer</code> 有数据 | 前 4 字节的哨兵干扰了厂商逻辑，默认初始化应改为全 0 |</p>\n<p>  | 全部变体 <code>written</code> 均为 0 且 <code>request_changed</code> 为 false | 请求没有真正到达 TA，优先查 SELinux 拒绝与 TA 服务状态 |</p>\n<p>  | 某变体 <code>request_changed</code> 为 true | out 参数落在了请求缓冲区上，参数顺序需要调整 |</p>\n<p>  | <code>level-0</code> 有数据 | 该固件要求 <code>security_level = 0</code> |</p>\n<p>  | <code>length-prefix</code> 有数据 | 请求需要长度前缀 |</p>\n<p>  | <code>object-0x80</code> / <code>object-0x100</code> 有数据 | 厂商对象比 0x40 大，<code>baseline</code> 的构造写越界破坏了堆 |</p>\n<p>  | 多个变体进程崩溃（<code>crashed: true</code>） | 厂商对象布局与该固件不匹配 |</p>\n<p>  | <code>library_symbols</code> 里有 <code>init</code> / <code>initialize</code> / <code>connect</code> 之类入口 | 调用前需要先完成初始化 |</p>\n<li>**报“无法识别 TA 响应帧”或“TA 未写入响应缓冲区”**：说明厂商 `send_cmd` 的返回封装与预期不同。`--rkp-issue --json` 的 `error.raw.head_hex` 是响应缓冲区开头 64 字节，`written` 是最后一个非零字节的位置：</li>\n<p>  - 前 8 位为 <code>00000080</code> 且 <code>written</code> 为 0：缓冲区完全未被写入，属于 ABI 或参数约定不匹配。</p>\n<p>  - 开头是 <code>82</code>、<code>a2</code>、<code>d2</code> 等 CBOR 首字节：厂商直接返回裸 payload。</p>\n<p>  - 前 4 字节全 <code>00</code>、随后才是长度：响应没有 status 字段。</p>\n<p>  - 前 4 字节是负值（如 <code>eeffffff</code>）：TA 明确返回了 KeyMint 错误码，按错误码排障。</p>\n<p>  签发成功时 <code>meta.json</code> 的 <code>frame_layout</code> 会记录实际命中的布局，可用来对比同型号固件。</p>\n<li>**OMK 没有更新**：检查安装检测结果、`omk_enabled` 与活动配置是否已生成；无效 TOML、未知版本或文件元数据无法保留时会拒绝更新。不要将文件写入成功视为服务已加载。</li>\n<li>**模块描述仍显示等待重启**：确认系统已经完成启动，运行 `--update-desc` 后检查退出码和日志。</li>\n\n<p>需要文件日志时，将 <code>config.conf</code> 中的 <code>debug</code> 改为 <code>1</code>，复现问题后查看 <code>/data/adb/teeforge/logs/</code>。分享前请移除设备标识、账号信息和其他隐私内容。</p>\n\n<p>提交 Issue 时请提供：</p>\n\n<li>TeeForge-CD 版本及下载渠道（Release 或 Dev）。</li>\n<li>Android 版本、设备 ABI、Root 实现及版本。</li>\n<li>Tricky Store、TEESimulator、TEESimulator-RS 或其他相关模块的名称及版本。</li>\n<li>清晰的复现步骤、期望结果和实际结果。</li>\n<li>安装输出、相关命令退出码及已脱敏日志。</li>\n\n<p><a href=\"https://github.com/mcxiaochenn/TeeForge-CD/issues\">提交 GitHub Issue</a></p>\n\n<h2>开发文档</h2>\n\n<li>[项目概览与 CLI](docs/project/OVERVIEW.md)</li>\n<li>[当前技术架构](docs/project/ARCHITECTURE.md)</li>\n<li>[构建、测试与发布](docs/development/BUILD_AND_RELEASE.md)</li>\n<li>[安装与设备验收](docs/operations/INSTALLATION.md)</li>\n<li>[当前路线图](docs/maintenance/ROADMAP.md)</li>\n\n<p>本 README 描述当前 <code>master</code> 的用户可见行为；正式包的具体内容以对应 Release 说明和安装输出为准。</p>\n\n<h2>License 与致谢</h2>\n\n<p>TeeForge-CD 采用 <a href=\"LICENSE\">GNU GPL v3 或更高版本</a>发布。</p>\n\n<p>感谢以下项目提供模块接口、兼容目标或基础能力：</p>\n\n<li>[Magisk](https://github.com/topjohnwu/Magisk)</li>\n<li>[KernelSU](https://github.com/tiann/KernelSU)</li>\n<li>[APatch](https://github.com/bmax121/APatch)</li>\n<li>[Tricky Store](https://github.com/5ec1cff/TrickyStore)</li>\n<li>[TEESimulator](https://github.com/JingMatrix/TEESimulator)</li>\n<li>[TEESimulator-RS](https://github.com/Enginex0/TEESimulator-RS)</li>\n<li>[Oh My Keymint](https://github.com/qwq233/OhMyKeymint)</li>\n<li>[Duck-ToolBox](https://github.com/eltavine/Duck-ToolBox)：设备端 RKP 签发流程、CSR_V2 帧格式与证书链校验（MIT，见 `module/licenses/duck-toolbox.txt`）；WebUI 的 Material 3 分层与列表行布局参考其设计思路，代码与样式为独立实现</li>\n\n<p>第三方项目名称仅用于说明依赖与兼容关系，不代表官方合作或背书。</p>",
+  "homepageUrl": "https://teeforge.mcxiaochen.top",
+  "sourceUrl": "https://github.com/mcxiaochenn/TeeForge-CD",
+  "url": "https://github.com/mcxiaochenn/TeeForge-CD",
+  "latestRelease": {
+    "name": "v0.7.0",
+    "version": "v0.7.0",
+    "time": "2026-10-22T14:57:16Z",
+    "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge_cd-v0.7.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.7.0",
+      "tagName": "v0.7.0",
+      "publishedAt": "2026-10-22T14:57:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge-arm64-v8a",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge-arm64-v8a",
+          "size": 982688,
+          "downloadCount": 27
+        },
+        {
+          "name": "teeforge-armeabi-v7a",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge-armeabi-v7a",
+          "size": 710836,
+          "downloadCount": 3
+        },
+        {
+          "name": "teeforge-x86",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge-x86",
+          "size": 1153712,
+          "downloadCount": 2
+        },
+        {
+          "name": "teeforge-x86_64",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge-x86_64",
+          "size": 1127880,
+          "downloadCount": 3
+        },
+        {
+          "name": "teeforge_cd-v0.7.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.7.0/teeforge_cd-v0.7.0.zip",
+          "size": 2244606,
+          "downloadCount": 71
+        }
+      ]
+    },
+    {
+      "name": "v0.6.0",
+      "tagName": "v0.6.0",
+      "publishedAt": "2026-08-03T09:33:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.6.0/teeforge",
+          "size": 500144,
+          "downloadCount": 70
+        },
+        {
+          "name": "teeforge_cd-v0.6.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.6.0/teeforge_cd-v0.6.0.zip",
+          "size": 699418,
+          "downloadCount": 632
+        }
+      ]
+    },
+    {
+      "name": "v0.5.0",
+      "tagName": "v0.5.0",
+      "publishedAt": "2026-07-15T12:32:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.5.0/teeforge",
+          "size": 500016,
+          "downloadCount": 29
+        },
+        {
+          "name": "teeforge_cd-v0.5.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.5.0/teeforge_cd-v0.5.0.zip",
+          "size": 694538,
+          "downloadCount": 240
+        }
+      ]
+    },
+    {
+      "name": "v0.4.1",
+      "tagName": "v0.4.1",
+      "publishedAt": "2026-07-15T09:45:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.4.1/teeforge",
+          "size": 500016,
+          "downloadCount": 4
+        },
+        {
+          "name": "teeforge_cd-v0.4.1.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.4.1/teeforge_cd-v0.4.1.zip",
+          "size": 684210,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-07-15T08:19:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.4.0/teeforge",
+          "size": 498928,
+          "downloadCount": 1
+        },
+        {
+          "name": "teeforge_cd-v0.4.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.4.0/teeforge_cd-v0.4.0.zip",
+          "size": 684046,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.8",
+      "tagName": "v0.3.8",
+      "publishedAt": "2026-07-14T15:14:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.8/teeforge",
+          "size": 497264,
+          "downloadCount": 11
+        },
+        {
+          "name": "teeforge_cd-v0.3.8.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.8/teeforge_cd-v0.3.8.zip",
+          "size": 682935,
+          "downloadCount": 70
+        }
+      ]
+    },
+    {
+      "name": "v0.3.2",
+      "tagName": "v0.3.2",
+      "publishedAt": "2026-07-14T12:48:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.2/teeforge",
+          "size": 495920,
+          "downloadCount": 3
+        },
+        {
+          "name": "teeforge_cd-v0.3.2.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.2/teeforge_cd-v0.3.2.zip",
+          "size": 681977,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v0.3.1",
+      "tagName": "v0.3.1",
+      "publishedAt": "2026-07-14T12:45:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.1/teeforge",
+          "size": 495920,
+          "downloadCount": 1
+        },
+        {
+          "name": "teeforge_cd-v0.3.1.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.1/teeforge_cd-v0.3.1.zip",
+          "size": 681977,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-07-14T12:41:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.0/teeforge",
+          "size": 495920,
+          "downloadCount": 1
+        },
+        {
+          "name": "teeforge_cd-v0.3.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.3.0/teeforge_cd-v0.3.0.zip",
+          "size": 681973,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.2.1",
+      "tagName": "v0.2.1",
+      "publishedAt": "2026-07-14T01:58:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.2.1/teeforge",
+          "size": 491952,
+          "downloadCount": 8
+        },
+        {
+          "name": "teeforge_cd-v0.2.1.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.2.1/teeforge_cd-v0.2.1.zip",
+          "size": 680845,
+          "downloadCount": 55
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-07-14T01:49:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.2.0/teeforge",
+          "size": 491952,
+          "downloadCount": 1
+        },
+        {
+          "name": "teeforge_cd-v0.2.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.2.0/teeforge_cd-v0.2.0.zip",
+          "size": 680856,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-07-13T21:47:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.1.1/teeforge",
+          "size": 489808,
+          "downloadCount": 4
+        },
+        {
+          "name": "teeforge_cd-v0.1.1.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.1.1/teeforge_cd-v0.1.1.zip",
+          "size": 226348,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-07-13T21:42:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "teeforge",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.1.0/teeforge",
+          "size": 489808,
+          "downloadCount": 1
+        },
+        {
+          "name": "teeforge_cd-v0.1.0.zip",
+          "downloadUrl": "https://github.com/mcxiaochenn/TeeForge-CD/releases/download/v0.1.0/teeforge_cd-v0.1.0.zip",
+          "size": 226763,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

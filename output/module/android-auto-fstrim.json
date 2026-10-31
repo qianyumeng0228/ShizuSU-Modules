@@ -1,0 +1,43 @@
+{
+  "readme": "## 安卓自动TRIM+内存碎片整理+内存写回+内存碎片整理KernelSU模块\n\n### 模块用途: 一加Ace3的潮汐引擎居然被砍了, 既然如此, 那就直接调用Linux内核节点去手动实现一个!\n\n### 注意:\n\n### 1. 需要让busybox二进制文件全局可见, 建议直接安装适配Magisk的busybox模块\n\n### 2. 对于开了手机息屏的用户, 未测试手机开了息屏显示状态下是否能正常识别手机亮/灭屏状态, 需要你们的反馈信息\n\n模块运行原理: 通过KernelSU/Apatch自带的busybox里的cron.d, 实现间隔1小时执行优化脚本, 而优化脚本auto_trim.sh加入了亮屏/灭屏检测, 只有间隔1小时且手机灭屏的情况下, 才会触发脚本进行内存写回+内存碎片整理+自动TRIM\n\n支持机型: 本模块已在小米6(LineageOS 23.0)与一加Ace3(ColorOS/LineageOS 23.0)上通过测试, 其他机子未经测试, 欢迎提交机型运行信息!",
+  "readmeHTML": "<h2>安卓自动TRIM+内存碎片整理+内存写回+内存碎片整理KernelSU模块</h2>\n\n<h3>模块用途: 一加Ace3的潮汐引擎居然被砍了, 既然如此, 那就直接调用Linux内核节点去手动实现一个!</h3>\n\n<h3>注意:</h3>\n\n<h3>1. 需要让busybox二进制文件全局可见, 建议直接安装适配Magisk的busybox模块</h3>\n\n<h3>2. 对于开了手机息屏的用户, 未测试手机开了息屏显示状态下是否能正常识别手机亮/灭屏状态, 需要你们的反馈信息</h3>\n\n<p>模块运行原理: 通过KernelSU/Apatch自带的busybox里的cron.d, 实现间隔1小时执行优化脚本, 而优化脚本auto_trim.sh加入了亮屏/灭屏检测, 只有间隔1小时且手机灭屏的情况下, 才会触发脚本进行内存写回+内存碎片整理+自动TRIM</p>\n\n<p>支持机型: 本模块已在小米6(LineageOS 23.0)与一加Ace3(ColorOS/LineageOS 23.0)上通过测试, 其他机子未经测试, 欢迎提交机型运行信息!</p>",
+  "homepageUrl": "https://github.com/LFRon/android-auto-fstrim",
+  "sourceUrl": "https://github.com/LFRon/android-auto-fstrim",
+  "url": "https://github.com/LFRon/android-auto-fstrim",
+  "latestRelease": {
+    "name": "3.0.2",
+    "version": "3.0.2",
+    "time": "2025-11-22T11:33:59Z",
+    "downloadUrl": "https://github.com/LFRon/android-auto-fstrim/releases/download/3.0.2/3.0.2-aarch64.zip"
+  },
+  "releases": [
+    {
+      "name": "3.0.2",
+      "tagName": "3.0.2",
+      "publishedAt": "2025-11-22T11:33:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "3.0.2-aarch64.zip",
+          "downloadUrl": "https://github.com/LFRon/android-auto-fstrim/releases/download/3.0.2/3.0.2-aarch64.zip",
+          "size": 399606,
+          "downloadCount": 156
+        }
+      ]
+    },
+    {
+      "name": "3.0.0",
+      "tagName": "3.0.0",
+      "publishedAt": "2025-11-21T13:56:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "3.0.0-aarch64.zip",
+          "downloadUrl": "https://github.com/LFRon/android-auto-fstrim/releases/download/3.0.0/3.0.0-aarch64.zip",
+          "size": 371490,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "readme": "# USB SampleRate Changer WebUI\n\n中文参考：[README_zh-CN.md](doc/README_zh-CN.md)\n\nThis project is a WebUI manager for [USB_SampleRate_Changer](https://github.com/yzyhk904/USB_SampleRate_Changer). The module uses a bundled Rust backend to execute the `USB_SampleRate_Changer` scripts.\n\n## Repository layout\n\n| Path | Purpose |\n| --- | --- |\n| `USB_SampleRate_Changer/` | `USB_SampleRate_Changer` source |\n| `patches/` | Compatibility patches |\n| `module/` | Module metadata and installer overlay |\n| `backend/` | Rust controller |\n| `webui/` | SolidJS WebUI |\n| `build.sh` | Build script |\n| `doc/` | Project documentation |\n\nIn the built module, all upstream scripts, templates and Extras are placed under `core/`. The module root keeps only module metadata, installation scripts, the controller and WebUI files. The Magisk/KernelSU-required `customize.sh` and `uninstall.sh` remain at the module root.\n\n## Parameter mapping\n\n| WebUI control | `USB_SampleRate_Changer` parameter |\n| --- | --- |\n| Policy template selector | `--auto`, `--offload`, `--offload-hifi-playback`, `--offload-direct`, `--offload-safer`, `--bypass-offload`, `--bypass-offload-safer`, `--legacy`, `--safe`, `--safest`, `--safest-auto`, `--usb-only` |\n| Sample-rate selector | Documented 44.1–768 kHz presets, plus a custom integer in the upstream-supported 44100–768000 Hz range |\n| Bit-depth selector | `16`, `24`, `32`, `float` |\n| DRC switch | `--drc` |\n| Force USBv2 switch | `--force-usbv2` |\n| Force Bluetooth QTI switch | `--force-bluetooth-qti` |\n| Bluetooth media route check | Runs automatically after an audio change when A2DP or LE Audio was connected before the operation |\n| Reset | `--reset` |\n\n## Extras\n\n| WebUI control | `USB_SampleRate_Changer` control |\n| --- | --- |\n| Bluetooth audio HAL | `change-bluetooth-hal.sh`: switch between `aosp`, `legacy`, `offload` and `sysbta`, or restore the original ROM property values |\n| AudioFlinger resampler | `change-resampling-quality.sh`: all bundled presets, or validated custom stop-band attenuation (20–242 dB), half-filter length (8–640 in steps of 8), cutoff/cheat percentage and 44.1/48/96 kHz activation threshold |\n| USB transfer period | `change-usb-period.sh`: the complete 125–50000 µs range in steps of 125 µs |\n| System Jitter optimization | `jitter-reducer.sh`: SELinux, thermal, Doze, CPU governor, camera, logd, I/O, virtual memory, Wi-Fi, battery and effects; I/O scheduler/tone and Wi-Fi no-restart are supported |\n| Diagnostics | Filtered/full audio dumps, Bluetooth dumps, audio configuration detection and ALSA hardware parameters |\n\n## Execution path\n\n```text\nSolidJS WebUI\n  -> APatch/KernelSU root bridge (spawn, with exec fallback)\n  -> usbsrctl validates the versioned command catalog\n  -> render the validated shell program in memory\n  -> feed it directly to the shell, entering the global mount namespace when required\n  -> execute the selected upstream script from the module's `core/` directory\n  -> record the command summary in /data/local/tmp/usb_samplerate_changer_webui/last-command.log\n```\n\n## Build\n\nBuild requirements are Node.js, Rust, the `aarch64-linux-android` Rust target, Android NDK and `zip`. Clone the repository with its Submodule when possible:\n\n```sh\ngit clone --recurse-submodules https://github.com/SivonZn/USB_SampleRate_Changer_WebUI.git\n# Existing clone:\ngit submodule update --init --recursive\n```\n\nThe build copies the current Submodule worktree into a temporary directory, verifies and applies all listed patches, builds both applications, and creates the module in the parent workspace's `output/` directory:\n\n```sh\n./build.sh\n```\n\n## Safety and compatibility\n\n- This module modifies audio policy, audio-service properties and selected system-tuning parameters. Confirm that the device, ROM and HAL support the chosen mode.\n- Applying a policy or resampler configuration may briefly interrupt audio. Pay particular attention to the route-recovery warning when Bluetooth A2DP or LE Audio is connected.\n- SELinux, thermal, Doze, governor and system-service operations may reduce security, stability or battery life and may cause overheating. Enable only options whose impact you understand.\n- Actual high-sample-rate support also depends on the USB DAC, kernel, USB Audio HAL and vendor audio policy; the selector range does not mean every device supports every rate.\n- Use this module at your own risk. The project is not responsible for damage caused by using it.\n",
+  "readmeHTML": "<h1>USB SampleRate Changer WebUI</h1>\n\n<p>中文参考：<a href=\"doc/README_zh-CN.md\">README_zh-CN.md</a></p>\n\n<p>This project is a WebUI manager for <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">USB_SampleRate_Changer</a>. The module uses a bundled Rust backend to execute the <code>USB_SampleRate_Changer</code> scripts.</p>\n\n<h2>Repository layout</h2>\n\n<p>| Path | Purpose |</p>\n<p>| --- | --- |</p>\n<p>| <code>USB_SampleRate_Changer/</code> | <code>USB_SampleRate_Changer</code> source |</p>\n<p>| <code>patches/</code> | Compatibility patches |</p>\n<p>| <code>module/</code> | Module metadata and installer overlay |</p>\n<p>| <code>backend/</code> | Rust controller |</p>\n<p>| <code>webui/</code> | SolidJS WebUI |</p>\n<p>| <code>build.sh</code> | Build script |</p>\n<p>| <code>doc/</code> | Project documentation |</p>\n\n<p>In the built module, all upstream scripts, templates and Extras are placed under <code>core/</code>. The module root keeps only module metadata, installation scripts, the controller and WebUI files. The Magisk/KernelSU-required <code>customize.sh</code> and <code>uninstall.sh</code> remain at the module root.</p>\n\n<h2>Parameter mapping</h2>\n\n<p>| WebUI control | <code>USB_SampleRate_Changer</code> parameter |</p>\n<p>| --- | --- |</p>\n<p>| Policy template selector | <code>--auto</code>, <code>--offload</code>, <code>--offload-hifi-playback</code>, <code>--offload-direct</code>, <code>--offload-safer</code>, <code>--bypass-offload</code>, <code>--bypass-offload-safer</code>, <code>--legacy</code>, <code>--safe</code>, <code>--safest</code>, <code>--safest-auto</code>, <code>--usb-only</code> |</p>\n<p>| Sample-rate selector | Documented 44.1–768 kHz presets, plus a custom integer in the upstream-supported 44100–768000 Hz range |</p>\n<p>| Bit-depth selector | <code>16</code>, <code>24</code>, <code>32</code>, <code>float</code> |</p>\n<p>| DRC switch | <code>--drc</code> |</p>\n<p>| Force USBv2 switch | <code>--force-usbv2</code> |</p>\n<p>| Force Bluetooth QTI switch | <code>--force-bluetooth-qti</code> |</p>\n<p>| Bluetooth media route check | Runs automatically after an audio change when A2DP or LE Audio was connected before the operation |</p>\n<p>| Reset | <code>--reset</code> |</p>\n\n<h2>Extras</h2>\n\n<p>| WebUI control | <code>USB_SampleRate_Changer</code> control |</p>\n<p>| --- | --- |</p>\n<p>| Bluetooth audio HAL | <code>change-bluetooth-hal.sh</code>: switch between <code>aosp</code>, <code>legacy</code>, <code>offload</code> and <code>sysbta</code>, or restore the original ROM property values |</p>\n<p>| AudioFlinger resampler | <code>change-resampling-quality.sh</code>: all bundled presets, or validated custom stop-band attenuation (20–242 dB), half-filter length (8–640 in steps of 8), cutoff/cheat percentage and 44.1/48/96 kHz activation threshold |</p>\n<p>| USB transfer period | <code>change-usb-period.sh</code>: the complete 125–50000 µs range in steps of 125 µs |</p>\n<p>| System Jitter optimization | <code>jitter-reducer.sh</code>: SELinux, thermal, Doze, CPU governor, camera, logd, I/O, virtual memory, Wi-Fi, battery and effects; I/O scheduler/tone and Wi-Fi no-restart are supported |</p>\n<p>| Diagnostics | Filtered/full audio dumps, Bluetooth dumps, audio configuration detection and ALSA hardware parameters |</p>\n\n<h2>Execution path</h2>\n\n<pre>SolidJS WebUI\n  -&gt; APatch/KernelSU root bridge (spawn, with exec fallback)\n  -&gt; usbsrctl validates the versioned command catalog\n  -&gt; render the validated shell program in memory\n  -&gt; feed it directly to the shell, entering the global mount namespace when required\n  -&gt; execute the selected upstream script from the module's `core/` directory\n  -&gt; record the command summary in /data/local/tmp/usb_samplerate_changer_webui/last-command.log</pre>\n\n<h2>Build</h2>\n\n<p>Build requirements are Node.js, Rust, the <code>aarch64-linux-android</code> Rust target, Android NDK and <code>zip</code>. Clone the repository with its Submodule when possible:</p>\n\n<pre>git clone --recurse-submodules https://github.com/SivonZn/USB_SampleRate_Changer_WebUI.git\n# Existing clone:\ngit submodule update --init --recursive</pre>\n\n<p>The build copies the current Submodule worktree into a temporary directory, verifies and applies all listed patches, builds both applications, and creates the module in the parent workspace's <code>output/</code> directory:</p>\n\n<pre>./build.sh</pre>\n\n<h2>Safety and compatibility</h2>\n\n<li>This module modifies audio policy, audio-service properties and selected system-tuning parameters. Confirm that the device, ROM and HAL support the chosen mode.</li>\n<li>Applying a policy or resampler configuration may briefly interrupt audio. Pay particular attention to the route-recovery warning when Bluetooth A2DP or LE Audio is connected.</li>\n<li>SELinux, thermal, Doze, governor and system-service operations may reduce security, stability or battery life and may cause overheating. Enable only options whose impact you understand.</li>\n<li>Actual high-sample-rate support also depends on the USB DAC, kernel, USB Audio HAL and vendor audio policy; the selector range does not mean every device supports every rate.</li>\n<li>Use this module at your own risk. The project is not responsible for damage caused by using it.</li>",
+  "homepageUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI",
+  "sourceUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI",
+  "url": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI",
+  "latestRelease": {
+    "name": "v1.2.6",
+    "version": "v1.2.6",
+    "time": "2026-09-19T07:02:07Z",
+    "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.6/USB_SampleRate_Changer_WebUI-1.2.6.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.6",
+      "tagName": "v1.2.6",
+      "publishedAt": "2026-09-19T07:02:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.6/update.json",
+          "size": 749,
+          "downloadCount": 1176
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.6.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.6/USB_SampleRate_Changer_WebUI-1.2.6.zip",
+          "size": 496950,
+          "downloadCount": 69
+        }
+      ]
+    },
+    {
+      "name": "v1.2.5",
+      "tagName": "v1.2.5",
+      "publishedAt": "2026-09-15T08:07:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.5/update.json",
+          "size": 876,
+          "downloadCount": 96
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.5.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.5/USB_SampleRate_Changer_WebUI-1.2.5.zip",
+          "size": 493696,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2026-09-14T06:05:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.4/update.json",
+          "size": 968,
+          "downloadCount": 36
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.4.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.4/USB_SampleRate_Changer_WebUI-1.2.4.zip",
+          "size": 479184,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2.3",
+      "tagName": "v1.2.3",
+      "publishedAt": "2026-09-13T08:39:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.3/update.json",
+          "size": 1087,
+          "downloadCount": 28
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.3.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.3/USB_SampleRate_Changer_WebUI-1.2.3.zip",
+          "size": 457742,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2.2",
+      "tagName": "v1.2.2",
+      "publishedAt": "2026-09-11T15:48:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.2/update.json",
+          "size": 1027,
+          "downloadCount": 71
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.2.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.2/USB_SampleRate_Changer_WebUI-1.2.2.zip",
+          "size": 453644,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-09-11T04:14:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.1/update.json",
+          "size": 515,
+          "downloadCount": 15
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.1.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.1/USB_SampleRate_Changer_WebUI-1.2.1.zip",
+          "size": 451417,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-09-06T11:36:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.0/update.json",
+          "size": 942,
+          "downloadCount": 97
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.2.0.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.2.0/USB_SampleRate_Changer_WebUI-1.2.0.zip",
+          "size": 451250,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-08-30T16:50:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.1.0/update.json",
+          "size": 1551,
+          "downloadCount": 89
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.1.0.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.1.0/USB_SampleRate_Changer_WebUI-1.1.0.zip",
+          "size": 400795,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2026-08-26T09:42:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.0.5/update.json",
+          "size": 725,
+          "downloadCount": 57
+        },
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.0.5.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.0.5/USB_SampleRate_Changer_WebUI-1.0.5.zip",
+          "size": 350055,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-08-26T04:53:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.0.4.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.0.4/USB_SampleRate_Changer_WebUI-1.0.4.zip",
+          "size": 349087,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-08-25T19:55:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.0.3.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.0.3/USB_SampleRate_Changer_WebUI-1.0.3.zip",
+          "size": 348441,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-08-23T09:49:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.0.2.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/v1.0.2/USB_SampleRate_Changer_WebUI-1.0.2.zip",
+          "size": 332836,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "1.0.1",
+      "tagName": "1.0.1",
+      "publishedAt": "2026-08-23T09:00:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "USB_SampleRate_Changer_WebUI-1.0.1.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/1.0.1/USB_SampleRate_Changer_WebUI-1.0.1.zip",
+          "size": 332846,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "1.0.0",
+      "tagName": "1.0.0",
+      "publishedAt": "2026-08-22T04:57:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "USB_SampleRate_Changer_WebUI.zip",
+          "downloadUrl": "https://github.com/SivonZn/USB_SampleRate_Changer_WebUI/releases/download/1.0.0/USB_SampleRate_Changer_WebUI.zip",
+          "size": 325554,
+          "downloadCount": 9
+        }
+      ]
+    }
+  ]
+}

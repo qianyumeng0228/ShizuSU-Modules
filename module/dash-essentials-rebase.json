@@ -1,0 +1,591 @@
+{
+  "readme": "# Dash Essential\n\nDash Essential is a native hardware-control application for Xiaomi Dash\n(POCO X8 Pro Max / Redmi Turbo 5 Max) and its MediaTek Dimensity 9500s\n(MT6991) platform.\nIt combines an Android `NativeActivity`, a Flutter AOT interface, a Rust host\nruntime, and a separately privileged Rust daemon. The UI and hardware-control\nlogic remain native/AOT. A small, framework-only DEX adapter provides the\nQuick Settings bypass tile and Android predictive Back callbacks; it contains\nno AndroidX, Compose or third-party managed libraries.\n\nThe APK never runs as root, does not use the system UID, and does not request\nprivileged Android permissions. Kernel and vendor controls are owned by the\ndaemon and reached through authenticated local transports restricted to the\ninstalled application UID.\n\n## Supported target\n\n- Device codename: `dash`\n- SoC: MediaTek MT6991 / Dimensity 9500s\n- CPU: 8 cores (4× Cortex-A720 + 3× Cortex-X4 + 1× Cortex-X925), 4+3+1\n  policies, up to 3.73 GHz\n- GPU: Arm Immortalis-G925, 12 cores, up to 1612 MHz\n- ABI: ARM64\n- Android: API 31 or newer\n- Kernel userspace: 16 KB page-compatible native binaries\n- Vendor dependencies: Dash touch and display AIDL services plus MediaTek GED\n\nThis is device-specific software. Other devices are rejected by the root-module\ninstaller and are not supported by the included AOSP policy.\n\n## Main features\n\n- Four persistent GPU performance profiles with live hardware readback.\n- Mali devfreq range, governor, GED boost, power-policy, and OPP controls.\n- CPU core mask, independent cluster governors, and validated per-cluster\n  minimum/maximum or sustained exact-lock controls sourced from the live kernel\n  OPP table.\n- UFS scheduler selection across every detected UFS logical unit.\n- Touch profiles for 240 Hz native timing, 480 Hz native timing, and the\n  original v1.18.0 one-millisecond Android output stream generated from the\n  native 480 Hz source.\n- Xiaomi touch/display AIDL integration, color modes, expert calibration,\n  sunlight mode, HDR/video controls, resolution, and density controls.\n- ZRAM size, algorithm, swappiness, compaction, charging, and power telemetry.\n- Kernel-supported bypass charging with Immediate or 20/40/80/90% thresholds,\n  daemon-owned persistence and measured battery-flow reporting.\n- Whole-app hardware-control pause and reset, plus OEM Control defaults for\n  touch response and display colour/temperature.\n- [System Colors](docs/SYSTEM_COLORS.md): Android Material You seed palettes,\n  wallpaper reset, style previews, and capability-based native color readback\n  without a HyperOS, ColorOS, or AOSP ROM-name allowlist.\n- Daemon-owned persistence and background reassertion after boot, screen wake,\n  vendor resets, app force-close, or removal from recents.\n- Configurable in-app motion timing with native 120 Hz frame pacing.\n- [Per-App Controls](docs/PER_APP_CONTROLS_IMPLEMENTATION.md): foreground touch,\n  refresh-rate, CPU and GPU overrides, with saved profiles and global/ROM\n  restoration. Starts disabled; system apps are hidden by default.\n- [Memory DVFS & UFS](docs/MEMORY_STORAGE_TRIALS.md): supported dynamic ranges,\n  exact driver-policy requests and OEM Reset. These are session controls,\n  recovered to originals after daemon restart or reboot.\n- Bypass Charging Quick Settings/Control Center tile with direct access to\n  Charging Control on long-press.\n\n## Screenshots\n\nThe redesigned interface groups live device telemetry and hardware tuning into\nfocused panels for each subsystem.\n\n<table align=\"center\" border=\"0\" cellpadding=\"8\" cellspacing=\"0\">\n  <tr>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/home-redesigned.png\"><img src=\"docs/screenshots/home-redesigned.png\" alt=\"Home dashboard\" width=\"150\"></a><br><sub><b>Home</b> - Device Pulse and quick controls</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/control-hubs-redesigned.png\"><img src=\"docs/screenshots/control-hubs-redesigned.png\" alt=\"Control hubs\" width=\"150\"></a><br><sub><b>Control Hubs</b> - Hardware subsystem navigation</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/cpu.png\"><img src=\"docs/screenshots/cpu.png\" alt=\"CPU controls\" width=\"150\"></a><br><sub><b>CPU</b> - Core and frequency control</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/gpu.png\"><img src=\"docs/screenshots/gpu.png\" alt=\"GPU controls\" width=\"150\"></a><br><sub><b>GPU</b> - Mali profiles and GED</sub></td>\n  </tr>\n  <tr>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/touch.png\"><img src=\"docs/screenshots/touch.png\" alt=\"Touch controls\" width=\"150\"></a><br><sub><b>Touch</b> - Response profiles</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/display.png\"><img src=\"docs/screenshots/display.png\" alt=\"Display controls\" width=\"150\"></a><br><sub><b>Display</b> - Color and HDR tuning</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/battery.png\"><img src=\"docs/screenshots/battery.png\" alt=\"Battery controls\" width=\"150\"></a><br><sub><b>Battery</b> - Charging telemetry</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/zram.png\"><img src=\"docs/screenshots/zram.png\" alt=\"ZRAM controls\" width=\"150\"></a><br><sub><b>ZRAM</b> - Memory compression</sub></td>\n  </tr>\n  <tr>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/diagnostics.png\"><img src=\"docs/screenshots/diagnostics.png\" alt=\"Diagnostics\" width=\"150\"></a><br><sub><b>Diagnostics</b> - Runtime health checks</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/support.png\"><img src=\"docs/screenshots/support.png\" alt=\"Support and project information\" width=\"150\"></a><br><sub><b>Support</b> - Community and safety information</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/system-colors.png\"><img src=\"docs/screenshots/system-colors.png\" alt=\"System Colors\" width=\"150\"></a><br><sub><b>System Colors</b> - Material You palette control</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/advanced-configuration.png\"><img src=\"docs/screenshots/advanced-configuration.png\" alt=\"Advanced Configuration\" width=\"150\"></a><br><sub><b>Advanced Configuration</b> - CPU governors and device tuning</sub></td>\n  </tr>\n  <tr>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/resolution.png\"><img src=\"docs/screenshots/resolution.png\" alt=\"Resolution controls\" width=\"150\"></a><br><sub><b>Resolution</b> - Canvas, density, and refresh settings</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/additional-screen-1.png\"><img src=\"docs/screenshots/additional-screen-1.png\" alt=\"Additional screen 1\" width=\"150\"></a><br><sub><b>Additional Screen 1</b> - Device configuration</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/additional-screen-2.png\"><img src=\"docs/screenshots/additional-screen-2.png\" alt=\"Additional screen 2\" width=\"150\"></a><br><sub><b>Additional Screen 2</b> - Device configuration</sub></td>\n    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/system-colors-updated.png\"><img src=\"docs/screenshots/system-colors-updated.png\" alt=\"Updated System Colors\" width=\"150\"></a><br><sub><b>System Colors</b> - Updated palette controls</sub></td>\n  </tr>\n</table>\n\n## Performance profiles\n\n| Profile | GPU range and governor | GED / power policy | CPU behavior |\n| --- | --- | --- | --- |\n| Stock Balanced | Vendor-managed 338–1612 MHz, `dummy` | GED off, `coarse_demand` | Unchanged; controlled separately |\n| Gaming Dynamic | 338–1612 MHz, `simple_ondemand` | GED on, `always_on` | Unchanged; controlled separately |\n| Battery Saver | 338–598 MHz, `powersave` | GED off, `coarse_demand` | Unchanged; controlled separately |\n| Extreme Beast | Fixed 1612 MHz, `performance`, DVFS off | GED on, `always_on` | Unchanged; controlled separately |\n\nGPU profiles never modify CPU governors, CPU clock ranges, or CPU core state.\nVendor CPU and platform thermal services remain running in every mode. Gaming\nDynamic and Extreme Beast override the Mali cooling constraint and can still\ncause extreme heat, rapid battery drain, instability, or an emergency hardware\nshutdown.\n\nCustom CPU ranges remain separate from GPU profiles and governors. While at\nleast one custom CPU range is active, the daemon selects Dash's OEM\n`thermal-nolimits` configuration so Xiaomi's userspace policy cannot replace an\nexact lock with a lower ceiling. It keeps the thermal services alive, remembers\nthe configuration that was active beforehand, and restores it when the final\ncustom CPU range is reset.\n\nGaming Dynamic and Extreme Beast borrow the vendor's `thermal_ap` configuration\ninstead of the `thermal-nolimits` mode CPU ranges use. The borrow is disabled by\ndefault (`MI_THERMAL_AP_MODE = -1`); enable it after on-device verification by\nsetting the mode id. GPU thermal borrow applies only when no CPU range is saved\n— CPU range ownership holds the stricter `nolimits` mode, which takes precedence.\nA background guard self-heals a stuck `sconfig=6` (nolimits) left by a daemon\nrestart or a lost save: when no saved range or thermal mode owner exists and the\nlive mode reads `6`, it immediately writes `0` (normal) and logs a warning.\n\n## Integration choices\n\n| Method | APK privilege | Backend | Persistence |\n| --- | --- | --- | --- |\n| AOSP ROM integration | Normal app UID | Root init daemon | `/data/system/dash-essential/state.conf` |\n| KernelSU Next or Magisk | Normal app UID | Root module daemon | `/data/adb/dash-essential/state.conf` |\n| Standalone APK | Normal app UID | None | Hardware controls unavailable |\n\nFor a ROM release, use the AOSP integration. It installs the APK and daemon in\n`/product`, creates a dedicated app SELinux domain, restricts the control socket\nto that domain, starts the daemon after boot, and restores saved state without a\nroot manager.\n\nSee [AOSP ROM integration](docs/ROM_INTEGRATION.md) for the complete maintainer\nworkflow and [Architecture](docs/ARCHITECTURE.md) for runtime details.\n\n## Build from source\n\nRequired tools:\n\n- Linux host\n- Flutter SDK and revision-matched Flutter engine checkout\n- Rust toolchain with `aarch64-linux-android`\n- Android SDK, platform 36, build-tools, and NDK r27 or newer\n- JDK 17 or newer, `ninja`, `zip`, `unzip`, and standard ELF tools\n\nBuild the pinned engine once:\n\n```bash\nrustup target add aarch64-linux-android\n./tools/build-flutter-engine.sh\n```\n\nBuild without touching a connected device:\n\n```bash\nDASH_BUILD_ONLY=1 ./build-and-install.sh\n```\n\nOutput is written under `out/release/<timestamp>/`. The build verifies\nFlutter analysis, ARM64 AOT output, the restricted platform DEX adapter, APK signing, 16 KB ZIP alignment,\n16 KB ELF segment alignment, and a content stamp covering the packaged Flutter\nassets and ICU data. If no signing key is supplied, a stable development key is\ncreated once under the ignored `out/signing/` directory and reused by later\nlocal builds.\n\nFor release signing, set:\n\n```bash\nDASH_KEYSTORE=/absolute/path/release.jks \\\nDASH_KEY_ALIAS=release \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\nDASH_BUILD_ONLY=1 ./build-and-install.sh\n```\n\n## Export for an AOSP tree\n\n```bash\nDASH_KEYSTORE=/absolute/path/rom-app.jks \\\nDASH_KEY_ALIAS=dash-essential \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/export-aosp-bundle.sh\n```\n\nThe generated `dist/aosp/DashEssential-<timestamp>/` directory contains the\nAPK, daemon, control client, `Android.bp`, init service, split product/vendor\nSELinux policy, the APK public certificate used by the dedicated app-domain\nmapping, and checksums. Keep the same private key for every ROM update; the\nprivate key is never copied into the bundle.\n\nTo build, stage, and wire the integration into an existing ROM source tree in\none command, provide the Dash product makefile and BoardConfig path:\n\n```bash\nDASH_KEYSTORE=/absolute/path/rom-app.jks \\\nDASH_KEY_ALIAS=dash-essential \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/integrate-aosp-rom.sh /absolute/path/to/aosp \\\n    device/xiaomi/dash/device.mk \\\n    device/xiaomi/dash/BoardConfig.mk\n```\n\nThe helper creates `vendor/dash-essential`, verifies the complete build, and\nadds the two exact include lines only when absent. It refuses paths outside the\nselected source tree and never replaces an existing integration directory.\nPassing only the AOSP root keeps the previous stage-only behavior.\n\n## KernelSU Next and Magisk module\n\nFor an existing rooted ROM, build the combined application and daemon module:\n\n```bash\nDASH_KEYSTORE=/absolute/path/release.jks \\\nDASH_KEY_ALIAS=release \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/build-kernelsu-next-module.sh\n```\n\nInstall the ZIP from KernelSU Next Manager or the Magisk app while Android is\nrunning. The installer registers the bundled APK as an ordinary user app and\nthe module runs only the separate hardware daemon as root. No live SELinux\npatch, system overlay, privileged-app conversion, or app-to-root socket rule is\nused. The direct Unix transport uses `SO_PEERCRED`. ROMs that block cross-domain\nUnix `connectto` use a root-privileged localhost port instead; the app first\nproves from its own UID/SELinux context that low-port binding is denied, and the\ndaemon resolves the accepted client's UID from `/proc/net/tcp` before serving a\ncommand. A daemon-initiated Unix path remains as a compatibility fallback.\nModule Action reports which authenticated transport completed instead of\ntreating a root-only control-client ping as proof. The package uses `skip_mount`;\nbecause it overlays no partition files, KernelSU does not require a metamodule.\nRecovery installation is not supported.\n\nKeep the signing key for every future module update. Android rejects an APK\nupdate signed by a different certificate. The first release after the signing\nidentity reset includes a one-time migration for module installations: it tries\na normal update first and only removes/reinstalls the user application when\nAndroid reports a certificate mismatch. Hardware profiles stored under\n`/data/adb/dash-essential` remain intact, while application-local preferences\nreset once. Later releases signed by the retained key update normally.\n\nThe same ZIP can also act as a temporary update layer over a ROM-native Dash\nEssential installation when that ROM APK uses the same signing certificate as\nthe release APK. The installer updates the app without clearing its data, the\nmodule daemon reuses `/data/system/dash-essential`, and native init is stopped\nbefore the module daemon starts. Removing the module rolls the app back to the\nROM copy and restarts the native service. A differently signed ROM build is\nrejected without uninstalling the app or deleting its data; that build must be\nupdated through its maintainer's OTA or original signing key.\n\n## Repository layout\n\n```text\nandroid/\n  aosp/                 AOSP prebuilt, init, and SELinux integration template\n  kernelsu-next/        KernelSU Next and Magisk module source\n  package/              Manifest and Android resources\n  platform/             Minimal Android tile and Back callback adapters\ndocs/                   Architecture, build, and ROM maintainer documentation\nruntime/\n  daemon-rust/          Privileged hardware backend and control client\n  flutter-engine/       Embedder header and ignored pinned engine prebuilts\n  host-rust/            NativeActivity, Flutter embedder, JNI, and IPC bridge\ntools/                  Engine, AOSP export, and module build scripts\nui/flutter/             Flutter AOT interface\n```\n\n## Documentation\n\n- [Architecture](docs/ARCHITECTURE.md)\n- [Building and verification](docs/BUILDING.md)\n- [AOSP ROM integration](docs/ROM_INTEGRATION.md)\n- [Unpacked EROFS/ext4 ROM integration](docs/UNPACKED_ROM_PORTER_GUIDE.md): Dash-only\n  additions and a merge tool using the porter's own ROM policy.\n- [Flutter runtime pin](docs/FLUTTER_RUNTIME.md)\n- [Commit convention](docs/COMMITS.md)\n\n## Port notes: Rodin Essential to Dash (MT6991)\n\nThis tree is a port of [Rodin Essential](https://github.com/NEESCHAL-3/Rodin-Essential)\nby **NEESCHAL-3**, reworked for the MediaTek MT6991 `dash` platform by\n**afrizal1211**, and carried along the SaanOS line of the same project by\n**Saan**. The upstream release it is based on is `v1.18.5`. The upstream\nproject's licence, copyright notice and release history are preserved;\n[NOTICE](NOTICE) lists the modifications.\n\nThe port is tested on real hardware by the\n[@PocoX8ProMaxID](https://t.me/PocoX8ProMaxID) Telegram community.\n\nThe port changed the following. Every value was taken from the shipped dash\nkernel, device tree and ROM rather than carried over from MT6899.\n\n### The GPU ladder\n\nThe upstream target's Mali-G720 published a uniformly spaced 26 MHz\noperating-point ladder, so an OPP index could be computed from a frequency with\na formula. Dash's Immortalis-G925 does not:\n\n- The device tree publishes 52 operating points from 1612 MHz down to 338 MHz,\n  and the three lowest entries all report the same 338 MHz.\n- The Mali devfreq node advertises 50 frequencies, while the GPUEB's own DVFS\n  ladder has 52 slots. The same frequency therefore sits at a different index\n  in each: 598 MHz is devfreq index 39 but GPUEB index 49, and 338 MHz is\n  devfreq index 49 but GPUEB index 51.\n\nThe daemon consequently resolves every operating-point index against the ladder\nthe driver publishes at `/proc/gpufreqv2/gpu_working_opp_table`, and it\npublishes a floor and a ceiling the way MediaTek's own tooling does:\n`custom_boost_gpu_freq` carries the ladder position of the requested minimum,\n`custom_upbound_gpu_freq` the position of the requested maximum, and the\n`gpu_cust_boost_freq` / `gpu_cust_upbound_freq` parameters carry the\nfrequencies themselves. A request the ladder cannot satisfy is reported as an\nerror rather than written as a guessed index, because a wrong index moves the\nfloor to an unrelated frequency.\n\n### Device baselines\n\n| Item | Upstream target | Dash |\n| --- | --- | --- |\n| GPU devfreq | `13000000.mali` | `48000000.mali` |\n| GPU ladder | 260–1300 MHz, 41 uniform steps | 338–1612 MHz, 52 uneven steps |\n| Mali cooling device | fixed `cooling_device3` | resolved by type `devfreq-48000000.mali` |\n| UFS devfreq | `112b0000.ufshci` | `16810000.ufshci` |\n| DVFSRC devfreq | `/devices/platform/soc/1c00f000.dvfsrc/...` | `/devices/platform/1c013000.dvfsrc/...` |\n| Backlight | `/sys/class/backlight/panel0-backlight` | `/sys/class/leds/lcd-backlight` |\n| Native resolution | 1220 x 2712 | 1280 x 2772 |\n| Touch panel | Goodix / FocalTech | Novatek NT38771 |\n\nThe CPU cluster layout is unchanged: Dash exposes the same 4+3+1 policy\nnumbering (`policy0`, `policy4`, `policy7`) with eight cores.\n\n### Thermal ownership\n\nDash's thermal interface is the same one the upstream target used, including\nthe `thermal_message/sconfig` configuration mode that suppresses the vendor's\ncompeting CPU policy while a custom CPU range is held. The vendor thermal\nservices stay running in every mode.\n\nGaming Dynamic and Extreme Beast borrow the vendor's `thermal_ap` configuration\n(mode `MI_THERMAL_AP_MODE`) instead of the `thermal-nolimits` mode CPU ranges\nuse. The borrow is disabled by default (`MI_THERMAL_AP_MODE = -1`); enable it\nafter on-device verification by setting the mode id. GPU thermal borrow applies\nonly when no CPU range is saved — CPU range ownership holds the stricter\n`nolimits` mode, which takes precedence. The borrow is journaled via the\nservice control journal and restored on release.\n\nA background guard self-heals a stuck `sconfig=6` (nolimits) left by a daemon\nrestart or a lost save: when no saved range or thermal mode owner exists and the\nlive mode reads `6`, it immediately writes `0` (normal) and logs a warning. The\nfresh-boot `-1` sentinel is normalized to `0` by `normalize_mi_thermal_config_mode`,\nso clean boots never false-trigger.\n\n### The platform's GPU ceiling\n\nDash's ladder has a plateau. Its 24 middle slots all report 1430 MHz, so a\n1430 MHz floor resolves to the last of them and a 1430 MHz ceiling to the\nfirst, and both name the same clock. The MediaTek firmware's own `THERMAL_EB`\nrow caps at the first of those slots, so the firmware's thermal ceiling is\n1430 MHz even though the ladder's top operating point is 1612 MHz.\n\nThat ceiling **cannot be raised from software.** The limit table the thermal\nframework arbitrates through is read-only on this ROM, and the platform's\npower service holds the GPU at or below 1430 MHz regardless. The app\ntherefore reports the cap rather than fighting it: a profile whose own writes\nlanded is shown as *armed and capped by THERMAL_EB*, with the effective\nceiling read from the driver, and it is not re-applied on every tick.\n\nThe effective ceiling is read twice, because the driver publishes it twice:\nas an index in the power policy status dump, and directly in hertz in\n`/sys/kernel/thermal/gpu_info`. The second form is simpler and does not need\nthe status dump to be read whole.\n\n### Known differences\n\n- Dash's stock kernel publishes no bypass-charging node, so the bypass-charging\n  feature reports itself as unsupported rather than pretending to provide\n  direct power. The charge-current limit is still available: dash exposes\n  `constant_charge_current` on the battery power supply.\n- The charge-current tiers follow the upstream calibration. The absolute\n  ceiling comes from the vendor charger configuration, which is not part of the\n  public ROM dump, so it should be confirmed against the target hardware; the\n  daemon verifies every write against its readback and reports a clamped or\n  rejected value instead of pretending it applied.\n\n## License\n\nLicensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).\n",
+  "readmeHTML": "<h1>Dash Essential</h1>\n\n<p>Dash Essential is a native hardware-control application for Xiaomi Dash</p>\n<p>(POCO X8 Pro Max / Redmi Turbo 5 Max) and its MediaTek Dimensity 9500s</p>\n<p>(MT6991) platform.</p>\n<p>It combines an Android <code>NativeActivity</code>, a Flutter AOT interface, a Rust host</p>\n<p>runtime, and a separately privileged Rust daemon. The UI and hardware-control</p>\n<p>logic remain native/AOT. A small, framework-only DEX adapter provides the</p>\n<p>Quick Settings bypass tile and Android predictive Back callbacks; it contains</p>\n<p>no AndroidX, Compose or third-party managed libraries.</p>\n\n<p>The APK never runs as root, does not use the system UID, and does not request</p>\n<p>privileged Android permissions. Kernel and vendor controls are owned by the</p>\n<p>daemon and reached through authenticated local transports restricted to the</p>\n<p>installed application UID.</p>\n\n<h2>Supported target</h2>\n\n<li>Device codename: `dash`</li>\n<li>SoC: MediaTek MT6991 / Dimensity 9500s</li>\n<li>CPU: 8 cores (4× Cortex-A720 + 3× Cortex-X4 + 1× Cortex-X925), 4+3+1</li>\n<p>  policies, up to 3.73 GHz</p>\n<li>GPU: Arm Immortalis-G925, 12 cores, up to 1612 MHz</li>\n<li>ABI: ARM64</li>\n<li>Android: API 31 or newer</li>\n<li>Kernel userspace: 16 KB page-compatible native binaries</li>\n<li>Vendor dependencies: Dash touch and display AIDL services plus MediaTek GED</li>\n\n<p>This is device-specific software. Other devices are rejected by the root-module</p>\n<p>installer and are not supported by the included AOSP policy.</p>\n\n<h2>Main features</h2>\n\n<li>Four persistent GPU performance profiles with live hardware readback.</li>\n<li>Mali devfreq range, governor, GED boost, power-policy, and OPP controls.</li>\n<li>CPU core mask, independent cluster governors, and validated per-cluster</li>\n<p>  minimum/maximum or sustained exact-lock controls sourced from the live kernel</p>\n<p>  OPP table.</p>\n<li>UFS scheduler selection across every detected UFS logical unit.</li>\n<li>Touch profiles for 240 Hz native timing, 480 Hz native timing, and the</li>\n<p>  original v1.18.0 one-millisecond Android output stream generated from the</p>\n<p>  native 480 Hz source.</p>\n<li>Xiaomi touch/display AIDL integration, color modes, expert calibration,</li>\n<p>  sunlight mode, HDR/video controls, resolution, and density controls.</p>\n<li>ZRAM size, algorithm, swappiness, compaction, charging, and power telemetry.</li>\n<li>Kernel-supported bypass charging with Immediate or 20/40/80/90% thresholds,</li>\n<p>  daemon-owned persistence and measured battery-flow reporting.</p>\n<li>Whole-app hardware-control pause and reset, plus OEM Control defaults for</li>\n<p>  touch response and display colour/temperature.</p>\n<li>[System Colors](docs/SYSTEM_COLORS.md): Android Material You seed palettes,</li>\n<p>  wallpaper reset, style previews, and capability-based native color readback</p>\n<p>  without a HyperOS, ColorOS, or AOSP ROM-name allowlist.</p>\n<li>Daemon-owned persistence and background reassertion after boot, screen wake,</li>\n<p>  vendor resets, app force-close, or removal from recents.</p>\n<li>Configurable in-app motion timing with native 120 Hz frame pacing.</li>\n<li>[Per-App Controls](docs/PER_APP_CONTROLS_IMPLEMENTATION.md): foreground touch,</li>\n<p>  refresh-rate, CPU and GPU overrides, with saved profiles and global/ROM</p>\n<p>  restoration. Starts disabled; system apps are hidden by default.</p>\n<li>[Memory DVFS & UFS](docs/MEMORY_STORAGE_TRIALS.md): supported dynamic ranges,</li>\n<p>  exact driver-policy requests and OEM Reset. These are session controls,</p>\n<p>  recovered to originals after daemon restart or reboot.</p>\n<li>Bypass Charging Quick Settings/Control Center tile with direct access to</li>\n<p>  Charging Control on long-press.</p>\n\n<h2>Screenshots</h2>\n\n<p>The redesigned interface groups live device telemetry and hardware tuning into</p>\n<p>focused panels for each subsystem.</p>\n\n<p><table align=\"center\" border=\"0\" cellpadding=\"8\" cellspacing=\"0\"></p>\n<p>  <tr></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/home-redesigned.png\"><img src=\"docs/screenshots/home-redesigned.png\" alt=\"Home dashboard\" width=\"150\"></a><br><sub><b>Home</b> - Device Pulse and quick controls</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/control-hubs-redesigned.png\"><img src=\"docs/screenshots/control-hubs-redesigned.png\" alt=\"Control hubs\" width=\"150\"></a><br><sub><b>Control Hubs</b> - Hardware subsystem navigation</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/cpu.png\"><img src=\"docs/screenshots/cpu.png\" alt=\"CPU controls\" width=\"150\"></a><br><sub><b>CPU</b> - Core and frequency control</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/gpu.png\"><img src=\"docs/screenshots/gpu.png\" alt=\"GPU controls\" width=\"150\"></a><br><sub><b>GPU</b> - Mali profiles and GED</sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/touch.png\"><img src=\"docs/screenshots/touch.png\" alt=\"Touch controls\" width=\"150\"></a><br><sub><b>Touch</b> - Response profiles</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/display.png\"><img src=\"docs/screenshots/display.png\" alt=\"Display controls\" width=\"150\"></a><br><sub><b>Display</b> - Color and HDR tuning</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/battery.png\"><img src=\"docs/screenshots/battery.png\" alt=\"Battery controls\" width=\"150\"></a><br><sub><b>Battery</b> - Charging telemetry</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/zram.png\"><img src=\"docs/screenshots/zram.png\" alt=\"ZRAM controls\" width=\"150\"></a><br><sub><b>ZRAM</b> - Memory compression</sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/diagnostics.png\"><img src=\"docs/screenshots/diagnostics.png\" alt=\"Diagnostics\" width=\"150\"></a><br><sub><b>Diagnostics</b> - Runtime health checks</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/support.png\"><img src=\"docs/screenshots/support.png\" alt=\"Support and project information\" width=\"150\"></a><br><sub><b>Support</b> - Community and safety information</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/system-colors.png\"><img src=\"docs/screenshots/system-colors.png\" alt=\"System Colors\" width=\"150\"></a><br><sub><b>System Colors</b> - Material You palette control</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/advanced-configuration.png\"><img src=\"docs/screenshots/advanced-configuration.png\" alt=\"Advanced Configuration\" width=\"150\"></a><br><sub><b>Advanced Configuration</b> - CPU governors and device tuning</sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/resolution.png\"><img src=\"docs/screenshots/resolution.png\" alt=\"Resolution controls\" width=\"150\"></a><br><sub><b>Resolution</b> - Canvas, density, and refresh settings</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/additional-screen-1.png\"><img src=\"docs/screenshots/additional-screen-1.png\" alt=\"Additional screen 1\" width=\"150\"></a><br><sub><b>Additional Screen 1</b> - Device configuration</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/additional-screen-2.png\"><img src=\"docs/screenshots/additional-screen-2.png\" alt=\"Additional screen 2\" width=\"150\"></a><br><sub><b>Additional Screen 2</b> - Device configuration</sub></td></p>\n<p>    <td align=\"center\" style=\"border: 0;\"><a href=\"docs/screenshots/system-colors-updated.png\"><img src=\"docs/screenshots/system-colors-updated.png\" alt=\"Updated System Colors\" width=\"150\"></a><br><sub><b>System Colors</b> - Updated palette controls</sub></td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<h2>Performance profiles</h2>\n\n<p>| Profile | GPU range and governor | GED / power policy | CPU behavior |</p>\n<p>| --- | --- | --- | --- |</p>\n<p>| Stock Balanced | Vendor-managed 338–1612 MHz, <code>dummy</code> | GED off, <code>coarse_demand</code> | Unchanged; controlled separately |</p>\n<p>| Gaming Dynamic | 338–1612 MHz, <code>simple_ondemand</code> | GED on, <code>always_on</code> | Unchanged; controlled separately |</p>\n<p>| Battery Saver | 338–598 MHz, <code>powersave</code> | GED off, <code>coarse_demand</code> | Unchanged; controlled separately |</p>\n<p>| Extreme Beast | Fixed 1612 MHz, <code>performance</code>, DVFS off | GED on, <code>always_on</code> | Unchanged; controlled separately |</p>\n\n<p>GPU profiles never modify CPU governors, CPU clock ranges, or CPU core state.</p>\n<p>Vendor CPU and platform thermal services remain running in every mode. Gaming</p>\n<p>Dynamic and Extreme Beast override the Mali cooling constraint and can still</p>\n<p>cause extreme heat, rapid battery drain, instability, or an emergency hardware</p>\n<p>shutdown.</p>\n\n<p>Custom CPU ranges remain separate from GPU profiles and governors. While at</p>\n<p>least one custom CPU range is active, the daemon selects Dash's OEM</p>\n<p><code>thermal-nolimits</code> configuration so Xiaomi's userspace policy cannot replace an</p>\n<p>exact lock with a lower ceiling. It keeps the thermal services alive, remembers</p>\n<p>the configuration that was active beforehand, and restores it when the final</p>\n<p>custom CPU range is reset.</p>\n\n<p>Gaming Dynamic and Extreme Beast borrow the vendor's <code>thermal_ap</code> configuration</p>\n<p>instead of the <code>thermal-nolimits</code> mode CPU ranges use. The borrow is disabled by</p>\n<p>default (<code>MI_THERMAL_AP_MODE = -1</code>); enable it after on-device verification by</p>\n<p>setting the mode id. GPU thermal borrow applies only when no CPU range is saved</p>\n<p>— CPU range ownership holds the stricter <code>nolimits</code> mode, which takes precedence.</p>\n<p>A background guard self-heals a stuck <code>sconfig=6</code> (nolimits) left by a daemon</p>\n<p>restart or a lost save: when no saved range or thermal mode owner exists and the</p>\n<p>live mode reads <code>6</code>, it immediately writes <code>0</code> (normal) and logs a warning.</p>\n\n<h2>Integration choices</h2>\n\n<p>| Method | APK privilege | Backend | Persistence |</p>\n<p>| --- | --- | --- | --- |</p>\n<p>| AOSP ROM integration | Normal app UID | Root init daemon | <code>/data/system/dash-essential/state.conf</code> |</p>\n<p>| KernelSU Next or Magisk | Normal app UID | Root module daemon | <code>/data/adb/dash-essential/state.conf</code> |</p>\n<p>| Standalone APK | Normal app UID | None | Hardware controls unavailable |</p>\n\n<p>For a ROM release, use the AOSP integration. It installs the APK and daemon in</p>\n<p><code>/product</code>, creates a dedicated app SELinux domain, restricts the control socket</p>\n<p>to that domain, starts the daemon after boot, and restores saved state without a</p>\n<p>root manager.</p>\n\n<p>See <a href=\"docs/ROM_INTEGRATION.md\">AOSP ROM integration</a> for the complete maintainer</p>\n<p>workflow and <a href=\"docs/ARCHITECTURE.md\">Architecture</a> for runtime details.</p>\n\n<h2>Build from source</h2>\n\n<p>Required tools:</p>\n\n<li>Linux host</li>\n<li>Flutter SDK and revision-matched Flutter engine checkout</li>\n<li>Rust toolchain with `aarch64-linux-android`</li>\n<li>Android SDK, platform 36, build-tools, and NDK r27 or newer</li>\n<li>JDK 17 or newer, `ninja`, `zip`, `unzip`, and standard ELF tools</li>\n\n<p>Build the pinned engine once:</p>\n\n<pre>rustup target add aarch64-linux-android\n./tools/build-flutter-engine.sh</pre>\n\n<p>Build without touching a connected device:</p>\n\n<pre>DASH_BUILD_ONLY=1 ./build-and-install.sh</pre>\n\n<p>Output is written under <code>out/release/<timestamp>/</code>. The build verifies</p>\n<p>Flutter analysis, ARM64 AOT output, the restricted platform DEX adapter, APK signing, 16 KB ZIP alignment,</p>\n<p>16 KB ELF segment alignment, and a content stamp covering the packaged Flutter</p>\n<p>assets and ICU data. If no signing key is supplied, a stable development key is</p>\n<p>created once under the ignored <code>out/signing/</code> directory and reused by later</p>\n<p>local builds.</p>\n\n<p>For release signing, set:</p>\n\n<pre>DASH_KEYSTORE=/absolute/path/release.jks \\\nDASH_KEY_ALIAS=release \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\nDASH_BUILD_ONLY=1 ./build-and-install.sh</pre>\n\n<h2>Export for an AOSP tree</h2>\n\n<pre>DASH_KEYSTORE=/absolute/path/rom-app.jks \\\nDASH_KEY_ALIAS=dash-essential \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/export-aosp-bundle.sh</pre>\n\n<p>The generated <code>dist/aosp/DashEssential-<timestamp>/</code> directory contains the</p>\n<p>APK, daemon, control client, <code>Android.bp</code>, init service, split product/vendor</p>\n<p>SELinux policy, the APK public certificate used by the dedicated app-domain</p>\n<p>mapping, and checksums. Keep the same private key for every ROM update; the</p>\n<p>private key is never copied into the bundle.</p>\n\n<p>To build, stage, and wire the integration into an existing ROM source tree in</p>\n<p>one command, provide the Dash product makefile and BoardConfig path:</p>\n\n<pre>DASH_KEYSTORE=/absolute/path/rom-app.jks \\\nDASH_KEY_ALIAS=dash-essential \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/integrate-aosp-rom.sh /absolute/path/to/aosp \\\n    device/xiaomi/dash/device.mk \\\n    device/xiaomi/dash/BoardConfig.mk</pre>\n\n<p>The helper creates <code>vendor/dash-essential</code>, verifies the complete build, and</p>\n<p>adds the two exact include lines only when absent. It refuses paths outside the</p>\n<p>selected source tree and never replaces an existing integration directory.</p>\n<p>Passing only the AOSP root keeps the previous stage-only behavior.</p>\n\n<h2>KernelSU Next and Magisk module</h2>\n\n<p>For an existing rooted ROM, build the combined application and daemon module:</p>\n\n<pre>DASH_KEYSTORE=/absolute/path/release.jks \\\nDASH_KEY_ALIAS=release \\\nDASH_KEYSTORE_PASS='store-password' \\\nDASH_KEY_PASS='key-password' \\\n  ./tools/build-kernelsu-next-module.sh</pre>\n\n<p>Install the ZIP from KernelSU Next Manager or the Magisk app while Android is</p>\n<p>running. The installer registers the bundled APK as an ordinary user app and</p>\n<p>the module runs only the separate hardware daemon as root. No live SELinux</p>\n<p>patch, system overlay, privileged-app conversion, or app-to-root socket rule is</p>\n<p>used. The direct Unix transport uses <code>SO_PEERCRED</code>. ROMs that block cross-domain</p>\n<p>Unix <code>connectto</code> use a root-privileged localhost port instead; the app first</p>\n<p>proves from its own UID/SELinux context that low-port binding is denied, and the</p>\n<p>daemon resolves the accepted client's UID from <code>/proc/net/tcp</code> before serving a</p>\n<p>command. A daemon-initiated Unix path remains as a compatibility fallback.</p>\n<p>Module Action reports which authenticated transport completed instead of</p>\n<p>treating a root-only control-client ping as proof. The package uses <code>skip_mount</code>;</p>\n<p>because it overlays no partition files, KernelSU does not require a metamodule.</p>\n<p>Recovery installation is not supported.</p>\n\n<p>Keep the signing key for every future module update. Android rejects an APK</p>\n<p>update signed by a different certificate. The first release after the signing</p>\n<p>identity reset includes a one-time migration for module installations: it tries</p>\n<p>a normal update first and only removes/reinstalls the user application when</p>\n<p>Android reports a certificate mismatch. Hardware profiles stored under</p>\n<p><code>/data/adb/dash-essential</code> remain intact, while application-local preferences</p>\n<p>reset once. Later releases signed by the retained key update normally.</p>\n\n<p>The same ZIP can also act as a temporary update layer over a ROM-native Dash</p>\n<p>Essential installation when that ROM APK uses the same signing certificate as</p>\n<p>the release APK. The installer updates the app without clearing its data, the</p>\n<p>module daemon reuses <code>/data/system/dash-essential</code>, and native init is stopped</p>\n<p>before the module daemon starts. Removing the module rolls the app back to the</p>\n<p>ROM copy and restarts the native service. A differently signed ROM build is</p>\n<p>rejected without uninstalling the app or deleting its data; that build must be</p>\n<p>updated through its maintainer's OTA or original signing key.</p>\n\n<h2>Repository layout</h2>\n\n<pre>android/\n  aosp/                 AOSP prebuilt, init, and SELinux integration template\n  kernelsu-next/        KernelSU Next and Magisk module source\n  package/              Manifest and Android resources\n  platform/             Minimal Android tile and Back callback adapters\ndocs/                   Architecture, build, and ROM maintainer documentation\nruntime/\n  daemon-rust/          Privileged hardware backend and control client\n  flutter-engine/       Embedder header and ignored pinned engine prebuilts\n  host-rust/            NativeActivity, Flutter embedder, JNI, and IPC bridge\ntools/                  Engine, AOSP export, and module build scripts\nui/flutter/             Flutter AOT interface</pre>\n\n<h2>Documentation</h2>\n\n<li>[Architecture](docs/ARCHITECTURE.md)</li>\n<li>[Building and verification](docs/BUILDING.md)</li>\n<li>[AOSP ROM integration](docs/ROM_INTEGRATION.md)</li>\n<li>[Unpacked EROFS/ext4 ROM integration](docs/UNPACKED_ROM_PORTER_GUIDE.md): Dash-only</li>\n<p>  additions and a merge tool using the porter's own ROM policy.</p>\n<li>[Flutter runtime pin](docs/FLUTTER_RUNTIME.md)</li>\n<li>[Commit convention](docs/COMMITS.md)</li>\n\n<h2>Port notes: Rodin Essential to Dash (MT6991)</h2>\n\n<p>This tree is a port of <a href=\"https://github.com/NEESCHAL-3/Rodin-Essential\">Rodin Essential</a></p>\n<p>by <b>NEESCHAL-3</b>, reworked for the MediaTek MT6991 <code>dash</code> platform by</p>\n<p><b>afrizal1211</b>, and carried along the SaanOS line of the same project by</p>\n<p><b>Saan</b>. The upstream release it is based on is <code>v1.18.5</code>. The upstream</p>\n<p>project's licence, copyright notice and release history are preserved;</p>\n<p><a href=\"NOTICE\">NOTICE</a> lists the modifications.</p>\n\n<p>The port is tested on real hardware by the</p>\n<p><a href=\"https://t.me/PocoX8ProMaxID\">@PocoX8ProMaxID</a> Telegram community.</p>\n\n<p>The port changed the following. Every value was taken from the shipped dash</p>\n<p>kernel, device tree and ROM rather than carried over from MT6899.</p>\n\n<h3>The GPU ladder</h3>\n\n<p>The upstream target's Mali-G720 published a uniformly spaced 26 MHz</p>\n<p>operating-point ladder, so an OPP index could be computed from a frequency with</p>\n<p>a formula. Dash's Immortalis-G925 does not:</p>\n\n<li>The device tree publishes 52 operating points from 1612 MHz down to 338 MHz,</li>\n<p>  and the three lowest entries all report the same 338 MHz.</p>\n<li>The Mali devfreq node advertises 50 frequencies, while the GPUEB's own DVFS</li>\n<p>  ladder has 52 slots. The same frequency therefore sits at a different index</p>\n<p>  in each: 598 MHz is devfreq index 39 but GPUEB index 49, and 338 MHz is</p>\n<p>  devfreq index 49 but GPUEB index 51.</p>\n\n<p>The daemon consequently resolves every operating-point index against the ladder</p>\n<p>the driver publishes at <code>/proc/gpufreqv2/gpu_working_opp_table</code>, and it</p>\n<p>publishes a floor and a ceiling the way MediaTek's own tooling does:</p>\n<p><code>custom_boost_gpu_freq</code> carries the ladder position of the requested minimum,</p>\n<p><code>custom_upbound_gpu_freq</code> the position of the requested maximum, and the</p>\n<p><code>gpu_cust_boost_freq</code> / <code>gpu_cust_upbound_freq</code> parameters carry the</p>\n<p>frequencies themselves. A request the ladder cannot satisfy is reported as an</p>\n<p>error rather than written as a guessed index, because a wrong index moves the</p>\n<p>floor to an unrelated frequency.</p>\n\n<h3>Device baselines</h3>\n\n<p>| Item | Upstream target | Dash |</p>\n<p>| --- | --- | --- |</p>\n<p>| GPU devfreq | <code>13000000.mali</code> | <code>48000000.mali</code> |</p>\n<p>| GPU ladder | 260–1300 MHz, 41 uniform steps | 338–1612 MHz, 52 uneven steps |</p>\n<p>| Mali cooling device | fixed <code>cooling_device3</code> | resolved by type <code>devfreq-48000000.mali</code> |</p>\n<p>| UFS devfreq | <code>112b0000.ufshci</code> | <code>16810000.ufshci</code> |</p>\n<p>| DVFSRC devfreq | <code>/devices/platform/soc/1c00f000.dvfsrc/...</code> | <code>/devices/platform/1c013000.dvfsrc/...</code> |</p>\n<p>| Backlight | <code>/sys/class/backlight/panel0-backlight</code> | <code>/sys/class/leds/lcd-backlight</code> |</p>\n<p>| Native resolution | 1220 x 2712 | 1280 x 2772 |</p>\n<p>| Touch panel | Goodix / FocalTech | Novatek NT38771 |</p>\n\n<p>The CPU cluster layout is unchanged: Dash exposes the same 4+3+1 policy</p>\n<p>numbering (<code>policy0</code>, <code>policy4</code>, <code>policy7</code>) with eight cores.</p>\n\n<h3>Thermal ownership</h3>\n\n<p>Dash's thermal interface is the same one the upstream target used, including</p>\n<p>the <code>thermal_message/sconfig</code> configuration mode that suppresses the vendor's</p>\n<p>competing CPU policy while a custom CPU range is held. The vendor thermal</p>\n<p>services stay running in every mode.</p>\n\n<p>Gaming Dynamic and Extreme Beast borrow the vendor's <code>thermal_ap</code> configuration</p>\n<p>(mode <code>MI_THERMAL_AP_MODE</code>) instead of the <code>thermal-nolimits</code> mode CPU ranges</p>\n<p>use. The borrow is disabled by default (<code>MI_THERMAL_AP_MODE = -1</code>); enable it</p>\n<p>after on-device verification by setting the mode id. GPU thermal borrow applies</p>\n<p>only when no CPU range is saved — CPU range ownership holds the stricter</p>\n<p><code>nolimits</code> mode, which takes precedence. The borrow is journaled via the</p>\n<p>service control journal and restored on release.</p>\n\n<p>A background guard self-heals a stuck <code>sconfig=6</code> (nolimits) left by a daemon</p>\n<p>restart or a lost save: when no saved range or thermal mode owner exists and the</p>\n<p>live mode reads <code>6</code>, it immediately writes <code>0</code> (normal) and logs a warning. The</p>\n<p>fresh-boot <code>-1</code> sentinel is normalized to <code>0</code> by <code>normalize_mi_thermal_config_mode</code>,</p>\n<p>so clean boots never false-trigger.</p>\n\n<h3>The platform's GPU ceiling</h3>\n\n<p>Dash's ladder has a plateau. Its 24 middle slots all report 1430 MHz, so a</p>\n<p>1430 MHz floor resolves to the last of them and a 1430 MHz ceiling to the</p>\n<p>first, and both name the same clock. The MediaTek firmware's own <code>THERMAL_EB</code></p>\n<p>row caps at the first of those slots, so the firmware's thermal ceiling is</p>\n<p>1430 MHz even though the ladder's top operating point is 1612 MHz.</p>\n\n<p>That ceiling <b>cannot be raised from software.</b> The limit table the thermal</p>\n<p>framework arbitrates through is read-only on this ROM, and the platform's</p>\n<p>power service holds the GPU at or below 1430 MHz regardless. The app</p>\n<p>therefore reports the cap rather than fighting it: a profile whose own writes</p>\n<p>landed is shown as *armed and capped by THERMAL_EB*, with the effective</p>\n<p>ceiling read from the driver, and it is not re-applied on every tick.</p>\n\n<p>The effective ceiling is read twice, because the driver publishes it twice:</p>\n<p>as an index in the power policy status dump, and directly in hertz in</p>\n<p><code>/sys/kernel/thermal/gpu_info</code>. The second form is simpler and does not need</p>\n<p>the status dump to be read whole.</p>\n\n<h3>Known differences</h3>\n\n<li>Dash's stock kernel publishes no bypass-charging node, so the bypass-charging</li>\n<p>  feature reports itself as unsupported rather than pretending to provide</p>\n<p>  direct power. The charge-current limit is still available: dash exposes</p>\n<p>  <code>constant_charge_current</code> on the battery power supply.</p>\n<li>The charge-current tiers follow the upstream calibration. The absolute</li>\n<p>  ceiling comes from the vendor charger configuration, which is not part of the</p>\n<p>  public ROM dump, so it should be confirmed against the target hardware; the</p>\n<p>  daemon verifies every write against its readback and reports a clamped or</p>\n<p>  rejected value instead of pretending it applied.</p>\n\n<h2>License</h2>\n\n<p>Licensed under the Apache License, Version 2.0. See <a href=\"LICENSE\">LICENSE</a>.</p>",
+  "homepageUrl": "https://github.com/afrizal1211/dash-essentials-rebase",
+  "sourceUrl": "https://github.com/afrizal1211/dash-essentials-rebase",
+  "url": "https://github.com/afrizal1211/dash-essentials-rebase",
+  "latestRelease": {
+    "name": "v1.18.23-dash",
+    "version": "v1.18.23-dash",
+    "time": "2026-10-31T04:19:37Z",
+    "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.23-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.23-Iapetus.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.18.23-dash",
+      "tagName": "v1.18.23-dash",
+      "publishedAt": "2026-10-31T04:19:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.23-Iapetus.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.23-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.23-Iapetus.zip",
+          "size": 14115254,
+          "downloadCount": 3
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.23-Iapetus.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.23-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.23-Iapetus.zip.sha256",
+          "size": 123,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.23-dash/Dash-Essential.apk",
+          "size": 27093847,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.23-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.22-dash",
+      "tagName": "v1.18.22-dash",
+      "publishedAt": "2026-10-30T22:12:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.22-Iapetus.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.22-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.22-Iapetus.zip",
+          "size": 14090998,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.22-Iapetus.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.22-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.22-Iapetus.zip.sha256",
+          "size": 123,
+          "downloadCount": 3
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.22-dash/Dash-Essential.apk",
+          "size": 27081482,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.22-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.21-dash",
+      "tagName": "v1.18.21-dash",
+      "publishedAt": "2026-10-25T11:59:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.21-Iapetus.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.21-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.21-Iapetus.zip",
+          "size": 14085998,
+          "downloadCount": 50
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.21-Iapetus.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.21-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.21-Iapetus.zip.sha256",
+          "size": 123,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.21-dash/Dash-Essential.apk",
+          "size": 27081482,
+          "downloadCount": 30
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.21-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.18.20-dash",
+      "tagName": "v1.18.20-dash",
+      "publishedAt": "2026-10-25T05:06:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.20-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip",
+          "size": 14084140,
+          "downloadCount": 9
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.20-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip.sha256",
+          "size": 115,
+          "downloadCount": 2
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.20-dash/Dash-Essential.apk",
+          "size": 27081482,
+          "downloadCount": 5
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.20-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.19-dash",
+      "tagName": "v1.18.19-dash",
+      "publishedAt": "2026-10-22T18:34:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.19-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip",
+          "size": 14084073,
+          "downloadCount": 21
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.19-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.19.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.19-dash/Dash-Essential.apk",
+          "size": 27081482,
+          "downloadCount": 8
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.19-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.18.18-dash",
+      "tagName": "v1.18.18-dash",
+      "publishedAt": "2026-10-22T14:57:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.18.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.18-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.18.zip",
+          "size": 14107561,
+          "downloadCount": 6
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.18.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.18-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.18.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.18-dash/Dash-Essential.apk",
+          "size": 27130723,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.18-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.18.17-dash",
+      "tagName": "v1.18.17-dash",
+      "publishedAt": "2026-10-22T12:19:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.17.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.17-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.17.zip",
+          "size": 14098095,
+          "downloadCount": 5
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.17.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.17-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.17.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.17-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.17-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.16-dash",
+      "tagName": "v1.18.16-dash",
+      "publishedAt": "2026-10-22T09:34:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.16.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.16-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.16.zip",
+          "size": 14090953,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.16.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.16-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.16.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.16-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.16-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.15-dash",
+      "tagName": "v1.18.15-dash",
+      "publishedAt": "2026-10-21T16:18:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.15.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.15-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.15.zip",
+          "size": 14011096,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.15.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.15-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.15.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.15-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.15-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.14-dash",
+      "tagName": "v1.18.14-dash",
+      "publishedAt": "2026-10-21T16:06:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.14.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.14-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.14.zip",
+          "size": 14010965,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.14.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.14-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.14.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.14-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.14-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.13-dash",
+      "tagName": "v1.18.13-dash",
+      "publishedAt": "2026-10-21T16:00:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.13.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.13-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.13.zip",
+          "size": 14010259,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.13.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.13-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.13.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.13-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.13-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.12-dash",
+      "tagName": "v1.18.12-dash",
+      "publishedAt": "2026-10-21T15:39:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.12.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.12-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.12.zip",
+          "size": 14008911,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.12.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.12-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.12.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.12-dash/Dash-Essential.apk",
+          "size": 27130637,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.12-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.11-dash",
+      "tagName": "v1.18.11-dash",
+      "publishedAt": "2026-10-21T15:10:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.11.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.11-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.11.zip",
+          "size": 13961295,
+          "downloadCount": 2
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.11.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.11-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.11.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.11-dash/Dash-Essential.apk",
+          "size": 26901261,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.11-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.10-dash",
+      "tagName": "v1.18.10-dash",
+      "publishedAt": "2026-10-21T13:19:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.10.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.10-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.10.zip",
+          "size": 13961008,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.10.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.10-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.10.zip.sha256",
+          "size": 115,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.10-dash/Dash-Essential.apk",
+          "size": 26901261,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.10-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.9-dash",
+      "tagName": "v1.18.9-dash",
+      "publishedAt": "2026-10-21T12:17:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.9.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.9-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.9.zip",
+          "size": 13960117,
+          "downloadCount": 2
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.9.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.9-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.9.zip.sha256",
+          "size": 114,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.9-dash/Dash-Essential.apk",
+          "size": 26901261,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.9-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.8-dash",
+      "tagName": "v1.18.8-dash",
+      "publishedAt": "2026-10-21T12:04:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.8.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.8-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.8.zip",
+          "size": 13955068,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.8.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.8-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.8.zip.sha256",
+          "size": 114,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.8-dash/Dash-Essential.apk",
+          "size": 26901261,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.8-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.7-dash",
+      "tagName": "v1.18.7-dash",
+      "publishedAt": "2026-10-21T11:08:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.7.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.7-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.7.zip",
+          "size": 13945582,
+          "downloadCount": 2
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.7.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.7-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.7.zip.sha256",
+          "size": 114,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.7-dash/Dash-Essential.apk",
+          "size": 26901261,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.7-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.18.6-dash",
+      "tagName": "v1.18.6-dash",
+      "publishedAt": "2026-10-21T08:37:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.6.zip",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.6-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.6.zip",
+          "size": 13913048,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential-KernelSU-Next-Magisk-v1.18.6.zip.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.6-dash/Dash-Essential-KernelSU-Next-Magisk-v1.18.6.zip.sha256",
+          "size": 114,
+          "downloadCount": 4
+        },
+        {
+          "name": "Dash-Essential.apk",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.6-dash/Dash-Essential.apk",
+          "size": 26819341,
+          "downloadCount": 1
+        },
+        {
+          "name": "Dash-Essential.apk.sha256",
+          "downloadUrl": "https://github.com/afrizal1211/dash-essentials-rebase/releases/download/v1.18.6-dash/Dash-Essential.apk.sha256",
+          "size": 131,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

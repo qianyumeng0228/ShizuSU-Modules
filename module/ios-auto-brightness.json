@@ -1,0 +1,55 @@
+{
+  "readme": "# iOS Auto Brightness\n\n[![CI](https://github.com/reF1nd/iOS-Auto-Brightness/actions/workflows/ci.yml/badge.svg)](https://github.com/reF1nd/iOS-Auto-Brightness/actions/workflows/ci.yml)\n\nKernelSU、APatch、Magisk 自动亮度模块。调光流程按闭源 v6.8 守护进程逐条还原，补上它在 Android 12+ 上失效的设置读取，并按 HyperOS 的规则让后置光感参与调光。\n\n从 [Releases](https://github.com/reF1nd/iOS-Auto-Brightness/releases) 下载模块；版本变更见 [更新日志](CHANGELOG.md)。项目名称描述调光体验目标，不表示使用或复现了 Apple 的原生算法。\n\n## 调光方式\n\n与 v6.8 相同，由一个原生守护进程按 800 毫秒周期运行：\n\n- 前置光感读数经尖峰限幅、按变化幅度自适应的 EMA 平滑和 5 点趋势检测，映射到 v6.8 的 lux → nits → 背光曲线（固定 52 点面板表）。\n- 只在曲线目标越过回差（2.5%～3%）时写入主屏背光节点；不追写系统对背光的其他改动。快速变暗、阳光模式使用 v6.8 的短渐变。\n- 夜间（18:00–6:00）降低 5%，电量低于 15% 且未充电时限制在 70%；照度超过 15000 lux 时进入阳光模式；电量低于 30% 且未充电，或电池/机身温度高于 45℃ 时不增强。\n- 环境光稳定后逐步放慢到 1.6 秒、8 秒一次；熄屏 15 秒一次；接近传感器遮挡时保持亮度不动。\n- 自动亮度模式下把背光节点设为 0444，系统切到手动亮度或模块停止时恢复 0644。\n\n0444 无法阻止系统通过已打开的句柄写背光（见[设备说明](docs/DEVICE.md)），v6.8 实际上是与系统自动亮度交替写入：系统按自身节奏调整，模块只在自己的目标变化时覆盖一次。本模块保持这一行为，不与系统抢写。\n\n### 与 v6.8 的差异\n\n- **设置读取**：v6.8 按文本 XML 截取 `settings_system.xml` 的前 8 KB，Android 12 起该文件默认为 ABX 二进制格式，读取失败时它会一直当作自动模式、亮度条学习永不触发。本模块完整解析 ABX 与文本 XML。\n- **亮度条学习**：公式与 v6.8 相同，亮度条变化至少 10 格时，把“亮度条换算值与曲线目标之差”按 10% 并入整条曲线的统一偏移（±30%），保存后重启仍生效。HyperOS 在自动亮度下会自己改写亮度条，所以额外核对系统的用户调节点（`dumpsys display` 中的 `mUserLux`/`mUserBrightness`），只学习真实拖动。\n- **后置光感**：v6.8 只在前置无读数时使用后置。本模块按 HyperOS `DualSensorPolicy` 的规则：后置的 1 秒、3 秒均值都超过前置的增亮阈值并通过防抖后改用后置照度，前置不低于后置时交还前置；后置只会让屏幕变亮，副屏点亮且前置很暗时忽略后置。可在设置中关闭，恢复 v6.8 行为。\n- **启动修正**：v6.8 启动时若曲线目标恰好落在当前亮度的回差内，会把屏幕写到最低亮度再回升，本模块沿用当前亮度。\n\n逐项对照与依据见 [docs/PARITY.md](docs/PARITY.md)。\n\n## 兼容范围\n\nAndroid 12（API 31）及以上，包含 ARM64、ARMv7、x86_64 和 x86 核心。优先控制 `panel0-backlight`，没有时使用第一个可用的背光设备；光感通过 NDK 读取，失败时回退 sysfs 或 `dumpsys sensorservice`。后置光感使用小米的 `xiaomi.sensor.back_lux` 类型，阈值曲线取自小米 17 Pro Max 的系统配置。\n\n真机验证目前只覆盖小米 17 Pro Max / Android 17 HyperOS 4 / KernelSU，详见 [验证记录](docs/VALIDATION.md)。\n\n## 安装与更新\n\n1. 下载模块 ZIP，可用同名 `.sha256` 核对。开发构建可从成功的 Actions 运行下载 `kernelsu-module` artifact。\n2. 用 Root 管理器安装。首次安装需要重启；首次安装后尚未重启时再次安装，也仍需重启。\n3. 已运行的模块支持热更新：停止旧服务、替换文件、启动并核对新服务，安装器退出后清除本模块的待重启标记，WebUI 立即可用；失败会回滚。\n4. 开启系统自动亮度，在 Root 管理器的 WebUI 入口查看状态、曲线与参数。\n\n禁用模块后服务全部退出，重新启用后在 WebUI 点击“启动服务”恢复。安装 v6.8 后再安装本模块会按首次安装处理，并迁移其配置和学习偏移。\n\n## 数据\n\n数据位于 `/data/adb/ios_auto_brightness/`：`config.conf`（v6.8 的配置项，另有 `learning_enabled`、`dual_sensor`）、`learn.conf`（学习偏移）、`service.log`。升级与卸载默认保留，WebUI 可清除学习偏移。\n\n## 构建与发布\n\n编译、测试、静态检查和打包由 [GitHub Actions](https://github.com/reF1nd/iOS-Auto-Brightness/actions) 执行：核心单元测试、真实二进制在模拟 sysfs 上的端到端测试、ASan/UBSan、四种 ABI 构建、安装与热更新事务测试和 WebUI 测试。Release 工作流复用完整 CI 并校验版本与源码提交。维护者操作见 [贡献约定](CONTRIBUTING.md)。\n\n## 项目来源与许可证\n\n本项目以闭源 v6.8 模块的行为分析为参考重新实现源码，参考 ZIP、二进制、网页资源和作者头像不包含在本仓库中。\n\n代码和文档采用 **GNU GPL v3.0 only**（`GPL-3.0-only`），见 [LICENSE](LICENSE)。\n",
+  "readmeHTML": "<h1>iOS Auto Brightness</h1>\n\n<p><a href=\"https://github.com/reF1nd/iOS-Auto-Brightness/actions/workflows/ci.yml/badge.svg\">![CI</a>](https://github.com/reF1nd/iOS-Auto-Brightness/actions/workflows/ci.yml)</p>\n\n<p>KernelSU、APatch、Magisk 自动亮度模块。调光流程按闭源 v6.8 守护进程逐条还原，补上它在 Android 12+ 上失效的设置读取，并按 HyperOS 的规则让后置光感参与调光。</p>\n\n<p>从 <a href=\"https://github.com/reF1nd/iOS-Auto-Brightness/releases\">Releases</a> 下载模块；版本变更见 <a href=\"CHANGELOG.md\">更新日志</a>。项目名称描述调光体验目标，不表示使用或复现了 Apple 的原生算法。</p>\n\n<h2>调光方式</h2>\n\n<p>与 v6.8 相同，由一个原生守护进程按 800 毫秒周期运行：</p>\n\n<li>前置光感读数经尖峰限幅、按变化幅度自适应的 EMA 平滑和 5 点趋势检测，映射到 v6.8 的 lux → nits → 背光曲线（固定 52 点面板表）。</li>\n<li>只在曲线目标越过回差（2.5%～3%）时写入主屏背光节点；不追写系统对背光的其他改动。快速变暗、阳光模式使用 v6.8 的短渐变。</li>\n<li>夜间（18:00–6:00）降低 5%，电量低于 15% 且未充电时限制在 70%；照度超过 15000 lux 时进入阳光模式；电量低于 30% 且未充电，或电池/机身温度高于 45℃ 时不增强。</li>\n<li>环境光稳定后逐步放慢到 1.6 秒、8 秒一次；熄屏 15 秒一次；接近传感器遮挡时保持亮度不动。</li>\n<li>自动亮度模式下把背光节点设为 0444，系统切到手动亮度或模块停止时恢复 0644。</li>\n\n<p>0444 无法阻止系统通过已打开的句柄写背光（见<a href=\"docs/DEVICE.md\">设备说明</a>），v6.8 实际上是与系统自动亮度交替写入：系统按自身节奏调整，模块只在自己的目标变化时覆盖一次。本模块保持这一行为，不与系统抢写。</p>\n\n<h3>与 v6.8 的差异</h3>\n\n<li>**设置读取**：v6.8 按文本 XML 截取 `settings_system.xml` 的前 8 KB，Android 12 起该文件默认为 ABX 二进制格式，读取失败时它会一直当作自动模式、亮度条学习永不触发。本模块完整解析 ABX 与文本 XML。</li>\n<li>**亮度条学习**：公式与 v6.8 相同，亮度条变化至少 10 格时，把“亮度条换算值与曲线目标之差”按 10% 并入整条曲线的统一偏移（±30%），保存后重启仍生效。HyperOS 在自动亮度下会自己改写亮度条，所以额外核对系统的用户调节点（`dumpsys display` 中的 `mUserLux`/`mUserBrightness`），只学习真实拖动。</li>\n<li>**后置光感**：v6.8 只在前置无读数时使用后置。本模块按 HyperOS `DualSensorPolicy` 的规则：后置的 1 秒、3 秒均值都超过前置的增亮阈值并通过防抖后改用后置照度，前置不低于后置时交还前置；后置只会让屏幕变亮，副屏点亮且前置很暗时忽略后置。可在设置中关闭，恢复 v6.8 行为。</li>\n<li>**启动修正**：v6.8 启动时若曲线目标恰好落在当前亮度的回差内，会把屏幕写到最低亮度再回升，本模块沿用当前亮度。</li>\n\n<p>逐项对照与依据见 <a href=\"docs/PARITY.md\">docs/PARITY.md</a>。</p>\n\n<h2>兼容范围</h2>\n\n<p>Android 12（API 31）及以上，包含 ARM64、ARMv7、x86_64 和 x86 核心。优先控制 <code>panel0-backlight</code>，没有时使用第一个可用的背光设备；光感通过 NDK 读取，失败时回退 sysfs 或 <code>dumpsys sensorservice</code>。后置光感使用小米的 <code>xiaomi.sensor.back_lux</code> 类型，阈值曲线取自小米 17 Pro Max 的系统配置。</p>\n\n<p>真机验证目前只覆盖小米 17 Pro Max / Android 17 HyperOS 4 / KernelSU，详见 <a href=\"docs/VALIDATION.md\">验证记录</a>。</p>\n\n<h2>安装与更新</h2>\n\n<li>下载模块 ZIP，可用同名 `.sha256` 核对。开发构建可从成功的 Actions 运行下载 `kernelsu-module` artifact。</li>\n<li>用 Root 管理器安装。首次安装需要重启；首次安装后尚未重启时再次安装，也仍需重启。</li>\n<li>已运行的模块支持热更新：停止旧服务、替换文件、启动并核对新服务，安装器退出后清除本模块的待重启标记，WebUI 立即可用；失败会回滚。</li>\n<li>开启系统自动亮度，在 Root 管理器的 WebUI 入口查看状态、曲线与参数。</li>\n\n<p>禁用模块后服务全部退出，重新启用后在 WebUI 点击“启动服务”恢复。安装 v6.8 后再安装本模块会按首次安装处理，并迁移其配置和学习偏移。</p>\n\n<h2>数据</h2>\n\n<p>数据位于 <code>/data/adb/ios_auto_brightness/</code>：<code>config.conf</code>（v6.8 的配置项，另有 <code>learning_enabled</code>、<code>dual_sensor</code>）、<code>learn.conf</code>（学习偏移）、<code>service.log</code>。升级与卸载默认保留，WebUI 可清除学习偏移。</p>\n\n<h2>构建与发布</h2>\n\n<p>编译、测试、静态检查和打包由 <a href=\"https://github.com/reF1nd/iOS-Auto-Brightness/actions\">GitHub Actions</a> 执行：核心单元测试、真实二进制在模拟 sysfs 上的端到端测试、ASan/UBSan、四种 ABI 构建、安装与热更新事务测试和 WebUI 测试。Release 工作流复用完整 CI 并校验版本与源码提交。维护者操作见 <a href=\"CONTRIBUTING.md\">贡献约定</a>。</p>\n\n<h2>项目来源与许可证</h2>\n\n<p>本项目以闭源 v6.8 模块的行为分析为参考重新实现源码，参考 ZIP、二进制、网页资源和作者头像不包含在本仓库中。</p>\n\n<p>代码和文档采用 <b>GNU GPL v3.0 only</b>（<code>GPL-3.0-only</code>），见 <a href=\"LICENSE\">LICENSE</a>。</p>",
+  "homepageUrl": "https://github.com/reF1nd/iOS-Auto-Brightness",
+  "sourceUrl": "https://github.com/reF1nd/iOS-Auto-Brightness",
+  "url": "https://github.com/reF1nd/iOS-Auto-Brightness",
+  "latestRelease": {
+    "name": "v8.0.0-beta.1",
+    "version": "v8.0.0-beta.1",
+    "time": "2026-10-29T12:29:58Z",
+    "downloadUrl": "https://github.com/reF1nd/iOS-Auto-Brightness/releases/download/v8.0.0-beta.1/iOS-Auto-Brightness-v8.0.0-beta.1-bff35540.zip"
+  },
+  "releases": [
+    {
+      "name": "v8.0.0-beta.1",
+      "tagName": "v8.0.0-beta.1",
+      "publishedAt": "2026-10-29T12:29:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "iOS-Auto-Brightness-v8.0.0-beta.1-bff35540.zip",
+          "downloadUrl": "https://github.com/reF1nd/iOS-Auto-Brightness/releases/download/v8.0.0-beta.1/iOS-Auto-Brightness-v8.0.0-beta.1-bff35540.zip",
+          "size": 493285,
+          "downloadCount": 1
+        },
+        {
+          "name": "iOS-Auto-Brightness-v8.0.0-beta.1-bff35540.zip.sha256",
+          "downloadUrl": "https://github.com/reF1nd/iOS-Auto-Brightness/releases/download/v8.0.0-beta.1/iOS-Auto-Brightness-v8.0.0-beta.1-bff35540.zip.sha256",
+          "size": 113,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v7.0.0-beta.13",
+      "tagName": "v7.0.0-beta.13",
+      "publishedAt": "2026-10-15T12:32:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "iOS-Auto-Brightness-v7.0.0-beta.13-6bae3aab.zip",
+          "downloadUrl": "https://github.com/reF1nd/iOS-Auto-Brightness/releases/download/v7.0.0-beta.13/iOS-Auto-Brightness-v7.0.0-beta.13-6bae3aab.zip",
+          "size": 2003275,
+          "downloadCount": 3
+        },
+        {
+          "name": "iOS-Auto-Brightness-v7.0.0-beta.13-6bae3aab.zip.sha256",
+          "downloadUrl": "https://github.com/reF1nd/iOS-Auto-Brightness/releases/download/v7.0.0-beta.13/iOS-Auto-Brightness-v7.0.0-beta.13-6bae3aab.zip.sha256",
+          "size": 114,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

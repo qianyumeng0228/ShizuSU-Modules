@@ -1,0 +1,85 @@
+{
+  "readme": "# Performance limit for Xiaomi 12 / 12 Pro\n\n[![Github All Releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/total.svg)]()\n\n> Limit CPU and GPU performance to desired level on Xiaomi devices with Qualcomm Gen 1 CPU\n\nWith max power limit temperature remains below 50(C) degrees and stability is more than 99% in stress tests!\n\nTested on Xiaomi 12 Pro Global, Android 13, Xiaomi.eu 14.0.14.0\n\nConfirmed to be working on Xiaomi 12, Xiaomi 12 Pro.\n\nGeekbench 6 score: 860/3200 (similar to Huawei Mate 40)\n<details> \n  <summary>3DMark Stress Test 20 minutes (`cpu_gpu_limit=3`)</summary>\n  <img src=\"docs/3dMark-stress-test-20-minutes.jpg\">\n</details>\n\n## Setup\n\nDownload and install the module. It just works. See [Releases](https://github.com/mgrybyk/perf-limit-magisk/releases).\n\n## Configuration\n\nConfig file location: `/sdcard/.perf-limit-magisk/config.prop`\n\nNote: `.perf-limit-magisk` is a hidden folder.\n\nNo need to reboot the devices after making changes to the config!\nCheck magisk logs after updating the config file. \nYour changes will be reflected within 20 seconds.\n\n### cpu_gpu_limit\n\n`cpu_gpu_limit`\n\n- `0` - Disable limit completely\n- `1` - Low GPU limit (6). CPU 1075200/1881600/1728000 (device is a bit less hot)\n- `2` - Low GPU limit (6). CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)\n- `3` - Average GPU limit (7). CPU 1075200/1881600/1728000 (device is less hot)\n- `4` - Average GPU limit (7). CPU 1075200/1324800/1171200 (same as 3 but with lower CPU freqs)\n- `5` - High GPU limit (8). CPU 1075200/1881600/1728000 (device is not hot)\n- `6` - High GPU limit (8). CPU 1075200/1324800/1171200 (same as 5 but with lower CPU freqs)\n\nDefault: `cpu_gpu_limit=3`\n\nRecommendations based on scenario:\n\n- **Average day to day usage**: 3\n- 4, 5 or 6 temporary for long time gaming.\n\nNOTE: set value back from 5 or 6 to something lower after gaming as far as the driver will disable GPU limit completely in apps like camera!\nIt's not recommended to use 2, 4 or 6 on daily basis.\nValues 1 or 2 won't make much difference so are not recommend as well.\n\n### Override max_pwrlevel\n\n`max_pwrlevel` - Allow manually override CPU frequencies and GPU power limit.\n`0` - disable limit. `8` - max power limit.\nReasonable values are `6`, `7`, `8`.\n\nExample: `cpu_gpu_limit=7`\n\n### Override policy0_scaling_max_freq\n\n`policy0_scaling_max_freq` - I don't recommend to change this one unless you wan't to go below 1075200 for some reason.\n\nCPUs 1-4. See `/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies` for available values.\n\nExample: `policy0_scaling_max_freq=960000`\n\n### Override policy4_scaling_max_freq\n\n`policy4_scaling_max_freq` - Recommended values are from `1324800` to `1881600`.\nShould be HIGHER than `policy7_scaling_max_freq`!\n\nCPUs 5-7. See `/sys/devices/system/cpu/cpufreq/policy4/scaling_available_frequencies` for available values.\n\nExample: `policy4_scaling_max_freq=1881600`\n\n### Override policy7_scaling_max_freq\n\n`policy7_scaling_max_freq` - Recommended values are from `1171200` to `1728000`.\nShould be LOWER than `policy4_scaling_max_freq`!\n\nCPU 8. See `/sys/devices/system/cpu/cpufreq/policy7/scaling_available_frequencies` for available values.\n\nExample: `policy7_scaling_max_freq=1728000`\n\n### Verbose logging\n\nTo enable verbose logging `enable_log=true`\n\n## Logs\n\nExample log output:\n\n```\nperf-limit: start, waiting for /sdcard\nperf-limit: Writing default config to ./config.prop\nperf-limit: cpu_gpu_limit=1\nperf-limit: current kgsl gpu value is '6'\nperf-limit: current policy 0 value is '1075200'\n...\nperf-limit: perf-limit service is running...\nperf-limit: applying new values:\nperf-limit: updating kgsl gpu to '8'\nperf-limit: updating policy 4 to '1881600'\n...\n```\n",
+  "readmeHTML": "<h1>Performance limit for Xiaomi 12 / 12 Pro</h1>\n\n<p><a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/total.svg\">![Github All Releases</a>]()</p>\n\n<p>> Limit CPU and GPU performance to desired level on Xiaomi devices with Qualcomm Gen 1 CPU</p>\n\n<p>With max power limit temperature remains below 50(C) degrees and stability is more than 99% in stress tests!</p>\n\n<p>Tested on Xiaomi 12 Pro Global, Android 13, Xiaomi.eu 14.0.14.0</p>\n\n<p>Confirmed to be working on Xiaomi 12, Xiaomi 12 Pro.</p>\n\n<p>Geekbench 6 score: 860/3200 (similar to Huawei Mate 40)</p>\n<p><details></p>\n<p>  <summary>3DMark Stress Test 20 minutes (<code>cpu_gpu_limit=3</code>)</summary></p>\n<p>  <img src=\"docs/3dMark-stress-test-20-minutes.jpg\"></p>\n<p></details></p>\n\n<h2>Setup</h2>\n\n<p>Download and install the module. It just works. See <a href=\"https://github.com/mgrybyk/perf-limit-magisk/releases\">Releases</a>.</p>\n\n<h2>Configuration</h2>\n\n<p>Config file location: <code>/sdcard/.perf-limit-magisk/config.prop</code></p>\n\n<p>Note: <code>.perf-limit-magisk</code> is a hidden folder.</p>\n\n<p>No need to reboot the devices after making changes to the config!</p>\n<p>Check magisk logs after updating the config file.</p>\n<p>Your changes will be reflected within 20 seconds.</p>\n\n<h3>cpu_gpu_limit</h3>\n\n<p><code>cpu_gpu_limit</code></p>\n\n<li>`0` - Disable limit completely</li>\n<li>`1` - Low GPU limit (6). CPU 1075200/1881600/1728000 (device is a bit less hot)</li>\n<li>`2` - Low GPU limit (6). CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)</li>\n<li>`3` - Average GPU limit (7). CPU 1075200/1881600/1728000 (device is less hot)</li>\n<li>`4` - Average GPU limit (7). CPU 1075200/1324800/1171200 (same as 3 but with lower CPU freqs)</li>\n<li>`5` - High GPU limit (8). CPU 1075200/1881600/1728000 (device is not hot)</li>\n<li>`6` - High GPU limit (8). CPU 1075200/1324800/1171200 (same as 5 but with lower CPU freqs)</li>\n\n<p>Default: <code>cpu_gpu_limit=3</code></p>\n\n<p>Recommendations based on scenario:</p>\n\n<li>**Average day to day usage**: 3</li>\n<li>4, 5 or 6 temporary for long time gaming.</li>\n\n<p>NOTE: set value back from 5 or 6 to something lower after gaming as far as the driver will disable GPU limit completely in apps like camera!</p>\n<p>It's not recommended to use 2, 4 or 6 on daily basis.</p>\n<p>Values 1 or 2 won't make much difference so are not recommend as well.</p>\n\n<h3>Override max_pwrlevel</h3>\n\n<p><code>max_pwrlevel</code> - Allow manually override CPU frequencies and GPU power limit.</p>\n<p><code>0</code> - disable limit. <code>8</code> - max power limit.</p>\n<p>Reasonable values are <code>6</code>, <code>7</code>, <code>8</code>.</p>\n\n<p>Example: <code>cpu_gpu_limit=7</code></p>\n\n<h3>Override policy0_scaling_max_freq</h3>\n\n<p><code>policy0_scaling_max_freq</code> - I don't recommend to change this one unless you wan't to go below 1075200 for some reason.</p>\n\n<p>CPUs 1-4. See <code>/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies</code> for available values.</p>\n\n<p>Example: <code>policy0_scaling_max_freq=960000</code></p>\n\n<h3>Override policy4_scaling_max_freq</h3>\n\n<p><code>policy4_scaling_max_freq</code> - Recommended values are from <code>1324800</code> to <code>1881600</code>.</p>\n<p>Should be HIGHER than <code>policy7_scaling_max_freq</code>!</p>\n\n<p>CPUs 5-7. See <code>/sys/devices/system/cpu/cpufreq/policy4/scaling_available_frequencies</code> for available values.</p>\n\n<p>Example: <code>policy4_scaling_max_freq=1881600</code></p>\n\n<h3>Override policy7_scaling_max_freq</h3>\n\n<p><code>policy7_scaling_max_freq</code> - Recommended values are from <code>1171200</code> to <code>1728000</code>.</p>\n<p>Should be LOWER than <code>policy4_scaling_max_freq</code>!</p>\n\n<p>CPU 8. See <code>/sys/devices/system/cpu/cpufreq/policy7/scaling_available_frequencies</code> for available values.</p>\n\n<p>Example: <code>policy7_scaling_max_freq=1728000</code></p>\n\n<h3>Verbose logging</h3>\n\n<p>To enable verbose logging <code>enable_log=true</code></p>\n\n<h2>Logs</h2>\n\n<p>Example log output:</p>\n\n<pre>perf-limit: start, waiting for /sdcard\nperf-limit: Writing default config to ./config.prop\nperf-limit: cpu_gpu_limit=1\nperf-limit: current kgsl gpu value is '6'\nperf-limit: current policy 0 value is '1075200'\n...\nperf-limit: perf-limit service is running...\nperf-limit: applying new values:\nperf-limit: updating kgsl gpu to '8'\nperf-limit: updating policy 4 to '1881600'\n...</pre>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12",
+  "latestRelease": {
+    "name": "v2.4",
+    "version": "v2.4",
+    "time": "2023-09-04T15:07:31Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.4/perf-limit-xiaomi-12-v2.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2023-09-04T15:07:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "perf-limit-xiaomi-12-v2.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.4/perf-limit-xiaomi-12-v2.4.zip",
+          "size": 4276,
+          "downloadCount": 4306
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2023-09-02T16:47:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "perf-limit-xiaomi-12-v2.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.3/perf-limit-xiaomi-12-v2.3.zip",
+          "size": 4063,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2023-09-02T16:43:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "perf-limit-xiaomi-12-v2.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.2/perf-limit-xiaomi-12-v2.2.zip",
+          "size": 57980,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2023-09-02T12:51:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "perf-limit-xiaomi-12-v2.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.1/perf-limit-xiaomi-12-v2.1.zip",
+          "size": 58021,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2023-09-02T10:57:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "perf-limit-xiaomi-12-v2.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/perf-limit-xiaomi-12/releases/download/v2.0/perf-limit-xiaomi-12-v2.0.zip",
+          "size": 4806,
+          "downloadCount": 14
+        }
+      ]
+    }
+  ]
+}

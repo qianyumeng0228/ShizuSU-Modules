@@ -1,0 +1,135 @@
+{
+  "readme": "# 软重启 PID 修复 (Soft Reboot PID Fix)\n\n[![KernelSU](https://img.shields.io/badge/KernelSU-Supported-brightgreen.svg)](https://kernelsu.org/)\n[![Build and Release](https://github.com/youfeng11/soft_restart_fix/actions/workflows/build.yml/badge.svg)](https://github.com/youfeng11/soft_restart_fix/actions/workflows/build.yml)\n[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)\n\n一个专为 Android（KernelSU）设计的超轻量级高效模块。在系统执行软重启（Soft Reboot）前，自动且极速地重置 Linux 内核 PID 计数器，使其回绕并重置到安全低位范围，从而有效避开部分安全软件或反作弊机制对软重启后异常高 PID 的检测。\n\n---\n\n## 📖 背景与原理\n\n### 为什么需要修复？\n- **软重启特性**：Android 系统的“软重启”（Soft Reboot，命令 `setprop ctl.restart zygote` ）并不会重启底层 Linux 内核。\n- **PID 持续累加**：由于内核未重启，PID 计数器持续递增。软重启后重新启动的 `system_server`、`zygote` 以及各类关键应用，其分配到的 PID 往往高达数万。\n- **安全与风控检测**：部分金融银行应用、企业安全控件或反作弊系统会检测“开机时间与 PID 的比例关系”或“关键进程 PID 异常偏高”，将其判定为环境异常、二次注入或多开容器。\n\n### 本模块如何解决？\n模块在软重启触发时自动执行原生核心组件 `pid_wrap`：\n1. **极速通道 (Fast Wrap)**：临时将 `/proc/sys/kernel/pid_max` 动态收缩至当前 PID 附近，促使 Linux 内核在极少次 fork/clone 后瞬间触发顶峰自然回绕（重置到安全低位区间 `[300, 1024]`），随后立即通过 RAII 机制安全复原原始 `pid_max`。\n2. **极速汇编兜底 (Inline Asm Fallback)**：若处于受限环境（如被强 SELinux 策略阻止修改 `procfs`），全自动切换至专属微架构内联汇编（`options(nostack)` 零栈开销直接触发系统调用）并绑定至 CPU 超大核，以每秒数万次的极速吞吐消耗 PID 实现回绕。\n3. **低位免回绕**：若当前系统 PID 已处于安全低位（`< 1500`），则直接智能退出，避免不必要的系统开销。\n\n---\n\n## ✨ 核心特性\n\n- **🚀 毫秒级极速重置**：核心采用 Rust 原生实现，利用内核自然回绕机制，执行耗时控制在微秒至毫秒级，软重启过程几乎零感知延迟。\n- **🛡️ 健全的 RAII 安全机制**：\n  - 基于 Rust `Drop` trait 实现 `PidMaxGuard`，在调整系统参数期间自动屏蔽进程信号，确保原始 `pid_max` 在任何异常路径下均 100% 自动还原。\n  - 采用原子写入 `pwrite`，避免 procfs 写入偏移飘移。\n- **⚡ 单一职责执行入口**：[`emulated-soft-reboot.sh`](emulated-soft-reboot.sh) 仅作为系统软重启事件的触发钩子，直接 `exec` 替换进程调用原生二进制，零多余子 Shell 开销。\n- **📱 全主流架构覆盖**：原生适配 Android 全部四大主流指令集：\n  - `ARM64` (`arm64-v8a` / `aarch64`)\n  - `ARM32` (`armeabi-v7a`)\n  - `x86_64` (`x64`)\n  - `x86`\n- **📊 模块可变简介（运行状态即时感知）**：集成 KernelSU 模块可变简介（`override.description`），状态在管理器中一目了然。\n\n---\n\n## 📁 项目结构\n\n```text\nsoft_restart_fix/\n├── Cargo.toml                 # Rust 项目依赖与编译配置\n├── Cargo.lock                 # 锁定精确依赖版本\n├── src/\n│   └── main.rs                # 核心 Rust 源码（PID 回绕消耗器）\n├── module.prop                # 模块元信息说明\n├── emulated-soft-reboot.sh    # 软重启触发入口钩子脚本\n├── customize.sh               # KernelSU 模块安装脚本（架构校验与安全拦截）\n├── build.sh                   # 自动化跨架构构建与 Zip 打包脚本\n└── bin/                       # 各架构预编译原生二进制文件\n    ├── pid_wrap_arm64\n    ├── pid_wrap_armeabi\n    ├── pid_wrap_x86\n    └── pid_wrap_x86_64\n```\n\n---\n\n## 🛠️ 构建指南\n\n本项目内置自适应跨平台构建脚本 [`build.sh`](build.sh)，支持在本地或 GitHub Actions CI 中自动化完成全架构编译与 strip 打包。\n\n### 前置要求\n- Linux / macOS 环境\n- Rust 工具链（`rustc`、`cargo` 与 `rustup`）\n- Android NDK（支持 r21 ~ r30+）\n- Python 3 或 `zip` 命令\n\n### 一键构建\n```bash\n# 自动扫描系统中已安装的最新 NDK 并编译所有 4 个 Android 目标\n./build.sh\n\n# 或显式指定 Android NDK 绝对路径\n./build.sh /path/to/android-ndk\n```\n\n构建成功后将在根目录下生成开箱即用的 `soft_restart_fix.zip` 刷机包。\n\n---\n\n## 📲 安装与使用\n\n1. 在 GitHub [Releases](https://github.com/youfeng11/soft_restart_fix/releases) 页面下载最新的 `soft_restart_fix.zip` 刷机包。\n2. 打开 **KernelSU 管理器** $\\rightarrow$ 进入 **模块** 页面 $\\rightarrow$ 选择 **从本地安装**。\n3. 安装成功后，执行一次软重启（例如在终端运行 `su -c 'setprop ctl.restart zygote'` 或通过工具箱执行软重启）。\n4. 软重启完成后，返回 KernelSU 管理器查看模块简介，标签显示 `[✅已生效]` 即代表生效！\n\n---\n\n## 📄 开源协议\n\n本项目采用 [Apache-2.0 License](LICENSE) 授权。\n",
+  "readmeHTML": "<h1>软重启 PID 修复 (Soft Reboot PID Fix)</h1>\n\n<p><a href=\"https://img.shields.io/badge/KernelSU-Supported-brightgreen.svg\">![KernelSU</a>](https://kernelsu.org/)</p>\n<p><a href=\"https://github.com/youfeng11/soft_restart_fix/actions/workflows/build.yml/badge.svg\">![Build and Release</a>](https://github.com/youfeng11/soft_restart_fix/actions/workflows/build.yml)</p>\n<p><a href=\"https://img.shields.io/badge/license-Apache%202.0-blue.svg\">![License</a>](LICENSE)</p>\n\n<p>一个专为 Android（KernelSU）设计的超轻量级高效模块。在系统执行软重启（Soft Reboot）前，自动且极速地重置 Linux 内核 PID 计数器，使其回绕并重置到安全低位范围，从而有效避开部分安全软件或反作弊机制对软重启后异常高 PID 的检测。</p>\n\n<p>---</p>\n\n<h2>📖 背景与原理</h2>\n\n<h3>为什么需要修复？</h3>\n<li>**软重启特性**：Android 系统的“软重启”（Soft Reboot，命令 `setprop ctl.restart zygote` ）并不会重启底层 Linux 内核。</li>\n<li>**PID 持续累加**：由于内核未重启，PID 计数器持续递增。软重启后重新启动的 `system_server`、`zygote` 以及各类关键应用，其分配到的 PID 往往高达数万。</li>\n<li>**安全与风控检测**：部分金融银行应用、企业安全控件或反作弊系统会检测“开机时间与 PID 的比例关系”或“关键进程 PID 异常偏高”，将其判定为环境异常、二次注入或多开容器。</li>\n\n<h3>本模块如何解决？</h3>\n<p>模块在软重启触发时自动执行原生核心组件 <code>pid_wrap</code>：</p>\n<li>**极速通道 (Fast Wrap)**：临时将 `/proc/sys/kernel/pid_max` 动态收缩至当前 PID 附近，促使 Linux 内核在极少次 fork/clone 后瞬间触发顶峰自然回绕（重置到安全低位区间 `[300, 1024]`），随后立即通过 RAII 机制安全复原原始 `pid_max`。</li>\n<li>**极速汇编兜底 (Inline Asm Fallback)**：若处于受限环境（如被强 SELinux 策略阻止修改 `procfs`），全自动切换至专属微架构内联汇编（`options(nostack)` 零栈开销直接触发系统调用）并绑定至 CPU 超大核，以每秒数万次的极速吞吐消耗 PID 实现回绕。</li>\n<li>**低位免回绕**：若当前系统 PID 已处于安全低位（`< 1500`），则直接智能退出，避免不必要的系统开销。</li>\n\n<p>---</p>\n\n<h2>✨ 核心特性</h2>\n\n<li>**🚀 毫秒级极速重置**：核心采用 Rust 原生实现，利用内核自然回绕机制，执行耗时控制在微秒至毫秒级，软重启过程几乎零感知延迟。</li>\n<li>**🛡️ 健全的 RAII 安全机制**：</li>\n<p>  - 基于 Rust <code>Drop</code> trait 实现 <code>PidMaxGuard</code>，在调整系统参数期间自动屏蔽进程信号，确保原始 <code>pid_max</code> 在任何异常路径下均 100% 自动还原。</p>\n<p>  - 采用原子写入 <code>pwrite</code>，避免 procfs 写入偏移飘移。</p>\n<li>**⚡ 单一职责执行入口**：[`emulated-soft-reboot.sh`](emulated-soft-reboot.sh) 仅作为系统软重启事件的触发钩子，直接 `exec` 替换进程调用原生二进制，零多余子 Shell 开销。</li>\n<li>**📱 全主流架构覆盖**：原生适配 Android 全部四大主流指令集：</li>\n<p>  - <code>ARM64</code> (<code>arm64-v8a</code> / <code>aarch64</code>)</p>\n<p>  - <code>ARM32</code> (<code>armeabi-v7a</code>)</p>\n<p>  - <code>x86_64</code> (<code>x64</code>)</p>\n<p>  - <code>x86</code></p>\n<li>**📊 模块可变简介（运行状态即时感知）**：集成 KernelSU 模块可变简介（`override.description`），状态在管理器中一目了然。</li>\n\n<p>---</p>\n\n<h2>📁 项目结构</h2>\n\n<pre>soft_restart_fix/\n├── Cargo.toml                 # Rust 项目依赖与编译配置\n├── Cargo.lock                 # 锁定精确依赖版本\n├── src/\n│   └── main.rs                # 核心 Rust 源码（PID 回绕消耗器）\n├── module.prop                # 模块元信息说明\n├── emulated-soft-reboot.sh    # 软重启触发入口钩子脚本\n├── customize.sh               # KernelSU 模块安装脚本（架构校验与安全拦截）\n├── build.sh                   # 自动化跨架构构建与 Zip 打包脚本\n└── bin/                       # 各架构预编译原生二进制文件\n    ├── pid_wrap_arm64\n    ├── pid_wrap_armeabi\n    ├── pid_wrap_x86\n    └── pid_wrap_x86_64</pre>\n\n<p>---</p>\n\n<h2>🛠️ 构建指南</h2>\n\n<p>本项目内置自适应跨平台构建脚本 <a href=\"build.sh\"><code>build.sh</code></a>，支持在本地或 GitHub Actions CI 中自动化完成全架构编译与 strip 打包。</p>\n\n<h3>前置要求</h3>\n<li>Linux / macOS 环境</li>\n<li>Rust 工具链（`rustc`、`cargo` 与 `rustup`）</li>\n<li>Android NDK（支持 r21 ~ r30+）</li>\n<li>Python 3 或 `zip` 命令</li>\n\n<h3>一键构建</h3>\n<pre># 自动扫描系统中已安装的最新 NDK 并编译所有 4 个 Android 目标\n./build.sh\n\n# 或显式指定 Android NDK 绝对路径\n./build.sh /path/to/android-ndk</pre>\n\n<p>构建成功后将在根目录下生成开箱即用的 <code>soft_restart_fix.zip</code> 刷机包。</p>\n\n<p>---</p>\n\n<h2>📲 安装与使用</h2>\n\n<li>在 GitHub [Releases](https://github.com/youfeng11/soft_restart_fix/releases) 页面下载最新的 `soft_restart_fix.zip` 刷机包。</li>\n<li>打开 **KernelSU 管理器** $\\rightarrow$ 进入 **模块** 页面 $\\rightarrow$ 选择 **从本地安装**。</li>\n<li>安装成功后，执行一次软重启（例如在终端运行 `su -c 'setprop ctl.restart zygote'` 或通过工具箱执行软重启）。</li>\n<li>软重启完成后，返回 KernelSU 管理器查看模块简介，标签显示 `[✅已生效]` 即代表生效！</li>\n\n<p>---</p>\n\n<h2>📄 开源协议</h2>\n\n<p>本项目采用 <a href=\"LICENSE\">Apache-2.0 License</a> 授权。</p>",
+  "homepageUrl": "https://github.com/youfeng11/soft_restart_fix",
+  "sourceUrl": "https://github.com/youfeng11/soft_restart_fix",
+  "url": "https://github.com/youfeng11/soft_restart_fix",
+  "latestRelease": {
+    "name": "v1.2.2",
+    "version": "v1.2.2",
+    "time": "2026-10-16T00:04:58Z",
+    "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.2/soft_restart_fix.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.2",
+      "tagName": "v1.2.2",
+      "publishedAt": "2026-10-16T00:04:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.2/changelog.md",
+          "size": 1221,
+          "downloadCount": 202
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.2/soft_restart_fix.zip",
+          "size": 759880,
+          "downloadCount": 583
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-10-11T16:23:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.1/changelog.md",
+          "size": 757,
+          "downloadCount": 97
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.1/soft_restart_fix.zip",
+          "size": 761198,
+          "downloadCount": 243
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-10-10T03:21:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.0/changelog.md",
+          "size": 836,
+          "downloadCount": 60
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.2.0/soft_restart_fix.zip",
+          "size": 758072,
+          "downloadCount": 155
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2026-10-07T02:51:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.2/changelog.md",
+          "size": 292,
+          "downloadCount": 6
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.2/soft_restart_fix.zip",
+          "size": 23500,
+          "downloadCount": 243
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-10-07T01:59:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.1/changelog.md",
+          "size": 683,
+          "downloadCount": 2
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.1/soft_restart_fix.zip",
+          "size": 23509,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-10-06T20:42:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "changelog.md",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.0/changelog.md",
+          "size": 102,
+          "downloadCount": 0
+        },
+        {
+          "name": "soft_restart_fix.zip",
+          "downloadUrl": "https://github.com/youfeng11/soft_restart_fix/releases/download/v1.1.0/soft_restart_fix.zip",
+          "size": 15736,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

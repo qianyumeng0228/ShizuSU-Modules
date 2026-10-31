@@ -1,0 +1,99 @@
+{
+  "readme": "# hyperos-accessibility-fix\nStop HyperOS from randomly disabling accessibility services\n\n## What's happening\nOn Android, when an accessibility app is force-stopped via `ActivityManager`, the [accessibility permission of the app is stripped](https://cs.android.com/android/platform/superproject/+/android-16.0.0_r4:frameworks/base/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java;drc=7f9ce6b127e5d17d7a2ccef1ccc21db212f60084;l=1050).\n\n```java\nboolean onPackagesForceStoppedLocked(String[] packages, AccessibilityUserState userState) {\n    final Set<String> packageSet = Set.of(packages);\n    \n    final ArrayList<ComponentName> continuousServices = userState.mInstalledServices.stream()\n            .filter(s -> (s.flags & FLAG_REQUEST_ACCESSIBILITY_BUTTON) == FLAG_REQUEST_ACCESSIBILITY_BUTTON)\n            .map(AccessibilityServiceInfo::getComponentName)\n            .filter(name -> packageSet.contains(name.getPackageName()))\n            .collect(Collectors.toCollection(ArrayList::new));\n\n    final boolean enabledServicesChanged = userState.mEnabledServices.removeIf(comp -> {\n        if (packageSet.contains(comp.getPackageName())) {\n            userState.getBindingServicesLocked().remove(comp);\n            userState.getCrashedServicesLocked().remove(comp);\n            return true;\n        }\n        return false;\n    });\n\n    if (enabledServicesChanged) {\n        persistComponentNamesToSettingLocked(\n            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,\n            userState.mEnabledServices, userState.mUserId);\n    }\n}\n    ...\n```\n\nAnd HyperOS is hardcoded to trigger a force-stop (not a kill) on \ncertain events like when the user is entering Ultra Battery Saver (`LockScreenClean`),\nand others:\n\n```log\n<ultra battery saver was enabled>\nI ActivityManager: Force stopping com.urbandroid.lux appid=10415 user=0: LockScreenClean\nD ActivityManager: Force removing proc 8855:com.urbandroid.lux:background/u0a415 (com.urbandroid.lux:background/10415)\n```\n\n## How it works\nThis module installs a background script that monitors the `logcat` stream for accessibility update events \nwith minimal system overhead.\n\nOn boot, it checks what accessibility services are enabled, and writes them to `a11y_watchlist.txt`. It also listens for signs of manual \nconfiguration changes (done by user in settings) and updates the watchlist automatically.\n \nWhen an accessibility update event is detected, the background script first checks if the device is in the Settings app (as mentioned above).\nIf not, the background script performs a verification of enabled accessibility services against the local `a11y_watchlist.txt`.\nAnd if the list doesn't match up, the changes are reverted instantly.\n\nThis background script also runs at `OOM` score `-800` to prevent `LMKD` from killing it in the background. And if it still gets killed under memory pressure,\nanother (monitor) script (that runs at `-900`) is running in background to restart it (provided it didn't get killed aswell lol)\n\n## Why use background scripts, and not zygisk/xposed?\nOn my device, these two frameworks cause a range of problems for some reason, so i decided to follow this approach instead.\n\nIt's also more minimal this way, having no requirements at all.\n\n## Note\n- When Ultra Battery Saver is turned on, the accessibility services will still keep running in the background\n- Force stopping an app via App Manager will not (permanently) remove it's accessibility permission anymore.\nSo be careful at what you enable\n\n## Installation:\n* [Download the module archive here](https://github.com/chkndrp/hyperos-accessibility-fix/releases/latest/download/hyperos-accessibility-fix.zip)\n* Flash it in magisk app, or using command line\n\n## Requirements\n- HyperOS 1.0+ (or any A14+ system)\n- KernelSU 1.0.2+\n- Magisk 28.0+\n",
+  "readmeHTML": "<h1>hyperos-accessibility-fix</h1>\n<p>Stop HyperOS from randomly disabling accessibility services</p>\n\n<h2>What's happening</h2>\n<p>On Android, when an accessibility app is force-stopped via <code>ActivityManager</code>, the <a href=\"https://cs.android.com/android/platform/superproject/+/android-16.0.0_r4:frameworks/base/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java;drc=7f9ce6b127e5d17d7a2ccef1ccc21db212f60084;l=1050\">accessibility permission of the app is stripped</a>.</p>\n\n<pre>boolean onPackagesForceStoppedLocked(String[] packages, AccessibilityUserState userState) {\n    final Set&lt;String&gt; packageSet = Set.of(packages);\n\n    final ArrayList&lt;ComponentName&gt; continuousServices = userState.mInstalledServices.stream()\n            .filter(s -&gt; (s.flags &amp; FLAG_REQUEST_ACCESSIBILITY_BUTTON) == FLAG_REQUEST_ACCESSIBILITY_BUTTON)\n            .map(AccessibilityServiceInfo::getComponentName)\n            .filter(name -&gt; packageSet.contains(name.getPackageName()))\n            .collect(Collectors.toCollection(ArrayList::new));\n\n    final boolean enabledServicesChanged = userState.mEnabledServices.removeIf(comp -&gt; {\n        if (packageSet.contains(comp.getPackageName())) {\n            userState.getBindingServicesLocked().remove(comp);\n            userState.getCrashedServicesLocked().remove(comp);\n            return true;\n        }\n        return false;\n    });\n\n    if (enabledServicesChanged) {\n        persistComponentNamesToSettingLocked(\n            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,\n            userState.mEnabledServices, userState.mUserId);\n    }\n}\n    ...</pre>\n\n<p>And HyperOS is hardcoded to trigger a force-stop (not a kill) on</p>\n<p>certain events like when the user is entering Ultra Battery Saver (<code>LockScreenClean</code>),</p>\n<p>and others:</p>\n\n<pre>&lt;ultra battery saver was enabled&gt;\nI ActivityManager: Force stopping com.urbandroid.lux appid=10415 user=0: LockScreenClean\nD ActivityManager: Force removing proc 8855:com.urbandroid.lux:background/u0a415 (com.urbandroid.lux:background/10415)</pre>\n\n<h2>How it works</h2>\n<p>This module installs a background script that monitors the <code>logcat</code> stream for accessibility update events</p>\n<p>with minimal system overhead.</p>\n\n<p>On boot, it checks what accessibility services are enabled, and writes them to <code>a11y_watchlist.txt</code>. It also listens for signs of manual</p>\n<p>configuration changes (done by user in settings) and updates the watchlist automatically.</p>\n\n<p>When an accessibility update event is detected, the background script first checks if the device is in the Settings app (as mentioned above).</p>\n<p>If not, the background script performs a verification of enabled accessibility services against the local <code>a11y_watchlist.txt</code>.</p>\n<p>And if the list doesn't match up, the changes are reverted instantly.</p>\n\n<p>This background script also runs at <code>OOM</code> score <code>-800</code> to prevent <code>LMKD</code> from killing it in the background. And if it still gets killed under memory pressure,</p>\n<p>another (monitor) script (that runs at <code>-900</code>) is running in background to restart it (provided it didn't get killed aswell lol)</p>\n\n<h2>Why use background scripts, and not zygisk/xposed?</h2>\n<p>On my device, these two frameworks cause a range of problems for some reason, so i decided to follow this approach instead.</p>\n\n<p>It's also more minimal this way, having no requirements at all.</p>\n\n<h2>Note</h2>\n<li>When Ultra Battery Saver is turned on, the accessibility services will still keep running in the background</li>\n<li>Force stopping an app via App Manager will not (permanently) remove it's accessibility permission anymore.</li>\n<p>So be careful at what you enable</p>\n\n<h2>Installation:</h2>\n<li>[Download the module archive here](https://github.com/chkndrp/hyperos-accessibility-fix/releases/latest/download/hyperos-accessibility-fix.zip)</li>\n<li>Flash it in magisk app, or using command line</li>\n\n<h2>Requirements</h2>\n<li>HyperOS 1.0+ (or any A14+ system)</li>\n<li>KernelSU 1.0.2+</li>\n<li>Magisk 28.0+</li>",
+  "homepageUrl": "https://github.com/chkndrp/hyperos-accessibility-fix",
+  "sourceUrl": "https://github.com/chkndrp/hyperos-accessibility-fix",
+  "url": "https://github.com/chkndrp/hyperos-accessibility-fix",
+  "latestRelease": {
+    "name": "1.0.5",
+    "version": "1.0.5",
+    "time": "2026-07-20T01:49:07Z",
+    "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.5/hyperos-accessibility-fix.zip"
+  },
+  "releases": [
+    {
+      "name": "1.0.5",
+      "tagName": "1.0.5",
+      "publishedAt": "2026-07-20T01:49:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.5/hyperos-accessibility-fix.zip",
+          "size": 23459,
+          "downloadCount": 903
+        }
+      ]
+    },
+    {
+      "name": "1.0.4",
+      "tagName": "1.0.4",
+      "publishedAt": "2026-06-17T16:33:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.4/hyperos-accessibility-fix.zip",
+          "size": 24000,
+          "downloadCount": 127
+        }
+      ]
+    },
+    {
+      "name": "1.0.3",
+      "tagName": "1.0.3",
+      "publishedAt": "2026-06-16T15:49:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.3/hyperos-accessibility-fix.zip",
+          "size": 24000,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "1.0.2",
+      "tagName": "1.0.2",
+      "publishedAt": "2026-06-13T05:26:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.2/hyperos-accessibility-fix.zip",
+          "size": 23983,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "1.0.1",
+      "tagName": "1.0.1",
+      "publishedAt": "2026-06-12T12:35:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.1/hyperos-accessibility-fix.zip",
+          "size": 23913,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "1.0.0",
+      "tagName": "1.0.0",
+      "publishedAt": "2026-06-07T18:34:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "hyperos-accessibility-fix.zip",
+          "downloadUrl": "https://github.com/chkndrp/hyperos-accessibility-fix/releases/download/1.0.0/hyperos-accessibility-fix.zip",
+          "size": 23117,
+          "downloadCount": 14
+        }
+      ]
+    }
+  ]
+}

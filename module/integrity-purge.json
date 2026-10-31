@@ -1,0 +1,29 @@
+{
+  "readme": "# Integrity Purge\n\nA lightweight Magisk / KernelSU module that provides a one-click **Action** button to wipe cached attestation states from Google Play Services, Google Play Store, and Google Wallet.\n\nUseful after updating fingerprints, modifying `pif.json`, or configuring hardware attestation keyboxes to force an immediate Play Integrity re-check without manually clearing app data.\n\n---\n\n## ⚡ Features\n\n- **One-Click Action:** Trigger the cleanup directly from the Magisk / KernelSU app UI.\n- **Deep Clean:** Force-stops and clears data for:\n  - Google Play Services (`com.google.android.gms`)\n  - Google Play Store (`com.android.vending`)\n  - Google Wallet (`com.google.android.apps.walletnfcrel`)\n- **Process Termination:** Kills background GMS unstable processes (`gms.unstable`).\n- **Zero Overhead:** Pure shell script (`sh`), no persistent background daemon consuming RAM/battery.\n\n---\n\n## 📦 Installation\n\n1. Download the latest `IntegrityPurge-vX.X.zip` from the [Releases](../../releases) tab.\n2. Open the **Magisk** (or KernelSU / APatch) app.\n3. Go to the **Modules** section and tap **Install from storage**.\n4. Select the `.zip` file and reboot your device.\n\n---\n\n## 🚀 How to Use\n\n1. Update your fingerprint, PIF profile, or keybox configuration.\n2. Open **Magisk** > **Modules**.\n3. Locate **Integrity Purge** and tap the **Action** button.\n4. Wait for the terminal log to report `Cleanup completed successfully!`.\n5. Open your Play Integrity checker app (or Google Wallet) to verify the new status.\n\n---\n\n## ⁉️ Need help?\n\n- Write me on Telegram: @imhugo22\n\n---\n## 📱 Tested on:\n- Samsung A52s 5G - Evolution X - Android 16 / Magisk 30.7\n- If anyone has tried it on another model and it works, please let me know via Telegram.\n---\n\n\n## 📄 License\n\nThis project is licensed under the [MIT License](LICENSE).\n",
+  "readmeHTML": "<h1>Integrity Purge</h1>\n\n<p>A lightweight Magisk / KernelSU module that provides a one-click <b>Action</b> button to wipe cached attestation states from Google Play Services, Google Play Store, and Google Wallet.</p>\n\n<p>Useful after updating fingerprints, modifying <code>pif.json</code>, or configuring hardware attestation keyboxes to force an immediate Play Integrity re-check without manually clearing app data.</p>\n\n<p>---</p>\n\n<h2>⚡ Features</h2>\n\n<li>**One-Click Action:** Trigger the cleanup directly from the Magisk / KernelSU app UI.</li>\n<li>**Deep Clean:** Force-stops and clears data for:</li>\n<p>  - Google Play Services (<code>com.google.android.gms</code>)</p>\n<p>  - Google Play Store (<code>com.android.vending</code>)</p>\n<p>  - Google Wallet (<code>com.google.android.apps.walletnfcrel</code>)</p>\n<li>**Process Termination:** Kills background GMS unstable processes (`gms.unstable`).</li>\n<li>**Zero Overhead:** Pure shell script (`sh`), no persistent background daemon consuming RAM/battery.</li>\n\n<p>---</p>\n\n<h2>📦 Installation</h2>\n\n<li>Download the latest `IntegrityPurge-vX.X.zip` from the [Releases](../../releases) tab.</li>\n<li>Open the **Magisk** (or KernelSU / APatch) app.</li>\n<li>Go to the **Modules** section and tap **Install from storage**.</li>\n<li>Select the `.zip` file and reboot your device.</li>\n\n<p>---</p>\n\n<h2>🚀 How to Use</h2>\n\n<li>Update your fingerprint, PIF profile, or keybox configuration.</li>\n<li>Open **Magisk** > **Modules**.</li>\n<li>Locate **Integrity Purge** and tap the **Action** button.</li>\n<li>Wait for the terminal log to report `Cleanup completed successfully!`.</li>\n<li>Open your Play Integrity checker app (or Google Wallet) to verify the new status.</li>\n\n<p>---</p>\n\n<h2>⁉️ Need help?</h2>\n\n<li>Write me on Telegram: @imhugo22</li>\n\n<p>---</p>\n<h2>📱 Tested on:</h2>\n<li>Samsung A52s 5G - Evolution X - Android 16 / Magisk 30.7</li>\n<li>If anyone has tried it on another model and it works, please let me know via Telegram.</li>\n<p>---</p>\n\n\n<h2>📄 License</h2>\n\n<p>This project is licensed under the <a href=\"LICENSE\">MIT License</a>.</p>",
+  "homepageUrl": "https://github.com/imhugo22/integrity-purge",
+  "sourceUrl": "https://github.com/imhugo22/integrity-purge",
+  "url": "https://github.com/imhugo22/integrity-purge",
+  "latestRelease": {
+    "name": "V1",
+    "version": "V1",
+    "time": "2026-09-25T12:50:34Z",
+    "downloadUrl": "https://github.com/imhugo22/integrity-purge/releases/download/V1/integrity-purge-v1.zip"
+  },
+  "releases": [
+    {
+      "name": "V1",
+      "tagName": "V1",
+      "publishedAt": "2026-09-25T12:50:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "integrity-purge-v1.zip",
+          "downloadUrl": "https://github.com/imhugo22/integrity-purge/releases/download/V1/integrity-purge-v1.zip",
+          "size": 2651,
+          "downloadCount": 7
+        }
+      ]
+    }
+  ]
+}

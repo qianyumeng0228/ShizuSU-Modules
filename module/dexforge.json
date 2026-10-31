@@ -1,0 +1,169 @@
+{
+  "readme": "# DexForge\n\n<p align=\"center\">\n  <img src=\"DexForge.webp\" alt=\"DexForge Logo\" width=\"600\">\n</p>\n\n<p align=\"center\">\n  <strong>Autonomous DEX and ART compilation engine dynamically tuned to your device hardware.</strong>\n</p>\n\n<p align=\"center\">\n  <img src=\"https://img.shields.io/badge/License-MIT-d35400?style=for-the-badge\" alt=\"License\">\n  <img src=\"https://img.shields.io/badge/Android-10.0%2B-ff7300?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\">\n  <img src=\"https://img.shields.io/badge/Version-3.0.1-ff9f0a?style=for-the-badge&logo=github&logoColor=white\" alt=\"Version\">\n  <img src=\"https://img.shields.io/badge/Root-KSU%20%7C%20APatch%20%7C%20Magisk-e65c00?style=for-the-badge&logo=linux&logoColor=white\" alt=\"Root\">\n</p>\n\n## Overview\n\nDexForge is a root module that optimizes your apps in the background by compiling DEX and ART bytecode during verified idle charging windows.\n\nDexForge started because manual compilation scripts made phones burn up and required constantly pressing buttons or volume keys just to get through a run. This rewrite is what it always should have been: silent, completely automatic, and intelligent. You flash it once and forget about it.\n\n\n## Why Use DexForge?\n\n- **Fully autonomous**: Runs quietly in the background while your phone is plugged in with the screen off. No buttons, no interactive prompts, and no manual babysitting.\n- **Hardware-aware CPU pinning**: Binds compiler worker threads strictly to energy-efficient LITTLE CPU cores, preventing overheating and eliminating UI frame drops.\n- **Micro-batching with instant yield**: Compiles 2 to 3 apps per idle cycle and aborts within milliseconds if you wake your screen or unplug the charger.\n- **Zero OAT corruption risk**: Relies on Android's native atomic file staging. Stopping compilation mid-flight removes temporary files cleanly, leaving existing app caches untouched.\n- **Live status dashboard**: Displays real-time compiler state, battery capacity, and temperature directly on your module card in KernelSU, APatch, or Magisk.\n\n\n## How to Use\n\n### 1. Installation\n* Download `DexForge.zip` from [Releases](https://github.com/dyokism/DexForge/releases).\n* Flash the archive using your root manager (KernelSU, APatch, or Magisk).\n* **Reboot** your device so the background service can initialize.\n\n### 2. Automatic Background Optimization\nOnce rebooted, DexForge takes over automatically. You do not need to press any action buttons or keep apps open in the foreground.\n\nWhenever your device meets these conditions:\n1. **Charging** (AC, USB, Wireless, or active OEM charge caps like Pixel 80%, Samsung Protect Battery, Asus Bypass)\n2. **Battery >= 50%**\n3. **Screen off or Always-On Display (AOD / Doze) for at least 2 minutes**\n4. **Battery temperature under 38.5°C**\n\nDexForge begins compiling your unoptimized apps in small batches, prioritizing your user-installed apps first. If you pick up your phone or turn on the screen, DexForge yields immediately.\n\n### 3. Monitoring Status and Logs\n* **Live status**: Check the DexForge module description inside KernelSU, APatch, or Magisk. It dynamically updates with live state (e.g. `[Active • Compiling com.example.app (3/15) • 32.5°C]`).\n* **Live log streaming**:\n  ```sh\n  su -c tail -f /data/adb/modules_config/DexForge/DexForge.log\n  ```\n* **Kernel ring buffer**:\n  ```sh\n  su -c dmesg | grep DexForge\n  ```\n\n\n## Technical Details\n\n### Dynamic Hardware Topology & LITTLE-Core Pinning (`service.sh`)\n* **Dynamic cluster resolver**: Queries the primary hardware DVFS domain (`/sys/devices/system/cpu/cpufreq/policy0/related_cpus`) with fallbacks to Linux scheduler capacity tiers (`cpu_capacity`). This deterministically isolates the energy-efficient cluster across DynamIQ architectures, modern asymmetric layouts (e.g. Snapdragon 8 Gen 2/3), and All-Big designs (Dimensity 9300/9400, Snapdragon 8 Elite), configuring `dalvik.vm.dex2oat-cpu-set`, `dalvik.vm.dex2oat-threads`, and background cgroup profiles (`-r bg-dexopt -p PRIORITY_BACKGROUND`). Compiler workers never touch prime or performance cores.\n* **Native job deconfliction**: Cancels competing native Android bg-dexopt tasks (Job 27873780 on Android 14+ and Job 800 on Android 10 to 13) to avoid Binder transaction exhaustion (`0x80000002`) and install lock contention.\n\n### System Safety & Preemption Safeguards\n* **Zero-IPC hardware gatekeeper**: Reads virtual kernel nodes directly. Aggregates multi-panel display luminance across `/sys/class/backlight/*` and `/sys/class/leds/*` to defeat dummy zero-brightness nodes while accommodating Always-On Display (AOD). Simultaneously verifies power supply telemetry across `/sys/class/power_supply/*/online` to respect OEM battery protection limits.\n* **Deterministic worker preemption**: Active 1.5-second watchdog abort traverses `/proc/[pid]/comm` directly to signal `dex2oat`, `dex2oat64`, and `dex2oat32` workers with `SIGTERM` on user wake. This bypasses Android 15/16 `art_exec` process-name suffix mutations and preserves parent `artd` / `installd` supervisors, triggering automatic RAII unlinking of `.tmp` staging files with zero app cache corruption.\n* **Storage failsafe**: Verifies at least **1024MB** of free space on `/data` before starting compilation to prevent low storage bootloops.\n* **Thermal ceiling**: Pauses compilation if battery temperature exceeds **38.5°C**, and kills active workers immediately if temperature reaches **39.0°C**.\n\n\n## Requirements\n\n| Requirement | Details |\n|-------------|---------|\n| Android | 10.0+ (API 29 to API 36+) |\n| Storage | Minimum 1024MB free space on `/data` partition |\n| Condition | Charging (or OEM cap) + Battery >= 50% + Screen off/AOD >= 2m |\n| Root | KernelSU v0.6.0+, APatch v0.10.0+, or Magisk v26.0+ |\n\n\n## License\n\nThis project is licensed under the MIT License. See [LICENSE](LICENSE) for details.\n",
+  "readmeHTML": "<h1>DexForge</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"DexForge.webp\" alt=\"DexForge Logo\" width=\"600\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <strong>Autonomous DEX and ART compilation engine dynamically tuned to your device hardware.</strong></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://img.shields.io/badge/License-MIT-d35400?style=for-the-badge\" alt=\"License\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Android-10.0%2B-ff7300?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Version-3.0.1-ff9f0a?style=for-the-badge&logo=github&logoColor=white\" alt=\"Version\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Root-KSU%20%7C%20APatch%20%7C%20Magisk-e65c00?style=for-the-badge&logo=linux&logoColor=white\" alt=\"Root\"></p>\n<p></p></p>\n\n<h2>Overview</h2>\n\n<p>DexForge is a root module that optimizes your apps in the background by compiling DEX and ART bytecode during verified idle charging windows.</p>\n\n<p>DexForge started because manual compilation scripts made phones burn up and required constantly pressing buttons or volume keys just to get through a run. This rewrite is what it always should have been: silent, completely automatic, and intelligent. You flash it once and forget about it.</p>\n\n\n<h2>Why Use DexForge?</h2>\n\n<li>**Fully autonomous**: Runs quietly in the background while your phone is plugged in with the screen off. No buttons, no interactive prompts, and no manual babysitting.</li>\n<li>**Hardware-aware CPU pinning**: Binds compiler worker threads strictly to energy-efficient LITTLE CPU cores, preventing overheating and eliminating UI frame drops.</li>\n<li>**Micro-batching with instant yield**: Compiles 2 to 3 apps per idle cycle and aborts within milliseconds if you wake your screen or unplug the charger.</li>\n<li>**Zero OAT corruption risk**: Relies on Android's native atomic file staging. Stopping compilation mid-flight removes temporary files cleanly, leaving existing app caches untouched.</li>\n<li>**Live status dashboard**: Displays real-time compiler state, battery capacity, and temperature directly on your module card in KernelSU, APatch, or Magisk.</li>\n\n\n<h2>How to Use</h2>\n\n<h3>1. Installation</h3>\n<li>Download `DexForge.zip` from [Releases](https://github.com/dyokism/DexForge/releases).</li>\n<li>Flash the archive using your root manager (KernelSU, APatch, or Magisk).</li>\n<li>**Reboot** your device so the background service can initialize.</li>\n\n<h3>2. Automatic Background Optimization</h3>\n<p>Once rebooted, DexForge takes over automatically. You do not need to press any action buttons or keep apps open in the foreground.</p>\n\n<p>Whenever your device meets these conditions:</p>\n<li>**Charging** (AC, USB, Wireless, or active OEM charge caps like Pixel 80%, Samsung Protect Battery, Asus Bypass)</li>\n<li>**Battery >= 50%**</li>\n<li>**Screen off or Always-On Display (AOD / Doze) for at least 2 minutes**</li>\n<li>**Battery temperature under 38.5°C**</li>\n\n<p>DexForge begins compiling your unoptimized apps in small batches, prioritizing your user-installed apps first. If you pick up your phone or turn on the screen, DexForge yields immediately.</p>\n\n<h3>3. Monitoring Status and Logs</h3>\n<li>**Live status**: Check the DexForge module description inside KernelSU, APatch, or Magisk. It dynamically updates with live state (e.g. `[Active • Compiling com.example.app (3/15) • 32.5°C]`).</li>\n<li>**Live log streaming**:</li>\n<p>  ```sh</p>\n<p>  su -c tail -f /data/adb/modules_config/DexForge/DexForge.log</p>\n<p>  ```</p>\n<li>**Kernel ring buffer**:</li>\n<p>  ```sh</p>\n<p>  su -c dmesg | grep DexForge</p>\n<p>  ```</p>\n\n\n<h2>Technical Details</h2>\n\n<h3>Dynamic Hardware Topology & LITTLE-Core Pinning (`service.sh`)</h3>\n<li>**Dynamic cluster resolver**: Queries the primary hardware DVFS domain (`/sys/devices/system/cpu/cpufreq/policy0/related_cpus`) with fallbacks to Linux scheduler capacity tiers (`cpu_capacity`). This deterministically isolates the energy-efficient cluster across DynamIQ architectures, modern asymmetric layouts (e.g. Snapdragon 8 Gen 2/3), and All-Big designs (Dimensity 9300/9400, Snapdragon 8 Elite), configuring `dalvik.vm.dex2oat-cpu-set`, `dalvik.vm.dex2oat-threads`, and background cgroup profiles (`-r bg-dexopt -p PRIORITY_BACKGROUND`). Compiler workers never touch prime or performance cores.</li>\n<li>**Native job deconfliction**: Cancels competing native Android bg-dexopt tasks (Job 27873780 on Android 14+ and Job 800 on Android 10 to 13) to avoid Binder transaction exhaustion (`0x80000002`) and install lock contention.</li>\n\n<h3>System Safety & Preemption Safeguards</h3>\n<li>**Zero-IPC hardware gatekeeper**: Reads virtual kernel nodes directly. Aggregates multi-panel display luminance across `/sys/class/backlight/*` and `/sys/class/leds/*` to defeat dummy zero-brightness nodes while accommodating Always-On Display (AOD). Simultaneously verifies power supply telemetry across `/sys/class/power_supply/*/online` to respect OEM battery protection limits.</li>\n<li>**Deterministic worker preemption**: Active 1.5-second watchdog abort traverses `/proc/[pid]/comm` directly to signal `dex2oat`, `dex2oat64`, and `dex2oat32` workers with `SIGTERM` on user wake. This bypasses Android 15/16 `art_exec` process-name suffix mutations and preserves parent `artd` / `installd` supervisors, triggering automatic RAII unlinking of `.tmp` staging files with zero app cache corruption.</li>\n<li>**Storage failsafe**: Verifies at least **1024MB** of free space on `/data` before starting compilation to prevent low storage bootloops.</li>\n<li>**Thermal ceiling**: Pauses compilation if battery temperature exceeds **38.5°C**, and kills active workers immediately if temperature reaches **39.0°C**.</li>\n\n\n<h2>Requirements</h2>\n\n<p>| Requirement | Details |</p>\n<p>|-------------|---------|</p>\n<p>| Android | 10.0+ (API 29 to API 36+) |</p>\n<p>| Storage | Minimum 1024MB free space on <code>/data</code> partition |</p>\n<p>| Condition | Charging (or OEM cap) + Battery >= 50% + Screen off/AOD >= 2m |</p>\n<p>| Root | KernelSU v0.6.0+, APatch v0.10.0+, or Magisk v26.0+ |</p>\n\n\n<h2>License</h2>\n\n<p>This project is licensed under the MIT License. See <a href=\"LICENSE\">LICENSE</a> for details.</p>",
+  "homepageUrl": "https://github.com/dyokism/DexForge",
+  "sourceUrl": "https://github.com/dyokism/DexForge",
+  "url": "https://github.com/dyokism/DexForge",
+  "latestRelease": {
+    "name": "v3.0.1",
+    "version": "v3.0.1",
+    "time": "2026-10-31T03:39:58Z",
+    "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/v3.0.1/DexForge.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2026-10-31T03:39:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/v3.0.1/DexForge.zip",
+          "size": 11878,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-10-30T08:55:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/v3.0.0/DexForge.zip",
+          "size": 11098,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "2.2",
+      "tagName": "2.2",
+      "publishedAt": "2026-07-01T07:18:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/2.2/DexForge.zip",
+          "size": 9841,
+          "downloadCount": 544
+        }
+      ]
+    },
+    {
+      "name": "2.1.1",
+      "tagName": "2.1.1",
+      "publishedAt": "2026-06-22T05:27:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/2.1.1/DexForge.zip",
+          "size": 10088,
+          "downloadCount": 56
+        }
+      ]
+    },
+    {
+      "name": "2.1",
+      "tagName": "2.1",
+      "publishedAt": "2026-06-11T03:38:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/2.1/DexForge.zip",
+          "size": 10501,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "2.0",
+      "tagName": "2.0",
+      "publishedAt": "2026-06-07T03:17:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/2.0/DexForge.zip",
+          "size": 8455,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "1.4",
+      "tagName": "1.4",
+      "publishedAt": "2026-06-04T12:13:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/1.4/DexForge.zip",
+          "size": 5609,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "1.3",
+      "tagName": "1.3",
+      "publishedAt": "2026-06-03T12:38:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge-v1.3.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/1.3/DexForge-v1.3.zip",
+          "size": 5462,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "1.2",
+      "tagName": "1.2",
+      "publishedAt": "2026-05-29T05:31:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge-v1.2.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/1.2/DexForge-v1.2.zip",
+          "size": 5605,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-05-21T15:29:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge-v1.1.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/v1.1/DexForge-v1.1.zip",
+          "size": 4410,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-05-19T07:16:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DexForge-v1.0.zip",
+          "downloadUrl": "https://github.com/dyokism/DexForge/releases/download/v1.0/DexForge-v1.0.zip",
+          "size": 3367,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

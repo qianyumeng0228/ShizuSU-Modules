@@ -1,0 +1,133 @@
+{
+  "readme": "## DRC (Dynamic Range Control)  remover\n\nThis simple module disables DRC (Dynamic Range Control, i.e., a kind of compression) on all audio outputs (a 3.5mm jack, an internal speaker, bluetooth earphones, USB DAC's, etc.; You cannot bypass this DRC feature activated in a DAC chip itself even by using a proprietary pseudo USB driver) if DRC has been enabled on a stock firmware. For example, smart phones and tablets whose SoC's have an SDM??? or SM???? model number usually enable DRC on all audio outputs, but those whose SoC's have an MT???? model number don't enable DRC on any audio output.<br/>\n<br/>\n\nThis module behaves as follows:\n<ol>\n    <li>Checks whether this device enables DRC  or not. If so, then continues below, else exits.</li>\n    <li>Copies the active main audio policy XML configuration file (e.g. /vendor/etc/audio_policy_configuration.xml, /vendor/etc/audio/audio_policy_configuration_a2dp_offload_disabled.xml, etc.) to a folder under $MODDIR/system/vendor</li>\n    <li>Edits the copied file under $MODDIR/system/vendor to replace 'speaker_drc_enabled=\"true\"' with 'speaker_drc_enabled=\"false\"'.</li>\n    <li>Overlays this modified file on its original one.</li>\n</ol>\n<br/>\n<br/>\n\n* Remark: There may be several main audio policy configuration XML files, but only one file being currently active will be copied, modified and overlaid on its original one. If you changed the active main audio policy configuration XML file by using a special settings menu or the like (e.g., \"disable a2dp hardware offload\" in developer options) after installing this module, please re-install or update this module to reflect the change.\n\n* This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 10 ~ 14, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations). But some custom ROM's (not stocks and GSI's) intendedly invert or change the meaning of 'speaker_drc_enabled' switch on context, then this module cannot disable DRC.\n\n* See also my companion magisk module [\"Audio misc. settings\"](https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings) for simply improving audio quality with respect to the number of media volume steps and resampling distortion of the Android OS mixer (AudioFlinger), and my root script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, ringing and intermodulation) ultimately. \n<br/><br/>\n\n\n## DISCLAIMER\n\n* I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.\n\n##\n",
+  "readmeHTML": "<h2>DRC (Dynamic Range Control)  remover</h2>\n\n<p>This simple module disables DRC (Dynamic Range Control, i.e., a kind of compression) on all audio outputs (a 3.5mm jack, an internal speaker, bluetooth earphones, USB DAC's, etc.; You cannot bypass this DRC feature activated in a DAC chip itself even by using a proprietary pseudo USB driver) if DRC has been enabled on a stock firmware. For example, smart phones and tablets whose SoC's have an SDM??? or SM???? model number usually enable DRC on all audio outputs, but those whose SoC's have an MT???? model number don't enable DRC on any audio output.<br/></p>\n<p><br/></p>\n\n<p>This module behaves as follows:</p>\n<p><ol></p>\n<p>    <li>Checks whether this device enables DRC  or not. If so, then continues below, else exits.</li></p>\n<p>    <li>Copies the active main audio policy XML configuration file (e.g. /vendor/etc/audio_policy_configuration.xml, /vendor/etc/audio/audio_policy_configuration_a2dp_offload_disabled.xml, etc.) to a folder under $MODDIR/system/vendor</li></p>\n<p>    <li>Edits the copied file under $MODDIR/system/vendor to replace 'speaker_drc_enabled=\"true\"' with 'speaker_drc_enabled=\"false\"'.</li></p>\n<p>    <li>Overlays this modified file on its original one.</li></p>\n<p></ol></p>\n<p><br/></p>\n<p><br/></p>\n\n<li>Remark: There may be several main audio policy configuration XML files, but only one file being currently active will be copied, modified and overlaid on its original one. If you changed the active main audio policy configuration XML file by using a special settings menu or the like (e.g., \"disable a2dp hardware offload\" in developer options) after installing this module, please re-install or update this module to reflect the change.</li>\n\n<li>This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 10 ~ 14, Qualcomm & MediaTek SoC, and Arm32 & Arm64 combinations). But some custom ROM's (not stocks and GSI's) intendedly invert or change the meaning of 'speaker_drc_enabled' switch on context, then this module cannot disable DRC.</li>\n\n<li>See also my companion magisk module [\"Audio misc. settings\"](https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings) for simply improving audio quality with respect to the number of media volume steps and resampling distortion of the Android OS mixer (AudioFlinger), and my root script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB (HAL) audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer to enjoy high resolution sound or to reduce resampling distortion (actually pre-echo, ringing and intermodulation) ultimately.</li>\n<p><br/><br/></p>\n\n\n<h2>DISCLAIMER</h2>\n\n<li>I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.</li>\n\n<p>##</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover",
+  "latestRelease": {
+    "name": "v1.2.5",
+    "version": "v1.2.5",
+    "time": "2025-06-07T14:56:56Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.5/magisk-module-drc-remover-v1.2.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.5",
+      "tagName": "v1.2.5",
+      "publishedAt": "2025-06-07T14:56:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.5/magisk-module-drc-remover-v1.2.5.zip",
+          "size": 19209,
+          "downloadCount": 3812
+        }
+      ]
+    },
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2024-06-26T11:41:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.4/magisk-module-drc-remover-v1.2.4-1.zip",
+          "size": 18925,
+          "downloadCount": 1045
+        }
+      ]
+    },
+    {
+      "name": "v1.2.3",
+      "tagName": "v1.2.3",
+      "publishedAt": "2024-04-15T06:35:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.3-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.3/magisk-module-drc-remover-v1.2.3-1.zip",
+          "size": 17914,
+          "downloadCount": 641
+        }
+      ]
+    },
+    {
+      "name": "v1.2.2",
+      "tagName": "v1.2.2",
+      "publishedAt": "2024-03-05T06:32:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.2/magisk-module-drc-remover-v1.2.2.zip",
+          "size": 17838,
+          "downloadCount": 485
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2023-05-07T15:24:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.1/magisk-module-drc-remover-v1.2.1.zip",
+          "size": 17547,
+          "downloadCount": 1933
+        },
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.1/magisk-module-usb-samplerate-unlocker-v1.5.4-1.zip",
+          "size": 19321,
+          "downloadCount": 218
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2023-04-11T09:55:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-v1.2.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/v1.2.0/magisk-module-drc-remover-v1.2.0.zip",
+          "size": 17427,
+          "downloadCount": 258
+        }
+      ]
+    },
+    {
+      "name": "V1.1.0",
+      "tagName": "V1.1.0",
+      "publishedAt": "2023-01-23T15:19:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-V1-1-0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/V1.1.0/magisk-module-drc-remover-V1-1-0.zip",
+          "size": 17151,
+          "downloadCount": 456
+        }
+      ]
+    },
+    {
+      "name": "V1.0.0",
+      "tagName": "V1.0.0",
+      "publishedAt": "2022-03-27T04:10:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-drc-remover-V1-0-0-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/drc-remover/releases/download/V1.0.0/magisk-module-drc-remover-V1-0-0-1.zip",
+          "size": 15382,
+          "downloadCount": 1686
+        }
+      ]
+    }
+  ]
+}

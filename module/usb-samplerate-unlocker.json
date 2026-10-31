@@ -1,0 +1,309 @@
+{
+  "readme": "## Unlocker for the USB (HAL) audio class driver's limitation (up to 96kHz lock) on Android devices\n\nThis magisk module has been developed for recent music streaming services which output greater than 96kHz high resolution sound, and behaves as follows:\n\n1. Hexdump \"/vendor/{lib, lib64}/libalsautils{,v2}.so\" to \"tempfile{,v2}-{lib, lib64}\"\n       \n2. Edit \"tempfile{,v2}-{lib, lib64}\" to replace\n\n```\nhexdumped \"std_sample_rates[]={96000, 88200, 192000, 176400, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000}\" (up to 96kHz lock)\n\n  with\n\nhexdumped \"std_sample_rates[]={192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000}\" (up to 192kHz lock)\t\n\n  or\n\nhexdumped \"std_sample_rates[]={384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 16000, 12000, 8000}\" (up to 384kHz lock)\n\n  or\n\nhexdumped \"std_sample_rates[]={768000, 705600, 384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 24000, 16000, 8000}\" (up to 768kHz lock).\n```\n\n3. Revert \"tempfile{,v2}-{lib, lib64}\" to each binary file \"$MODDIR/system/vendor/{lib, lib64}/libalsautils{,v2}.so\".\n\n4. Overlay \"$MODDIR/system/vendor/{lib, lib64}/libalsautils{,v2}.so\" onto \"/vendor/{lib, lib64}/libalsautils{,v2}.so\"\n</br>\n\n* Remark: This module unlocks up to 384kHz unless you have modified \"post-fs-data.sh\" in its zip file (or \"post-fs-data.sh\" installed in its \"$MODDIR\" on your device) except some known devices which don't stutter at 768kHz & 32bit mode. Up to 768kHz unlocking may stutter sound on your device. If you need to automatically connect 192kHz (instead of 384kHz) to your USB DAC, please modify the \"post-fs-data.sh\" (in this file, \"max\", \"full\" and \"default\" mean \"up to 768kHz\", \"up to 384kHz\" and \"up to 192kHz\" unlocking, respectively).\n\n* Note: This module unlocks the limiter of oldest or low priced Tensor device's USB offload driver from 96kHz to 192kHz by modifying \"/vendor/etc/audio_platofrm_configuration.xml\".\n\n* This module has been tested on LineageOS based ROMs (Android 10 ~ 14) and crDroid (Android 11 ~ 14). See also my companion script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer.\n* In details, see [\"modules/usbaudio/audio_hal.c\"](https://android.googlesource.com/platform/hardware/libhardware/+/master/modules/usbaudio/audio_hal.c), [\"alsa_utils/alsa_device_profile.c\"](https://android.googlesource.com/platform/system/media/+/master/alsa_utils/alsa_device_profile.c) and [\"alsa_utils/alsa_device_proxy.c\"](https://android.googlesource.com/platform/system/media/+/master/alsa_utils/alsa_device_proxy.c) in AOSP sources.\n* If your device uses (USB) audio hardware offloading, its UAC driver is capable of outputting up to 384kHz for Qcomm devices, 96kHz for MTK ones, and 96kHz for oldest or low priced Tensor ones (192kHz for others). So you may not need this magisk module for Qcomm devices unless considering jitter distortion. Try [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer).\n<br/>\n\n## DISCLAIMER\n\n* I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.\n\n##\n",
+  "readmeHTML": "<h2>Unlocker for the USB (HAL) audio class driver's limitation (up to 96kHz lock) on Android devices</h2>\n\n<p>This magisk module has been developed for recent music streaming services which output greater than 96kHz high resolution sound, and behaves as follows:</p>\n\n<li>Hexdump \"/vendor/{lib, lib64}/libalsautils{,v2}.so\" to \"tempfile{,v2}-{lib, lib64}\"</li>\n\n<li>Edit \"tempfile{,v2}-{lib, lib64}\" to replace</li>\n\n<pre>hexdumped \"std_sample_rates[]={96000, 88200, 192000, 176400, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000}\" (up to 96kHz lock)\n\n  with\n\nhexdumped \"std_sample_rates[]={192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000}\" (up to 192kHz lock)\n\n  or\n\nhexdumped \"std_sample_rates[]={384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 16000, 12000, 8000}\" (up to 384kHz lock)\n\n  or\n\nhexdumped \"std_sample_rates[]={768000, 705600, 384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 24000, 16000, 8000}\" (up to 768kHz lock).</pre>\n\n<li>Revert \"tempfile{,v2}-{lib, lib64}\" to each binary file \"$MODDIR/system/vendor/{lib, lib64}/libalsautils{,v2}.so\".</li>\n\n<li>Overlay \"$MODDIR/system/vendor/{lib, lib64}/libalsautils{,v2}.so\" onto \"/vendor/{lib, lib64}/libalsautils{,v2}.so\"</li>\n<p></br></p>\n\n<li>Remark: This module unlocks up to 384kHz unless you have modified \"post-fs-data.sh\" in its zip file (or \"post-fs-data.sh\" installed in its \"$MODDIR\" on your device) except some known devices which don't stutter at 768kHz & 32bit mode. Up to 768kHz unlocking may stutter sound on your device. If you need to automatically connect 192kHz (instead of 384kHz) to your USB DAC, please modify the \"post-fs-data.sh\" (in this file, \"max\", \"full\" and \"default\" mean \"up to 768kHz\", \"up to 384kHz\" and \"up to 192kHz\" unlocking, respectively).</li>\n\n<li>Note: This module unlocks the limiter of oldest or low priced Tensor device's USB offload driver from 96kHz to 192kHz by modifying \"/vendor/etc/audio_platofrm_configuration.xml\".</li>\n\n<li>This module has been tested on LineageOS based ROMs (Android 10 ~ 14) and crDroid (Android 11 ~ 14). See also my companion script [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) to change the sample rate of the USB audio class driver and a 3.5mm jack on the fly like Bluetooth LDAC or Windows mixer.</li>\n<li>In details, see [\"modules/usbaudio/audio_hal.c\"](https://android.googlesource.com/platform/hardware/libhardware/+/master/modules/usbaudio/audio_hal.c), [\"alsa_utils/alsa_device_profile.c\"](https://android.googlesource.com/platform/system/media/+/master/alsa_utils/alsa_device_profile.c) and [\"alsa_utils/alsa_device_proxy.c\"](https://android.googlesource.com/platform/system/media/+/master/alsa_utils/alsa_device_proxy.c) in AOSP sources.</li>\n<li>If your device uses (USB) audio hardware offloading, its UAC driver is capable of outputting up to 384kHz for Qcomm devices, 96kHz for MTK ones, and 96kHz for oldest or low priced Tensor ones (192kHz for others). So you may not need this magisk module for Qcomm devices unless considering jitter distortion. Try [\"USB_SampleRate_Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer).</li>\n<p><br/></p>\n\n<h2>DISCLAIMER</h2>\n\n<li>I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.</li>\n\n<p>##</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker",
+  "latestRelease": {
+    "name": "v1.5.11",
+    "version": "v1.5.11",
+    "time": "2026-04-03T14:38:46Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.11/magisk-module-usb-samplerate-unlocker-v1.5.11.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.11",
+      "tagName": "v1.5.11",
+      "publishedAt": "2026-04-03T14:38:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.11.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.11/magisk-module-usb-samplerate-unlocker-v1.5.11.zip",
+          "size": 20199,
+          "downloadCount": 11716
+        }
+      ]
+    },
+    {
+      "name": "v1.5.10",
+      "tagName": "v1.5.10",
+      "publishedAt": "2025-06-07T14:59:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.10.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.10/magisk-module-usb-samplerate-unlocker-v1.5.10.zip",
+          "size": 20185,
+          "downloadCount": 3661
+        }
+      ]
+    },
+    {
+      "name": "v1.5.9",
+      "tagName": "v1.5.9",
+      "publishedAt": "2025-04-30T13:31:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.9/magisk-module-usb-samplerate-unlocker-v1.5.9.zip",
+          "size": 20174,
+          "downloadCount": 231
+        }
+      ]
+    },
+    {
+      "name": "v1.5.7",
+      "tagName": "v1.5.7",
+      "publishedAt": "2024-07-28T06:28:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.7-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.7/magisk-module-usb-samplerate-unlocker-v1.5.7-1.zip",
+          "size": 19865,
+          "downloadCount": 1004
+        }
+      ]
+    },
+    {
+      "name": "v1.5.6",
+      "tagName": "v1.5.6",
+      "publishedAt": "2024-04-15T06:37:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.6-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.6/magisk-module-usb-samplerate-unlocker-v1.5.6-1.zip",
+          "size": 19712,
+          "downloadCount": 946
+        }
+      ]
+    },
+    {
+      "name": "v1.5.5",
+      "tagName": "v1.5.5",
+      "publishedAt": "2024-03-05T06:19:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.5/magisk-module-usb-samplerate-unlocker-v1.5.5.zip",
+          "size": 19539,
+          "downloadCount": 369
+        }
+      ]
+    },
+    {
+      "name": "v1.5.4",
+      "tagName": "v1.5.4",
+      "publishedAt": "2023-12-31T11:16:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.4/magisk-module-usb-samplerate-unlocker-v1.5.4-1.zip",
+          "size": 19321,
+          "downloadCount": 408
+        }
+      ]
+    },
+    {
+      "name": "v1.5.3",
+      "tagName": "v1.5.3",
+      "publishedAt": "2023-10-03T07:31:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.3/magisk-module-usb-samplerate-unlocker-v1.5.3.zip",
+          "size": 19213,
+          "downloadCount": 583
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2",
+      "tagName": "v1.5.2",
+      "publishedAt": "2023-08-13T14:26:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.2/magisk-module-usb-samplerate-unlocker-v1.5.2.zip",
+          "size": 19217,
+          "downloadCount": 334
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2023-06-12T11:34:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.1-3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.1/magisk-module-usb-samplerate-unlocker-v1.5.1-3.zip",
+          "size": 19243,
+          "downloadCount": 210
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2023-04-11T09:57:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-v1.5.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/v1.5.0/magisk-module-usb-samplerate-unlocker-v1.5.0.zip",
+          "size": 18061,
+          "downloadCount": 317
+        }
+      ]
+    },
+    {
+      "name": "V1.4.1",
+      "tagName": "V1.4.1",
+      "publishedAt": "2023-01-25T10:47:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.4.1/magisk-module-usb-samplerate-unlocker-V1-4-1.zip",
+          "size": 17770,
+          "downloadCount": 405
+        }
+      ]
+    },
+    {
+      "name": "V1.4.0",
+      "tagName": "V1.4.0",
+      "publishedAt": "2022-08-06T10:15:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-4-0-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.4.0/magisk-module-usb-samplerate-unlocker-V1-4-0-2.zip",
+          "size": 17741,
+          "downloadCount": 203
+        }
+      ]
+    },
+    {
+      "name": "V1.3.0",
+      "tagName": "V1.3.0",
+      "publishedAt": "2022-06-01T08:51:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-3-0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.3.0/magisk-module-usb-samplerate-unlocker-V1-3-0.zip",
+          "size": 17259,
+          "downloadCount": 340
+        }
+      ]
+    },
+    {
+      "name": "V1.2.9",
+      "tagName": "V1.2.9",
+      "publishedAt": "2022-05-08T12:20:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.9/magisk-module-usb-samplerate-unlocker-V1-2-9.zip",
+          "size": 17135,
+          "downloadCount": 159
+        }
+      ]
+    },
+    {
+      "name": "V1.2.8",
+      "tagName": "V1.2.8",
+      "publishedAt": "2022-04-11T10:24:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-8.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.8/magisk-module-usb-samplerate-unlocker-V1-2-8.zip",
+          "size": 17080,
+          "downloadCount": 205
+        }
+      ]
+    },
+    {
+      "name": "V1.2.7",
+      "tagName": "V1.2.7",
+      "publishedAt": "2022-04-02T11:28:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.7/magisk-module-usb-samplerate-unlocker-V1-2-7.zip",
+          "size": 17077,
+          "downloadCount": 170
+        }
+      ]
+    },
+    {
+      "name": "V1.2.5",
+      "tagName": "V1.2.5",
+      "publishedAt": "2022-02-11T10:10:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.5/magisk-module-usb-samplerate-unlocker-V1-2-5.zip",
+          "size": 16713,
+          "downloadCount": 151
+        }
+      ]
+    },
+    {
+      "name": "V1.2.4",
+      "tagName": "V1.2.4",
+      "publishedAt": "2022-02-01T12:34:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.4/magisk-module-usb-samplerate-unlocker-V1-2-4.zip",
+          "size": 16633,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "V1.2.3",
+      "tagName": "V1.2.3",
+      "publishedAt": "2022-01-15T10:00:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.3/magisk-module-usb-samplerate-unlocker-V1-2-3.zip",
+          "size": 17468,
+          "downloadCount": 61
+        }
+      ]
+    },
+    {
+      "name": "V1.2.2",
+      "tagName": "V1.2.2",
+      "publishedAt": "2022-01-07T07:18:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-usb-samplerate-unlocker-V1-2-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker/releases/download/V1.2.2/magisk-module-usb-samplerate-unlocker-V1-2-2.zip",
+          "size": 17260,
+          "downloadCount": 35
+        }
+      ]
+    }
+  ]
+}

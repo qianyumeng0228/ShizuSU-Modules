@@ -1,0 +1,95 @@
+{
+  "readme": "# WorkBuddy2API KernelSU 模块\n\n在 Android 手机上以 KernelSU 模块运行 WorkBuddy2API。网关只监听\n`127.0.0.1:7863`，管理后台随服务端二进制一起分发。\n\n上游：Sliverkiss/workbuddy2api -> [YuleBest/workbuddy2api](https://github.com/YuleBest/workbuddy2api) -> [YuleBest/workbuddy2api-magisk](https://github.com/YuleBest/workbuddy2api-magisk)\n\n> [!WARNING]\n> 仅限本人已授权账号与本机使用。不要把凭据、管理面板或网关端口暴露给未授权用户。\n\n![WorkBuddy2API 管理后台，展示总览、账号池和模型页面](docs/images/admin-panel.jpg)\n\n## 支持范围\n\n- KernelSU，Android 6.0 / API 23 及以上，arm64-v8a\n- 内置管理后台与多 key 鉴权\n- 账号池、会话粘性、双域模型和 OpenAI 兼容接口\n- 签到、活跃上报、旅行、保活、开学季、夜猫子均为 Go 实现\n- 自动定时任务默认关闭，可从面板或 CLI 手动触发\n- 不包含 Cloudflare Tunnel\n\n## 安装\n\n从 [Releases](https://github.com/YuleBest/workbuddy2api-magisk/releases)\n下载 `wb2api-*-arm64-v8a.zip`，刷入 KernelSU 后重启。\n\n本地构建需要 Go、Android NDK r27c、`zip`、`shellcheck` 和 `shfmt`：\n\n```bash\nmake build   # 产物在 build/，同时生成 .sha256\nmake test\n```\n\n## 使用\n\n点击模块的“操作”按钮会启动网关并打开管理后台，管理 token 显示在操作输出中。\n\n```bash\nWBAPI=/data/adb/modules/wb2api/bin/wbapi\n$WBAPI status\n$WBAPI panel --show-token\n$WBAPI login --realm=cn\n$WBAPI task checkin\n```\n\n配置、凭证、状态、日志和临时文件全部位于\n`/data/adb/modules/wb2api`。模块升级会保留这些文件，卸载会随模块目录删除。\n\n详细说明见 [Android 模块文档](docs/android-module.md)；账号池与请求链路见\n[核心能力](docs/features.md)，配置见 [配置](docs/config.md)，面板与 CLI 见\n[管理后台与 CLI](docs/admin.md)。桌面和服务器部署请使用上游项目。\n\n本项目使用 MIT 许可。\n",
+  "readmeHTML": "<h1>WorkBuddy2API KernelSU 模块</h1>\n\n<p>在 Android 手机上以 KernelSU 模块运行 WorkBuddy2API。网关只监听</p>\n<p><code>127.0.0.1:7863</code>，管理后台随服务端二进制一起分发。</p>\n\n<p>上游：Sliverkiss/workbuddy2api -> <a href=\"https://github.com/YuleBest/workbuddy2api\">YuleBest/workbuddy2api</a> -> <a href=\"https://github.com/YuleBest/workbuddy2api-magisk\">YuleBest/workbuddy2api-magisk</a></p>\n\n<p>> [!WARNING]</p>\n<p>> 仅限本人已授权账号与本机使用。不要把凭据、管理面板或网关端口暴露给未授权用户。</p>\n\n<p>!<a href=\"docs/images/admin-panel.jpg\">WorkBuddy2API 管理后台，展示总览、账号池和模型页面</a></p>\n\n<h2>支持范围</h2>\n\n<li>KernelSU，Android 6.0 / API 23 及以上，arm64-v8a</li>\n<li>内置管理后台与多 key 鉴权</li>\n<li>账号池、会话粘性、双域模型和 OpenAI 兼容接口</li>\n<li>签到、活跃上报、旅行、保活、开学季、夜猫子均为 Go 实现</li>\n<li>自动定时任务默认关闭，可从面板或 CLI 手动触发</li>\n<li>不包含 Cloudflare Tunnel</li>\n\n<h2>安装</h2>\n\n<p>从 <a href=\"https://github.com/YuleBest/workbuddy2api-magisk/releases\">Releases</a></p>\n<p>下载 <code>wb2api-*-arm64-v8a.zip</code>，刷入 KernelSU 后重启。</p>\n\n<p>本地构建需要 Go、Android NDK r27c、<code>zip</code>、<code>shellcheck</code> 和 <code>shfmt</code>：</p>\n\n<pre>make build   # 产物在 build/，同时生成 .sha256\nmake test</pre>\n\n<h2>使用</h2>\n\n<p>点击模块的“操作”按钮会启动网关并打开管理后台，管理 token 显示在操作输出中。</p>\n\n<pre>WBAPI=/data/adb/modules/wb2api/bin/wbapi\n$WBAPI status\n$WBAPI panel --show-token\n$WBAPI login --realm=cn\n$WBAPI task checkin</pre>\n\n<p>配置、凭证、状态、日志和临时文件全部位于</p>\n<p><code>/data/adb/modules/wb2api</code>。模块升级会保留这些文件，卸载会随模块目录删除。</p>\n\n<p>详细说明见 <a href=\"docs/android-module.md\">Android 模块文档</a>；账号池与请求链路见</p>\n<p><a href=\"docs/features.md\">核心能力</a>，配置见 <a href=\"docs/config.md\">配置</a>，面板与 CLI 见</p>\n<p><a href=\"docs/admin.md\">管理后台与 CLI</a>。桌面和服务器部署请使用上游项目。</p>\n\n<p>本项目使用 MIT 许可。</p>",
+  "homepageUrl": "https://github.com/YuleBest/workbuddy2api-magisk",
+  "sourceUrl": "https://github.com/YuleBest/workbuddy2api-magisk",
+  "url": "https://github.com/YuleBest/workbuddy2api-magisk",
+  "latestRelease": {
+    "name": "v0.2.0-beta.1",
+    "version": "v0.2.0-beta.1",
+    "time": "2026-10-22T06:54:27Z",
+    "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.2.0-beta.1/wb2api-v0.2.0-beta.1-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2.0-beta.1",
+      "tagName": "v0.2.0-beta.1",
+      "publishedAt": "2026-10-22T06:54:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wb2api-v0.2.0-beta.1-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.2.0-beta.1/wb2api-v0.2.0-beta.1-arm64-v8a.zip",
+          "size": 8071613,
+          "downloadCount": 29
+        },
+        {
+          "name": "wb2api-v0.2.0-beta.1-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.2.0-beta.1/wb2api-v0.2.0-beta.1-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0-beta.3",
+      "tagName": "v0.1.0-beta.3",
+      "publishedAt": "2026-10-20T08:20:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wb2api-v0.1.0-beta.3-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.3/wb2api-v0.1.0-beta.3-arm64-v8a.zip",
+          "size": 7927689,
+          "downloadCount": 11
+        },
+        {
+          "name": "wb2api-v0.1.0-beta.3-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.3/wb2api-v0.1.0-beta.3-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0-beta.2",
+      "tagName": "v0.1.0-beta.2",
+      "publishedAt": "2026-10-19T13:01:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wb2api-v0.1.0-beta.2-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.2/wb2api-v0.1.0-beta.2-arm64-v8a.zip",
+          "size": 7910824,
+          "downloadCount": 15
+        },
+        {
+          "name": "wb2api-v0.1.0-beta.2-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.2/wb2api-v0.1.0-beta.2-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0-beta.1",
+      "tagName": "v0.1.0-beta.1",
+      "publishedAt": "2026-10-18T09:48:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wb2api-v0.1.0-beta.1-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.1/wb2api-v0.1.0-beta.1-arm64-v8a.zip",
+          "size": 7784037,
+          "downloadCount": 19
+        },
+        {
+          "name": "wb2api-v0.1.0-beta.1-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/YuleBest/workbuddy2api-magisk/releases/download/v0.1.0-beta.1/wb2api-v0.1.0-beta.1-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

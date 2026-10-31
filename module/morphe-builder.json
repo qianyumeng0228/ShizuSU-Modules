@@ -1,0 +1,891 @@
+{
+  "readme": "# Morphe Module and APK\n[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/rvc_magisk)\n[![CI](https://github.com/elohim-etz/morphe-builder/actions/workflows/ci.yml/badge.svg?event=schedule)](https://github.com/elohim-etz/morphe-builder/actions/workflows/ci.yml)\n\nExtensive Morphe Builder\n\nGet the [latest CI release](https://github.com/elohim-etz/morphe-builder/releases).\n\nUse [**zygisk-detach**](https://github.com/j-hc/zygisk-detach) to detach YouTube and YT Music from Play Store if you are using modules. \n\n<details><summary><big>Features</big></summary>\n<ul>\n <li>Support all present and future <a href=\"https://github.com/MorpheApp/morphe-patches\">Morphe</a> apps</li>\n <li> Can build Modules and non-root APKs</li>\n <li> Updated daily with the latest versions of apps and patches</li>\n <li> Optimize APKs and modules for size</li>\n <li> Modules</li>\n    <ul>\n     <li> recompile invalidated odex for faster usage</li>\n     <li> receive updates from Magisk app</li>\n     <li> do not break safetynet or trigger root detections</li>\n     <li> handle installation of the correct version of the stock app and all that</li>\n     <li> support Magisk and KernelSU</li>\n    </ul>\n</ul>\nNote that the <a href=\"../../actions/workflows/ci.yml\">CI workflow</a> is scheduled to build the modules and APKs everyday using GitHub Actions if there is a change in Morphe patches. You may want to disable it.\n</details>\n\n## To include/exclude patches or patch other apps\n\n * Star the repo :eyes:\n * Use the repo as a [template](https://github.com/new?template_name=morphe-builder&template_owner=elohim-etz)\n * Customize [`config.toml`](./config.toml) using [rvmm-config-gen](https://j-hc.github.io/rvmm-config-gen/)\n * Run the build [workflow](../../actions/workflows/build.yml)\n * Grab your modules and APKs from [releases](../../releases)\n\nalso see here [`CONFIG.md`](./CONFIG.md)\n\n## If you are having trouble with the classic mount method of the modules\nsuch as,\n- **\"Reflash needed\"** error after reboots\n- **\"Suspicious mount detected\"** warnings from root detector apps\n\nYou can consider using [rvmm-zygisk-mount](https://github.com/j-hc/rvmm-zygisk-mount)\n\n## Building Locally\n### On Termux\n```console\nbash <(curl -sSf https://raw.githubusercontent.com/elohim-etz/morphe-builder/main/build-termux.sh)\n```\n\n### On Desktop\n```console\n$ git clone https://github.com/elohim-etz/morphe-builder\n$ cd morphe-builder\n$ ./build.sh\n```\n",
+  "readmeHTML": "<h1>Morphe Module and APK</h1>\n<p><a href=\"https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram</a>](https://t.me/rvc_magisk)</p>\n<p><a href=\"https://github.com/elohim-etz/morphe-builder/actions/workflows/ci.yml/badge.svg?event=schedule\">![CI</a>](https://github.com/elohim-etz/morphe-builder/actions/workflows/ci.yml)</p>\n\n<p>Extensive Morphe Builder</p>\n\n<p>Get the <a href=\"https://github.com/elohim-etz/morphe-builder/releases\">latest CI release</a>.</p>\n\n<p>Use <a href=\"https://github.com/j-hc/zygisk-detach\"><b>zygisk-detach</b></a> to detach YouTube and YT Music from Play Store if you are using modules.</p>\n\n<p><details><summary><big>Features</big></summary></p>\n<p><ul></p>\n<p> <li>Support all present and future <a href=\"https://github.com/MorpheApp/morphe-patches\">Morphe</a> apps</li></p>\n<p> <li> Can build Modules and non-root APKs</li></p>\n<p> <li> Updated daily with the latest versions of apps and patches</li></p>\n<p> <li> Optimize APKs and modules for size</li></p>\n<p> <li> Modules</li></p>\n<p>    <ul></p>\n<p>     <li> recompile invalidated odex for faster usage</li></p>\n<p>     <li> receive updates from Magisk app</li></p>\n<p>     <li> do not break safetynet or trigger root detections</li></p>\n<p>     <li> handle installation of the correct version of the stock app and all that</li></p>\n<p>     <li> support Magisk and KernelSU</li></p>\n<p>    </ul></p>\n<p></ul></p>\n<p>Note that the <a href=\"../../actions/workflows/ci.yml\">CI workflow</a> is scheduled to build the modules and APKs everyday using GitHub Actions if there is a change in Morphe patches. You may want to disable it.</p>\n<p></details></p>\n\n<h2>To include/exclude patches or patch other apps</h2>\n\n<p> * Star the repo :eyes:</p>\n<p> * Use the repo as a <a href=\"https://github.com/new?template_name=morphe-builder&template_owner=elohim-etz\">template</a></p>\n<p> * Customize <a href=\"./config.toml\"><code>config.toml</code></a> using <a href=\"https://j-hc.github.io/rvmm-config-gen/\">rvmm-config-gen</a></p>\n<p> * Run the build <a href=\"../../actions/workflows/build.yml\">workflow</a></p>\n<p> * Grab your modules and APKs from <a href=\"../../releases\">releases</a></p>\n\n<p>also see here <a href=\"./CONFIG.md\"><code>CONFIG.md</code></a></p>\n\n<h2>If you are having trouble with the classic mount method of the modules</h2>\n<p>such as,</p>\n<li>**\"Reflash needed\"** error after reboots</li>\n<li>**\"Suspicious mount detected\"** warnings from root detector apps</li>\n\n<p>You can consider using <a href=\"https://github.com/j-hc/rvmm-zygisk-mount\">rvmm-zygisk-mount</a></p>\n\n<h2>Building Locally</h2>\n<h3>On Termux</h3>\n<pre>bash &lt;(curl -sSf https://raw.githubusercontent.com/elohim-etz/morphe-builder/main/build-termux.sh)</pre>\n\n<h3>On Desktop</h3>\n<pre>$ git clone https://github.com/elohim-etz/morphe-builder\n$ cd morphe-builder\n$ ./build.sh</pre>",
+  "homepageUrl": "https://elohim-etz.github.io/morphe-builder/",
+  "sourceUrl": "https://github.com/elohim-etz/morphe-builder",
+  "url": "https://github.com/elohim-etz/morphe-builder",
+  "latestRelease": {
+    "name": "119",
+    "version": "119",
+    "time": "2026-10-30T17:37:44Z",
+    "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/119/music-morphe-module-v9.30.53-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "119",
+      "tagName": "119",
+      "publishedAt": "2026-10-30T17:37:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.30.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/119/music-morphe-module-v9.30.53-arm64-v8a.zip",
+          "size": 68580687,
+          "downloadCount": 10
+        },
+        {
+          "name": "music-morphe-v9.30.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/119/music-morphe-v9.30.53-arm64-v8a.apk",
+          "size": 80108580,
+          "downloadCount": 7
+        },
+        {
+          "name": "youtube-morphe-module-v21.30.216-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/119/youtube-morphe-module-v21.30.216-all.zip",
+          "size": 236246853,
+          "downloadCount": 35
+        },
+        {
+          "name": "youtube-morphe-v21.30.216-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/119/youtube-morphe-v21.30.216-all.apk",
+          "size": 145950779,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "118",
+      "tagName": "118",
+      "publishedAt": "2026-10-28T22:05:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/118/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 233789490,
+          "downloadCount": 10
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/118/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 159436558,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "117",
+      "tagName": "117",
+      "publishedAt": "2026-10-24T13:03:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/117/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 233789492,
+          "downloadCount": 9
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/117/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 159436558,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "116",
+      "tagName": "116",
+      "publishedAt": "2026-10-22T19:01:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/116/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67724037,
+          "downloadCount": 20
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/116/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 77678998,
+          "downloadCount": 35
+        },
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/116/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 219751456,
+          "downloadCount": 90
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/116/youtube-morphe-v21.20.405-all.apk",
+          "size": 134290488,
+          "downloadCount": 56
+        }
+      ]
+    },
+    {
+      "name": "115",
+      "tagName": "115",
+      "publishedAt": "2026-10-11T17:15:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/115/music-morphe-module-v9.20.53-arm64-v8a.zip",
+          "size": 67165352,
+          "downloadCount": 52
+        },
+        {
+          "name": "music-morphe-v9.20.53-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/115/music-morphe-v9.20.53-arm64-v8a.apk",
+          "size": 76486981,
+          "downloadCount": 100
+        },
+        {
+          "name": "youtube-morphe-module-v21.20.405-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/115/youtube-morphe-module-v21.20.405-all.zip",
+          "size": 217917226,
+          "downloadCount": 190
+        },
+        {
+          "name": "youtube-morphe-v21.20.405-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/115/youtube-morphe-v21.20.405-all.apk",
+          "size": 131153725,
+          "downloadCount": 67
+        }
+      ]
+    },
+    {
+      "name": "114",
+      "tagName": "114",
+      "publishedAt": "2026-10-04T11:45:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286318,
+          "downloadCount": 90
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157876049,
+          "downloadCount": 41
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 68437245,
+          "downloadCount": 36
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 82343783,
+          "downloadCount": 70
+        },
+        {
+          "name": "youtube-morphe-module-v21.16.256-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/youtube-morphe-module-v21.16.256-all.zip",
+          "size": 215664337,
+          "downloadCount": 74
+        },
+        {
+          "name": "youtube-morphe-v21.16.256-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/114/youtube-morphe-v21.16.256-all.apk",
+          "size": 129871990,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "113",
+      "tagName": "113",
+      "publishedAt": "2026-10-03T03:15:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/113/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286316,
+          "downloadCount": 31
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/113/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157876049,
+          "downloadCount": 43
+        }
+      ]
+    },
+    {
+      "name": "112",
+      "tagName": "112",
+      "publishedAt": "2026-10-02T09:22:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/112/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 68437246,
+          "downloadCount": 14
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/112/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 82343783,
+          "downloadCount": 27
+        },
+        {
+          "name": "youtube-morphe-module-v21.16.256-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/112/youtube-morphe-module-v21.16.256-all.zip",
+          "size": 215664377,
+          "downloadCount": 57
+        },
+        {
+          "name": "youtube-morphe-v21.16.256-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/112/youtube-morphe-v21.16.256-all.apk",
+          "size": 129871990,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "111",
+      "tagName": "111",
+      "publishedAt": "2026-09-21T15:34:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/111/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 68160236,
+          "downloadCount": 22
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/111/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 81790480,
+          "downloadCount": 206
+        }
+      ]
+    },
+    {
+      "name": "110",
+      "tagName": "110",
+      "publishedAt": "2026-09-21T02:46:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/110/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286313,
+          "downloadCount": 22
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/110/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157859665,
+          "downloadCount": 74
+        }
+      ]
+    },
+    {
+      "name": "109",
+      "tagName": "109",
+      "publishedAt": "2026-09-19T22:39:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/109/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286351,
+          "downloadCount": 37
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/109/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157859665,
+          "downloadCount": 95
+        }
+      ]
+    },
+    {
+      "name": "108",
+      "tagName": "108",
+      "publishedAt": "2026-09-15T14:07:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/108/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286348,
+          "downloadCount": 98
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/108/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157896529,
+          "downloadCount": 184
+        }
+      ]
+    },
+    {
+      "name": "107",
+      "tagName": "107",
+      "publishedAt": "2026-09-14T15:37:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/107/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67800960,
+          "downloadCount": 33
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/107/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 81061392,
+          "downloadCount": 64
+        },
+        {
+          "name": "youtube-morphe-module-v21.13.164-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/107/youtube-morphe-module-v21.13.164-all.zip",
+          "size": 212203049,
+          "downloadCount": 133
+        },
+        {
+          "name": "youtube-morphe-v21.13.164-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/107/youtube-morphe-v21.13.164-all.apk",
+          "size": 128330815,
+          "downloadCount": 80
+        }
+      ]
+    },
+    {
+      "name": "106",
+      "tagName": "106",
+      "publishedAt": "2026-09-11T18:06:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.80.0.929302933-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/106/googlephotos-morphe-module-v7.80.0.929302933-all.zip",
+          "size": 222973137,
+          "downloadCount": 58
+        },
+        {
+          "name": "googlephotos-morphe-v7.80.0.929302933-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/106/googlephotos-morphe-v7.80.0.929302933-all.apk",
+          "size": 152776312,
+          "downloadCount": 101
+        }
+      ]
+    },
+    {
+      "name": "105",
+      "tagName": "105",
+      "publishedAt": "2026-09-10T22:55:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.90.0.971743778-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/105/googlephotos-morphe-module-v7.90.0.971743778-all.zip",
+          "size": 232985864,
+          "downloadCount": 35
+        },
+        {
+          "name": "googlephotos-morphe-v7.90.0.971743778-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/105/googlephotos-morphe-v7.90.0.971743778-all.apk",
+          "size": 158241874,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "104",
+      "tagName": "104",
+      "publishedAt": "2026-09-10T14:16:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/googlephotos-morphe-module-v7.92.0.977185651-all.zip",
+          "size": 232286347,
+          "downloadCount": 21
+        },
+        {
+          "name": "googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/googlephotos-morphe-v7.92.0.977185651-all.apk",
+          "size": 157896529,
+          "downloadCount": 3
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67797868,
+          "downloadCount": 18
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 81045008,
+          "downloadCount": 49
+        },
+        {
+          "name": "youtube-morphe-module-v21.13.164-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/youtube-morphe-module-v21.13.164-all.zip",
+          "size": 212098173,
+          "downloadCount": 39
+        },
+        {
+          "name": "youtube-morphe-v21.13.164-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/104/youtube-morphe-v21.13.164-all.apk",
+          "size": 128203839,
+          "downloadCount": 46
+        }
+      ]
+    },
+    {
+      "name": "102",
+      "tagName": "102",
+      "publishedAt": "2026-09-06T12:34:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.91.0.973540846-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/102/googlephotos-morphe-module-v7.91.0.973540846-all.zip",
+          "size": 233280826,
+          "downloadCount": 49
+        },
+        {
+          "name": "googlephotos-morphe-v7.91.0.973540846-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/102/googlephotos-morphe-v7.91.0.973540846-all.apk",
+          "size": 158371863,
+          "downloadCount": 169
+        }
+      ]
+    },
+    {
+      "name": "101",
+      "tagName": "101",
+      "publishedAt": "2026-09-04T12:13:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "googlephotos-morphe-module-v7.91.0.973540846-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/googlephotos-morphe-module-v7.91.0.973540846-all.zip",
+          "size": 233280821,
+          "downloadCount": 131
+        },
+        {
+          "name": "googlephotos-morphe-v7.91.0.973540846-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/googlephotos-morphe-v7.91.0.973540846-all.apk",
+          "size": 158371863,
+          "downloadCount": 12
+        },
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67766326,
+          "downloadCount": 22
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80983568,
+          "downloadCount": 47
+        },
+        {
+          "name": "youtube-morphe-module-v21.07.247-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/youtube-morphe-module-v21.07.247-all.zip",
+          "size": 201761729,
+          "downloadCount": 71
+        },
+        {
+          "name": "youtube-morphe-v21.07.247-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/101/youtube-morphe-v21.07.247-all.apk",
+          "size": 122544064,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "100",
+      "tagName": "100",
+      "publishedAt": "2026-09-01T18:09:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/100/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67765842,
+          "downloadCount": 23
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/100/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80983568,
+          "downloadCount": 24
+        },
+        {
+          "name": "youtube-morphe-module-v21.07.247-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/100/youtube-morphe-module-v21.07.247-all.zip",
+          "size": 201762607,
+          "downloadCount": 150
+        },
+        {
+          "name": "youtube-morphe-v21.07.247-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/100/youtube-morphe-v21.07.247-all.apk",
+          "size": 122544064,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "99",
+      "tagName": "99",
+      "publishedAt": "2026-08-24T12:40:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/99/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67697823,
+          "downloadCount": 18
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/99/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 88827611,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-morphe-module-v21.04.223-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/99/youtube-morphe-module-v21.04.223-all.zip",
+          "size": 199862145,
+          "downloadCount": 101
+        },
+        {
+          "name": "youtube-morphe-v21.04.223-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/99/youtube-morphe-v21.04.223-all.apk",
+          "size": 136668057,
+          "downloadCount": 69
+        }
+      ]
+    },
+    {
+      "name": "98",
+      "tagName": "98",
+      "publishedAt": "2026-08-08T12:39:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/98/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67603913,
+          "downloadCount": 36
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/98/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80549528,
+          "downloadCount": 59
+        },
+        {
+          "name": "youtube-morphe-module-v21.04.223-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/98/youtube-morphe-module-v21.04.223-all.zip",
+          "size": 199674412,
+          "downloadCount": 133
+        },
+        {
+          "name": "youtube-morphe-v21.04.223-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/98/youtube-morphe-v21.04.223-all.apk",
+          "size": 120824331,
+          "downloadCount": 108
+        }
+      ]
+    },
+    {
+      "name": "97",
+      "tagName": "97",
+      "publishedAt": "2026-08-01T08:14:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/97/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67537050,
+          "downloadCount": 33
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/97/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80405891,
+          "downloadCount": 26
+        },
+        {
+          "name": "youtube-morphe-module-v21.04.223-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/97/youtube-morphe-module-v21.04.223-all.zip",
+          "size": 199599133,
+          "downloadCount": 95
+        },
+        {
+          "name": "youtube-morphe-v21.04.223-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/97/youtube-morphe-v21.04.223-all.apk",
+          "size": 120680971,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "96",
+      "tagName": "96",
+      "publishedAt": "2026-07-26T15:23:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/96/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67496447,
+          "downloadCount": 28
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/96/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80331972,
+          "downloadCount": 34
+        },
+        {
+          "name": "youtube-morphe-module-v21.04.223-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/96/youtube-morphe-module-v21.04.223-all.zip",
+          "size": 199576209,
+          "downloadCount": 55
+        },
+        {
+          "name": "youtube-morphe-v21.04.223-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/96/youtube-morphe-v21.04.223-all.apk",
+          "size": 120611339,
+          "downloadCount": 52
+        }
+      ]
+    },
+    {
+      "name": "95",
+      "tagName": "95",
+      "publishedAt": "2026-07-18T15:53:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/95/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67420014,
+          "downloadCount": 47
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/95/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80163809,
+          "downloadCount": 43
+        },
+        {
+          "name": "youtube-morphe-module-v21.04.223-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/95/youtube-morphe-module-v21.04.223-all.zip",
+          "size": 199514109,
+          "downloadCount": 92
+        },
+        {
+          "name": "youtube-morphe-v21.04.223-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/95/youtube-morphe-v21.04.223-all.apk",
+          "size": 120496651,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "94",
+      "tagName": "94",
+      "publishedAt": "2026-07-10T11:49:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/94/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67371679,
+          "downloadCount": 36
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/94/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 80065505,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-morphe-module-v20.51.39-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/94/youtube-morphe-module-v20.51.39-all.zip",
+          "size": 198287628,
+          "downloadCount": 82
+        },
+        {
+          "name": "youtube-morphe-v20.51.39-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/94/youtube-morphe-v20.51.39-all.apk",
+          "size": 119608191,
+          "downloadCount": 66
+        }
+      ]
+    },
+    {
+      "name": "93",
+      "tagName": "93",
+      "publishedAt": "2026-07-03T06:29:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/93/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 67230390,
+          "downloadCount": 41
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/93/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 79762401,
+          "downloadCount": 43
+        },
+        {
+          "name": "youtube-morphe-module-v20.51.39-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/93/youtube-morphe-module-v20.51.39-all.zip",
+          "size": 198262706,
+          "downloadCount": 56
+        },
+        {
+          "name": "youtube-morphe-v20.51.39-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/93/youtube-morphe-v20.51.39-all.apk",
+          "size": 119542655,
+          "downloadCount": 41
+        }
+      ]
+    },
+    {
+      "name": "92",
+      "tagName": "92",
+      "publishedAt": "2026-06-23T14:39:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/92/music-morphe-module-v9.15.51-arm64-v8a.zip",
+          "size": 66790936,
+          "downloadCount": 29
+        },
+        {
+          "name": "music-morphe-v9.15.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/92/music-morphe-v9.15.51-arm64-v8a.apk",
+          "size": 78705223,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-morphe-module-v20.51.39-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/92/youtube-morphe-module-v20.51.39-all.zip",
+          "size": 198061002,
+          "downloadCount": 71
+        },
+        {
+          "name": "youtube-morphe-v20.51.39-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/92/youtube-morphe-v20.51.39-all.apk",
+          "size": 119206626,
+          "downloadCount": 69
+        }
+      ]
+    },
+    {
+      "name": "91",
+      "tagName": "91",
+      "publishedAt": "2026-06-13T06:58:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v8.51.51-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/91/music-morphe-module-v8.51.51-arm64-v8a.zip",
+          "size": 59959998,
+          "downloadCount": 25
+        },
+        {
+          "name": "music-morphe-v8.51.51-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/91/music-morphe-v8.51.51-arm64-v8a.apk",
+          "size": 67265188,
+          "downloadCount": 173
+        },
+        {
+          "name": "youtube-morphe-module-v20.51.39-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/91/youtube-morphe-module-v20.51.39-all.zip",
+          "size": 197983928,
+          "downloadCount": 73
+        },
+        {
+          "name": "youtube-morphe-v20.51.39-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/91/youtube-morphe-v20.51.39-all.apk",
+          "size": 119083746,
+          "downloadCount": 85
+        }
+      ]
+    },
+    {
+      "name": "90",
+      "tagName": "90",
+      "publishedAt": "2026-05-29T12:14:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v8.47.56-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/90/music-morphe-module-v8.47.56-arm64-v8a.zip",
+          "size": 60821138,
+          "downloadCount": 49
+        },
+        {
+          "name": "music-morphe-v8.47.56-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/90/music-morphe-v8.47.56-arm64-v8a.apk",
+          "size": 70201808,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-morphe-module-v20.51.39-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/90/youtube-morphe-module-v20.51.39-all.zip",
+          "size": 197812388,
+          "downloadCount": 113
+        },
+        {
+          "name": "youtube-morphe-v20.51.39-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/90/youtube-morphe-v20.51.39-all.apk",
+          "size": 118813850,
+          "downloadCount": 92
+        }
+      ]
+    },
+    {
+      "name": "89",
+      "tagName": "89",
+      "publishedAt": "2026-05-21T12:15:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "music-morphe-module-v8.47.56-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/89/music-morphe-module-v8.47.56-arm64-v8a.zip",
+          "size": 60798383,
+          "downloadCount": 33
+        },
+        {
+          "name": "music-morphe-v8.47.56-arm64-v8a.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/89/music-morphe-v8.47.56-arm64-v8a.apk",
+          "size": 70127188,
+          "downloadCount": 40
+        },
+        {
+          "name": "youtube-morphe-module-v20.47.62-all.zip",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/89/youtube-morphe-module-v20.47.62-all.zip",
+          "size": 197296953,
+          "downloadCount": 62
+        },
+        {
+          "name": "youtube-morphe-v20.47.62-all.apk",
+          "downloadUrl": "https://github.com/elohim-etz/morphe-builder/releases/download/89/youtube-morphe-v20.47.62-all.apk",
+          "size": 118256147,
+          "downloadCount": 88
+        }
+      ]
+    }
+  ]
+}

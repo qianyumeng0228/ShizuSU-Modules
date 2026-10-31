@@ -1,0 +1,63 @@
+{
+  "readme": "# AuracastControl\n\n**RedMagic 11 Pro** için **Auracast (LE Audio Broadcast)** yayınlarını zahmetsizce yönetin.  \nKernelSU entegrasyonu sayesinde **WebUI** üzerinden tek dokunuşla yayın başlatın, durdurun ve yapılandırın.\n\n## Neden AuracastControl?\n\nRedMagic OS (Nubia), donanım desteklemesine rağmen Auracast arayüzünü kaldırmıştır. Bu modül, sistemin derinliklerindeki Bluetooth API'lerine erişerek bu engeli ortadan kaldırır. Artık **karmaşık komutlara veya harici araçlara gerek kalmadan** Auracast'i tam anlamıyla kullanabilirsiniz.\n\n> 🚀 **Öne çıkanlar:**  \n> - **Tek tıkla yayın başlat/durdur** – WebUI arayüzünden anında kontrol.  \n> - **Güvenli bağlantı** – İsteğe bağlı yayın kodu ile yetkisiz erişimi engelleyin.  \n> - **Zengin metadata** – Yayın adı ve dil bilgisini özelleştirin.  \n> - **Uyumlu cihaz keşfi** – JBL Headphones gibi destekleyen cihazları otomatik tarama moduna alın.  \n> - **Kalıcı ayarlar** – Tüm yapılandırma `/data/adb/` altında saklanır, yeniden başlatmada kaybolmaz.\n\n## Ekran Görüntüleri\n\n![Ana Arayüz](Screenshot_20260901_141518.jpg)\n\n![Aura Paneli 1](Screenshot_20260901_141525.jpg)\n\n![Aura Paneli 2](Screenshot_20260901_141532.jpg)\n\n## Kurulum\n\n1. ZIP dosyasını indirin.  \n2. **KernelSU** uygulamasını açın.  \n3. **Modüller** sekmesine gidin.  \n4. **Yükle**'ye dokunun ve ZIP dosyasını seçin.  \n5. Cihazınızı **yeniden başlatın**.  \n6. KernelSU → Modüller → **AuracastControl** üzerine dokunarak WebUI'yi açın.\n\n## WebUI Kullanımı\n\nKullanıcı dostu arayüz sayesinde hiçbir teknik bilgiye ihtiyaç duymadan:\n\n- Yayın durumunu görüntüleyebilir,  \n- Tek dokunuşla yayın başlatıp durdurabilir,  \n- Yayın kodu belirleyebilir,  \n- Metadata alanlarını düzenleyebilir,  \n- Mevcut yayınları tarayabilirsiniz.\n\n## Teknik Detaylar\n\nModül, aşağıdaki sistem bileşenleriyle iletişim kurar:\n\n- `android.bluetooth.IBluetoothManager` Binder servisi  \n- Gizli `IBluetooth` arayüzü ve `startLeAudioBroadcast` metodu  \n- `android.bluetooth.action.LE_AUDIO_BROADCAST_STATE_CHANGED` intent'i  \n- JBL Headphones uygulamasının Auracast ekranını tetikleme\n\n> Bu sayede, stok ROM'da kapalı olan Auracast işlevselliği tamamen açığa çıkar.\n\n## Uyumluluk\n\n- **Test edilen cihaz:** RedMagic 11 Pro  \n- **Gereksinim:** KernelSU root, Android 13 veya üzeri  \n- **Diğer cihazlar:** Test edilmemiştir; donanım/yazılım farklılıkları nedeniyle çalışmayabilir.\n\n## Uyarı ve Sorumluluk Reddi\n\n**KULLANIM RİSKİ SİZE AİTTİR.**\n\n- Bu modül, düşük seviyeli Bluetooth sistem servislerine müdahale eder.  \n- Cihazınızda işlev kaybı, kararsızlık veya başka sorunlar oluşabilir.  \n- Geliştirici hiçbir zarardan sorumlu tutulamaz.  \n- Bu proje **eğitim ve araştırma amaçlıdır**.\n\n**Yüklemeden önce mutlaka yedek alın.**\n",
+  "readmeHTML": "<h1>AuracastControl</h1>\n\n<p><b>RedMagic 11 Pro</b> için <b>Auracast (LE Audio Broadcast)</b> yayınlarını zahmetsizce yönetin.</p>\n<p>KernelSU entegrasyonu sayesinde <b>WebUI</b> üzerinden tek dokunuşla yayın başlatın, durdurun ve yapılandırın.</p>\n\n<h2>Neden AuracastControl?</h2>\n\n<p>RedMagic OS (Nubia), donanım desteklemesine rağmen Auracast arayüzünü kaldırmıştır. Bu modül, sistemin derinliklerindeki Bluetooth API'lerine erişerek bu engeli ortadan kaldırır. Artık <b>karmaşık komutlara veya harici araçlara gerek kalmadan</b> Auracast'i tam anlamıyla kullanabilirsiniz.</p>\n\n<p>> 🚀 <b>Öne çıkanlar:</b></p>\n<p>> - <b>Tek tıkla yayın başlat/durdur</b> – WebUI arayüzünden anında kontrol.</p>\n<p>> - <b>Güvenli bağlantı</b> – İsteğe bağlı yayın kodu ile yetkisiz erişimi engelleyin.</p>\n<p>> - <b>Zengin metadata</b> – Yayın adı ve dil bilgisini özelleştirin.</p>\n<p>> - <b>Uyumlu cihaz keşfi</b> – JBL Headphones gibi destekleyen cihazları otomatik tarama moduna alın.</p>\n<p>> - <b>Kalıcı ayarlar</b> – Tüm yapılandırma <code>/data/adb/</code> altında saklanır, yeniden başlatmada kaybolmaz.</p>\n\n<h2>Ekran Görüntüleri</h2>\n\n<p>!<a href=\"Screenshot_20260901_141518.jpg\">Ana Arayüz</a></p>\n\n<p>!<a href=\"Screenshot_20260901_141525.jpg\">Aura Paneli 1</a></p>\n\n<p>!<a href=\"Screenshot_20260901_141532.jpg\">Aura Paneli 2</a></p>\n\n<h2>Kurulum</h2>\n\n<li>ZIP dosyasını indirin.</li>\n<li>**KernelSU** uygulamasını açın.</li>\n<li>**Modüller** sekmesine gidin.</li>\n<li>**Yükle**'ye dokunun ve ZIP dosyasını seçin.</li>\n<li>Cihazınızı **yeniden başlatın**.</li>\n<li>KernelSU → Modüller → **AuracastControl** üzerine dokunarak WebUI'yi açın.</li>\n\n<h2>WebUI Kullanımı</h2>\n\n<p>Kullanıcı dostu arayüz sayesinde hiçbir teknik bilgiye ihtiyaç duymadan:</p>\n\n<li>Yayın durumunu görüntüleyebilir,</li>\n<li>Tek dokunuşla yayın başlatıp durdurabilir,</li>\n<li>Yayın kodu belirleyebilir,</li>\n<li>Metadata alanlarını düzenleyebilir,</li>\n<li>Mevcut yayınları tarayabilirsiniz.</li>\n\n<h2>Teknik Detaylar</h2>\n\n<p>Modül, aşağıdaki sistem bileşenleriyle iletişim kurar:</p>\n\n<li>`android.bluetooth.IBluetoothManager` Binder servisi</li>\n<li>Gizli `IBluetooth` arayüzü ve `startLeAudioBroadcast` metodu</li>\n<li>`android.bluetooth.action.LE_AUDIO_BROADCAST_STATE_CHANGED` intent'i</li>\n<li>JBL Headphones uygulamasının Auracast ekranını tetikleme</li>\n\n<p>> Bu sayede, stok ROM'da kapalı olan Auracast işlevselliği tamamen açığa çıkar.</p>\n\n<h2>Uyumluluk</h2>\n\n<li>**Test edilen cihaz:** RedMagic 11 Pro</li>\n<li>**Gereksinim:** KernelSU root, Android 13 veya üzeri</li>\n<li>**Diğer cihazlar:** Test edilmemiştir; donanım/yazılım farklılıkları nedeniyle çalışmayabilir.</li>\n\n<h2>Uyarı ve Sorumluluk Reddi</h2>\n\n<p><b>KULLANIM RİSKİ SİZE AİTTİR.</b></p>\n\n<li>Bu modül, düşük seviyeli Bluetooth sistem servislerine müdahale eder.</li>\n<li>Cihazınızda işlev kaybı, kararsızlık veya başka sorunlar oluşabilir.</li>\n<li>Geliştirici hiçbir zarardan sorumlu tutulamaz.</li>\n<li>Bu proje **eğitim ve araştırma amaçlıdır**.</li>\n\n<p><b>Yüklemeden önce mutlaka yedek alın.</b></p>",
+  "homepageUrl": "https://github.com/KahramanEdit/AuracastControl",
+  "sourceUrl": "https://github.com/KahramanEdit/AuracastControl",
+  "url": "https://github.com/KahramanEdit/AuracastControl",
+  "latestRelease": {
+    "name": "v1.1",
+    "version": "v1.1",
+    "time": "2026-09-05T15:52:13Z",
+    "downloadUrl": "https://github.com/KahramanEdit/AuracastControl/releases/download/v1.1/AuracastControl_Final.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-09-05T15:52:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AuracastControl_Final.zip",
+          "downloadUrl": "https://github.com/KahramanEdit/AuracastControl/releases/download/v1.1/AuracastControl_Final.zip",
+          "size": 23081,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v.1.1beta",
+      "tagName": "v.1.1beta",
+      "publishedAt": "2026-09-05T14:36:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "auracast_control_v3.zip",
+          "downloadUrl": "https://github.com/KahramanEdit/AuracastControl/releases/download/v.1.1beta/auracast_control_v3.zip",
+          "size": 19157,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-09-01T11:08:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "auracast_control.zip",
+          "downloadUrl": "https://github.com/KahramanEdit/AuracastControl/releases/download/v1.0/auracast_control.zip",
+          "size": 10431,
+          "downloadCount": 0
+        },
+        {
+          "name": "README.md",
+          "downloadUrl": "https://github.com/KahramanEdit/AuracastControl/releases/download/v1.0/README.md",
+          "size": 1877,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

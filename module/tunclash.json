@@ -1,0 +1,197 @@
+{
+  "readme": "# TunClash · mihomo 透明代理\n\n[![CI](https://github.com/De4869/tunclash/actions/workflows/ci.yml/badge.svg)](https://github.com/De4869/tunclash/actions/workflows/ci.yml)\n[![Release](https://img.shields.io/github/v/release/De4869/tunclash)](https://github.com/De4869/tunclash/releases)\n![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84)\n![License](https://img.shields.io/badge/license-MIT-blue)\n\n给 **已 Root 的安卓手机**（KernelSU / Magisk / APatch / SukiSU）用的 mihomo 透明代理方案：\n**App 图形界面 + mihomo 内核（构建时拉取最新 release）+ Root 级 TUN 全局接管**，不占用系统 VPN 入口，状态栏不会出现 VPN 图标，也不会被\"检测 VPN\"的 App 识别。\n\n> **为什么自己写一个**：之前用过 [MagicNet](https://github.com/LIghtJUNction/MagicNet) 和\n> [NetProxy-Magisk](https://github.com/Fanju6/NetProxy-Magisk)，\"Root 级 TUN、不占 VPN 槽位\"的思路很好，\n> 但它们基于 sing-box 内核：拿 mihomo / Clash 订阅去用要先转换，切换订阅慢，换 Wi-Fi 或移动网络后连接经常卡住。\n> 所以这里换成 **mihomo（Clash.Meta）内核**，把订阅、节点、分流、测速全部收进一个原生 Compose App：\n> 订阅一键导入、节点整合去重、自动测速选优、热重载开关，不重启进程。\n\n---\n\n## 1. 特性\n\n| 能力 | 说明 |\n|---|---|\n| **mihomo 内核** | arm64 内核随构建拉取最新 release（当前 v1.19.x 最新），支持 vmess / vless / trojan / ss / hysteria2 / tuic 等全部主流协议，可在 App 内一键更新 |\n| **无 VPN 槽位** | 直接用 `/dev/net/tun` + 策略路由接管全局流量，不创建 VpnService，不显示 VPN 图标 |\n| **订阅导入** | 支持 Clash 订阅链接（自动识别 YAML / base64 分享链接）、多行粘贴节点链接、本地 YAML |\n| **节点整合** | 多个订阅一键合并，按 `类型+服务器+端口+凭据` 去重，重名自动改名，自动按地区分组（港/台/日/新/美…）；支持**关键词过滤**（排除「剩余流量/官网/试用」等非节点条目，内置预设一键填入） |\n| **自动选优** | 调 mihomo 的 `/group/{name}/delay` 一次并发测完整个策略组，自动选中最低延迟；同时生成 ♻️自动选择 / 🔯故障转移 / ⚖️负载均衡 策略组 |\n| **平台检测** | 一键检测 Google / YouTube / ChatGPT / GitHub / Netflix / Telegram / X / Spotify / Instagram / 百度，给出每个平台的可用性与延迟 |\n| **在线广告规则** | 除内置 `GEOSITE,category-ads-all` 外，可导入任意 mihomo rule-provider（内置 ACL4SSR BanAD / 程序广告预设）；支持**手动更新**、显示每个规则源的**条数与上次更新时间**、自动更新间隔可选（6/12/24/48 小时） |\n| **内核更新** | 「设置 → 检查更新」查询 GitHub 最新 release（走当前代理），发现新版本可一键下载 .gz、替换二进制并自动重启；重启 App 不会把内核降级回内置版本 |\n| **不重启开关** | 大按钮暂停/恢复代理只改 mihomo 运行模式（`PATCH /configs`），内核不退出、连接不断 |\n| **热重载** | 换订阅、改 DNS、改分流、改分应用名单 → 写配置后 `PUT /configs` 热加载，同样不重启进程 |\n| **分流规则** | 内置智能分流（GEOSITE/GEOIP 国内直连）、全局代理、全局直连；广告拦截开关；可视化分应用黑白名单 |\n| **实时状态** | 上下行速率、累计流量、运行时长、节点延迟、内核日志（实时流） |\n| **开机自启** | 写入 `/data/adb/service.d`，开机 25 秒后自动拉起 |\n| **模块化** | 附带 KernelSU/Magisk 模块 zip（可选），App 单独也能用；模块自带 WebUI（概览/节点/订阅/日志），不装 App 也能操作 |\n| **快捷磁贴** | 下拉通知栏「TunClash」磁贴一键启停代理；长按直接打开 App |\n| **外观** | 跟随系统 / 深色 / 浅色三档，浅色模式状态栏图标同步反色；桌面与磁贴统一使用「六边形 + T」图标 |\n| **Google Play 兼容** | IPv6 关闭时阻断 IPv6 出站避免绕过代理，并让 Play 下载域名走国内 CDN 直连，避免更新卡在 0% |\n| **应用更新** | 「关于 → 检查更新」对比 GitHub 最新 release，有新版时展示更新日志并可跳转下载 |\n| **日志面板** | 级别筛选（全部/警告/错误）、关键字搜索、一键复制、错误标红、滚到底自动跟随 |\n\n## 界面\n\n<p align=\"center\">\n  <img src=\"docs/img/home.png\" width=\"300\" alt=\"首页：一屏状态 / 流量 / 节点 / 模式 / 快捷操作\">\n  <img src=\"docs/img/logs.png\" width=\"300\" alt=\"日志：级别筛选 / 搜索 / 复制\">\n  <img src=\"docs/img/platform-test.png\" width=\"300\" alt=\"平台检测\">\n  <img src=\"docs/img/webui.png\" width=\"300\" alt=\"模块 WebUI（不装 App 也能用）\">\n</p>\n\n> 节点名称已打码，截图里不包含订阅地址。\n\n## 2. 目录\n\n```\n透明代理/\n├─ Android/       App 源码（Kotlin + Jetpack Compose）\n├─ module/        KernelSU / Magisk 模块（含 WebUI：webroot/index.html）\n├─ scripts/       fetch-deps.sh（拉内核 + geo）、set-repo.sh（更新通道）\n├─ docs/          测试记录 + 演示截图\n└─ .github/       CI、Release、Issue 模板、Dependabot\n```\n\n## 3. 安装\n\n### 3.1 下载\n\n产物在 [Releases](https://github.com/De4869/tunclash/releases) 页面：\n\n| 文件 | 用途 |\n|---|---|\n| `TunClash-v1.2.9.apk` | App（控制面板 + 一键装内核） |\n| `TunClash-Module-v1.2.9.zip` | KernelSU / Magisk 模块（可脱离 App） |\n\n### 3.2 只装 App（推荐）\n\n```bash\nadb install -r TunClash-v1.2.9.apk\n```\n\n1. 打开 App，KernelSU 会弹出 Root 授权 → **允许**（勾选记住）。\n2. 首次启动自动把内核、geo 数据库、控制脚本安装到 `/data/adb/mihomo_tproxy`（约 5 秒）。\n3. 进入「订阅」→ 右上角 **+** → 粘贴订阅链接或节点链接 → 添加。\n4. 回到首页 → 点大圆环开关 → 代理生效。\n\n### 3.3 模块（可选）\n\n```bash\nadb push TunClash-Module-v1.2.9.zip /data/local/tmp/\nadb shell su -c \"ksud module install /data/local/tmp/TunClash-Module-v1.2.9.zip\"\n```\n\n模块只负责：装内核/geo/控制脚本 + 开机按 `/data/adb/mihomo_tproxy/auto_start` 标志启动内核。\nApp 仍然是控制面板；两者共用同一套运行时目录。\n\n> IPv6 的处理：设置里的「IPv6」开关关闭时（默认），内核启动期间会用 `ip6tables` 临时阻断 IPv6 出站，\n> 强制应用回落到 IPv4；停止代理后规则自动移除，不改动系统的 IPv6 地址。\n> 打开开关时 IPv6 会进隧道走代理，**前提是节点支持 IPv6**。\n> 节点不支持时，Google Play 等应用可能无法下载或更新（一直停在\"等待中\"），部分 IPv6 站点也会连接失败；\n> 不确定时保持关闭即可，日常上网与下载不受影响。\n\n## 4. 使用要点\n\n- **大圆环**：启动/暂停代理。暂停时内核仍在运行（状态 \"已暂停\"），网络立即恢复直连；再点恢复，秒切回。\n- **首页模式条**：规则 / 全局 / 直连，点击即生效（`PATCH /configs`，不重启）。\n- **节点页**：「全部测速」并发测所有节点并自动切到最快的；也可直接点选任意节点。\n- **订阅页**：「整合全部节点」把现有所有订阅合并成一份去重、按地区分组的新配置（会新增\"聚合节点\"配置并启用）。\n- **设置 → 分应用代理**：黑名单=选中的应用直连；白名单=只有选中的应用走代理。走的是 `PROCESS-NAME` 规则，改完热重载。\n- **设置 → 广告拦截**：加入 `GEOSITE,category-ads-all,REJECT` 规则。\n- **首页 → 检测**：一键测 10 个常用平台（走当前节点，超时 6 秒），结果直接显示每个平台是否可用和延迟。\n- **设置 → 开机自启**：写入 `/data/adb/service.d/99-tunclash.sh`。\n\n## 5. 技术方案（为什么这样能连上）\n\n```\nApp 进程（普通 uid） ──su──▶ root 守护进程\n                                 │\n             /data/adb/mihomo_tproxy/bin/mihomo -d ... -f config.yaml\n                                 │\n        ┌────────────────────────┴─────────────────────────┐\n        │ TUN 网卡 mihomo0（198.18.0.1/30，Mixed 栈）        │\n        │ auto-route：ip rule pref 9000/9001 → table 2022   │\n        │ DNS：dns-hijack any:53 → fake-ip 198.18.0.0/16    │\n        └────────────────────────┬─────────────────────────┘\n                                 │ 规则（GEOSITE/GEOIP/PROCESS-NAME）\n                          节点 / DIRECT\n```\n\n关键点：\n\n1. **不抢 VPN**：`/dev/net/tun` 在 root 下可直接 `TUNSETIFF`，mihomo 用 sing-tun 的 `auto-route` 在优先级 9000/9001（早于 Android 的 11000+）插入策略路由，把\"新发起的连接\"导入 table 2022 → `default dev mihomo0`。\n2. **不回环**：`auto-detect-interface: true` 让 mihomo 自己把出站 socket 绑到 wlan0/rmnet，避免自己代理自己。\n3. **DNS 不泄漏**：`dns-hijack: any:53` + fake-ip，App 的 DNS 请求（包括 netd 代发）都会被接管。\n4. **热重载**：mihomo 只允许重载 `-d` 目录内的配置，所以配置放在 `/data/adb/mihomo_tproxy/data/config.yaml`，`PUT /configs?force=true` 返回 204，TUN 与监听端口平滑重建。\n5. **配置合成**：订阅 YAML 原样保留 `proxies/proxy-groups/rules`，只剥离并重写 `tun/dns/ports/external-controller/log-level` 等受管顶层键；分享链接会被翻译成 Clash proxy 块。\n\n## 6. 构建\n\n```bash\nbash scripts/fetch-deps.sh          # 下载 mihomo 内核 + geo 数据库\ncd Android && ./gradlew assembleDebug\n```\n\n依赖 JDK 21、Android SDK（compileSdk 36 / build-tools 36.1），`local.properties` 的 `sdk.dir` 指向本机 SDK。\n\n## 7. 常见问题\n\n**Q：节点列表空白 / 内核起不来？**\n最常见的原因是订阅里某个节点名带了非法转义（例如 `\"🇺🇸\\_美国-...\"`，YAML 双引号里的 `\\_` 是非法的），mihomo 解析到一半直接 `fatal`，进程退出 → App 读不到 `/proxies` → 列表空白。\n现在做了两道防护：生成配置时统一规范节点名（去掉 `\\`、保证组引用与节点名完全一致），并且每次切换配置前先用 `mihomo -t` 预校验，校验不过就保留旧配置并在底部提示错误，不会把正在跑的代理弄挂。\n\n**Q：连不上 / 打开网页转圈？**\n1. 看「设置 → 查看内核日志」是否有 `Parse config error`（订阅里有重名节点或格式不支持）。\n2. 节点是否可用：节点页点「全部测速」，全部超时就是订阅/节点问题。\n3. 订阅是 base64 的 v2ray 链接集合：App 会自动转成 Clash 配置，但 SSR / 部分冷门协议不支持。\n\n**Q：和别的 VPN/代理 App 冲突？**\n本方案不占 VPN 槽位，但**别的 VPN 开启时会改掉默认路由**，导致流量进不到 mihomo0。用之前先关掉其它 VPN（如 Bettbox / Clash 类 App）。\n\n**Q：杀后台后代理还在吗？**\n在。内核是 root 进程，App 被杀不影响；重新打开 App 会通过 API 读到运行状态。\n\n**Q：怎么彻底卸载？**\nApp 内「设置 → 停止内核」，然后 `adb shell su -c \"rm -rf /data/adb/mihomo_tproxy /data/adb/service.d/99-tunclash.sh\"`，再卸载 App。\n\n## 8. 已知限制\n\n- 仅打包 **arm64-v8a** 内核（目前所有主流机型都是 arm64）。\n- IPv6 默认关闭（避免节点不支持 IPv6 时泄漏）；需要时在设置里打开。\n- UDP（QUIC）能否走代理取决于节点是否支持 UDP；不支持时游戏/视频通话会退回 TCP。\n- 需要 Root；未 Root 的设备请用 ClashMetaForAndroid 这类 VpnService 方案。\n\n## 9. 不装 App 也能用：模块 + WebUI\n\n模块自带 WebUI（KernelSU 管理器「模块」页里，TunClash 内核 卡片上的 `<>` 打开），和 App 共用同一套运行时\n（`/data/adb/mihomo_tproxy`），装 App 或不装都能用，两边操作互相同步状态。\n\nWebUI 能力：\n\n- 概览：运行状态、上下行速率/累计流量、模式切换（规则/全局/直连）、启动/暂停/重启\n- 节点：策略组切换、节点搜索、按延迟排序、点选切换、整组测速并自动选最快\n- 订阅：多个订阅**合并去重**成一个节点池（按节点名去重，同名只保留一条）；添加 Clash 订阅链接、删除、全部更新；**支持分享链接订阅**（`vless://` / `vmess://` / `trojan://` / `ss://` / `hysteria2://` / `tuic://` / `anytls://`，自动转换为 Clash YAML）\n- 日志：实时 tail 内核日志，每 3 秒自动刷新\n- 主题：右上角 ☾ / ☀ 切换深色与浅色，选择会记住\n\nWebUI 的独立运行时靠这几个文件：\n\n```\n/data/adb/mihomo_tproxy/\n├─ subs.list          # 订阅列表：名称|URL\n├─ secret             # 外部控制 API 的密钥\n├─ gen.sh             # 从 subs.list + data/subN.yaml 生成 config.yaml\n├─ ctl.sh             # 启停/状态/清理\n└─ data/subN.yaml     # 每个订阅下载下来的 Clash 配置（作为 provider 使用）\n```\n\n### 能力边界：什么时候必须用 App\n\nWebUI 是「网页 + shell + REST API」的壳，没有原生能力，所以下面这些**只有 App 能做**：\n\n| 功能 | WebUI | App |\n|---|---|---|\n| 启动/停止、切模式、切节点、测速 | ✅ | ✅ |\n| 状态、速率、日志 | ✅ | ✅ |\n| Clash 订阅 / 分享链接订阅 | ✅ | ✅ |\n| **聚合多个订阅成一个「聚合节点」** | ❌（只能 provider 汇总） | ✅ |\n| **分应用黑白名单** | ❌ | ✅ |\n| **广告规则源管理（条数/间隔/时间）** | ❌ | ✅ |\n| 开机自启开关、快捷磁贴 | ❌ | ✅ |\n\n**推荐做法**：\n\n1. 需要聚合、分应用、规则源这些功能 → 用 App 配好（App 会写出 `config.yaml`）\n2. 配好之后如果不想要 App，可以**直接卸载 App，只保留模块**：内核、配置、WebUI 都在 `/data/adb/mihomo_tproxy` 里，卸载 App 不影响代理\n3. 之后日常用 WebUI 启停、切节点、看日志即可\n\n> 反过来也成立：只用 WebUI 也能长期跑，只是少了聚合与分应用这类高级配置。\n\n注意：\n1. WebUI 走 `gen.sh` 生成 **provider 结构**的配置（proxy-providers + 分组 + GEOSITE 规则），适合纯模块用户；\n   如果用 App 切换订阅，App 会用自己的配置覆盖 `config.yaml`，两者择一即可。\n2. WebUI 订阅只接受 **Clash YAML** 订阅（分享链接的转换在 App 里做）。\n3. 模块安装不会覆盖你已经升级过的内核版本（只有全新安装才释放随包内核）。\n4. 升级内核的三种方式：\n   - App：设置 → 检查更新 → 立即更新；\n   - WebUI：概览 → 更新内核（调用 `update_core.sh`）；\n   - 终端：`su -c 'sh /data/adb/mihomo_tproxy/update_core.sh'`。\n   三者都走 GitHub release（直连 API 常被限流，脚本内置 `gh-proxy.com` 镜像），下载 .gz → 解压 → 替换 → 重启。\n\n## 10. 致谢\n\n这个项目基本是站在别人肩膀上：\n\n- **[mihomo / Clash.Meta](https://github.com/MetaCubeX/mihomo)** —— 核心内核，整套透明代理都建立在它之上\n- **[meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)** —— 用到的 geoip.metadb / geosite.dat\n- **[MagicNet](https://github.com/LIghtJUNction/MagicNet)** —— Root 级 TUN、不占 VPN 槽位的早期实践，最初思路来源\n- **[NetProxy-Magisk](https://github.com/Fanju6/NetProxy-Magisk)** —— 同类方案参考\n- **[KernelSU](https://github.com/tiann/KernelSU)** / **[SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)** —— 模块与 WebUI 的运行环境\n- **[Jetpack Compose](https://developer.android.com/jetpack/compose)** —— 界面\n- 以及所有提 issue、反馈问题、帮忙测试的朋友\n\n如果这里漏了你的项目，提个 issue 或 PR，我补上。\n",
+  "readmeHTML": "<h1>TunClash · mihomo 透明代理</h1>\n\n<p><a href=\"https://github.com/De4869/tunclash/actions/workflows/ci.yml/badge.svg\">![CI</a>](https://github.com/De4869/tunclash/actions/workflows/ci.yml)</p>\n<p><a href=\"https://img.shields.io/github/v/release/De4869/tunclash\">![Release</a>](https://github.com/De4869/tunclash/releases)</p>\n<p>!<a href=\"https://img.shields.io/badge/Android-8.0%2B-3ddc84\">Android</a></p>\n<p>!<a href=\"https://img.shields.io/badge/license-MIT-blue\">License</a></p>\n\n<p>给 <b>已 Root 的安卓手机</b>（KernelSU / Magisk / APatch / SukiSU）用的 mihomo 透明代理方案：</p>\n<p><b>App 图形界面 + mihomo 内核（构建时拉取最新 release）+ Root 级 TUN 全局接管</b>，不占用系统 VPN 入口，状态栏不会出现 VPN 图标，也不会被\"检测 VPN\"的 App 识别。</p>\n\n<p>> <b>为什么自己写一个</b>：之前用过 <a href=\"https://github.com/LIghtJUNction/MagicNet\">MagicNet</a> 和</p>\n<p>> <a href=\"https://github.com/Fanju6/NetProxy-Magisk\">NetProxy-Magisk</a>，\"Root 级 TUN、不占 VPN 槽位\"的思路很好，</p>\n<p>> 但它们基于 sing-box 内核：拿 mihomo / Clash 订阅去用要先转换，切换订阅慢，换 Wi-Fi 或移动网络后连接经常卡住。</p>\n<p>> 所以这里换成 <b>mihomo（Clash.Meta）内核</b>，把订阅、节点、分流、测速全部收进一个原生 Compose App：</p>\n<p>> 订阅一键导入、节点整合去重、自动测速选优、热重载开关，不重启进程。</p>\n\n<p>---</p>\n\n<h2>1. 特性</h2>\n\n<p>| 能力 | 说明 |</p>\n<p>|---|---|</p>\n<p>| <b>mihomo 内核</b> | arm64 内核随构建拉取最新 release（当前 v1.19.x 最新），支持 vmess / vless / trojan / ss / hysteria2 / tuic 等全部主流协议，可在 App 内一键更新 |</p>\n<p>| <b>无 VPN 槽位</b> | 直接用 <code>/dev/net/tun</code> + 策略路由接管全局流量，不创建 VpnService，不显示 VPN 图标 |</p>\n<p>| <b>订阅导入</b> | 支持 Clash 订阅链接（自动识别 YAML / base64 分享链接）、多行粘贴节点链接、本地 YAML |</p>\n<p>| <b>节点整合</b> | 多个订阅一键合并，按 <code>类型+服务器+端口+凭据</code> 去重，重名自动改名，自动按地区分组（港/台/日/新/美…）；支持<b>关键词过滤</b>（排除「剩余流量/官网/试用」等非节点条目，内置预设一键填入） |</p>\n<p>| <b>自动选优</b> | 调 mihomo 的 <code>/group/{name}/delay</code> 一次并发测完整个策略组，自动选中最低延迟；同时生成 ♻️自动选择 / 🔯故障转移 / ⚖️负载均衡 策略组 |</p>\n<p>| <b>平台检测</b> | 一键检测 Google / YouTube / ChatGPT / GitHub / Netflix / Telegram / X / Spotify / Instagram / 百度，给出每个平台的可用性与延迟 |</p>\n<p>| <b>在线广告规则</b> | 除内置 <code>GEOSITE,category-ads-all</code> 外，可导入任意 mihomo rule-provider（内置 ACL4SSR BanAD / 程序广告预设）；支持<b>手动更新</b>、显示每个规则源的<b>条数与上次更新时间</b>、自动更新间隔可选（6/12/24/48 小时） |</p>\n<p>| <b>内核更新</b> | 「设置 → 检查更新」查询 GitHub 最新 release（走当前代理），发现新版本可一键下载 .gz、替换二进制并自动重启；重启 App 不会把内核降级回内置版本 |</p>\n<p>| <b>不重启开关</b> | 大按钮暂停/恢复代理只改 mihomo 运行模式（<code>PATCH /configs</code>），内核不退出、连接不断 |</p>\n<p>| <b>热重载</b> | 换订阅、改 DNS、改分流、改分应用名单 → 写配置后 <code>PUT /configs</code> 热加载，同样不重启进程 |</p>\n<p>| <b>分流规则</b> | 内置智能分流（GEOSITE/GEOIP 国内直连）、全局代理、全局直连；广告拦截开关；可视化分应用黑白名单 |</p>\n<p>| <b>实时状态</b> | 上下行速率、累计流量、运行时长、节点延迟、内核日志（实时流） |</p>\n<p>| <b>开机自启</b> | 写入 <code>/data/adb/service.d</code>，开机 25 秒后自动拉起 |</p>\n<p>| <b>模块化</b> | 附带 KernelSU/Magisk 模块 zip（可选），App 单独也能用；模块自带 WebUI（概览/节点/订阅/日志），不装 App 也能操作 |</p>\n<p>| <b>快捷磁贴</b> | 下拉通知栏「TunClash」磁贴一键启停代理；长按直接打开 App |</p>\n<p>| <b>外观</b> | 跟随系统 / 深色 / 浅色三档，浅色模式状态栏图标同步反色；桌面与磁贴统一使用「六边形 + T」图标 |</p>\n<p>| <b>Google Play 兼容</b> | IPv6 关闭时阻断 IPv6 出站避免绕过代理，并让 Play 下载域名走国内 CDN 直连，避免更新卡在 0% |</p>\n<p>| <b>应用更新</b> | 「关于 → 检查更新」对比 GitHub 最新 release，有新版时展示更新日志并可跳转下载 |</p>\n<p>| <b>日志面板</b> | 级别筛选（全部/警告/错误）、关键字搜索、一键复制、错误标红、滚到底自动跟随 |</p>\n\n<h2>界面</h2>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/img/home.png\" width=\"300\" alt=\"首页：一屏状态 / 流量 / 节点 / 模式 / 快捷操作\"></p>\n<p>  <img src=\"docs/img/logs.png\" width=\"300\" alt=\"日志：级别筛选 / 搜索 / 复制\"></p>\n<p>  <img src=\"docs/img/platform-test.png\" width=\"300\" alt=\"平台检测\"></p>\n<p>  <img src=\"docs/img/webui.png\" width=\"300\" alt=\"模块 WebUI（不装 App 也能用）\"></p>\n<p></p></p>\n\n<p>> 节点名称已打码，截图里不包含订阅地址。</p>\n\n<h2>2. 目录</h2>\n\n<pre>透明代理/\n├─ Android/       App 源码（Kotlin + Jetpack Compose）\n├─ module/        KernelSU / Magisk 模块（含 WebUI：webroot/index.html）\n├─ scripts/       fetch-deps.sh（拉内核 + geo）、set-repo.sh（更新通道）\n├─ docs/          测试记录 + 演示截图\n└─ .github/       CI、Release、Issue 模板、Dependabot</pre>\n\n<h2>3. 安装</h2>\n\n<h3>3.1 下载</h3>\n\n<p>产物在 <a href=\"https://github.com/De4869/tunclash/releases\">Releases</a> 页面：</p>\n\n<p>| 文件 | 用途 |</p>\n<p>|---|---|</p>\n<p>| <code>TunClash-v1.2.9.apk</code> | App（控制面板 + 一键装内核） |</p>\n<p>| <code>TunClash-Module-v1.2.9.zip</code> | KernelSU / Magisk 模块（可脱离 App） |</p>\n\n<h3>3.2 只装 App（推荐）</h3>\n\n<pre>adb install -r TunClash-v1.2.9.apk</pre>\n\n<li>打开 App，KernelSU 会弹出 Root 授权 → **允许**（勾选记住）。</li>\n<li>首次启动自动把内核、geo 数据库、控制脚本安装到 `/data/adb/mihomo_tproxy`（约 5 秒）。</li>\n<li>进入「订阅」→ 右上角 **+** → 粘贴订阅链接或节点链接 → 添加。</li>\n<li>回到首页 → 点大圆环开关 → 代理生效。</li>\n\n<h3>3.3 模块（可选）</h3>\n\n<pre>adb push TunClash-Module-v1.2.9.zip /data/local/tmp/\nadb shell su -c \"ksud module install /data/local/tmp/TunClash-Module-v1.2.9.zip\"</pre>\n\n<p>模块只负责：装内核/geo/控制脚本 + 开机按 <code>/data/adb/mihomo_tproxy/auto_start</code> 标志启动内核。</p>\n<p>App 仍然是控制面板；两者共用同一套运行时目录。</p>\n\n<p>> IPv6 的处理：设置里的「IPv6」开关关闭时（默认），内核启动期间会用 <code>ip6tables</code> 临时阻断 IPv6 出站，</p>\n<p>> 强制应用回落到 IPv4；停止代理后规则自动移除，不改动系统的 IPv6 地址。</p>\n<p>> 打开开关时 IPv6 会进隧道走代理，<b>前提是节点支持 IPv6</b>。</p>\n<p>> 节点不支持时，Google Play 等应用可能无法下载或更新（一直停在\"等待中\"），部分 IPv6 站点也会连接失败；</p>\n<p>> 不确定时保持关闭即可，日常上网与下载不受影响。</p>\n\n<h2>4. 使用要点</h2>\n\n<li>**大圆环**：启动/暂停代理。暂停时内核仍在运行（状态 \"已暂停\"），网络立即恢复直连；再点恢复，秒切回。</li>\n<li>**首页模式条**：规则 / 全局 / 直连，点击即生效（`PATCH /configs`，不重启）。</li>\n<li>**节点页**：「全部测速」并发测所有节点并自动切到最快的；也可直接点选任意节点。</li>\n<li>**订阅页**：「整合全部节点」把现有所有订阅合并成一份去重、按地区分组的新配置（会新增\"聚合节点\"配置并启用）。</li>\n<li>**设置 → 分应用代理**：黑名单=选中的应用直连；白名单=只有选中的应用走代理。走的是 `PROCESS-NAME` 规则，改完热重载。</li>\n<li>**设置 → 广告拦截**：加入 `GEOSITE,category-ads-all,REJECT` 规则。</li>\n<li>**首页 → 检测**：一键测 10 个常用平台（走当前节点，超时 6 秒），结果直接显示每个平台是否可用和延迟。</li>\n<li>**设置 → 开机自启**：写入 `/data/adb/service.d/99-tunclash.sh`。</li>\n\n<h2>5. 技术方案（为什么这样能连上）</h2>\n\n<pre>App 进程（普通 uid） ──su──▶ root 守护进程\n                                 │\n             /data/adb/mihomo_tproxy/bin/mihomo -d ... -f config.yaml\n                                 │\n        ┌────────────────────────┴─────────────────────────┐\n        │ TUN 网卡 mihomo0（198.18.0.1/30，Mixed 栈）        │\n        │ auto-route：ip rule pref 9000/9001 → table 2022   │\n        │ DNS：dns-hijack any:53 → fake-ip 198.18.0.0/16    │\n        └────────────────────────┬─────────────────────────┘\n                                 │ 规则（GEOSITE/GEOIP/PROCESS-NAME）\n                          节点 / DIRECT</pre>\n\n<p>关键点：</p>\n\n<li>**不抢 VPN**：`/dev/net/tun` 在 root 下可直接 `TUNSETIFF`，mihomo 用 sing-tun 的 `auto-route` 在优先级 9000/9001（早于 Android 的 11000+）插入策略路由，把\"新发起的连接\"导入 table 2022 → `default dev mihomo0`。</li>\n<li>**不回环**：`auto-detect-interface: true` 让 mihomo 自己把出站 socket 绑到 wlan0/rmnet，避免自己代理自己。</li>\n<li>**DNS 不泄漏**：`dns-hijack: any:53` + fake-ip，App 的 DNS 请求（包括 netd 代发）都会被接管。</li>\n<li>**热重载**：mihomo 只允许重载 `-d` 目录内的配置，所以配置放在 `/data/adb/mihomo_tproxy/data/config.yaml`，`PUT /configs?force=true` 返回 204，TUN 与监听端口平滑重建。</li>\n<li>**配置合成**：订阅 YAML 原样保留 `proxies/proxy-groups/rules`，只剥离并重写 `tun/dns/ports/external-controller/log-level` 等受管顶层键；分享链接会被翻译成 Clash proxy 块。</li>\n\n<h2>6. 构建</h2>\n\n<pre>bash scripts/fetch-deps.sh          # 下载 mihomo 内核 + geo 数据库\ncd Android &amp;&amp; ./gradlew assembleDebug</pre>\n\n<p>依赖 JDK 21、Android SDK（compileSdk 36 / build-tools 36.1），<code>local.properties</code> 的 <code>sdk.dir</code> 指向本机 SDK。</p>\n\n<h2>7. 常见问题</h2>\n\n<p><b>Q：节点列表空白 / 内核起不来？</b></p>\n<p>最常见的原因是订阅里某个节点名带了非法转义（例如 <code>\"🇺🇸\\_美国-...\"</code>，YAML 双引号里的 <code>\\_</code> 是非法的），mihomo 解析到一半直接 <code>fatal</code>，进程退出 → App 读不到 <code>/proxies</code> → 列表空白。</p>\n<p>现在做了两道防护：生成配置时统一规范节点名（去掉 <code>\\</code>、保证组引用与节点名完全一致），并且每次切换配置前先用 <code>mihomo -t</code> 预校验，校验不过就保留旧配置并在底部提示错误，不会把正在跑的代理弄挂。</p>\n\n<p><b>Q：连不上 / 打开网页转圈？</b></p>\n<li>看「设置 → 查看内核日志」是否有 `Parse config error`（订阅里有重名节点或格式不支持）。</li>\n<li>节点是否可用：节点页点「全部测速」，全部超时就是订阅/节点问题。</li>\n<li>订阅是 base64 的 v2ray 链接集合：App 会自动转成 Clash 配置，但 SSR / 部分冷门协议不支持。</li>\n\n<p><b>Q：和别的 VPN/代理 App 冲突？</b></p>\n<p>本方案不占 VPN 槽位，但<b>别的 VPN 开启时会改掉默认路由</b>，导致流量进不到 mihomo0。用之前先关掉其它 VPN（如 Bettbox / Clash 类 App）。</p>\n\n<p><b>Q：杀后台后代理还在吗？</b></p>\n<p>在。内核是 root 进程，App 被杀不影响；重新打开 App 会通过 API 读到运行状态。</p>\n\n<p><b>Q：怎么彻底卸载？</b></p>\n<p>App 内「设置 → 停止内核」，然后 <code>adb shell su -c \"rm -rf /data/adb/mihomo_tproxy /data/adb/service.d/99-tunclash.sh\"</code>，再卸载 App。</p>\n\n<h2>8. 已知限制</h2>\n\n<li>仅打包 **arm64-v8a** 内核（目前所有主流机型都是 arm64）。</li>\n<li>IPv6 默认关闭（避免节点不支持 IPv6 时泄漏）；需要时在设置里打开。</li>\n<li>UDP（QUIC）能否走代理取决于节点是否支持 UDP；不支持时游戏/视频通话会退回 TCP。</li>\n<li>需要 Root；未 Root 的设备请用 ClashMetaForAndroid 这类 VpnService 方案。</li>\n\n<h2>9. 不装 App 也能用：模块 + WebUI</h2>\n\n<p>模块自带 WebUI（KernelSU 管理器「模块」页里，TunClash 内核 卡片上的 <code><></code> 打开），和 App 共用同一套运行时</p>\n<p>（<code>/data/adb/mihomo_tproxy</code>），装 App 或不装都能用，两边操作互相同步状态。</p>\n\n<p>WebUI 能力：</p>\n\n<li>概览：运行状态、上下行速率/累计流量、模式切换（规则/全局/直连）、启动/暂停/重启</li>\n<li>节点：策略组切换、节点搜索、按延迟排序、点选切换、整组测速并自动选最快</li>\n<li>订阅：多个订阅**合并去重**成一个节点池（按节点名去重，同名只保留一条）；添加 Clash 订阅链接、删除、全部更新；**支持分享链接订阅**（`vless://` / `vmess://` / `trojan://` / `ss://` / `hysteria2://` / `tuic://` / `anytls://`，自动转换为 Clash YAML）</li>\n<li>日志：实时 tail 内核日志，每 3 秒自动刷新</li>\n<li>主题：右上角 ☾ / ☀ 切换深色与浅色，选择会记住</li>\n\n<p>WebUI 的独立运行时靠这几个文件：</p>\n\n<pre>/data/adb/mihomo_tproxy/\n├─ subs.list          # 订阅列表：名称|URL\n├─ secret             # 外部控制 API 的密钥\n├─ gen.sh             # 从 subs.list + data/subN.yaml 生成 config.yaml\n├─ ctl.sh             # 启停/状态/清理\n└─ data/subN.yaml     # 每个订阅下载下来的 Clash 配置（作为 provider 使用）</pre>\n\n<h3>能力边界：什么时候必须用 App</h3>\n\n<p>WebUI 是「网页 + shell + REST API」的壳，没有原生能力，所以下面这些<b>只有 App 能做</b>：</p>\n\n<p>| 功能 | WebUI | App |</p>\n<p>|---|---|---|</p>\n<p>| 启动/停止、切模式、切节点、测速 | ✅ | ✅ |</p>\n<p>| 状态、速率、日志 | ✅ | ✅ |</p>\n<p>| Clash 订阅 / 分享链接订阅 | ✅ | ✅ |</p>\n<p>| <b>聚合多个订阅成一个「聚合节点」</b> | ❌（只能 provider 汇总） | ✅ |</p>\n<p>| <b>分应用黑白名单</b> | ❌ | ✅ |</p>\n<p>| <b>广告规则源管理（条数/间隔/时间）</b> | ❌ | ✅ |</p>\n<p>| 开机自启开关、快捷磁贴 | ❌ | ✅ |</p>\n\n<p><b>推荐做法</b>：</p>\n\n<li>需要聚合、分应用、规则源这些功能 → 用 App 配好（App 会写出 `config.yaml`）</li>\n<li>配好之后如果不想要 App，可以**直接卸载 App，只保留模块**：内核、配置、WebUI 都在 `/data/adb/mihomo_tproxy` 里，卸载 App 不影响代理</li>\n<li>之后日常用 WebUI 启停、切节点、看日志即可</li>\n\n<p>> 反过来也成立：只用 WebUI 也能长期跑，只是少了聚合与分应用这类高级配置。</p>\n\n<p>注意：</p>\n<li>WebUI 走 `gen.sh` 生成 **provider 结构**的配置（proxy-providers + 分组 + GEOSITE 规则），适合纯模块用户；</li>\n<p>   如果用 App 切换订阅，App 会用自己的配置覆盖 <code>config.yaml</code>，两者择一即可。</p>\n<li>WebUI 订阅只接受 **Clash YAML** 订阅（分享链接的转换在 App 里做）。</li>\n<li>模块安装不会覆盖你已经升级过的内核版本（只有全新安装才释放随包内核）。</li>\n<li>升级内核的三种方式：</li>\n<p>   - App：设置 → 检查更新 → 立即更新；</p>\n<p>   - WebUI：概览 → 更新内核（调用 <code>update_core.sh</code>）；</p>\n<p>   - 终端：<code>su -c 'sh /data/adb/mihomo_tproxy/update_core.sh'</code>。</p>\n<p>   三者都走 GitHub release（直连 API 常被限流，脚本内置 <code>gh-proxy.com</code> 镜像），下载 .gz → 解压 → 替换 → 重启。</p>\n\n<h2>10. 致谢</h2>\n\n<p>这个项目基本是站在别人肩膀上：</p>\n\n<li>**[mihomo / Clash.Meta](https://github.com/MetaCubeX/mihomo)** —— 核心内核，整套透明代理都建立在它之上</li>\n<li>**[meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)** —— 用到的 geoip.metadb / geosite.dat</li>\n<li>**[MagicNet](https://github.com/LIghtJUNction/MagicNet)** —— Root 级 TUN、不占 VPN 槽位的早期实践，最初思路来源</li>\n<li>**[NetProxy-Magisk](https://github.com/Fanju6/NetProxy-Magisk)** —— 同类方案参考</li>\n<li>**[KernelSU](https://github.com/tiann/KernelSU)** / **[SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)** —— 模块与 WebUI 的运行环境</li>\n<li>**[Jetpack Compose](https://developer.android.com/jetpack/compose)** —— 界面</li>\n<li>以及所有提 issue、反馈问题、帮忙测试的朋友</li>\n\n<p>如果这里漏了你的项目，提个 issue 或 PR，我补上。</p>",
+  "homepageUrl": "https://github.com/De4869/tunclash",
+  "sourceUrl": "https://github.com/De4869/tunclash",
+  "url": "https://github.com/De4869/tunclash",
+  "latestRelease": {
+    "name": "v1.3.0",
+    "version": "v1.3.0",
+    "time": "2026-10-25T14:44:46Z",
+    "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.3.0/TunClash-Module-v1.3.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-10-25T14:44:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.3.0.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.3.0/TunClash-Module-v1.3.0.zip",
+          "size": 27467132,
+          "downloadCount": 41
+        },
+        {
+          "name": "TunClash-v1.3.0.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.3.0/TunClash-v1.3.0.apk",
+          "size": 46328897,
+          "downloadCount": 55
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.3.0/update.json",
+          "size": 234,
+          "downloadCount": 148
+        }
+      ]
+    },
+    {
+      "name": "v1.2.9",
+      "tagName": "v1.2.9",
+      "publishedAt": "2026-10-25T14:08:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.9.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.9/TunClash-Module-v1.2.9.zip",
+          "size": 27467183,
+          "downloadCount": 3
+        },
+        {
+          "name": "TunClash-v1.2.9.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.9/TunClash-v1.2.9.apk",
+          "size": 46328893,
+          "downloadCount": 7
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.9/update.json",
+          "size": 234,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.2.8",
+      "tagName": "v1.2.8",
+      "publishedAt": "2026-10-25T13:50:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.8.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.8/TunClash-Module-v1.2.8.zip",
+          "size": 27466831,
+          "downloadCount": 2
+        },
+        {
+          "name": "TunClash-v1.2.8.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.8/TunClash-v1.2.8.apk",
+          "size": 46328897,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.8/update.json",
+          "size": 234,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.2.7",
+      "tagName": "v1.2.7",
+      "publishedAt": "2026-10-25T13:34:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.7.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.7/TunClash-Module-v1.2.7.zip",
+          "size": 27466834,
+          "downloadCount": 1
+        },
+        {
+          "name": "TunClash-v1.2.7.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.7/TunClash-v1.2.7.apk",
+          "size": 46328897,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.7/update.json",
+          "size": 234,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.2.6",
+      "tagName": "v1.2.6",
+      "publishedAt": "2026-10-25T13:17:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.6.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.6/TunClash-Module-v1.2.6.zip",
+          "size": 27466832,
+          "downloadCount": 1
+        },
+        {
+          "name": "TunClash-v1.2.6.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.6/TunClash-v1.2.6.apk",
+          "size": 46326918,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.6/update.json",
+          "size": 233,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.2.5",
+      "tagName": "v1.2.5",
+      "publishedAt": "2026-10-24T12:06:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.5.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.5/TunClash-Module-v1.2.5.zip",
+          "size": 27466184,
+          "downloadCount": 6
+        },
+        {
+          "name": "TunClash-v1.2.5.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.5/TunClash-v1.2.5.apk",
+          "size": 46325978,
+          "downloadCount": 9
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.5/update.json",
+          "size": 233,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v1.2.4",
+      "tagName": "v1.2.4",
+      "publishedAt": "2026-10-23T12:58:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TunClash-Module-v1.2.4.zip",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.4/TunClash-Module-v1.2.4.zip",
+          "size": 27459983,
+          "downloadCount": 4
+        },
+        {
+          "name": "TunClash-v1.2.4.apk",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.4/TunClash-v1.2.4.apk",
+          "size": 46321354,
+          "downloadCount": 7
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/De4869/tunclash/releases/download/v1.2.4/update.json",
+          "size": 233,
+          "downloadCount": 14
+        }
+      ]
+    }
+  ]
+}

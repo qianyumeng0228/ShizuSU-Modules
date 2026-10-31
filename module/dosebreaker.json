@@ -1,0 +1,71 @@
+{
+  "readme": "# DoseBreaker\n\nA root module for Android that disables EU safe media volume enforcement, including the CSD (Content Sound Dosimetry) system introduced in Android 14.\n\nSupports **Magisk**, **KernelSU**, and **APatch**.\n\n---\n\n## The Problem\n\nEU regulations require Android devices to automatically reduce headphone volume after a period of loud listening. Android implements this through two systems:\n\n**Legacy safe media volume** — an index-based system that limits volume above a threshold and re-enables after ~20 hours of cumulative listening.\n\n**CSD (Content Sound Dosimetry)** — a newer system introduced in Android 14 that measures actual sound exposure using MEL (Mean Energy Level). It accumulates dose in-memory within AudioService and triggers volume reduction at 100% of the weekly dose threshold. As of Android 16 / LineageOS 23.2, the accumulator is managed entirely at runtime with no persistent settings keys.\n\nThere is no user-facing toggle to disable either system.\n\n---\n\n## What This Module Does\n\nThis module targets safe volume enforcement at multiple layers and continuously counteracts it at runtime.\n\n### Core enforcement bypass\n- Resets the CSD dose accumulator directly via `cmd audio set-sound-dose-value 0.0`\n- Resets the momentary exposure timeout via `cmd audio reset-sound-dose-timeout`\n- Forces legacy safe volume state to disabled via the settings database\n\n### Persistent runtime enforcement\n- Runs a background daemon (`service.sh`)\n- Continuously resets the CSD accumulator and legacy settings overrides\n- Uses an adaptive loop (aggressive at boot, lower overhead at steady state)\n- Prevents vendor services from re-enabling enforcement\n\n### Adaptive audio system handling\n- Detects audio mods at install time:\n  - JamesDSP\n  - ViPER4Android\n- Applies compatibility tweaks to prevent conflicts with DSP chains\n\n### Audio pipeline tuning\n- Sets resampler quality to 7 on all devices\n- Enables audio offload and deep buffer for sustained playback quality\n\n---\n\n## Why a Maintenance Loop?\n\nModern Android offloads parts of audio policy enforcement to vendor services in `/vendor/`.\n\nThese services:\n- Periodically recalculate and re-enable CSD\n- Override userland changes to the dose accumulator\n\nBecause `/vendor/` is read-only and device-specific, the module uses a **persistent enforcement loop** instead:\n\n- Early boot: aggressive enforcement (every ~30 seconds)\n- Steady state: reduced overhead (~2 minutes)\n- Periodically reapplies audio configuration to counter system overrides\n\nThis keeps the CSD accumulator effectively pinned near zero under normal use.\n\n---\n\n## Requirements\n\n- Android 12+\n- Tested on Android 16 (LineageOS 23.2)\n- One of the following:\n  - [Magisk](https://github.com/topjohnwu/Magisk) v20.4+\n  - [KernelSU](https://github.com/tiann/KernelSU)\n  - [APatch](https://github.com/bmax121/APatch)\n\n---\n\n## Installation\n\n1. Download the latest zip from  \n   https://github.com/LyrinoxTechnologies/dosebreaker/releases/latest\n2. Open Magisk / KernelSU / APatch\n3. Go to Modules → Install from storage\n4. Select the downloaded zip\n5. Reboot\n\n---\n\n## Debugging\n\nRun these in a root shell:\n\n```bash\n# Current CSD dose value\ncmd audio get-sound-dose-value\n\n# Full CSD state and update log\ndumpsys audio | grep -A2 -B2 \"Csd\\|mCurrentCsd\\|mEnableCsd\"\n\n# Legacy safe volume state\ndumpsys audio | grep \"mSafeMediaVolume\"\n```\n\nModule log:\n\n```\n/data/adb/modules/disable_safe_media_volume/log.txt\n```\n\n---\n\n## Tested On\n\n| Device          | OS                          | Root   |\n| --------------- | --------------------------- | ------ |\n| Pixel 8 (shiba) | LineageOS 23.2 (Android 16) | Magisk |\n\nIf you've tested on other devices, open an issue or PR to expand this table.\n\n---\n\n## Known Limitations\n\n- Some OEMs heavily modify audio frameworks, which may require additional adaptation\n- The module cannot patch `/vendor/`, so continuous enforcement is required\n- `cmd audio set-sound-dose-value` requires Android 14+ — on older versions the legacy settings layer is the only enforcement mechanism\n\n---\n\n## Versioning\n\nFormat: `vMAJOR.MINOR.PATCH`\n\n* **Major** → architectural changes (e.g. v2 → v3 runtime enforcement)\n* **Minor** → new features / detection improvements\n* **Patch** → fixes, stability improvements\n\n---\n\n## Contributing\n\nIssues and PRs are welcome.\n\nIf something doesn't work:\n\n* Include device model\n* Android version\n* Root manager\n* Logs (`log.txt`)\n\n---\n\n## Support Lyrinox Technologies\n\nIf this module helped you, consider sponsoring:\n\n[https://github.com/sponsors/LyrinoxTechnologies](https://github.com/sponsors/LyrinoxTechnologies)\n\n---\n\n## License\n\nGNU GPL v3.0 — see [LICENSE](LICENSE)\n\nYou are free to use, modify, and distribute this module, but derivative works must remain open source under GPLv3.\n\n---\n\n*Built and maintained by Vetheon @ Lyrinox Technologies*\n",
+  "readmeHTML": "<h1>DoseBreaker</h1>\n\n<p>A root module for Android that disables EU safe media volume enforcement, including the CSD (Content Sound Dosimetry) system introduced in Android 14.</p>\n\n<p>Supports <b>Magisk</b>, <b>KernelSU</b>, and <b>APatch</b>.</p>\n\n<p>---</p>\n\n<h2>The Problem</h2>\n\n<p>EU regulations require Android devices to automatically reduce headphone volume after a period of loud listening. Android implements this through two systems:</p>\n\n<p><b>Legacy safe media volume</b> — an index-based system that limits volume above a threshold and re-enables after ~20 hours of cumulative listening.</p>\n\n<p><b>CSD (Content Sound Dosimetry)</b> — a newer system introduced in Android 14 that measures actual sound exposure using MEL (Mean Energy Level). It accumulates dose in-memory within AudioService and triggers volume reduction at 100% of the weekly dose threshold. As of Android 16 / LineageOS 23.2, the accumulator is managed entirely at runtime with no persistent settings keys.</p>\n\n<p>There is no user-facing toggle to disable either system.</p>\n\n<p>---</p>\n\n<h2>What This Module Does</h2>\n\n<p>This module targets safe volume enforcement at multiple layers and continuously counteracts it at runtime.</p>\n\n<h3>Core enforcement bypass</h3>\n<li>Resets the CSD dose accumulator directly via `cmd audio set-sound-dose-value 0.0`</li>\n<li>Resets the momentary exposure timeout via `cmd audio reset-sound-dose-timeout`</li>\n<li>Forces legacy safe volume state to disabled via the settings database</li>\n\n<h3>Persistent runtime enforcement</h3>\n<li>Runs a background daemon (`service.sh`)</li>\n<li>Continuously resets the CSD accumulator and legacy settings overrides</li>\n<li>Uses an adaptive loop (aggressive at boot, lower overhead at steady state)</li>\n<li>Prevents vendor services from re-enabling enforcement</li>\n\n<h3>Adaptive audio system handling</h3>\n<li>Detects audio mods at install time:</li>\n<p>  - JamesDSP</p>\n<p>  - ViPER4Android</p>\n<li>Applies compatibility tweaks to prevent conflicts with DSP chains</li>\n\n<h3>Audio pipeline tuning</h3>\n<li>Sets resampler quality to 7 on all devices</li>\n<li>Enables audio offload and deep buffer for sustained playback quality</li>\n\n<p>---</p>\n\n<h2>Why a Maintenance Loop?</h2>\n\n<p>Modern Android offloads parts of audio policy enforcement to vendor services in <code>/vendor/</code>.</p>\n\n<p>These services:</p>\n<li>Periodically recalculate and re-enable CSD</li>\n<li>Override userland changes to the dose accumulator</li>\n\n<p>Because <code>/vendor/</code> is read-only and device-specific, the module uses a <b>persistent enforcement loop</b> instead:</p>\n\n<li>Early boot: aggressive enforcement (every ~30 seconds)</li>\n<li>Steady state: reduced overhead (~2 minutes)</li>\n<li>Periodically reapplies audio configuration to counter system overrides</li>\n\n<p>This keeps the CSD accumulator effectively pinned near zero under normal use.</p>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<li>Android 12+</li>\n<li>Tested on Android 16 (LineageOS 23.2)</li>\n<li>One of the following:</li>\n<p>  - <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a> v20.4+</p>\n<p>  - <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a></p>\n<p>  - <a href=\"https://github.com/bmax121/APatch\">APatch</a></p>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>Download the latest zip from</li>\n<p>   https://github.com/LyrinoxTechnologies/dosebreaker/releases/latest</p>\n<li>Open Magisk / KernelSU / APatch</li>\n<li>Go to Modules → Install from storage</li>\n<li>Select the downloaded zip</li>\n<li>Reboot</li>\n\n<p>---</p>\n\n<h2>Debugging</h2>\n\n<p>Run these in a root shell:</p>\n\n<pre># Current CSD dose value\ncmd audio get-sound-dose-value\n\n# Full CSD state and update log\ndumpsys audio | grep -A2 -B2 \"Csd\\|mCurrentCsd\\|mEnableCsd\"\n\n# Legacy safe volume state\ndumpsys audio | grep \"mSafeMediaVolume\"</pre>\n\n<p>Module log:</p>\n\n<pre>/data/adb/modules/disable_safe_media_volume/log.txt</pre>\n\n<p>---</p>\n\n<h2>Tested On</h2>\n\n<p>| Device          | OS                          | Root   |</p>\n<p>| --------------- | --------------------------- | ------ |</p>\n<p>| Pixel 8 (shiba) | LineageOS 23.2 (Android 16) | Magisk |</p>\n\n<p>If you've tested on other devices, open an issue or PR to expand this table.</p>\n\n<p>---</p>\n\n<h2>Known Limitations</h2>\n\n<li>Some OEMs heavily modify audio frameworks, which may require additional adaptation</li>\n<li>The module cannot patch `/vendor/`, so continuous enforcement is required</li>\n<li>`cmd audio set-sound-dose-value` requires Android 14+ — on older versions the legacy settings layer is the only enforcement mechanism</li>\n\n<p>---</p>\n\n<h2>Versioning</h2>\n\n<p>Format: <code>vMAJOR.MINOR.PATCH</code></p>\n\n<li>**Major** → architectural changes (e.g. v2 → v3 runtime enforcement)</li>\n<li>**Minor** → new features / detection improvements</li>\n<li>**Patch** → fixes, stability improvements</li>\n\n<p>---</p>\n\n<h2>Contributing</h2>\n\n<p>Issues and PRs are welcome.</p>\n\n<p>If something doesn't work:</p>\n\n<li>Include device model</li>\n<li>Android version</li>\n<li>Root manager</li>\n<li>Logs (`log.txt`)</li>\n\n<p>---</p>\n\n<h2>Support Lyrinox Technologies</h2>\n\n<p>If this module helped you, consider sponsoring:</p>\n\n<p><a href=\"https://github.com/sponsors/LyrinoxTechnologies\">https://github.com/sponsors/LyrinoxTechnologies</a></p>\n\n<p>---</p>\n\n<h2>License</h2>\n\n<p>GNU GPL v3.0 — see <a href=\"LICENSE\">LICENSE</a></p>\n\n<p>You are free to use, modify, and distribute this module, but derivative works must remain open source under GPLv3.</p>\n\n<p>---</p>\n\n<p>*Built and maintained by Vetheon @ Lyrinox Technologies*</p>",
+  "homepageUrl": "https://github.com/VetheonDevelops/DoseBreaker",
+  "sourceUrl": "https://github.com/VetheonDevelops/DoseBreaker",
+  "url": "https://github.com/VetheonDevelops/DoseBreaker",
+  "latestRelease": {
+    "name": "v3.2.1",
+    "version": "v3.2.1",
+    "time": "2026-04-19T17:18:05Z",
+    "downloadUrl": "https://github.com/VetheonDevelops/DoseBreaker/releases/download/v3.2.1/dosebreaker-v3.2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.2.1",
+      "tagName": "v3.2.1",
+      "publishedAt": "2026-04-19T17:18:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dosebreaker-v3.2.1.zip",
+          "downloadUrl": "https://github.com/VetheonDevelops/DoseBreaker/releases/download/v3.2.1/dosebreaker-v3.2.1.zip",
+          "size": 3824,
+          "downloadCount": 96
+        }
+      ]
+    },
+    {
+      "name": "v3.1.3",
+      "tagName": "v3.1.3",
+      "publishedAt": "2026-03-19T13:22:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dosebreaker-v3.1.3.zip",
+          "downloadUrl": "https://github.com/VetheonDevelops/DoseBreaker/releases/download/v3.1.3/dosebreaker-v3.1.3.zip",
+          "size": 5746,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2026-03-18T18:39:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_safe_media_volume-v3.0.1.zip",
+          "downloadUrl": "https://github.com/VetheonDevelops/DoseBreaker/releases/download/v3.0.1/disable_safe_media_volume-v3.0.1.zip",
+          "size": 5128,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-03-14T15:23:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_safe_media_volume_v100.zip",
+          "downloadUrl": "https://github.com/VetheonDevelops/DoseBreaker/releases/download/v1.1.0/disable_safe_media_volume_v100.zip",
+          "size": 14754,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

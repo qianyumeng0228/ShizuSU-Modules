@@ -1,0 +1,323 @@
+{
+  "readme": "<div align=\"center\">\n\n<img src=\"assets/tux.png\" alt=\"OnyxZygisk\" width=\"128\">\n\n# OnyxZygisk\n\n**The Zygisk runtime that just works — on every root.**\n\nA ptrace-powered Zygisk implementation with a built-in WebUI, hot-swappable FN modules, and an advanced DenyList. No kernel module required.\n\n[![Telegram](https://img.shields.io/badge/Telegram-OnyxZygisk-2CA5E0?logo=telegram&logoColor=white)](https://t.me/OnyxZygisk)\n[![Release](https://img.shields.io/github/v/release/OnyxZygisk/OnyxZygisk?label=Latest&color=brightgreen)](https://github.com/OnyxZygisk/OnyxZygisk/releases/latest)\n[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)\n\n**English** · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md)\n\n</div>\n\n---\n\n## Why OnyxZygisk?\n\n### Root-agnostic\n\nWorks out of the box on **APatch**, **KernelSU** (including LKM late-load), and **Magisk**. Switch root solutions without switching your Zygisk — one module covers them all.\n\n### Zero-reboot workflow\n\n- **Hot-plug** — enable or disable Zygisk modules without rebooting.\n- **FN modules** — declarative, scoped, hot-swappable extension nodes that take effect on the next app launch. [Learn more →](docs/FN.md)\n\n### Built-in WebUI\n\nA full control panel built with React + Vite + Tailwind CSS, served locally by KernelSU / APatch Manager / MMRL — no network port, no server process. Status, module list, FN management, logcat viewer and settings. A strictly monochrome design in light, dark and pure-black themes. [Learn more →](docs/WEBUI.md)\n\n### Advanced stealth\n\nA two-layer DenyList that keeps root invisible to detection-hardened apps:\n\n| Strategy | How it works |\n| :--- | :--- |\n| **Zygote unmount** (primary) | Strips root and module mounts from zygote *before* the app process is specialised. |\n| **Namespace switch** (fallback) | Moves the forked app into a cached, completely clean mount namespace via `setns`. |\n\nNo traces in `/proc/self/maps`, no leaked mount points, no stale file descriptors.\n\n### Userspace-only, no kernel module\n\nPure ptrace injection — no custom kernel module to build, maintain, or break on kernel updates. Works on any kernel that supports `PTRACE_SEIZE`.\n\n---\n\n## Quick start\n\n### Install\n\nFlash the zip from the [latest release](https://github.com/OnyxZygisk/OnyxZygisk/releases/latest) in your root manager (APatch / KernelSU / Magisk) and reboot.\n\n### Configure the DenyList\n\n| Root solution | Where to enable |\n| :--- | :--- |\n| **APatch / KernelSU** | Enable **Umount modules** for the target app |\n| **Magisk** | **Configure DenyList** (keep Magisk's own *Enforce DenyList* **off**) |\n\n### Open the WebUI\n\nOpen the module page in KernelSU Manager, APatch Manager, or MMRL and tap **WebUI**.\n\n---\n\n## Build from source\n\n```sh\ngit clone https://github.com/OnyxZygisk/OnyxZygisk.git\ncd OnyxZygisk\n./gradlew :module:zipRelease\n```\n\nThe flashable zip is written to `module/build/outputs/release/`.\n\n---\n\n## Community\n\n[![Telegram Channel](https://img.shields.io/badge/Telegram-OnyxZygisk-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/OnyxZygisk)\n\nJoin the Telegram channel for release announcements, discussion, and support.\n\n---\n\n## Credits\n\nOnyxZygisk is built on and inspired by:\n\n- **Zygisk API** — [topjohnwu](https://github.com/topjohnwu) / [Magisk](https://github.com/topjohnwu/Magisk)\n- **Zygisk Next** — [Dr-TSNG](https://github.com/Dr-TSNG/ZygiskNext)\n- **NeoZygisk** — [JingMatrix](https://github.com/JingMatrix/NeoZygisk)\n- **OnyxZygisk** — Sai, Matsuzaka Yuki, and [contributors](https://github.com/OnyxZygisk/OnyxZygisk/graphs/contributors)\n\n## License\n\n[AGPL-3.0](LICENSE). OnyxZygisk is a downstream of NeoZygisk (GPL-3.0) and integrates CSOLoader (AGPL-3.0) as its in-process custom module loader; per GPL-3.0 §13 the combined work is conveyed under AGPL-3.0. Upstream GPL-3.0 notices are retained — see [NOTICE.md](NOTICE.md).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"assets/tux.png\" alt=\"OnyxZygisk\" width=\"128\"></p>\n\n<h1>OnyxZygisk</h1>\n\n<p><b>The Zygisk runtime that just works — on every root.</b></p>\n\n<p>A ptrace-powered Zygisk implementation with a built-in WebUI, hot-swappable FN modules, and an advanced DenyList. No kernel module required.</p>\n\n<p><a href=\"https://img.shields.io/badge/Telegram-OnyxZygisk-2CA5E0?logo=telegram&logoColor=white\">![Telegram</a>](https://t.me/OnyxZygisk)</p>\n<p><a href=\"https://img.shields.io/github/v/release/OnyxZygisk/OnyxZygisk?label=Latest&color=brightgreen\">![Release</a>](https://github.com/OnyxZygisk/OnyxZygisk/releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/License-AGPL--3.0-blue.svg\">![License: AGPL-3.0</a>](LICENSE)</p>\n\n<p><b>English</b> · <a href=\"README.zh-CN.md\">简体中文</a> · <a href=\"README.zh-TW.md\">繁體中文</a> · <a href=\"README.ja.md\">日本語</a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>Why OnyxZygisk?</h2>\n\n<h3>Root-agnostic</h3>\n\n<p>Works out of the box on <b>APatch</b>, <b>KernelSU</b> (including LKM late-load), and <b>Magisk</b>. Switch root solutions without switching your Zygisk — one module covers them all.</p>\n\n<h3>Zero-reboot workflow</h3>\n\n<li>**Hot-plug** — enable or disable Zygisk modules without rebooting.</li>\n<li>**FN modules** — declarative, scoped, hot-swappable extension nodes that take effect on the next app launch. [Learn more →](docs/FN.md)</li>\n\n<h3>Built-in WebUI</h3>\n\n<p>A full control panel built with React + Vite + Tailwind CSS, served locally by KernelSU / APatch Manager / MMRL — no network port, no server process. Status, module list, FN management, logcat viewer and settings. A strictly monochrome design in light, dark and pure-black themes. <a href=\"docs/WEBUI.md\">Learn more →</a></p>\n\n<h3>Advanced stealth</h3>\n\n<p>A two-layer DenyList that keeps root invisible to detection-hardened apps:</p>\n\n<p>| Strategy | How it works |</p>\n<p>| :--- | :--- |</p>\n<p>| <b>Zygote unmount</b> (primary) | Strips root and module mounts from zygote *before* the app process is specialised. |</p>\n<p>| <b>Namespace switch</b> (fallback) | Moves the forked app into a cached, completely clean mount namespace via <code>setns</code>. |</p>\n\n<p>No traces in <code>/proc/self/maps</code>, no leaked mount points, no stale file descriptors.</p>\n\n<h3>Userspace-only, no kernel module</h3>\n\n<p>Pure ptrace injection — no custom kernel module to build, maintain, or break on kernel updates. Works on any kernel that supports <code>PTRACE_SEIZE</code>.</p>\n\n<p>---</p>\n\n<h2>Quick start</h2>\n\n<h3>Install</h3>\n\n<p>Flash the zip from the <a href=\"https://github.com/OnyxZygisk/OnyxZygisk/releases/latest\">latest release</a> in your root manager (APatch / KernelSU / Magisk) and reboot.</p>\n\n<h3>Configure the DenyList</h3>\n\n<p>| Root solution | Where to enable |</p>\n<p>| :--- | :--- |</p>\n<p>| <b>APatch / KernelSU</b> | Enable <b>Umount modules</b> for the target app |</p>\n<p>| <b>Magisk</b> | <b>Configure DenyList</b> (keep Magisk's own *Enforce DenyList* <b>off</b>) |</p>\n\n<h3>Open the WebUI</h3>\n\n<p>Open the module page in KernelSU Manager, APatch Manager, or MMRL and tap <b>WebUI</b>.</p>\n\n<p>---</p>\n\n<h2>Build from source</h2>\n\n<pre>git clone https://github.com/OnyxZygisk/OnyxZygisk.git\ncd OnyxZygisk\n./gradlew :module:zipRelease</pre>\n\n<p>The flashable zip is written to <code>module/build/outputs/release/</code>.</p>\n\n<p>---</p>\n\n<h2>Community</h2>\n\n<p><a href=\"https://img.shields.io/badge/Telegram-OnyxZygisk-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white\">![Telegram Channel</a>](https://t.me/OnyxZygisk)</p>\n\n<p>Join the Telegram channel for release announcements, discussion, and support.</p>\n\n<p>---</p>\n\n<h2>Credits</h2>\n\n<p>OnyxZygisk is built on and inspired by:</p>\n\n<li>**Zygisk API** — [topjohnwu](https://github.com/topjohnwu) / [Magisk](https://github.com/topjohnwu/Magisk)</li>\n<li>**Zygisk Next** — [Dr-TSNG](https://github.com/Dr-TSNG/ZygiskNext)</li>\n<li>**NeoZygisk** — [JingMatrix](https://github.com/JingMatrix/NeoZygisk)</li>\n<li>**OnyxZygisk** — Sai, Matsuzaka Yuki, and [contributors](https://github.com/OnyxZygisk/OnyxZygisk/graphs/contributors)</li>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">AGPL-3.0</a>. OnyxZygisk is a downstream of NeoZygisk (GPL-3.0) and integrates CSOLoader (AGPL-3.0) as its in-process custom module loader; per GPL-3.0 §13 the combined work is conveyed under AGPL-3.0. Upstream GPL-3.0 notices are retained — see <a href=\"NOTICE.md\">NOTICE.md</a>.</p>",
+  "homepageUrl": "https://github.com/OnyxZygisk/OnyxZygisk",
+  "sourceUrl": "https://github.com/OnyxZygisk/OnyxZygisk",
+  "url": "https://github.com/OnyxZygisk/OnyxZygisk",
+  "latestRelease": {
+    "name": "v1.09",
+    "version": "v1.09",
+    "time": "2026-09-21T13:45:06Z",
+    "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.09/OnyxZygisk-v1.09-399-820b68b-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.09",
+      "tagName": "v1.09",
+      "publishedAt": "2026-09-21T13:45:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.09-399-820b68b-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.09/OnyxZygisk-v1.09-399-820b68b-release.zip",
+          "size": 4070203,
+          "downloadCount": 2809
+        }
+      ]
+    },
+    {
+      "name": "v1.08",
+      "tagName": "v1.08",
+      "publishedAt": "2026-09-01T07:53:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.08-4-ebae065-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.08/OnyxZygisk-v1.08-4-ebae065-release.zip",
+          "size": 3989918,
+          "downloadCount": 1610
+        }
+      ]
+    },
+    {
+      "name": "v1.07-zigcore",
+      "tagName": "v1.07-zigcore",
+      "publishedAt": "2026-08-29T05:33:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.07-373-512a666-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.07-zigcore/OnyxZygisk-v1.07-373-512a666-release.zip",
+          "size": 3980803,
+          "downloadCount": 512
+        }
+      ]
+    },
+    {
+      "name": "v1.07-373",
+      "tagName": "v1.07-373",
+      "publishedAt": "2026-08-12T01:18:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.07-373-512a666-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.07-373/OnyxZygisk-v1.07-373-512a666-release.zip",
+          "size": 3918923,
+          "downloadCount": 555
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6-369",
+      "tagName": "v1.0.6-369",
+      "publishedAt": "2026-08-11T15:13:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.6-369-d42d9fe-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.6-369/OnyxZygisk-v1.0.6-369-d42d9fe-release.zip",
+          "size": 3912952,
+          "downloadCount": 122
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-368",
+      "tagName": "v1.0.5-368",
+      "publishedAt": "2026-08-11T06:53:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-368-d42d9fe-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-368/OnyxZygisk-v1.0.5-368-d42d9fe-release.zip",
+          "size": 3842808,
+          "downloadCount": 82
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-364",
+      "tagName": "v1.0.5-364",
+      "publishedAt": "2026-08-10T06:13:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-364-5b1abb3-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-364/OnyxZygisk-v1.0.5-364-5b1abb3-release.zip",
+          "size": 3845100,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-363",
+      "tagName": "v1.0.5-363",
+      "publishedAt": "2026-08-10T05:58:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-363-d20dfe4-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-363/OnyxZygisk-v1.0.5-363-d20dfe4-release.zip",
+          "size": 3845106,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-362",
+      "tagName": "v1.0.5-362",
+      "publishedAt": "2026-08-10T04:58:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-362-3b17b81-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-362/OnyxZygisk-v1.0.5-362-3b17b81-release.zip",
+          "size": 3843182,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-361",
+      "tagName": "v1.0.5-361",
+      "publishedAt": "2026-08-10T02:02:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-361-92829bc-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-361/OnyxZygisk-v1.0.5-361-92829bc-release.zip",
+          "size": 3840102,
+          "downloadCount": 59
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-360",
+      "tagName": "v1.0.5-360",
+      "publishedAt": "2026-08-09T12:10:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-360-f2f07dc-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-360/OnyxZygisk-v1.0.5-360-f2f07dc-release.zip",
+          "size": 3839201,
+          "downloadCount": 82
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-339",
+      "tagName": "v1.0.5-339",
+      "publishedAt": "2026-08-08T09:25:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-339-f57746d-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-339/OnyxZygisk-v1.0.5-339-f57746d-release.zip",
+          "size": 3782082,
+          "downloadCount": 77
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-338",
+      "tagName": "v1.0.5-338",
+      "publishedAt": "2026-08-08T07:39:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-338-e1e7dbf-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-338/OnyxZygisk-v1.0.5-338-e1e7dbf-release.zip",
+          "size": 3781633,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-337",
+      "tagName": "v1.0.5-337",
+      "publishedAt": "2026-08-08T05:20:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-337-bc12bac-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-337/OnyxZygisk-v1.0.5-337-bc12bac-release.zip",
+          "size": 3739651,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-333",
+      "tagName": "v1.0.5-333",
+      "publishedAt": "2026-08-08T01:42:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-333-637ab0f-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-333/OnyxZygisk-v1.0.5-333-637ab0f-release.zip",
+          "size": 3739431,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-329",
+      "tagName": "v1.0.5-329",
+      "publishedAt": "2026-08-08T01:12:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-329-f7e226e-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-329/OnyxZygisk-v1.0.5-329-f7e226e-release.zip",
+          "size": 3739707,
+          "downloadCount": 2720
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5-328",
+      "tagName": "v1.0.5-328",
+      "publishedAt": "2026-08-07T16:46:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0.5-328-0af1b90-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0.5-328/OnyxZygisk-v1.0.5-328-0af1b90-release.zip",
+          "size": 3736682,
+          "downloadCount": 91
+        }
+      ]
+    },
+    {
+      "name": "v1.0-310",
+      "tagName": "v1.0-310",
+      "publishedAt": "2026-08-07T14:55:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0-310-400c367-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0-310/OnyxZygisk-v1.0-310-400c367-release.zip",
+          "size": 2512713,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v1.0-308",
+      "tagName": "v1.0-308",
+      "publishedAt": "2026-08-07T13:53:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0-308-5d1b588-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0-308/OnyxZygisk-v1.0-308-5d1b588-release.zip",
+          "size": 2512615,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.0-307",
+      "tagName": "v1.0-307",
+      "publishedAt": "2026-08-07T13:43:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0-307-000d2b0-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0-307/OnyxZygisk-v1.0-307-000d2b0-release.zip",
+          "size": 2512603,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.0-306",
+      "tagName": "v1.0-306",
+      "publishedAt": "2026-08-07T05:29:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0-306-da0f5d1-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0-306/OnyxZygisk-v1.0-306-da0f5d1-release.zip",
+          "size": 2513185,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v1.0-300",
+      "tagName": "v1.0-300",
+      "publishedAt": "2026-08-07T02:35:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnyxZygisk-v1.0-300-3c07865-release.zip",
+          "downloadUrl": "https://github.com/OnyxZygisk/OnyxZygisk/releases/download/v1.0-300/OnyxZygisk-v1.0-300-3c07865-release.zip",
+          "size": 2502237,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ]
+}

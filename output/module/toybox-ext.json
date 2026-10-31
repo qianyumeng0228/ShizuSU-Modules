@@ -1,0 +1,141 @@
+{
+  "readme": "# ToyBox-Ext\n\n### Description\nSystemless Magisk module\nto install (additional) ToyBox applets, using **ARMv7 or higher** binaries from:\nhttps://github.com/landley/toybox\n\n**Supported**: ARMv7 and higher, all Android versions\n\n##### TEST\n\nUssually, **ToyBox** comes preinstalled to `/system/bin`, but with limited number of **applets**.\nThe module installes additional `toybox-ext` binary, with the additional applets (**UNIX/Linux command-line utilities**).\n\n**Install** the module and **reboot**. Use **Terminal Emulator** - **Toybox applets** are for Terminal and **shell scripts**.\n\nMake sure that `/system/bin` and/or `/system/xbin` (the latter might not be available on some devices) are in the `PATH`.\nCheck e.g. with (all commands are **case sensitive**):\n\n```\nsu\necho $PATH\n```\n\nCheck if `toybox-ext` was properly installed and is it installed to `/system/xbin` or `/system/bin`:\n\n```\ntoybox-ext --help\nwhich toybox-ext\n```\n\nIf the responded toybox-ext path was `/system/xbin` then check:\n\n```\nls -l /system/xbin | grep toybox-ext\n```\n\nwhereas if the toybox-ext path was `/system/bin` then use:\n\n```\nls -l /system/bin | grep toybox-ext\n```\n\nThe command will show all toybox-ext applets as installed (symlinked to the toybox-ext binary).\nUsually, `w` will be one of them, hence you can try:\n\n```\nw\n```\n\n**Note 1**: Some applets are common to **BusyBox** and **ToyBox**, e.g. `ascii`.\n\nHence, if you have also the `busybox` installed, `toybox-ext` will symlink less number of (additional) applets.\n\n**Note 2**: Since ToyBox-Ext **v1.0.2**, the module also looks if there are not-symlinked applets available from the pre-installed toybox binary (ROMs usually come with the pre-installed ToyBox but with smaller or an older binary and with a less number of applets).\n\nFor me, the additionally found applets from the pre-installed ToyBox were e.g. `getfattr` and `iotop`.\n\n#### Source \n\n[My Repo:](https://github.com/zgfg/ToyBox-Ext)\n\n![GitHub release (latest by date)](https://img.shields.io/github/v/release/zgfg/ToyBox-Ext?label=Release&style=plastic) ![GitHub Release Date](https://img.shields.io/github/release-date/zgfg/ToyBox-Ext?label=Release%20Date&style=plastic) \n![GitHub Releases](https://img.shields.io/github/downloads/zgfg/ToyBox-Ext/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic)\n![GitHub All Releases](https://img.shields.io/github/downloads/zgfg/ToyBox-Ext/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic)\n\n[Alt-Repo:](https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext)\n\n![GitHub release (latest by date)](https://img.shields.io/github/v/release/Magisk-Modules-Alt-Repo/ToyBox-Ext?label=Release&style=plastic) ![GitHub Release Date](https://img.shields.io/github/release-date/Magisk-Modules-Alt-Repo/ToyBox-Ext?label=Release%20Date&style=plastic) \n![GitHub Releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/ToyBox-Ext/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic)\n![GitHub All Releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/ToyBox-Ext/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic)\n\n#### Copyright (c) zgfg @ xda, 2022-\n\n<p align=\"left\">\n<a href=\"https://github.com/zgfg/ToyBox-Ext/blob/4bc5c7b33512fc4fcb10881fb61830ebcff2bf52/LICENSE\">\n<img src=\"https://img.shields.io/github/license/zgfg/ToyBox-Ext?label=License&logo=gnu&logoColor=orange&color=orange\" alt=\"OBSD License\">\n</a>\n<a href=\"https://zgfg.github.io/PayPal.html\"> <img src=\"https://img.shields.io/badge/-Donate%20a%20coffee-FFDD00?logo=CoffeeScript&logoColor=black\" alt=\"Donate a coffee\">\n</a> \n</p>\n",
+  "readmeHTML": "<h1>ToyBox-Ext</h1>\n\n<h3>Description</h3>\n<p>Systemless Magisk module</p>\n<p>to install (additional) ToyBox applets, using <b>ARMv7 or higher</b> binaries from:</p>\n<p>https://github.com/landley/toybox</p>\n\n<p><b>Supported</b>: ARMv7 and higher, all Android versions</p>\n\n<p>##### TEST</p>\n\n<p>Ussually, <b>ToyBox</b> comes preinstalled to <code>/system/bin</code>, but with limited number of <b>applets</b>.</p>\n<p>The module installes additional <code>toybox-ext</code> binary, with the additional applets (<b>UNIX/Linux command-line utilities</b>).</p>\n\n<p><b>Install</b> the module and <b>reboot</b>. Use <b>Terminal Emulator</b> - <b>Toybox applets</b> are for Terminal and <b>shell scripts</b>.</p>\n\n<p>Make sure that <code>/system/bin</code> and/or <code>/system/xbin</code> (the latter might not be available on some devices) are in the <code>PATH</code>.</p>\n<p>Check e.g. with (all commands are <b>case sensitive</b>):</p>\n\n<pre>su\necho $PATH</pre>\n\n<p>Check if <code>toybox-ext</code> was properly installed and is it installed to <code>/system/xbin</code> or <code>/system/bin</code>:</p>\n\n<pre>toybox-ext --help\nwhich toybox-ext</pre>\n\n<p>If the responded toybox-ext path was <code>/system/xbin</code> then check:</p>\n\n<pre>ls -l /system/xbin | grep toybox-ext</pre>\n\n<p>whereas if the toybox-ext path was <code>/system/bin</code> then use:</p>\n\n<pre>ls -l /system/bin | grep toybox-ext</pre>\n\n<p>The command will show all toybox-ext applets as installed (symlinked to the toybox-ext binary).</p>\n<p>Usually, <code>w</code> will be one of them, hence you can try:</p>\n\n<pre>w</pre>\n\n<p><b>Note 1</b>: Some applets are common to <b>BusyBox</b> and <b>ToyBox</b>, e.g. <code>ascii</code>.</p>\n\n<p>Hence, if you have also the <code>busybox</code> installed, <code>toybox-ext</code> will symlink less number of (additional) applets.</p>\n\n<p><b>Note 2</b>: Since ToyBox-Ext <b>v1.0.2</b>, the module also looks if there are not-symlinked applets available from the pre-installed toybox binary (ROMs usually come with the pre-installed ToyBox but with smaller or an older binary and with a less number of applets).</p>\n\n<p>For me, the additionally found applets from the pre-installed ToyBox were e.g. <code>getfattr</code> and <code>iotop</code>.</p>\n\n<p>#### Source</p>\n\n<p><a href=\"https://github.com/zgfg/ToyBox-Ext\">My Repo:</a></p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/zgfg/ToyBox-Ext?label=Release&style=plastic\">GitHub release (latest by date)</a> !<a href=\"https://img.shields.io/github/release-date/zgfg/ToyBox-Ext?label=Release%20Date&style=plastic\">GitHub Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/zgfg/ToyBox-Ext/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic\">GitHub Releases</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/zgfg/ToyBox-Ext/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic\">GitHub All Releases</a></p>\n\n<p><a href=\"https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext\">Alt-Repo:</a></p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/Magisk-Modules-Alt-Repo/ToyBox-Ext?label=Release&style=plastic\">GitHub release (latest by date)</a> !<a href=\"https://img.shields.io/github/release-date/Magisk-Modules-Alt-Repo/ToyBox-Ext?label=Release%20Date&style=plastic\">GitHub Release Date</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/ToyBox-Ext/latest/total?label=Downloads%20%28Latest%20Release%29&style=plastic\">GitHub Releases</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/ToyBox-Ext/total?label=Total%20Downloads%20%28All%20Releases%29&style=plastic\">GitHub All Releases</a></p>\n\n<p>#### Copyright (c) zgfg @ xda, 2022-</p>\n\n<p><p align=\"left\"></p>\n<p><a href=\"https://github.com/zgfg/ToyBox-Ext/blob/4bc5c7b33512fc4fcb10881fb61830ebcff2bf52/LICENSE\"></p>\n<p><img src=\"https://img.shields.io/github/license/zgfg/ToyBox-Ext?label=License&logo=gnu&logoColor=orange&color=orange\" alt=\"OBSD License\"></p>\n<p></a></p>\n<p><a href=\"https://zgfg.github.io/PayPal.html\"> <img src=\"https://img.shields.io/badge/-Donate%20a%20coffee-FFDD00?logo=CoffeeScript&logoColor=black\" alt=\"Donate a coffee\"></p>\n<p></a></p>\n<p></p></p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext",
+  "latestRelease": {
+    "name": "109",
+    "version": "109",
+    "time": "2023-08-06T21:43:17Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/109/ToyBox-Ext_v1.0.9.zip"
+  },
+  "releases": [
+    {
+      "name": "109",
+      "tagName": "109",
+      "publishedAt": "2023-08-06T21:43:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.9.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/109/ToyBox-Ext_v1.0.9.zip",
+          "size": 1499417,
+          "downloadCount": 5867
+        }
+      ]
+    },
+    {
+      "name": "108",
+      "tagName": "108",
+      "publishedAt": "2023-06-05T14:39:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.8.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/108/ToyBox-Ext_v1.0.8.zip",
+          "size": 1481341,
+          "downloadCount": 552
+        }
+      ]
+    },
+    {
+      "name": "107",
+      "tagName": "107",
+      "publishedAt": "2023-06-03T11:22:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/107/ToyBox-Ext_v1.0.7.zip",
+          "size": 1481285,
+          "downloadCount": 57
+        }
+      ]
+    },
+    {
+      "name": "106",
+      "tagName": "106",
+      "publishedAt": "2023-03-05T13:50:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/106/ToyBox-Ext_v1.0.6.zip",
+          "size": 1480930,
+          "downloadCount": 941
+        }
+      ]
+    },
+    {
+      "name": "105",
+      "tagName": "105",
+      "publishedAt": "2023-02-21T07:42:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/105/ToyBox-Ext_v1.0.5.zip",
+          "size": 1480860,
+          "downloadCount": 179
+        }
+      ]
+    },
+    {
+      "name": "104",
+      "tagName": "104",
+      "publishedAt": "2023-01-29T13:08:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/104/ToyBox-Ext_v1.0.4.zip",
+          "size": 1479667,
+          "downloadCount": 190
+        }
+      ]
+    },
+    {
+      "name": "103",
+      "tagName": "103",
+      "publishedAt": "2022-05-22T20:48:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/103/ToyBox-Ext_v1.0.3.zip",
+          "size": 1447149,
+          "downloadCount": 2185
+        }
+      ]
+    },
+    {
+      "name": "102",
+      "tagName": "102",
+      "publishedAt": "2022-03-04T18:50:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/102/ToyBox-Ext_v1.0.2.zip",
+          "size": 1412251,
+          "downloadCount": 472
+        }
+      ]
+    },
+    {
+      "name": "100",
+      "tagName": "100",
+      "publishedAt": "2022-02-27T18:09:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ToyBox-Ext_v1.0.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ToyBox-Ext/releases/download/100/ToyBox-Ext_v1.0.0.zip",
+          "size": 1411583,
+          "downloadCount": 44
+        }
+      ]
+    }
+  ]
+}

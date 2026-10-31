@@ -1,0 +1,435 @@
+{
+  "readme": "# JeTeeZnTmax\n\nKernelSU 工具箱模块 —— **一个把系统底层信息、机型伪装、应用/进程管理\n和「受保护的执行」全塞进一个玻璃拟态 WebUI 的东西。**\n\n作者：**[@JeTeeZnTmax](https://github.com/jeteezntmax)**\nUI 借鉴：**@月虹yh**\n\n---\n\n## 功能\n\n### 🛡 受保护的执行（本模块最特别的一块）\n\n把一个**来路不明的脚本或程序**放在 `ptrace` 底下跑，在危险 syscall\n**执行之前**把它拦下来。\n\n不是沙箱、不是虚拟机 —— 是同权限下的 syscall 级拦截。\n\n**为什么需要它：**\n\n现在流行的「格机」程序基本都是这样写的：\n\n```c\n#define my_openat(dirfd, path, flags, mode) syscall(__NR_openat, dirfd, path, flags, mode)\n```\n\n**全部走 raw syscall** —— `LD_PRELOAD` / libc hook 完全失效；\n而且它用 `openat(目录fd, \"sda1\")` 这种方式打开块设备，\n连完整路径都不给，基于路径匹配的 LSM / seccomp 也拦不住。\n\n**ptrace 在内核停点上看得到，它绕不过。**\n\n**拦什么：**\n\n| 类别 | 内容 |\n| --- | --- |\n| 块设备 | `/dev/block` 下的一切（读、写、列目录、stat、readlink），`/proc/partitions` |\n| 建节点 | `mknod` / `mknodat` 带 `S_IFBLK` |\n| 内核开关 | 写 `/proc/sysrq-trigger`、`/proc/sys/kernel/panic`、`/sys/fs/selinux` |\n| 危险删除 | `/vendor` `/system` `/persist` `/metadata` `/dev/input` `/data/data` 等，以及名字含 `touch` `firmware` `modem` `abl` `xbl` `vbmeta` 的 |\n| 绕道路径 | `io_uring_setup/enter/register`、`splice`、`sendfile`、`copy_file_range` |\n| 逃逸监控 | `clone` / `clone3` 带 `CLONE_UNTRACED` |\n| 重启 | `reboot(2)` syscall、属性 `sys.powerctl` |\n\n**两种模式：**\n\n- **先观察** —— 只记录不拦。**先用它跑一遍看清行为，再决定要不要动刀**\n- **拦截并杀死** —— 命中立刻 SIGKILL 整个进程组\n\n**两种范围：**\n\n- **读写全拦**（默认）—— 碰 `/dev/block` 就杀\n- **只拦写** —— 放行读。**自己备份 boot 镜像的时候用这个**，\n  否则 `dd if=/dev/block/by-name/boot of=/sdcard/boot.img` 会被当成攻击一起杀掉\n\n**细节：**\n\n- **日志实时滚动**：命中的那一刻就滚进终端，一条不丢；日志太长会提示你点\n  「看日志」看完整内容（终端只保留最近那部分）\n- **时限可调**：30 / 60 / 120 / 300 秒。到点连目标的**整个进程组**一起收工，\n  退出码 `4`（`3` 才是\"命中并拦截\"），界面会明确告诉你这次结论不完整\n- **看门狗是独立进程**：哪怕目标在狂刷 syscall 把跟踪者卡住，到点照样收工\n- **大文件不会被拖死**：fd 判定带 300ms 缓存。旧版每一次 `read` / `write` 都要\n  `readlink(\"/proc/<pid>/fd/N\")` 判断是不是块设备，`dd` 几百万次读下来这些开销\n  全砸在跟踪者身上，被跟踪的进程会被拖到像死机\n\n### 📦 应用管理\n\n全部应用列表（中文应用名）、搜索、点开看包名 / 版本 / 安装路径 / SDK /\nUID / 大小 / 安装时间。支持**冻结**、**卸载**、**备份 APK**。\n\n### ⚙️ 进程管理\n\nPID / PPID / 用户 / **实时 CPU%（两次采样差值，不是生命周期平均值）** /\nRSS / 状态 / cpuset / cgroup / wchan，可按 CPU / 内存 / PID / UID 排序，\n底栏搜索。可以 **kill -9**。\n\n### 🎚 迷你监视器（悬浮窗）\n\n性能页最下面 →「打开悬浮窗」，把一条**浮在所有应用上面**的实时状态条放出来：\n\n```\n┌──────────────────────────────────────────────────────────────────────┐\n│ CPU 20% │ GPU 27% │ FPS 60 │ 内存 63% │ 电池 88% │ 功耗 1.97W │ 温度 36.0° │ 10:24 │\n└──────────────────────────────────────────────────────────────────────┘\n```\n\n**显示项随便挑**（八项里勾）：\n\n| 项 | 说明 |\n| --- | --- |\n| CPU | 两次 `/proc/stat` 采样差值 |\n| GPU | 高通 kgsl → MTK → Mali 依次探测占用率，拿不到就退而显示频率 |\n| FPS | `Choreographer` 数屏幕的刷新回调 —— **不用 root、不用 dumpsys** |\n| 内存 | `/proc/meminfo` 的 MemAvailable / MemTotal |\n| 电池 | `power_supply/battery/capacity` |\n| 功耗 | `current_now × voltage_now`，自动判断 µA/mA 与 µV/mV |\n| 温度 | 电池温度（`battery/temp`，拿不到退 `bms/temp`），十分之一度自动识别 |\n| 时间 | `时:分` 或 `时:分:秒`（秒是本地每秒跳，不占采样） |\n\n**配色**：每一项都能单独指定颜色；不指定就按负载自动变色（CPU / GPU / 内存按占用，\n温度按冷热，电量按高低）。\n\n**位置**：在性能页用一行方向键就能挪 —— `← ↑ ↓ →` + 居中 / 读位置 / 重置，步长可切；\n也能直接拖，位置会记住。**双击悬浮窗关闭**，或点通知里的「停止」。\n\n数据由桌面 App 直接读 sysfs（App 有 root），不走 shell —— 所以整条状态条没有额外进程开销。\n每 2 秒刷新一次，帧率每秒更新，时间每秒跳。\n\n### 🎮 游戏加速（音量键菜单 + 提示悬浮窗）\n\n- **音量上键呼出菜单**（音量下键收起）：总开关 / CPU 锁频 / 调速器 / 线程绑定 / 刷新率\n  + 应用 / 还原 / 清后台 / 关闭\n- **按 uid 绑定，不做前台猜测**：只看\"这个 uid 的进程里有没有 `oom_score_adj == 0` 的\"\n  （顶层应用就是 0），在就自动应用、退出自动还原\n- **功能提示悬浮窗**：右上角，标题行 + 已打开的功能 + 系统参数（时间到秒/CPU 频率/FPS/功耗/温度），\n  按字数从多到少排，可拖、可勾显示项、彩虹渐变字一直流转\n- **清后台**：只清第三方 + 缓存态进程，支持白名单（目标应用永远受保护）\n- **保活**：被别的组件改回去会自动重写并计数；关掉的项从原值还原\n- 需要无障碍的「过滤按键事件」（WebUI 一键开）\n\n### 🎚 刷新率锁定（性能页）\n\n- **扫描档位** —— 读 `dumpsys display` 的模式表，列出本机可用刷新率，\n  并记下每档对应的 `modeId`（有些 ROM 只认 `cmd display set-user-preferred-display-mode`）\n- **持续锁定** —— 写 system 的 `peak_refresh_rate` / `min_refresh_rate`，\n  另外尽量切 display 的 user-preferred-mode\n- **保活** —— 每 8 秒复查一次，被别的组件改回去就重写并计数\n  （界面提示「⚠ 被改回去 N 次」）；开机自动恢复保活\n- **恢复原值** —— 锁定前的值会先存下来，点一下原样还原\n- **悬浮窗上直接换档** —— 监视器开着、显示项里有 FPS 时，\n  点悬浮窗上的「FPS」会在它正下方弹出档位面板（每档一颗药丸 + 「恢复」，\n  当前档高亮）；点面板外面 / 8 秒无操作 / 拖动悬浮窗都会自动收起\n\n### 🌡 温度 / 电源 / 性能\n\n- 环形仪表盘、各核心频率、真实 CPU 占用趋势\n- 实时功率、电池健康 / 循环次数、充电信息、剩余时间\n- **充电保护**（电源页）：到点停充 / 掉电恢复，可手动停充，原值可还原\n- **温度只读**：温度分类总览、thermal zone 状态（写热区功能早已移除 —— 本机写热区会重启 ✗）\n- **CPU 锁频 / 调速器**（游戏加速内）：按目标应用 uid 自动应用与还原\n\n### 📱 机型伪装\n\nDevice Faker 的配置前端（TOML 编辑、模板管理、备份）。\n\n### 🌐 浏览器访问\n\n设置页开启后，在浏览器输入 `127.0.0.1:8765` 就能用同一个界面。\n（只读快照，不需要 token）\n\n### 📱 独立桌面 App\n\n`app/` 是真源码，安装包在模块 zip 的 `app/JeTeeZnTmax.apk`（也随 Release 附件分发）。\n\n它自带 `ksu` 桥，所以**打开就是完整功能，不是只读预览**。\n自带应用图标（走 PackageManager，比 shell 快得多）。\n\n---\n\n## 安装\n\n### 要求\n\n- **KernelSU**（或任何提供 `su` 的 root 方案）\n- Android 8+ / arm64\n- 建议先完整备份\n\n### 步骤\n\n1. 下载 Release 里的 `ksu-toolbox-update.zip`\n2. KernelSU 管理器 → 模块 → 从本地安装\n3. 重启\n4. 管理器里点模块的「打开」，或装桌面 App\n\n---\n\n## ⚠️ 依赖（**必须自己装，本仓库不含**）\n\n### Device Faker —— 机型伪装需要\n\n- 地址：https://github.com/Seyud/device_faker\n- 协议：**GPL-3.0**\n\n> 因为它是 GPL-3.0，本人**无权对它附加「禁止修改」这类限制**。\n>\n> **本仓库的源码里不含它的任何文件** —— 你要二次开发，请去上游拿。\n>\n> 但 `release/` 里的**安装包**为了开箱可用，打包了它的运行时文件\n> （`device_faker_cli`、`zygisk/arm64-v8a.so`）。**这部分版权归 Seyud，\n> 遵循 GPL-3.0**，可以自由再分发 / 修改，不受本仓库协议约束。\n\n## 目录结构\n\n```\n.\n├── index.html              和 webroot/index.html 同一份（给 Pages / 直接看用）\n├── webroot/index.html      全内联 WebUI（HTML/CSS/JS，约 285KB，一个文件装完）\n├── bin/\n│   ├── ksu_guard           ptrace 拦截器（aarch64 静态 ELF，纯 musl）\n│   ├── chg.sh              充电控制后端（节点探测 + 写入）\n│   ├── refresh.sh          刷新率锁定 / 保活（scan/lock/restore/keepalive）\n│   ├── collect.sh          HTTP 快照采集\n│   └── webui-server.sh     本地服务（只监听 127.0.0.1）\n├── app/                    独立桌面 App 源码\n│   ├── java/.../MainActivity.java / MonitorService.java / MonitorView.java /\n│   │            SysStats.java / MonitorActivity.java\n│   ├── build.sh            不用 Gradle，直接调 SDK 工具链\n│   ├── make_icon.py        纯 Python 生成图标（不依赖 PIL）\n│   └── guard/              ksu_guard 的 C 源码 + 测试小程序\n├── customize.sh / service.sh / module.prop\n└── release/                编好的 APK 和模块 zip\n     ↑ 模块 zip 里打包了 Device Faker 的运行时（GPL-3.0，见上）\n       源码目录里没有它\n```\n\n---\n\n## 自己编译\n\n### WebUI\n\n`webroot/index.html` 是全内联的，改完直接刷。\n\n### ksu_guard（ptrace 拦截器）\n\n需要 aarch64 交叉工具链 + musl 静态库：\n\n```sh\n# 工具链\napt install gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu\n# musl（要自己编一份 aarch64 静态版，装到 /opt/musl）\nsh app/guard/build-guard.sh\n```\n\n### 桌面 App\n\n**不需要 Android Studio**，只要 JDK + SDK 的 build-tools：\n\n```sh\nsh app/build.sh\n```\n\n它干的事：`aapt2 compile` → `aapt2 link` → `javac` → `d8` →\n塞 `classes.dex` → `zipalign` → `apksigner`。\n\n---\n\n## 协议\n\n本模块采用 **GNU General Public License v3.0（GPL-3.0）**。\n\n**为什么是 GPL**：模块里打包了 **Device Faker**（GPL-3.0，见 `NOTICE-device_faker.txt`）。\n按 GPL 的要求，**把 GPL 组件和别的代码组合在一起分发时，整个组合作品也必须按 GPL 发布** ✓。\n所以从本版起整个模块统一为 GPL-3.0 —— 以前那份「自定义许可 / 禁止二改后发布」不再适用\n（GPL 不允许附加额外限制，那几条必须去掉）。\n\n这意味着：\n\n- ✅ 免费用、随便改、**改完也可以再发布**、可以拿去做别的项目\n- ✅ 可以商业使用\n- 📌 **但必须**：保留作者署名与版权声明；把你发布的那份**同样以 GPL-3.0 授权**，并**提供对应源码**\n- 📌 **不能**再加任何额外限制（不改署名、不改协议、不加\"禁止二改\"之类的条款）\n\n第三方组件保留原许可：**Device Faker**（GPL-3.0，见 `NOTICE-device_faker.txt`）。\n\n完整条款见 [LICENSE](LICENSE)（GPL-3.0 全文）。\n\n---\n\n## 免责声明\n\n本模块涉及系统底层修改（内核接口、分区读写拦截、Zygisk 注入）。\n\n**使用风险自负。** 因使用本模块导致的设备损坏、数据丢失、无法开机、\n保修失效、账号被封等后果，作者不承担责任。\n\n**请务必先备份，并先在备用设备上验证。**\n\n---\n\n## 致谢\n\n- **@月虹yh** —— UI 设计借鉴\n- **Seyud** —— Device Faker\n- **tiann** —— KernelSU\n\n详见 [CREDITS.md](CREDITS.md)。\n",
+  "readmeHTML": "<h1>JeTeeZnTmax</h1>\n\n<p>KernelSU 工具箱模块 —— **一个把系统底层信息、机型伪装、应用/进程管理</p>\n<p>和「受保护的执行」全塞进一个玻璃拟态 WebUI 的东西。**</p>\n\n<p>作者：<b><a href=\"https://github.com/jeteezntmax\">@JeTeeZnTmax</a></b></p>\n<p>UI 借鉴：<b>@月虹yh</b></p>\n\n<p>---</p>\n\n<h2>功能</h2>\n\n<h3>🛡 受保护的执行（本模块最特别的一块）</h3>\n\n<p>把一个<b>来路不明的脚本或程序</b>放在 <code>ptrace</code> 底下跑，在危险 syscall</p>\n<p><b>执行之前</b>把它拦下来。</p>\n\n<p>不是沙箱、不是虚拟机 —— 是同权限下的 syscall 级拦截。</p>\n\n<p><b>为什么需要它：</b></p>\n\n<p>现在流行的「格机」程序基本都是这样写的：</p>\n\n<pre>#define my_openat(dirfd, path, flags, mode) syscall(__NR_openat, dirfd, path, flags, mode)</pre>\n\n<p><b>全部走 raw syscall</b> —— <code>LD_PRELOAD</code> / libc hook 完全失效；</p>\n<p>而且它用 <code>openat(目录fd, \"sda1\")</code> 这种方式打开块设备，</p>\n<p>连完整路径都不给，基于路径匹配的 LSM / seccomp 也拦不住。</p>\n\n<p><b>ptrace 在内核停点上看得到，它绕不过。</b></p>\n\n<p><b>拦什么：</b></p>\n\n<p>| 类别 | 内容 |</p>\n<p>| --- | --- |</p>\n<p>| 块设备 | <code>/dev/block</code> 下的一切（读、写、列目录、stat、readlink），<code>/proc/partitions</code> |</p>\n<p>| 建节点 | <code>mknod</code> / <code>mknodat</code> 带 <code>S_IFBLK</code> |</p>\n<p>| 内核开关 | 写 <code>/proc/sysrq-trigger</code>、<code>/proc/sys/kernel/panic</code>、<code>/sys/fs/selinux</code> |</p>\n<p>| 危险删除 | <code>/vendor</code> <code>/system</code> <code>/persist</code> <code>/metadata</code> <code>/dev/input</code> <code>/data/data</code> 等，以及名字含 <code>touch</code> <code>firmware</code> <code>modem</code> <code>abl</code> <code>xbl</code> <code>vbmeta</code> 的 |</p>\n<p>| 绕道路径 | <code>io_uring_setup/enter/register</code>、<code>splice</code>、<code>sendfile</code>、<code>copy_file_range</code> |</p>\n<p>| 逃逸监控 | <code>clone</code> / <code>clone3</code> 带 <code>CLONE_UNTRACED</code> |</p>\n<p>| 重启 | <code>reboot(2)</code> syscall、属性 <code>sys.powerctl</code> |</p>\n\n<p><b>两种模式：</b></p>\n\n<li>**先观察** —— 只记录不拦。**先用它跑一遍看清行为，再决定要不要动刀**</li>\n<li>**拦截并杀死** —— 命中立刻 SIGKILL 整个进程组</li>\n\n<p><b>两种范围：</b></p>\n\n<li>**读写全拦**（默认）—— 碰 `/dev/block` 就杀</li>\n<li>**只拦写** —— 放行读。**自己备份 boot 镜像的时候用这个**，</li>\n<p>  否则 <code>dd if=/dev/block/by-name/boot of=/sdcard/boot.img</code> 会被当成攻击一起杀掉</p>\n\n<p><b>细节：</b></p>\n\n<li>**日志实时滚动**：命中的那一刻就滚进终端，一条不丢；日志太长会提示你点</li>\n<p>  「看日志」看完整内容（终端只保留最近那部分）</p>\n<li>**时限可调**：30 / 60 / 120 / 300 秒。到点连目标的**整个进程组**一起收工，</li>\n<p>  退出码 <code>4</code>（<code>3</code> 才是\"命中并拦截\"），界面会明确告诉你这次结论不完整</p>\n<li>**看门狗是独立进程**：哪怕目标在狂刷 syscall 把跟踪者卡住，到点照样收工</li>\n<li>**大文件不会被拖死**：fd 判定带 300ms 缓存。旧版每一次 `read` / `write` 都要</li>\n<p>  <code>readlink(\"/proc/<pid>/fd/N\")</code> 判断是不是块设备，<code>dd</code> 几百万次读下来这些开销</p>\n<p>  全砸在跟踪者身上，被跟踪的进程会被拖到像死机</p>\n\n<h3>📦 应用管理</h3>\n\n<p>全部应用列表（中文应用名）、搜索、点开看包名 / 版本 / 安装路径 / SDK /</p>\n<p>UID / 大小 / 安装时间。支持<b>冻结</b>、<b>卸载</b>、<b>备份 APK</b>。</p>\n\n<h3>⚙️ 进程管理</h3>\n\n<p>PID / PPID / 用户 / <b>实时 CPU%（两次采样差值，不是生命周期平均值）</b> /</p>\n<p>RSS / 状态 / cpuset / cgroup / wchan，可按 CPU / 内存 / PID / UID 排序，</p>\n<p>底栏搜索。可以 <b>kill -9</b>。</p>\n\n<h3>🎚 迷你监视器（悬浮窗）</h3>\n\n<p>性能页最下面 →「打开悬浮窗」，把一条<b>浮在所有应用上面</b>的实时状态条放出来：</p>\n\n<pre>┌──────────────────────────────────────────────────────────────────────┐\n│ CPU 20% │ GPU 27% │ FPS 60 │ 内存 63% │ 电池 88% │ 功耗 1.97W │ 温度 36.0° │ 10:24 │\n└──────────────────────────────────────────────────────────────────────┘</pre>\n\n<p><b>显示项随便挑</b>（八项里勾）：</p>\n\n<p>| 项 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| CPU | 两次 <code>/proc/stat</code> 采样差值 |</p>\n<p>| GPU | 高通 kgsl → MTK → Mali 依次探测占用率，拿不到就退而显示频率 |</p>\n<p>| FPS | <code>Choreographer</code> 数屏幕的刷新回调 —— <b>不用 root、不用 dumpsys</b> |</p>\n<p>| 内存 | <code>/proc/meminfo</code> 的 MemAvailable / MemTotal |</p>\n<p>| 电池 | <code>power_supply/battery/capacity</code> |</p>\n<p>| 功耗 | <code>current_now × voltage_now</code>，自动判断 µA/mA 与 µV/mV |</p>\n<p>| 温度 | 电池温度（<code>battery/temp</code>，拿不到退 <code>bms/temp</code>），十分之一度自动识别 |</p>\n<p>| 时间 | <code>时:分</code> 或 <code>时:分:秒</code>（秒是本地每秒跳，不占采样） |</p>\n\n<p><b>配色</b>：每一项都能单独指定颜色；不指定就按负载自动变色（CPU / GPU / 内存按占用，</p>\n<p>温度按冷热，电量按高低）。</p>\n\n<p><b>位置</b>：在性能页用一行方向键就能挪 —— <code>← ↑ ↓ →</code> + 居中 / 读位置 / 重置，步长可切；</p>\n<p>也能直接拖，位置会记住。<b>双击悬浮窗关闭</b>，或点通知里的「停止」。</p>\n\n<p>数据由桌面 App 直接读 sysfs（App 有 root），不走 shell —— 所以整条状态条没有额外进程开销。</p>\n<p>每 2 秒刷新一次，帧率每秒更新，时间每秒跳。</p>\n\n<h3>🎮 游戏加速（音量键菜单 + 提示悬浮窗）</h3>\n\n<li>**音量上键呼出菜单**（音量下键收起）：总开关 / CPU 锁频 / 调速器 / 线程绑定 / 刷新率</li>\n<p>  + 应用 / 还原 / 清后台 / 关闭</p>\n<li>**按 uid 绑定，不做前台猜测**：只看\"这个 uid 的进程里有没有 `oom_score_adj == 0` 的\"</li>\n<p>  （顶层应用就是 0），在就自动应用、退出自动还原</p>\n<li>**功能提示悬浮窗**：右上角，标题行 + 已打开的功能 + 系统参数（时间到秒/CPU 频率/FPS/功耗/温度），</li>\n<p>  按字数从多到少排，可拖、可勾显示项、彩虹渐变字一直流转</p>\n<li>**清后台**：只清第三方 + 缓存态进程，支持白名单（目标应用永远受保护）</li>\n<li>**保活**：被别的组件改回去会自动重写并计数；关掉的项从原值还原</li>\n<li>需要无障碍的「过滤按键事件」（WebUI 一键开）</li>\n\n<h3>🎚 刷新率锁定（性能页）</h3>\n\n<li>**扫描档位** —— 读 `dumpsys display` 的模式表，列出本机可用刷新率，</li>\n<p>  并记下每档对应的 <code>modeId</code>（有些 ROM 只认 <code>cmd display set-user-preferred-display-mode</code>）</p>\n<li>**持续锁定** —— 写 system 的 `peak_refresh_rate` / `min_refresh_rate`，</li>\n<p>  另外尽量切 display 的 user-preferred-mode</p>\n<li>**保活** —— 每 8 秒复查一次，被别的组件改回去就重写并计数</li>\n<p>  （界面提示「⚠ 被改回去 N 次」）；开机自动恢复保活</p>\n<li>**恢复原值** —— 锁定前的值会先存下来，点一下原样还原</li>\n<li>**悬浮窗上直接换档** —— 监视器开着、显示项里有 FPS 时，</li>\n<p>  点悬浮窗上的「FPS」会在它正下方弹出档位面板（每档一颗药丸 + 「恢复」，</p>\n<p>  当前档高亮）；点面板外面 / 8 秒无操作 / 拖动悬浮窗都会自动收起</p>\n\n<h3>🌡 温度 / 电源 / 性能</h3>\n\n<li>环形仪表盘、各核心频率、真实 CPU 占用趋势</li>\n<li>实时功率、电池健康 / 循环次数、充电信息、剩余时间</li>\n<li>**充电保护**（电源页）：到点停充 / 掉电恢复，可手动停充，原值可还原</li>\n<li>**温度只读**：温度分类总览、thermal zone 状态（写热区功能早已移除 —— 本机写热区会重启 ✗）</li>\n<li>**CPU 锁频 / 调速器**（游戏加速内）：按目标应用 uid 自动应用与还原</li>\n\n<h3>📱 机型伪装</h3>\n\n<p>Device Faker 的配置前端（TOML 编辑、模板管理、备份）。</p>\n\n<h3>🌐 浏览器访问</h3>\n\n<p>设置页开启后，在浏览器输入 <code>127.0.0.1:8765</code> 就能用同一个界面。</p>\n<p>（只读快照，不需要 token）</p>\n\n<h3>📱 独立桌面 App</h3>\n\n<p><code>app/</code> 是真源码，安装包在模块 zip 的 <code>app/JeTeeZnTmax.apk</code>（也随 Release 附件分发）。</p>\n\n<p>它自带 <code>ksu</code> 桥，所以<b>打开就是完整功能，不是只读预览</b>。</p>\n<p>自带应用图标（走 PackageManager，比 shell 快得多）。</p>\n\n<p>---</p>\n\n<h2>安装</h2>\n\n<h3>要求</h3>\n\n<li>**KernelSU**（或任何提供 `su` 的 root 方案）</li>\n<li>Android 8+ / arm64</li>\n<li>建议先完整备份</li>\n\n<h3>步骤</h3>\n\n<li>下载 Release 里的 `ksu-toolbox-update.zip`</li>\n<li>KernelSU 管理器 → 模块 → 从本地安装</li>\n<li>重启</li>\n<li>管理器里点模块的「打开」，或装桌面 App</li>\n\n<p>---</p>\n\n<h2>⚠️ 依赖（**必须自己装，本仓库不含**）</h2>\n\n<h3>Device Faker —— 机型伪装需要</h3>\n\n<li>地址：https://github.com/Seyud/device_faker</li>\n<li>协议：**GPL-3.0**</li>\n\n<p>> 因为它是 GPL-3.0，本人<b>无权对它附加「禁止修改」这类限制</b>。</p>\n<p>></p>\n<p>> <b>本仓库的源码里不含它的任何文件</b> —— 你要二次开发，请去上游拿。</p>\n<p>></p>\n<p>> 但 <code>release/</code> 里的<b>安装包</b>为了开箱可用，打包了它的运行时文件</p>\n<p>> （<code>device_faker_cli</code>、<code>zygisk/arm64-v8a.so</code>）。**这部分版权归 Seyud，</p>\n<p>> 遵循 GPL-3.0**，可以自由再分发 / 修改，不受本仓库协议约束。</p>\n\n<h2>目录结构</h2>\n\n<pre>.\n├── index.html              和 webroot/index.html 同一份（给 Pages / 直接看用）\n├── webroot/index.html      全内联 WebUI（HTML/CSS/JS，约 285KB，一个文件装完）\n├── bin/\n│   ├── ksu_guard           ptrace 拦截器（aarch64 静态 ELF，纯 musl）\n│   ├── chg.sh              充电控制后端（节点探测 + 写入）\n│   ├── refresh.sh          刷新率锁定 / 保活（scan/lock/restore/keepalive）\n│   ├── collect.sh          HTTP 快照采集\n│   └── webui-server.sh     本地服务（只监听 127.0.0.1）\n├── app/                    独立桌面 App 源码\n│   ├── java/.../MainActivity.java / MonitorService.java / MonitorView.java /\n│   │            SysStats.java / MonitorActivity.java\n│   ├── build.sh            不用 Gradle，直接调 SDK 工具链\n│   ├── make_icon.py        纯 Python 生成图标（不依赖 PIL）\n│   └── guard/              ksu_guard 的 C 源码 + 测试小程序\n├── customize.sh / service.sh / module.prop\n└── release/                编好的 APK 和模块 zip\n     ↑ 模块 zip 里打包了 Device Faker 的运行时（GPL-3.0，见上）\n       源码目录里没有它</pre>\n\n<p>---</p>\n\n<h2>自己编译</h2>\n\n<h3>WebUI</h3>\n\n<p><code>webroot/index.html</code> 是全内联的，改完直接刷。</p>\n\n<h3>ksu_guard（ptrace 拦截器）</h3>\n\n<p>需要 aarch64 交叉工具链 + musl 静态库：</p>\n\n<pre># 工具链\napt install gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu\n# musl（要自己编一份 aarch64 静态版，装到 /opt/musl）\nsh app/guard/build-guard.sh</pre>\n\n<h3>桌面 App</h3>\n\n<p><b>不需要 Android Studio</b>，只要 JDK + SDK 的 build-tools：</p>\n\n<pre>sh app/build.sh</pre>\n\n<p>它干的事：<code>aapt2 compile</code> → <code>aapt2 link</code> → <code>javac</code> → <code>d8</code> →</p>\n<p>塞 <code>classes.dex</code> → <code>zipalign</code> → <code>apksigner</code>。</p>\n\n<p>---</p>\n\n<h2>协议</h2>\n\n<p>本模块采用 <b>GNU General Public License v3.0（GPL-3.0）</b>。</p>\n\n<p><b>为什么是 GPL</b>：模块里打包了 <b>Device Faker</b>（GPL-3.0，见 <code>NOTICE-device_faker.txt</code>）。</p>\n<p>按 GPL 的要求，<b>把 GPL 组件和别的代码组合在一起分发时，整个组合作品也必须按 GPL 发布</b> ✓。</p>\n<p>所以从本版起整个模块统一为 GPL-3.0 —— 以前那份「自定义许可 / 禁止二改后发布」不再适用</p>\n<p>（GPL 不允许附加额外限制，那几条必须去掉）。</p>\n\n<p>这意味着：</p>\n\n<li>✅ 免费用、随便改、**改完也可以再发布**、可以拿去做别的项目</li>\n<li>✅ 可以商业使用</li>\n<li>📌 **但必须**：保留作者署名与版权声明；把你发布的那份**同样以 GPL-3.0 授权**，并**提供对应源码**</li>\n<li>📌 **不能**再加任何额外限制（不改署名、不改协议、不加\"禁止二改\"之类的条款）</li>\n\n<p>第三方组件保留原许可：<b>Device Faker</b>（GPL-3.0，见 <code>NOTICE-device_faker.txt</code>）。</p>\n\n<p>完整条款见 <a href=\"LICENSE\">LICENSE</a>（GPL-3.0 全文）。</p>\n\n<p>---</p>\n\n<h2>免责声明</h2>\n\n<p>本模块涉及系统底层修改（内核接口、分区读写拦截、Zygisk 注入）。</p>\n\n<p><b>使用风险自负。</b> 因使用本模块导致的设备损坏、数据丢失、无法开机、</p>\n<p>保修失效、账号被封等后果，作者不承担责任。</p>\n\n<p><b>请务必先备份，并先在备用设备上验证。</b></p>\n\n<p>---</p>\n\n<h2>致谢</h2>\n\n<li>**@月虹yh** —— UI 设计借鉴</li>\n<li>**Seyud** —— Device Faker</li>\n<li>**tiann** —— KernelSU</li>\n\n<p>详见 <a href=\"CREDITS.md\">CREDITS.md</a>。</p>",
+  "homepageUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax",
+  "sourceUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax",
+  "url": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax",
+  "latestRelease": {
+    "name": "v3.5.11",
+    "version": "v3.5.11",
+    "time": "2026-10-07T10:44:19Z",
+    "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.11/ksu-toolbox-update.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.5.11",
+      "tagName": "v3.5.11",
+      "publishedAt": "2026-10-07T10:44:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.11/ksu-toolbox-update.zip",
+          "size": 1533993,
+          "downloadCount": 192
+        }
+      ]
+    },
+    {
+      "name": "v3.5.10",
+      "tagName": "v3.5.10",
+      "publishedAt": "2026-10-05T03:58:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.10/ksu-toolbox-update.zip",
+          "size": 1533910,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v3.5.9",
+      "tagName": "v3.5.9",
+      "publishedAt": "2026-10-05T03:12:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.9/ksu-toolbox-update.zip",
+          "size": 1533027,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.5.8",
+      "tagName": "v3.5.8",
+      "publishedAt": "2026-10-05T02:46:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.8/ksu-toolbox-update.zip",
+          "size": 1532673,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.5.7",
+      "tagName": "v3.5.7",
+      "publishedAt": "2026-10-05T02:02:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.7/ksu-toolbox-update.zip",
+          "size": 1532402,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.5.6",
+      "tagName": "v3.5.6",
+      "publishedAt": "2026-10-05T01:00:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.6/ksu-toolbox-update.zip",
+          "size": 1534284,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.5.5",
+      "tagName": "v3.5.5",
+      "publishedAt": "2026-10-05T00:49:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.5.5/ksu-toolbox-update.zip",
+          "size": 1533753,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.32",
+      "tagName": "v3.4.32",
+      "publishedAt": "2026-10-04T14:09:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.32/ksu-toolbox-update.zip",
+          "size": 1924696,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "v3.4.31",
+      "tagName": "v3.4.31",
+      "publishedAt": "2026-10-04T13:18:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.31/ksu-toolbox-update.zip",
+          "size": 1924312,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.4.30",
+      "tagName": "v3.4.30",
+      "publishedAt": "2026-10-04T07:59:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.30/ksu-toolbox-update.zip",
+          "size": 1923720,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v3.4.29",
+      "tagName": "v3.4.29",
+      "publishedAt": "2026-10-04T07:50:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.29/ksu-toolbox-update.zip",
+          "size": 1923560,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.17",
+      "tagName": "v3.4.17",
+      "publishedAt": "2026-10-04T06:42:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.17/ksu-toolbox-update.zip",
+          "size": 1921867,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.16",
+      "tagName": "v3.4.16",
+      "publishedAt": "2026-10-04T06:34:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.16/ksu-toolbox-update.zip",
+          "size": 1931595,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.15",
+      "tagName": "v3.4.15",
+      "publishedAt": "2026-10-04T06:30:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.15/ksu-toolbox-update.zip",
+          "size": 1928692,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.4.14",
+      "tagName": "v3.4.14",
+      "publishedAt": "2026-10-04T05:10:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.14/ksu-toolbox-update.zip",
+          "size": 1927832,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.13",
+      "tagName": "v3.4.13",
+      "publishedAt": "2026-10-04T05:07:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.13/ksu-toolbox-update.zip",
+          "size": 1927204,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.12",
+      "tagName": "v3.4.12",
+      "publishedAt": "2026-10-04T05:00:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.12/ksu-toolbox-update.zip",
+          "size": 1926973,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.11",
+      "tagName": "v3.4.11",
+      "publishedAt": "2026-10-04T04:34:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.11/ksu-toolbox-update.zip",
+          "size": 1926982,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v3.4.10",
+      "tagName": "v3.4.10",
+      "publishedAt": "2026-10-04T04:06:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.10/ksu-toolbox-update.zip",
+          "size": 1867248,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.9",
+      "tagName": "v3.4.9",
+      "publishedAt": "2026-10-04T04:03:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.9/ksu-toolbox-update.zip",
+          "size": 1867270,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.8",
+      "tagName": "v3.4.8",
+      "publishedAt": "2026-10-04T03:55:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.8/ksu-toolbox-update.zip",
+          "size": 1867271,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.7",
+      "tagName": "v3.4.7",
+      "publishedAt": "2026-10-04T03:50:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.7/ksu-toolbox-update.zip",
+          "size": 1866895,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.6",
+      "tagName": "v3.4.6",
+      "publishedAt": "2026-10-04T03:37:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.6/ksu-toolbox-update.zip",
+          "size": 1865280,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v3.4.5",
+      "tagName": "v3.4.5",
+      "publishedAt": "2026-10-04T03:33:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.5/ksu-toolbox-update.zip",
+          "size": 1864807,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.4",
+      "tagName": "v3.4.4",
+      "publishedAt": "2026-10-04T03:28:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.4/ksu-toolbox-update.zip",
+          "size": 1864095,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.3",
+      "tagName": "v3.4.3",
+      "publishedAt": "2026-10-04T03:23:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.3/ksu-toolbox-update.zip",
+          "size": 1863009,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.2",
+      "tagName": "v3.4.2",
+      "publishedAt": "2026-10-04T03:11:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.2/ksu-toolbox-update.zip",
+          "size": 1862966,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.4.1",
+      "tagName": "v3.4.1",
+      "publishedAt": "2026-10-04T03:07:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.1/ksu-toolbox-update.zip",
+          "size": 1862861,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v3.4.0",
+      "tagName": "v3.4.0",
+      "publishedAt": "2026-10-04T03:03:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.4.0/ksu-toolbox-update.zip",
+          "size": 1862008,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v3.3.2",
+      "tagName": "v3.3.2",
+      "publishedAt": "2026-10-03T12:37:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-toolbox-update.zip",
+          "downloadUrl": "https://github.com/jeteezntmax/Kernelsu-Toolbox-JeTeeZnTmax/releases/download/v3.3.2/ksu-toolbox-update.zip",
+          "size": 1836702,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

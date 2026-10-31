@@ -1,0 +1,71 @@
+{
+  "readme": "# 微信保推送结束主进程 (wechat_push_keeper)\n\n[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)\n[![Magisk](https://img.shields.io/badge/Magisk-20.4+-green.svg)](https://github.com/topjohnwu/Magisk)\n[![KernelSU](https://img.shields.io/badge/KernelSU-supported-orange.svg)](https://kernelsu.org)\n[![Android](https://img.shields.io/badge/Android-10+-brightgreen.svg)](https://www.android.com)\n\nMagisk / KernelSU / APatch 模块，基于事件监听的被动触发机制，通过Logcat监听微信进程启动事件，仅保留 `:push` 推送进程，结束后台唤醒的主进程等非必要进程。\n\n## 📌 功能特性\n\n- **事件监听被动触发** — 监听 `am_proc_start` 事件，微信非 `:push` 进程启动后等待 5 秒自动结束\n- **灭屏结束进程** — 监听屏幕熄灭事件，灭屏时立即结束非推送进程\n- **VoIP 通话保护** — 检测到微信语音/视频通话时延迟结束进程，通话结束后再清理\n- **前台保护** — 微信在前台时不结束进程，不影响正常使用\n- **WebUI 控制面板** — 可视化配置各项参数，保存即生效（无需重启设备）\n- **零功耗延迟** — 事件监听机制，无轮询无耗电\n- **日志轮转** — 超过可配置行数自动截断\n\n## 📱 兼容性\n\n- Magisk 20.4+ / KernelSU / APatch\n- Android 10+\n- 仅处理 `com.tencent.mm` 包名，不依赖微信版本号\n\n## 📥 安装方式\n\n### 方法一：Magisk/KernelSU 管理器\n\n1. 下载最新 Release 中的 `wechat_push_keeper.zip`\n2. 打开 Magisk / KernelSU 管理器\n3. 点击 **模块** → **从本地安装**\n4. 选择下载的 zip 文件\n5. 重启设备\n\n### 方法二：手动安装\n\n```bash\n# 解压模块到 Magisk 模块目录\nunzip wechat_push_keeper.zip -d /data/adb/modules/wechat_push_keeper\n\n# 设置权限\nchmod 755 /data/adb/modules/wechat_push_keeper/service.sh\n\n# 重启设备\nreboot\n```\n\n## 📝 查看日志\n\n```bash\n# 查看运行日志\ncat /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.log\n\n# 实时跟踪日志\ntail -f /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.log\n```\n\n### 日志示例\n\n```\n[2024-01-01 12:00:00] ========== service.sh 启动 ==========\n[2024-01-01 12:00:05] 等待系统启动完成...\n[2024-01-01 12:00:20] 系统启动完成，等待15秒...\n[2024-01-01 12:00:35] 开始监听...\n[2024-01-01 12:01:00] 事件: am_proc_start: com.tencent.mm:push\n[2024-01-01 12:01:00] 进程: [com.tencent.mm:push]\n[2024-01-01 12:01:00] 跳过 :push\n[2024-01-01 12:02:00] 事件: am_proc_start: com.tencent.mm\n[2024-01-01 12:02:00] 进程: [com.tencent.mm]\n[2024-01-01 12:02:00] 非push进程 [com.tencent.mm]，等5秒...\n[2024-01-01 12:02:05] 结束 PID=12345\n```\n\n## ⚙️ 手动控制\n\n```bash\n# 临时停用模块\nkill $(cat /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.pid)\n\n# 重新启用模块\nsh /data/adb/modules/wechat_push_keeper/service.sh &\n```\n\n## 🌐 WebUI 控制面板\n\n模块 v1.3 起内置 WebUI 控制面板，可在模块管理器内点击模块图标进入。\n\n**功能：**\n- **运行状态** — 实时查看主进程、灭屏监听、VoIP 轮询状态\n- **配置调节** — 可视化调节各项参数，保存即生效（无需重启设备）\n- **实时日志** — 直接在 WebUI 查看运行日志\n\n**支持的参数：**\n| 参数 | 说明 | 默认值 |\n|------|------|--------|\n| 启动后等待延迟 | 检测到非 :push 进程后的等待秒数 | 5s |\n| 灭屏第一次延迟 | 灭屏后第一次清理前的等待秒数 | 0s（立即） |\n| 灭屏二次延迟 | 第一次清理后的再次等待秒数 | 3s |\n| 灭屏轮询间隔 | 灭屏状态检测频率 | 2s |\n| VoIP 轮询间隔 | VoIP 通话检测频率 | 20s |\n| 日志最大行数 | 日志超过此数时截断保留一半 | 100 行 |\n\n## 🗑️ 卸载\n\n在 Magisk / KernelSU 管理器中移除模块即可。\n\n`uninstall.sh` 会自动清理：\n- 所有 PID 文件\n- 日志文件\n- 锁文件\n- 运行中的进程（精确定位，不误杀其他模块）\n\n## 🔧 工作原理\n\n微信在后台维持消息推送时实际只需要 `com.tencent.mm:push` 进程。其余进程（主进程、工具进程等）均为非必要消耗。\n\n本模块通过以下机制实现精准控制：\n\n1. **Logcat 事件监听** — 监听 `am_proc_start` 事件，检测微信进程启动\n2. **进程过滤** — 排除 `:push` 进程，仅处理非必要进程\n3. **延迟结束** — 等待 5 秒确保进程完全启动后再结束\n4. **前台保护** — 检测微信是否在前台，避免误结束\n5. **VoIP 保护** — 检测语音/视频通话服务，延迟结束\n6. **灭屏清理** — 屏幕熄灭时立即清理非必要进程\n\n## 📊 功耗对比\n\n| 场景 | 未安装模块 | 安装模块 |\n|------|-----------|---------|\n| 后台待机 8 小时 | ~3-5% | ~1-2% |\n| 灭屏待机 | 频繁唤醒 | 仅 :push 运行 |\n| 语音通话 | 正常 | 正常（保护） |\n\n## 🤝 贡献指南\n\n欢迎提交 Issue 和 Pull Request！\n\n### 提交 Bug\n\n请提供以下信息：\n- 设备型号\n- Android 版本\n- Magisk/KernelSU 版本\n- 日志文件 (`模块目录/tmp/wechat_push_keeper.log`)\n\n### 功能建议\n\n- 描述你想要的功能\n- 说明使用场景\n- 如有可能，提供实现思路\n\n## 📄 开源协议\n\n本项目采用 MIT 协议 - 查看 [LICENSE](LICENSE) 文件了解详情\n\n## ⚠️ 免责声明\n\n- 本模块仅供学习和研究使用\n- 使用本模块可能导致微信推送延迟或其他异常\n- 作者不对使用本模块造成的任何后果负责\n- 请在了解风险后自行决定是否使用\n\n## 📋 更新日志\n\n### v1.5.0\n- 移除 配置保存/恢复默认后的服务强制重启，避免热更新导致系统卡死\n- 新增 配置文件热加载机制，无需重启服务即时生效\n- 新增 kill并发锁 (flock)，防止多进程同时dumpsys导致系统资源耗尽\n- 优化 WebUI 提示文案，明确\"热加载\"而非\"重启\"\n\n### v1.4.4\n- 修复 action.sh CLI 入口缺少 log_max_lines 参数，导致日志最大行数设置无效\n\n### v1.4.3\n- 修复 action.sh 入口重复执行 save/default 的 restart/status，导致服务启动两次并提示失败\n\n### v1.4.2\n- 修复 WebUI保存/恢复默认配置卡死和显示失败的问题\n- 优化 action.sh save/default 去除重复read_config/status调用\n- 增大 WebUI JS桥接超时至15秒\n\n### v1.4.1\n- 修复 事件循环内sleep阻塞管道导致事件延迟触发误杀\n\n### v1.4\n- 修复 配置保存后未重启服务导致不生效的 bug\n- 修复 按住发语音/查看公众号/视频通话时子进程被误杀（增加前台状态 + top-activity 双重检测）\n- 优化 action.sh save/default/restart 命令写配置后自动重启服务并输出状态\n- 优化 配置文件注释，提示保存后自动生效\n\n### v1.3\n- 新增 WebUI 控制面板，支持可视化配置与日志查看\n- 新增 灭屏第一次延迟参数\n- 优化 配置持久化与热更新机制\n- 优化 WebUI 布局，适配 Magisk/KernelSU/APatch 全平台\n\n## 🙏 鸣谢\n\n- [topjohnwu](https://github.com/topjohnwu) - Magisk\n- [rifsxd](https://github.com/rifsxd) - KernelSU\n- 所有贡献者和测试用户\n",
+  "readmeHTML": "<h1>微信保推送结束主进程 (wechat_push_keeper)</h1>\n\n<p><a href=\"https://img.shields.io/badge/license-MIT-blue.svg\">![License</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Magisk-20.4+-green.svg\">![Magisk</a>](https://github.com/topjohnwu/Magisk)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU-supported-orange.svg\">![KernelSU</a>](https://kernelsu.org)</p>\n<p><a href=\"https://img.shields.io/badge/Android-10+-brightgreen.svg\">![Android</a>](https://www.android.com)</p>\n\n<p>Magisk / KernelSU / APatch 模块，基于事件监听的被动触发机制，通过Logcat监听微信进程启动事件，仅保留 <code>:push</code> 推送进程，结束后台唤醒的主进程等非必要进程。</p>\n\n<h2>📌 功能特性</h2>\n\n<li>**事件监听被动触发** — 监听 `am_proc_start` 事件，微信非 `:push` 进程启动后等待 5 秒自动结束</li>\n<li>**灭屏结束进程** — 监听屏幕熄灭事件，灭屏时立即结束非推送进程</li>\n<li>**VoIP 通话保护** — 检测到微信语音/视频通话时延迟结束进程，通话结束后再清理</li>\n<li>**前台保护** — 微信在前台时不结束进程，不影响正常使用</li>\n<li>**WebUI 控制面板** — 可视化配置各项参数，保存即生效（无需重启设备）</li>\n<li>**零功耗延迟** — 事件监听机制，无轮询无耗电</li>\n<li>**日志轮转** — 超过可配置行数自动截断</li>\n\n<h2>📱 兼容性</h2>\n\n<li>Magisk 20.4+ / KernelSU / APatch</li>\n<li>Android 10+</li>\n<li>仅处理 `com.tencent.mm` 包名，不依赖微信版本号</li>\n\n<h2>📥 安装方式</h2>\n\n<h3>方法一：Magisk/KernelSU 管理器</h3>\n\n<li>下载最新 Release 中的 `wechat_push_keeper.zip`</li>\n<li>打开 Magisk / KernelSU 管理器</li>\n<li>点击 **模块** → **从本地安装**</li>\n<li>选择下载的 zip 文件</li>\n<li>重启设备</li>\n\n<h3>方法二：手动安装</h3>\n\n<pre># 解压模块到 Magisk 模块目录\nunzip wechat_push_keeper.zip -d /data/adb/modules/wechat_push_keeper\n\n# 设置权限\nchmod 755 /data/adb/modules/wechat_push_keeper/service.sh\n\n# 重启设备\nreboot</pre>\n\n<h2>📝 查看日志</h2>\n\n<pre># 查看运行日志\ncat /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.log\n\n# 实时跟踪日志\ntail -f /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.log</pre>\n\n<h3>日志示例</h3>\n\n<pre>[2024-01-01 12:00:00] ========== service.sh 启动 ==========\n[2024-01-01 12:00:05] 等待系统启动完成...\n[2024-01-01 12:00:20] 系统启动完成，等待15秒...\n[2024-01-01 12:00:35] 开始监听...\n[2024-01-01 12:01:00] 事件: am_proc_start: com.tencent.mm:push\n[2024-01-01 12:01:00] 进程: [com.tencent.mm:push]\n[2024-01-01 12:01:00] 跳过 :push\n[2024-01-01 12:02:00] 事件: am_proc_start: com.tencent.mm\n[2024-01-01 12:02:00] 进程: [com.tencent.mm]\n[2024-01-01 12:02:00] 非push进程 [com.tencent.mm]，等5秒...\n[2024-01-01 12:02:05] 结束 PID=12345</pre>\n\n<h2>⚙️ 手动控制</h2>\n\n<pre># 临时停用模块\nkill $(cat /data/adb/modules/wechat_push_keeper/tmp/wechat_push_keeper.pid)\n\n# 重新启用模块\nsh /data/adb/modules/wechat_push_keeper/service.sh &amp;</pre>\n\n<h2>🌐 WebUI 控制面板</h2>\n\n<p>模块 v1.3 起内置 WebUI 控制面板，可在模块管理器内点击模块图标进入。</p>\n\n<p><b>功能：</b></p>\n<li>**运行状态** — 实时查看主进程、灭屏监听、VoIP 轮询状态</li>\n<li>**配置调节** — 可视化调节各项参数，保存即生效（无需重启设备）</li>\n<li>**实时日志** — 直接在 WebUI 查看运行日志</li>\n\n<p><b>支持的参数：</b></p>\n<p>| 参数 | 说明 | 默认值 |</p>\n<p>|------|------|--------|</p>\n<p>| 启动后等待延迟 | 检测到非 :push 进程后的等待秒数 | 5s |</p>\n<p>| 灭屏第一次延迟 | 灭屏后第一次清理前的等待秒数 | 0s（立即） |</p>\n<p>| 灭屏二次延迟 | 第一次清理后的再次等待秒数 | 3s |</p>\n<p>| 灭屏轮询间隔 | 灭屏状态检测频率 | 2s |</p>\n<p>| VoIP 轮询间隔 | VoIP 通话检测频率 | 20s |</p>\n<p>| 日志最大行数 | 日志超过此数时截断保留一半 | 100 行 |</p>\n\n<h2>🗑️ 卸载</h2>\n\n<p>在 Magisk / KernelSU 管理器中移除模块即可。</p>\n\n<p><code>uninstall.sh</code> 会自动清理：</p>\n<li>所有 PID 文件</li>\n<li>日志文件</li>\n<li>锁文件</li>\n<li>运行中的进程（精确定位，不误杀其他模块）</li>\n\n<h2>🔧 工作原理</h2>\n\n<p>微信在后台维持消息推送时实际只需要 <code>com.tencent.mm:push</code> 进程。其余进程（主进程、工具进程等）均为非必要消耗。</p>\n\n<p>本模块通过以下机制实现精准控制：</p>\n\n<li>**Logcat 事件监听** — 监听 `am_proc_start` 事件，检测微信进程启动</li>\n<li>**进程过滤** — 排除 `:push` 进程，仅处理非必要进程</li>\n<li>**延迟结束** — 等待 5 秒确保进程完全启动后再结束</li>\n<li>**前台保护** — 检测微信是否在前台，避免误结束</li>\n<li>**VoIP 保护** — 检测语音/视频通话服务，延迟结束</li>\n<li>**灭屏清理** — 屏幕熄灭时立即清理非必要进程</li>\n\n<h2>📊 功耗对比</h2>\n\n<p>| 场景 | 未安装模块 | 安装模块 |</p>\n<p>|------|-----------|---------|</p>\n<p>| 后台待机 8 小时 | ~3-5% | ~1-2% |</p>\n<p>| 灭屏待机 | 频繁唤醒 | 仅 :push 运行 |</p>\n<p>| 语音通话 | 正常 | 正常（保护） |</p>\n\n<h2>🤝 贡献指南</h2>\n\n<p>欢迎提交 Issue 和 Pull Request！</p>\n\n<h3>提交 Bug</h3>\n\n<p>请提供以下信息：</p>\n<li>设备型号</li>\n<li>Android 版本</li>\n<li>Magisk/KernelSU 版本</li>\n<li>日志文件 (`模块目录/tmp/wechat_push_keeper.log`)</li>\n\n<h3>功能建议</h3>\n\n<li>描述你想要的功能</li>\n<li>说明使用场景</li>\n<li>如有可能，提供实现思路</li>\n\n<h2>📄 开源协议</h2>\n\n<p>本项目采用 MIT 协议 - 查看 <a href=\"LICENSE\">LICENSE</a> 文件了解详情</p>\n\n<h2>⚠️ 免责声明</h2>\n\n<li>本模块仅供学习和研究使用</li>\n<li>使用本模块可能导致微信推送延迟或其他异常</li>\n<li>作者不对使用本模块造成的任何后果负责</li>\n<li>请在了解风险后自行决定是否使用</li>\n\n<h2>📋 更新日志</h2>\n\n<h3>v1.5.0</h3>\n<li>移除 配置保存/恢复默认后的服务强制重启，避免热更新导致系统卡死</li>\n<li>新增 配置文件热加载机制，无需重启服务即时生效</li>\n<li>新增 kill并发锁 (flock)，防止多进程同时dumpsys导致系统资源耗尽</li>\n<li>优化 WebUI 提示文案，明确\"热加载\"而非\"重启\"</li>\n\n<h3>v1.4.4</h3>\n<li>修复 action.sh CLI 入口缺少 log_max_lines 参数，导致日志最大行数设置无效</li>\n\n<h3>v1.4.3</h3>\n<li>修复 action.sh 入口重复执行 save/default 的 restart/status，导致服务启动两次并提示失败</li>\n\n<h3>v1.4.2</h3>\n<li>修复 WebUI保存/恢复默认配置卡死和显示失败的问题</li>\n<li>优化 action.sh save/default 去除重复read_config/status调用</li>\n<li>增大 WebUI JS桥接超时至15秒</li>\n\n<h3>v1.4.1</h3>\n<li>修复 事件循环内sleep阻塞管道导致事件延迟触发误杀</li>\n\n<h3>v1.4</h3>\n<li>修复 配置保存后未重启服务导致不生效的 bug</li>\n<li>修复 按住发语音/查看公众号/视频通话时子进程被误杀（增加前台状态 + top-activity 双重检测）</li>\n<li>优化 action.sh save/default/restart 命令写配置后自动重启服务并输出状态</li>\n<li>优化 配置文件注释，提示保存后自动生效</li>\n\n<h3>v1.3</h3>\n<li>新增 WebUI 控制面板，支持可视化配置与日志查看</li>\n<li>新增 灭屏第一次延迟参数</li>\n<li>优化 配置持久化与热更新机制</li>\n<li>优化 WebUI 布局，适配 Magisk/KernelSU/APatch 全平台</li>\n\n<h2>🙏 鸣谢</h2>\n\n<li>[topjohnwu](https://github.com/topjohnwu) - Magisk</li>\n<li>[rifsxd](https://github.com/rifsxd) - KernelSU</li>\n<li>所有贡献者和测试用户</li>",
+  "homepageUrl": "https://github.com/Sillybomo/wechat_push_keeper",
+  "sourceUrl": "https://github.com/Sillybomo/wechat_push_keeper",
+  "url": "https://github.com/Sillybomo/wechat_push_keeper",
+  "latestRelease": {
+    "name": "v1.5.2",
+    "version": "v1.5.2",
+    "time": "2026-09-21T16:14:19Z",
+    "downloadUrl": "https://github.com/Sillybomo/wechat_push_keeper/releases/download/v1.5.2/wechat_push_keeper_v1.5.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.2",
+      "tagName": "v1.5.2",
+      "publishedAt": "2026-09-21T16:14:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wechat_push_keeper_v1.5.2.zip",
+          "downloadUrl": "https://github.com/Sillybomo/wechat_push_keeper/releases/download/v1.5.2/wechat_push_keeper_v1.5.2.zip",
+          "size": 22784,
+          "downloadCount": 63
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-05-27T09:59:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wechat_push_keeper_v1.5.1.zip",
+          "downloadUrl": "https://github.com/Sillybomo/wechat_push_keeper/releases/download/v1.5.1/wechat_push_keeper_v1.5.1.zip",
+          "size": 22386,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-05-26T11:00:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wechat_push_keeper_v1.3.zip",
+          "downloadUrl": "https://github.com/Sillybomo/wechat_push_keeper/releases/download/v1.3/wechat_push_keeper_v1.3.zip",
+          "size": 18698,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-05-25T11:48:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wechat_push_keeper_v1.0.zip",
+          "downloadUrl": "https://github.com/Sillybomo/wechat_push_keeper/releases/download/v1.0/wechat_push_keeper_v1.0.zip",
+          "size": 6676,
+          "downloadCount": 12
+        }
+      ]
+    }
+  ]
+}

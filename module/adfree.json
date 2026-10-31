@@ -1,0 +1,57 @@
+{
+  "readme": "# AdFree Hosts\n\nModul KernelSU untuk memilih dan mengunduh berbagai daftar hosts adblock langsung dari tombol **Action** di KernelSU Manager. Tanpa perlu download file hosts secara manual.\n\n## Fitur\n- **Menu pemilihan** - Pilih daftar hosts langsung dari tombol Action\n- **Banyak pilihan** - Tersedia dari StevenBlack, AdAway, OISD, 1Hosts, HaGeZi, GoodbyeAds, AWAvenue, dan AdRules\n- **Backup otomatis** - Hosts lama otomatis di-backup ke `hosts.bak`\n- **Auto-konversi** - Mendukung format `127.0.0.1` dan `dnsmasq` (`address=/domain/`)\n- **Validasi ketat** - Hanya menerapkan jika file valid\n- **Kompatibel** - Mendukung KernelSU dan fallback Magisk\n\n## Daftar Hosts yang Tersedia\n\n### StevenBlack\n| No | Nama | Keterangan |\n|---|---|---|\n| 1 | Unified | Adware/Malware - Paling ringan |\n| 2 | Unified + Fake News | +Fake News |\n| 3 | Unified + Gambling | +Gamping?\n| 4 | Unified + Porn | +Porn\n| 5 | Unified + Social | +Social\n| 6 | Unified + FakeNews + Gambling | +FakeNews + Gambling\n| 7 | Unified + FakeNews + Gambling + Porn | +FakeNews + Gambling + Porn\n| 8 | Unified + FakeNews + Gambling + Porn + Social (MAX) | Paling lengkap\n| 9 | Unified + Social + Gambling | +Social + Gambling\n| 10 | Unified + Porn + Social | +Porn + Social\n\n### AdFree / Independent\n| No | Nama | Keterangan |\n|---|---|---|\n| 11 | AdAway Official | Fokus adblock + tracker (sangat ringan) | \n| 12 | OISD Small | Seimbang, stabil untuk daily use\n| 13 | OISD Big | Lebih agresif, lebih banyak domain diblokir\n| 14 | 1Hosts Lite | Ringan & minim false positive\n| 15 | 1Hosts Pro | Agresif, lebih lengkap\n\n### HaGeZi / GoodbyeAds\n| No | Nama | Keterangan |\n|---|---|---|\n| 16 | HaGeZi Light | Paling ringan & amaan?\n| 17 HaGeZi Normal | Seimbang \n| 18) HaGeZi Pro | Agresif\n| 19) HaGeZi Ultimate | Paling agressif\n| 20) GoodbyeAds | Ringan & simpel\n\n### AWAvenue / AdRules\n| No | Nama | Keterangan |\n|---|---|---|\n| 21 | AWAvenue Ads Rule | Ringan, modern & minim false positive |\n| 22 | AdRules (DNS) - Cats-Team | Seimbang, cakupan luas\n| 23 | AdRules (Strict) - Cats-Team | Agresif, cakupan lebih luas\n\n## Cara Install\n1. Download `adfree-hosts.zip` dari [Releases](https://github.com/vhio/adfree/releases/latest)\n2. Install via **KernelSU Manager > Modules > Install from storage**\n3. Buka modul **AdFree Hosts** di KernelSU Manager\n4. Tekan tombol **Action**\n5. Pilih nomor list yang diinginkan\n6. Tunggu proses download & penerapan selesai\n7. **Reboot**\n\n## Rekomendasi\n- **Daily Use:** `HaGeZi Light (16)` or `AWAvenue Ads Rule (21)`\n- **Super Ringan:** `AdAway Official (11)` or `Unified (1)`\n- **Agresif:** `HaGeZi Pro (18)` or `AdRules (Strict) (23)`\n- **Maksimal Blocking:** `HaGeZi Ultimate (19)`\n\n## Catatan\n- Backup otomatis tersimpan at `system/etc/hosts.bak`\n- Butuh koneksi internet saat menjalankan Action\n\n## Credits\n- [StevenBlack/hosts](https://github.com/StevenBlack/hosts)\n- [AdAway](https://github.com/AdAway/AdAway)\n- [OISD](https://oisd.nl/)\n- [1Hosts](https://github.com/badmojr/1Hosts)\n- [HaGeZi/dns-blocklists](https://github.com/hagezi/dns-blocklists)\n- [GoodbyeAds](https://github.com/GoodbyeAds/GoodbyeAds)\n- [AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)\n- [Cats-Team/AdRules](https://github.com/Cats-Team/AdRules)\n",
+  "readmeHTML": "<h1>AdFree Hosts</h1>\n\n<p>Modul KernelSU untuk memilih dan mengunduh berbagai daftar hosts adblock langsung dari tombol <b>Action</b> di KernelSU Manager. Tanpa perlu download file hosts secara manual.</p>\n\n<h2>Fitur</h2>\n<li>**Menu pemilihan** - Pilih daftar hosts langsung dari tombol Action</li>\n<li>**Banyak pilihan** - Tersedia dari StevenBlack, AdAway, OISD, 1Hosts, HaGeZi, GoodbyeAds, AWAvenue, dan AdRules</li>\n<li>**Backup otomatis** - Hosts lama otomatis di-backup ke `hosts.bak`</li>\n<li>**Auto-konversi** - Mendukung format `127.0.0.1` dan `dnsmasq` (`address=/domain/`)</li>\n<li>**Validasi ketat** - Hanya menerapkan jika file valid</li>\n<li>**Kompatibel** - Mendukung KernelSU dan fallback Magisk</li>\n\n<h2>Daftar Hosts yang Tersedia</h2>\n\n<h3>StevenBlack</h3>\n<p>| No | Nama | Keterangan |</p>\n<p>|---|---|---|</p>\n<p>| 1 | Unified | Adware/Malware - Paling ringan |</p>\n<p>| 2 | Unified + Fake News | +Fake News |</p>\n<p>| 3 | Unified + Gambling | +Gamping?</p>\n<p>| 4 | Unified + Porn | +Porn</p>\n<p>| 5 | Unified + Social | +Social</p>\n<p>| 6 | Unified + FakeNews + Gambling | +FakeNews + Gambling</p>\n<p>| 7 | Unified + FakeNews + Gambling + Porn | +FakeNews + Gambling + Porn</p>\n<p>| 8 | Unified + FakeNews + Gambling + Porn + Social (MAX) | Paling lengkap</p>\n<p>| 9 | Unified + Social + Gambling | +Social + Gambling</p>\n<p>| 10 | Unified + Porn + Social | +Porn + Social</p>\n\n<h3>AdFree / Independent</h3>\n<p>| No | Nama | Keterangan |</p>\n<p>|---|---|---|</p>\n<p>| 11 | AdAway Official | Fokus adblock + tracker (sangat ringan) |</p>\n<p>| 12 | OISD Small | Seimbang, stabil untuk daily use</p>\n<p>| 13 | OISD Big | Lebih agresif, lebih banyak domain diblokir</p>\n<p>| 14 | 1Hosts Lite | Ringan & minim false positive</p>\n<p>| 15 | 1Hosts Pro | Agresif, lebih lengkap</p>\n\n<h3>HaGeZi / GoodbyeAds</h3>\n<p>| No | Nama | Keterangan |</p>\n<p>|---|---|---|</p>\n<p>| 16 | HaGeZi Light | Paling ringan & amaan?</p>\n<p>| 17 HaGeZi Normal | Seimbang</p>\n<p>| 18) HaGeZi Pro | Agresif</p>\n<p>| 19) HaGeZi Ultimate | Paling agressif</p>\n<p>| 20) GoodbyeAds | Ringan & simpel</p>\n\n<h3>AWAvenue / AdRules</h3>\n<p>| No | Nama | Keterangan |</p>\n<p>|---|---|---|</p>\n<p>| 21 | AWAvenue Ads Rule | Ringan, modern & minim false positive |</p>\n<p>| 22 | AdRules (DNS) - Cats-Team | Seimbang, cakupan luas</p>\n<p>| 23 | AdRules (Strict) - Cats-Team | Agresif, cakupan lebih luas</p>\n\n<h2>Cara Install</h2>\n<li>Download `adfree-hosts.zip` dari [Releases](https://github.com/vhio/adfree/releases/latest)</li>\n<li>Install via **KernelSU Manager > Modules > Install from storage**</li>\n<li>Buka modul **AdFree Hosts** di KernelSU Manager</li>\n<li>Tekan tombol **Action**</li>\n<li>Pilih nomor list yang diinginkan</li>\n<li>Tunggu proses download & penerapan selesai</li>\n<li>**Reboot**</li>\n\n<h2>Rekomendasi</h2>\n<li>**Daily Use:** `HaGeZi Light (16)` or `AWAvenue Ads Rule (21)`</li>\n<li>**Super Ringan:** `AdAway Official (11)` or `Unified (1)`</li>\n<li>**Agresif:** `HaGeZi Pro (18)` or `AdRules (Strict) (23)`</li>\n<li>**Maksimal Blocking:** `HaGeZi Ultimate (19)`</li>\n\n<h2>Catatan</h2>\n<li>Backup otomatis tersimpan at `system/etc/hosts.bak`</li>\n<li>Butuh koneksi internet saat menjalankan Action</li>\n\n<h2>Credits</h2>\n<li>[StevenBlack/hosts](https://github.com/StevenBlack/hosts)</li>\n<li>[AdAway](https://github.com/AdAway/AdAway)</li>\n<li>[OISD](https://oisd.nl/)</li>\n<li>[1Hosts](https://github.com/badmojr/1Hosts)</li>\n<li>[HaGeZi/dns-blocklists](https://github.com/hagezi/dns-blocklists)</li>\n<li>[GoodbyeAds](https://github.com/GoodbyeAds/GoodbyeAds)</li>\n<li>[AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)</li>\n<li>[Cats-Team/AdRules](https://github.com/Cats-Team/AdRules)</li>",
+  "homepageUrl": "https://github.com/vhio/adfree",
+  "sourceUrl": "https://github.com/vhio/adfree",
+  "url": "https://github.com/vhio/adfree",
+  "latestRelease": {
+    "name": "v1.5",
+    "version": "v1.5",
+    "time": "2026-10-29T02:00:56Z",
+    "downloadUrl": "https://github.com/vhio/adfree/releases/download/v1.5/adfree-hosts.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-10-29T02:00:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adfree-hosts.zip",
+          "downloadUrl": "https://github.com/vhio/adfree/releases/download/v1.5/adfree-hosts.zip",
+          "size": 18196,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-10-29T01:50:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adfree-hosts.zip",
+          "downloadUrl": "https://github.com/vhio/adfree/releases/download/v1.4/adfree-hosts.zip",
+          "size": 18085,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-10-29T01:40:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "adfree-hosts.zip",
+          "downloadUrl": "https://github.com/vhio/adfree/releases/download/v1.3/adfree-hosts.zip",
+          "size": 2795,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "readme": "# Pixel Sound Expert\n\nMagisk / KernelSU / APatch module for Google Pixel that:\n\n- silences the camera shutter and screenshot sound\n- disables the headphone \"high volume\" warning and its automatic volume lowering\n\nSystemless: remove the module and reboot to restore stock behavior.\nVerified on Pixel 10a, Android 17.\n\n> Silencing the shutter is illegal in some countries (e.g. Japan, South Korea).\n> Use only where lawful.\n\n## Install\n\n1. Download the zip from [Releases](https://github.com/HritwikSinghal/pixel-sound-expert/releases).\n2. Root manager -> Modules -> Install from storage -> select the zip.\n3. Reboot.\n\nLater updates install from inside the root manager. Upgrading from the old\n`silence-shutter-screenshot` module removes it automatically.\n\n| Manager | Shutter / screenshot | Headphone warning |\n|---|---|---|\n| Magisk 20.4+ | yes | yes |\n| KernelSU(-Next) | yes, see below if hiding modules | needs a metamodule (e.g. Hybrid Mount) |\n| APatch | untested | untested |\n\n## KernelSU with module hiding\n\nWith \"Umount modules\" or susfs `auto_try_umount` on, System UI never sees the\nmodule and the shutter still clicks. Fix once:\nKernelSU app -> app list (show system apps) -> **System UI** -> turn off\n**Umount modules** -> reboot. Other apps stay hidden.\n\n## Troubleshooting\n\n```\nsu -c 'ls -l /product/media/audio/ui/camera_click.ogg'      # ~3.6 KB = silenced\ndumpsys audio | grep -E 'mEnableCsd|mSafeMediaVolumeState'  # false / DISABLED\n```\n\nStill hearing a sound? Open an issue with the installer output and:\n\n```\nsu -c 'find /system /product /system_ext /vendor /odm -name \"*.ogg\" | grep -iE \"camera|shutter|screen\"'\n```\n\n## Development\n\n```\nbash scripts/validate.sh && bash scripts/build.sh   # -> dist/pixel-sound-expert-<version>.zip\n```\n\nRelease: bump `version` + `versionCode` in `module/module.prop`, add a\n`CHANGELOG.md` entry, push tag `v<version>`.\nInternals: [docs/architecture.md](docs/architecture.md).\n\n## License\n\n[GPL-3.0](LICENSE)\n",
+  "readmeHTML": "<h1>Pixel Sound Expert</h1>\n\n<p>Magisk / KernelSU / APatch module for Google Pixel that:</p>\n\n<li>silences the camera shutter and screenshot sound</li>\n<li>disables the headphone \"high volume\" warning and its automatic volume lowering</li>\n\n<p>Systemless: remove the module and reboot to restore stock behavior.</p>\n<p>Verified on Pixel 10a, Android 17.</p>\n\n<p>> Silencing the shutter is illegal in some countries (e.g. Japan, South Korea).</p>\n<p>> Use only where lawful.</p>\n\n<h2>Install</h2>\n\n<li>Download the zip from [Releases](https://github.com/HritwikSinghal/pixel-sound-expert/releases).</li>\n<li>Root manager -> Modules -> Install from storage -> select the zip.</li>\n<li>Reboot.</li>\n\n<p>Later updates install from inside the root manager. Upgrading from the old</p>\n<p><code>silence-shutter-screenshot</code> module removes it automatically.</p>\n\n<p>| Manager | Shutter / screenshot | Headphone warning |</p>\n<p>|---|---|---|</p>\n<p>| Magisk 20.4+ | yes | yes |</p>\n<p>| KernelSU(-Next) | yes, see below if hiding modules | needs a metamodule (e.g. Hybrid Mount) |</p>\n<p>| APatch | untested | untested |</p>\n\n<h2>KernelSU with module hiding</h2>\n\n<p>With \"Umount modules\" or susfs <code>auto_try_umount</code> on, System UI never sees the</p>\n<p>module and the shutter still clicks. Fix once:</p>\n<p>KernelSU app -> app list (show system apps) -> <b>System UI</b> -> turn off</p>\n<p><b>Umount modules</b> -> reboot. Other apps stay hidden.</p>\n\n<h2>Troubleshooting</h2>\n\n<pre>su -c 'ls -l /product/media/audio/ui/camera_click.ogg'      # ~3.6 KB = silenced\ndumpsys audio | grep -E 'mEnableCsd|mSafeMediaVolumeState'  # false / DISABLED</pre>\n\n<p>Still hearing a sound? Open an issue with the installer output and:</p>\n\n<pre>su -c 'find /system /product /system_ext /vendor /odm -name \"*.ogg\" | grep -iE \"camera|shutter|screen\"'</pre>\n\n<h2>Development</h2>\n\n<pre>bash scripts/validate.sh &amp;&amp; bash scripts/build.sh   # -&gt; dist/pixel-sound-expert-&lt;version&gt;.zip</pre>\n\n<p>Release: bump <code>version</code> + <code>versionCode</code> in <code>module/module.prop</code>, add a</p>\n<p><code>CHANGELOG.md</code> entry, push tag <code>v<version></code>.</p>\n<p>Internals: <a href=\"docs/architecture.md\">docs/architecture.md</a>.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">GPL-3.0</a></p>",
+  "homepageUrl": "https://github.com/HritwikSinghal/pixel-sound-expert",
+  "sourceUrl": "https://github.com/HritwikSinghal/pixel-sound-expert",
+  "url": "https://github.com/HritwikSinghal/pixel-sound-expert",
+  "latestRelease": {
+    "name": "v2.5",
+    "version": "v2.5",
+    "time": "2026-10-23T07:22:02Z",
+    "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.5/pixel-sound-expert-2.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.5",
+      "tagName": "v2.5",
+      "publishedAt": "2026-10-23T07:22:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel-sound-expert-2.5.zip",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.5/pixel-sound-expert-2.5.zip",
+          "size": 14338,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.5/update.json",
+          "size": 268,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2026-10-22T18:01:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_sscam_sound-2.4.zip",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.4/disable_sscam_sound-2.4.zip",
+          "size": 14065,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.4/update.json",
+          "size": 271,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-06-20T10:54:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_sscam_sound-2.3.zip",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.3/disable_sscam_sound-2.3.zip",
+          "size": 8787,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.3/update.json",
+          "size": 271,
+          "downloadCount": 73
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-06-20T10:26:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_sscam_sound-2.2.zip",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.2/disable_sscam_sound-2.2.zip",
+          "size": 8727,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-06-20T02:22:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "disable_sscam_sound-2.0.zip",
+          "downloadUrl": "https://github.com/HritwikSinghal/pixel-sound-expert/releases/download/v2.0/disable_sscam_sound-2.0.zip",
+          "size": 6349,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

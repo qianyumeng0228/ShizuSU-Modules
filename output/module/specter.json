@@ -1,0 +1,379 @@
+{
+  "readme": "# Specter\n\n<p align=\"center\">\n  <img src=\"./screenshots/home.png\" width=\"19%\" alt=\"Home\">\n  <img src=\"./screenshots/tools.png\" width=\"19%\" alt=\"Tools\">\n  <img src=\"./screenshots/target.png\" width=\"19%\" alt=\"App Targeting\">\n  <img src=\"./screenshots/control.png\" width=\"19%\" alt=\"Control\">\n  <img src=\"./screenshots/settings.png\" width=\"19%\" alt=\"Settings\">\n</p>\n\n[![latest release](https://img.shields.io/github/v/release/dpejoh/specter?label=Release&logo=github)](https://github.com/dpejoh/specter/releases/latest)\n[![CI](https://github.com/dpejoh/specter/actions/workflows/build-test.yml/badge.svg)](https://github.com/dpejoh/specter/actions/workflows/build-test.yml)\n\nGetting strong integrity, TEESimulator management, detection solve. Clean, focused, no bloat.\n\n[Download](https://github.com/dpejoh/specter/releases/latest)\n\n## Background\n\nSpecter is a complete rewrite of what I originally built as Yurikey.\n\n## Support\n\n- Telegram: [Channel](https://t.me/dpejoh) · [Group](https://t.me/dpejoh0)\n- Ko-fi: [ko-fi.com/dpejoh](https://ko-fi.com/dpejoh)\n- BTC: bc1qfy4vfstns4aqhvck66x0r53n3hfkkzhwkt7zpw\n- ETC: 0x895762C0Fd2BeF54EE3cD478Fc03212aeA673a68\n\n## Quick start\n\n1. Install [Tricky Store](https://github.com/5ec1cff/TrickyStore/releases/latest) /\n   [TEESimulator](https://github.com/JingMatrix/TEESimulator/releases/latest) /\n   [TEESimulator-RS](https://github.com/Enginex0/TEESimulator-RS/releases/latest)\n   (Specter auto-installs TEESimulator-RS if none found — skip if using OhMyKeymint)\n2. Install [Play Integrity Inject](https://github.com/KOWX712/PlayIntegrityFix/releases/latest)\n   or [Play Integrity Fork](https://github.com/osm0sis/PlayIntegrityFork/releases/latest)\n3. Install Specter via Magisk / KernelSU / APatch\n4. Reboot. First-boot runs backup, target, security patch, keybox.\n5. Open the WebUI\n\n## Features\n\n- **Keybox**: multi-source catalog, custom keybox, Google revocation, backup/restore\n- **Auto Target**: inotify + polling for new apps\n- **App Targeting**: per-app states, suffixes, blacklist\n- **Security Patch**: live fetch with offline fallback\n- **ROM Fingerprint**: cleans custom ROM props and prefixes\n- **ADB Disabler**: dev options, USB debugging, OEM unlock\n- **PIF**: auto-detect variant, fetch fingerprint, block spoof engines\n- **GMS Kill**: force-stops DroidGuard/GMS, clears Play Store\n- **Module Configs**: HMA-OSS config generation, Zygisk Next\n- **Detection Cleanup**: removes detector logs, temp dirs, caches\n- **Widevine L1**: attestation keys via KmInstallKeybox\n- **Conflict Resolution**: 8 modules — aggressive disabled, passive coexists, TEESimulator WebUI feature ownership\n- **Scheduler**: periodic keybox info, auto-target, autopif\n- **First-Boot**: backup originals, run full pipeline once\n\n## Requirements\n\n- Root access (Magisk / KernelSU / APatch)\n- [Tricky Store](https://github.com/5ec1cff/TrickyStore/releases/latest) /\n  [TEESimulator](https://github.com/JingMatrix/TEESimulator/releases/latest) /\n  [TEESimulator-RS](https://github.com/Enginex0/TEESimulator-RS/releases/latest) /\n  or OhMyKeymint\n  (Specter auto-installs TEESimulator-RS if none detected)\n- [Play Integrity Inject](https://github.com/KOWX712/PlayIntegrityFix/releases/latest)\n  or [Play Integrity Fork](https://github.com/osm0sis/PlayIntegrityFork/releases/latest)\n\n## Build\n\n```bash\ngit clone https://github.com/dpejoh/specter\ncd specter\nnpm install\nnpm run build\n```\n\nOutput: `Specter-v{version}.zip`\n\n### Testing\n\n```bash\nbash tests/run.sh          # Shell tests. 12 files, 321 assertions.\nnpm test                   # TS tests. 10 files, 94 tests (vitest + happy-dom).\nnpx tsc --noEmit           # TypeScript strict check\n```\n\n### CI\n\n- TypeScript strict, ShellCheck (warning), shell tests, TS tests\n- Module structure verification\n- No hardcoded `/data/adb/modules/Specter` paths in lib/ or features/\n- No `su -c` in feature scripts\n\n## Legal\n\n```\nFOR EDUCATIONAL PURPOSES ONLY.\nTHE DEVELOPER DOES NOT CONDONE ILLEGAL ACTIVITIES INCLUDING BYPASSING DRM, VIOLATING TERMS OF SERVICE, OR COMMITTING FRAUD.\nUSERS ARE SOLELY RESPONSIBLE FOR COMPLYING WITH APPLICABLE LAWS.\n```\n\n## Warning\n\n```\nSPECTER IS PROGRAMMED NOT TO CAUSE PROBLEMS, BUT AN UNLOCKED PHONE ALWAYS COMES WITH RISKS.\nNOTHING IS 100% GUARANTEED. USE AT YOUR OWN RISK.\nYOUR WARRANTY MAY BE VOIDED, APPS MAY BREAK, AND ACCOUNT BANS ARE POSSIBLE.\nALWAYS MAINTAIN BACKUPS OF IMPORTANT DATA.\n```\n\n## Translations\n\nThe WebUI is translated into Arabic, Spanish, French, Hungarian, Indonesian, Polish, Russian, Turkish, and Chinese (mostly AI-generated. Human review welcome).\n\nTo contribute translations:\n- **Preferred**: Join the [Crowdin project](https://crowdin.com/project/specter-module) — web UI, no git needed\n- **Alternative**: Edit the JSON files in `src/webroot/lang/` and submit a PR\n\nAutomation:\n- Pushing changes to `src/webroot/lang/source/string.json` on `main` uploads the new keys to Crowdin\n- Every Monday a workflow downloads finished translations and opens a PR (`i18n: translation updates from Crowdin`)\n- Required repo secrets: `CROWDIN_PROJECT_ID`, `CROWDIN_PERSONAL_TOKEN`\n\nEach `*.json` file is validated against `source/string.json` in CI (`npm test`). New keys without translations fall back to English.\n\n## Thanks\n\n- [chiteroman](https://github.com/chiteroman/PlayIntegrityFix), [KOWX712](https://github.com/KOWX712/PlayIntegrityFix) and [osm0sis](https://github.com/osm0sis/PlayIntegrityFork). PIF and forks.\n- [5ec1cff](https://github.com/5ec1cff/TrickyStore), [JingMatrix](https://github.com/JingMatrix/TEESimulator), [Enginex0](https://github.com/Enginex0/TEESimulator-RS). Tricky Store and forks.\n- [KOWX712](https://github.com/KOWX712/Tricky-Addon-Update-Target-List), [Enginex0](https://github.com/Enginex0/tricky-addon-enhanced). Tricky Store Addon.\n- [eltavine](https://github.com/eltavine/Duck-Detector-Refactoring). Duck Detector.\n- [Citra-Standalone](https://github.com/Citra-Standalone/TSupport-Advance). TSupport-Advance.\n\n## License\n\nGNU GPL v3.0\n",
+  "readmeHTML": "<h1>Specter</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"./screenshots/home.png\" width=\"19%\" alt=\"Home\"></p>\n<p>  <img src=\"./screenshots/tools.png\" width=\"19%\" alt=\"Tools\"></p>\n<p>  <img src=\"./screenshots/target.png\" width=\"19%\" alt=\"App Targeting\"></p>\n<p>  <img src=\"./screenshots/control.png\" width=\"19%\" alt=\"Control\"></p>\n<p>  <img src=\"./screenshots/settings.png\" width=\"19%\" alt=\"Settings\"></p>\n<p></p></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/dpejoh/specter?label=Release&logo=github\">![latest release</a>](https://github.com/dpejoh/specter/releases/latest)</p>\n<p><a href=\"https://github.com/dpejoh/specter/actions/workflows/build-test.yml/badge.svg\">![CI</a>](https://github.com/dpejoh/specter/actions/workflows/build-test.yml)</p>\n\n<p>Getting strong integrity, TEESimulator management, detection solve. Clean, focused, no bloat.</p>\n\n<p><a href=\"https://github.com/dpejoh/specter/releases/latest\">Download</a></p>\n\n<h2>Background</h2>\n\n<p>Specter is a complete rewrite of what I originally built as Yurikey.</p>\n\n<h2>Support</h2>\n\n<li>Telegram: [Channel](https://t.me/dpejoh) · [Group](https://t.me/dpejoh0)</li>\n<li>Ko-fi: [ko-fi.com/dpejoh](https://ko-fi.com/dpejoh)</li>\n<li>BTC: bc1qfy4vfstns4aqhvck66x0r53n3hfkkzhwkt7zpw</li>\n<li>ETC: 0x895762C0Fd2BeF54EE3cD478Fc03212aeA673a68</li>\n\n<h2>Quick start</h2>\n\n<li>Install [Tricky Store](https://github.com/5ec1cff/TrickyStore/releases/latest) /</li>\n<p>   <a href=\"https://github.com/JingMatrix/TEESimulator/releases/latest\">TEESimulator</a> /</p>\n<p>   <a href=\"https://github.com/Enginex0/TEESimulator-RS/releases/latest\">TEESimulator-RS</a></p>\n<p>   (Specter auto-installs TEESimulator-RS if none found — skip if using OhMyKeymint)</p>\n<li>Install [Play Integrity Inject](https://github.com/KOWX712/PlayIntegrityFix/releases/latest)</li>\n<p>   or <a href=\"https://github.com/osm0sis/PlayIntegrityFork/releases/latest\">Play Integrity Fork</a></p>\n<li>Install Specter via Magisk / KernelSU / APatch</li>\n<li>Reboot. First-boot runs backup, target, security patch, keybox.</li>\n<li>Open the WebUI</li>\n\n<h2>Features</h2>\n\n<li>**Keybox**: multi-source catalog, custom keybox, Google revocation, backup/restore</li>\n<li>**Auto Target**: inotify + polling for new apps</li>\n<li>**App Targeting**: per-app states, suffixes, blacklist</li>\n<li>**Security Patch**: live fetch with offline fallback</li>\n<li>**ROM Fingerprint**: cleans custom ROM props and prefixes</li>\n<li>**ADB Disabler**: dev options, USB debugging, OEM unlock</li>\n<li>**PIF**: auto-detect variant, fetch fingerprint, block spoof engines</li>\n<li>**GMS Kill**: force-stops DroidGuard/GMS, clears Play Store</li>\n<li>**Module Configs**: HMA-OSS config generation, Zygisk Next</li>\n<li>**Detection Cleanup**: removes detector logs, temp dirs, caches</li>\n<li>**Widevine L1**: attestation keys via KmInstallKeybox</li>\n<li>**Conflict Resolution**: 8 modules — aggressive disabled, passive coexists, TEESimulator WebUI feature ownership</li>\n<li>**Scheduler**: periodic keybox info, auto-target, autopif</li>\n<li>**First-Boot**: backup originals, run full pipeline once</li>\n\n<h2>Requirements</h2>\n\n<li>Root access (Magisk / KernelSU / APatch)</li>\n<li>[Tricky Store](https://github.com/5ec1cff/TrickyStore/releases/latest) /</li>\n<p>  <a href=\"https://github.com/JingMatrix/TEESimulator/releases/latest\">TEESimulator</a> /</p>\n<p>  <a href=\"https://github.com/Enginex0/TEESimulator-RS/releases/latest\">TEESimulator-RS</a> /</p>\n<p>  or OhMyKeymint</p>\n<p>  (Specter auto-installs TEESimulator-RS if none detected)</p>\n<li>[Play Integrity Inject](https://github.com/KOWX712/PlayIntegrityFix/releases/latest)</li>\n<p>  or <a href=\"https://github.com/osm0sis/PlayIntegrityFork/releases/latest\">Play Integrity Fork</a></p>\n\n<h2>Build</h2>\n\n<pre>git clone https://github.com/dpejoh/specter\ncd specter\nnpm install\nnpm run build</pre>\n\n<p>Output: <code>Specter-v{version}.zip</code></p>\n\n<h3>Testing</h3>\n\n<pre>bash tests/run.sh          # Shell tests. 12 files, 321 assertions.\nnpm test                   # TS tests. 10 files, 94 tests (vitest + happy-dom).\nnpx tsc --noEmit           # TypeScript strict check</pre>\n\n<h3>CI</h3>\n\n<li>TypeScript strict, ShellCheck (warning), shell tests, TS tests</li>\n<li>Module structure verification</li>\n<li>No hardcoded `/data/adb/modules/Specter` paths in lib/ or features/</li>\n<li>No `su -c` in feature scripts</li>\n\n<h2>Legal</h2>\n\n<pre>FOR EDUCATIONAL PURPOSES ONLY.\nTHE DEVELOPER DOES NOT CONDONE ILLEGAL ACTIVITIES INCLUDING BYPASSING DRM, VIOLATING TERMS OF SERVICE, OR COMMITTING FRAUD.\nUSERS ARE SOLELY RESPONSIBLE FOR COMPLYING WITH APPLICABLE LAWS.</pre>\n\n<h2>Warning</h2>\n\n<pre>SPECTER IS PROGRAMMED NOT TO CAUSE PROBLEMS, BUT AN UNLOCKED PHONE ALWAYS COMES WITH RISKS.\nNOTHING IS 100% GUARANTEED. USE AT YOUR OWN RISK.\nYOUR WARRANTY MAY BE VOIDED, APPS MAY BREAK, AND ACCOUNT BANS ARE POSSIBLE.\nALWAYS MAINTAIN BACKUPS OF IMPORTANT DATA.</pre>\n\n<h2>Translations</h2>\n\n<p>The WebUI is translated into Arabic, Spanish, French, Hungarian, Indonesian, Polish, Russian, Turkish, and Chinese (mostly AI-generated. Human review welcome).</p>\n\n<p>To contribute translations:</p>\n<li>**Preferred**: Join the [Crowdin project](https://crowdin.com/project/specter-module) — web UI, no git needed</li>\n<li>**Alternative**: Edit the JSON files in `src/webroot/lang/` and submit a PR</li>\n\n<p>Automation:</p>\n<li>Pushing changes to `src/webroot/lang/source/string.json` on `main` uploads the new keys to Crowdin</li>\n<li>Every Monday a workflow downloads finished translations and opens a PR (`i18n: translation updates from Crowdin`)</li>\n<li>Required repo secrets: `CROWDIN_PROJECT_ID`, `CROWDIN_PERSONAL_TOKEN`</li>\n\n<p>Each <code>*.json</code> file is validated against <code>source/string.json</code> in CI (<code>npm test</code>). New keys without translations fall back to English.</p>\n\n<h2>Thanks</h2>\n\n<li>[chiteroman](https://github.com/chiteroman/PlayIntegrityFix), [KOWX712](https://github.com/KOWX712/PlayIntegrityFix) and [osm0sis](https://github.com/osm0sis/PlayIntegrityFork). PIF and forks.</li>\n<li>[5ec1cff](https://github.com/5ec1cff/TrickyStore), [JingMatrix](https://github.com/JingMatrix/TEESimulator), [Enginex0](https://github.com/Enginex0/TEESimulator-RS). Tricky Store and forks.</li>\n<li>[KOWX712](https://github.com/KOWX712/Tricky-Addon-Update-Target-List), [Enginex0](https://github.com/Enginex0/tricky-addon-enhanced). Tricky Store Addon.</li>\n<li>[eltavine](https://github.com/eltavine/Duck-Detector-Refactoring). Duck Detector.</li>\n<li>[Citra-Standalone](https://github.com/Citra-Standalone/TSupport-Advance). TSupport-Advance.</li>\n\n<h2>License</h2>\n\n<p>GNU GPL v3.0</p>",
+  "homepageUrl": "https://specter.dpejoh.com",
+  "sourceUrl": "https://github.com/dpejoh/specter",
+  "url": "https://github.com/dpejoh/specter",
+  "latestRelease": {
+    "name": "v1.5.0",
+    "version": "v1.5.0",
+    "time": "2026-09-12T11:41:38Z",
+    "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.5.0/specter-v1.5.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-09-12T11:41:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "specter-v1.5.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.5.0/specter-v1.5.0.zip",
+          "size": 941568,
+          "downloadCount": 21260
+        }
+      ]
+    },
+    {
+      "name": "v1.4.5.2",
+      "tagName": "v1.4.5.2",
+      "publishedAt": "2026-09-09T11:48:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "specter-v1.4.5-2.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.5.2/specter-v1.4.5-2.zip",
+          "size": 454651,
+          "downloadCount": 2492
+        }
+      ]
+    },
+    {
+      "name": "v1.4.5.1",
+      "tagName": "v1.4.5.1",
+      "publishedAt": "2026-09-02T17:59:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "specter-v1.4.5-1.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.5.1/specter-v1.4.5-1.zip",
+          "size": 445944,
+          "downloadCount": 3383
+        }
+      ]
+    },
+    {
+      "name": "v1.4.5",
+      "tagName": "v1.4.5",
+      "publishedAt": "2026-08-22T02:27:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "specter-v1.4.5.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.5/specter-v1.4.5.zip",
+          "size": 438412,
+          "downloadCount": 3928
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.17",
+      "tagName": "v1.4.4.17",
+      "publishedAt": "2026-06-28T02:29:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "specter-v1.4.4-17.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.17/specter-v1.4.4-17.zip",
+          "size": 385951,
+          "downloadCount": 11442
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.15",
+      "tagName": "v1.4.4.15",
+      "publishedAt": "2026-06-27T23:46:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4-15.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.15/Specter-v1.4.4-15.zip",
+          "size": 345363,
+          "downloadCount": 1717
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.14",
+      "tagName": "v1.4.4.14",
+      "publishedAt": "2026-06-20T22:22:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.14.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.14/Specter-v1.4.4.14.zip",
+          "size": 338127,
+          "downloadCount": 444
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.13",
+      "tagName": "v1.4.4.13",
+      "publishedAt": "2026-06-20T12:34:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.13.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.13/Specter-v1.4.4.13.zip",
+          "size": 333805,
+          "downloadCount": 269
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.12",
+      "tagName": "v1.4.4.12",
+      "publishedAt": "2026-06-20T00:30:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.12.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.12/Specter-v1.4.4.12.zip",
+          "size": 330568,
+          "downloadCount": 959
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.11",
+      "tagName": "v1.4.4.11",
+      "publishedAt": "2026-06-19T16:02:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.11.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.11/Specter-v1.4.4.11.zip",
+          "size": 321915,
+          "downloadCount": 296
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.10",
+      "tagName": "v1.4.4.10",
+      "publishedAt": "2026-06-19T11:07:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.10.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.10/Specter-v1.4.4.10.zip",
+          "size": 199673,
+          "downloadCount": 217
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4.09",
+      "tagName": "v1.4.4.09",
+      "publishedAt": "2026-06-18T19:57:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.09.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4.09/Specter-v1.4.4.09.zip",
+          "size": 196592,
+          "downloadCount": 489
+        }
+      ]
+    },
+    {
+      "name": "1.4.4.08",
+      "tagName": "1.4.4.08",
+      "publishedAt": "2026-06-16T18:40:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.08.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/1.4.4.08/Specter-v1.4.4.08.zip",
+          "size": 188766,
+          "downloadCount": 82
+        }
+      ]
+    },
+    {
+      "name": "1.4.4.07",
+      "tagName": "1.4.4.07",
+      "publishedAt": "2026-06-03T23:40:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-1.4.4.07.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/1.4.4.07/Specter-1.4.4.07.zip",
+          "size": 197363,
+          "downloadCount": 2274
+        }
+      ]
+    },
+    {
+      "name": "v1.4.4",
+      "tagName": "v1.4.4",
+      "publishedAt": "2026-06-02T13:51:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.4.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.4/Specter-v1.4.4.zip",
+          "size": 189719,
+          "downloadCount": 614
+        }
+      ]
+    },
+    {
+      "name": "v1.4.3",
+      "tagName": "v1.4.3",
+      "publishedAt": "2026-05-28T23:08:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.3.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.3/Specter-v1.4.3.zip",
+          "size": 181181,
+          "downloadCount": 1973
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2",
+      "tagName": "v1.4.2",
+      "publishedAt": "2026-05-26T20:50:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.2.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.2/Specter-v1.4.2.zip",
+          "size": 182043,
+          "downloadCount": 838
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2026-05-23T15:48:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.1.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.1/Specter-v1.4.1.zip",
+          "size": 175076,
+          "downloadCount": 771
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-05-17T12:16:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.4.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.4.0/Specter-v1.4.0.zip",
+          "size": 163735,
+          "downloadCount": 1156
+        }
+      ]
+    },
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2026-05-16T11:26:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.3.3.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.3.3/Specter-v1.3.3.zip",
+          "size": 178244,
+          "downloadCount": 462
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2026-05-14T13:22:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.3.2.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.3.2/Specter-v1.3.2.zip",
+          "size": 173756,
+          "downloadCount": 547
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2026-05-13T16:40:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.3.1.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.3.1/Specter-v1.3.1.zip",
+          "size": 173988,
+          "downloadCount": 399
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-05-12T10:46:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.3.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.3.0/Specter-v1.3.0.zip",
+          "size": 173552,
+          "downloadCount": 493
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-05-08T13:39:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.2.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.2.0/Specter-v1.2.0.zip",
+          "size": 161922,
+          "downloadCount": 758
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-05-06T13:50:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.1.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.1.0/Specter-v1.1.0.zip",
+          "size": 156007,
+          "downloadCount": 68
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-05-05T17:15:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Specter-v1.0.0.zip",
+          "downloadUrl": "https://github.com/dpejoh/specter/releases/download/v1.0.0/Specter-v1.0.0.zip",
+          "size": 149444,
+          "downloadCount": 61
+        }
+      ]
+    }
+  ]
+}

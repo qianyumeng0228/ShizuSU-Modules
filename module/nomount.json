@@ -1,0 +1,141 @@
+{
+  "readme": "# NoMount\n\n> **WARNING:** This project operates directly at the kernel VFS layer and is intended for research and development. Proceed with caution.\n\n**NoMount** is a VFS (Virtual File System) path redirection framework for Android kernels.\n\nUnlike traditional mount solutions like Magic Mount or OverlayFS that rely on modifying the mount table and polluting `/proc/mounts`, NoMount operates purely in RAM. Instead of making a real mount, it intercepts path resolution and directory iteration dynamically, making file injections completely transparent to the Android system and userspace apps without generating any mounts.\n\n<details>\n<summary><strong>View Screenshots</strong></summary>\n<br>\n<table>\n  <tr>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_1.jpg\"><img src=\"assets/module_1.jpg\" width=\"100%\" alt=\"Home Status\"></a></td>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_2.jpg\"><img src=\"assets/module_2.jpg\" width=\"100%\" alt=\"Modules List\"></a></td>\n  </tr>\n  <tr>\n    <td align=\"center\"><sub><b>Home Status</b></sub></td>\n    <td align=\"center\"><sub><b>Modules List</b></sub></td>\n  </tr>\n  <tr>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_3.jpg\"><img src=\"assets/module_3.jpg\" width=\"100%\" alt=\"Exclusions Empty\"></a></td>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_4.jpg\"><img src=\"assets/module_4.jpg\" width=\"100%\" alt=\"Exclusions Active\"></a></td>\n  </tr>\n  <tr>\n    <td align=\"center\"><sub><b>Exclusions Empty</b></sub></td>\n    <td align=\"center\"><sub><b>Exclusions Active</b></sub></td>\n  </tr>\n  <tr>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_5.jpg\"><img src=\"assets/module_5.jpg\" width=\"100%\" alt=\"App Selector\"></a></td>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_6.jpg\"><img src=\"assets/module_6.jpg\" width=\"100%\" alt=\"Manual UID Entry\"></a></td>\n  </tr>\n  <tr>\n    <td align=\"center\"><sub><b>App Selector</b></sub></td>\n    <td align=\"center\"><sub><b>Manual Entry</b></sub></td>\n  </tr>\n  <tr>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_7.jpg\"><img src=\"assets/module_7.jpg\" width=\"100%\" alt=\"Options\"></a></td>\n    <td width=\"50%\" align=\"center\"><a href=\"assets/module_8.jpg\"><img src=\"assets/module_8.jpg\" width=\"100%\" alt=\"Installation\"></a></td>\n  </tr>\n  <tr>\n    <td align=\"center\"><sub><b>Options</b></sub></td>\n    <td align=\"center\"><sub><b>Installation</b></sub></td>\n  </tr>\n</table>\n</details>\n\n## How it Works\n\nWhen you set up a redirection, you provide two paths: the original file the system expects to find (e.g., `/vendor/etc/audio.conf`), and your modified file located elsewhere (e.g., `/data/local/tmp/mod.conf`).\n\nInstead of applying global hooks in-kernel that affect the whole system, NoMount specifically modifies the directory operations of the target path directly in the RAM cache. When an application requests the original file, NoMount intercepts the call and creates a fake file representation in RAM. Once the application opens this file, NoMount internally opens your real modified file in the background and links them together. From that exact moment, any read, memory mapping (`mmap`), or data operation performed by the application is forwarded to your real file. The application reads the modified content naturally, completely unaware of the redirection.\n\nNoMount also takes control of directory iteration. This allows you to inject entirely new files into existing system directories or completely hide existing ones (known as whiteouts). When an app or a terminal command like `ls` tries to list the contents of a directory, NoMount dynamically injects the new entries or omits the hidden ones, reflecting the changes in file lists and system calls. Also NoMount includes a dedicated UID filter. Before any path interception occurs, NoMount checks the process ID of the application making the request. If the app's UID is flagged (such as a banking app or an root detector), NoMount simply steps aside and lets the kernel resolve the path normally. The isolated app will see the stock, untouched filesystem.\n\nThis approach makes NoMount highly compatible with both read-only partitions (like `erofs`) and read-write partitions (like `ext4`), because the underlying partition is never modified. Furthermore, all communication between the userspace tool and the kernel is handled via the Linux keyring subsystem (`add_key`), completely bypassing the complications of traditional `/dev` nodes and IOCTL commands.\n\n## How to Use It (Metamodule)\n\nNoMount is distributed as a **Metamodule** for KernelSU (and forks) and APatch (and forks). This means it acts as a master module that dynamically intercepts and manages the mounting process of other standard modules in your system.\n\nThe NoMount module includes a built-in **WebUI** that allows you to easily control the kernel subsystem without touching the terminal:\n* **Hot Load/Unload:** Enable or disable modules on the fly without rebooting.\n* **App Exclusion (UID Isolation):** Select specific apps (like banking apps or anti-cheats) from a list. The WebUI extracts their UID and isolates them, ensuring they only see the stock, untouched filesystem.\n* **Global Flush:** Instantly clear all redirection rules.\n\n### Do I need a custom kernel?\n\nSince NoMount operates at the VFS layer, it requires kernel-level integration. However, how you get this integration depends on your device:\n\n* **Standard GKI Kernels (5.10+):** You **DO NOT** need to modify your kernel. The NoMount release ZIP includes pre-compiled LKMs (Loadable Kernel Modules) that will inject the VFS subsystem automatically upon flashing.\n* **Legacy Kernels (< 5.10) and Strict Kernels:** If you are on an older kernel (e.g., 4.14, 4.19) or a strictly locked kernel (e.g., Sultan kernels with `CONFIG_INTEGRATED_MODULES=y`), the pre-compiled LKMs will not load. You will need to integrate NoMount directly into your kernel source or compile a specific LKM for your device.\n\nFor detailed instructions on how to patch your kernel source or compile a custom LKM, please read [kernel/README.md](kernel/README.md).\n\n### How to Install the NoMount Metamodule\n\nIf your kernel already has NoMount integrated, or if you plan to use the included / compiled LKM, simply download the latest module from [Releases](https://github.com/maxsteeel/nomount/releases) or the [Nightly builds (dev branch)](https://nightly.link/maxsteeel/nomount/workflows/build/dev). Flash it via KernelSU/APatch and reboot your device.\n\nAfter rebooting, just install your favorite modules (like audio mods or system tweaks) in KernelSU/APatch exactly as you normally would. NoMount's Metamodule will automatically intercept them at boot and use VFS injection instead of traditional mounts.\n\n## How to Use It (Binary)\n\nThe subsystem is controlled via the `nm` binary. The CLI uses a simple command structure.\n\n| Command | Description |\n| --- | --- |\n| `nm rule add <virtual> <real>` | Inject `real` file at `virtual` path. |\n| `nm rule add --whiteout <virtual>` | Hide the file/directory at `virtual` path. |\n| `nm rule del <virtual>` | Remove a specific injection rule. |\n| `nm uid add <uid>` | Isolate UID. The app will see the stock filesystem. |\n| `nm uid del <uid>` | Remove isolation for UID. |\n| `nm rule list` | Show currently active injection rules. |\n| `nm rule list --json` | Show currently active injection rules in JSON format. |\n| `nm uid list` | Show currently isolated UIDs. |\n| `nm clear all` | Flush all rules and UID blocks immediately. |\n| `nm version` | Show the kernel subsystem version. |\n\n### Examples\n\n**Inject a custom library:**\n\n```bash\n# The system thinks libfoo.so is in /vendor, but it loads from /data\nnm rule add /vendor/lib64/soundfx/libfoo.so /data/local/tmp/my_lib.so\n\n```\n\n**Hide a file completely (Whiteout):**\n\n```bash\n# Make the system think this configuration file does not exist\nnm rule add --whiteout /system/etc/hidden_config.xml\n\n```\n\n**Hide modifications from a specific app:**\n\n```bash\n# App with UID 10256 will see the untouched filesystem, bypassing detection\nnm uid add 10256\n\n```\n\n> **Note:** Because NoMount operates entirely in RAM, manual rules or modifications created via the CLI are lost upon reboot. The metamodule handles the persistent injection of your installed modules automatically during the boot process.\n\n## Special Thanks\n\n* **[Kasumi](https://github.com/Anatdx/Kasumi)**: Inspiration for this project.\n* **[ZQZCC](https://github.com/ZQZCC)**: WebUI MD3E-style design.\n* **[backslashxx](https://github.com/backslashxx)**: Code optimization.\n* **[KernelSU](https://github.com/tiann/KernelSU)**: Root solution.\n* **All testers and contributors**: Thanks for testing this project and helping to make it stable.\n\n## License\n\n- Files under `kernel` directory are [GPL-2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)\n- All other parts except `kernel` directory are [GPL-3](https://www.gnu.org/licenses/gpl-3.0.html)\n\n## Disclaimer\n\n**NoMount** is a kernel modification tool intended for research and development. Modifying kernel behavior carries inherent risks. The developers are not responsible for bricked devices, data loss, or thermonuclear war.\n",
+  "readmeHTML": "<h1>NoMount</h1>\n\n<p>> <b>WARNING:</b> This project operates directly at the kernel VFS layer and is intended for research and development. Proceed with caution.</p>\n\n<p><b>NoMount</b> is a VFS (Virtual File System) path redirection framework for Android kernels.</p>\n\n<p>Unlike traditional mount solutions like Magic Mount or OverlayFS that rely on modifying the mount table and polluting <code>/proc/mounts</code>, NoMount operates purely in RAM. Instead of making a real mount, it intercepts path resolution and directory iteration dynamically, making file injections completely transparent to the Android system and userspace apps without generating any mounts.</p>\n\n<p><details></p>\n<p><summary><strong>View Screenshots</strong></summary></p>\n<p><br></p>\n<p><table></p>\n<p>  <tr></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_1.jpg\"><img src=\"assets/module_1.jpg\" width=\"100%\" alt=\"Home Status\"></a></td></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_2.jpg\"><img src=\"assets/module_2.jpg\" width=\"100%\" alt=\"Modules List\"></a></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\"><sub><b>Home Status</b></sub></td></p>\n<p>    <td align=\"center\"><sub><b>Modules List</b></sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_3.jpg\"><img src=\"assets/module_3.jpg\" width=\"100%\" alt=\"Exclusions Empty\"></a></td></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_4.jpg\"><img src=\"assets/module_4.jpg\" width=\"100%\" alt=\"Exclusions Active\"></a></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\"><sub><b>Exclusions Empty</b></sub></td></p>\n<p>    <td align=\"center\"><sub><b>Exclusions Active</b></sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_5.jpg\"><img src=\"assets/module_5.jpg\" width=\"100%\" alt=\"App Selector\"></a></td></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_6.jpg\"><img src=\"assets/module_6.jpg\" width=\"100%\" alt=\"Manual UID Entry\"></a></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\"><sub><b>App Selector</b></sub></td></p>\n<p>    <td align=\"center\"><sub><b>Manual Entry</b></sub></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_7.jpg\"><img src=\"assets/module_7.jpg\" width=\"100%\" alt=\"Options\"></a></td></p>\n<p>    <td width=\"50%\" align=\"center\"><a href=\"assets/module_8.jpg\"><img src=\"assets/module_8.jpg\" width=\"100%\" alt=\"Installation\"></a></td></p>\n<p>  </tr></p>\n<p>  <tr></p>\n<p>    <td align=\"center\"><sub><b>Options</b></sub></td></p>\n<p>    <td align=\"center\"><sub><b>Installation</b></sub></td></p>\n<p>  </tr></p>\n<p></table></p>\n<p></details></p>\n\n<h2>How it Works</h2>\n\n<p>When you set up a redirection, you provide two paths: the original file the system expects to find (e.g., <code>/vendor/etc/audio.conf</code>), and your modified file located elsewhere (e.g., <code>/data/local/tmp/mod.conf</code>).</p>\n\n<p>Instead of applying global hooks in-kernel that affect the whole system, NoMount specifically modifies the directory operations of the target path directly in the RAM cache. When an application requests the original file, NoMount intercepts the call and creates a fake file representation in RAM. Once the application opens this file, NoMount internally opens your real modified file in the background and links them together. From that exact moment, any read, memory mapping (<code>mmap</code>), or data operation performed by the application is forwarded to your real file. The application reads the modified content naturally, completely unaware of the redirection.</p>\n\n<p>NoMount also takes control of directory iteration. This allows you to inject entirely new files into existing system directories or completely hide existing ones (known as whiteouts). When an app or a terminal command like <code>ls</code> tries to list the contents of a directory, NoMount dynamically injects the new entries or omits the hidden ones, reflecting the changes in file lists and system calls. Also NoMount includes a dedicated UID filter. Before any path interception occurs, NoMount checks the process ID of the application making the request. If the app's UID is flagged (such as a banking app or an root detector), NoMount simply steps aside and lets the kernel resolve the path normally. The isolated app will see the stock, untouched filesystem.</p>\n\n<p>This approach makes NoMount highly compatible with both read-only partitions (like <code>erofs</code>) and read-write partitions (like <code>ext4</code>), because the underlying partition is never modified. Furthermore, all communication between the userspace tool and the kernel is handled via the Linux keyring subsystem (<code>add_key</code>), completely bypassing the complications of traditional <code>/dev</code> nodes and IOCTL commands.</p>\n\n<h2>How to Use It (Metamodule)</h2>\n\n<p>NoMount is distributed as a <b>Metamodule</b> for KernelSU (and forks) and APatch (and forks). This means it acts as a master module that dynamically intercepts and manages the mounting process of other standard modules in your system.</p>\n\n<p>The NoMount module includes a built-in <b>WebUI</b> that allows you to easily control the kernel subsystem without touching the terminal:</p>\n<li>**Hot Load/Unload:** Enable or disable modules on the fly without rebooting.</li>\n<li>**App Exclusion (UID Isolation):** Select specific apps (like banking apps or anti-cheats) from a list. The WebUI extracts their UID and isolates them, ensuring they only see the stock, untouched filesystem.</li>\n<li>**Global Flush:** Instantly clear all redirection rules.</li>\n\n<h3>Do I need a custom kernel?</h3>\n\n<p>Since NoMount operates at the VFS layer, it requires kernel-level integration. However, how you get this integration depends on your device:</p>\n\n<li>**Standard GKI Kernels (5.10+):** You **DO NOT** need to modify your kernel. The NoMount release ZIP includes pre-compiled LKMs (Loadable Kernel Modules) that will inject the VFS subsystem automatically upon flashing.</li>\n<li>**Legacy Kernels (< 5.10) and Strict Kernels:** If you are on an older kernel (e.g., 4.14, 4.19) or a strictly locked kernel (e.g., Sultan kernels with `CONFIG_INTEGRATED_MODULES=y`), the pre-compiled LKMs will not load. You will need to integrate NoMount directly into your kernel source or compile a specific LKM for your device.</li>\n\n<p>For detailed instructions on how to patch your kernel source or compile a custom LKM, please read <a href=\"kernel/README.md\">kernel/README.md</a>.</p>\n\n<h3>How to Install the NoMount Metamodule</h3>\n\n<p>If your kernel already has NoMount integrated, or if you plan to use the included / compiled LKM, simply download the latest module from <a href=\"https://github.com/maxsteeel/nomount/releases\">Releases</a> or the <a href=\"https://nightly.link/maxsteeel/nomount/workflows/build/dev\">Nightly builds (dev branch)</a>. Flash it via KernelSU/APatch and reboot your device.</p>\n\n<p>After rebooting, just install your favorite modules (like audio mods or system tweaks) in KernelSU/APatch exactly as you normally would. NoMount's Metamodule will automatically intercept them at boot and use VFS injection instead of traditional mounts.</p>\n\n<h2>How to Use It (Binary)</h2>\n\n<p>The subsystem is controlled via the <code>nm</code> binary. The CLI uses a simple command structure.</p>\n\n<p>| Command | Description |</p>\n<p>| --- | --- |</p>\n<p>| <code>nm rule add <virtual> <real></code> | Inject <code>real</code> file at <code>virtual</code> path. |</p>\n<p>| <code>nm rule add --whiteout <virtual></code> | Hide the file/directory at <code>virtual</code> path. |</p>\n<p>| <code>nm rule del <virtual></code> | Remove a specific injection rule. |</p>\n<p>| <code>nm uid add <uid></code> | Isolate UID. The app will see the stock filesystem. |</p>\n<p>| <code>nm uid del <uid></code> | Remove isolation for UID. |</p>\n<p>| <code>nm rule list</code> | Show currently active injection rules. |</p>\n<p>| <code>nm rule list --json</code> | Show currently active injection rules in JSON format. |</p>\n<p>| <code>nm uid list</code> | Show currently isolated UIDs. |</p>\n<p>| <code>nm clear all</code> | Flush all rules and UID blocks immediately. |</p>\n<p>| <code>nm version</code> | Show the kernel subsystem version. |</p>\n\n<h3>Examples</h3>\n\n<p><b>Inject a custom library:</b></p>\n\n<pre># The system thinks libfoo.so is in /vendor, but it loads from /data\nnm rule add /vendor/lib64/soundfx/libfoo.so /data/local/tmp/my_lib.so\n</pre>\n\n<p><b>Hide a file completely (Whiteout):</b></p>\n\n<pre># Make the system think this configuration file does not exist\nnm rule add --whiteout /system/etc/hidden_config.xml\n</pre>\n\n<p><b>Hide modifications from a specific app:</b></p>\n\n<pre># App with UID 10256 will see the untouched filesystem, bypassing detection\nnm uid add 10256\n</pre>\n\n<p>> <b>Note:</b> Because NoMount operates entirely in RAM, manual rules or modifications created via the CLI are lost upon reboot. The metamodule handles the persistent injection of your installed modules automatically during the boot process.</p>\n\n<h2>Special Thanks</h2>\n\n<li>**[Kasumi](https://github.com/Anatdx/Kasumi)**: Inspiration for this project.</li>\n<li>**[ZQZCC](https://github.com/ZQZCC)**: WebUI MD3E-style design.</li>\n<li>**[backslashxx](https://github.com/backslashxx)**: Code optimization.</li>\n<li>**[KernelSU](https://github.com/tiann/KernelSU)**: Root solution.</li>\n<li>**All testers and contributors**: Thanks for testing this project and helping to make it stable.</li>\n\n<h2>License</h2>\n\n<li>Files under `kernel` directory are [GPL-2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)</li>\n<li>All other parts except `kernel` directory are [GPL-3](https://www.gnu.org/licenses/gpl-3.0.html)</li>\n\n<h2>Disclaimer</h2>\n\n<p><b>NoMount</b> is a kernel modification tool intended for research and development. Modifying kernel behavior carries inherent risks. The developers are not responsible for bricked devices, data loss, or thermonuclear war.</p>",
+  "homepageUrl": "https://t.me/nomount",
+  "sourceUrl": "https://github.com/maxsteeel/nomount",
+  "url": "https://github.com/maxsteeel/nomount",
+  "latestRelease": {
+    "name": "v2.2.0",
+    "version": "v2.2.0",
+    "time": "2026-10-22T16:42:59Z",
+    "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v2.2.0/NoMount-v2.2.0-release-605.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-10-22T16:42:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v2.2.0-release-605.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v2.2.0/NoMount-v2.2.0-release-605.zip",
+          "size": 468780,
+          "downloadCount": 6254
+        }
+      ]
+    },
+    {
+      "name": "v2.1.1",
+      "tagName": "v2.1.1",
+      "publishedAt": "2026-10-13T08:36:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v2.1.1-release-7046c7a-555.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v2.1.1/NoMount-v2.1.1-release-7046c7a-555.zip",
+          "size": 263841,
+          "downloadCount": 4866
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-10-06T07:31:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v2.1.0-release-500.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v2.1.0/NoMount-v2.1.0-release-500.zip",
+          "size": 251243,
+          "downloadCount": 4195
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-08-24T12:32:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v2.0.0-release.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v2.0.0/NoMount-v2.0.0-release.zip",
+          "size": 325526,
+          "downloadCount": 10974
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-08-07T17:36:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v1.1.1-release.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v1.1.1/NoMount-v1.1.1-release.zip",
+          "size": 31837,
+          "downloadCount": 611
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-06-22T12:58:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v1.1.0-release.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v1.1.0/NoMount-v1.1.0-release.zip",
+          "size": 31793,
+          "downloadCount": 3079
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-05-26T09:56:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v1.0.0-release.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v1.0.0/NoMount-v1.0.0-release.zip",
+          "size": 102215,
+          "downloadCount": 531
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-02-10T03:32:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v0.2.0.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v0.2.0/NoMount-v0.2.0.zip",
+          "size": 38858,
+          "downloadCount": 111
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-01-09T06:27:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NoMount-v0.1.0.zip",
+          "downloadUrl": "https://github.com/maxsteeel/nomount/releases/download/v0.1.0/NoMount-v0.1.0.zip",
+          "size": 35360,
+          "downloadCount": 75
+        }
+      ]
+    }
+  ]
+}

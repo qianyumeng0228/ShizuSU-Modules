@@ -1,0 +1,239 @@
+{
+  "readme": "<div align=\"center\">\n\n# LuminPro — 日用屏幕亮度强化\n\n**中文简体** 丨 [English](https://github.com/YuleBest/LuminPro/blob/main/README_en.md)\n\n让你的 Android 设备随时可以突破前台亮度上限，将屏幕提升至硬件峰值  \n_基于 KernelSU WebUI + Go 事件驱动架构_\n\n</div>\n\n## 模块介绍\n\n无论当前屏幕亮度如何，只要触发亮度超过设定阈值，LuminPro 便会自动且平滑地将屏幕提升至硬件支持的峰值亮度，确保你在强光户外也能获得清晰的显示效果。模块采用 Go 编写的常驻守护进程进行底层文件事件监听，零轮询、零空转，配合 KernelSU WebUI 提供完整的可视化配置与状态监控。\n\n> [!TIP]\n> 如果你是开发者，请参阅 [开发文档 (DEVELOPMENT.md)](./DEVELOPMENT.md) 了解构建与调试流程。\n\n## V2.3+ 核心特性\n\n- **零耗电底层监听 (luminpro)**  \n  彻底告别死循环与轮询。Go 编写的常驻守护进程 (`luminpro`) 直接使用 inotify 监听亮度节点，仅在文件发生变更的瞬间响应，内置 300ms 防抖与事件排空；判定逻辑、渐变写入、状态维护全部在同一进程内完成，无脚本拼接与进程拉起开销，并具备**失效自动修复**机制（监听失效自动重建、遗留锁自动回收）。\n\n- **兼容模式 (轮询驱动)**  \n  针对部分无法触发 inotify 事件的特殊机型，新增兼容模式。开启后模块切换为 2 秒一次的低频轮询，确保在任何环境下都能正常工作。\n\n- **KernelSU WebUI 可视化配置**  \n  在管理器的模块设置页面中，通过暗色面板实时调整所有参数，保存后**立即生效**，无需重启：\n  - `前台最大亮度` — 触发提升的亮度阈值\n  - `峰值最大亮度` — 提升后的目标硬件亮度\n  - `调整步数` — 平滑过渡的步进数（默认 50 步）\n  - `休眠时段` — 指定不触发提升的时间范围（如 `2200-0700`）\n  - `日志等级` — 控制日志输出量（关闭 / 仅错误 / 警告+ / 全部）\n  - `亮度/最大亮度节点路径` — 支持自定义设备 sysfs 路径\n  - `inotify 监测事件` — 自定义监听的事件类型\n\n- **平滑亮度过渡**  \n  毫秒级 50 步步进算法，避免亮度瞬间跃升带来的视觉不适。步数可在 WebUI 中自由调整。\n\n- **智能跳过机制**  \n  以下情况模块将自动跳过本次提升，避免干扰正常使用：\n  - 系统自动亮度已启用\n  - 当前正在播放 HDR 内容（可配置）\n  - 当前前台应用在黑名单中\n  - 处于配置的休眠时段内\n\n- **应用黑名单**  \n  在 WebUI 的「应用」页面中管理黑名单，支持按包名搜索、Activity 精准匹配（可通过内置扫描工具自动获取前台 Activity 名）。黑名单内的应用处于前台时，模块不执行亮度提升。\n\n- **一键峰值触发 (boost.sh)**  \n  通过管理器的「操作」按钮或 `action.sh` 快捷开关，可即时将亮度拉至峰值；再次触发则恢复原始亮度。\n\n- **实时状态监控与日志**  \n  WebUI 状态页实时显示当前亮度值、守护进程 PID 及服务状态。日志页支持按 `INFO` / `WARN` / `ERROR` 等级过滤，并可一键复制或导出到 `/sdcard`。\n\n## 配置项说明\n\n| 配置项              | 说明                            | 默认值            |\n| ------------------- | ------------------------------- | ----------------- |\n| `ui_max_bri`        | 前台触发阈值（UI 亮度值）       | `0`（需手动校准） |\n| `max_bri`           | 峰值目标亮度                    | `0`（需手动校准） |\n| `compatibility_mode`| 兼容模式（轮询驱动）            | `0`（禁用）       |\n| `steps_num`         | 亮度过渡步数                    | `50`              |\n| `sleep_time`        | 休眠时段，格式 `HHMM-HHMM`      | 空（禁用）        |\n| `auto_bri_sleep`    | 自动亮度开启时跳过              | `1`（启用）       |\n| `display_hdr_sleep` | HDR 内容时跳过                  | `0`（禁用）       |\n| `hdr_enter_ratio`   | HDR 进入休眠阈值（HDR/SDR 比率）| `1.15`            |\n| `hdr_exit_ratio`    | HDR 退出休眠阈值（HDR/SDR 比率）| `1.05`            |\n| `log_level`         | 日志等级（off/error/warn/info） | `info`            |\n| `log_max_size`      | 日志文件大小上限（KB）          | `512`             |\n| `now_bri_file`      | 当前亮度节点路径                | 标准 panel0 路径  |\n| `max_bri_file`      | 最大亮度节点路径                | 标准 panel0 路径  |\n| `blacklist_apps`    | 黑名单包名/Activity 列表        | `[]`              |\n| `inotify_events`    | 监听事件                        | `c`               |\n\n## 安装方法\n\n1. 在支持 KernelSU WebUI 的管理器中刷入模块 ZIP。\n2. 在音量键安装向导中完成亮度校准（若已有旧版配置，按音量上键直接继承跳过）。\n3. 重启设备生效。\n4. 在管理器模块设置页调整各项参数，点击保存立即生效。\n\n## 版本通道\n\n- **正式版**：稳定发布，自动更新只会推正式版\n- **预览版 (Beta)**：抢先体验新功能，可能不稳定；刷入 beta 包后会自动跟随 beta 更新\n\n两个通道互不干扰——正式版用户不会收到 beta 包。预览版用户在下一个正式版发布时会自动\n收到正式版；若想提前回到正式版，手动刷入正式版包即可。\n\n下载地址：[GitHub Releases](https://github.com/YuleBest/LuminPro/releases)\n（`v*` 为正式版，`*-beta*` 为预览版）\n\n## 注意事项\n\n> ⚠️ **OLED 烧屏与发热警告**  \n> 长期维持峰值亮度会显著加剧 OLED 屏幕老化与烧屏风险，并大幅增加设备发热与耗电。请根据使用场景合理配置，切勿超出设备硬件安全范围。\n\n- 确保填写的亮度数值在设备硬件支持的安全范围内。\n- 遇到问题时，请通过 WebUI 日志页导出运行日志后反馈至社区。\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>LuminPro — 日用屏幕亮度强化</h1>\n\n<p><b>中文简体</b> 丨 <a href=\"https://github.com/YuleBest/LuminPro/blob/main/README_en.md\">English</a></p>\n\n<p>让你的 Android 设备随时可以突破前台亮度上限，将屏幕提升至硬件峰值</p>\n<p>_基于 KernelSU WebUI + Go 事件驱动架构_</p>\n\n<p></div></p>\n\n<h2>模块介绍</h2>\n\n<p>无论当前屏幕亮度如何，只要触发亮度超过设定阈值，LuminPro 便会自动且平滑地将屏幕提升至硬件支持的峰值亮度，确保你在强光户外也能获得清晰的显示效果。模块采用 Go 编写的常驻守护进程进行底层文件事件监听，零轮询、零空转，配合 KernelSU WebUI 提供完整的可视化配置与状态监控。</p>\n\n<p>> [!TIP]</p>\n<p>> 如果你是开发者，请参阅 <a href=\"./DEVELOPMENT.md\">开发文档 (DEVELOPMENT.md)</a> 了解构建与调试流程。</p>\n\n<h2>V2.3+ 核心特性</h2>\n\n<li>**零耗电底层监听 (luminpro)**</li>\n<p>  彻底告别死循环与轮询。Go 编写的常驻守护进程 (<code>luminpro</code>) 直接使用 inotify 监听亮度节点，仅在文件发生变更的瞬间响应，内置 300ms 防抖与事件排空；判定逻辑、渐变写入、状态维护全部在同一进程内完成，无脚本拼接与进程拉起开销，并具备<b>失效自动修复</b>机制（监听失效自动重建、遗留锁自动回收）。</p>\n\n<li>**兼容模式 (轮询驱动)**</li>\n<p>  针对部分无法触发 inotify 事件的特殊机型，新增兼容模式。开启后模块切换为 2 秒一次的低频轮询，确保在任何环境下都能正常工作。</p>\n\n<li>**KernelSU WebUI 可视化配置**</li>\n<p>  在管理器的模块设置页面中，通过暗色面板实时调整所有参数，保存后<b>立即生效</b>，无需重启：</p>\n<p>  - <code>前台最大亮度</code> — 触发提升的亮度阈值</p>\n<p>  - <code>峰值最大亮度</code> — 提升后的目标硬件亮度</p>\n<p>  - <code>调整步数</code> — 平滑过渡的步进数（默认 50 步）</p>\n<p>  - <code>休眠时段</code> — 指定不触发提升的时间范围（如 <code>2200-0700</code>）</p>\n<p>  - <code>日志等级</code> — 控制日志输出量（关闭 / 仅错误 / 警告+ / 全部）</p>\n<p>  - <code>亮度/最大亮度节点路径</code> — 支持自定义设备 sysfs 路径</p>\n<p>  - <code>inotify 监测事件</code> — 自定义监听的事件类型</p>\n\n<li>**平滑亮度过渡**</li>\n<p>  毫秒级 50 步步进算法，避免亮度瞬间跃升带来的视觉不适。步数可在 WebUI 中自由调整。</p>\n\n<li>**智能跳过机制**</li>\n<p>  以下情况模块将自动跳过本次提升，避免干扰正常使用：</p>\n<p>  - 系统自动亮度已启用</p>\n<p>  - 当前正在播放 HDR 内容（可配置）</p>\n<p>  - 当前前台应用在黑名单中</p>\n<p>  - 处于配置的休眠时段内</p>\n\n<li>**应用黑名单**</li>\n<p>  在 WebUI 的「应用」页面中管理黑名单，支持按包名搜索、Activity 精准匹配（可通过内置扫描工具自动获取前台 Activity 名）。黑名单内的应用处于前台时，模块不执行亮度提升。</p>\n\n<li>**一键峰值触发 (boost.sh)**</li>\n<p>  通过管理器的「操作」按钮或 <code>action.sh</code> 快捷开关，可即时将亮度拉至峰值；再次触发则恢复原始亮度。</p>\n\n<li>**实时状态监控与日志**</li>\n<p>  WebUI 状态页实时显示当前亮度值、守护进程 PID 及服务状态。日志页支持按 <code>INFO</code> / <code>WARN</code> / <code>ERROR</code> 等级过滤，并可一键复制或导出到 <code>/sdcard</code>。</p>\n\n<h2>配置项说明</h2>\n\n<p>| 配置项              | 说明                            | 默认值            |</p>\n<p>| ------------------- | ------------------------------- | ----------------- |</p>\n<p>| <code>ui_max_bri</code>        | 前台触发阈值（UI 亮度值）       | <code>0</code>（需手动校准） |</p>\n<p>| <code>max_bri</code>           | 峰值目标亮度                    | <code>0</code>（需手动校准） |</p>\n<p>| <code>compatibility_mode</code>| 兼容模式（轮询驱动）            | <code>0</code>（禁用）       |</p>\n<p>| <code>steps_num</code>         | 亮度过渡步数                    | <code>50</code>              |</p>\n<p>| <code>sleep_time</code>        | 休眠时段，格式 <code>HHMM-HHMM</code>      | 空（禁用）        |</p>\n<p>| <code>auto_bri_sleep</code>    | 自动亮度开启时跳过              | <code>1</code>（启用）       |</p>\n<p>| <code>display_hdr_sleep</code> | HDR 内容时跳过                  | <code>0</code>（禁用）       |</p>\n<p>| <code>hdr_enter_ratio</code>   | HDR 进入休眠阈值（HDR/SDR 比率）| <code>1.15</code>            |</p>\n<p>| <code>hdr_exit_ratio</code>    | HDR 退出休眠阈值（HDR/SDR 比率）| <code>1.05</code>            |</p>\n<p>| <code>log_level</code>         | 日志等级（off/error/warn/info） | <code>info</code>            |</p>\n<p>| <code>log_max_size</code>      | 日志文件大小上限（KB）          | <code>512</code>             |</p>\n<p>| <code>now_bri_file</code>      | 当前亮度节点路径                | 标准 panel0 路径  |</p>\n<p>| <code>max_bri_file</code>      | 最大亮度节点路径                | 标准 panel0 路径  |</p>\n<p>| <code>blacklist_apps</code>    | 黑名单包名/Activity 列表        | <code>[]</code>              |</p>\n<p>| <code>inotify_events</code>    | 监听事件                        | <code>c</code>               |</p>\n\n<h2>安装方法</h2>\n\n<li>在支持 KernelSU WebUI 的管理器中刷入模块 ZIP。</li>\n<li>在音量键安装向导中完成亮度校准（若已有旧版配置，按音量上键直接继承跳过）。</li>\n<li>重启设备生效。</li>\n<li>在管理器模块设置页调整各项参数，点击保存立即生效。</li>\n\n<h2>版本通道</h2>\n\n<li>**正式版**：稳定发布，自动更新只会推正式版</li>\n<li>**预览版 (Beta)**：抢先体验新功能，可能不稳定；刷入 beta 包后会自动跟随 beta 更新</li>\n\n<p>两个通道互不干扰——正式版用户不会收到 beta 包。预览版用户在下一个正式版发布时会自动</p>\n<p>收到正式版；若想提前回到正式版，手动刷入正式版包即可。</p>\n\n<p>下载地址：<a href=\"https://github.com/YuleBest/LuminPro/releases\">GitHub Releases</a></p>\n<p>（<code>v*</code> 为正式版，<code>*-beta*</code> 为预览版）</p>\n\n<h2>注意事项</h2>\n\n<p>> ⚠️ <b>OLED 烧屏与发热警告</b></p>\n<p>> 长期维持峰值亮度会显著加剧 OLED 屏幕老化与烧屏风险，并大幅增加设备发热与耗电。请根据使用场景合理配置，切勿超出设备硬件安全范围。</p>\n\n<li>确保填写的亮度数值在设备硬件支持的安全范围内。</li>\n<li>遇到问题时，请通过 WebUI 日志页导出运行日志后反馈至社区。</li>",
+  "homepageUrl": "https://github.com/YuleBest/LuminPro",
+  "sourceUrl": "https://github.com/YuleBest/LuminPro",
+  "url": "https://github.com/YuleBest/LuminPro",
+  "latestRelease": {
+    "name": "v2.5.0",
+    "version": "v2.5.0",
+    "time": "2026-09-11T19:07:44Z",
+    "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0/LuminPro_V2.5.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.5.0",
+      "tagName": "v2.5.0",
+      "publishedAt": "2026-09-11T19:07:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0/LuminPro_V2.5.0.zip",
+          "size": 1534028,
+          "downloadCount": 2195
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.6",
+      "tagName": "v2.5.0-beta.6",
+      "publishedAt": "2026-09-11T18:57:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.6.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.6/LuminPro_V2.5.0-beta.6.zip",
+          "size": 1534427,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.5",
+      "tagName": "v2.5.0-beta.5",
+      "publishedAt": "2026-09-11T11:05:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.5.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.5/LuminPro_V2.5.0-beta.5.zip",
+          "size": 1534042,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.4",
+      "tagName": "v2.5.0-beta.4",
+      "publishedAt": "2026-09-11T11:02:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.4.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.4/LuminPro_V2.5.0-beta.4.zip",
+          "size": 1533970,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.3",
+      "tagName": "v2.5.0-beta.3",
+      "publishedAt": "2026-09-11T10:52:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.3.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.3/LuminPro_V2.5.0-beta.3.zip",
+          "size": 1533813,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.2",
+      "tagName": "v2.5.0-beta.2",
+      "publishedAt": "2026-09-10T03:29:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.2.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.2/LuminPro_V2.5.0-beta.2.zip",
+          "size": 1532804,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v2.5.0-beta.1",
+      "tagName": "v2.5.0-beta.1",
+      "publishedAt": "2026-09-09T21:11:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.5.0-beta.1.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.5.0-beta.1/LuminPro_V2.5.0-beta.1.zip",
+          "size": 1460723,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v2.4-2401",
+      "tagName": "v2.4-2401",
+      "publishedAt": "2026-06-01T20:08:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.4-2401-f2c489e.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.4-2401/LuminPro_V2.4-2401-f2c489e.zip",
+          "size": 1297153,
+          "downloadCount": 1125
+        }
+      ]
+    },
+    {
+      "name": "v2.3-2301",
+      "tagName": "v2.3-2301",
+      "publishedAt": "2026-04-10T01:34:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.3-2301.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.3-2301/LuminPro_V2.3-2301.zip",
+          "size": 1293487,
+          "downloadCount": 321
+        }
+      ]
+    },
+    {
+      "name": "v2.2-2208",
+      "tagName": "v2.2-2208",
+      "publishedAt": "2026-04-09T01:18:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.2-2208.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.2-2208/LuminPro_V2.2-2208.zip",
+          "size": 264895,
+          "downloadCount": 30
+        }
+      ]
+    },
+    {
+      "name": "v2.2-2204",
+      "tagName": "v2.2-2204",
+      "publishedAt": "2026-04-05T22:29:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.2-2204.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.2-2204/LuminPro_V2.2-2204.zip",
+          "size": 187626,
+          "downloadCount": 80
+        }
+      ]
+    },
+    {
+      "name": "v2.2-2202",
+      "tagName": "v2.2-2202",
+      "publishedAt": "2026-04-04T17:31:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.2-2202.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.2-2202/LuminPro_V2.2-2202.zip",
+          "size": 178458,
+          "downloadCount": 56
+        }
+      ]
+    },
+    {
+      "name": "v2.1-2101",
+      "tagName": "v2.1-2101",
+      "publishedAt": "2026-04-03T01:17:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.1-2101.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/v2.1-2101/LuminPro_V2.1-2101.zip",
+          "size": 173324,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "2.0",
+      "tagName": "2.0",
+      "publishedAt": "2025-02-17T21:48:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V2.0.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/2.0/LuminPro_V2.0.zip",
+          "size": 12826,
+          "downloadCount": 708
+        }
+      ]
+    },
+    {
+      "name": "1.3",
+      "tagName": "1.3",
+      "publishedAt": "2025-02-12T00:31:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V1.3.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/1.3/LuminPro_V1.3.zip",
+          "size": 5816,
+          "downloadCount": 56
+        }
+      ]
+    },
+    {
+      "name": "1.2",
+      "tagName": "1.2",
+      "publishedAt": "2025-02-09T20:13:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LuminPro_V1.2.zip",
+          "downloadUrl": "https://github.com/YuleBest/LuminPro/releases/download/1.2/LuminPro_V1.2.zip",
+          "size": 5306,
+          "downloadCount": 33
+        }
+      ]
+    }
+  ]
+}

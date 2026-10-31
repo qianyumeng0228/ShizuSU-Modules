@@ -1,0 +1,211 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"a2h-icon-512.png\" alt=\"A2HHook\" width=\"120\">\n</p>\n\n<h1 align=\"center\">A2HHook</h1>\n\n<p align=\"center\">\n  <b>让 HyperOS 的音乐触感按你的规则工作</b><br>\n  <span>面向 REDMI K80 Ultra（代号 dali，K80U）的全局、白名单与后台音乐触感模块</span>\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/bbbomb0/A2HHook/releases/latest\"><img src=\"https://img.shields.io/github/v/release/bbbomb0/A2HHook?display_name=tag&label=release\" alt=\"Release\"></a>\n  <a href=\"https://github.com/bbbomb0/A2HHook/stargazers\"><img src=\"https://img.shields.io/github/stars/bbbomb0/A2HHook?style=flat&label=stars\" alt=\"Stars\"></a>\n  <a href=\"https://github.com/bbbomb0/A2HHook/issues\"><img src=\"https://img.shields.io/github/issues/bbbomb0/A2HHook\" alt=\"Issues\"></a>\n  <img src=\"https://img.shields.io/badge/KernelSU%20%2F%20Magisk-compatible-3DDC84\" alt=\"KernelSU and Magisk\">\n  <img src=\"https://img.shields.io/badge/version-v1.5.9.5-informational\" alt=\"Version v1.5.9.5\">\n  <img src=\"https://img.shields.io/badge/license-GPL--3.0--or--later-blue\" alt=\"GPL-3.0-or-later\">\n</p>\n\n<p align=\"center\">\n  <a href=\"./README.md\">简体中文</a> ·\n  <a href=\"https://github.com/bbbomb0/A2HHook/releases/latest\">下载最新版本</a> ·\n  <a href=\"https://github.com/bbbomb0/A2HHook/issues\">提交问题</a>\n</p>\n\n---\n\n## 目录\n\n- [简介](#简介)\n- [功能](#功能)\n- [默认白名单](#默认白名单)\n- [安装](#安装)\n- [使用说明](#使用说明)\n- [兼容性](#兼容性)\n- [从 v1.5.9 到 v1.5.9.5](#从-v159-到-v1595)\n- [发布文件与校验](#发布文件与校验)\n- [故障排查](#故障排查)\n- [反馈](#反馈)\n- [开发与验证](#开发与验证)\n- [许可证](#许可证)\n\n## 简介\n\nA2HHook 是一个面向 **REDMI K80 Ultra（代号 dali，K80U）** 的 Root 音乐触感模块。它在系统音频 HAL 层识别音乐、视频、游戏和系统短音的生命周期，根据全局模式或 10 槽白名单决定何时启用 A2H 音乐触感。\n\n模块提供 KernelSU、ReKernelSU、ReSukiSU 管理器使用的根目录安装流程，也在发布 ZIP 中提供 Magisk v20.4+ recovery 安装入口。模块 WebUI 与伴生 APK 共用同一套离线页面，不依赖网络服务、CDN 或额外后台守护进程。\n\n> 当前公开版本：**v1.5.9.5**（`versionCode=1595`）\n\n> [!IMPORTANT]\n> A2HHook 会修改目标设备音频 HAL 的运行时行为。请只在自己能够恢复或救砖的设备上使用，并在刷入前保留模块禁用方式和重要数据备份。\n>\n> [!WARNING]\n> 本项目不是通用 Android 音频增强器。当前公开目标是 REDMI K80 Ultra（代号 dali，K80U）；未列出的设备、深度修改过的 ROM、修改过的音频 HAL，以及与其他音频注入模块叠加的场景，都不能视为已验证兼容。\n\n## 功能\n\n<details>\n<summary><b>全局模式与白名单</b></summary>\n\n- **全局模式**：对所有符合安全条件的普通应用启用音乐触感。\n- **白名单模式**：只匹配已启用的包名槽位。\n- 内置 6 个官方音乐应用包名，另有 4 个自定义槽位，共 10 槽。\n- 每个槽位独立开关；关闭槽位时保留包名，重新开启即可恢复。\n- WebUI、控制中心磁贴和 `config/packages.txt` 均可修改配置。\n- 配置提交使用原子事务、锁所有权和失败回滚，避免半写入状态。\n\n</details>\n\n<details>\n<summary><b>后台音乐触感</b></summary>\n\n- 选项名称为 **后台音乐触感**，默认关闭，默认行为遵循小米官方的跨应用暂停策略。\n- 开启后，后台白名单音乐与前台游戏、视频、浏览器、设置、桌面或普通应用同时使用扬声器时，仍可保持音乐触感。\n- 判定依据是活动应用、音轨生命周期和当前全局/白名单规则，不硬编码前台游戏包名。\n- 同一应用的多条扬声器流不会被误判为不同应用并发。\n- 锁屏、提示音、视频焦点变化和游戏进出场由事件驱动的 handoff/concurrent-latch 逻辑承接。\n\n</details>\n\n<details>\n<summary><b>游戏与低延迟音频</b></summary>\n\n- 识别 `FAST`、`DEEP_BUFFER`、`COMPRESS_OFFLOAD` 和 `AUDIO_OUTPUT_FLAG_SPATIALIZER` 等合法媒体/游戏输出。\n- 对部分不会向 HAL 下发 `appname` 的低延迟游戏，结合厂商 playback 事件与 AudioPolicy 输出生命周期补齐应用登记。\n- 通过真实应用 UID、`portId` 和 `session` 管理登记流，停止最后一条应用音轨后释放对应租约。\n- 不猜测前台应用、不硬编码游戏包名、不使用周期性 `dumpsys` 或 `ptrace` 维持功能。\n\n</details>\n\n<details>\n<summary><b>WebUI 与控制中心</b></summary>\n\n- 离线 Miuix / HyperOS 设置页风格，伴生 APK 和 Root 管理器复用同一份页面。\n- 全局模式切换时，应用白名单使用收起与拉起动画。\n- “关于”“支持我们”等底部页面支持单指下拉、速度/距离阈值关闭、回弹和返回栈清理。\n- 支持跟随系统、浅色、深色三种主题；减少动态效果时自动停止装饰动画。\n- 两枚控制中心磁贴：\n  - **A2H 全局音乐触感**：切换全局模式与白名单模式；\n  - **后台音乐触感**：切换跨应用保持策略。\n- 磁贴点击先反馈预测状态，再提交配置并读回确认；失败时自动恢复图标和状态。\n\n</details>\n\n<details>\n<summary><b>日志、升级与安全边界</b></summary>\n\n- WebUI 提供“日志记录”开关，可停止或恢复 `a2h_patch.log` 与 `action.log` 的持久写入。\n- 稳态 watcher 使用事件唤醒和有界健康探测，不在稳定状态下周期启动 native 检查。\n- 模块更新时不会预先卸载伴生 APK；相同签名的覆盖安装保留应用数据和已有 Root 授权。\n- 只有正式卸载模块时才清理伴生 APK 与模块固定运行时文件。\n- native 写入保留双写、I-cache 同步、完整校验和失败回滚。\n\n</details>\n\n## 默认白名单\n\n| 槽位 | 包名 | 默认状态 |\n| :---: | :--- | :---: |\n| 1 | `cn.kuwo.player` | 开启 |\n| 2 | `com.miui.player` | 开启 |\n| 3 | `com.luna.music` | 开启 |\n| 4 | `com.tencent.qqmusic` | 开启 |\n| 5 | `com.netease.cloudmusic` | 开启 |\n| 6 | `com.kugou.android` | 开启 |\n| 7–10 | 自定义包名 | 关闭 |\n\n第 7–10 槽可以填写任意需要匹配的普通应用包名。包名必须是 Android 实际包名，不能填写应用名称或带空格的显示文本。\n\n## 安装\n\n### 安装前\n\n1. 解锁 Bootloader，并确认设备已经 Root。\n2. 关闭会同时修改同一音频 HAL 或 A2H 策略的同类模块。\n3. 备份当前模块配置；升级会保留正常的白名单和策略文件，但仍建议保留回滚方案。\n\n### KernelSU / ReKernelSU / ReSukiSU\n\n1. 从 [GitHub Releases](https://github.com/bbbomb0/A2HHook/releases/latest) 下载 `a2h_hook_v1.5.9.5.zip`。\n2. 在 Root 管理器的模块页面选择 ZIP 安装。\n3. 重启设备。\n4. 打开模块 WebUI，确认 Root 授权和配置读取正常。\n5. 根据需要选择全局模式、白名单槽位和后台音乐触感。\n\n### Magisk\n\n发布 ZIP 包含 `META-INF/com/google/android/update-binary` 和 `#MAGISK` updater 标记，支持 Magisk v20.4 及以上 recovery 安装入口。通过 Magisk 模块页面安装时，按 Magisk 的提示完成安装并重启设备。\n\nKernelSU 系列管理器仍使用 ZIP 根目录的 `module.prop`、`customize.sh` 和 service 脚本，不需要额外转换 ZIP。\n\n### 伴生 APK 与 Root 授权\n\n伴生包名为 `io.github.bbbomb0.a2hhook`。首次从磁贴长按进入或首次读取配置时，Root 管理器可能显示授权请求。请允许该请求后重新打开伴生页面。\n\n覆盖升级使用保留数据的安装方式；签名不匹配时会保留旧 APK 并报告失败，不会先卸载旧版本。正式卸载模块时，`uninstall.sh` 才会执行伴生 APK 的清理。\n\n## 使用说明\n\n### WebUI\n\n- **全局模式开启**：所有符合安全边界的普通应用都可触发 A2H。\n- **全局模式关闭**：只有已启用槽位中的包名可触发 A2H。\n- **后台音乐触感开启**：后台命中的白名单音乐可在跨应用播放时继续触感。\n- **日志记录关闭**：停止持久写入详细日志，不会停用模块补丁或配置应用。\n- **强劲震感**：只控制 WebUI、按钮和磁贴操作的触感反馈，不改变音频判定。\n\n### 直接编辑配置\n\nRoot 文件管理器可以编辑模块目录中的 `config/packages.txt`。每行一个包名，最多 10 行；前 6 行对应官方槽位，后 4 行对应自定义槽位。文件修改完成并保持稳定后，watcher 会自动规范化并热更新。\n\n推荐优先使用 WebUI 修改配置。直接编辑时不要同时保存多个临时版本，也不要删除 `config/package_states`、`config/state` 或 `config/game_auto_pause`。\n\n### 控制中心磁贴\n\n将以下磁贴添加到控制中心后，可以快速切换策略：\n\n- **A2H 全局音乐触感**：全局 ↔ 白名单。\n- **后台音乐触感**：遵循官方策略 ↔ 后台保持。\n\n长按任一磁贴可打开伴生 APK 内置 WebUI。\n\n## 兼容性\n\n| 项目 | 说明 |\n| :--- | :--- |\n| 目标设备 | REDMI K80 Ultra（代号 dali，K80U） |\n| 系统范围 | 运行时按 ELF/语义定位；公开验证覆盖 dali / K80U 的 HyperOS 4.0.0.7 Beta 与 HyperOS 3.0.302 |\n| 设计目标 | 兼容 HyperOS 2.x / 3.x / 4.x 的布局变化；每台设备仍需通过运行时门禁 |\n| Root | KernelSU、ReKernelSU、ReSukiSU；发布 ZIP 提供 Magisk v20.4+ recovery 入口 |\n| 架构 | ARM64（`arm64-v8a`） |\n| 音频实现 | 目标设备需使用可被运行时解析的 `audio.primary.*.so` |\n| 适配结论 | dali / K80U 的 HyperOS 3.0.302 已完成公开回归；其他 ROM 需在目标设备上完成门禁验证 |\n\n模块不会把未验证的 ROM 宣称为通用兼容。运行时解析遇到符号缺失、锚点缺失、重复命中、函数边界异常或所有权校验失败时，会拒绝写入并保留诊断信息。\n\n## 从 v1.5.9 到 v1.5.9.5\n\n### v1.5.9\n\n- 适配 dali / K80U HyperOS 4.0.0.7 Beta 的运行时 inline path，使用 ELF 符号和语义布局定位，不依赖固定 ROM profile。\n- 修复 WebUI 配置读取边界，确保日志开关、10 槽包名和槽位状态可以正确回读。\n- 新增运行日志开关，关闭后不再持久写入 `a2h_patch.log` 和 `action.log`。\n- 模式切换后对正在播放的媒体流即时重算；保留 AudioPolicy 端口、session、PID/starttime 所有权和单例 watcher。\n- 通过事件驱动 handoff、输出池重算和 guarded idle-clear，修复游戏往返、锁屏解锁和 APP 返回时的异常继承。\n\n### v1.5.9.5\n\n- 增加 Magisk v20.4+ recovery 的 `META-INF` 安装入口。\n- 全局模式切换增加应用白名单拉起/收回动画；关于等页面支持下拉关闭和回弹清理。\n- 模块更新或安装时不预先卸载伴生 APK，尽量保留原有 Root 授权和应用数据。\n- 将“游戏时启动后台音乐触感”统一命名为“后台音乐触感”，同步更新磁贴图标、标签、副标题和无障碍描述。\n- 修复锁屏、提示音、视频等场景的异常音乐触感。\n- 修复官方游戏与其他 APP 往返时的暂停音乐触感及触感回归。\n- 修复游戏/媒体 UID 的 AAudio session 原子发布：session 目录使用 `root:<实际 UID>` 和 `1730` 权限。\n\n## 发布文件与校验\n\n最新发布页：[A2HHook v1.5.9.5](https://github.com/bbbomb0/A2HHook/releases/tag/v1.5.9.5)\n\n| 文件 | 用途 |\n| :--- | :--- |\n| `a2h_hook_v1.5.9.5.zip` | KernelSU / ReKernelSU / ReSukiSU 模块安装包，也包含 Magisk recovery 入口 |\n| `companion/a2h_companion.apk` | 伴生 APK，随模块安装或升级处理 |\n\n当前公开 ZIP 的 SHA-256：\n\n```text\n2F18AB1C726BD6D819DBD12B301D982B0D10006D5C67D8D350251D4DEA4BABD8\n```\n\n安装前可以在 Windows PowerShell 中校验：\n\n```powershell\nGet-FileHash .\\a2h_hook_v1.5.9.5.zip -Algorithm SHA256\n```\n\n## 故障排查\n\n### WebUI 显示“设备配置读取失败”\n\n1. 确认 Root 管理器已向 `io.github.bbbomb0.a2hhook` 授权。\n2. 关闭伴生 APK 后重新打开，再点击“重新读取”。\n3. 确认模块目录中的 `config/state`、`config/packages.txt` 和 `config/package_states` 存在且可读。\n4. 如果是升级后出现，重启一次设备，让 service 重新应用配置。\n\n### 开启后没有音乐触感\n\n1. 先切换到全局模式验证基础链路。\n2. 白名单模式下确认包名拼写、槽位开关和实际运行包名一致。\n3. 确认音频输出为扬声器；通话、耳机、蓝牙和系统安全门禁不会被绕过。\n4. 打开日志记录，重新触发一次音频事件，再查看模块日志。\n5. 如果 native 解析失败，不要反复强制写入；保留日志并提交问题。\n\n### 出现异常触感或应用切换后状态不对\n\n1. 确认没有同时启用其他修改音频 HAL 或音乐触感的模块。\n2. 先关闭后台音乐触感，重现一次官方策略，再根据需要重新开启。\n3. 重启设备后再次测试锁屏、提示音、视频和游戏往返场景。\n4. 提交问题时附上设备型号、完整 HyperOS 版本、Root 管理器版本、模块日志和复现步骤。\n\n\n### 已知限制\n\n- 模块只对扬声器路径和符合安全条件的普通应用音频生效；通话、耳机、蓝牙、振动流和系统保护路径不会被强行接管。\n- 不同 ROM 可能裁剪 ELF 符号、改变音频 HAL 布局或替换厂商事件格式。解析失败时模块应拒绝写入；请不要通过关闭校验强行使用。\n- Magisk recovery 入口和 KernelSU 系列管理器入口共用同一个发布 ZIP，但具体安装界面和 Root 授权流程由对应管理器决定。\n- 后台音乐触感属于可选策略。关闭时遵循小米官方的跨应用暂停行为，开启后才允许命中的后台白名单音乐继续触感。\n\n## 反馈\n\n请通过 [GitHub Issues](https://github.com/bbbomb0/A2HHook/issues) 提交问题，并附上：\n\n1. 设备型号、HyperOS 完整版本和 Android API；\n2. KernelSU / ReKernelSU / ReSukiSU / Magisk 版本；\n3. A2HHook 版本和当前全局/白名单、后台音乐触感设置；\n4. 复现步骤、预期结果和实际结果；\n5. 相关日志与截图。\n\n请不要在公开 Issue 中上传包含设备序列号、账号信息或其他个人数据的完整系统转储。\n\n## 开发与验证\n\n本仓库包含 native patcher、watcher、伴生 APK、离线 WebUI 和确定性打包脚本。开发检查可运行：\n\n```powershell\npython tests/static_regression.py --repo . --archive .\\a2h_hook_v1.5.9.5.zip\npython tests/verify_module_zip.py .\\a2h_hook_v1.5.9.5.zip `\n  --expected-version v1.5.9.5 --expected-code 1595\n```\n\n发布 ZIP 使用 `package_module.py` 的固定清单生成，测试文件、设备归档和本地诊断文件不会进入模块包。Android 设备专用检查需要 `--adb` 和已连接的 Root 设备。\n\n## 许可证\n\n本项目以 [GNU General Public License v3.0 或更高版本](./LICENSE) 发布。GPL 授予的既有权利不能被追溯撤销；提交代码、文档或其他可受版权保护的内容前，请确认你有权提交，并接受项目的贡献审查规则。第三方组件和许可证说明见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。\n\n## 相关链接\n\n- [最新 Release](https://github.com/bbbomb0/A2HHook/releases/latest)\n- [更新日志](./CHANGELOG.md)\n- [兼容性资料规范](./compatibility/README.md)\n- [问题反馈](https://github.com/bbbomb0/A2HHook/issues)",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"a2h-icon-512.png\" alt=\"A2HHook\" width=\"120\"></p>\n<p></p></p>\n\n<p><h1 align=\"center\">A2HHook</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <b>让 HyperOS 的音乐触感按你的规则工作</b><br></p>\n<p>  <span>面向 REDMI K80 Ultra（代号 dali，K80U）的全局、白名单与后台音乐触感模块</span></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/bbbomb0/A2HHook/releases/latest\"><img src=\"https://img.shields.io/github/v/release/bbbomb0/A2HHook?display_name=tag&label=release\" alt=\"Release\"></a></p>\n<p>  <a href=\"https://github.com/bbbomb0/A2HHook/stargazers\"><img src=\"https://img.shields.io/github/stars/bbbomb0/A2HHook?style=flat&label=stars\" alt=\"Stars\"></a></p>\n<p>  <a href=\"https://github.com/bbbomb0/A2HHook/issues\"><img src=\"https://img.shields.io/github/issues/bbbomb0/A2HHook\" alt=\"Issues\"></a></p>\n<p>  <img src=\"https://img.shields.io/badge/KernelSU%20%2F%20Magisk-compatible-3DDC84\" alt=\"KernelSU and Magisk\"></p>\n<p>  <img src=\"https://img.shields.io/badge/version-v1.5.9.5-informational\" alt=\"Version v1.5.9.5\"></p>\n<p>  <img src=\"https://img.shields.io/badge/license-GPL--3.0--or--later-blue\" alt=\"GPL-3.0-or-later\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"./README.md\">简体中文</a> ·</p>\n<p>  <a href=\"https://github.com/bbbomb0/A2HHook/releases/latest\">下载最新版本</a> ·</p>\n<p>  <a href=\"https://github.com/bbbomb0/A2HHook/issues\">提交问题</a></p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>目录</h2>\n\n<li>[简介](#简介)</li>\n<li>[功能](#功能)</li>\n<li>[默认白名单](#默认白名单)</li>\n<li>[安装](#安装)</li>\n<li>[使用说明](#使用说明)</li>\n<li>[兼容性](#兼容性)</li>\n<li>[从 v1.5.9 到 v1.5.9.5](#从-v159-到-v1595)</li>\n<li>[发布文件与校验](#发布文件与校验)</li>\n<li>[故障排查](#故障排查)</li>\n<li>[反馈](#反馈)</li>\n<li>[开发与验证](#开发与验证)</li>\n<li>[许可证](#许可证)</li>\n\n<h2>简介</h2>\n\n<p>A2HHook 是一个面向 <b>REDMI K80 Ultra（代号 dali，K80U）</b> 的 Root 音乐触感模块。它在系统音频 HAL 层识别音乐、视频、游戏和系统短音的生命周期，根据全局模式或 10 槽白名单决定何时启用 A2H 音乐触感。</p>\n\n<p>模块提供 KernelSU、ReKernelSU、ReSukiSU 管理器使用的根目录安装流程，也在发布 ZIP 中提供 Magisk v20.4+ recovery 安装入口。模块 WebUI 与伴生 APK 共用同一套离线页面，不依赖网络服务、CDN 或额外后台守护进程。</p>\n\n<p>> 当前公开版本：<b>v1.5.9.5</b>（<code>versionCode=1595</code>）</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> A2HHook 会修改目标设备音频 HAL 的运行时行为。请只在自己能够恢复或救砖的设备上使用，并在刷入前保留模块禁用方式和重要数据备份。</p>\n<p>></p>\n<p>> [!WARNING]</p>\n<p>> 本项目不是通用 Android 音频增强器。当前公开目标是 REDMI K80 Ultra（代号 dali，K80U）；未列出的设备、深度修改过的 ROM、修改过的音频 HAL，以及与其他音频注入模块叠加的场景，都不能视为已验证兼容。</p>\n\n<h2>功能</h2>\n\n<p><details></p>\n<p><summary><b>全局模式与白名单</b></summary></p>\n\n<li>**全局模式**：对所有符合安全条件的普通应用启用音乐触感。</li>\n<li>**白名单模式**：只匹配已启用的包名槽位。</li>\n<li>内置 6 个官方音乐应用包名，另有 4 个自定义槽位，共 10 槽。</li>\n<li>每个槽位独立开关；关闭槽位时保留包名，重新开启即可恢复。</li>\n<li>WebUI、控制中心磁贴和 `config/packages.txt` 均可修改配置。</li>\n<li>配置提交使用原子事务、锁所有权和失败回滚，避免半写入状态。</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>后台音乐触感</b></summary></p>\n\n<li>选项名称为 **后台音乐触感**，默认关闭，默认行为遵循小米官方的跨应用暂停策略。</li>\n<li>开启后，后台白名单音乐与前台游戏、视频、浏览器、设置、桌面或普通应用同时使用扬声器时，仍可保持音乐触感。</li>\n<li>判定依据是活动应用、音轨生命周期和当前全局/白名单规则，不硬编码前台游戏包名。</li>\n<li>同一应用的多条扬声器流不会被误判为不同应用并发。</li>\n<li>锁屏、提示音、视频焦点变化和游戏进出场由事件驱动的 handoff/concurrent-latch 逻辑承接。</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>游戏与低延迟音频</b></summary></p>\n\n<li>识别 `FAST`、`DEEP_BUFFER`、`COMPRESS_OFFLOAD` 和 `AUDIO_OUTPUT_FLAG_SPATIALIZER` 等合法媒体/游戏输出。</li>\n<li>对部分不会向 HAL 下发 `appname` 的低延迟游戏，结合厂商 playback 事件与 AudioPolicy 输出生命周期补齐应用登记。</li>\n<li>通过真实应用 UID、`portId` 和 `session` 管理登记流，停止最后一条应用音轨后释放对应租约。</li>\n<li>不猜测前台应用、不硬编码游戏包名、不使用周期性 `dumpsys` 或 `ptrace` 维持功能。</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>WebUI 与控制中心</b></summary></p>\n\n<li>离线 Miuix / HyperOS 设置页风格，伴生 APK 和 Root 管理器复用同一份页面。</li>\n<li>全局模式切换时，应用白名单使用收起与拉起动画。</li>\n<li>“关于”“支持我们”等底部页面支持单指下拉、速度/距离阈值关闭、回弹和返回栈清理。</li>\n<li>支持跟随系统、浅色、深色三种主题；减少动态效果时自动停止装饰动画。</li>\n<li>两枚控制中心磁贴：</li>\n<p>  - <b>A2H 全局音乐触感</b>：切换全局模式与白名单模式；</p>\n<p>  - <b>后台音乐触感</b>：切换跨应用保持策略。</p>\n<li>磁贴点击先反馈预测状态，再提交配置并读回确认；失败时自动恢复图标和状态。</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>日志、升级与安全边界</b></summary></p>\n\n<li>WebUI 提供“日志记录”开关，可停止或恢复 `a2h_patch.log` 与 `action.log` 的持久写入。</li>\n<li>稳态 watcher 使用事件唤醒和有界健康探测，不在稳定状态下周期启动 native 检查。</li>\n<li>模块更新时不会预先卸载伴生 APK；相同签名的覆盖安装保留应用数据和已有 Root 授权。</li>\n<li>只有正式卸载模块时才清理伴生 APK 与模块固定运行时文件。</li>\n<li>native 写入保留双写、I-cache 同步、完整校验和失败回滚。</li>\n\n<p></details></p>\n\n<h2>默认白名单</h2>\n\n<p>| 槽位 | 包名 | 默认状态 |</p>\n<p>| :---: | :--- | :---: |</p>\n<p>| 1 | <code>cn.kuwo.player</code> | 开启 |</p>\n<p>| 2 | <code>com.miui.player</code> | 开启 |</p>\n<p>| 3 | <code>com.luna.music</code> | 开启 |</p>\n<p>| 4 | <code>com.tencent.qqmusic</code> | 开启 |</p>\n<p>| 5 | <code>com.netease.cloudmusic</code> | 开启 |</p>\n<p>| 6 | <code>com.kugou.android</code> | 开启 |</p>\n<p>| 7–10 | 自定义包名 | 关闭 |</p>\n\n<p>第 7–10 槽可以填写任意需要匹配的普通应用包名。包名必须是 Android 实际包名，不能填写应用名称或带空格的显示文本。</p>\n\n<h2>安装</h2>\n\n<h3>安装前</h3>\n\n<li>解锁 Bootloader，并确认设备已经 Root。</li>\n<li>关闭会同时修改同一音频 HAL 或 A2H 策略的同类模块。</li>\n<li>备份当前模块配置；升级会保留正常的白名单和策略文件，但仍建议保留回滚方案。</li>\n\n<h3>KernelSU / ReKernelSU / ReSukiSU</h3>\n\n<li>从 [GitHub Releases](https://github.com/bbbomb0/A2HHook/releases/latest) 下载 `a2h_hook_v1.5.9.5.zip`。</li>\n<li>在 Root 管理器的模块页面选择 ZIP 安装。</li>\n<li>重启设备。</li>\n<li>打开模块 WebUI，确认 Root 授权和配置读取正常。</li>\n<li>根据需要选择全局模式、白名单槽位和后台音乐触感。</li>\n\n<h3>Magisk</h3>\n\n<p>发布 ZIP 包含 <code>META-INF/com/google/android/update-binary</code> 和 <code>#MAGISK</code> updater 标记，支持 Magisk v20.4 及以上 recovery 安装入口。通过 Magisk 模块页面安装时，按 Magisk 的提示完成安装并重启设备。</p>\n\n<p>KernelSU 系列管理器仍使用 ZIP 根目录的 <code>module.prop</code>、<code>customize.sh</code> 和 service 脚本，不需要额外转换 ZIP。</p>\n\n<h3>伴生 APK 与 Root 授权</h3>\n\n<p>伴生包名为 <code>io.github.bbbomb0.a2hhook</code>。首次从磁贴长按进入或首次读取配置时，Root 管理器可能显示授权请求。请允许该请求后重新打开伴生页面。</p>\n\n<p>覆盖升级使用保留数据的安装方式；签名不匹配时会保留旧 APK 并报告失败，不会先卸载旧版本。正式卸载模块时，<code>uninstall.sh</code> 才会执行伴生 APK 的清理。</p>\n\n<h2>使用说明</h2>\n\n<h3>WebUI</h3>\n\n<li>**全局模式开启**：所有符合安全边界的普通应用都可触发 A2H。</li>\n<li>**全局模式关闭**：只有已启用槽位中的包名可触发 A2H。</li>\n<li>**后台音乐触感开启**：后台命中的白名单音乐可在跨应用播放时继续触感。</li>\n<li>**日志记录关闭**：停止持久写入详细日志，不会停用模块补丁或配置应用。</li>\n<li>**强劲震感**：只控制 WebUI、按钮和磁贴操作的触感反馈，不改变音频判定。</li>\n\n<h3>直接编辑配置</h3>\n\n<p>Root 文件管理器可以编辑模块目录中的 <code>config/packages.txt</code>。每行一个包名，最多 10 行；前 6 行对应官方槽位，后 4 行对应自定义槽位。文件修改完成并保持稳定后，watcher 会自动规范化并热更新。</p>\n\n<p>推荐优先使用 WebUI 修改配置。直接编辑时不要同时保存多个临时版本，也不要删除 <code>config/package_states</code>、<code>config/state</code> 或 <code>config/game_auto_pause</code>。</p>\n\n<h3>控制中心磁贴</h3>\n\n<p>将以下磁贴添加到控制中心后，可以快速切换策略：</p>\n\n<li>**A2H 全局音乐触感**：全局 ↔ 白名单。</li>\n<li>**后台音乐触感**：遵循官方策略 ↔ 后台保持。</li>\n\n<p>长按任一磁贴可打开伴生 APK 内置 WebUI。</p>\n\n<h2>兼容性</h2>\n\n<p>| 项目 | 说明 |</p>\n<p>| :--- | :--- |</p>\n<p>| 目标设备 | REDMI K80 Ultra（代号 dali，K80U） |</p>\n<p>| 系统范围 | 运行时按 ELF/语义定位；公开验证覆盖 dali / K80U 的 HyperOS 4.0.0.7 Beta 与 HyperOS 3.0.302 |</p>\n<p>| 设计目标 | 兼容 HyperOS 2.x / 3.x / 4.x 的布局变化；每台设备仍需通过运行时门禁 |</p>\n<p>| Root | KernelSU、ReKernelSU、ReSukiSU；发布 ZIP 提供 Magisk v20.4+ recovery 入口 |</p>\n<p>| 架构 | ARM64（<code>arm64-v8a</code>） |</p>\n<p>| 音频实现 | 目标设备需使用可被运行时解析的 <code>audio.primary.*.so</code> |</p>\n<p>| 适配结论 | dali / K80U 的 HyperOS 3.0.302 已完成公开回归；其他 ROM 需在目标设备上完成门禁验证 |</p>\n\n<p>模块不会把未验证的 ROM 宣称为通用兼容。运行时解析遇到符号缺失、锚点缺失、重复命中、函数边界异常或所有权校验失败时，会拒绝写入并保留诊断信息。</p>\n\n<h2>从 v1.5.9 到 v1.5.9.5</h2>\n\n<h3>v1.5.9</h3>\n\n<li>适配 dali / K80U HyperOS 4.0.0.7 Beta 的运行时 inline path，使用 ELF 符号和语义布局定位，不依赖固定 ROM profile。</li>\n<li>修复 WebUI 配置读取边界，确保日志开关、10 槽包名和槽位状态可以正确回读。</li>\n<li>新增运行日志开关，关闭后不再持久写入 `a2h_patch.log` 和 `action.log`。</li>\n<li>模式切换后对正在播放的媒体流即时重算；保留 AudioPolicy 端口、session、PID/starttime 所有权和单例 watcher。</li>\n<li>通过事件驱动 handoff、输出池重算和 guarded idle-clear，修复游戏往返、锁屏解锁和 APP 返回时的异常继承。</li>\n\n<h3>v1.5.9.5</h3>\n\n<li>增加 Magisk v20.4+ recovery 的 `META-INF` 安装入口。</li>\n<li>全局模式切换增加应用白名单拉起/收回动画；关于等页面支持下拉关闭和回弹清理。</li>\n<li>模块更新或安装时不预先卸载伴生 APK，尽量保留原有 Root 授权和应用数据。</li>\n<li>将“游戏时启动后台音乐触感”统一命名为“后台音乐触感”，同步更新磁贴图标、标签、副标题和无障碍描述。</li>\n<li>修复锁屏、提示音、视频等场景的异常音乐触感。</li>\n<li>修复官方游戏与其他 APP 往返时的暂停音乐触感及触感回归。</li>\n<li>修复游戏/媒体 UID 的 AAudio session 原子发布：session 目录使用 `root:<实际 UID>` 和 `1730` 权限。</li>\n\n<h2>发布文件与校验</h2>\n\n<p>最新发布页：<a href=\"https://github.com/bbbomb0/A2HHook/releases/tag/v1.5.9.5\">A2HHook v1.5.9.5</a></p>\n\n<p>| 文件 | 用途 |</p>\n<p>| :--- | :--- |</p>\n<p>| <code>a2h_hook_v1.5.9.5.zip</code> | KernelSU / ReKernelSU / ReSukiSU 模块安装包，也包含 Magisk recovery 入口 |</p>\n<p>| <code>companion/a2h_companion.apk</code> | 伴生 APK，随模块安装或升级处理 |</p>\n\n<p>当前公开 ZIP 的 SHA-256：</p>\n\n<pre>2F18AB1C726BD6D819DBD12B301D982B0D10006D5C67D8D350251D4DEA4BABD8</pre>\n\n<p>安装前可以在 Windows PowerShell 中校验：</p>\n\n<pre>Get-FileHash .\\a2h_hook_v1.5.9.5.zip -Algorithm SHA256</pre>\n\n<h2>故障排查</h2>\n\n<h3>WebUI 显示“设备配置读取失败”</h3>\n\n<li>确认 Root 管理器已向 `io.github.bbbomb0.a2hhook` 授权。</li>\n<li>关闭伴生 APK 后重新打开，再点击“重新读取”。</li>\n<li>确认模块目录中的 `config/state`、`config/packages.txt` 和 `config/package_states` 存在且可读。</li>\n<li>如果是升级后出现，重启一次设备，让 service 重新应用配置。</li>\n\n<h3>开启后没有音乐触感</h3>\n\n<li>先切换到全局模式验证基础链路。</li>\n<li>白名单模式下确认包名拼写、槽位开关和实际运行包名一致。</li>\n<li>确认音频输出为扬声器；通话、耳机、蓝牙和系统安全门禁不会被绕过。</li>\n<li>打开日志记录，重新触发一次音频事件，再查看模块日志。</li>\n<li>如果 native 解析失败，不要反复强制写入；保留日志并提交问题。</li>\n\n<h3>出现异常触感或应用切换后状态不对</h3>\n\n<li>确认没有同时启用其他修改音频 HAL 或音乐触感的模块。</li>\n<li>先关闭后台音乐触感，重现一次官方策略，再根据需要重新开启。</li>\n<li>重启设备后再次测试锁屏、提示音、视频和游戏往返场景。</li>\n<li>提交问题时附上设备型号、完整 HyperOS 版本、Root 管理器版本、模块日志和复现步骤。</li>\n\n\n<h3>已知限制</h3>\n\n<li>模块只对扬声器路径和符合安全条件的普通应用音频生效；通话、耳机、蓝牙、振动流和系统保护路径不会被强行接管。</li>\n<li>不同 ROM 可能裁剪 ELF 符号、改变音频 HAL 布局或替换厂商事件格式。解析失败时模块应拒绝写入；请不要通过关闭校验强行使用。</li>\n<li>Magisk recovery 入口和 KernelSU 系列管理器入口共用同一个发布 ZIP，但具体安装界面和 Root 授权流程由对应管理器决定。</li>\n<li>后台音乐触感属于可选策略。关闭时遵循小米官方的跨应用暂停行为，开启后才允许命中的后台白名单音乐继续触感。</li>\n\n<h2>反馈</h2>\n\n<p>请通过 <a href=\"https://github.com/bbbomb0/A2HHook/issues\">GitHub Issues</a> 提交问题，并附上：</p>\n\n<li>设备型号、HyperOS 完整版本和 Android API；</li>\n<li>KernelSU / ReKernelSU / ReSukiSU / Magisk 版本；</li>\n<li>A2HHook 版本和当前全局/白名单、后台音乐触感设置；</li>\n<li>复现步骤、预期结果和实际结果；</li>\n<li>相关日志与截图。</li>\n\n<p>请不要在公开 Issue 中上传包含设备序列号、账号信息或其他个人数据的完整系统转储。</p>\n\n<h2>开发与验证</h2>\n\n<p>本仓库包含 native patcher、watcher、伴生 APK、离线 WebUI 和确定性打包脚本。开发检查可运行：</p>\n\n<pre>python tests/static_regression.py --repo . --archive .\\a2h_hook_v1.5.9.5.zip\npython tests/verify_module_zip.py .\\a2h_hook_v1.5.9.5.zip `\n  --expected-version v1.5.9.5 --expected-code 1595</pre>\n\n<p>发布 ZIP 使用 <code>package_module.py</code> 的固定清单生成，测试文件、设备归档和本地诊断文件不会进入模块包。Android 设备专用检查需要 <code>--adb</code> 和已连接的 Root 设备。</p>\n\n<h2>许可证</h2>\n\n<p>本项目以 <a href=\"./LICENSE\">GNU General Public License v3.0 或更高版本</a> 发布。GPL 授予的既有权利不能被追溯撤销；提交代码、文档或其他可受版权保护的内容前，请确认你有权提交，并接受项目的贡献审查规则。第三方组件和许可证说明见 <a href=\"./THIRD_PARTY_NOTICES.md\">THIRD_PARTY_NOTICES.md</a>。</p>\n\n<h2>相关链接</h2>\n\n<li>[最新 Release](https://github.com/bbbomb0/A2HHook/releases/latest)</li>\n<li>[更新日志](./CHANGELOG.md)</li>\n<li>[兼容性资料规范](./compatibility/README.md)</li>\n<li>[问题反馈](https://github.com/bbbomb0/A2HHook/issues)</li>",
+  "homepageUrl": "https://github.com/bbbomb0/A2HHook/releases",
+  "sourceUrl": "https://github.com/bbbomb0/A2HHook",
+  "url": "https://github.com/bbbomb0/A2HHook",
+  "latestRelease": {
+    "name": "v1.5.9.5",
+    "version": "v1.5.9.5",
+    "time": "2026-09-26T10:21:49Z",
+    "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.9.5/a2h_hook_v1.5.9.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.9.5",
+      "tagName": "v1.5.9.5",
+      "publishedAt": "2026-09-26T10:21:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.9.5.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.9.5/a2h_hook_v1.5.9.5.zip",
+          "size": 595709,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v1.5.9",
+      "tagName": "v1.5.9",
+      "publishedAt": "2026-09-19T12:13:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.9.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.9/a2h_hook_v1.5.9.zip",
+          "size": 585401,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.5.8",
+      "tagName": "v1.5.8",
+      "publishedAt": "2026-08-16T13:50:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.8.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.8/a2h_hook_v1.5.8.zip",
+          "size": 582213,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v1.5.7-fix",
+      "tagName": "v1.5.7-fix",
+      "publishedAt": "2026-08-12T18:47:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.7-fix.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.7-fix/a2h_hook_v1.5.7-fix.zip",
+          "size": 578677,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.5.6-fix",
+      "tagName": "v1.5.6-fix",
+      "publishedAt": "2026-08-09T21:00:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.6-fix.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.6-fix/a2h_hook_v1.5.6-fix.zip",
+          "size": 356881,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v1.5.6",
+      "tagName": "v1.5.6",
+      "publishedAt": "2026-08-08T19:10:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.6.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.6/a2h_hook_v1.5.6.zip",
+          "size": 342417,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5.5-fix3",
+      "tagName": "v1.5.5-fix3",
+      "publishedAt": "2026-07-30T05:44:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.5-fix3.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.5-fix3/a2h_hook_v1.5.5-fix3.zip",
+          "size": 277107,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v1.5.5-fix2",
+      "tagName": "v1.5.5-fix2",
+      "publishedAt": "2026-07-29T22:19:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.5-fix2.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.5-fix2/a2h_hook_v1.5.5-fix2.zip",
+          "size": 276264,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v1.5.5-fix",
+      "tagName": "v1.5.5-fix",
+      "publishedAt": "2026-07-29T20:01:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.5-fix.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.5-fix/a2h_hook_v1.5.5-fix.zip",
+          "size": 273857,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.5.5",
+      "tagName": "v1.5.5",
+      "publishedAt": "2026-07-29T12:09:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.5.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.5/a2h_hook_v1.5.5.zip",
+          "size": 351063,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.5.4",
+      "tagName": "v1.5.4",
+      "publishedAt": "2026-07-23T15:44:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.4.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.4/a2h_hook_v1.5.4.zip",
+          "size": 338062,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5.3",
+      "tagName": "v1.5.3",
+      "publishedAt": "2026-07-22T22:04:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.3.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.3/a2h_hook_v1.5.3.zip",
+          "size": 336520,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2-fix",
+      "tagName": "v1.5.2-fix",
+      "publishedAt": "2026-07-20T14:56:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.2-fix.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.2-fix/a2h_hook_v1.5.2-fix.zip",
+          "size": 324036,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-07-19T17:45:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "a2h_hook_v1.5.1.zip",
+          "downloadUrl": "https://github.com/bbbomb0/A2HHook/releases/download/v1.5.1/a2h_hook_v1.5.1.zip",
+          "size": 323144,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "readme": "# susfs4ksu-lkm-x64\n\nx86_64 port of [inforcqb/susfs4ksu-lkm](https://github.com/inforcqb/susfs4ksu-lkm): susfs as a loadable kernel module for the Android 16 x86_64 emulator image, whose kernel comes from the android15-6.6 branch (6.6.66-android15-8), running beside KernelSU-Next LKM. No custom kernel, nothing replaces the ramdisk. \n\nPlease use [KernelSU-Next-AVD](https://github.com/ymuuuu/KernelSU-Next-AVD) to root your AVD.\n\nReleases and updates are announced on Telegram: [t.me/ymuulabs](https://t.me/ymuulabs).\n\n## Build\n\nPushes to main run four jobs: `arm64-control` (upstream module, unchanged, catches regressions), `x86_64-port` (this port, android15-6.6), `x86_64-matrix` (the other KMIs the KernelSU-Next CI covers, android12-5.10 up to android17-6.18) and `x86_64-package`. All must be green. Artifacts per run: `x86_64-android15-6.6-susfs_guard_lkm.ko`, the per-KMI `x86_64-<kmi>-susfs_guard_lkm.ko` set, `x86_64-susfs_sc` (bare supercall test client) and `x86_64-susfs-lkm-module` (the flashable loader module zip, one .ko per KMI, the boot script picks by kernel release). Prebuilt binaries: the [releases](https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases) page.\n\n## Install\n\nThe module zip is the intended path: KernelSU-Next manager, module section, install from storage, reboot (or `ksud module install susfs_lkm_x64.zip`). After reboot the module loads itself at boot and installs the x86_64 `susfs` CLI at `/data/adb/ksu/bin/susfs` (with `sus` and `ksu_susfs` symlinks) for manager modules that call the classic command line. Check with `ksud susfs version`, expect v2.3.0.\n\nFor a manual one-shot load instead: plain `insmod` cannot work, five imports are unexported to modules on every GKI variant, arm64 included, same as upstream. Use `ksud insmod <path-to-.ko>`. The module hides itself from lsmod on purpose; check `/sys/module/susfs_guard_lkm` instead.\n\n## State\n\nLive-tested on the emulator: autoload after reboot, `ksud susfs version` answers v2.3.0 and `ksud susfs support` answers Supported, sus_path hides paths from app uids while root and shell still see them, uname spoof, kstat/opath/open_redirect tables, no-opt probes holding. v1 scope: the AArch32 compat layer stays arm64-only.\n\n\n![image.png](image.png)\n\nUserspace talks through the reboot-ABI supercall and the `/proc/susfs_*` nodes (interface reference: upstream [PROC_INTERFACES.md](https://github.com/inforcqb/susfs4ksu-lkm/blob/main/PROC_INTERFACES.md)). \n\n\n> IMPORTANT: Manager modules that ship their own arm64 `susfs`/`ksu_susfs` binaries (BRENE, sidex15) still carry a dead arm64 binary inside; the installed CLI here answers the same command surface, but those modules' installers may need their arch gate bypassed.\nShort Answer: susfs4ksu-module and all its forks still needs to be ported to x86_64\n\n\n\n## Origin and license\n\nPort of inforcqb/susfs4ksu-lkm, which ports simonpunk/susfs4ksu (logic and hook points), with patch_memory/lsm_hook/symbol_resolver from SukiSU-Ultra. GPL-2.0-only, see LICENSE. Research and learning only, use at your own risk.\n\n## Disclaimer\nI am no developer or a low level programmer, I am a guy who loves breaking, testing, building security releated tools that helps with my workflow, excpect bugs and errors, thank you.\n",
+  "readmeHTML": "<h1>susfs4ksu-lkm-x64</h1>\n\n<p>x86_64 port of <a href=\"https://github.com/inforcqb/susfs4ksu-lkm\">inforcqb/susfs4ksu-lkm</a>: susfs as a loadable kernel module for the Android 16 x86_64 emulator image, whose kernel comes from the android15-6.6 branch (6.6.66-android15-8), running beside KernelSU-Next LKM. No custom kernel, nothing replaces the ramdisk.</p>\n\n<p>Please use <a href=\"https://github.com/ymuuuu/KernelSU-Next-AVD\">KernelSU-Next-AVD</a> to root your AVD.</p>\n\n<p>Releases and updates are announced on Telegram: <a href=\"https://t.me/ymuulabs\">t.me/ymuulabs</a>.</p>\n\n<h2>Build</h2>\n\n<p>Pushes to main run four jobs: <code>arm64-control</code> (upstream module, unchanged, catches regressions), <code>x86_64-port</code> (this port, android15-6.6), <code>x86_64-matrix</code> (the other KMIs the KernelSU-Next CI covers, android12-5.10 up to android17-6.18) and <code>x86_64-package</code>. All must be green. Artifacts per run: <code>x86_64-android15-6.6-susfs_guard_lkm.ko</code>, the per-KMI <code>x86_64-<kmi>-susfs_guard_lkm.ko</code> set, <code>x86_64-susfs_sc</code> (bare supercall test client) and <code>x86_64-susfs-lkm-module</code> (the flashable loader module zip, one .ko per KMI, the boot script picks by kernel release). Prebuilt binaries: the <a href=\"https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases\">releases</a> page.</p>\n\n<h2>Install</h2>\n\n<p>The module zip is the intended path: KernelSU-Next manager, module section, install from storage, reboot (or <code>ksud module install susfs_lkm_x64.zip</code>). After reboot the module loads itself at boot and installs the x86_64 <code>susfs</code> CLI at <code>/data/adb/ksu/bin/susfs</code> (with <code>sus</code> and <code>ksu_susfs</code> symlinks) for manager modules that call the classic command line. Check with <code>ksud susfs version</code>, expect v2.3.0.</p>\n\n<p>For a manual one-shot load instead: plain <code>insmod</code> cannot work, five imports are unexported to modules on every GKI variant, arm64 included, same as upstream. Use <code>ksud insmod <path-to-.ko></code>. The module hides itself from lsmod on purpose; check <code>/sys/module/susfs_guard_lkm</code> instead.</p>\n\n<h2>State</h2>\n\n<p>Live-tested on the emulator: autoload after reboot, <code>ksud susfs version</code> answers v2.3.0 and <code>ksud susfs support</code> answers Supported, sus_path hides paths from app uids while root and shell still see them, uname spoof, kstat/opath/open_redirect tables, no-opt probes holding. v1 scope: the AArch32 compat layer stays arm64-only.</p>\n\n\n<p>!<a href=\"image.png\">image.png</a></p>\n\n<p>Userspace talks through the reboot-ABI supercall and the <code>/proc/susfs_*</code> nodes (interface reference: upstream <a href=\"https://github.com/inforcqb/susfs4ksu-lkm/blob/main/PROC_INTERFACES.md\">PROC_INTERFACES.md</a>).</p>\n\n\n<p>> IMPORTANT: Manager modules that ship their own arm64 <code>susfs</code>/<code>ksu_susfs</code> binaries (BRENE, sidex15) still carry a dead arm64 binary inside; the installed CLI here answers the same command surface, but those modules' installers may need their arch gate bypassed.</p>\n<p>Short Answer: susfs4ksu-module and all its forks still needs to be ported to x86_64</p>\n\n\n\n<h2>Origin and license</h2>\n\n<p>Port of inforcqb/susfs4ksu-lkm, which ports simonpunk/susfs4ksu (logic and hook points), with patch_memory/lsm_hook/symbol_resolver from SukiSU-Ultra. GPL-2.0-only, see LICENSE. Research and learning only, use at your own risk.</p>\n\n<h2>Disclaimer</h2>\n<p>I am no developer or a low level programmer, I am a guy who loves breaking, testing, building security releated tools that helps with my workflow, excpect bugs and errors, thank you.</p>",
+  "homepageUrl": "https://t.me/ymuulabs",
+  "sourceUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64",
+  "url": "https://github.com/ymuuuu/susfs4ksu-lkm-x64",
+  "latestRelease": {
+    "name": "v0.0.7",
+    "version": "v0.0.7",
+    "time": "2026-10-20T09:22:51Z",
+    "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.7/susfs_lkm_x64.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.0.7",
+      "tagName": "v0.0.7",
+      "publishedAt": "2026-10-20T09:22:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.7/susfs_guard_lkm.ko",
+          "size": 2375824,
+          "downloadCount": 26
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.7/susfs_lkm_x64.zip",
+          "size": 3338796,
+          "downloadCount": 105
+        }
+      ]
+    },
+    {
+      "name": "v0.0.6",
+      "tagName": "v0.0.6",
+      "publishedAt": "2026-10-20T08:13:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.6/susfs_guard_lkm.ko",
+          "size": 2374656,
+          "downloadCount": 2
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.6/susfs_lkm_x64.zip",
+          "size": 3332883,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v0.0.5",
+      "tagName": "v0.0.5",
+      "publishedAt": "2026-10-19T10:39:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.5/susfs_guard_lkm.ko",
+          "size": 2367056,
+          "downloadCount": 6
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.5/susfs_lkm_x64.zip",
+          "size": 3279639,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v0.0.4",
+      "tagName": "v0.0.4",
+      "publishedAt": "2026-10-18T10:22:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.4/susfs_guard_lkm.ko",
+          "size": 2366976,
+          "downloadCount": 4
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.4/susfs_lkm_x64.zip",
+          "size": 3279614,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "v0.0.3",
+      "tagName": "v0.0.3",
+      "publishedAt": "2026-10-16T14:31:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.3/susfs_guard_lkm.ko",
+          "size": 452984,
+          "downloadCount": 6
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.3/susfs_lkm_x64.zip",
+          "size": 3246535,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v0.0.2",
+      "tagName": "v0.0.2",
+      "publishedAt": "2026-10-16T10:47:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.2/susfs_guard_lkm.ko",
+          "size": 2357800,
+          "downloadCount": 0
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.2/susfs_lkm_x64.zip",
+          "size": 2369606,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.0.1",
+      "tagName": "v0.0.1",
+      "publishedAt": "2026-10-14T18:25:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.1/susfs_guard_lkm.ko",
+          "size": 2070712,
+          "downloadCount": 4
+        },
+        {
+          "name": "susfs_lkm_x64.zip",
+          "downloadUrl": "https://github.com/ymuuuu/susfs4ksu-lkm-x64/releases/download/v0.0.1/susfs_lkm_x64.zip",
+          "size": 2082390,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ]
+}

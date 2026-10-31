@@ -1,0 +1,135 @@
+{
+  "readme": "# 🛡️ Ashizw - Shizuku Watchdog & Manager\n\n> **Keep Shizuku alive, automatically.**\n\n[![Platform](https://img.shields.io/badge/Platform-Android-green)]()\n[![Root](https://img.shields.io/badge/Root-Required-red)]()\n\n**Author:** [Ghulam Qadar](https://github.com/Snakeeyez248)\n\n---\n\n## 📖 Description\n**Ashizw** is a universal Magisk/KernelSU module designed to ensure **Shizuku** stays running permanently. It acts as a background watchdog, automatically restarting Shizuku if it crashes or stops unexpectedly. \n\nNow featuring a **beautiful WebUI dashboard** inside KernelSU Manager for one-tap control, real-time monitoring, and live logs — no Termux required! Plus a powerful CLI and interactive menu for advanced users who prefer terminal management.\n\n## ✨ Features\n- 👍 **Watchdog Service:** Monitors Shizuku status at configurable intervals (Default: 30min)\n- 🚀 **Auto-Start:** Automatically starts Shizuku after boot with a customizable delay (Default: 45s)\n- 🌐 **WebUI Dashboard** *(v1.4+)*: \n  - Real-time status badge (🟢 Running / 🔴 Stopped)\n  - One-tap Start/Stop Shizuku with instant feedback\n  - Live log viewer with auto-refresh, color-coded entries, and scroll controls\n  - Configurable boot delay & check interval with live validation\n  - **🎨 Theme Switcher** *(v1.5+)*: Choose between **Dark**, **Light**, or **Auto** (System) themes\n  - Responsive design optimized for all devices\n- 📱 **Interactive CLI:** User-friendly menu-driven management in Termux\n- ⚡ **Quick Commands:** Fast CLI shortcuts for common actions (`ashizw start`, `ashizw status`, etc.)\n- 🔘 **KernelSU Action Button** *(v1.5+)*: \n  - Clean, minimal interface with volume key controls\n  - `Volume Up` → Start/Stop Shizuku (with confirmation)\n  - `Volume Down` → Directly opens Shizuku app (no picker menu)\n- 🖼️ **Module Banner Support** *(v1.4+)*: Displays artwork in supported managers (✅ KernelSU Next)\n- 🧹 **Clean Uninstall:** Completely removes all configurations and logs upon module removal\n\n## 📦 Installation\n### Basic Install\n1. Download the latest `Ashizw-v1.5.zip` module file from [Releases](https://github.com/Snakeeyez248/Ashizw/releases)\n2. Open your root manager (Magisk, KernelSU, or APatch)\n3. Navigate to the **Modules** section\n4. Tap **Install from Storage** and select the zip file\n5. **Reboot** your device\n\n### Post-Install Setup\n#### 🔹 Using WebUI (KernelSU Manager)\n1. Open **KernelSU Manager** → **Modules** → **Ashizw**\n2. Tap the **WebUI** tab (or globe icon 🌐)\n3. Enjoy the dashboard:\n   - 🟢 Status badge shows Shizuku state instantly\n   - ⚡ Start/Stop buttons with visual feedback\n   - 📝 Logs tab with live auto-refresh\n   - ⚙️ Configure intervals without editing files\n   - 🎨 **Theme Switcher**: Toggle between Dark, Light, or Auto themes in the header\n\n#### 🔹 Using KernelSU Action Button *(v1.5+)*\n1. Open **KernelSU Manager** → **Modules** → **Ashizw**\n2. Tap the **Action Button** (⚡ icon)\n3. Wait for the action screen to appear\n4. Press a volume key within 10 seconds:\n   - **Volume Up** → Start/Stop Shizuku (confirms before executing)\n   - **Volume Down** → Opens Shizuku app directly\n5. Screen exits automatically after action completes\n\n#### 🔹 Using CLI (Termux)\nOpen Termux and type:\n\n    su\n    ashizw\n\n### Direct CLI Commands\n\n| Command | Description |\n|---------|-------------|\n| `ashizw start` | Start Shizuku manually |\n| `ashizw stop` | Stop Shizuku service |\n| `ashizw status` | Check current status |\n| `ashizw set_delay <s>` | Set Boot Delay (seconds) |\n| `ashizw set_interval <s>` | Set Check Interval (seconds) |\n| `ashizw menu` | Open Interactive Menu |\n| `ashizw help` | Show help message |\n\n## ⚙️ Configuration\n\n- **Config File:** `/data/adb/.config/ashizw/config.json`\n- **Log File:** `/data/adb/.config/ashizw/ashizw.log`\n- **Default Boot Delay:** 45 seconds\n- **Default Check Interval:** 1800 seconds (30 min)\n\n## ⚠️ Requirements\n- ✅ Root Access (Magisk / KernelSU / APatch)\n- ✅ Shizuku App installed\n- ✅ Termux (for management commands)\n> **Note:** Complete hiding of OverlayFS signatures requires SuSFS or similar kernel-level modules. Ashizw does not modify mount structures.\n> \n> *My setup (working without detection issues):*  \n> - Root Manager: SukiSu Ultra v4.1.2  \n> - Mount Mode: Hybrid Mount (magic mount default)  \n> - Hiding Module: SuSFS enabled  \n> - Result: ✅ No OverlayFS warnings in Hunter/Duck Detector\n## 🐛 Troubleshooting\n- **Shizuku not starting?** Check logs at `/data/adb/.config/ashizw/ashizw.log`\n- **Command not found?** Ensure module is installed and rebooted\n- **Permission denied?** Run commands with `su`\n\n---\n\n<div align=\"center\">\n\n**Made with ❤️ by Ghulam Qadar**\n\n[Report Bugs](https://github.com/Snakeeyez248/ashizw/issues)\n\n</div>\n\n---\n\n👋 **A Personal Note from the Developer**\n\n> Hi! I'm Ghulam Qadar. I want to be honest: **I don't know how to code**. 💙\n> \n> I just had an idea to keep Shizuku running automatically, and I used **Qwen AI** to help me write the code. Since AI wrote it, **don't expect too much**, but I tested it thoroughly and I'm using it on my own device (Redmi 14C, HyperOS) right now - working perfectly! 🎉\n> \n> **P.S.** If you're wondering what \"Ashizw\" means - it's short for **\"A Shizuku Watchdog\"**! 🔍\n> \n> This is my first public module, so:\n> - 🙏 If you have any advice, I'd love to hear it!\n> - 🐛 If you find any bugs, please report them!\n> - ✨ If you have feature ideas, let me know!\n> \n> Every contribution helps me learn and make this project better. Thank you for trying Ashizw! ❤️\n\n",
+  "readmeHTML": "<h1>🛡️ Ashizw - Shizuku Watchdog & Manager</h1>\n\n<p>> <b>Keep Shizuku alive, automatically.</b></p>\n\n<p><a href=\"https://img.shields.io/badge/Platform-Android-green\">![Platform</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/Root-Required-red\">![Root</a>]()</p>\n\n<p><b>Author:</b> <a href=\"https://github.com/Snakeeyez248\">Ghulam Qadar</a></p>\n\n<p>---</p>\n\n<h2>📖 Description</h2>\n<p><b>Ashizw</b> is a universal Magisk/KernelSU module designed to ensure <b>Shizuku</b> stays running permanently. It acts as a background watchdog, automatically restarting Shizuku if it crashes or stops unexpectedly.</p>\n\n<p>Now featuring a <b>beautiful WebUI dashboard</b> inside KernelSU Manager for one-tap control, real-time monitoring, and live logs — no Termux required! Plus a powerful CLI and interactive menu for advanced users who prefer terminal management.</p>\n\n<h2>✨ Features</h2>\n<li>👍 **Watchdog Service:** Monitors Shizuku status at configurable intervals (Default: 30min)</li>\n<li>🚀 **Auto-Start:** Automatically starts Shizuku after boot with a customizable delay (Default: 45s)</li>\n<li>🌐 **WebUI Dashboard** *(v1.4+)*:</li>\n<p>  - Real-time status badge (🟢 Running / 🔴 Stopped)</p>\n<p>  - One-tap Start/Stop Shizuku with instant feedback</p>\n<p>  - Live log viewer with auto-refresh, color-coded entries, and scroll controls</p>\n<p>  - Configurable boot delay & check interval with live validation</p>\n<p>  - <b>🎨 Theme Switcher</b> *(v1.5+)*: Choose between <b>Dark</b>, <b>Light</b>, or <b>Auto</b> (System) themes</p>\n<p>  - Responsive design optimized for all devices</p>\n<li>📱 **Interactive CLI:** User-friendly menu-driven management in Termux</li>\n<li>⚡ **Quick Commands:** Fast CLI shortcuts for common actions (`ashizw start`, `ashizw status`, etc.)</li>\n<li>🔘 **KernelSU Action Button** *(v1.5+)*:</li>\n<p>  - Clean, minimal interface with volume key controls</p>\n<p>  - <code>Volume Up</code> → Start/Stop Shizuku (with confirmation)</p>\n<p>  - <code>Volume Down</code> → Directly opens Shizuku app (no picker menu)</p>\n<li>🖼️ **Module Banner Support** *(v1.4+)*: Displays artwork in supported managers (✅ KernelSU Next)</li>\n<li>🧹 **Clean Uninstall:** Completely removes all configurations and logs upon module removal</li>\n\n<h2>📦 Installation</h2>\n<h3>Basic Install</h3>\n<li>Download the latest `Ashizw-v1.5.zip` module file from [Releases](https://github.com/Snakeeyez248/Ashizw/releases)</li>\n<li>Open your root manager (Magisk, KernelSU, or APatch)</li>\n<li>Navigate to the **Modules** section</li>\n<li>Tap **Install from Storage** and select the zip file</li>\n<li>**Reboot** your device</li>\n\n<h3>Post-Install Setup</h3>\n<p>#### 🔹 Using WebUI (KernelSU Manager)</p>\n<li>Open **KernelSU Manager** → **Modules** → **Ashizw**</li>\n<li>Tap the **WebUI** tab (or globe icon 🌐)</li>\n<li>Enjoy the dashboard:</li>\n<p>   - 🟢 Status badge shows Shizuku state instantly</p>\n<p>   - ⚡ Start/Stop buttons with visual feedback</p>\n<p>   - 📝 Logs tab with live auto-refresh</p>\n<p>   - ⚙️ Configure intervals without editing files</p>\n<p>   - 🎨 <b>Theme Switcher</b>: Toggle between Dark, Light, or Auto themes in the header</p>\n\n<p>#### 🔹 Using KernelSU Action Button *(v1.5+)*</p>\n<li>Open **KernelSU Manager** → **Modules** → **Ashizw**</li>\n<li>Tap the **Action Button** (⚡ icon)</li>\n<li>Wait for the action screen to appear</li>\n<li>Press a volume key within 10 seconds:</li>\n<p>   - <b>Volume Up</b> → Start/Stop Shizuku (confirms before executing)</p>\n<p>   - <b>Volume Down</b> → Opens Shizuku app directly</p>\n<li>Screen exits automatically after action completes</li>\n\n<p>#### 🔹 Using CLI (Termux)</p>\n<p>Open Termux and type:</p>\n\n<p>    su</p>\n<p>    ashizw</p>\n\n<h3>Direct CLI Commands</h3>\n\n<p>| Command | Description |</p>\n<p>|---------|-------------|</p>\n<p>| <code>ashizw start</code> | Start Shizuku manually |</p>\n<p>| <code>ashizw stop</code> | Stop Shizuku service |</p>\n<p>| <code>ashizw status</code> | Check current status |</p>\n<p>| <code>ashizw set_delay <s></code> | Set Boot Delay (seconds) |</p>\n<p>| <code>ashizw set_interval <s></code> | Set Check Interval (seconds) |</p>\n<p>| <code>ashizw menu</code> | Open Interactive Menu |</p>\n<p>| <code>ashizw help</code> | Show help message |</p>\n\n<h2>⚙️ Configuration</h2>\n\n<li>**Config File:** `/data/adb/.config/ashizw/config.json`</li>\n<li>**Log File:** `/data/adb/.config/ashizw/ashizw.log`</li>\n<li>**Default Boot Delay:** 45 seconds</li>\n<li>**Default Check Interval:** 1800 seconds (30 min)</li>\n\n<h2>⚠️ Requirements</h2>\n<li>✅ Root Access (Magisk / KernelSU / APatch)</li>\n<li>✅ Shizuku App installed</li>\n<li>✅ Termux (for management commands)</li>\n<p>> <b>Note:</b> Complete hiding of OverlayFS signatures requires SuSFS or similar kernel-level modules. Ashizw does not modify mount structures.</p>\n<p>></p>\n<p>> *My setup (working without detection issues):*</p>\n<p>> - Root Manager: SukiSu Ultra v4.1.2</p>\n<p>> - Mount Mode: Hybrid Mount (magic mount default)</p>\n<p>> - Hiding Module: SuSFS enabled</p>\n<p>> - Result: ✅ No OverlayFS warnings in Hunter/Duck Detector</p>\n<h2>🐛 Troubleshooting</h2>\n<li>**Shizuku not starting?** Check logs at `/data/adb/.config/ashizw/ashizw.log`</li>\n<li>**Command not found?** Ensure module is installed and rebooted</li>\n<li>**Permission denied?** Run commands with `su`</li>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n\n<p><b>Made with ❤️ by Ghulam Qadar</b></p>\n\n<p><a href=\"https://github.com/Snakeeyez248/ashizw/issues\">Report Bugs</a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p>👋 <b>A Personal Note from the Developer</b></p>\n\n<p>> Hi! I'm Ghulam Qadar. I want to be honest: <b>I don't know how to code</b>. 💙</p>\n<p>></p>\n<p>> I just had an idea to keep Shizuku running automatically, and I used <b>Qwen AI</b> to help me write the code. Since AI wrote it, <b>don't expect too much</b>, but I tested it thoroughly and I'm using it on my own device (Redmi 14C, HyperOS) right now - working perfectly! 🎉</p>\n<p>></p>\n<p>> <b>P.S.</b> If you're wondering what \"Ashizw\" means - it's short for <b>\"A Shizuku Watchdog\"</b>! 🔍</p>\n<p>></p>\n<p>> This is my first public module, so:</p>\n<p>> - 🙏 If you have any advice, I'd love to hear it!</p>\n<p>> - 🐛 If you find any bugs, please report them!</p>\n<p>> - ✨ If you have feature ideas, let me know!</p>\n<p>></p>\n<p>> Every contribution helps me learn and make this project better. Thank you for trying Ashizw! ❤️</p>\n",
+  "homepageUrl": "https://github.com/Snakeeyez248/Ashizw",
+  "sourceUrl": "https://github.com/Snakeeyez248/Ashizw",
+  "url": "https://github.com/Snakeeyez248/Ashizw",
+  "latestRelease": {
+    "name": "v1.5",
+    "version": "v1.5",
+    "time": "2026-04-17T19:38:47Z",
+    "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.5/Ashizw-v1.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-04-17T19:38:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizw-v1.5.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.5/Ashizw-v1.5.zip",
+          "size": 220430,
+          "downloadCount": 603
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.5/CHANGELOG.md",
+          "size": 1483,
+          "downloadCount": 176
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-03-06T22:18:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizwv1.4.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.4/Ashizwv1.4.zip",
+          "size": 26585,
+          "downloadCount": 19
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.4/CHANGELOG.md",
+          "size": 1841,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-03-01T01:34:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizwv1.3.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.3/Ashizwv1.3.zip",
+          "size": 19820,
+          "downloadCount": 6
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.3/CHANGELOG.md",
+          "size": 626,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-03-01T01:00:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizwv1.2.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.2/Ashizwv1.2.zip",
+          "size": 19450,
+          "downloadCount": 4
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.2/CHANGELOG.md",
+          "size": 279,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-02-27T14:38:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizwv1.1.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.1/Ashizwv1.1.zip",
+          "size": 19399,
+          "downloadCount": 5
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.1/CHANGELOG.md",
+          "size": 383,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-02-27T12:19:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Ashizwv1.0.zip",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.0/Ashizwv1.0.zip",
+          "size": 19027,
+          "downloadCount": 3
+        },
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Snakeeyez248/Ashizw/releases/download/v1.0/CHANGELOG.md",
+          "size": 1312,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

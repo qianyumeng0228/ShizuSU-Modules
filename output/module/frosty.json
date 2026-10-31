@@ -1,0 +1,309 @@
+{
+  "readme": "<div align=\"center\">\n\n# 🧊 FROSTY\n\n### GMS Freezer & Battery Saver\n\n[![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-00B0FF.svg)](https://github.com/topjohnwu/Magisk)\n[![KernelSU](https://img.shields.io/badge/KernelSU-Supported-green.svg)](https://github.com/tiann/KernelSU)\n[![APatch](https://img.shields.io/badge/APatch-Supported-orange.svg)](https://github.com/bmax121/APatch)\n[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)\n![Downloads](https://img.shields.io/github/downloads/Drsexo/Frosty/total)\n\n[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Categories](#gms-categories) • [FAQ](#faq)\n\n---\n\n🇬🇧 English • [🇫🇷 Français](readme/README.fr.md) • [🇩🇪 Deutsch](readme/README.de.md)  \n[🇵🇱 Polski](readme/README.pl.md) • [🇮🇹 Italiano](readme/README.it.md) • [🇪🇸 Español](readme/README.es.md)  \n[🇧🇷 Português](readme/README.pt-BR.md) • [🇹🇷 Türkçe](readme/README.tr.md) • [🇮🇩 Indonesia](readme/README.id.md)  \n[🇷🇺 Русский](readme/README.ru.md) • [🇺🇦 Українська](readme/README.uk.md) • [🇨🇳 中文](readme/README.zh-CN.md)  \n[🇯🇵 日本語](readme/README.ja.md) • [🇸🇦 العربية](readme/README.ar.md)\n\n</div>\n\n<div align=\"center\">\n<img src=\"readme/images/en.png\" width=\"600\">\n</div>\n\n## Overview\n\nFrosty optimizes battery life by freezing GMS services, applying system-wide doze enhancements, and automating screen-off behavior. Configure everything through the WebUI.\n\n## Features\n\n- **GMS Freezing**: Disable GMS services across 8 categories\n- **App Doze**: Remove any app from Android's Doze power-save exemption list. GMS is selectable here too, replacing the old dedicated GMS Doze toggle\n- **Deep Doze**: Background restrictions for all apps while the device is locked (Minimum / Moderate / Maximum)\n- **Screen Off Optimization**: Disable selected connections (Wi-Fi, Bluetooth, data, NFC, location, sensors, panel low-power mode) and optionally run the RAM cleaner after the device has been locked for a configurable delay, restores on unlock\n- **Kill Google Tracking**: Disables GMS analytics, Clearcut telemetry, Phenotype polling, and ad tracking\n- **Kernel Tweaks**: Scheduler, VM, network, and debug optimizations\n- **RAM Optimizer**: ZRAM auto-tuning, LMK/LMKD/PSI thresholds, OEM reclaim disabling, VM memory params (Moderate / Maximum), configurable RAM Cleaner, Multitasking Profile (Performance / Balanced / Power Saving)\n- **System Props**: Disable debug properties to save RAM and battery\n- **Log Killing**: Stop battery-draining log and debug processes\n- **Battery Saver Tuner**: Customize what Android's built-in battery saver does when active, including an option to keep max refresh rate while it's on\n\n## Installation\n\n**Requirements:** Android 9+, Magisk 20.4+ / KernelSU / APatch, Google Play Services\n\n1. Download from [Releases](https://github.com/Drsexo/Frosty/releases)\n2. Install via your root manager\n3. Reboot\n4. Open the WebUI to enable features\n\n> [!NOTE]\n> Magisk users can use [KsuWebUI](https://github.com/KOWX712/KsuWebUIStandalone/releases) / [WebUI-X](https://github.com/MMRLApp/WebUI-X-Portable/releases) to access the WebUI.\n\n> [!NOTE]\n> On KernelSU/APatch, Frosty requests a hot install. If your manager supports it, refresh the WebUI after installing instead of rebooting. Reboot if anything looks off. Magisk always requires a reboot.\n\n## Usage\n\nOpen the WebUI from your root manager:\n\n- **System Tweaks**: kernel tweaks, system props, blur disable, log killing, tracking block, RAM optimizer and cleaner\n- **Doze**: App Doze with app picker, Deep Doze with level selector and whitelist editor\n- **Screen Off Optimization**: per-connection toggles, delay timers, restore on unlock\n- **GMS Categories**: freeze individual GMS service groups, or use Enable all / Disable all to batch the ones not already in the state you want\n- **Battery Saver Tuner**: fine-tune battery saver behavior\n- **Import / Export**: back up and restore your full configuration\n\n## GMS Categories\n\n#### Safe to Disable\n| Category | Impact |\n|----------|--------|\n| 📊 **Telemetry** | None. Stops ads, analytics, tracking. |\n| 🔄 **Background** | Auto-updates may be delayed. |\n\n#### May Break Features\n| Category | What Breaks |\n|----------|-------------|\n| 📍 **Location** | Maps, navigation, Find My Device, location sharing |\n| 📡 **Connectivity** | Chromecast, Quick Share, Fast Pair |\n| ☁️ **Cloud** | Google Sign-in, Autofill, passwords, backup |\n| 💳 **Payments** | Google Pay, NFC tap-to-pay |\n| ⌚ **Wearables** | Wear OS, Google Fit, fitness tracking |\n| 🎮 **Games** | Play Games achievements, leaderboards, cloud saves |\n\n## Deep Doze Levels\n\nAll levels rewrite Doze constants and enable JobScheduler flex-idle on Android 14+ where the system supports it. **Minimum** is the gentlest tier: shorter Doze timeouts and the `frequent` standby bucket, with no wakelock killer, no `WAKE_LOCK` denial and no sensor restriction. **Moderate** and **Maximum** force IDLE while the device is locked and run a 5-min wakelock killer once it has been locked that long; after those 5 minutes apps move to the `rare` bucket (Moderate) or the `restricted` bucket (Maximum), and unlocking restores them. Restrictions follow lock state, not screen state: checking the time or glancing at ambient display doesn't reset anything, only unlocking does. **Maximum** additionally denies `WAKE_LOCK` for restricted apps, blocks sensor access (including lift-to-wake) for every app except the default dialer while locked (restored during calls and on unlock), and kills wakelocks immediately on apply.\n\n## RAM Optimizer\n\nAuto-tunes ZRAM compression, LMK / LMKD / PSI thresholds, OEM reclaim nodes, and VM memory params. **Maximum** scales LMK weights up ~50-70% and uses more proactive LMKD/PSI thresholds. Multitasking Profile (Performance / Balanced / Power Saving) separately controls how many background apps ActivityManager keeps ready to resume instantly.\n\n## FAQ\n\n**Q: Why are my notifications delayed?**  \nA: App Doze and Deep Doze restrict background activity. GMS/Firebase itself is whitelisted by default so push delivery stays intact, but third-party messaging apps still need to be added to the Deep Doze whitelist in the WebUI.\n\n**Q: What happens if I disable the module in the manager instead of turning features off?**  \nA: Frosty stops running at the next boot, but settings it already wrote (Doze constants, standby buckets, app ops, system settings) stay in place and its monitors keep running until you reboot. Turn the features off in the WebUI first, then disable the module. Removing the module runs Frosty's uninstall revert at the next boot.\n\n**Q: Where did GMS Doze go?**  \nA: It's now part of App Doze. Open the App Doze picker and select GMS, same effect, unified interface.\n\n**Q: Does this work without Google Play Services?**  \nA: Kernel Tweaks, System Props, Blur Disable, Log Killing, RAM Optimizer and Cleaner, and Deep Doze all work. GMS features require GMS.\n\n**Q: Is anything enabled after install?**  \nA: No. Everything is off by default. Enable only what you need.\n\n## Credits\n\n- **kaushikieeee** [GhostGMS](https://github.com/kaushikieeee/GhostGMS)\n- **gloeyisk** [Universal GMS Doze](https://github.com/gloeyisk/universal-gms-doze)\n- **Azyrn** [DeepDoze Enforcer](https://github.com/Azyrn/DeepDoze-Enforcer)\n- **MoZoiD** [GMS Component Disable Script](https://t.me/MoZoiDStack/137)\n- **s1m** [SaverTuner](https://codeberg.org/s1m/savertuner)\n- [xizt158](https://github.com/xizt159) for many quality contributions\n\n## License\n\nLicensed under **GPL v3** see [LICENSE](LICENSE).  \nThe name **Frosty** is reserved for official releases only. Forks must use a different name and clearly state they are unofficial. The original author takes no responsibility for damage caused by unofficial or modified versions.\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>🧊 FROSTY</h1>\n\n<h3>GMS Freezer & Battery Saver</h3>\n\n<p><a href=\"https://img.shields.io/badge/Magisk-20.4%2B-00B0FF.svg\">![Magisk</a>](https://github.com/topjohnwu/Magisk)</p>\n<p><a href=\"https://img.shields.io/badge/KernelSU-Supported-green.svg\">![KernelSU</a>](https://github.com/tiann/KernelSU)</p>\n<p><a href=\"https://img.shields.io/badge/APatch-Supported-orange.svg\">![APatch</a>](https://github.com/bmax121/APatch)</p>\n<p><a href=\"https://img.shields.io/badge/License-GPL--3.0-blue.svg\">![License</a>](LICENSE)</p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Drsexo/Frosty/total\">Downloads</a></p>\n\n<p><a href=\"#features\">Features</a> • <a href=\"#installation\">Installation</a> • <a href=\"#usage\">Usage</a> • <a href=\"#gms-categories\">Categories</a> • <a href=\"#faq\">FAQ</a></p>\n\n<p>---</p>\n\n<p>🇬🇧 English • <a href=\"readme/README.fr.md\">🇫🇷 Français</a> • <a href=\"readme/README.de.md\">🇩🇪 Deutsch</a></p>\n<p><a href=\"readme/README.pl.md\">🇵🇱 Polski</a> • <a href=\"readme/README.it.md\">🇮🇹 Italiano</a> • <a href=\"readme/README.es.md\">🇪🇸 Español</a></p>\n<p><a href=\"readme/README.pt-BR.md\">🇧🇷 Português</a> • <a href=\"readme/README.tr.md\">🇹🇷 Türkçe</a> • <a href=\"readme/README.id.md\">🇮🇩 Indonesia</a></p>\n<p><a href=\"readme/README.ru.md\">🇷🇺 Русский</a> • <a href=\"readme/README.uk.md\">🇺🇦 Українська</a> • <a href=\"readme/README.zh-CN.md\">🇨🇳 中文</a></p>\n<p><a href=\"readme/README.ja.md\">🇯🇵 日本語</a> • <a href=\"readme/README.ar.md\">🇸🇦 العربية</a></p>\n\n<p></div></p>\n\n<p><div align=\"center\"></p>\n<p><img src=\"readme/images/en.png\" width=\"600\"></p>\n<p></div></p>\n\n<h2>Overview</h2>\n\n<p>Frosty optimizes battery life by freezing GMS services, applying system-wide doze enhancements, and automating screen-off behavior. Configure everything through the WebUI.</p>\n\n<h2>Features</h2>\n\n<li>**GMS Freezing**: Disable GMS services across 8 categories</li>\n<li>**App Doze**: Remove any app from Android's Doze power-save exemption list. GMS is selectable here too, replacing the old dedicated GMS Doze toggle</li>\n<li>**Deep Doze**: Background restrictions for all apps while the device is locked (Minimum / Moderate / Maximum)</li>\n<li>**Screen Off Optimization**: Disable selected connections (Wi-Fi, Bluetooth, data, NFC, location, sensors, panel low-power mode) and optionally run the RAM cleaner after the device has been locked for a configurable delay, restores on unlock</li>\n<li>**Kill Google Tracking**: Disables GMS analytics, Clearcut telemetry, Phenotype polling, and ad tracking</li>\n<li>**Kernel Tweaks**: Scheduler, VM, network, and debug optimizations</li>\n<li>**RAM Optimizer**: ZRAM auto-tuning, LMK/LMKD/PSI thresholds, OEM reclaim disabling, VM memory params (Moderate / Maximum), configurable RAM Cleaner, Multitasking Profile (Performance / Balanced / Power Saving)</li>\n<li>**System Props**: Disable debug properties to save RAM and battery</li>\n<li>**Log Killing**: Stop battery-draining log and debug processes</li>\n<li>**Battery Saver Tuner**: Customize what Android's built-in battery saver does when active, including an option to keep max refresh rate while it's on</li>\n\n<h2>Installation</h2>\n\n<p><b>Requirements:</b> Android 9+, Magisk 20.4+ / KernelSU / APatch, Google Play Services</p>\n\n<li>Download from [Releases](https://github.com/Drsexo/Frosty/releases)</li>\n<li>Install via your root manager</li>\n<li>Reboot</li>\n<li>Open the WebUI to enable features</li>\n\n<p>> [!NOTE]</p>\n<p>> Magisk users can use <a href=\"https://github.com/KOWX712/KsuWebUIStandalone/releases\">KsuWebUI</a> / <a href=\"https://github.com/MMRLApp/WebUI-X-Portable/releases\">WebUI-X</a> to access the WebUI.</p>\n\n<p>> [!NOTE]</p>\n<p>> On KernelSU/APatch, Frosty requests a hot install. If your manager supports it, refresh the WebUI after installing instead of rebooting. Reboot if anything looks off. Magisk always requires a reboot.</p>\n\n<h2>Usage</h2>\n\n<p>Open the WebUI from your root manager:</p>\n\n<li>**System Tweaks**: kernel tweaks, system props, blur disable, log killing, tracking block, RAM optimizer and cleaner</li>\n<li>**Doze**: App Doze with app picker, Deep Doze with level selector and whitelist editor</li>\n<li>**Screen Off Optimization**: per-connection toggles, delay timers, restore on unlock</li>\n<li>**GMS Categories**: freeze individual GMS service groups, or use Enable all / Disable all to batch the ones not already in the state you want</li>\n<li>**Battery Saver Tuner**: fine-tune battery saver behavior</li>\n<li>**Import / Export**: back up and restore your full configuration</li>\n\n<h2>GMS Categories</h2>\n\n<p>#### Safe to Disable</p>\n<p>| Category | Impact |</p>\n<p>|----------|--------|</p>\n<p>| 📊 <b>Telemetry</b> | None. Stops ads, analytics, tracking. |</p>\n<p>| 🔄 <b>Background</b> | Auto-updates may be delayed. |</p>\n\n<p>#### May Break Features</p>\n<p>| Category | What Breaks |</p>\n<p>|----------|-------------|</p>\n<p>| 📍 <b>Location</b> | Maps, navigation, Find My Device, location sharing |</p>\n<p>| 📡 <b>Connectivity</b> | Chromecast, Quick Share, Fast Pair |</p>\n<p>| ☁️ <b>Cloud</b> | Google Sign-in, Autofill, passwords, backup |</p>\n<p>| 💳 <b>Payments</b> | Google Pay, NFC tap-to-pay |</p>\n<p>| ⌚ <b>Wearables</b> | Wear OS, Google Fit, fitness tracking |</p>\n<p>| 🎮 <b>Games</b> | Play Games achievements, leaderboards, cloud saves |</p>\n\n<h2>Deep Doze Levels</h2>\n\n<p>All levels rewrite Doze constants and enable JobScheduler flex-idle on Android 14+ where the system supports it. <b>Minimum</b> is the gentlest tier: shorter Doze timeouts and the <code>frequent</code> standby bucket, with no wakelock killer, no <code>WAKE_LOCK</code> denial and no sensor restriction. <b>Moderate</b> and <b>Maximum</b> force IDLE while the device is locked and run a 5-min wakelock killer once it has been locked that long; after those 5 minutes apps move to the <code>rare</code> bucket (Moderate) or the <code>restricted</code> bucket (Maximum), and unlocking restores them. Restrictions follow lock state, not screen state: checking the time or glancing at ambient display doesn't reset anything, only unlocking does. <b>Maximum</b> additionally denies <code>WAKE_LOCK</code> for restricted apps, blocks sensor access (including lift-to-wake) for every app except the default dialer while locked (restored during calls and on unlock), and kills wakelocks immediately on apply.</p>\n\n<h2>RAM Optimizer</h2>\n\n<p>Auto-tunes ZRAM compression, LMK / LMKD / PSI thresholds, OEM reclaim nodes, and VM memory params. <b>Maximum</b> scales LMK weights up ~50-70% and uses more proactive LMKD/PSI thresholds. Multitasking Profile (Performance / Balanced / Power Saving) separately controls how many background apps ActivityManager keeps ready to resume instantly.</p>\n\n<h2>FAQ</h2>\n\n<p><b>Q: Why are my notifications delayed?</b></p>\n<p>A: App Doze and Deep Doze restrict background activity. GMS/Firebase itself is whitelisted by default so push delivery stays intact, but third-party messaging apps still need to be added to the Deep Doze whitelist in the WebUI.</p>\n\n<p><b>Q: What happens if I disable the module in the manager instead of turning features off?</b></p>\n<p>A: Frosty stops running at the next boot, but settings it already wrote (Doze constants, standby buckets, app ops, system settings) stay in place and its monitors keep running until you reboot. Turn the features off in the WebUI first, then disable the module. Removing the module runs Frosty's uninstall revert at the next boot.</p>\n\n<p><b>Q: Where did GMS Doze go?</b></p>\n<p>A: It's now part of App Doze. Open the App Doze picker and select GMS, same effect, unified interface.</p>\n\n<p><b>Q: Does this work without Google Play Services?</b></p>\n<p>A: Kernel Tweaks, System Props, Blur Disable, Log Killing, RAM Optimizer and Cleaner, and Deep Doze all work. GMS features require GMS.</p>\n\n<p><b>Q: Is anything enabled after install?</b></p>\n<p>A: No. Everything is off by default. Enable only what you need.</p>\n\n<h2>Credits</h2>\n\n<li>**kaushikieeee** [GhostGMS](https://github.com/kaushikieeee/GhostGMS)</li>\n<li>**gloeyisk** [Universal GMS Doze](https://github.com/gloeyisk/universal-gms-doze)</li>\n<li>**Azyrn** [DeepDoze Enforcer](https://github.com/Azyrn/DeepDoze-Enforcer)</li>\n<li>**MoZoiD** [GMS Component Disable Script](https://t.me/MoZoiDStack/137)</li>\n<li>**s1m** [SaverTuner](https://codeberg.org/s1m/savertuner)</li>\n<li>[xizt158](https://github.com/xizt159) for many quality contributions</li>\n\n<h2>License</h2>\n\n<p>Licensed under <b>GPL v3</b> see <a href=\"LICENSE\">LICENSE</a>.</p>\n<p>The name <b>Frosty</b> is reserved for official releases only. Forks must use a different name and clearly state they are unofficial. The original author takes no responsibility for damage caused by unofficial or modified versions.</p>",
+  "homepageUrl": "https://github.com/Drsexo/Frosty",
+  "sourceUrl": "https://github.com/Drsexo/Frosty",
+  "url": "https://github.com/Drsexo/Frosty",
+  "latestRelease": {
+    "name": "4.5",
+    "version": "4.5",
+    "time": "2026-10-10T01:49:15Z",
+    "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.5/Frosty-4.5.zip"
+  },
+  "releases": [
+    {
+      "name": "4.5",
+      "tagName": "4.5",
+      "publishedAt": "2026-10-10T01:49:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.5.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.5/Frosty-4.5.zip",
+          "size": 862117,
+          "downloadCount": 4335
+        }
+      ]
+    },
+    {
+      "name": "4.4",
+      "tagName": "4.4",
+      "publishedAt": "2026-09-03T09:10:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.4.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.4/Frosty-4.4.zip",
+          "size": 347878,
+          "downloadCount": 5290
+        }
+      ]
+    },
+    {
+      "name": "4.3",
+      "tagName": "4.3",
+      "publishedAt": "2026-07-04T20:56:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.3.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.3/Frosty-4.3.zip",
+          "size": 321321,
+          "downloadCount": 6100
+        }
+      ]
+    },
+    {
+      "name": "4.2",
+      "tagName": "4.2",
+      "publishedAt": "2026-07-01T10:55:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.2.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.2/Frosty-4.2.zip",
+          "size": 321192,
+          "downloadCount": 849
+        }
+      ]
+    },
+    {
+      "name": "4.1",
+      "tagName": "4.1",
+      "publishedAt": "2026-06-11T16:33:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.1.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.1/Frosty-4.1.zip",
+          "size": 331379,
+          "downloadCount": 1831
+        }
+      ]
+    },
+    {
+      "name": "4.0",
+      "tagName": "4.0",
+      "publishedAt": "2026-05-07T12:26:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-4.0.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/4.0/Frosty-4.0.zip",
+          "size": 617510,
+          "downloadCount": 2740
+        }
+      ]
+    },
+    {
+      "name": "3.7",
+      "tagName": "3.7",
+      "publishedAt": "2026-04-15T13:02:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.7.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.7/Frosty-3.7.zip",
+          "size": 616857,
+          "downloadCount": 1950
+        }
+      ]
+    },
+    {
+      "name": "3.6",
+      "tagName": "3.6",
+      "publishedAt": "2026-03-21T20:36:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.6.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.6/Frosty-3.6.zip",
+          "size": 617933,
+          "downloadCount": 1742
+        }
+      ]
+    },
+    {
+      "name": "3.5",
+      "tagName": "3.5",
+      "publishedAt": "2026-03-14T10:25:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.5.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.5/Frosty-3.5.zip",
+          "size": 606964,
+          "downloadCount": 80
+        }
+      ]
+    },
+    {
+      "name": "3.4",
+      "tagName": "3.4",
+      "publishedAt": "2026-03-10T14:24:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.4.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.4/Frosty-3.4.zip",
+          "size": 603073,
+          "downloadCount": 277
+        }
+      ]
+    },
+    {
+      "name": "3.3",
+      "tagName": "3.3",
+      "publishedAt": "2026-03-07T16:35:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.3.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.3/Frosty-3.3.zip",
+          "size": 576297,
+          "downloadCount": 228
+        }
+      ]
+    },
+    {
+      "name": "3.2",
+      "tagName": "3.2",
+      "publishedAt": "2026-03-05T13:26:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.2.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.2/Frosty-3.2.zip",
+          "size": 576032,
+          "downloadCount": 205
+        }
+      ]
+    },
+    {
+      "name": "3.1",
+      "tagName": "3.1",
+      "publishedAt": "2026-03-04T18:03:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.1.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.1/Frosty-3.1.zip",
+          "size": 573098,
+          "downloadCount": 95
+        }
+      ]
+    },
+    {
+      "name": "3.0",
+      "tagName": "3.0",
+      "publishedAt": "2026-03-03T18:04:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-3.0.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/3.0/Frosty-3.0.zip",
+          "size": 664451,
+          "downloadCount": 172
+        }
+      ]
+    },
+    {
+      "name": "2.5",
+      "tagName": "2.5",
+      "publishedAt": "2026-02-28T15:13:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.5.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.5/Frosty-2.5.zip",
+          "size": 151819,
+          "downloadCount": 292
+        }
+      ]
+    },
+    {
+      "name": "2.4",
+      "tagName": "2.4",
+      "publishedAt": "2026-02-27T15:15:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.4.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.4/Frosty-2.4.zip",
+          "size": 148806,
+          "downloadCount": 156
+        }
+      ]
+    },
+    {
+      "name": "2.3",
+      "tagName": "2.3",
+      "publishedAt": "2026-02-26T21:37:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.3.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.3/Frosty-2.3.zip",
+          "size": 146822,
+          "downloadCount": 55
+        }
+      ]
+    },
+    {
+      "name": "2.2",
+      "tagName": "2.2",
+      "publishedAt": "2026-02-16T06:00:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.2.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.2/Frosty-2.2.zip",
+          "size": 138747,
+          "downloadCount": 354
+        }
+      ]
+    },
+    {
+      "name": "2.1",
+      "tagName": "2.1",
+      "publishedAt": "2026-02-10T20:53:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.1.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.1/Frosty-2.1.zip",
+          "size": 136256,
+          "downloadCount": 267
+        }
+      ]
+    },
+    {
+      "name": "2.0",
+      "tagName": "2.0",
+      "publishedAt": "2026-02-03T05:49:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-2.0.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/2.0/Frosty-2.0.zip",
+          "size": 143253,
+          "downloadCount": 771
+        }
+      ]
+    },
+    {
+      "name": "1.0",
+      "tagName": "1.0",
+      "publishedAt": "2026-02-02T08:31:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Frosty-1.0.zip",
+          "downloadUrl": "https://github.com/Drsexo/Frosty/releases/download/1.0/Frosty-1.0.zip",
+          "size": 134720,
+          "downloadCount": 35
+        }
+      ]
+    }
+  ]
+}

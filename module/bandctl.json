@@ -1,0 +1,351 @@
+{
+  "readme": "# Band Controller\n\nA standalone KernelSU module for LTE/NR band control and modem diagnostics on Qualcomm devices — no third-party apps required (Network Signal Guru is not needed).\n\n## Requirements\n\n- **Root**: KernelSU (or KernelSU-compatible) root.\n- **Device**: A Qualcomm modem device (tested on Poco F3 / alioth).\n- **No dependencies** — the module ships a bundled Python runtime; Termux is not required.\n\n## Install\n\n1. Download the latest `bandctl-*.zip` from the [Releases](https://github.com/raz123/bandctl/releases) page to your device.\n2. Open the **KernelSU app** → **Modules** → **Install from storage** and pick the zip.\n   - Alternatively, from a root shell: `ksud module install bandctl-*.zip`\n3. Reboot (or let the module start the service).\n4. Open the web UI:\n   - **Module manager (primary)** — open **KernelSU/ReSukiSU → Modules → Band Controller → WebUI**; the manager opens the built-in WebView pointed at the module.\n   - **Browser** — open **http://localhost:8090** from the device browser.\n   - From a computer: `adb forward tcp:8090 tcp:8090`, then open http://localhost:8090.\n\n   The listen port defaults to **8090** (chosen to dodge the common 8080 LAN squatter) and can be changed via `\"port\"` in `config/settings.json`; the Web UI resolves the API base automatically, so no other configuration is needed after a restart.\n\n## Screenshots\n\n<p align=\"center\">\n  <img src=\"bands.png\" alt=\"Bands tab\" width=\"180\" />&nbsp;\n  <img src=\"diag.png\" alt=\"Diagnostics tab\" width=\"180\" />&nbsp;\n  <img src=\"settings.png\" alt=\"Settings tab\" width=\"180\" />\n</p>\n<p align=\"center\">\n  <em>Bands tab &middot; Diagnostics tab &middot; Settings tab</em>\n</p>\n\n## Features\n\n- **13 API endpoints** — every endpoint is addressed as `/api/<name>?action=<name>` (the `action=` query parameter selects the handler; the path itself is just the API root):\n  - `GET  /api/read?action=read` — current LTE/NR band configuration (from QMI, diag, config file, or default)\n  - `POST /api/write?action=write` — write LTE/NR band configuration to the modem (QMI first, diag fallback)\n  - `GET  /api/defaults?action=defaults` — carrier-aware defaults (Rogers 302720 curated, others unrestricted minus bands 7/66)\n  - `POST /api/boot-apply?action=boot-apply` — re-apply the persisted config at boot (config-file gated)\n  - `POST /api/export?action=export` — export the submitted band config to a timestamped JSON file in the module config dir (WebView-compatible: the UI toasts the on-device path instead of a blob download)\n  - `GET  /api/settings?action=settings` — network-access settings (LAN mode, token required?)\n  - `POST /api/settings?action=settings` — enable/disable LAN mode, (re)generate the access token\n  - `POST /api/restart?action=restart` — restart the server (needed after changing network access)\n  - `GET  /api/signal?action=signal` — current signal strength (RSRP/RSRQ/level) from `dumpsys telephony.registry`\n  - `GET  /api/registration?action=registration` — service/data state, network type, operator, roaming\n  - `GET  /api/health?action=health` — transport status (QMI or diag, band counts, diag session owner)\n  - `POST /api/modem-reset?action=modem-reset` — soft modem reset (`cmd phone radio power` off/on, with fallback)\n  - `GET  /api/band-camping?action=band-camping` — live band-camping log: last N serving-cell EARFCN/band samples\n  - `GET/POST /api/drop-log?action=drop-log` — debug drop logging: enable/disable the watchdog, list recorded drop snapshots\n- **Live band-camping readout** — the Diagnostics tab shows the current camped band (band + EARFCN) live, so you can see whether a forced band actually stuck.\n- **Debug drop logging** — Settings > Debug > Drop logging (default off): when enabled, a server-side watchdog stamps every radio drop (OUT_OF_SERVICE / POWER_OFF / EMERGENCY_ONLY) with correlation context — registration state, call state, Wi-Fi link/AP, data counters, a redacted radio-buffer summary — and records the recovery duration. Snapshots land in the persistent data dir `/data/local/tmp/bandctl/drop_log` on-device (survives reboots and module updates), falling back to the module's `config/drop_log/` when that path isn't available; the toggle is live, no restart needed.\n- **Boot-time band re-apply** — the persisted config is re-applied automatically at every boot (pre-unlock, no app needed); config-file absent = no-op. There is no UI toggle to disable the boot re-apply. To stop it, delete `config/bands.json` — the server **never re-seeds it** (the boot-apply path is read-only w.r.t. the config), so a missing file stays a permanent no-op until you save/apply a new config from the UI.\n- **Carrier-aware defaults** — Rogers (302720) gets a curated whitelist; other carriers get unrestricted defaults (bands 7/66 excluded there too — see Band configuration) until you lock bands.\n- **RSRP graph UI** — the web UI plots signal strength over time.\n- **Config persistence** — band settings are mirrored to `/data/adb/modules/bandctl/config/bands.json` and survive reboots.\n\n## How it works\n\n- **Bundled Python runtime** — the web server runs on the Python interpreter shipped inside the module (`python/bin/python3.14` with its stdlib and shared libraries under `python/`), so no Termux install is needed and the service starts before first unlock.\n- **Direct QMI band apply over QRTR** via the bundled static `qmi_band` client (source in `qmi/`). It discovers the live NAS endpoint at runtime (service/node/port are probed, not hardcoded), reads the current band configuration, and applies LTE/NR band preference changes — the modem camps per the applied list.\n- **`/dev/diag` fallback** via the bundled pure-Python protocol stack (the diag kernel driver, feature masks, and NV/band-mask commands) for devices where diag works.\n- **Telephony-framework monitoring** via `dumpsys telephony.registry` — signal strength, registration state, and band camping are reported regardless of transport.\n- **Graceful fallback chain** — reads try QMI, then diag, then the config file; writes try QMI, then diag, and mirror a verified apply to `config/bands.json` (a failed apply is never persisted, so boot re-apply never retries a rejected set).\n\n## Status and honest limitations\n\n**QMI band apply works on this device (Poco F3 / alioth).** Forcing bands via the web UI moved camping off band 4 (EARFCN 2050) onto band 12 (EARFCN 5060) in ~40s, and restoring the Rogers config moved it back toward band 4 with registration IN_SERVICE. `/api/read` reports the live QMI band state with `source: \"qmi\"`.\n\nWhere the QRTR QMI service is unavailable, the module falls back to `/dev/diag` — on kernels where the diag feature-mask handshake never completes, band **writes** may be NACKed. A verified band apply is mirrored to the config file (a NACKed write is not) and monitoring keeps working.\n\n## Network access\n\nBy default the server listens on **127.0.0.1 only** — reachable from the phone itself (device browser, `adb forward`), never from the network. To control the module from a computer on the same Wi-Fi, enable **Network access → Allow access from other devices** in the Settings tab: the server then binds all interfaces and **every API call from a non-loopback client requires the access token** shown in the UI (regenerate it anytime; the token-less bootstrap settings read is exempt and returns no token material). Loopback read-only diagnostics never need the token, but once a token is configured, state-changing actions (write, boot-apply, modem-reset, restart, export, drop-log toggle) require it even from the phone's own browser — an unprivileged phone app must not drive the modem. This is plain HTTP on your LAN — fine for home use, but treat the token like a password.\n\n## Band configuration\n\nDefault config on Rogers (MCC/MNC 302720), written by the installer (`customize.sh`) on install (`config/bands.json`):\n\n```json\n{\n  \"lte\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"8\", \"12\", \"17\", \"20\", \"28\", \"38\", \"40\", \"41\"],\n  \"nr\": [\"1\", \"3\", \"5\", \"8\", \"20\", \"28\", \"38\", \"41\", \"77\", \"78\"]\n}\n```\n\nLTE bands **7 and 66 are intentionally disabled** — a community-validated fix for Canadian carriers: the SM8250 modem can crash during 66↔7 handover. Other bands (including 6, a Japan-only 850 MHz variant of band 5) are simply not part of the Rogers whitelist; the modem only scans the listed bands. Defaults are carrier-aware: on any other carrier no config file is seeded and defaults are unrestricted **except LTE bands 7 and 66** — the same crash pair is kept out of every default path (it stays selectable only by explicit user action) until you lock bands from the UI or a preset. Edit `/data/adb/modules/bandctl/config/bands.json` (or use the web UI) to customize.\n\n## Development / testing\n\n- Tested on: **Poco F3 (alioth)**, **ArrowOS 13.1**, kernel **4.19.325-cip130**.\n- Tests: **267/267 passing** (`python3 -m pytest test_server.py test_diag_client.py test_diag_protocol.py -q`; the web UI also has a dev-only jsdom suite under `tests/js/`).\n- The repo contains the complete module source: `customize.sh` (installer), `service.sh` (boot service), `web/` (pure-stdlib Python HTTP server + UI), `diag/` (pure-Python diag protocol stack), `qmi/` (the QRTR QMI band client — `qmi_band.c` + Makefile, built static for aarch64 with musl; only the binary ships in the module zip), `python/` (bundled Python 3.14 runtime, shipped in the zip), `config/bands.json` (reference default band config; the zip ships without it and the installer seeds it on first install), and `tools/check_release_zip.py` (release gate: run `python3 tools/check_release_zip.py bandctl-*.zip` before publishing — it fails a zip missing the bundled interpreter, whose `diag/protocol.py` differs from the tested repo copy, or whose bundled `_ssl`/`_hashlib` modules can't link on-device).\n\n## License\n\n[MIT](LICENSE) © 2026.\n",
+  "readmeHTML": "<h1>Band Controller</h1>\n\n<p>A standalone KernelSU module for LTE/NR band control and modem diagnostics on Qualcomm devices — no third-party apps required (Network Signal Guru is not needed).</p>\n\n<h2>Requirements</h2>\n\n<li>**Root**: KernelSU (or KernelSU-compatible) root.</li>\n<li>**Device**: A Qualcomm modem device (tested on Poco F3 / alioth).</li>\n<li>**No dependencies** — the module ships a bundled Python runtime; Termux is not required.</li>\n\n<h2>Install</h2>\n\n<li>Download the latest `bandctl-*.zip` from the [Releases](https://github.com/raz123/bandctl/releases) page to your device.</li>\n<li>Open the **KernelSU app** → **Modules** → **Install from storage** and pick the zip.</li>\n<p>   - Alternatively, from a root shell: <code>ksud module install bandctl-*.zip</code></p>\n<li>Reboot (or let the module start the service).</li>\n<li>Open the web UI:</li>\n<p>   - <b>Module manager (primary)</b> — open <b>KernelSU/ReSukiSU → Modules → Band Controller → WebUI</b>; the manager opens the built-in WebView pointed at the module.</p>\n<p>   - <b>Browser</b> — open <b>http://localhost:8090</b> from the device browser.</p>\n<p>   - From a computer: <code>adb forward tcp:8090 tcp:8090</code>, then open http://localhost:8090.</p>\n\n<p>   The listen port defaults to <b>8090</b> (chosen to dodge the common 8080 LAN squatter) and can be changed via <code>\"port\"</code> in <code>config/settings.json</code>; the Web UI resolves the API base automatically, so no other configuration is needed after a restart.</p>\n\n<h2>Screenshots</h2>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"bands.png\" alt=\"Bands tab\" width=\"180\" />&nbsp;</p>\n<p>  <img src=\"diag.png\" alt=\"Diagnostics tab\" width=\"180\" />&nbsp;</p>\n<p>  <img src=\"settings.png\" alt=\"Settings tab\" width=\"180\" /></p>\n<p></p></p>\n<p><p align=\"center\"></p>\n<p>  <em>Bands tab &middot; Diagnostics tab &middot; Settings tab</em></p>\n<p></p></p>\n\n<h2>Features</h2>\n\n<li>**13 API endpoints** — every endpoint is addressed as `/api/<name>?action=<name>` (the `action=` query parameter selects the handler; the path itself is just the API root):</li>\n<p>  - <code>GET  /api/read?action=read</code> — current LTE/NR band configuration (from QMI, diag, config file, or default)</p>\n<p>  - <code>POST /api/write?action=write</code> — write LTE/NR band configuration to the modem (QMI first, diag fallback)</p>\n<p>  - <code>GET  /api/defaults?action=defaults</code> — carrier-aware defaults (Rogers 302720 curated, others unrestricted minus bands 7/66)</p>\n<p>  - <code>POST /api/boot-apply?action=boot-apply</code> — re-apply the persisted config at boot (config-file gated)</p>\n<p>  - <code>POST /api/export?action=export</code> — export the submitted band config to a timestamped JSON file in the module config dir (WebView-compatible: the UI toasts the on-device path instead of a blob download)</p>\n<p>  - <code>GET  /api/settings?action=settings</code> — network-access settings (LAN mode, token required?)</p>\n<p>  - <code>POST /api/settings?action=settings</code> — enable/disable LAN mode, (re)generate the access token</p>\n<p>  - <code>POST /api/restart?action=restart</code> — restart the server (needed after changing network access)</p>\n<p>  - <code>GET  /api/signal?action=signal</code> — current signal strength (RSRP/RSRQ/level) from <code>dumpsys telephony.registry</code></p>\n<p>  - <code>GET  /api/registration?action=registration</code> — service/data state, network type, operator, roaming</p>\n<p>  - <code>GET  /api/health?action=health</code> — transport status (QMI or diag, band counts, diag session owner)</p>\n<p>  - <code>POST /api/modem-reset?action=modem-reset</code> — soft modem reset (<code>cmd phone radio power</code> off/on, with fallback)</p>\n<p>  - <code>GET  /api/band-camping?action=band-camping</code> — live band-camping log: last N serving-cell EARFCN/band samples</p>\n<p>  - <code>GET/POST /api/drop-log?action=drop-log</code> — debug drop logging: enable/disable the watchdog, list recorded drop snapshots</p>\n<li>**Live band-camping readout** — the Diagnostics tab shows the current camped band (band + EARFCN) live, so you can see whether a forced band actually stuck.</li>\n<li>**Debug drop logging** — Settings > Debug > Drop logging (default off): when enabled, a server-side watchdog stamps every radio drop (OUT_OF_SERVICE / POWER_OFF / EMERGENCY_ONLY) with correlation context — registration state, call state, Wi-Fi link/AP, data counters, a redacted radio-buffer summary — and records the recovery duration. Snapshots land in the persistent data dir `/data/local/tmp/bandctl/drop_log` on-device (survives reboots and module updates), falling back to the module's `config/drop_log/` when that path isn't available; the toggle is live, no restart needed.</li>\n<li>**Boot-time band re-apply** — the persisted config is re-applied automatically at every boot (pre-unlock, no app needed); config-file absent = no-op. There is no UI toggle to disable the boot re-apply. To stop it, delete `config/bands.json` — the server **never re-seeds it** (the boot-apply path is read-only w.r.t. the config), so a missing file stays a permanent no-op until you save/apply a new config from the UI.</li>\n<li>**Carrier-aware defaults** — Rogers (302720) gets a curated whitelist; other carriers get unrestricted defaults (bands 7/66 excluded there too — see Band configuration) until you lock bands.</li>\n<li>**RSRP graph UI** — the web UI plots signal strength over time.</li>\n<li>**Config persistence** — band settings are mirrored to `/data/adb/modules/bandctl/config/bands.json` and survive reboots.</li>\n\n<h2>How it works</h2>\n\n<li>**Bundled Python runtime** — the web server runs on the Python interpreter shipped inside the module (`python/bin/python3.14` with its stdlib and shared libraries under `python/`), so no Termux install is needed and the service starts before first unlock.</li>\n<li>**Direct QMI band apply over QRTR** via the bundled static `qmi_band` client (source in `qmi/`). It discovers the live NAS endpoint at runtime (service/node/port are probed, not hardcoded), reads the current band configuration, and applies LTE/NR band preference changes — the modem camps per the applied list.</li>\n<li>**`/dev/diag` fallback** via the bundled pure-Python protocol stack (the diag kernel driver, feature masks, and NV/band-mask commands) for devices where diag works.</li>\n<li>**Telephony-framework monitoring** via `dumpsys telephony.registry` — signal strength, registration state, and band camping are reported regardless of transport.</li>\n<li>**Graceful fallback chain** — reads try QMI, then diag, then the config file; writes try QMI, then diag, and mirror a verified apply to `config/bands.json` (a failed apply is never persisted, so boot re-apply never retries a rejected set).</li>\n\n<h2>Status and honest limitations</h2>\n\n<p><b>QMI band apply works on this device (Poco F3 / alioth).</b> Forcing bands via the web UI moved camping off band 4 (EARFCN 2050) onto band 12 (EARFCN 5060) in ~40s, and restoring the Rogers config moved it back toward band 4 with registration IN_SERVICE. <code>/api/read</code> reports the live QMI band state with <code>source: \"qmi\"</code>.</p>\n\n<p>Where the QRTR QMI service is unavailable, the module falls back to <code>/dev/diag</code> — on kernels where the diag feature-mask handshake never completes, band <b>writes</b> may be NACKed. A verified band apply is mirrored to the config file (a NACKed write is not) and monitoring keeps working.</p>\n\n<h2>Network access</h2>\n\n<p>By default the server listens on <b>127.0.0.1 only</b> — reachable from the phone itself (device browser, <code>adb forward</code>), never from the network. To control the module from a computer on the same Wi-Fi, enable <b>Network access → Allow access from other devices</b> in the Settings tab: the server then binds all interfaces and <b>every API call from a non-loopback client requires the access token</b> shown in the UI (regenerate it anytime; the token-less bootstrap settings read is exempt and returns no token material). Loopback read-only diagnostics never need the token, but once a token is configured, state-changing actions (write, boot-apply, modem-reset, restart, export, drop-log toggle) require it even from the phone's own browser — an unprivileged phone app must not drive the modem. This is plain HTTP on your LAN — fine for home use, but treat the token like a password.</p>\n\n<h2>Band configuration</h2>\n\n<p>Default config on Rogers (MCC/MNC 302720), written by the installer (<code>customize.sh</code>) on install (<code>config/bands.json</code>):</p>\n\n<pre>{\n  \"lte\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"8\", \"12\", \"17\", \"20\", \"28\", \"38\", \"40\", \"41\"],\n  \"nr\": [\"1\", \"3\", \"5\", \"8\", \"20\", \"28\", \"38\", \"41\", \"77\", \"78\"]\n}</pre>\n\n<p>LTE bands <b>7 and 66 are intentionally disabled</b> — a community-validated fix for Canadian carriers: the SM8250 modem can crash during 66↔7 handover. Other bands (including 6, a Japan-only 850 MHz variant of band 5) are simply not part of the Rogers whitelist; the modem only scans the listed bands. Defaults are carrier-aware: on any other carrier no config file is seeded and defaults are unrestricted <b>except LTE bands 7 and 66</b> — the same crash pair is kept out of every default path (it stays selectable only by explicit user action) until you lock bands from the UI or a preset. Edit <code>/data/adb/modules/bandctl/config/bands.json</code> (or use the web UI) to customize.</p>\n\n<h2>Development / testing</h2>\n\n<li>Tested on: **Poco F3 (alioth)**, **ArrowOS 13.1**, kernel **4.19.325-cip130**.</li>\n<li>Tests: **267/267 passing** (`python3 -m pytest test_server.py test_diag_client.py test_diag_protocol.py -q`; the web UI also has a dev-only jsdom suite under `tests/js/`).</li>\n<li>The repo contains the complete module source: `customize.sh` (installer), `service.sh` (boot service), `web/` (pure-stdlib Python HTTP server + UI), `diag/` (pure-Python diag protocol stack), `qmi/` (the QRTR QMI band client — `qmi_band.c` + Makefile, built static for aarch64 with musl; only the binary ships in the module zip), `python/` (bundled Python 3.14 runtime, shipped in the zip), `config/bands.json` (reference default band config; the zip ships without it and the installer seeds it on first install), and `tools/check_release_zip.py` (release gate: run `python3 tools/check_release_zip.py bandctl-*.zip` before publishing — it fails a zip missing the bundled interpreter, whose `diag/protocol.py` differs from the tested repo copy, or whose bundled `_ssl`/`_hashlib` modules can't link on-device).</li>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a> © 2026.</p>",
+  "homepageUrl": "https://github.com/raz123/bandctl",
+  "sourceUrl": "https://github.com/raz123/bandctl",
+  "url": "https://github.com/raz123/bandctl",
+  "latestRelease": {
+    "name": "v2.7.4",
+    "version": "v2.7.4",
+    "time": "2026-08-19T05:01:26Z",
+    "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7.4/bandctl-v2.7.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.7.4",
+      "tagName": "v2.7.4",
+      "publishedAt": "2026-08-19T05:01:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.7.4.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7.4/bandctl-v2.7.4.zip",
+          "size": 6518560,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v2.7.3",
+      "tagName": "v2.7.3",
+      "publishedAt": "2026-08-19T03:15:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.7.3.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7.3/bandctl-v2.7.3.zip",
+          "size": 6559528,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.7.2",
+      "tagName": "v2.7.2",
+      "publishedAt": "2026-08-15T02:44:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.7.2.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7.2/bandctl-v2.7.2.zip",
+          "size": 6559261,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.7.1",
+      "tagName": "v2.7.1",
+      "publishedAt": "2026-08-15T02:28:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.7.1.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7.1/bandctl-v2.7.1.zip",
+          "size": 6559135,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.7",
+      "tagName": "v2.7",
+      "publishedAt": "2026-08-15T02:12:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.7.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.7/bandctl-v2.7.zip",
+          "size": 6558523,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.6",
+      "tagName": "v2.6",
+      "publishedAt": "2026-08-06T17:51:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.6.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.6/bandctl-v2.6.zip",
+          "size": 6541323,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.5",
+      "tagName": "v2.5",
+      "publishedAt": "2026-08-06T04:21:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.5.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.5/bandctl-v2.5.zip",
+          "size": 2231246,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2026-08-06T03:21:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.4.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.4/bandctl-v2.4.zip",
+          "size": 6564925,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-08-05T23:54:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.3.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.3/bandctl-v2.3.zip",
+          "size": 6564253,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-08-05T15:15:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.2.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.2/bandctl-v2.2.zip",
+          "size": 6560897,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-08-05T13:46:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.1.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.1/bandctl-v2.1.zip",
+          "size": 6551893,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-08-05T04:41:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v2.0.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v2.0/bandctl-v2.0.zip",
+          "size": 6551069,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.9",
+      "tagName": "v1.9",
+      "publishedAt": "2026-08-05T04:25:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.9.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.9/bandctl-v1.9.zip",
+          "size": 6549512,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2026-08-05T02:40:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.8.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.8/bandctl-v1.8.zip",
+          "size": 6547263,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2026-08-05T02:09:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.7.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.7/bandctl-v1.7.zip",
+          "size": 6547618,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-08-04T19:58:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.6.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.6/bandctl-v1.6.zip",
+          "size": 6547497,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-08-04T17:33:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.5.1.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.5.1/bandctl-v1.5.1.zip",
+          "size": 98087,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-08-04T16:59:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.5.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.5/bandctl-v1.5.zip",
+          "size": 97759,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2026-08-04T10:10:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.4.1.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.4.1/bandctl-v1.4.1.zip",
+          "size": 95761,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-08-04T04:29:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.4.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.4/bandctl-v1.4.zip",
+          "size": 95590,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-08-03T22:19:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.3.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.3/bandctl-v1.3.zip",
+          "size": 40078,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-08-03T20:52:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.2.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.2/bandctl-v1.2.zip",
+          "size": 37400,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-08-03T20:36:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.1.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.1/bandctl-v1.1.zip",
+          "size": 37765,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-08-03T20:15:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bandctl-v1.0.zip",
+          "downloadUrl": "https://github.com/raz123/bandctl/releases/download/v1.0/bandctl-v1.0.zip",
+          "size": 27597,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

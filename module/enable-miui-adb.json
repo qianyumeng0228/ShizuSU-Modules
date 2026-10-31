@@ -1,0 +1,29 @@
+{
+  "readme": "<p align=\"center\"><img src=\"assets/icon.png\" width=\"96\" alt=\"icon\"></p>\n\n# enable-miui-adb\n\nEnable \"adb install\" for MIUI / HyperOS without Xiaomi account login and SIM card.\n\nRequires ROOT permission.\n\nWhat it does:\n\n1. Enable USB debugging (Security settings) — `persist.security.adbinput=1`\n2. Enable Fastboot — `persist.fastboot.enable=1`\n3. Enable \"Install via USB\" — `security_adb_install_enable=true` in Security Center preferences\n4. Disable the install intercept — `permcenter_install_intercept_enabled=false`\n\n## Usage\n\n### KernelSU manager (one-shot script)\n\nThis is a one-shot script entry in [KernelSU Modules](https://modules.kernelsu.org/module/enable_miui_adb).\nOpen it in the manager's module store and tap **Run**: the script runs once, nothing is installed and no reboot\nis needed.\n\nOptions:\n\n- **Also enable fastboot** (`ENABLE_FASTBOOT`, default on): also set `persist.fastboot.enable=1`.\n\n### Older KernelSU managers / Magisk\n\n1. Install the ZIP from the module store or from [Releases](https://github.com/Ylarod/enable-miui-adb/releases).\n2. Tap the **Action** button of the module in the manager. No reboot is needed.\n   The module can be uninstalled afterwards.\n\n### Shell\n\n```shell\ncurl https://raw.githubusercontent.com/Ylarod/enable-miui-adb/main/module/action.sh > /data/local/tmp/enable_miui_adb.sh\nsu -c sh /data/local/tmp/enable_miui_adb.sh\n# Skip fastboot: su -c 'KSU_PARAM_ENABLE_FASTBOOT=false sh /data/local/tmp/enable_miui_adb.sh'\nrm /data/local/tmp/enable_miui_adb.sh\n```\n\n## Releasing a new version\n\n1. Bump `version` and `versionCode` in `module/module.prop` (versionCode must increase).\n2. Commit, then tag and push: `git tag v1.0.1 && git push origin v1.0.1`\n\nThe release workflow zips `module/` and publishes an immutable release, which KernelSU Modules\npicks up automatically.\n\n## Thanks\n\nhttps://www.leadroyal.cn/p/1189/\n\n## License\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<p><p align=\"center\"><img src=\"assets/icon.png\" width=\"96\" alt=\"icon\"></p></p>\n\n<h1>enable-miui-adb</h1>\n\n<p>Enable \"adb install\" for MIUI / HyperOS without Xiaomi account login and SIM card.</p>\n\n<p>Requires ROOT permission.</p>\n\n<p>What it does:</p>\n\n<li>Enable USB debugging (Security settings) — `persist.security.adbinput=1`</li>\n<li>Enable Fastboot — `persist.fastboot.enable=1`</li>\n<li>Enable \"Install via USB\" — `security_adb_install_enable=true` in Security Center preferences</li>\n<li>Disable the install intercept — `permcenter_install_intercept_enabled=false`</li>\n\n<h2>Usage</h2>\n\n<h3>KernelSU manager (one-shot script)</h3>\n\n<p>This is a one-shot script entry in <a href=\"https://modules.kernelsu.org/module/enable_miui_adb\">KernelSU Modules</a>.</p>\n<p>Open it in the manager's module store and tap <b>Run</b>: the script runs once, nothing is installed and no reboot</p>\n<p>is needed.</p>\n\n<p>Options:</p>\n\n<li>**Also enable fastboot** (`ENABLE_FASTBOOT`, default on): also set `persist.fastboot.enable=1`.</li>\n\n<h3>Older KernelSU managers / Magisk</h3>\n\n<li>Install the ZIP from the module store or from [Releases](https://github.com/Ylarod/enable-miui-adb/releases).</li>\n<li>Tap the **Action** button of the module in the manager. No reboot is needed.</li>\n<p>   The module can be uninstalled afterwards.</p>\n\n<h3>Shell</h3>\n\n<pre>curl https://raw.githubusercontent.com/Ylarod/enable-miui-adb/main/module/action.sh &gt; /data/local/tmp/enable_miui_adb.sh\nsu -c sh /data/local/tmp/enable_miui_adb.sh\n# Skip fastboot: su -c 'KSU_PARAM_ENABLE_FASTBOOT=false sh /data/local/tmp/enable_miui_adb.sh'\nrm /data/local/tmp/enable_miui_adb.sh</pre>\n\n<h2>Releasing a new version</h2>\n\n<li>Bump `version` and `versionCode` in `module/module.prop` (versionCode must increase).</li>\n<li>Commit, then tag and push: `git tag v1.0.1 && git push origin v1.0.1`</li>\n\n<p>The release workflow zips <code>module/</code> and publishes an immutable release, which KernelSU Modules</p>\n<p>picks up automatically.</p>\n\n<h2>Thanks</h2>\n\n<p>https://www.leadroyal.cn/p/1189/</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/Ylarod/enable-miui-adb",
+  "sourceUrl": "https://github.com/Ylarod/enable-miui-adb",
+  "url": "https://github.com/Ylarod/enable-miui-adb",
+  "latestRelease": {
+    "name": "v1.1.1",
+    "version": "v1.1.1",
+    "time": "2026-10-14T21:56:48Z",
+    "downloadUrl": "https://github.com/Ylarod/enable-miui-adb/releases/download/v1.1.1/enable_miui_adb-111-v1.1.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-10-14T21:56:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable_miui_adb-111-v1.1.1.zip",
+          "downloadUrl": "https://github.com/Ylarod/enable-miui-adb/releases/download/v1.1.1/enable_miui_adb-111-v1.1.1.zip",
+          "size": 2208,
+          "downloadCount": 460
+        }
+      ]
+    }
+  ]
+}

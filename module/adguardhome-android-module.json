@@ -1,0 +1,375 @@
+{
+  "readme": "# AdGuardHome Android Module\n\n[![CI](https://github.com/snowzlmbot/AdGuardHome-Android-Module/actions/workflows/ci.yml/badge.svg)](https://github.com/snowzlmbot/AdGuardHome-Android-Module/actions/workflows/ci.yml)\n[![Latest Release](https://img.shields.io/github/v/release/snowzlmbot/AdGuardHome-Android-Module?display_name=tag&sort=semver)](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest)\n[![License](https://img.shields.io/github/license/snowzlmbot/AdGuardHome-Android-Module)](LICENSE)\n\n**中文** | [English](README.en.md)\n\n一个面向 Magisk 与 KernelSU 的模块化 AdGuard Home Android DNS 过滤项目。\n\n> 已发布：**0.1.20**。\n>\n> [下载可安装模块 ZIP](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/AdGuardHome-Android-Module-0.1.20-agh-0.107.79.zip) · [SHA256SUMS](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/SHA256SUMS) · [发布说明](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/tag/module-v0.1.20)\n>\n> 请勿刷入 GitHub Source ZIP。构建与回归测试已通过；设备兼容性仍需按文档验收。\n\n## 项目入口\n\n| 文档 | 入口 |\n| --- | --- |\n| 更新日志 | [`CHANGELOG.md`](CHANGELOG.md) |\n| 许可证 | [`LICENSE`](LICENSE) |\n| 致谢 | [`CREDITS.md`](CREDITS.md) |\n| 安全策略 | [`SECURITY.md`](SECURITY.md) |\n| 第三方声明 | [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) |\n| 模块目录规范 | [`docs/MODULE_LAYOUT.md`](docs/MODULE_LAYOUT.md) |\n| 最新 Release | [GitHub Releases](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest) |\n\n## 项目定位\n\n本项目将 AdGuard Home 集成到 Android Root 环境，提供 DNS 过滤、网络兼容、可选适配器和可视化控制功能。\n\n- 原始项目：[@410154425](https://github.com/410154425) / [`AdGuardHome_magisk`](https://github.com/410154425/AdGuardHome_magisk)\n- 后续维护项目：[@liuzq2002](https://github.com/liuzq2002) / [`Adguard-Home-For-Magisk-Mod`](https://github.com/liuzq2002/Adguard-Home-For-Magisk-Mod)\n\n项目采用分层组件结构，让核心 DNS、网络发现、防火墙、代理适配、文件适配、诊断和生命周期可以独立运行和维护。\n\n## 主要能力\n\n| 能力 | 说明 |\n| --- | --- |\n| Root 管理器 | Magisk、KernelSU |\n| CPU 架构 | arm64、armv7 |\n| DNS 模式 | 内网兼容、纯加密上游、Bootstrap |\n| 网络 | Wi‑Fi、移动数据、以太网、VPN 叠加、代理模块共存 |\n| 控制 | 启动、暂停、恢复、重启核心、固定端口 |\n| WebUI | KernelSU 原生 `webroot/` 控制台 |\n| 凭据 | 首次本地生成随机管理密码 |\n| 适配器 | Box/Clash/Mihomo 代理适配；文件级去广告；默认关闭 |\n| 更新方式 | GitHub Release 完整包与校验文件 |\n\n## 安装与升级\n\n1. 从 [Latest Release](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest) 下载 ZIP。\n2. 下载同一 Release 下的 `SHA256SUMS` 并校验：\n\n   ```sh\n   sha256sum -c SHA256SUMS\n   ```\n\n3. 在 Magisk 或 KernelSU 管理器中安装 ZIP。\n4. 首次刷入按提示使用音量键选择模式和功能开关。\n5. 重启设备。\n6. KernelSU：进入模块页面打开 WebUI；Magisk：点击模块操作按钮。\n\n不要直接刷 GitHub 自动生成的 Source ZIP。Source ZIP 不包含最终架构二进制，不是可安装成品。\n\n### 首次安装选项\n\n- DNS 模式 1：内网/校园网兼容；\n- DNS 模式 2：纯加密上游，默认推荐；\n- DNS 模式 3：Bootstrap；\n- IPv6 DNS 防泄漏：默认开启；\n- TCP/UDP 853 防泄漏：默认关闭（严格私人 DNS 开启时强制拦截会断网）；\n- 代理适配：默认关闭；\n- 文件级去广告：默认关闭。\n\n音量上键表示开启/选择，音量下键表示关闭/下一项。无法读取按键时使用安全默认值，不会卡住安装。\n\n## 使用入口\n\n### KernelSU WebUI\n\n```text\nKernelSU → 模块 → AdGuardHome Android Module → WebUI\n```\n\n可查看和操作：\n\n- 运行状态和核心失败原因；\n- Wi‑Fi/移动数据/以太网/VPN 状态；\n- DNS 模式；\n- 核心、防火墙、规则、代理、文件适配状态；\n- 启动、暂停、恢复、重启核心；\n- 打开 AdGuard Home 管理页；\n- 打开查询日志：`/#logs?response_status=all`；\n- 查看脱敏模块日志；\n- 语言自动检测并持久化。\n\n### Magisk 操作按钮\n\n点击模块操作按钮后，会显示：\n\n- 固定 Web 管理地址；\n- 用户名；\n- 随机密码；\n\n随后自动打开浏览器。\n\n日常使用无需手动执行 `scripts/` 中的模块脚本。\n\n## 管理地址与数据\n\n首次安装随机生成 Web/DNS 端口，之后升级和重启固定复用：\n\n```text\nhttp://127.0.0.1:<web_port>\n```\n\n端口文件：\n\n```text\n/data/adb/agh/state/ports.conf\n```\n\n管理用户名默认为：\n\n```text\nadmin\n```\n\n随机密码只保存在：\n\n```text\n/data/adb/agh/state/credentials.conf\n```\n\n升级会保留已有端口、凭据、模式和适配器开关。\n\n## 源码与成品目录\n\n```text\nAdGuardHome-Android-Module/\n├── module/                 # 真实可安装模块根\n│   ├── module.prop\n│   ├── customize.sh\n│   ├── service.sh\n│   ├── action.sh\n│   ├── boot-completed.sh\n│   ├── uninstall.sh\n│   ├── scripts/            # 所有模块 Shell 和公共库\n│   ├── config/             # 默认配置与适配器配置\n│   ├── targets/            # 文件适配目标清单\n│   ├── webroot/             # KernelSU WebUI\n│   ├── licenses/\n│   └── sbom/\n├── build/                  # Release 构建、资产和校验\n├── tests/                  # fixture、原生核心和安装模拟测试\n├── docs/                   # 架构和目录文档\n├── .github/                # CI/Release workflow\n├── LICENSE                 # 根目录许可证入口\n├── CREDITS.md              # 根目录致谢入口\n├── SECURITY.md             # 根目录安全策略\n└── THIRD_PARTY_NOTICES.md  # 根目录第三方声明\n```\n\n详细目录规范：[`docs/MODULE_LAYOUT.md`](docs/MODULE_LAYOUT.md)\n\n## 0.1.20 故障排查\n\n见 [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)。安装包和 Actions artifact 外层 ZIP 不同；KSU 的 archive 错误通常发生在读取根目录 `module.prop` 时。\n\n过滤测试时请暂时关闭 Android 私人 DNS、应用自带 DoH 和 VPN，确认核心与防火墙均 ready。VPN 兼容模式会明确绕过过滤；微信同域信息流广告不属于 DNS 能保证移除的范围。\n\n## 许可证、致谢与安全\n\n- 许可证：[`LICENSE`](LICENSE)\n- 致谢：[`CREDITS.md`](CREDITS.md)\n- 安全策略：[`SECURITY.md`](SECURITY.md)\n- 第三方声明：[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)\n- AdGuard Home、过滤规则和 KernelSU 使用各自上游许可证。\n\n感谢原作者 [@410154425](https://github.com/410154425) 与后续维护者 [@liuzq2002](https://github.com/liuzq2002)。\n",
+  "readmeHTML": "<h1>AdGuardHome Android Module</h1>\n\n<p><a href=\"https://github.com/snowzlmbot/AdGuardHome-Android-Module/actions/workflows/ci.yml/badge.svg\">![CI</a>](https://github.com/snowzlmbot/AdGuardHome-Android-Module/actions/workflows/ci.yml)</p>\n<p><a href=\"https://img.shields.io/github/v/release/snowzlmbot/AdGuardHome-Android-Module?display_name=tag&sort=semver\">![Latest Release</a>](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/license/snowzlmbot/AdGuardHome-Android-Module\">![License</a>](LICENSE)</p>\n\n<p><b>中文</b> | <a href=\"README.en.md\">English</a></p>\n\n<p>一个面向 Magisk 与 KernelSU 的模块化 AdGuard Home Android DNS 过滤项目。</p>\n\n<p>> 已发布：<b>0.1.20</b>。</p>\n<p>></p>\n<p>> <a href=\"https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/AdGuardHome-Android-Module-0.1.20-agh-0.107.79.zip\">下载可安装模块 ZIP</a> · <a href=\"https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/SHA256SUMS\">SHA256SUMS</a> · <a href=\"https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/tag/module-v0.1.20\">发布说明</a></p>\n<p>></p>\n<p>> 请勿刷入 GitHub Source ZIP。构建与回归测试已通过；设备兼容性仍需按文档验收。</p>\n\n<h2>项目入口</h2>\n\n<p>| 文档 | 入口 |</p>\n<p>| --- | --- |</p>\n<p>| 更新日志 | <a href=\"CHANGELOG.md\"><code>CHANGELOG.md</code></a> |</p>\n<p>| 许可证 | <a href=\"LICENSE\"><code>LICENSE</code></a> |</p>\n<p>| 致谢 | <a href=\"CREDITS.md\"><code>CREDITS.md</code></a> |</p>\n<p>| 安全策略 | <a href=\"SECURITY.md\"><code>SECURITY.md</code></a> |</p>\n<p>| 第三方声明 | <a href=\"THIRD_PARTY_NOTICES.md\"><code>THIRD_PARTY_NOTICES.md</code></a> |</p>\n<p>| 模块目录规范 | <a href=\"docs/MODULE_LAYOUT.md\"><code>docs/MODULE_LAYOUT.md</code></a> |</p>\n<p>| 最新 Release | <a href=\"https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest\">GitHub Releases</a> |</p>\n\n<h2>项目定位</h2>\n\n<p>本项目将 AdGuard Home 集成到 Android Root 环境，提供 DNS 过滤、网络兼容、可选适配器和可视化控制功能。</p>\n\n<li>原始项目：[@410154425](https://github.com/410154425) / [`AdGuardHome_magisk`](https://github.com/410154425/AdGuardHome_magisk)</li>\n<li>后续维护项目：[@liuzq2002](https://github.com/liuzq2002) / [`Adguard-Home-For-Magisk-Mod`](https://github.com/liuzq2002/Adguard-Home-For-Magisk-Mod)</li>\n\n<p>项目采用分层组件结构，让核心 DNS、网络发现、防火墙、代理适配、文件适配、诊断和生命周期可以独立运行和维护。</p>\n\n<h2>主要能力</h2>\n\n<p>| 能力 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| Root 管理器 | Magisk、KernelSU |</p>\n<p>| CPU 架构 | arm64、armv7 |</p>\n<p>| DNS 模式 | 内网兼容、纯加密上游、Bootstrap |</p>\n<p>| 网络 | Wi‑Fi、移动数据、以太网、VPN 叠加、代理模块共存 |</p>\n<p>| 控制 | 启动、暂停、恢复、重启核心、固定端口 |</p>\n<p>| WebUI | KernelSU 原生 <code>webroot/</code> 控制台 |</p>\n<p>| 凭据 | 首次本地生成随机管理密码 |</p>\n<p>| 适配器 | Box/Clash/Mihomo 代理适配；文件级去广告；默认关闭 |</p>\n<p>| 更新方式 | GitHub Release 完整包与校验文件 |</p>\n\n<h2>安装与升级</h2>\n\n<li>从 [Latest Release](https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/latest) 下载 ZIP。</li>\n<li>下载同一 Release 下的 `SHA256SUMS` 并校验：</li>\n\n<p>   ```sh</p>\n<p>   sha256sum -c SHA256SUMS</p>\n<p>   ```</p>\n\n<li>在 Magisk 或 KernelSU 管理器中安装 ZIP。</li>\n<li>首次刷入按提示使用音量键选择模式和功能开关。</li>\n<li>重启设备。</li>\n<li>KernelSU：进入模块页面打开 WebUI；Magisk：点击模块操作按钮。</li>\n\n<p>不要直接刷 GitHub 自动生成的 Source ZIP。Source ZIP 不包含最终架构二进制，不是可安装成品。</p>\n\n<h3>首次安装选项</h3>\n\n<li>DNS 模式 1：内网/校园网兼容；</li>\n<li>DNS 模式 2：纯加密上游，默认推荐；</li>\n<li>DNS 模式 3：Bootstrap；</li>\n<li>IPv6 DNS 防泄漏：默认开启；</li>\n<li>TCP/UDP 853 防泄漏：默认关闭（严格私人 DNS 开启时强制拦截会断网）；</li>\n<li>代理适配：默认关闭；</li>\n<li>文件级去广告：默认关闭。</li>\n\n<p>音量上键表示开启/选择，音量下键表示关闭/下一项。无法读取按键时使用安全默认值，不会卡住安装。</p>\n\n<h2>使用入口</h2>\n\n<h3>KernelSU WebUI</h3>\n\n<pre>KernelSU → 模块 → AdGuardHome Android Module → WebUI</pre>\n\n<p>可查看和操作：</p>\n\n<li>运行状态和核心失败原因；</li>\n<li>Wi‑Fi/移动数据/以太网/VPN 状态；</li>\n<li>DNS 模式；</li>\n<li>核心、防火墙、规则、代理、文件适配状态；</li>\n<li>启动、暂停、恢复、重启核心；</li>\n<li>打开 AdGuard Home 管理页；</li>\n<li>打开查询日志：`/#logs?response_status=all`；</li>\n<li>查看脱敏模块日志；</li>\n<li>语言自动检测并持久化。</li>\n\n<h3>Magisk 操作按钮</h3>\n\n<p>点击模块操作按钮后，会显示：</p>\n\n<li>固定 Web 管理地址；</li>\n<li>用户名；</li>\n<li>随机密码；</li>\n\n<p>随后自动打开浏览器。</p>\n\n<p>日常使用无需手动执行 <code>scripts/</code> 中的模块脚本。</p>\n\n<h2>管理地址与数据</h2>\n\n<p>首次安装随机生成 Web/DNS 端口，之后升级和重启固定复用：</p>\n\n<pre>http://127.0.0.1:&lt;web_port&gt;</pre>\n\n<p>端口文件：</p>\n\n<pre>/data/adb/agh/state/ports.conf</pre>\n\n<p>管理用户名默认为：</p>\n\n<pre>admin</pre>\n\n<p>随机密码只保存在：</p>\n\n<pre>/data/adb/agh/state/credentials.conf</pre>\n\n<p>升级会保留已有端口、凭据、模式和适配器开关。</p>\n\n<h2>源码与成品目录</h2>\n\n<pre>AdGuardHome-Android-Module/\n├── module/                 # 真实可安装模块根\n│   ├── module.prop\n│   ├── customize.sh\n│   ├── service.sh\n│   ├── action.sh\n│   ├── boot-completed.sh\n│   ├── uninstall.sh\n│   ├── scripts/            # 所有模块 Shell 和公共库\n│   ├── config/             # 默认配置与适配器配置\n│   ├── targets/            # 文件适配目标清单\n│   ├── webroot/             # KernelSU WebUI\n│   ├── licenses/\n│   └── sbom/\n├── build/                  # Release 构建、资产和校验\n├── tests/                  # fixture、原生核心和安装模拟测试\n├── docs/                   # 架构和目录文档\n├── .github/                # CI/Release workflow\n├── LICENSE                 # 根目录许可证入口\n├── CREDITS.md              # 根目录致谢入口\n├── SECURITY.md             # 根目录安全策略\n└── THIRD_PARTY_NOTICES.md  # 根目录第三方声明</pre>\n\n<p>详细目录规范：<a href=\"docs/MODULE_LAYOUT.md\"><code>docs/MODULE_LAYOUT.md</code></a></p>\n\n<h2>0.1.20 故障排查</h2>\n\n<p>见 <a href=\"docs/TROUBLESHOOTING.md\"><code>docs/TROUBLESHOOTING.md</code></a>。安装包和 Actions artifact 外层 ZIP 不同；KSU 的 archive 错误通常发生在读取根目录 <code>module.prop</code> 时。</p>\n\n<p>过滤测试时请暂时关闭 Android 私人 DNS、应用自带 DoH 和 VPN，确认核心与防火墙均 ready。VPN 兼容模式会明确绕过过滤；微信同域信息流广告不属于 DNS 能保证移除的范围。</p>\n\n<h2>许可证、致谢与安全</h2>\n\n<li>许可证：[`LICENSE`](LICENSE)</li>\n<li>致谢：[`CREDITS.md`](CREDITS.md)</li>\n<li>安全策略：[`SECURITY.md`](SECURITY.md)</li>\n<li>第三方声明：[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)</li>\n<li>AdGuard Home、过滤规则和 KernelSU 使用各自上游许可证。</li>\n\n<p>感谢原作者 <a href=\"https://github.com/410154425\">@410154425</a> 与后续维护者 <a href=\"https://github.com/liuzq2002\">@liuzq2002</a>。</p>",
+  "homepageUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module",
+  "sourceUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module",
+  "url": "https://github.com/snowzlmbot/AdGuardHome-Android-Module",
+  "latestRelease": {
+    "name": "module-v0.1.20",
+    "version": "module-v0.1.20",
+    "time": "2026-10-01T12:45:57Z",
+    "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/AdGuardHome-Android-Module-0.1.20-agh-0.107.79.zip"
+  },
+  "releases": [
+    {
+      "name": "module-v0.1.20",
+      "tagName": "module-v0.1.20",
+      "publishedAt": "2026-10-01T12:45:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.20-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/AdGuardHome-Android-Module-0.1.20-agh-0.107.79.zip",
+          "size": 25943798,
+          "downloadCount": 4
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.20/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.16",
+      "tagName": "module-v0.1.16",
+      "publishedAt": "2026-09-20T07:39:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.16-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.16/AdGuardHome-Android-Module-0.1.16-agh-0.107.79.zip",
+          "size": 20779410,
+          "downloadCount": 6
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.16/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.15",
+      "tagName": "module-v0.1.15",
+      "publishedAt": "2026-09-20T05:41:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.15-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.15/AdGuardHome-Android-Module-0.1.15-agh-0.107.79.zip",
+          "size": 20777477,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.15/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.14",
+      "tagName": "module-v0.1.14",
+      "publishedAt": "2026-09-20T03:39:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.14-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.14/AdGuardHome-Android-Module-0.1.14-agh-0.107.79.zip",
+          "size": 20770172,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.14/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.9",
+      "tagName": "module-v0.1.9",
+      "publishedAt": "2026-09-19T08:28:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.9-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.9/AdGuardHome-Android-Module-0.1.9-agh-0.107.79.zip",
+          "size": 23265403,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.9/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.8",
+      "tagName": "module-v0.1.8",
+      "publishedAt": "2026-09-19T07:19:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.8-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.8/AdGuardHome-Android-Module-0.1.8-agh-0.107.79.zip",
+          "size": 23265942,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.8/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.7",
+      "tagName": "module-v0.1.7",
+      "publishedAt": "2026-09-19T06:08:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.7-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.7/AdGuardHome-Android-Module-0.1.7-agh-0.107.79.zip",
+          "size": 23266677,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.7/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.6",
+      "tagName": "module-v0.1.6",
+      "publishedAt": "2026-09-19T05:11:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.6-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.6/AdGuardHome-Android-Module-0.1.6-agh-0.107.79.zip",
+          "size": 23266889,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.6/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.5",
+      "tagName": "module-v0.1.5",
+      "publishedAt": "2026-09-19T04:15:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.5-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.5/AdGuardHome-Android-Module-0.1.5-agh-0.107.79.zip",
+          "size": 23265663,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.5/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.13",
+      "tagName": "module-v0.1.13",
+      "publishedAt": "2026-09-19T16:05:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.13-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.13/AdGuardHome-Android-Module-0.1.13-agh-0.107.79.zip",
+          "size": 23269142,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.13/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.12",
+      "tagName": "module-v0.1.12",
+      "publishedAt": "2026-09-19T13:07:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.12-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.12/AdGuardHome-Android-Module-0.1.12-agh-0.107.79.zip",
+          "size": 23267795,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.12/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.11",
+      "tagName": "module-v0.1.11",
+      "publishedAt": "2026-09-19T11:40:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.11-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.11/AdGuardHome-Android-Module-0.1.11-agh-0.107.79.zip",
+          "size": 23265820,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.11/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.10",
+      "tagName": "module-v0.1.10",
+      "publishedAt": "2026-09-19T09:14:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.10-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.10/AdGuardHome-Android-Module-0.1.10-agh-0.107.79.zip",
+          "size": 23265786,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.10/SHA256SUMS",
+          "size": 117,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.4",
+      "tagName": "module-v0.1.4",
+      "publishedAt": "2026-09-19T02:40:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.4-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.4/AdGuardHome-Android-Module-0.1.4-agh-0.107.79.zip",
+          "size": 23262523,
+          "downloadCount": 5
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.4/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.3",
+      "tagName": "module-v0.1.3",
+      "publishedAt": "2026-09-19T01:26:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.3-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.3/AdGuardHome-Android-Module-0.1.3-agh-0.107.79.zip",
+          "size": 23257369,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.3/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.2",
+      "tagName": "module-v0.1.2",
+      "publishedAt": "2026-09-19T01:12:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.2-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.2/AdGuardHome-Android-Module-0.1.2-agh-0.107.79.zip",
+          "size": 23257113,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.2/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.1",
+      "tagName": "module-v0.1.1",
+      "publishedAt": "2026-09-19T01:04:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.1-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.1/AdGuardHome-Android-Module-0.1.1-agh-0.107.79.zip",
+          "size": 23257047,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.1/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "module-v0.1.0",
+      "tagName": "module-v0.1.0",
+      "publishedAt": "2026-09-18T16:41:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHome-Android-Module-0.1.0-agh-0.107.79.zip",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.0/AdGuardHome-Android-Module-0.1.0-agh-0.107.79.zip",
+          "size": 23243698,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/snowzlmbot/AdGuardHome-Android-Module/releases/download/module-v0.1.0/SHA256SUMS",
+          "size": 116,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

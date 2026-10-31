@@ -1,0 +1,173 @@
+{
+  "readme": "# 三星 Samsung Galaxy Tab S9 SM-X710：国行 One UI 8.5 升级、KernelSU-Next Root 与救援教程\n\n[在线教程 / Website](https://cthaat.github.io/SM-X710-EZH3-Guide/) · [English](README.en.md) · [下载刷机包 / Downloads](https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/latest) · [Root 步骤](docs/03-root.md) · [启动循环救援](docs/04-rescue.md)\n\n这是一次真实升级记录：原机为三星 Tab S9（TabS9），已解锁，从 BXG5 经 CYH4 ABL + EZH3 混合 BL 恢复原 PIN 解锁，再使用自编译 KernelSU-Next 3.4.2 boot-only 包取得 Root。这里记录了国行 CHN 固件升级、混合 BL、Odin 刷机、启动循环（bootloop）恢复和文件校验的完整过程。\n\nSingle-device verified guide for **Samsung Galaxy Tab S9 SM-X710 (gts9wifi, China/CHN)**: **One UI 8.5 / Android 16 / EZH3 firmware upgrade**, **KernelSU-Next 3.4.2 root**, hybrid bootloader and stock boot/init_boot rescue. [Read in English](README.en.md).\n\n**实机验收日期：2026-10-16；整理日期：2026-10-22。仅验证一台已解锁的 SM-X710。** 不能推广到其他机型、地区、固件位数或模块组合。文件名中的 PRESERVE_DATA 是制作目标，不是保留数据保证。务必另存自己的备份。\n\n| 项目 | 本次真实版本 |\n|---|---|\n| 机型 | Samsung Galaxy Tab S9 **SM-X710 / gts9wifi / CHN / Wi-Fi** |\n| 起点 | X710ZCS4BXG5，Android 14；原机已解锁并已有 Root |\n| 旧 ABL 来源 | **X710ZCU5CYH4**，不是最初示例中的 CYG2 |\n| 目标系统 | X710ZCS6EZH3，Android 16 / SDK 36 / One UI 8.5（80500） |\n| 完整 build | BP4A.251205.006.X710ZCS6EZH3 |\n| 混合 BL | CYH4 ABL5 + EZH3 其他 BL 成员，vbmeta flags=3 |\n| 最终内核 | 5.15.189-android13-8-33413632-abX710ZCS6EZH3 |\n| Root | builtin KernelSU-Next v3.4.2 / 33355 / UAPI 5 |\n| KernelSU 提交 | 4c706b5938665866ebe16944a481a7b91e3396af |\n| 实际 Odin | 3.14.4（engine 3.1401） |\n\n## 下载与文件还原\n\n**[进入 Release 下载页](https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/tag/v1.0-ezh3-ksun342)**，文件清单见 [FILES.md](FILES.md)。Release 含 25 个附件：完整系统 AP 的 9 个分片、混合 BL、HOME_CSC、Root AP、救援 AP、管理器、Odin、对应内核源码、教程和校验工具。\n\n1. 将 Release 的全部附件下载到同一个文件夹；完整 AP 必须先合并，分片不能直接交给 Odin。\n2. 安装 Python 3.10 或更新版，在**附件下载目录**打开 PowerShell：\n\n```powershell\npython assets.py verify release-upload-manifest.json .\npython assets.py join parts.json AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar\n```\n\n工具会逐片并对合并文件做 SHA-256 核验，拒绝覆盖已有输出。合并需额外约 8.7 GB；完整 AP 的预期 SHA-256 为 `6e5333c80f71d0b59fd8139f68c5aa7fa7090397981ce85e4635be24f89cf647`。\n\nGitHub 的 “Code → Download ZIP” 只包含教程源码；刷机附件在 Release。Release 内的教程 ZIP 是发布时快照，最新说明以本仓库为准。具体文件用途和槽位见下面的分步教程。\n\n## 阅读顺序\n\n1. [适用条件与备份](docs/01-preparation.md)\n2. [文件清单与校验](FILES.md)\n3. [混合 BL + 原版 EZH3 升级](docs/02-upgrade.md)：先确认 PIN、文件与基本功能正常。\n4. [boot-only Root](docs/03-root.md)：AP 单槽刷入。\n5. [启动循环救援](docs/04-rescue.md)：原版 boot + init_boot。\n\n另见 [失败经过](docs/05-failures.md)、[私有备份边界](docs/06-backups.md)、[源码与构建](docs/07-source.md)、[自行发布](docs/08-publishing.md)、[脱敏验收证据](evidence/acceptance.json)。\n\n## 常见问题\n\n**适用于哪些机型？** 仅本次实测的国行 Samsung Galaxy Tab S9 SM-X710 / CHN / gts9wifi。其他地区、SM-X716、Tab S9 FE 或不同固件版本，需要重新核对兼容性。\n\n**升级后还是完整 BL4 吗？** 起点是 BXG5，成功组合使用 CYH4 ABL5 和 EZH3 其他 BL 成员。不能据此保证整套降回 BXG5，详见 [位数与回滚限制](docs/01-preparation.md)。\n\n**Root 后无限重启怎么办？** 本次经原版 EZH3 `boot + init_boot` 恢复系统；救援前提是 Download 可进入、故障在这两个分区范围内，详见 [救援步骤](docs/04-rescue.md)。不要因开机失败直接清数据或重新锁定。\n\n**管理器可以“直接安装”升级吗？** 此启动组合曾在直接安装并启用模块后出现循环，根因未唯一确定。请使用冻结的 boot-only AP 流程。附件官方 Next 3.4.2 APK 与最终实测的 `com.sukisu.ultra v4.1.0/40201` 管理器不同，身份与验证边界见 [Root 说明](docs/03-root.md)。\n\n## 本地仓库布局\n\n- docs、manifests、evidence、tools、tests：进入 Git 的教程、清单、证据与校验工具。\n- **release-assets/**：完整刷机附件、管理器、Odin 与内核对应源码；被 Git 忽略，需要另行上传 Release。\n- **private-backups/**：本机旧分区备份和本地位置索引；被 Git 忽略，禁止公开。\n\n本次整理没有再次刷机、重启或修改模块，也没有删除源文件。实机结果来自上述验收日期，并非今日重新运行设备测试。\n\n在仓库根目录用 Python 3 校验：\n\n```powershell\npython tools/assets.py verify manifests/assets.json release-assets\npython -m unittest discover -s tests -v\n```\n\n新编写的教程和工具采用 [MIT](LICENSE)。三星固件、Odin、KernelSU 与 Linux 等仍适用各自权利和许可，见 [NOTICE](NOTICE.md)。\n",
+  "readmeHTML": "<h1>三星 Samsung Galaxy Tab S9 SM-X710：国行 One UI 8.5 升级、KernelSU-Next Root 与救援教程</h1>\n\n<p><a href=\"https://cthaat.github.io/SM-X710-EZH3-Guide/\">在线教程 / Website</a> · <a href=\"README.en.md\">English</a> · <a href=\"https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/latest\">下载刷机包 / Downloads</a> · <a href=\"docs/03-root.md\">Root 步骤</a> · <a href=\"docs/04-rescue.md\">启动循环救援</a></p>\n\n<p>这是一次真实升级记录：原机为三星 Tab S9（TabS9），已解锁，从 BXG5 经 CYH4 ABL + EZH3 混合 BL 恢复原 PIN 解锁，再使用自编译 KernelSU-Next 3.4.2 boot-only 包取得 Root。这里记录了国行 CHN 固件升级、混合 BL、Odin 刷机、启动循环（bootloop）恢复和文件校验的完整过程。</p>\n\n<p>Single-device verified guide for <b>Samsung Galaxy Tab S9 SM-X710 (gts9wifi, China/CHN)</b>: <b>One UI 8.5 / Android 16 / EZH3 firmware upgrade</b>, <b>KernelSU-Next 3.4.2 root</b>, hybrid bootloader and stock boot/init_boot rescue. <a href=\"README.en.md\">Read in English</a>.</p>\n\n<p><b>实机验收日期：2026-10-16；整理日期：2026-10-22。仅验证一台已解锁的 SM-X710。</b> 不能推广到其他机型、地区、固件位数或模块组合。文件名中的 PRESERVE_DATA 是制作目标，不是保留数据保证。务必另存自己的备份。</p>\n\n<p>| 项目 | 本次真实版本 |</p>\n<p>|---|---|</p>\n<p>| 机型 | Samsung Galaxy Tab S9 <b>SM-X710 / gts9wifi / CHN / Wi-Fi</b> |</p>\n<p>| 起点 | X710ZCS4BXG5，Android 14；原机已解锁并已有 Root |</p>\n<p>| 旧 ABL 来源 | <b>X710ZCU5CYH4</b>，不是最初示例中的 CYG2 |</p>\n<p>| 目标系统 | X710ZCS6EZH3，Android 16 / SDK 36 / One UI 8.5（80500） |</p>\n<p>| 完整 build | BP4A.251205.006.X710ZCS6EZH3 |</p>\n<p>| 混合 BL | CYH4 ABL5 + EZH3 其他 BL 成员，vbmeta flags=3 |</p>\n<p>| 最终内核 | 5.15.189-android13-8-33413632-abX710ZCS6EZH3 |</p>\n<p>| Root | builtin KernelSU-Next v3.4.2 / 33355 / UAPI 5 |</p>\n<p>| KernelSU 提交 | 4c706b5938665866ebe16944a481a7b91e3396af |</p>\n<p>| 实际 Odin | 3.14.4（engine 3.1401） |</p>\n\n<h2>下载与文件还原</h2>\n\n<p><b><a href=\"https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/tag/v1.0-ezh3-ksun342\">进入 Release 下载页</a></b>，文件清单见 <a href=\"FILES.md\">FILES.md</a>。Release 含 25 个附件：完整系统 AP 的 9 个分片、混合 BL、HOME_CSC、Root AP、救援 AP、管理器、Odin、对应内核源码、教程和校验工具。</p>\n\n<li>将 Release 的全部附件下载到同一个文件夹；完整 AP 必须先合并，分片不能直接交给 Odin。</li>\n<li>安装 Python 3.10 或更新版，在**附件下载目录**打开 PowerShell：</li>\n\n<pre>python assets.py verify release-upload-manifest.json .\npython assets.py join parts.json AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar</pre>\n\n<p>工具会逐片并对合并文件做 SHA-256 核验，拒绝覆盖已有输出。合并需额外约 8.7 GB；完整 AP 的预期 SHA-256 为 <code>6e5333c80f71d0b59fd8139f68c5aa7fa7090397981ce85e4635be24f89cf647</code>。</p>\n\n<p>GitHub 的 “Code → Download ZIP” 只包含教程源码；刷机附件在 Release。Release 内的教程 ZIP 是发布时快照，最新说明以本仓库为准。具体文件用途和槽位见下面的分步教程。</p>\n\n<h2>阅读顺序</h2>\n\n<li>[适用条件与备份](docs/01-preparation.md)</li>\n<li>[文件清单与校验](FILES.md)</li>\n<li>[混合 BL + 原版 EZH3 升级](docs/02-upgrade.md)：先确认 PIN、文件与基本功能正常。</li>\n<li>[boot-only Root](docs/03-root.md)：AP 单槽刷入。</li>\n<li>[启动循环救援](docs/04-rescue.md)：原版 boot + init_boot。</li>\n\n<p>另见 <a href=\"docs/05-failures.md\">失败经过</a>、<a href=\"docs/06-backups.md\">私有备份边界</a>、<a href=\"docs/07-source.md\">源码与构建</a>、<a href=\"docs/08-publishing.md\">自行发布</a>、<a href=\"evidence/acceptance.json\">脱敏验收证据</a>。</p>\n\n<h2>常见问题</h2>\n\n<p><b>适用于哪些机型？</b> 仅本次实测的国行 Samsung Galaxy Tab S9 SM-X710 / CHN / gts9wifi。其他地区、SM-X716、Tab S9 FE 或不同固件版本，需要重新核对兼容性。</p>\n\n<p><b>升级后还是完整 BL4 吗？</b> 起点是 BXG5，成功组合使用 CYH4 ABL5 和 EZH3 其他 BL 成员。不能据此保证整套降回 BXG5，详见 <a href=\"docs/01-preparation.md\">位数与回滚限制</a>。</p>\n\n<p><b>Root 后无限重启怎么办？</b> 本次经原版 EZH3 <code>boot + init_boot</code> 恢复系统；救援前提是 Download 可进入、故障在这两个分区范围内，详见 <a href=\"docs/04-rescue.md\">救援步骤</a>。不要因开机失败直接清数据或重新锁定。</p>\n\n<p><b>管理器可以“直接安装”升级吗？</b> 此启动组合曾在直接安装并启用模块后出现循环，根因未唯一确定。请使用冻结的 boot-only AP 流程。附件官方 Next 3.4.2 APK 与最终实测的 <code>com.sukisu.ultra v4.1.0/40201</code> 管理器不同，身份与验证边界见 <a href=\"docs/03-root.md\">Root 说明</a>。</p>\n\n<h2>本地仓库布局</h2>\n\n<li>docs、manifests、evidence、tools、tests：进入 Git 的教程、清单、证据与校验工具。</li>\n<li>**release-assets/**：完整刷机附件、管理器、Odin 与内核对应源码；被 Git 忽略，需要另行上传 Release。</li>\n<li>**private-backups/**：本机旧分区备份和本地位置索引；被 Git 忽略，禁止公开。</li>\n\n<p>本次整理没有再次刷机、重启或修改模块，也没有删除源文件。实机结果来自上述验收日期，并非今日重新运行设备测试。</p>\n\n<p>在仓库根目录用 Python 3 校验：</p>\n\n<pre>python tools/assets.py verify manifests/assets.json release-assets\npython -m unittest discover -s tests -v</pre>\n\n<p>新编写的教程和工具采用 <a href=\"LICENSE\">MIT</a>。三星固件、Odin、KernelSU 与 Linux 等仍适用各自权利和许可，见 <a href=\"NOTICE.md\">NOTICE</a>。</p>",
+  "homepageUrl": "https://cthaat.github.io/SM-X710-EZH3-Guide/",
+  "sourceUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide",
+  "url": "https://github.com/Cthaat/SM-X710-EZH3-Guide",
+  "latestRelease": {
+    "name": "v1.0-ezh3-ksun342",
+    "version": "v1.0-ezh3-ksun342",
+    "time": "2026-10-22T02:29:24Z",
+    "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/Odin3.14.4-Windows.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0-ezh3-ksun342",
+      "tagName": "v1.0-ezh3-ksun342",
+      "publishedAt": "2026-10-22T02:29:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AP_RESCUE_EZH3_STOCK_BOOT_INIT_BOOT_ONLY.tar",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_RESCUE_EZH3_STOCK_BOOT_INIT_BOOT_ONLY.tar",
+          "size": 31539200,
+          "downloadCount": 0
+        },
+        {
+          "name": "AP_ROOT_EZH3_KSUN_NEXT_3.4.2_BOOT_ONLY.tar",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_ROOT_EZH3_KSUN_NEXT_3.4.2_BOOT_ONLY.tar",
+          "size": 24903680,
+          "downloadCount": 0
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0001",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0001",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0002",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0002",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0003",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0003",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0004",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0004",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0005",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0005",
+          "size": 1073741824,
+          "downloadCount": 0
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0006",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0006",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0007",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0007",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0008",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0008",
+          "size": 1073741824,
+          "downloadCount": 1
+        },
+        {
+          "name": "AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0009",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/AP_STOCK_EZH3_PRESERVE_DATA_NO_ROOT.tar.part0009",
+          "size": 115990528,
+          "downloadCount": 0
+        },
+        {
+          "name": "assets.py",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/assets.py",
+          "size": 5205,
+          "downloadCount": 0
+        },
+        {
+          "name": "BL_HYBRID_EZH3_CYH4_ABL5_AVB3.tar",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/BL_HYBRID_EZH3_CYH4_ABL5_AVB3.tar",
+          "size": 114196480,
+          "downloadCount": 1
+        },
+        {
+          "name": "HOME_CSC_CHN_X710CHN6EZH3_MQB114014704_REV00_user_low_ship_MULTI_CERT.tar.md5",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/HOME_CSC_CHN_X710CHN6EZH3_MQB114014704_REV00_user_low_ship_MULTI_CERT.tar.md5",
+          "size": 73789548,
+          "downloadCount": 0
+        },
+        {
+          "name": "kernel-corresponding-source.tar.gz",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/kernel-corresponding-source.tar.gz",
+          "size": 994632972,
+          "downloadCount": 0
+        },
+        {
+          "name": "KernelSU_Next_v3.4.2_33355-release.apk",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/KernelSU_Next_v3.4.2_33355-release.apk",
+          "size": 16682167,
+          "downloadCount": 1
+        },
+        {
+          "name": "Odin3.14.4-Windows.zip",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/Odin3.14.4-Windows.zip",
+          "size": 4557384,
+          "downloadCount": 0
+        },
+        {
+          "name": "original-assets.json",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/original-assets.json",
+          "size": 2213,
+          "downloadCount": 0
+        },
+        {
+          "name": "original-SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/original-SHA256SUMS.txt",
+          "size": 1065,
+          "downloadCount": 0
+        },
+        {
+          "name": "parts.json",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/parts.json",
+          "size": 1891,
+          "downloadCount": 0
+        },
+        {
+          "name": "README-RELEASE.md",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/README-RELEASE.md",
+          "size": 2667,
+          "downloadCount": 0
+        },
+        {
+          "name": "RELEASE-SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/RELEASE-SHA256SUMS.txt",
+          "size": 2482,
+          "downloadCount": 0
+        },
+        {
+          "name": "release-upload-manifest.json",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/release-upload-manifest.json",
+          "size": 4068,
+          "downloadCount": 1
+        },
+        {
+          "name": "SM-X710-EZH3-Guide.zip",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/SM-X710-EZH3-Guide.zip",
+          "size": 28721,
+          "downloadCount": 0
+        },
+        {
+          "name": "UPLOAD-INSTRUCTIONS.txt",
+          "downloadUrl": "https://github.com/Cthaat/SM-X710-EZH3-Guide/releases/download/v1.0-ezh3-ksun342/UPLOAD-INSTRUCTIONS.txt",
+          "size": 541,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

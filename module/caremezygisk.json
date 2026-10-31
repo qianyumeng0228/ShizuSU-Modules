@@ -1,0 +1,35 @@
+{
+  "readme": "# CaremeZygisk\n\n面向 **CaremeOS 8.1**（基于 Android 8.1 / SDK 27 的小天才 / XTC 儿童手表 ROM）的**设备专用 Zygisk**。已在 **CaremeOS 1.0 与 2.0** 上测试可用 —— 版本号按 Android 底座 8.1 命名，而非某一个 CaremeOS 发行版本。\n\n基底为 [ReZygisk](https://github.com/PerformanC/ReZygisk)（Zygisk 的独立 C 实现），针对 CaremeOS 的魔改 framework、纯 32 位环境与厂商检测做了适配。\n\n## 目标设备与约束\n\n- **系统**：CaremeOS 8.1（Android 8.1 / SDK 27），已测 CaremeOS 1.0、2.0\n- **架构**：纯 32 位，仅 `armeabi-v7a`（无 arm64 用户空间，只有 `app_process32`）\n- **Root**：三根兼容 —— Magisk / KernelSU / APatch\n- **SELinux**：宽容（permissive）\n\n## 能做什么\n\n- 加载现有 Zygisk 模块（如 LSPosed / Vector）—— 完整 Zygisk API v5 兼容\n- 隐藏 root / DenyList（mount 命名空间隔离）\n- 绕过 CaremeOS 自身的注入 / 调试检测\n- Zygisk 自身隐藏（loader 库、daemon、ptrace 痕迹）\n\n## 注入方式（双路并存）\n\n构建期同时打包两条注入路径，运行期通过 `/data/adb/caremezygisk/mode` 切换：\n\n- **ptrace（主）**：monitor 追踪 init，捕获 `app_process32`，ptrace-seize zygote，远程加载 `libzygisk.so`。不触碰 `ro.dalvik.vm.native.bridge`，属性零痕迹。\n- **native-bridge（备）**：设 `ro.dalvik.vm.native.bridge`，NativeBridgeCallbacks v2 构造器加载 payload；外部观察者存在一次指纹窗口。\n\n## 依赖\n\n| 工具 | 说明 |\n|------|------|\n| Android NDK | `29.0.13113456`（见 `common.mk` 的 `NDK_VERSION`） |\n| python3 | 打包 / 签名 `scripts/sign.py` |\n| zip / 7z | 打包 |\n\nvendored C 依赖：`PLTI`（Android PLT hook）、`CSOLoader`（自定义 linker，绕过 linker 检测）。\n\n## 构建\n\n```bash\nexport ANDROID_HOME=~/Android/Sdk   # 指向本机 SDK\nmake all       # debug + release，产物落在 build/out/\nmake release   # 仅 release\nmake debug     # 仅 debug\n```\n\n产物：`build/out/CaremeZygisk-<versionName>-<versionCode>-<hash>-<type>.zip`，仅含 `armeabi-v7a`。\nCI（GitHub Actions）在 push / PR / tag 上自动 `make all` 并上传 artifact，`v*` tag 直接发 release。\n\n## 安装\n\n1. 选包：日常用 `release`，排障用 `debug`（日志更全，仅用于排障 / 提 Issue）。\n2. 用 root 管理器（Magisk / KernelSU / APatch）刷入 zip，检查安装日志无误后重启。\n3. **Magisk 用户务必关闭内置 Zygisk**（设置里关掉 Zygisk 选项），否则冲突。\n4. 重启后在模块描述里确认 daemon 是否在跑。\n\n## 状态\n\n设备专用，持续迭代。针对具体固件的厂商检测适配（Zygote JNI 签名、ArtMethod 布局、anti-ptrace、`native.bridge` 属性检测、maps 扫描、`app_process32` 结构）按机型确认后启用。\n\n## 致谢与许可\n\n基于 PerformanC 的 [ReZygisk](https://github.com/PerformanC/ReZygisk)。遵循 [AGPL 3.0](./LICENSE)。\n",
+  "readmeHTML": "<h1>CaremeZygisk</h1>\n\n<p>面向 <b>CaremeOS 8.1</b>（基于 Android 8.1 / SDK 27 的小天才 / XTC 儿童手表 ROM）的<b>设备专用 Zygisk</b>。已在 <b>CaremeOS 1.0 与 2.0</b> 上测试可用 —— 版本号按 Android 底座 8.1 命名，而非某一个 CaremeOS 发行版本。</p>\n\n<p>基底为 <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a>（Zygisk 的独立 C 实现），针对 CaremeOS 的魔改 framework、纯 32 位环境与厂商检测做了适配。</p>\n\n<h2>目标设备与约束</h2>\n\n<li>**系统**：CaremeOS 8.1（Android 8.1 / SDK 27），已测 CaremeOS 1.0、2.0</li>\n<li>**架构**：纯 32 位，仅 `armeabi-v7a`（无 arm64 用户空间，只有 `app_process32`）</li>\n<li>**Root**：三根兼容 —— Magisk / KernelSU / APatch</li>\n<li>**SELinux**：宽容（permissive）</li>\n\n<h2>能做什么</h2>\n\n<li>加载现有 Zygisk 模块（如 LSPosed / Vector）—— 完整 Zygisk API v5 兼容</li>\n<li>隐藏 root / DenyList（mount 命名空间隔离）</li>\n<li>绕过 CaremeOS 自身的注入 / 调试检测</li>\n<li>Zygisk 自身隐藏（loader 库、daemon、ptrace 痕迹）</li>\n\n<h2>注入方式（双路并存）</h2>\n\n<p>构建期同时打包两条注入路径，运行期通过 <code>/data/adb/caremezygisk/mode</code> 切换：</p>\n\n<li>**ptrace（主）**：monitor 追踪 init，捕获 `app_process32`，ptrace-seize zygote，远程加载 `libzygisk.so`。不触碰 `ro.dalvik.vm.native.bridge`，属性零痕迹。</li>\n<li>**native-bridge（备）**：设 `ro.dalvik.vm.native.bridge`，NativeBridgeCallbacks v2 构造器加载 payload；外部观察者存在一次指纹窗口。</li>\n\n<h2>依赖</h2>\n\n<p>| 工具 | 说明 |</p>\n<p>|------|------|</p>\n<p>| Android NDK | <code>29.0.13113456</code>（见 <code>common.mk</code> 的 <code>NDK_VERSION</code>） |</p>\n<p>| python3 | 打包 / 签名 <code>scripts/sign.py</code> |</p>\n<p>| zip / 7z | 打包 |</p>\n\n<p>vendored C 依赖：<code>PLTI</code>（Android PLT hook）、<code>CSOLoader</code>（自定义 linker，绕过 linker 检测）。</p>\n\n<h2>构建</h2>\n\n<pre>export ANDROID_HOME=~/Android/Sdk   # 指向本机 SDK\nmake all       # debug + release，产物落在 build/out/\nmake release   # 仅 release\nmake debug     # 仅 debug</pre>\n\n<p>产物：<code>build/out/CaremeZygisk-<versionName>-<versionCode>-<hash>-<type>.zip</code>，仅含 <code>armeabi-v7a</code>。</p>\n<p>CI（GitHub Actions）在 push / PR / tag 上自动 <code>make all</code> 并上传 artifact，<code>v*</code> tag 直接发 release。</p>\n\n<h2>安装</h2>\n\n<li>选包：日常用 `release`，排障用 `debug`（日志更全，仅用于排障 / 提 Issue）。</li>\n<li>用 root 管理器（Magisk / KernelSU / APatch）刷入 zip，检查安装日志无误后重启。</li>\n<li>**Magisk 用户务必关闭内置 Zygisk**（设置里关掉 Zygisk 选项），否则冲突。</li>\n<li>重启后在模块描述里确认 daemon 是否在跑。</li>\n\n<h2>状态</h2>\n\n<p>设备专用，持续迭代。针对具体固件的厂商检测适配（Zygote JNI 签名、ArtMethod 布局、anti-ptrace、<code>native.bridge</code> 属性检测、maps 扫描、<code>app_process32</code> 结构）按机型确认后启用。</p>\n\n<h2>致谢与许可</h2>\n\n<p>基于 PerformanC 的 <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a>。遵循 <a href=\"./LICENSE\">AGPL 3.0</a>。</p>",
+  "homepageUrl": "https://github.com/CaremeOS-Dev/CaremeZygisk",
+  "sourceUrl": "https://github.com/CaremeOS-Dev/CaremeZygisk",
+  "url": "https://github.com/CaremeOS-Dev/CaremeZygisk",
+  "latestRelease": {
+    "name": "v0.1.0-rc2",
+    "version": "v0.1.0-rc2",
+    "time": "2026-08-27T05:52:39Z",
+    "downloadUrl": "https://github.com/CaremeOS-Dev/CaremeZygisk/releases/download/v0.1.0-rc2/CaremeZygisk-0.1.0-rc2-4-dc87406-debug.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.0-rc2",
+      "tagName": "v0.1.0-rc2",
+      "publishedAt": "2026-08-27T05:52:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CaremeZygisk-0.1.0-rc2-4-dc87406-debug.zip",
+          "downloadUrl": "https://github.com/CaremeOS-Dev/CaremeZygisk/releases/download/v0.1.0-rc2/CaremeZygisk-0.1.0-rc2-4-dc87406-debug.zip",
+          "size": 141480,
+          "downloadCount": 2
+        },
+        {
+          "name": "CaremeZygisk-0.1.0-rc2-4-dc87406-release.zip",
+          "downloadUrl": "https://github.com/CaremeOS-Dev/CaremeZygisk/releases/download/v0.1.0-rc2/CaremeZygisk-0.1.0-rc2-4-dc87406-release.zip",
+          "size": 94167,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

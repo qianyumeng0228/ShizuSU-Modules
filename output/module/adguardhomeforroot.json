@@ -1,0 +1,615 @@
+{
+  "readme": "# AdGuardHome for Root\n\n[English](README_en.md) | 简体中文\n\n![arm-64 support](https://img.shields.io/badge/arm--64-support-ef476f?logo=linux&logoColor=white&color=ef476f)\n![arm-v7 support](https://img.shields.io/badge/arm--v7-support-ffa500?logo=linux&logoColor=white&color=ffa500)\n![GitHub downloads](https://img.shields.io/github/downloads/twoone-3/AdGuardHomeForRoot/total?logo=github&logoColor=white&color=ffd166)\n![License](https://img.shields.io/badge/License-MIT-9b5de5?logo=opensourceinitiative&logoColor=white)\n[![Docs](https://img.shields.io/badge/Docs-Guide-0066ff?logo=book&logoColor=white)](docs/index.md)\n[![Join Telegram Channel](https://img.shields.io/badge/Telegram-Join%20Channel-06d6a0?logo=telegram&logoColor=white)](https://t.me/twoone3_tech_tips)\n[![Join Telegram Group](https://img.shields.io/badge/Telegram-Join%20Group-118ab2?logo=telegram&logoColor=white)](https://t.me/+Q3Ur_HCYdM0xM2I1)\n\n关注我们的频道获取最新消息，或加入我们的群组进行讨论！  \n\n## 简介\n\n- 本模块是一个在安卓设备上运行 [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome) 的模块，提供了一个本地 DNS 服务器，能够屏蔽广告、恶意软件和跟踪器。\n- 它可以作为一个本地广告拦截模块使用，也可以通过调整配置文件，转变为一个独立运行的 AdGuardHome 工具。\n- 该模块支持 Magisk、KernelSU 和 APatch 等多种安装方式，适用于大多数 Android 设备。\n- 该模块的设计初衷是为了提供一个轻量级的广告拦截解决方案，避免了使用 VPN 的复杂性和性能损失。\n- 它可以与其他代理软件（如 [NekoBox](https://github.com/MatsuriDayo/NekoBoxForAndroid)、[FlClash](https://github.com/chen08209/FlClash)、[box for magisk](https://github.com/taamarin/box_for_magisk)、[akashaProxy](https://github.com/akashaProxy/akashaProxy) 等）共存，提供更好的隐私保护和网络安全。\n\n## 特性\n\n- 可选将本机 DNS 请求转发到本地 AdGuardHome 服务器\n- 使用 [秋风广告规则](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) 过滤广告，轻量，省电，少误杀\n- 可从 <http://127.0.0.1:3000> 访问 AdGuardHome 后台，支持查询统计，修改 DNS 上游服务器以及自定义规则等功能\n\n## 快速开始\n\n1. 前往 [Release](https://github.com/twoone-3/AdGuardHomeForRoot/releases/latest) 页面下载模块\n2. 检查 Android 设置 -> 网络和互联网 -> 高级 -> 私人 DNS，确保 `私人 DNS` 关闭\n3. 在 root 管理器中安装模块，重启设备\n4. 若看到模块运行成功的提示，则可以访问 <http://127.0.0.1:3000> 进入 AdGuardHome 后台，默认用户密码 root/root\n5. 若需高级使用教程和常见问题解答，请访问 **[文档与教程](docs/index.md)**。\n\n## 鸣谢\n\n- [AWAvenue Ads Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)\n- [AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)\n- [akashaProxy](https://github.com/ModuleList/akashaProxy)\n- [box_for_magisk](https://github.com/taamarin/box_for_magisk)\n\n> 特别感谢赞助：\n>\n> - y******a - 200\n> - 偶****** - 10\n",
+  "readmeHTML": "<h1>AdGuardHome for Root</h1>\n\n<p><a href=\"README_en.md\">English</a> | 简体中文</p>\n\n<p>!<a href=\"https://img.shields.io/badge/arm--64-support-ef476f?logo=linux&logoColor=white&color=ef476f\">arm-64 support</a></p>\n<p>!<a href=\"https://img.shields.io/badge/arm--v7-support-ffa500?logo=linux&logoColor=white&color=ffa500\">arm-v7 support</a></p>\n<p>!<a href=\"https://img.shields.io/github/downloads/twoone-3/AdGuardHomeForRoot/total?logo=github&logoColor=white&color=ffd166\">GitHub downloads</a></p>\n<p>!<a href=\"https://img.shields.io/badge/License-MIT-9b5de5?logo=opensourceinitiative&logoColor=white\">License</a></p>\n<p><a href=\"https://img.shields.io/badge/Docs-Guide-0066ff?logo=book&logoColor=white\">![Docs</a>](docs/index.md)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-Join%20Channel-06d6a0?logo=telegram&logoColor=white\">![Join Telegram Channel</a>](https://t.me/twoone3_tech_tips)</p>\n<p><a href=\"https://img.shields.io/badge/Telegram-Join%20Group-118ab2?logo=telegram&logoColor=white\">![Join Telegram Group</a>](https://t.me/+Q3Ur_HCYdM0xM2I1)</p>\n\n<p>关注我们的频道获取最新消息，或加入我们的群组进行讨论！</p>\n\n<h2>简介</h2>\n\n<li>本模块是一个在安卓设备上运行 [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome) 的模块，提供了一个本地 DNS 服务器，能够屏蔽广告、恶意软件和跟踪器。</li>\n<li>它可以作为一个本地广告拦截模块使用，也可以通过调整配置文件，转变为一个独立运行的 AdGuardHome 工具。</li>\n<li>该模块支持 Magisk、KernelSU 和 APatch 等多种安装方式，适用于大多数 Android 设备。</li>\n<li>该模块的设计初衷是为了提供一个轻量级的广告拦截解决方案，避免了使用 VPN 的复杂性和性能损失。</li>\n<li>它可以与其他代理软件（如 [NekoBox](https://github.com/MatsuriDayo/NekoBoxForAndroid)、[FlClash](https://github.com/chen08209/FlClash)、[box for magisk](https://github.com/taamarin/box_for_magisk)、[akashaProxy](https://github.com/akashaProxy/akashaProxy) 等）共存，提供更好的隐私保护和网络安全。</li>\n\n<h2>特性</h2>\n\n<li>可选将本机 DNS 请求转发到本地 AdGuardHome 服务器</li>\n<li>使用 [秋风广告规则](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) 过滤广告，轻量，省电，少误杀</li>\n<li>可从 <http://127.0.0.1:3000> 访问 AdGuardHome 后台，支持查询统计，修改 DNS 上游服务器以及自定义规则等功能</li>\n\n<h2>快速开始</h2>\n\n<li>前往 [Release](https://github.com/twoone-3/AdGuardHomeForRoot/releases/latest) 页面下载模块</li>\n<li>检查 Android 设置 -> 网络和互联网 -> 高级 -> 私人 DNS，确保 `私人 DNS` 关闭</li>\n<li>在 root 管理器中安装模块，重启设备</li>\n<li>若看到模块运行成功的提示，则可以访问 <http://127.0.0.1:3000> 进入 AdGuardHome 后台，默认用户密码 root/root</li>\n<li>若需高级使用教程和常见问题解答，请访问 **[文档与教程](docs/index.md)**。</li>\n\n<h2>鸣谢</h2>\n\n<li>[AWAvenue Ads Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)</li>\n<li>[AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)</li>\n<li>[akashaProxy](https://github.com/ModuleList/akashaProxy)</li>\n<li>[box_for_magisk](https://github.com/taamarin/box_for_magisk)</li>\n\n<p>> 特别感谢赞助：</p>\n<p>></p>\n<p>> - y******a - 200</p>\n<p>> - 偶****** - 10</p>",
+  "homepageUrl": "https://github.com/twoone-3/AdGuardHomeForRoot",
+  "sourceUrl": "https://github.com/twoone-3/AdGuardHomeForRoot",
+  "url": "https://github.com/twoone-3/AdGuardHomeForRoot",
+  "latestRelease": {
+    "name": "20261027",
+    "version": "20261027",
+    "time": "2026-10-27T13:11:11Z",
+    "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20261027/AdGuardHomeForRoot_arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "20261027",
+      "tagName": "20261027",
+      "publishedAt": "2026-10-27T13:11:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20261027/AdGuardHomeForRoot_arm64.zip",
+          "size": 11321973,
+          "downloadCount": 1520
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20261027/AdGuardHomeForRoot_armv7.zip",
+          "size": 11811253,
+          "downloadCount": 43
+        }
+      ]
+    },
+    {
+      "name": "20261016",
+      "tagName": "20261016",
+      "publishedAt": "2026-10-16T03:13:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20261016/AdGuardHomeForRoot_arm64.zip",
+          "size": 11320619,
+          "downloadCount": 2776
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20261016/AdGuardHomeForRoot_armv7.zip",
+          "size": 11809899,
+          "downloadCount": 70
+        }
+      ]
+    },
+    {
+      "name": "20260825",
+      "tagName": "20260825",
+      "publishedAt": "2026-08-25T01:39:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260825/AdGuardHomeForRoot_arm64.zip",
+          "size": 11375804,
+          "downloadCount": 6354
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260825/AdGuardHomeForRoot_armv7.zip",
+          "size": 11880052,
+          "downloadCount": 304
+        }
+      ]
+    },
+    {
+      "name": "20260728",
+      "tagName": "20260728",
+      "publishedAt": "2026-07-28T11:07:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260728/AdGuardHomeForRoot_arm64.zip",
+          "size": 11359262,
+          "downloadCount": 3687
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260728/AdGuardHomeForRoot_armv7.zip",
+          "size": 11854935,
+          "downloadCount": 133
+        }
+      ]
+    },
+    {
+      "name": "20260710",
+      "tagName": "20260710",
+      "publishedAt": "2026-07-10T10:47:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260710/AdGuardHomeForRoot_arm64.zip",
+          "size": 10889947,
+          "downloadCount": 2821
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260710/AdGuardHomeForRoot_armv7.zip",
+          "size": 11336075,
+          "downloadCount": 116
+        }
+      ]
+    },
+    {
+      "name": "20260526",
+      "tagName": "20260526",
+      "publishedAt": "2026-05-26T13:59:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260526/AdGuardHomeForRoot_arm64.zip",
+          "size": 10877112,
+          "downloadCount": 5533
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260526/AdGuardHomeForRoot_armv7.zip",
+          "size": 11324130,
+          "downloadCount": 274
+        }
+      ]
+    },
+    {
+      "name": "20260419",
+      "tagName": "20260419",
+      "publishedAt": "2026-04-19T09:31:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260419/AdGuardHomeForRoot_arm64.zip",
+          "size": 10901399,
+          "downloadCount": 3992
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260419/AdGuardHomeForRoot_armv7.zip",
+          "size": 11347387,
+          "downloadCount": 168
+        }
+      ]
+    },
+    {
+      "name": "20260315",
+      "tagName": "20260315",
+      "publishedAt": "2026-03-15T02:13:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260315/AdGuardHomeForRoot_arm64.zip",
+          "size": 10817674,
+          "downloadCount": 2062
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260315/AdGuardHomeForRoot_armv7.zip",
+          "size": 11210354,
+          "downloadCount": 90
+        }
+      ]
+    },
+    {
+      "name": "20260227",
+      "tagName": "20260227",
+      "publishedAt": "2026-02-27T08:03:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260227/AdGuardHomeForRoot_arm64.zip",
+          "size": 10413288,
+          "downloadCount": 1293
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260227/AdGuardHomeForRoot_armv7.zip",
+          "size": 10763618,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "20260215",
+      "tagName": "20260215",
+      "publishedAt": "2026-02-15T06:26:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260215/AdGuardHomeForRoot_arm64.zip",
+          "size": 10324947,
+          "downloadCount": 1425
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20260215/AdGuardHomeForRoot_armv7.zip",
+          "size": 10673944,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "20251217",
+      "tagName": "20251217",
+      "publishedAt": "2025-12-17T08:30:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20251217/AdGuardHomeForRoot_arm64.zip",
+          "size": 10324554,
+          "downloadCount": 3364
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20251217/AdGuardHomeForRoot_armv7.zip",
+          "size": 10673551,
+          "downloadCount": 159
+        }
+      ]
+    },
+    {
+      "name": "20251101",
+      "tagName": "20251101",
+      "publishedAt": "2025-11-01T12:44:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20251101/AdGuardHomeForRoot_arm64.zip",
+          "size": 10221809,
+          "downloadCount": 3076
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20251101/AdGuardHomeForRoot_armv7.zip",
+          "size": 10566703,
+          "downloadCount": 120
+        }
+      ]
+    },
+    {
+      "name": "20250921",
+      "tagName": "20250921",
+      "publishedAt": "2025-09-21T15:19:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250921/AdGuardHomeForRoot_arm64.zip",
+          "size": 10031359,
+          "downloadCount": 2828
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250921/AdGuardHomeForRoot_armv7.zip",
+          "size": 10369529,
+          "downloadCount": 116
+        }
+      ]
+    },
+    {
+      "name": "20250803",
+      "tagName": "20250803",
+      "publishedAt": "2025-08-03T01:18:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250803/AdGuardHomeForRoot_arm64.zip",
+          "size": 10019264,
+          "downloadCount": 2880
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250803/AdGuardHomeForRoot_armv7.zip",
+          "size": 10255553,
+          "downloadCount": 165
+        }
+      ]
+    },
+    {
+      "name": "20250725",
+      "tagName": "20250725",
+      "publishedAt": "2025-07-25T01:15:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250725/AdGuardHomeForRoot_arm64.zip",
+          "size": 10029775,
+          "downloadCount": 1099
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250725/AdGuardHomeForRoot_armv7.zip",
+          "size": 10265063,
+          "downloadCount": 38
+        }
+      ]
+    },
+    {
+      "name": "20250630",
+      "tagName": "20250630",
+      "publishedAt": "2025-06-30T11:38:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250630/AdGuardHomeForRoot_arm64.zip",
+          "size": 10030353,
+          "downloadCount": 1710
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250630/AdGuardHomeForRoot_armv7.zip",
+          "size": 10265641,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "20250601",
+      "tagName": "20250601",
+      "publishedAt": "2025-06-01T14:16:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250601/AdGuardHomeForRoot_arm64.zip",
+          "size": 9921407,
+          "downloadCount": 1992
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250601/AdGuardHomeForRoot_armv7.zip",
+          "size": 10149664,
+          "downloadCount": 88
+        }
+      ]
+    },
+    {
+      "name": "20250515",
+      "tagName": "20250515",
+      "publishedAt": "2025-05-15T01:49:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250515/AdGuardHomeForRoot_arm64.zip",
+          "size": 9900868,
+          "downloadCount": 1268
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250515/AdGuardHomeForRoot_armv7.zip",
+          "size": 10127572,
+          "downloadCount": 52
+        }
+      ]
+    },
+    {
+      "name": "20250514",
+      "tagName": "20250514",
+      "publishedAt": "2025-05-14T05:04:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250514/AdGuardHomeForRoot_arm64.zip",
+          "size": 9899103,
+          "downloadCount": 211
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250514/AdGuardHomeForRoot_armv7.zip",
+          "size": 10125807,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "20250511",
+      "tagName": "20250511",
+      "publishedAt": "2025-05-11T08:09:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250511/AdGuardHomeForRoot_arm64.zip",
+          "size": 9899054,
+          "downloadCount": 476
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250511/AdGuardHomeForRoot_armv7.zip",
+          "size": 10125758,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "20250427",
+      "tagName": "20250427",
+      "publishedAt": "2025-04-27T00:40:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250427/AdGuardHomeForRoot_arm64.zip",
+          "size": 9899549,
+          "downloadCount": 1099
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250427/AdGuardHomeForRoot_armv7.zip",
+          "size": 10126253,
+          "downloadCount": 46
+        }
+      ]
+    },
+    {
+      "name": "20250419",
+      "tagName": "20250419",
+      "publishedAt": "2025-04-19T12:43:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForRoot_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250419/AdGuardHomeForRoot_arm64.zip",
+          "size": 9895636,
+          "downloadCount": 865
+        },
+        {
+          "name": "AdGuardHomeForRoot_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250419/AdGuardHomeForRoot_armv7.zip",
+          "size": 10122921,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "20250417",
+      "tagName": "20250417",
+      "publishedAt": "2025-04-17T11:37:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250417/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9895877,
+          "downloadCount": 417
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250417/AdGuardHomeForMagisk_armv7.zip",
+          "size": 10123162,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "20250320",
+      "tagName": "20250320",
+      "publishedAt": "2025-03-20T04:58:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250320/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9876343,
+          "downloadCount": 1471
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20250320/AdGuardHomeForMagisk_armv7.zip",
+          "size": 10108974,
+          "downloadCount": 60
+        }
+      ]
+    },
+    {
+      "name": "20241214",
+      "tagName": "20241214",
+      "publishedAt": "2024-12-14T11:00:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241214/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9649308,
+          "downloadCount": 3491
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241214/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9776445,
+          "downloadCount": 106
+        }
+      ]
+    },
+    {
+      "name": "20241130",
+      "tagName": "20241130",
+      "publishedAt": "2024-11-30T13:21:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241130/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9625527,
+          "downloadCount": 785
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241130/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9753392,
+          "downloadCount": 31
+        }
+      ]
+    },
+    {
+      "name": "20241127",
+      "tagName": "20241127",
+      "publishedAt": "2024-11-27T11:50:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241127/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9625132,
+          "downloadCount": 317
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241127/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9752997,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "20241121",
+      "tagName": "20241121",
+      "publishedAt": "2024-11-21T09:21:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241121/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9624951,
+          "downloadCount": 477
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241121/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9752816,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "20241109",
+      "tagName": "20241109",
+      "publishedAt": "2024-11-09T00:35:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241109/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9624829,
+          "downloadCount": 835
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241109/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9752694,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "20241030",
+      "tagName": "20241030",
+      "publishedAt": "2024-10-30T15:34:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AdGuardHomeForMagisk_arm64.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241030/AdGuardHomeForMagisk_arm64.zip",
+          "size": 9628423,
+          "downloadCount": 721
+        },
+        {
+          "name": "AdGuardHomeForMagisk_armv7.zip",
+          "downloadUrl": "https://github.com/twoone-3/AdGuardHomeForRoot/releases/download/20241030/AdGuardHomeForMagisk_armv7.zip",
+          "size": 9751187,
+          "downloadCount": 27
+        }
+      ]
+    }
+  ]
+}

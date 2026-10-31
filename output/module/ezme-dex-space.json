@@ -1,0 +1,29 @@
+{
+  "readme": "# Space saving Ahead-of-Time\n\nChanges how Android's dex2oat compiles packages to save space, rather than focus on speed.\n\n## Description\n\nModifies the build.prop systemlessly in order to change a few parameters.\n\n````\npm.dexopt.install=space-profile\npm.dexopt.install-bulk=space-profile\npm.dexopt.bg-dexopt=space-profile\npm.dexopt.ab-ota=space-profile\npm.dexopt.shared=space\n````\n\nThis changes the defaults from <code>speed</code> to <code>space</code> so that apps may be a tiny bit slower, but they are less likely to trigger Out-of-Memory situations.\n\nIt is highly recommended to wipe/clear Dalvik-Cache and reboot, so that the apps get Optimized with the new settings.\n\n\nThe module is confirmed to work in LineageOS 18.1 and 19.1 (Android 11 and 12L) with Magisk 24+.\n\n",
+  "readmeHTML": "<h1>Space saving Ahead-of-Time</h1>\n\n<p>Changes how Android's dex2oat compiles packages to save space, rather than focus on speed.</p>\n\n<h2>Description</h2>\n\n<p>Modifies the build.prop systemlessly in order to change a few parameters.</p>\n\n<pre>pm.dexopt.install=space-profile\npm.dexopt.install-bulk=space-profile\npm.dexopt.bg-dexopt=space-profile\npm.dexopt.ab-ota=space-profile\npm.dexopt.shared=space</pre>\n\n<p>This changes the defaults from <code>speed</code> to <code>space</code> so that apps may be a tiny bit slower, but they are less likely to trigger Out-of-Memory situations.</p>\n\n<p>It is highly recommended to wipe/clear Dalvik-Cache and reboot, so that the apps get Optimized with the new settings.</p>\n\n\n<p>The module is confirmed to work in LineageOS 18.1 and 19.1 (Android 11 and 12L) with Magisk 24+.</p>\n",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/ezme-dex-space",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/ezme-dex-space",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/ezme-dex-space",
+  "latestRelease": {
+    "name": "v1",
+    "version": "v1",
+    "time": "2025-07-09T01:11:05Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ezme-dex-space/releases/download/v1/ezme-dex-space.zip"
+  },
+  "releases": [
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2025-07-09T01:11:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ezme-dex-space.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/ezme-dex-space/releases/download/v1/ezme-dex-space.zip",
+          "size": 2859,
+          "downloadCount": 2018
+        }
+      ]
+    }
+  ]
+}

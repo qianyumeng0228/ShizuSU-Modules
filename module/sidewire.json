@@ -1,0 +1,499 @@
+{
+  "readme": "# SideWire\n\n[한국어](README.ko.md)\n\nKernelSU Module URL: https://modules.kernelsu.org/en/modules/sidewire/\n\nSideWire is a native bridge for controlling rooted Android devices from Windows, macOS, or Linux. It does not rely on ADB.\n\nIt provides a Rust daemon installed as a KernelSU module and a Rust CLI/server on the host.\n\nSecure connections are the default, and normal traffic is authenticated and encrypted after pairing.\n\nIt supports most of the workflows you would normally use ADB for, but ADB is not used internally, so SideWire does not show up as an ADB session.\n\n## What it does\n\n- interactive shell / PTY and one-shot commands\n- root or shell execution\n- recursive file push and pull\n- PC and Android text clipboard\n- TCP forward and reverse tunnels\n- inbound and outbound connection modes\n- multiple devices with stable device IDs\n- one-time PIN pairing with encrypted sessions afterward\n\n## Requirements\n\n- arm64 Android device\n- KernelSU-compatible module environment\n- Windows x86_64, macOS (Apple Silicon or Intel), or Linux x86_64 host\n- both devices reachable over the same LAN/VPN\n\nRelease binaries and the KernelSU ZIP are published from the GitHub Releases page.\n\n## Quick start\n\n1. Install the SideWire KernelSU module and open its WebUI.\n2. Choose `Secure`, set the connection mode/endpoint, and start SideWire.\n3. Press **Generate pairing PIN**.\n4. Pair the PC once:\n\n```powershell\nsidewire pair 192.168.0.123\n```\n\nThe desktop server does **not** need to be running while pairing. Enter the six-digit PIN shown by the WebUI.\n\nFor the default outbound mode, start the host server afterward:\n\n```powershell\nsidewire server\n```\n\nThen use SideWire from another terminal:\n\n```powershell\nsidewire devices\nsidewire shell\nsidewire exec --as root id\n```\n\n## Clipboard and files\n\n```powershell\nsidewire clipboard push\nsidewire clipboard pull\nsidewire push .\\build /data/local/tmp/build\nsidewire pull /sdcard/Download/report.txt ./\nsidewire pull /sdcard/MyFolder .\\MyFolder\n```\n\n`clipboard push` copies the PC clipboard to Android; `pull` does the reverse. Recursive `push`/`pull` transfers use up to 4 concurrent files by default; use `--jobs 1..16` to tune concurrency. Protocol 1.2 peers also apply receive-window flow control to file chunks, while older peers keep the existing fallback behavior.\n\nFor a single-file `pull`, an existing local directory keeps the remote file name. Otherwise, the destination is used as the output file path. An existing output file is overwritten.\n\n## Connection modes\n\n**Outbound** is the usual setup: Android connects to `sidewire server` on the PC.\n\n**Inbound** makes Android listen for the host instead:\n\n```powershell\nsidewire server --connect 192.168.0.123:58321\n```\n\nInbound devices can also be discovered with `sidewire discover` or `sidewire server --discover`.\n\n## Security\n\nSecure mode uses SPAKE2 for the short-lived pairing PIN and Noise for authenticated encrypted sessions. The PIN is only used to establish a random long-term shared secret.\n\nPlaintext mode exists for trusted development networks, but both sides must explicitly opt into it. Secure connections never silently downgrade.\n\nSee [SECURITY.md](SECURITY.md) for vulnerability reporting.\n\n## Building\n\nWindows + WebUI + Android:\n\n```powershell\npowershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\build.ps1\n```\n\nmacOS host CLI:\n\n```bash\nbash ./scripts/build-macos.sh\n```\n\nLinux host CLI:\n\n```bash\nbash ./scripts/build-linux.sh\n```\n\nRun the normal Rust checks with:\n\n```text\ncargo fmt --all -- --check\ncargo clippy --workspace --all-targets -- -D warnings\ncargo test --workspace\n```\n\nThe wire protocol is currently `1.2` with capability negotiation for optional features.\n\n## License\n\nGNU General Public License v3.0 (`GPL-3.0-only`). See [LICENSE](LICENSE).\n",
+  "readmeHTML": "<h1>SideWire</h1>\n\n<p><a href=\"README.ko.md\">한국어</a></p>\n\n<p>KernelSU Module URL: https://modules.kernelsu.org/en/modules/sidewire/</p>\n\n<p>SideWire is a native bridge for controlling rooted Android devices from Windows, macOS, or Linux. It does not rely on ADB.</p>\n\n<p>It provides a Rust daemon installed as a KernelSU module and a Rust CLI/server on the host.</p>\n\n<p>Secure connections are the default, and normal traffic is authenticated and encrypted after pairing.</p>\n\n<p>It supports most of the workflows you would normally use ADB for, but ADB is not used internally, so SideWire does not show up as an ADB session.</p>\n\n<h2>What it does</h2>\n\n<li>interactive shell / PTY and one-shot commands</li>\n<li>root or shell execution</li>\n<li>recursive file push and pull</li>\n<li>PC and Android text clipboard</li>\n<li>TCP forward and reverse tunnels</li>\n<li>inbound and outbound connection modes</li>\n<li>multiple devices with stable device IDs</li>\n<li>one-time PIN pairing with encrypted sessions afterward</li>\n\n<h2>Requirements</h2>\n\n<li>arm64 Android device</li>\n<li>KernelSU-compatible module environment</li>\n<li>Windows x86_64, macOS (Apple Silicon or Intel), or Linux x86_64 host</li>\n<li>both devices reachable over the same LAN/VPN</li>\n\n<p>Release binaries and the KernelSU ZIP are published from the GitHub Releases page.</p>\n\n<h2>Quick start</h2>\n\n<li>Install the SideWire KernelSU module and open its WebUI.</li>\n<li>Choose `Secure`, set the connection mode/endpoint, and start SideWire.</li>\n<li>Press **Generate pairing PIN**.</li>\n<li>Pair the PC once:</li>\n\n<pre>sidewire pair 192.168.0.123</pre>\n\n<p>The desktop server does <b>not</b> need to be running while pairing. Enter the six-digit PIN shown by the WebUI.</p>\n\n<p>For the default outbound mode, start the host server afterward:</p>\n\n<pre>sidewire server</pre>\n\n<p>Then use SideWire from another terminal:</p>\n\n<pre>sidewire devices\nsidewire shell\nsidewire exec --as root id</pre>\n\n<h2>Clipboard and files</h2>\n\n<pre>sidewire clipboard push\nsidewire clipboard pull\nsidewire push .\\build /data/local/tmp/build\nsidewire pull /sdcard/Download/report.txt ./\nsidewire pull /sdcard/MyFolder .\\MyFolder</pre>\n\n<p><code>clipboard push</code> copies the PC clipboard to Android; <code>pull</code> does the reverse. Recursive <code>push</code>/<code>pull</code> transfers use up to 4 concurrent files by default; use <code>--jobs 1..16</code> to tune concurrency. Protocol 1.2 peers also apply receive-window flow control to file chunks, while older peers keep the existing fallback behavior.</p>\n\n<p>For a single-file <code>pull</code>, an existing local directory keeps the remote file name. Otherwise, the destination is used as the output file path. An existing output file is overwritten.</p>\n\n<h2>Connection modes</h2>\n\n<p><b>Outbound</b> is the usual setup: Android connects to <code>sidewire server</code> on the PC.</p>\n\n<p><b>Inbound</b> makes Android listen for the host instead:</p>\n\n<pre>sidewire server --connect 192.168.0.123:58321</pre>\n\n<p>Inbound devices can also be discovered with <code>sidewire discover</code> or <code>sidewire server --discover</code>.</p>\n\n<h2>Security</h2>\n\n<p>Secure mode uses SPAKE2 for the short-lived pairing PIN and Noise for authenticated encrypted sessions. The PIN is only used to establish a random long-term shared secret.</p>\n\n<p>Plaintext mode exists for trusted development networks, but both sides must explicitly opt into it. Secure connections never silently downgrade.</p>\n\n<p>See <a href=\"SECURITY.md\">SECURITY.md</a> for vulnerability reporting.</p>\n\n<h2>Building</h2>\n\n<p>Windows + WebUI + Android:</p>\n\n<pre>powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\build.ps1</pre>\n\n<p>macOS host CLI:</p>\n\n<pre>bash ./scripts/build-macos.sh</pre>\n\n<p>Linux host CLI:</p>\n\n<pre>bash ./scripts/build-linux.sh</pre>\n\n<p>Run the normal Rust checks with:</p>\n\n<pre>cargo fmt --all -- --check\ncargo clippy --workspace --all-targets -- -D warnings\ncargo test --workspace</pre>\n\n<p>The wire protocol is currently <code>1.2</code> with capability negotiation for optional features.</p>\n\n<h2>License</h2>\n\n<p>GNU General Public License v3.0 (<code>GPL-3.0-only</code>). See <a href=\"LICENSE\">LICENSE</a>.</p>",
+  "homepageUrl": "https://github.com/mzggr0914/sidewire",
+  "sourceUrl": "https://github.com/mzggr0914/sidewire",
+  "url": "https://github.com/mzggr0914/sidewire",
+  "latestRelease": {
+    "name": "v1.0.7",
+    "version": "v1.0.7",
+    "time": "2026-10-29T08:04:45Z",
+    "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/SideWire-KernelSU-v1.0.7-arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.7",
+      "tagName": "v1.0.7",
+      "publishedAt": "2026-10-29T08:04:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 4
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.7-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/SideWire-KernelSU-v1.0.7-arm64.zip",
+          "size": 1244756,
+          "downloadCount": 47
+        },
+        {
+          "name": "sidewire-v1.0.7-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/sidewire-v1.0.7-linux-x86_64",
+          "size": 4097984,
+          "downloadCount": 10
+        },
+        {
+          "name": "sidewire-v1.0.7-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/sidewire-v1.0.7-macos-arm64",
+          "size": 3141296,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.7-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/sidewire-v1.0.7-macos-x86_64",
+          "size": 3591680,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.7-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.7/sidewire-v1.0.7-windows-x86_64.exe",
+          "size": 2759680,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2026-10-27T01:03:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 4
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.6-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/SideWire-KernelSU-v1.0.6-arm64.zip",
+          "size": 1244900,
+          "downloadCount": 72
+        },
+        {
+          "name": "sidewire-v1.0.6-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/sidewire-v1.0.6-linux-x86_64",
+          "size": 4094864,
+          "downloadCount": 6
+        },
+        {
+          "name": "sidewire-v1.0.6-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/sidewire-v1.0.6-macos-arm64",
+          "size": 3142576,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v1.0.6-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/sidewire-v1.0.6-macos-x86_64",
+          "size": 3587416,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.6-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.6/sidewire-v1.0.6-windows-x86_64.exe",
+          "size": 2756608,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.0.5",
+      "tagName": "v1.0.5",
+      "publishedAt": "2026-10-24T10:38:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 3
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.5-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/SideWire-KernelSU-v1.0.5-arm64.zip",
+          "size": 1244915,
+          "downloadCount": 61
+        },
+        {
+          "name": "sidewire-v1.0.5-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/sidewire-v1.0.5-linux-x86_64",
+          "size": 4094864,
+          "downloadCount": 4
+        },
+        {
+          "name": "sidewire-v1.0.5-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/sidewire-v1.0.5-macos-arm64",
+          "size": 3142576,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.5-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/sidewire-v1.0.5-macos-x86_64",
+          "size": 3587376,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.5-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.5/sidewire-v1.0.5-windows-x86_64.exe",
+          "size": 2756608,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-10-23T13:54:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 2
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.4-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/SideWire-KernelSU-v1.0.4-arm64.zip",
+          "size": 1244845,
+          "downloadCount": 18
+        },
+        {
+          "name": "sidewire-v1.0.4-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/sidewire-v1.0.4-linux-x86_64",
+          "size": 4092440,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v1.0.4-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/sidewire-v1.0.4-macos-arm64",
+          "size": 3142320,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.4-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/sidewire-v1.0.4-macos-x86_64",
+          "size": 3583024,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.4-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.4/sidewire-v1.0.4-windows-x86_64.exe",
+          "size": 2754560,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-10-21T16:28:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 2
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.3-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/SideWire-KernelSU-v1.0.3-arm64.zip",
+          "size": 1244849,
+          "downloadCount": 25
+        },
+        {
+          "name": "sidewire-v1.0.3-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/sidewire-v1.0.3-linux-x86_64",
+          "size": 4092480,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v1.0.3-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/sidewire-v1.0.3-macos-arm64",
+          "size": 3142304,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.3-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/sidewire-v1.0.3-macos-x86_64",
+          "size": 3583024,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.3-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.3/sidewire-v1.0.3-windows-x86_64.exe",
+          "size": 2754560,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-10-21T16:18:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 2
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.2-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/SideWire-KernelSU-v1.0.2-arm64.zip",
+          "size": 1244853,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.2-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/sidewire-v1.0.2-linux-x86_64",
+          "size": 4092328,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.2-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/sidewire-v1.0.2-macos-arm64",
+          "size": 3142336,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.2-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/sidewire-v1.0.2-macos-x86_64",
+          "size": 3583048,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.2-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.2/sidewire-v1.0.2-windows-x86_64.exe",
+          "size": 2754560,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-09-13T12:34:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 17
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.1-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/SideWire-KernelSU-v1.0.1-arm64.zip",
+          "size": 1241177,
+          "downloadCount": 21
+        },
+        {
+          "name": "sidewire-v1.0.1-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/sidewire-v1.0.1-linux-x86_64",
+          "size": 4095384,
+          "downloadCount": 10
+        },
+        {
+          "name": "sidewire-v1.0.1-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/sidewire-v1.0.1-macos-arm64",
+          "size": 3137184,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.1-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/sidewire-v1.0.1-macos-x86_64",
+          "size": 3578848,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.1-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.1/sidewire-v1.0.1-windows-x86_64.exe",
+          "size": 2759168,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-09-12T16:36:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 4
+        },
+        {
+          "name": "SideWire-KernelSU-v1.0.0-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/SideWire-KernelSU-v1.0.0-arm64.zip",
+          "size": 1241063,
+          "downloadCount": 8
+        },
+        {
+          "name": "sidewire-v1.0.0-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/sidewire-v1.0.0-linux-x86_64",
+          "size": 4095408,
+          "downloadCount": 5
+        },
+        {
+          "name": "sidewire-v1.0.0-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/sidewire-v1.0.0-macos-arm64",
+          "size": 3137168,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v1.0.0-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/sidewire-v1.0.0-macos-x86_64",
+          "size": 3578840,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v1.0.0-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v1.0.0/sidewire-v1.0.0-windows-x86_64.exe",
+          "size": 2759168,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v0.9.9",
+      "tagName": "v0.9.9",
+      "publishedAt": "2026-09-09T13:39:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 2
+        },
+        {
+          "name": "SideWire-KernelSU-v0.9.9-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/SideWire-KernelSU-v0.9.9-arm64.zip",
+          "size": 1195903,
+          "downloadCount": 6
+        },
+        {
+          "name": "sidewire-v0.9.9-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/sidewire-v0.9.9-linux-x86_64",
+          "size": 3964512,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v0.9.9-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/sidewire-v0.9.9-macos-arm64",
+          "size": 3020272,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v0.9.9-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/sidewire-v0.9.9-macos-x86_64",
+          "size": 3465640,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v0.9.9-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.9/sidewire-v0.9.9-windows-x86_64.exe",
+          "size": 2678272,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v0.9.8",
+      "tagName": "v0.9.8",
+      "publishedAt": "2026-09-06T13:11:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 5
+        },
+        {
+          "name": "SideWire-KernelSU-v0.9.8-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/SideWire-KernelSU-v0.9.8-arm64.zip",
+          "size": 1195391,
+          "downloadCount": 12
+        },
+        {
+          "name": "sidewire-v0.9.8-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/sidewire-v0.9.8-linux-x86_64",
+          "size": 3964512,
+          "downloadCount": 7
+        },
+        {
+          "name": "sidewire-v0.9.8-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/sidewire-v0.9.8-macos-arm64",
+          "size": 3020256,
+          "downloadCount": 3
+        },
+        {
+          "name": "sidewire-v0.9.8-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/sidewire-v0.9.8-macos-x86_64",
+          "size": 3465640,
+          "downloadCount": 4
+        },
+        {
+          "name": "sidewire-v0.9.8-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.8/sidewire-v0.9.8-windows-x86_64.exe",
+          "size": 2678272,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v0.9.7",
+      "tagName": "v0.9.7",
+      "publishedAt": "2026-09-02T16:49:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/SHA256SUMS",
+          "size": 486,
+          "downloadCount": 1
+        },
+        {
+          "name": "SideWire-KernelSU-v0.9.7-arm64.zip",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/SideWire-KernelSU-v0.9.7-arm64.zip",
+          "size": 1188029,
+          "downloadCount": 4
+        },
+        {
+          "name": "sidewire-v0.9.7-linux-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/sidewire-v0.9.7-linux-x86_64",
+          "size": 3919432,
+          "downloadCount": 2
+        },
+        {
+          "name": "sidewire-v0.9.7-macos-arm64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/sidewire-v0.9.7-macos-arm64",
+          "size": 2977248,
+          "downloadCount": 1
+        },
+        {
+          "name": "sidewire-v0.9.7-macos-x86_64",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/sidewire-v0.9.7-macos-x86_64",
+          "size": 3422432,
+          "downloadCount": 1
+        },
+        {
+          "name": "sidewire-v0.9.7-windows-x86_64.exe",
+          "downloadUrl": "https://github.com/mzggr0914/sidewire/releases/download/v0.9.7/sidewire-v0.9.7-windows-x86_64.exe",
+          "size": 2643456,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

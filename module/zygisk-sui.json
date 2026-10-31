@@ -1,0 +1,197 @@
+{
+  "readme": "# Sui\n\n[🇨🇳中文README](https://github.com/XiaoTong6666/Sui/blob/main/README.zh-CN.md) | [🇯🇵日本語README](https://github.com/XiaoTong6666/Sui/blob/main/README.ja.md)\n\nModern super user interface (SUI) implementation for Android. ~~The name, Sui, also comes from [a character](https://github.com/XiaoTong6666/Sui/issues/1).~~\n\n## Introduction\n\nSui provides Java APIs, namely [Shizuku API](https://github.com/RikkaApps/Shizuku-API), for root / shell apps. It mainly provides two abilities:\n\n1. Use Android Framework APIs directly, almost as if calling system APIs from Java as root or shell.\n2. Start an app-defined AIDL-style Java service under root or shell.\n\nThis makes privileged Android app development much more comfortable.\n\nAnother advantage is that Sui does not add binaries to `PATH` and does not install a standalone manager app. This means we no longer need to spend a huge amount of time fighting apps that detect them.\n\nTo be clear, the full implementation of \"root\" is far more than `su` itself. There is a lot of hard work to be done before it. Sui is not a full root solution. It requires an existing root environment and runs as a Zygisk module.\n\n<details>\n  <summary>Why \"su\" is unfriendly for app development</summary>\n\n`su`, a \"shell\" running as root, is too far from the Android world.\n\nTo explain this, we need to briefly talk about how system APIs work. For example, we can use `PackageManager#getInstalledApplications` to get the app list. This is actually an inter-process communication (IPC) process between the app process and the system_server process. The Android Framework just hides the details for us.\n\nAndroid uses `Binder` for this type of IPC. `Binder` allows the server side to learn the uid and pid of the client side, so system_server can check whether the app has permission to perform the operation.\n\nBack to `su`. In a `su` environment, we usually only have commands provided by the Android system. In the same example, to get the app list with `su`, we have to run `pm list`. This is painful:\n\n1. **Text-based output**: there is no structured data like `PackageInfo` in Java. You have to parse text.\n2. **Slow**: running a command means at least one new process is started, and `PackageManager#getInstalledApplications` is still called inside `pm list`.\n3. **Limited ability**: commands only cover a small part of Android APIs.\n\nAlthough it is possible to use Java APIs as root with `app_process` through libraries such as libsu or librootjava, transferring Binder objects between the app process and the root process is painful. If you want the root process to run as a daemon, once the app process restarts, there is no cheap way to get the Binder of the root process again.\n\nIn fact, for Magisk and other root solutions, making `su` work is not as easy as some people think. Both `su` itself and the communication between `su` and the manager app involve a lot of unpleasant work behind the scenes.\n\n</details>\n\n## User guide\n\nNote: the behavior of existing apps that only support `su` will NOT change.\n\n### Install\n\nYou can install Sui directly in KernelSU or another compatible root manager such as Magisk or APatch. Or download the zip from [release](https://github.com/XiaoTong6666/Sui/releases) and use **Install from storage** in your root manager.\n\nSui requires a compatible root environment. On Magisk, this means Magisk 24.0+ with Zygisk enabled. On KernelSU or APatch, it additionally requires a separate Zygisk implementation such as [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext), [ReZygisk](https://github.com/PerformanC/ReZygisk), or [NeoZygisk](https://github.com/JingMatrix/NeoZygisk). Do not add SystemUI or Settings to Zygisk DenyList, otherwise the injected management UI may not work properly.\n\n### Management UI\n\n* Long press the **System Settings** icon on the home screen to see the Sui shortcut\n* In the Sui management interface, tap the menu button in the top-right corner and select **Add shortcut to home screen**\n* Enter `*#*#784784#*#*` in the default dialer app\n* Open the Sui management interface via the **Action** button in KernelSU/Magisk manager\n\n> **Note:** On some systems, the Sui shortcut may not appear when long-pressing Settings.     \n> Additionally, to avoid disturbing users, newer versions have **removed** the feature that automatically prompts to add a shortcut when entering **Developer options**.\n\n### Permission modes\n\nSui stores permission states by UID. The main modes are:\n\n* **Ask / default**: the app can connect to Sui and request permission through the normal flow.\n* **Allow root**: the app will be routed to the root backend.\n* **Allow shell**: the app will be routed to the shell backend.\n* **Deny**: deny the app from using Sui.\n* **Hide**: hide Sui from the target app. When Hide is enabled, the target app UID is intercepted in the Native Binder `execTransact` stage. Its Sui bridge transaction is swallowed before it can enter BridgeService and obtain the Sui Binder.\n\nWhen the permission state changes, Sui may force-stop affected apps to cut off old Binder handles and make them obtain the correct backend on the next launch.\n\n### Interactive shell\n\nSui provides an interactive shell.\n\nSince Sui does not add files to `PATH`, the required files need to be copied manually. See `/data/adb/sui/post-install.example.sh` to learn how to do this automatically.\n\nAfter the files are correctly copied, use `rish` as `sh` to start an interactive shell.\n\n### adb root\n\nSui also provides optional `adb root` support. When enabled, Sui sets up an `adbd` wrapper plus preload hook so that `adbd` can run under the current root implementation's SELinux domain while keeping the expected `adbd` socket label.\n\nThis feature is disabled by default. Enable it by creating one of the following marker files from a root shell, then reboot so Sui can apply the setup during `post-fs-data`:\n\n* Enable for the next boot only:\n\n  ```sh\n  touch /data/adb/sui/enable_adb_root_once\n  ```\n\n* Enable persistently for every boot:\n\n  ```sh\n  touch /data/adb/sui/enable_adb_root\n  ```\n\nAfter reboot, use `adb root` normally.\n\nTo disable the persistent mode again:\n\n```sh\nrm /data/adb/sui/enable_adb_root\n```\n> This feature depends on your root implementation and SELinux policy. Sui checks the required `setcurrent`, `dyntransition`, and `setsockcreate` permissions before enabling it.\n> Existing app behavior does not change. This only affects the device `adbd` path.\n> If your device uses a heavily customized `adbd` implementation, compatibility may vary.\n\n## Application development guide\n\nSui app development should still primarily follow the upstream Shizuku API documentation:\n\n[https://github.com/RikkaApps/Shizuku-API](https://github.com/RikkaApps/Shizuku-API)\n\nApps are recommended to use `rikka.shizuku.Shizuku` as the unified compatibility layer. Do not maintain a Sui-only code path. In this way, one wrapper can support both Shizuku and Sui.\n\nIn the normal integration pattern, you only need `ShizukuProvider` plus the regular Shizuku API flow. `ShizukuProvider` already attempts Sui initialization automatically, so app code usually does not need to import or call `rikka.sui.Sui` directly.\n\nIf you intentionally disable `ShizukuProvider`'s automatic Sui initialization, you can still call `Sui.init(packageName)` manually inside your wrapper. If it receives a Binder, it passes it to the Shizuku API layer; if not, the app can continue with the normal Shizuku flow.\n\nExample pattern with the normal auto-initialization flow:\n\n```kotlin\nimport android.content.pm.PackageManager\nimport android.content.pm.IPackageManager\nimport rikka.shizuku.Shizuku\nimport rikka.shizuku.ShizukuBinderWrapper\nimport rikka.shizuku.SystemServiceHelper\n\nfun initPrivilegedApi() {\n    Shizuku.addBinderReceivedListener {\n        checkShizukuPermission()\n    }\n\n    if (Shizuku.pingBinder()) {\n        checkShizukuPermission()\n    }\n}\n\nfun checkShizukuPermission() {\n    if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {\n        val binder = SystemServiceHelper.getSystemService(\"package\")\n            ?: return\n\n        val pm = IPackageManager.Stub.asInterface(\n            ShizukuBinderWrapper(binder)\n        )\n\n        pm.isPackageAvailable(\"android\", 0)\n    } else {\n        Shizuku.requestPermission(0)\n    }\n}\n```\n\nIf you want manual initialization instead, add `import rikka.sui.Sui` and call `Sui.init(packageName)` before waiting for the binder.\n\nCommon APIs include:\n\n* `Shizuku.pingBinder()`\n* `Shizuku.checkSelfPermission()`\n* `Shizuku.requestPermission(requestCode)`\n* `Shizuku.getUid()`, which can be used to check the current backend identity, for example `0` for root and `2000` for shell\n* `SystemServiceHelper.getSystemService(name)`\n* `ShizukuBinderWrapper`, used to wrap Android Framework service binders\n* `bindUserService()`, used to start an app-defined Java service running as root or shell\n\n## Build\n\n> **Note:** Clone the repository with submodules, otherwise required API projects will be missing.\n\n```bash\ngit clone --recurse-submodules https://github.com/XiaoTong6666/Sui.git\n```\n\nGradle tasks:\n\n`BuildType` could be `Debug` or `Release`.\n\n* `:module:assemble<BuildType>`\n\n  Build the module. After assemble finishes, the flashable module zip will be generated to `out`.\n\n* `:module:zip<BuildType>`\n\n  Generate the flashable module zip to `out`.\n\n* `:module:push<BuildType>`\n\n  Push the zip with adb to `/data/local/tmp`.\n\n* `:module:flash<BuildType>`\n\n  Install the zip with `adb shell su -c magisk --install-module`.\n\n* `:module:flashWithKsud<BuildType>`\n\n  Install the zip with `adb shell su -c ksud module install`.\n\n* `:module:flashAndReboot<BuildType>`\n\n  Install the zip and reboot the device.\n\n* `:module:flashWithKsudAndReboot<BuildType>`\n\n  Install the zip with ksud and reboot the device.\n\nFor example:\n\n```bash\n./gradlew :module:assembleRelease\n./gradlew :module:zipRelease\n./gradlew :module:flashRelease\n```\n\n## Troubleshooting\n\n### Capture Sui logs\n\n```sh\nadb logcat -v time | grep -i sui\n```\n\n### How to report problems\n\nIf you need to report a problem, please provide logs reproduced on a **debug** build.\n\n- Install or flash a **debug** build of Sui and reproduce the issue.\n- If you use **KernelSU** or **APatch**, export logs from the root manager first. These logs are usually more complete for module mounting, Zygisk injection, SELinux, and early boot/runtime issues.\n- Also [capture Sui logs](#capture-sui-logs).\n- Include basic environment information:\n  - root implementation and version\n  - Zygisk implementation and version\n  - Android version / ROM\n  - whether `SystemUI` or `Settings` is in DenyList\n  - exact reproduction steps\n\nIf the issue cannot be reproduced on the debug build and only happens on release builds, include a short description of the release-only behavior and the exact reproduction steps.\n\n### Cannot access the Sui management interface\n\n- Your root environment is supported (Magisk with Zygisk enabled, or KernelSU/APatch with a compatible Zygisk implementation).\n- `SystemUI` and `Settings` are **not** included in the Zygisk DenyList.\n- The device has been rebooted after installing or updating Sui.\n\n### Optional features do not work as expected\n\n- Reboot once after changing Sui module files or marker files.\n- If needed, export logs from KernelSU / APatch and [capture Sui logs](#capture-sui-logs).\n- If needed, also inspect the files under `/data/adb/sui/` to confirm marker files and generated artifacts are present.\n\n## Internals\n\nSui requires [Zygisk](https://github.com/topjohnwu/zygisk-module-sample). Zygisk allows us to inject into system_server, SystemUI, Settings and related app processes.\n\nOverall, there are five main parts, and an optional `adb root` path:\n\n* **Root process**\n\n  This is a root process started by the root implementation during the post-fs-data stage. It starts a Java server that implements Shizuku API and private APIs used by other parts.\n\n  The root server is the main source of permission configuration. It maintains the UID permission database and syncs hidden, root allowed, shell allowed, denied and default mode states to system_server.\n\n* **Shell process**\n\n  The shell server runs as shell and serves apps granted with shell permission.\n\n  It loads UID permission states from the configuration file mirrored by the root server. When the shell backend needs to show a permission confirmation window, it delegates the request to the root server, which then triggers the SystemUI confirmation UI.\n\n* **SystemServer inject**\n\n  * Hooks `Binder#execTransact` to intercept the dedicated Binder transaction used by Sui inside `system_server`\n  * Keeps the root binder, shell binder, and permission caches for hidden/root allowed/shell allowed/denied/default mode\n  * Chooses which backend Binder to return based on the UID's effective permission: root gets the root binder, shell gets the shell binder\n  * For hidden UIDs, blocks the Sui bridge request directly; for ask/deny, still returns the root binder so the client can continue through the normal permission or denial result flow\n\n* **SystemUI inject**\n\n  * Opens the Sui APK fd from Sui service and loads Sui `Resources` plus the permission dialog class\n  * Attaches to the service and shows permission confirmation dialogs on callback\n  * Registers secret-code style entry points and, when triggered, launches the Sui management UI hosted in the Settings process\n\n* **Settings inject**\n\n  * Opens the Sui APK fd from Sui service and loads Sui `Resources` plus `SuiActivity`\n  * Replaces `ActivityThread` instrumentation during Settings process startup\n  * Maintains dynamic/pinned shortcuts and handles pinned-shortcut requests relayed from SystemUI\n  * When the target `Activity` intent carries the Sui extra and token, instantiates and displays `SuiActivity` instead\n\n* **adbd wrapper / preload (optional)**\n\n  * During `post-fs-data`, when `adb root` support is enabled, Sui prepares an `adbd` wrapper and preload library for `/apex/com.android.adbd/bin/adbd` or `/system/bin/adbd`\n  * The wrapper rewrites `--root_seclabel=...` to the current root implementation's SELinux domain and injects `LD_PRELOAD`\n  * The preload hook intercepts `selinux_android_setcon()` / `setcon()` so `adbd` can switch into the root domain while restoring `sockcreate` to the expected `adbd` label\n\n## License\n\nSui is licensed under GPL-3.0-or-later.\n",
+  "readmeHTML": "<h1>Sui</h1>\n\n<p><a href=\"https://github.com/XiaoTong6666/Sui/blob/main/README.zh-CN.md\">🇨🇳中文README</a> | <a href=\"https://github.com/XiaoTong6666/Sui/blob/main/README.ja.md\">🇯🇵日本語README</a></p>\n\n<p>Modern super user interface (SUI) implementation for Android. ~~The name, Sui, also comes from <a href=\"https://github.com/XiaoTong6666/Sui/issues/1\">a character</a>.~~</p>\n\n<h2>Introduction</h2>\n\n<p>Sui provides Java APIs, namely <a href=\"https://github.com/RikkaApps/Shizuku-API\">Shizuku API</a>, for root / shell apps. It mainly provides two abilities:</p>\n\n<li>Use Android Framework APIs directly, almost as if calling system APIs from Java as root or shell.</li>\n<li>Start an app-defined AIDL-style Java service under root or shell.</li>\n\n<p>This makes privileged Android app development much more comfortable.</p>\n\n<p>Another advantage is that Sui does not add binaries to <code>PATH</code> and does not install a standalone manager app. This means we no longer need to spend a huge amount of time fighting apps that detect them.</p>\n\n<p>To be clear, the full implementation of \"root\" is far more than <code>su</code> itself. There is a lot of hard work to be done before it. Sui is not a full root solution. It requires an existing root environment and runs as a Zygisk module.</p>\n\n<p><details></p>\n<p>  <summary>Why \"su\" is unfriendly for app development</summary></p>\n\n<p><code>su</code>, a \"shell\" running as root, is too far from the Android world.</p>\n\n<p>To explain this, we need to briefly talk about how system APIs work. For example, we can use <code>PackageManager#getInstalledApplications</code> to get the app list. This is actually an inter-process communication (IPC) process between the app process and the system_server process. The Android Framework just hides the details for us.</p>\n\n<p>Android uses <code>Binder</code> for this type of IPC. <code>Binder</code> allows the server side to learn the uid and pid of the client side, so system_server can check whether the app has permission to perform the operation.</p>\n\n<p>Back to <code>su</code>. In a <code>su</code> environment, we usually only have commands provided by the Android system. In the same example, to get the app list with <code>su</code>, we have to run <code>pm list</code>. This is painful:</p>\n\n<li>**Text-based output**: there is no structured data like `PackageInfo` in Java. You have to parse text.</li>\n<li>**Slow**: running a command means at least one new process is started, and `PackageManager#getInstalledApplications` is still called inside `pm list`.</li>\n<li>**Limited ability**: commands only cover a small part of Android APIs.</li>\n\n<p>Although it is possible to use Java APIs as root with <code>app_process</code> through libraries such as libsu or librootjava, transferring Binder objects between the app process and the root process is painful. If you want the root process to run as a daemon, once the app process restarts, there is no cheap way to get the Binder of the root process again.</p>\n\n<p>In fact, for Magisk and other root solutions, making <code>su</code> work is not as easy as some people think. Both <code>su</code> itself and the communication between <code>su</code> and the manager app involve a lot of unpleasant work behind the scenes.</p>\n\n<p></details></p>\n\n<h2>User guide</h2>\n\n<p>Note: the behavior of existing apps that only support <code>su</code> will NOT change.</p>\n\n<h3>Install</h3>\n\n<p>You can install Sui directly in KernelSU or another compatible root manager such as Magisk or APatch. Or download the zip from <a href=\"https://github.com/XiaoTong6666/Sui/releases\">release</a> and use <b>Install from storage</b> in your root manager.</p>\n\n<p>Sui requires a compatible root environment. On Magisk, this means Magisk 24.0+ with Zygisk enabled. On KernelSU or APatch, it additionally requires a separate Zygisk implementation such as <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a>, <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a>, or <a href=\"https://github.com/JingMatrix/NeoZygisk\">NeoZygisk</a>. Do not add SystemUI or Settings to Zygisk DenyList, otherwise the injected management UI may not work properly.</p>\n\n<h3>Management UI</h3>\n\n<li>Long press the **System Settings** icon on the home screen to see the Sui shortcut</li>\n<li>In the Sui management interface, tap the menu button in the top-right corner and select **Add shortcut to home screen**</li>\n<li>Enter `*#*#784784#*#*` in the default dialer app</li>\n<li>Open the Sui management interface via the **Action** button in KernelSU/Magisk manager</li>\n\n<p>> <b>Note:</b> On some systems, the Sui shortcut may not appear when long-pressing Settings.</p>\n<p>> Additionally, to avoid disturbing users, newer versions have <b>removed</b> the feature that automatically prompts to add a shortcut when entering <b>Developer options</b>.</p>\n\n<h3>Permission modes</h3>\n\n<p>Sui stores permission states by UID. The main modes are:</p>\n\n<li>**Ask / default**: the app can connect to Sui and request permission through the normal flow.</li>\n<li>**Allow root**: the app will be routed to the root backend.</li>\n<li>**Allow shell**: the app will be routed to the shell backend.</li>\n<li>**Deny**: deny the app from using Sui.</li>\n<li>**Hide**: hide Sui from the target app. When Hide is enabled, the target app UID is intercepted in the Native Binder `execTransact` stage. Its Sui bridge transaction is swallowed before it can enter BridgeService and obtain the Sui Binder.</li>\n\n<p>When the permission state changes, Sui may force-stop affected apps to cut off old Binder handles and make them obtain the correct backend on the next launch.</p>\n\n<h3>Interactive shell</h3>\n\n<p>Sui provides an interactive shell.</p>\n\n<p>Since Sui does not add files to <code>PATH</code>, the required files need to be copied manually. See <code>/data/adb/sui/post-install.example.sh</code> to learn how to do this automatically.</p>\n\n<p>After the files are correctly copied, use <code>rish</code> as <code>sh</code> to start an interactive shell.</p>\n\n<h3>adb root</h3>\n\n<p>Sui also provides optional <code>adb root</code> support. When enabled, Sui sets up an <code>adbd</code> wrapper plus preload hook so that <code>adbd</code> can run under the current root implementation's SELinux domain while keeping the expected <code>adbd</code> socket label.</p>\n\n<p>This feature is disabled by default. Enable it by creating one of the following marker files from a root shell, then reboot so Sui can apply the setup during <code>post-fs-data</code>:</p>\n\n<li>Enable for the next boot only:</li>\n\n<p>  ```sh</p>\n<p>  touch /data/adb/sui/enable_adb_root_once</p>\n<p>  ```</p>\n\n<li>Enable persistently for every boot:</li>\n\n<p>  ```sh</p>\n<p>  touch /data/adb/sui/enable_adb_root</p>\n<p>  ```</p>\n\n<p>After reboot, use <code>adb root</code> normally.</p>\n\n<p>To disable the persistent mode again:</p>\n\n<pre>rm /data/adb/sui/enable_adb_root</pre>\n<p>> This feature depends on your root implementation and SELinux policy. Sui checks the required <code>setcurrent</code>, <code>dyntransition</code>, and <code>setsockcreate</code> permissions before enabling it.</p>\n<p>> Existing app behavior does not change. This only affects the device <code>adbd</code> path.</p>\n<p>> If your device uses a heavily customized <code>adbd</code> implementation, compatibility may vary.</p>\n\n<h2>Application development guide</h2>\n\n<p>Sui app development should still primarily follow the upstream Shizuku API documentation:</p>\n\n<p><a href=\"https://github.com/RikkaApps/Shizuku-API\">https://github.com/RikkaApps/Shizuku-API</a></p>\n\n<p>Apps are recommended to use <code>rikka.shizuku.Shizuku</code> as the unified compatibility layer. Do not maintain a Sui-only code path. In this way, one wrapper can support both Shizuku and Sui.</p>\n\n<p>In the normal integration pattern, you only need <code>ShizukuProvider</code> plus the regular Shizuku API flow. <code>ShizukuProvider</code> already attempts Sui initialization automatically, so app code usually does not need to import or call <code>rikka.sui.Sui</code> directly.</p>\n\n<p>If you intentionally disable <code>ShizukuProvider</code>'s automatic Sui initialization, you can still call <code>Sui.init(packageName)</code> manually inside your wrapper. If it receives a Binder, it passes it to the Shizuku API layer; if not, the app can continue with the normal Shizuku flow.</p>\n\n<p>Example pattern with the normal auto-initialization flow:</p>\n\n<pre>import android.content.pm.PackageManager\nimport android.content.pm.IPackageManager\nimport rikka.shizuku.Shizuku\nimport rikka.shizuku.ShizukuBinderWrapper\nimport rikka.shizuku.SystemServiceHelper\n\nfun initPrivilegedApi() {\n    Shizuku.addBinderReceivedListener {\n        checkShizukuPermission()\n    }\n\n    if (Shizuku.pingBinder()) {\n        checkShizukuPermission()\n    }\n}\n\nfun checkShizukuPermission() {\n    if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {\n        val binder = SystemServiceHelper.getSystemService(\"package\")\n            ?: return\n\n        val pm = IPackageManager.Stub.asInterface(\n            ShizukuBinderWrapper(binder)\n        )\n\n        pm.isPackageAvailable(\"android\", 0)\n    } else {\n        Shizuku.requestPermission(0)\n    }\n}</pre>\n\n<p>If you want manual initialization instead, add <code>import rikka.sui.Sui</code> and call <code>Sui.init(packageName)</code> before waiting for the binder.</p>\n\n<p>Common APIs include:</p>\n\n<li>`Shizuku.pingBinder()`</li>\n<li>`Shizuku.checkSelfPermission()`</li>\n<li>`Shizuku.requestPermission(requestCode)`</li>\n<li>`Shizuku.getUid()`, which can be used to check the current backend identity, for example `0` for root and `2000` for shell</li>\n<li>`SystemServiceHelper.getSystemService(name)`</li>\n<li>`ShizukuBinderWrapper`, used to wrap Android Framework service binders</li>\n<li>`bindUserService()`, used to start an app-defined Java service running as root or shell</li>\n\n<h2>Build</h2>\n\n<p>> <b>Note:</b> Clone the repository with submodules, otherwise required API projects will be missing.</p>\n\n<pre>git clone --recurse-submodules https://github.com/XiaoTong6666/Sui.git</pre>\n\n<p>Gradle tasks:</p>\n\n<p><code>BuildType</code> could be <code>Debug</code> or <code>Release</code>.</p>\n\n<li>`:module:assemble<BuildType>`</li>\n\n<p>  Build the module. After assemble finishes, the flashable module zip will be generated to <code>out</code>.</p>\n\n<li>`:module:zip<BuildType>`</li>\n\n<p>  Generate the flashable module zip to <code>out</code>.</p>\n\n<li>`:module:push<BuildType>`</li>\n\n<p>  Push the zip with adb to <code>/data/local/tmp</code>.</p>\n\n<li>`:module:flash<BuildType>`</li>\n\n<p>  Install the zip with <code>adb shell su -c magisk --install-module</code>.</p>\n\n<li>`:module:flashWithKsud<BuildType>`</li>\n\n<p>  Install the zip with <code>adb shell su -c ksud module install</code>.</p>\n\n<li>`:module:flashAndReboot<BuildType>`</li>\n\n<p>  Install the zip and reboot the device.</p>\n\n<li>`:module:flashWithKsudAndReboot<BuildType>`</li>\n\n<p>  Install the zip with ksud and reboot the device.</p>\n\n<p>For example:</p>\n\n<pre>./gradlew :module:assembleRelease\n./gradlew :module:zipRelease\n./gradlew :module:flashRelease</pre>\n\n<h2>Troubleshooting</h2>\n\n<h3>Capture Sui logs</h3>\n\n<pre>adb logcat -v time | grep -i sui</pre>\n\n<h3>How to report problems</h3>\n\n<p>If you need to report a problem, please provide logs reproduced on a <b>debug</b> build.</p>\n\n<li>Install or flash a **debug** build of Sui and reproduce the issue.</li>\n<li>If you use **KernelSU** or **APatch**, export logs from the root manager first. These logs are usually more complete for module mounting, Zygisk injection, SELinux, and early boot/runtime issues.</li>\n<li>Also [capture Sui logs](#capture-sui-logs).</li>\n<li>Include basic environment information:</li>\n<p>  - root implementation and version</p>\n<p>  - Zygisk implementation and version</p>\n<p>  - Android version / ROM</p>\n<p>  - whether <code>SystemUI</code> or <code>Settings</code> is in DenyList</p>\n<p>  - exact reproduction steps</p>\n\n<p>If the issue cannot be reproduced on the debug build and only happens on release builds, include a short description of the release-only behavior and the exact reproduction steps.</p>\n\n<h3>Cannot access the Sui management interface</h3>\n\n<li>Your root environment is supported (Magisk with Zygisk enabled, or KernelSU/APatch with a compatible Zygisk implementation).</li>\n<li>`SystemUI` and `Settings` are **not** included in the Zygisk DenyList.</li>\n<li>The device has been rebooted after installing or updating Sui.</li>\n\n<h3>Optional features do not work as expected</h3>\n\n<li>Reboot once after changing Sui module files or marker files.</li>\n<li>If needed, export logs from KernelSU / APatch and [capture Sui logs](#capture-sui-logs).</li>\n<li>If needed, also inspect the files under `/data/adb/sui/` to confirm marker files and generated artifacts are present.</li>\n\n<h2>Internals</h2>\n\n<p>Sui requires <a href=\"https://github.com/topjohnwu/zygisk-module-sample\">Zygisk</a>. Zygisk allows us to inject into system_server, SystemUI, Settings and related app processes.</p>\n\n<p>Overall, there are five main parts, and an optional <code>adb root</code> path:</p>\n\n<li>**Root process**</li>\n\n<p>  This is a root process started by the root implementation during the post-fs-data stage. It starts a Java server that implements Shizuku API and private APIs used by other parts.</p>\n\n<p>  The root server is the main source of permission configuration. It maintains the UID permission database and syncs hidden, root allowed, shell allowed, denied and default mode states to system_server.</p>\n\n<li>**Shell process**</li>\n\n<p>  The shell server runs as shell and serves apps granted with shell permission.</p>\n\n<p>  It loads UID permission states from the configuration file mirrored by the root server. When the shell backend needs to show a permission confirmation window, it delegates the request to the root server, which then triggers the SystemUI confirmation UI.</p>\n\n<li>**SystemServer inject**</li>\n\n<p>  * Hooks <code>Binder#execTransact</code> to intercept the dedicated Binder transaction used by Sui inside <code>system_server</code></p>\n<p>  * Keeps the root binder, shell binder, and permission caches for hidden/root allowed/shell allowed/denied/default mode</p>\n<p>  * Chooses which backend Binder to return based on the UID's effective permission: root gets the root binder, shell gets the shell binder</p>\n<p>  * For hidden UIDs, blocks the Sui bridge request directly; for ask/deny, still returns the root binder so the client can continue through the normal permission or denial result flow</p>\n\n<li>**SystemUI inject**</li>\n\n<p>  * Opens the Sui APK fd from Sui service and loads Sui <code>Resources</code> plus the permission dialog class</p>\n<p>  * Attaches to the service and shows permission confirmation dialogs on callback</p>\n<p>  * Registers secret-code style entry points and, when triggered, launches the Sui management UI hosted in the Settings process</p>\n\n<li>**Settings inject**</li>\n\n<p>  * Opens the Sui APK fd from Sui service and loads Sui <code>Resources</code> plus <code>SuiActivity</code></p>\n<p>  * Replaces <code>ActivityThread</code> instrumentation during Settings process startup</p>\n<p>  * Maintains dynamic/pinned shortcuts and handles pinned-shortcut requests relayed from SystemUI</p>\n<p>  * When the target <code>Activity</code> intent carries the Sui extra and token, instantiates and displays <code>SuiActivity</code> instead</p>\n\n<li>**adbd wrapper / preload (optional)**</li>\n\n<p>  * During <code>post-fs-data</code>, when <code>adb root</code> support is enabled, Sui prepares an <code>adbd</code> wrapper and preload library for <code>/apex/com.android.adbd/bin/adbd</code> or <code>/system/bin/adbd</code></p>\n<p>  * The wrapper rewrites <code>--root_seclabel=...</code> to the current root implementation's SELinux domain and injects <code>LD_PRELOAD</code></p>\n<p>  * The preload hook intercepts <code>selinux_android_setcon()</code> / <code>setcon()</code> so <code>adbd</code> can switch into the root domain while restoring <code>sockcreate</code> to the expected <code>adbd</code> label</p>\n\n<h2>License</h2>\n\n<p>Sui is licensed under GPL-3.0-or-later.</p>",
+  "homepageUrl": "https://github.com/XiaoTong6666/zygisk-sui",
+  "sourceUrl": "https://github.com/XiaoTong6666/zygisk-sui",
+  "url": "https://github.com/XiaoTong6666/zygisk-sui",
+  "latestRelease": {
+    "name": "v573-cab27cf",
+    "version": "v573-cab27cf",
+    "time": "2026-10-30T05:23:47Z",
+    "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v573-cab27cf/Sui-v13.5.4.3_573-cab27cf-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v573-cab27cf",
+      "tagName": "v573-cab27cf",
+      "publishedAt": "2026-10-30T05:23:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_573-cab27cf-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v573-cab27cf/Sui-v13.5.4.3_573-cab27cf-release.zip",
+          "size": 1452813,
+          "downloadCount": 197
+        }
+      ]
+    },
+    {
+      "name": "v572-201b29a",
+      "tagName": "v572-201b29a",
+      "publishedAt": "2026-10-27T06:00:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_572-201b29a-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v572-201b29a/Sui-v13.5.4.3_572-201b29a-release.zip",
+          "size": 1457158,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v571-af5447f",
+      "tagName": "v571-af5447f",
+      "publishedAt": "2026-10-25T10:25:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_571-af5447f-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v571-af5447f/Sui-v13.5.4.3_571-af5447f-release.zip",
+          "size": 1456818,
+          "downloadCount": 377
+        }
+      ]
+    },
+    {
+      "name": "v570-f81d431",
+      "tagName": "v570-f81d431",
+      "publishedAt": "2026-10-25T10:13:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_570-f81d431-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v570-f81d431/Sui-v13.5.4.3_570-f81d431-release.zip",
+          "size": 1454707,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v569-8d2392a",
+      "tagName": "v569-8d2392a",
+      "publishedAt": "2026-10-22T08:52:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_569-8d2392a-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v569-8d2392a/Sui-v13.5.4.3_569-8d2392a-release.zip",
+          "size": 1454699,
+          "downloadCount": 499
+        }
+      ]
+    },
+    {
+      "name": "v568-d92eb95",
+      "tagName": "v568-d92eb95",
+      "publishedAt": "2026-10-19T06:33:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_568-d92eb95-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v568-d92eb95/Sui-v13.5.4.3_568-d92eb95-release.zip",
+          "size": 1438623,
+          "downloadCount": 565
+        }
+      ]
+    },
+    {
+      "name": "v567-ff78053",
+      "tagName": "v567-ff78053",
+      "publishedAt": "2026-10-17T14:23:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_567-ff78053-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v567-ff78053/Sui-v13.5.4.3_567-ff78053-release.zip",
+          "size": 1435612,
+          "downloadCount": 321
+        }
+      ]
+    },
+    {
+      "name": "v566-099cb89",
+      "tagName": "v566-099cb89",
+      "publishedAt": "2026-10-16T03:30:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_566-099cb89-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v566-099cb89/Sui-v13.5.4.3_566-099cb89-release.zip",
+          "size": 1435616,
+          "downloadCount": 271
+        }
+      ]
+    },
+    {
+      "name": "v565-241084a",
+      "tagName": "v565-241084a",
+      "publishedAt": "2026-10-16T02:57:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_565-241084a-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v565-241084a/Sui-v13.5.4.3_565-241084a-release.zip",
+          "size": 1436026,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v564-e967423",
+      "tagName": "v564-e967423",
+      "publishedAt": "2026-10-15T08:55:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_564-e967423-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v564-e967423/Sui-v13.5.4.3_564-e967423-release.zip",
+          "size": 1364750,
+          "downloadCount": 171
+        }
+      ]
+    },
+    {
+      "name": "v563-a82856c",
+      "tagName": "v563-a82856c",
+      "publishedAt": "2026-10-15T05:12:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_563-a82856c-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v563-a82856c/Sui-v13.5.4.3_563-a82856c-release.zip",
+          "size": 1364551,
+          "downloadCount": 45
+        }
+      ]
+    },
+    {
+      "name": "v562-b033d81",
+      "tagName": "v562-b033d81",
+      "publishedAt": "2026-10-13T09:18:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_562-b033d81-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v562-b033d81/Sui-v13.5.4.3_562-b033d81-release.zip",
+          "size": 1360195,
+          "downloadCount": 204
+        }
+      ]
+    },
+    {
+      "name": "v561-ff124fb",
+      "tagName": "v561-ff124fb",
+      "publishedAt": "2026-10-12T14:35:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sui-v13.5.4.3_561-ff124fb-release.zip",
+          "downloadUrl": "https://github.com/XiaoTong6666/zygisk-sui/releases/download/v561-ff124fb/Sui-v13.5.4.3_561-ff124fb-release.zip",
+          "size": 1360191,
+          "downloadCount": 83
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+{
+  "readme": "# Pixel 9 Series Supercharger\n\n<p align=\"center\">\n<a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest\">\n<img src=\"https://img.shields.io/github/v/release/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=Release&color=34A853\" alt=\"Latest release\">\n</a>\n<a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases\">\n<img src=\"https://img.shields.io/github/downloads/Drizzy07x/Supercharger_Pixel_9_Series/total?style=for-the-badge&label=Downloads&color=4285F4\" alt=\"Total downloads\">\n</a>\n<a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/stargazers\">\n<img src=\"https://img.shields.io/github/stars/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=Stars&color=F29900\" alt=\"Stars\">\n</a>\n<a href=\"LICENSE\">\n<img src=\"https://img.shields.io/github/license/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=License&color=EA4335\" alt=\"License\">\n</a>\n</p>\n\n<p align=\"center\">\n<img src=\"https://img.shields.io/badge/Device-Pixel%209%20Series-4285F4?style=flat-square&logo=google&logoColor=white\" alt=\"Device\">\n<img src=\"https://img.shields.io/badge/SoC-Tensor%20G4-F29900?style=flat-square\" alt=\"SoC\">\n<img src=\"https://img.shields.io/badge/Android-16%20QPR3%2B%20%26%2017-3DDC84?style=flat-square&logo=android&logoColor=white\" alt=\"Android\">\n<img src=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-EA4335?style=flat-square\" alt=\"Root\">\n<img src=\"https://img.shields.io/badge/Channel-Stable-101c30?style=flat-square\" alt=\"Channel\">\n</p>\n\n**Pixel 9 Series Supercharger** is a systemless performance, thermal, and maintenance module for the **Pixel 9 series on Tensor G4**.\n\nThe goal is simple: improve daily smoothness and responsiveness without turning the device into a reckless benchmark profile. Every change is applied best-effort, logged, and reversible from a WebUI dashboard.\n\n<p align=\"center\">\n<a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest\"><b>Download the latest release &rarr;</b></a>\n</p>\n\n<p align=\"center\">\n<img src=\"docs/images/webui-overview.png\" alt=\"Supercharger WebUI dashboard showing module status, device information, and system health\" width=\"820\">\n</p>\n\n---\n\n## Why This Module\n\n- **Conservative by design.** No forced clocks in the stable profile, no thermal bypass, no charging override. If the kernel rejects a write, the setting is left unchanged instead of forced.\n- **Everything is inspectable.** Boot tuning and dashboard actions are both logged, and a one-tap support snapshot collects the state needed to diagnose a problem.\n- **Thermal Control is opt-in.** The thermal overlay is off after installation. You enable it yourself, once the phone has booted normally.\n- **A real dashboard.** Profiles, thermal mode, maintenance, app optimization, and logs are all driven from the WebUI, not from hidden background behavior.\n\n---\n\n## Supported Devices\n\nThe installer verifies `ro.product.device` and aborts on anything else.\n\n| Device           | Codename |\n| ---------------- | -------- |\n| Pixel 9          | `tokay`  |\n| Pixel 9 Pro      | `caiman` |\n| Pixel 9 Pro XL   | `komodo` |\n| Pixel 9 Pro Fold | `comet`  |\n\nTuning targets the Tensor G4 platform rather than a single model, and every write is best-effort with a safe fallback. Devices outside the Pixel 9 series are not a target of this project.\n\n### Requirements\n\n- Android 16 QPR3+ or Android 17\n- An unlocked bootloader with Magisk, KernelSU, or APatch installed\n- Magisk 30.7 or newer when installing with Magisk (`minMagisk` 30700). Do not treat Magisk 31.0 as the floor until an official APK exists\n- A root manager with WebUI support, to reach the dashboard\n- On KernelSU / APatch 3.x, Integrated Thermal Control is a no-op unless a metamodule provides overlay/mount capability (`meta-overlayfs` and/or `meta-magicmount`). Supercharger does not ship a metamodule\n\n---\n\n## Installation\n\n1. Download the latest `Pixel-9-Series-Supercharger-*.zip` from the [releases page](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest).\n2. Optionally verify it against the published `.sha256` file.\n3. Flash the ZIP from your root manager:\n   - **Magisk** — *Modules* &rarr; *Install from storage* &rarr; select the ZIP\n   - **KernelSU / APatch** — *Modules* &rarr; *Install* &rarr; select the ZIP\n4. Reboot.\n5. Open your root manager, find **Pixel 9 Series Supercharger**, and open its **WebUI** to reach the dashboard.\n\nThermal Control stays off until you enable it. Once the phone has booted normally, open *Profiles* &rarr; *Integrated Thermal Control* &rarr; **Enable Thermal Control**, then reboot again before judging behavior. On KernelSU / APatch 3.x the overlay is still a no-op unless a metamodule such as `meta-overlayfs` or `meta-magicmount` is already providing overlay/mount capability. Supercharger does not install that metamodule.\n\n### Updating\n\nThe module publishes an update feed as a release asset, so Magisk, KernelSU, and APatch offer new versions in-app. You can also flash a newer ZIP over the installed module. Your selected performance profile and thermal profile survive the update.\n\n### Uninstalling\n\nRemove the module from your root manager and reboot. Uninstall stops the dashboard updater, clears persistent state under `/data/adb/supercharger_state`, and removes only the thermal request this module created, leaving an external Thermal Control add-on's registry intact.\n\n---\n\n## Screenshots\n\n| Profiles and Thermal Control | Maintenance and app optimization |\n| ---------------------------- | -------------------------------- |\n| <img src=\"docs/images/webui-profiles.png\" alt=\"Profile control and integrated thermal control panels\" width=\"420\"> | <img src=\"docs/images/webui-maintenance.png\" alt=\"One-tap maintenance and app optimization panels\" width=\"420\"> |\n\n> Dashboard previews rendered from the shipped WebUI source with sample status values.\n\n---\n\n## What the Module Does\n\nSupercharger focuses on conservative, audited tuning rather than extreme changes.\n\n### Current tuning direction\n\n- Conservative virtual memory tuning\n- Conditional `vm.page-cluster=0` when swap / zRAM is active\n- Selective IRQ affinity for storage, network, and input paths when accepted by the kernel\n- Safe block I/O tuning on valid physical devices only\n- Conservative network tuning\n- Read-only verification for selected system properties\n- Best-effort writes with graceful fallback on unsupported kernels\n\n---\n\n## Profiles\n\n### Active Smooth\n\nDefault daily profile focused on smoothness, safe boot behavior, and consistent responsiveness.\n\n### Performance / Gaming\n\nExperimental profile intended for gaming sessions and heavier foreground workloads. It includes expanded GPU devfreq discovery and a GPU floor fallback.\n\nIt uses best-effort writes and safe fallback behavior. If the kernel rejects a node, the module leaves it unchanged.\n\nReboot after switching profiles before judging behavior.\n\n---\n\n## Integrated Thermal Control\n\nThermal Control profiles are bundled into the main Supercharger module, but the thermal overlay is **off by default**.\n\nThis is intentional. The module does not place thermal config files under `system/vendor/etc` during installation. The user must enable Thermal Control manually from WebUI after confirming the device boots normally.\n\nOn KernelSU / APatch 3.x, the thermal overlay remains a no-op unless a metamodule (`meta-overlayfs` and/or `meta-magicmount`) is installed to provide overlay/mount capability. Supercharger does not implement or bundle that metamodule.\n\nWhen enabled, Supercharger can keep the thermal profile aligned with the active performance profile:\n\n| Performance profile  | Thermal profile |\n| -------------------- | --------------- |\n| Active Smooth        | `balanced`      |\n| Performance / Gaming | `gaming`        |\n\n`charge_cool` remains a manual Thermal-only profile for charging-focused behavior. Switching Thermal Control on, changing thermal profiles, or disabling it requires a reboot before judging behavior.\n\n---\n\n## WebUI Dashboard\n\nThe WebUI provides module status and maintenance controls without applying hidden changes by itself.\n\nIt reports:\n\n- module health\n- active profile\n- root environment\n- device model and codename\n- Android release and SDK level\n- battery temperature\n- kernel and build info\n- storage and network status\n- integrated Thermal Control status\n\nIt also exposes:\n\n- profile selection\n- one-tap maintenance\n- app optimization tools\n- Android system dexopt job trigger\n- manual Thermal Control enable / disable\n- thermal profile selection for Balanced, Gaming, and Charge Cool\n- logs\n- support snapshot output\n\nApp optimization is incremental by default: Android can skip work it considers\nunnecessary. Supercharger requests background priority when the platform supports\nit, and reports performed, skipped, or failed results when ART provides that detail.\nFor an explicit retry, expand **Advanced: forced recompilation** and recompile only\nthe selected app. This can take longer and generate extra heat.\n\nThe app list is cached for up to one minute while using the dashboard; **Refresh\napp list** reloads it immediately. Task polling pauses while the dashboard is\nhidden and resumes when you return. The background task itself continues.\n\n---\n\n## Stability-First Design\n\nThis module is intentionally built around safe application and clean fallback behavior.\n\nThat means:\n\n- no blind writes to unsupported nodes\n- no global IRQ affinity\n- no forced CPU/GPU clocks in the stable profile\n- no thermal safety bypass\n- no charging behavior override\n- no version hacks tied rigidly to one Android build\n\nThe stable profile is designed to feel better in real use, not just look louder on paper.\n\n---\n\n## Troubleshooting\n\n**The module installs but the WebUI will not open.**\nThe dashboard needs a root manager with WebUI support. Confirm your manager exposes a WebUI entry for installed modules, then reopen the module page.\n\n**I switched profiles and nothing feels different.**\nProfile changes need a reboot. Switch, reboot, then judge over normal daily use rather than a single benchmark run.\n\n**Thermal Control shows as off after installing.**\nThat is the intended default. Enable it from *Profiles* &rarr; *Integrated Thermal Control* once the phone boots normally, then reboot.\n\n**Thermal Control is enabled but nothing changes on KernelSU or APatch 3.x.**\nThose root solutions need a metamodule (`meta-overlayfs` and/or `meta-magicmount`) for overlay mounts. Without one, the thermal overlay is a no-op. Install a metamodule from your root manager; Supercharger does not ship one.\n\n**A tuning entry shows as skipped in the log.**\nThat is the fallback working. The kernel rejected that node, so the module left it unchanged instead of forcing it. Skipped entries are expected on some builds.\n\n**Installation aborts with an incompatible device error.**\nThe installer only accepts the four Pixel 9 codenames listed above. Run `getprop ro.product.device` to confirm what your device reports.\n\n**The device misbehaves after enabling Thermal Control.**\nDisable Thermal Control from the WebUI and reboot. If the device will not boot far enough to reach the dashboard, remove the module from your root manager's recovery or safe mode, then open an issue with a support snapshot.\n\n---\n\n## Logs and Support Snapshot\n\nThe module keeps two separate logs under `/data/adb/modules/p9pxl_supercharger/`, both readable from the WebUI *Logs* tab:\n\n| File                 | Contents                                                                       |\n| -------------------- | ------------------------------------------------------------------------------ |\n| `debug.log`          | Boot tuning report: what was applied, skipped, or rejected. Rewritten each boot |\n| `debug.previous.log` | The boot report from the previous boot, kept for comparison                     |\n| `maintenance.log`    | Running history of actions taken from the dashboard                             |\n\nBecause `debug.log` is rewritten on every boot, check it for what the current boot applied. Profile switches, Thermal Control changes, maintenance runs, and app optimization are recorded in `maintenance.log` instead, which accumulates across boots.\n\nSupport snapshots are written to:\n\n```sh\n/data/adb/modules/p9pxl_supercharger/support_snapshot.txt\n```\n\nThe snapshot is regenerated by **Run maintenance** in the *Maintenance* tab. Run it first, then load and copy the snapshot from the *Support* tab and attach it to your report.\n\n---\n\n## Getting Help and Contributing\n\nVisit the [project website](https://drizzy07x.github.io/Supercharger_Pixel_9_Series/) for the English/Spanish guide, version history, requirements checker, ZIP verification, and support draft tools.\nSee [website development](docs/WEBSITE.md) for local preview and publishing.\n\n- [Report a bug](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/issues/new?template=bug_report.yml)\n- [Request a feature](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/issues/new?template=feature_request.yml)\n- [Ask a question](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/discussions)\n\nContributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the design rules and the checks to run before opening a pull request, and [SECURITY.md](SECURITY.md) for reporting a security issue privately.\n\n---\n\n## Project Info\n\n- **Current release:** v2.6.7 (Stable channel)\n- **Module ID:** `p9pxl_supercharger`\n- **Developed by:** [Drizzy07x](https://github.com/Drizzy07x)\n- **Changelog:** [changelog.md](changelog.md)\n- **License:** [MIT](LICENSE)\n\n### Project Goals\n\n- Improve day-to-day smoothness and responsiveness\n- Keep tuning selective and device-aware\n- Avoid unnecessary aggressive behavior\n- Preserve battery life and thermal consistency where possible\n- Maintain clean boot behavior and predictable runtime behavior\n- Improve logging, diagnostics, and maintainability\n\n---\n\n## Support the Project\n\nIf you like the project and want to support future development, testing, and refinement:\n\n[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/Drizzy_07)\n\nStarring the repository also helps other Pixel 9 owners find it.\n\n---\n\n## Credits\n\nCredit to the Android, Magisk, KernelSU, APatch, and Pixel kernel development communities for the platform and tooling that make systemless development possible.\n",
+  "readmeHTML": "<h1>Pixel 9 Series Supercharger</h1>\n\n<p><p align=\"center\"></p>\n<p><a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest\"></p>\n<p><img src=\"https://img.shields.io/github/v/release/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=Release&color=34A853\" alt=\"Latest release\"></p>\n<p></a></p>\n<p><a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases\"></p>\n<p><img src=\"https://img.shields.io/github/downloads/Drizzy07x/Supercharger_Pixel_9_Series/total?style=for-the-badge&label=Downloads&color=4285F4\" alt=\"Total downloads\"></p>\n<p></a></p>\n<p><a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/stargazers\"></p>\n<p><img src=\"https://img.shields.io/github/stars/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=Stars&color=F29900\" alt=\"Stars\"></p>\n<p></a></p>\n<p><a href=\"LICENSE\"></p>\n<p><img src=\"https://img.shields.io/github/license/Drizzy07x/Supercharger_Pixel_9_Series?style=for-the-badge&label=License&color=EA4335\" alt=\"License\"></p>\n<p></a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p><img src=\"https://img.shields.io/badge/Device-Pixel%209%20Series-4285F4?style=flat-square&logo=google&logoColor=white\" alt=\"Device\"></p>\n<p><img src=\"https://img.shields.io/badge/SoC-Tensor%20G4-F29900?style=flat-square\" alt=\"SoC\"></p>\n<p><img src=\"https://img.shields.io/badge/Android-16%20QPR3%2B%20%26%2017-3DDC84?style=flat-square&logo=android&logoColor=white\" alt=\"Android\"></p>\n<p><img src=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-EA4335?style=flat-square\" alt=\"Root\"></p>\n<p><img src=\"https://img.shields.io/badge/Channel-Stable-101c30?style=flat-square\" alt=\"Channel\"></p>\n<p></p></p>\n\n<p><b>Pixel 9 Series Supercharger</b> is a systemless performance, thermal, and maintenance module for the <b>Pixel 9 series on Tensor G4</b>.</p>\n\n<p>The goal is simple: improve daily smoothness and responsiveness without turning the device into a reckless benchmark profile. Every change is applied best-effort, logged, and reversible from a WebUI dashboard.</p>\n\n<p><p align=\"center\"></p>\n<p><a href=\"https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest\"><b>Download the latest release &rarr;</b></a></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p><img src=\"docs/images/webui-overview.png\" alt=\"Supercharger WebUI dashboard showing module status, device information, and system health\" width=\"820\"></p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>Why This Module</h2>\n\n<li>**Conservative by design.** No forced clocks in the stable profile, no thermal bypass, no charging override. If the kernel rejects a write, the setting is left unchanged instead of forced.</li>\n<li>**Everything is inspectable.** Boot tuning and dashboard actions are both logged, and a one-tap support snapshot collects the state needed to diagnose a problem.</li>\n<li>**Thermal Control is opt-in.** The thermal overlay is off after installation. You enable it yourself, once the phone has booted normally.</li>\n<li>**A real dashboard.** Profiles, thermal mode, maintenance, app optimization, and logs are all driven from the WebUI, not from hidden background behavior.</li>\n\n<p>---</p>\n\n<h2>Supported Devices</h2>\n\n<p>The installer verifies <code>ro.product.device</code> and aborts on anything else.</p>\n\n<p>| Device           | Codename |</p>\n<p>| ---------------- | -------- |</p>\n<p>| Pixel 9          | <code>tokay</code>  |</p>\n<p>| Pixel 9 Pro      | <code>caiman</code> |</p>\n<p>| Pixel 9 Pro XL   | <code>komodo</code> |</p>\n<p>| Pixel 9 Pro Fold | <code>comet</code>  |</p>\n\n<p>Tuning targets the Tensor G4 platform rather than a single model, and every write is best-effort with a safe fallback. Devices outside the Pixel 9 series are not a target of this project.</p>\n\n<h3>Requirements</h3>\n\n<li>Android 16 QPR3+ or Android 17</li>\n<li>An unlocked bootloader with Magisk, KernelSU, or APatch installed</li>\n<li>Magisk 30.7 or newer when installing with Magisk (`minMagisk` 30700). Do not treat Magisk 31.0 as the floor until an official APK exists</li>\n<li>A root manager with WebUI support, to reach the dashboard</li>\n<li>On KernelSU / APatch 3.x, Integrated Thermal Control is a no-op unless a metamodule provides overlay/mount capability (`meta-overlayfs` and/or `meta-magicmount`). Supercharger does not ship a metamodule</li>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>Download the latest `Pixel-9-Series-Supercharger-*.zip` from the [releases page](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/latest).</li>\n<li>Optionally verify it against the published `.sha256` file.</li>\n<li>Flash the ZIP from your root manager:</li>\n<p>   - <b>Magisk</b> — *Modules* &rarr; *Install from storage* &rarr; select the ZIP</p>\n<p>   - <b>KernelSU / APatch</b> — *Modules* &rarr; *Install* &rarr; select the ZIP</p>\n<li>Reboot.</li>\n<li>Open your root manager, find **Pixel 9 Series Supercharger**, and open its **WebUI** to reach the dashboard.</li>\n\n<p>Thermal Control stays off until you enable it. Once the phone has booted normally, open *Profiles* &rarr; *Integrated Thermal Control* &rarr; <b>Enable Thermal Control</b>, then reboot again before judging behavior. On KernelSU / APatch 3.x the overlay is still a no-op unless a metamodule such as <code>meta-overlayfs</code> or <code>meta-magicmount</code> is already providing overlay/mount capability. Supercharger does not install that metamodule.</p>\n\n<h3>Updating</h3>\n\n<p>The module publishes an update feed as a release asset, so Magisk, KernelSU, and APatch offer new versions in-app. You can also flash a newer ZIP over the installed module. Your selected performance profile and thermal profile survive the update.</p>\n\n<h3>Uninstalling</h3>\n\n<p>Remove the module from your root manager and reboot. Uninstall stops the dashboard updater, clears persistent state under <code>/data/adb/supercharger_state</code>, and removes only the thermal request this module created, leaving an external Thermal Control add-on's registry intact.</p>\n\n<p>---</p>\n\n<h2>Screenshots</h2>\n\n<p>| Profiles and Thermal Control | Maintenance and app optimization |</p>\n<p>| ---------------------------- | -------------------------------- |</p>\n<p>| <img src=\"docs/images/webui-profiles.png\" alt=\"Profile control and integrated thermal control panels\" width=\"420\"> | <img src=\"docs/images/webui-maintenance.png\" alt=\"One-tap maintenance and app optimization panels\" width=\"420\"> |</p>\n\n<p>> Dashboard previews rendered from the shipped WebUI source with sample status values.</p>\n\n<p>---</p>\n\n<h2>What the Module Does</h2>\n\n<p>Supercharger focuses on conservative, audited tuning rather than extreme changes.</p>\n\n<h3>Current tuning direction</h3>\n\n<li>Conservative virtual memory tuning</li>\n<li>Conditional `vm.page-cluster=0` when swap / zRAM is active</li>\n<li>Selective IRQ affinity for storage, network, and input paths when accepted by the kernel</li>\n<li>Safe block I/O tuning on valid physical devices only</li>\n<li>Conservative network tuning</li>\n<li>Read-only verification for selected system properties</li>\n<li>Best-effort writes with graceful fallback on unsupported kernels</li>\n\n<p>---</p>\n\n<h2>Profiles</h2>\n\n<h3>Active Smooth</h3>\n\n<p>Default daily profile focused on smoothness, safe boot behavior, and consistent responsiveness.</p>\n\n<h3>Performance / Gaming</h3>\n\n<p>Experimental profile intended for gaming sessions and heavier foreground workloads. It includes expanded GPU devfreq discovery and a GPU floor fallback.</p>\n\n<p>It uses best-effort writes and safe fallback behavior. If the kernel rejects a node, the module leaves it unchanged.</p>\n\n<p>Reboot after switching profiles before judging behavior.</p>\n\n<p>---</p>\n\n<h2>Integrated Thermal Control</h2>\n\n<p>Thermal Control profiles are bundled into the main Supercharger module, but the thermal overlay is <b>off by default</b>.</p>\n\n<p>This is intentional. The module does not place thermal config files under <code>system/vendor/etc</code> during installation. The user must enable Thermal Control manually from WebUI after confirming the device boots normally.</p>\n\n<p>On KernelSU / APatch 3.x, the thermal overlay remains a no-op unless a metamodule (<code>meta-overlayfs</code> and/or <code>meta-magicmount</code>) is installed to provide overlay/mount capability. Supercharger does not implement or bundle that metamodule.</p>\n\n<p>When enabled, Supercharger can keep the thermal profile aligned with the active performance profile:</p>\n\n<p>| Performance profile  | Thermal profile |</p>\n<p>| -------------------- | --------------- |</p>\n<p>| Active Smooth        | <code>balanced</code>      |</p>\n<p>| Performance / Gaming | <code>gaming</code>        |</p>\n\n<p><code>charge_cool</code> remains a manual Thermal-only profile for charging-focused behavior. Switching Thermal Control on, changing thermal profiles, or disabling it requires a reboot before judging behavior.</p>\n\n<p>---</p>\n\n<h2>WebUI Dashboard</h2>\n\n<p>The WebUI provides module status and maintenance controls without applying hidden changes by itself.</p>\n\n<p>It reports:</p>\n\n<li>module health</li>\n<li>active profile</li>\n<li>root environment</li>\n<li>device model and codename</li>\n<li>Android release and SDK level</li>\n<li>battery temperature</li>\n<li>kernel and build info</li>\n<li>storage and network status</li>\n<li>integrated Thermal Control status</li>\n\n<p>It also exposes:</p>\n\n<li>profile selection</li>\n<li>one-tap maintenance</li>\n<li>app optimization tools</li>\n<li>Android system dexopt job trigger</li>\n<li>manual Thermal Control enable / disable</li>\n<li>thermal profile selection for Balanced, Gaming, and Charge Cool</li>\n<li>logs</li>\n<li>support snapshot output</li>\n\n<p>App optimization is incremental by default: Android can skip work it considers</p>\n<p>unnecessary. Supercharger requests background priority when the platform supports</p>\n<p>it, and reports performed, skipped, or failed results when ART provides that detail.</p>\n<p>For an explicit retry, expand <b>Advanced: forced recompilation</b> and recompile only</p>\n<p>the selected app. This can take longer and generate extra heat.</p>\n\n<p>The app list is cached for up to one minute while using the dashboard; **Refresh</p>\n<p>app list** reloads it immediately. Task polling pauses while the dashboard is</p>\n<p>hidden and resumes when you return. The background task itself continues.</p>\n\n<p>---</p>\n\n<h2>Stability-First Design</h2>\n\n<p>This module is intentionally built around safe application and clean fallback behavior.</p>\n\n<p>That means:</p>\n\n<li>no blind writes to unsupported nodes</li>\n<li>no global IRQ affinity</li>\n<li>no forced CPU/GPU clocks in the stable profile</li>\n<li>no thermal safety bypass</li>\n<li>no charging behavior override</li>\n<li>no version hacks tied rigidly to one Android build</li>\n\n<p>The stable profile is designed to feel better in real use, not just look louder on paper.</p>\n\n<p>---</p>\n\n<h2>Troubleshooting</h2>\n\n<p><b>The module installs but the WebUI will not open.</b></p>\n<p>The dashboard needs a root manager with WebUI support. Confirm your manager exposes a WebUI entry for installed modules, then reopen the module page.</p>\n\n<p><b>I switched profiles and nothing feels different.</b></p>\n<p>Profile changes need a reboot. Switch, reboot, then judge over normal daily use rather than a single benchmark run.</p>\n\n<p><b>Thermal Control shows as off after installing.</b></p>\n<p>That is the intended default. Enable it from *Profiles* &rarr; *Integrated Thermal Control* once the phone boots normally, then reboot.</p>\n\n<p><b>Thermal Control is enabled but nothing changes on KernelSU or APatch 3.x.</b></p>\n<p>Those root solutions need a metamodule (<code>meta-overlayfs</code> and/or <code>meta-magicmount</code>) for overlay mounts. Without one, the thermal overlay is a no-op. Install a metamodule from your root manager; Supercharger does not ship one.</p>\n\n<p><b>A tuning entry shows as skipped in the log.</b></p>\n<p>That is the fallback working. The kernel rejected that node, so the module left it unchanged instead of forcing it. Skipped entries are expected on some builds.</p>\n\n<p><b>Installation aborts with an incompatible device error.</b></p>\n<p>The installer only accepts the four Pixel 9 codenames listed above. Run <code>getprop ro.product.device</code> to confirm what your device reports.</p>\n\n<p><b>The device misbehaves after enabling Thermal Control.</b></p>\n<p>Disable Thermal Control from the WebUI and reboot. If the device will not boot far enough to reach the dashboard, remove the module from your root manager's recovery or safe mode, then open an issue with a support snapshot.</p>\n\n<p>---</p>\n\n<h2>Logs and Support Snapshot</h2>\n\n<p>The module keeps two separate logs under <code>/data/adb/modules/p9pxl_supercharger/</code>, both readable from the WebUI *Logs* tab:</p>\n\n<p>| File                 | Contents                                                                       |</p>\n<p>| -------------------- | ------------------------------------------------------------------------------ |</p>\n<p>| <code>debug.log</code>          | Boot tuning report: what was applied, skipped, or rejected. Rewritten each boot |</p>\n<p>| <code>debug.previous.log</code> | The boot report from the previous boot, kept for comparison                     |</p>\n<p>| <code>maintenance.log</code>    | Running history of actions taken from the dashboard                             |</p>\n\n<p>Because <code>debug.log</code> is rewritten on every boot, check it for what the current boot applied. Profile switches, Thermal Control changes, maintenance runs, and app optimization are recorded in <code>maintenance.log</code> instead, which accumulates across boots.</p>\n\n<p>Support snapshots are written to:</p>\n\n<pre>/data/adb/modules/p9pxl_supercharger/support_snapshot.txt</pre>\n\n<p>The snapshot is regenerated by <b>Run maintenance</b> in the *Maintenance* tab. Run it first, then load and copy the snapshot from the *Support* tab and attach it to your report.</p>\n\n<p>---</p>\n\n<h2>Getting Help and Contributing</h2>\n\n<p>Visit the <a href=\"https://drizzy07x.github.io/Supercharger_Pixel_9_Series/\">project website</a> for the English/Spanish guide, version history, requirements checker, ZIP verification, and support draft tools.</p>\n<p>See <a href=\"docs/WEBSITE.md\">website development</a> for local preview and publishing.</p>\n\n<li>[Report a bug](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/issues/new?template=bug_report.yml)</li>\n<li>[Request a feature](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/issues/new?template=feature_request.yml)</li>\n<li>[Ask a question](https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/discussions)</li>\n\n<p>Contributions are welcome. See <a href=\"CONTRIBUTING.md\">CONTRIBUTING.md</a> for the design rules and the checks to run before opening a pull request, and <a href=\"SECURITY.md\">SECURITY.md</a> for reporting a security issue privately.</p>\n\n<p>---</p>\n\n<h2>Project Info</h2>\n\n<li>**Current release:** v2.6.7 (Stable channel)</li>\n<li>**Module ID:** `p9pxl_supercharger`</li>\n<li>**Developed by:** [Drizzy07x](https://github.com/Drizzy07x)</li>\n<li>**Changelog:** [changelog.md](changelog.md)</li>\n<li>**License:** [MIT](LICENSE)</li>\n\n<h3>Project Goals</h3>\n\n<li>Improve day-to-day smoothness and responsiveness</li>\n<li>Keep tuning selective and device-aware</li>\n<li>Avoid unnecessary aggressive behavior</li>\n<li>Preserve battery life and thermal consistency where possible</li>\n<li>Maintain clean boot behavior and predictable runtime behavior</li>\n<li>Improve logging, diagnostics, and maintainability</li>\n\n<p>---</p>\n\n<h2>Support the Project</h2>\n\n<p>If you like the project and want to support future development, testing, and refinement:</p>\n\n<p><a href=\"https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow?style=for-the-badge&logo=buy-me-a-coffee\">![Buy Me A Coffee</a>](https://www.buymeacoffee.com/Drizzy_07)</p>\n\n<p>Starring the repository also helps other Pixel 9 owners find it.</p>\n\n<p>---</p>\n\n<h2>Credits</h2>\n\n<p>Credit to the Android, Magisk, KernelSU, APatch, and Pixel kernel development communities for the platform and tooling that make systemless development possible.</p>",
+  "homepageUrl": "https://drizzy07x.github.io/Supercharger_Pixel_9_Series/",
+  "sourceUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series",
+  "url": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series",
+  "latestRelease": {
+    "name": "v2.6.7",
+    "version": "v2.6.7",
+    "time": "2026-07-30T22:23:12Z",
+    "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.7/Pixel-9-Series-Supercharger-v2.6.7.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.6.7",
+      "tagName": "v2.6.7",
+      "publishedAt": "2026-07-30T22:23:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.7.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.7/Pixel-9-Series-Supercharger-v2.6.7.zip",
+          "size": 68740,
+          "downloadCount": 278
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.7.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.7/Pixel-9-Series-Supercharger-v2.6.7.zip.sha256",
+          "size": 105,
+          "downloadCount": 16
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.7/update.json",
+          "size": 296,
+          "downloadCount": 8084
+        }
+      ]
+    },
+    {
+      "name": "v2.6.6",
+      "tagName": "v2.6.6",
+      "publishedAt": "2026-07-30T20:54:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.6.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.6/Pixel-9-Series-Supercharger-v2.6.6.zip",
+          "size": 67935,
+          "downloadCount": 6
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.6.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.6/Pixel-9-Series-Supercharger-v2.6.6.zip.sha256",
+          "size": 105,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.6/update.json",
+          "size": 296,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.6.5",
+      "tagName": "v2.6.5",
+      "publishedAt": "2026-07-16T04:45:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.5.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.5/Pixel-9-Series-Supercharger-v2.6.5.zip",
+          "size": 65919,
+          "downloadCount": 156
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.5.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.5/Pixel-9-Series-Supercharger-v2.6.5.zip.sha256",
+          "size": 110,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v2.6.4",
+      "tagName": "v2.6.4",
+      "publishedAt": "2026-06-28T23:38:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.4.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.4/Pixel-9-Series-Supercharger-v2.6.4.zip",
+          "size": 65639,
+          "downloadCount": 94
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.6.4.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.6.4/Pixel-9-Series-Supercharger-v2.6.4.zip.sha256",
+          "size": 110,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.5.1",
+      "tagName": "v2.5.1",
+      "publishedAt": "2026-05-31T23:37:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.5.1.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.5.1/Pixel-9-Series-Supercharger-v2.5.1.zip",
+          "size": 37043,
+          "downloadCount": 139
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.5.1.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.5.1/Pixel-9-Series-Supercharger-v2.5.1.zip.sha256",
+          "size": 110,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v2.5",
+      "tagName": "v2.5",
+      "publishedAt": "2026-05-08T03:20:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.5.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.5/Pixel-9-Series-Supercharger-v2.5.zip",
+          "size": 36749,
+          "downloadCount": 102
+        },
+        {
+          "name": "Pixel-9-Series-Supercharger-v2.5.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.5/Pixel-9-Series-Supercharger-v2.5.zip.sha256",
+          "size": 108,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2026-04-11T07:23:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.4.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.4/Pixel-9-Pro-Series-Supercharger-v2.4.zip",
+          "size": 8728,
+          "downloadCount": 121
+        },
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.4.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.4/Pixel-9-Pro-Series-Supercharger-v2.4.zip.sha256",
+          "size": 107,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-04-09T07:43:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.3.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.3/Pixel-9-Pro-Series-Supercharger-v2.3.zip",
+          "size": 6858,
+          "downloadCount": 24
+        },
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.3.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.3/Pixel-9-Pro-Series-Supercharger-v2.3.zip.sha256",
+          "size": 107,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-04-08T08:04:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.2.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.2/Pixel-9-Pro-Series-Supercharger-v2.2.zip",
+          "size": 6178,
+          "downloadCount": 23
+        },
+        {
+          "name": "Pixel-9-Pro-Series-Supercharger-v2.2.zip.sha256",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.2/Pixel-9-Pro-Series-Supercharger-v2.2.zip.sha256",
+          "size": 107,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-04-07T06:34:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Supercharger-v2.1.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.1/Supercharger-v2.1.zip",
+          "size": 4979,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-04-04T02:54:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Supercharger-v2.0.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v2.0/Supercharger-v2.0.zip",
+          "size": 4870,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-04-03T06:26:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Supercharger-v1.6.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v1.6/Supercharger-v1.6.zip",
+          "size": 4579,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-04-01T05:35:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Supercharger-v1.5.1.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v1.5.1/Supercharger-v1.5.1.zip",
+          "size": 3300,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-03-31T12:31:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Supercharger-v1.5.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v1.5/Supercharger-v1.5.zip",
+          "size": 7775,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-03-30T00:50:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Drizzy07_P9PXL_Supercharger_v1.4.zip",
+          "downloadUrl": "https://github.com/Drizzy07x/Supercharger_Pixel_9_Series/releases/download/v1.4/Drizzy07_P9PXL_Supercharger_v1.4.zip",
+          "size": 1641,
+          "downloadCount": 15
+        }
+      ]
+    }
+  ]
+}

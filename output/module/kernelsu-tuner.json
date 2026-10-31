@@ -1,0 +1,141 @@
+{
+  "readme": "# KernelSU Tuner\n\n[English](README.en.md) | 简体中文\n\n给 KernelSU 写的一个调优模块。主要想解决两件事：把散在各个 `sysfs` / `proc` 节点的性能参数集中管起来，以及让这些参数能根据实际情况自己切换。\n\n起因是之前用过的那些\"性能优化\"脚本，改完之后想还原只能重刷，而且很多脚本不看机型，往同一个值上怼。所以这个模块从第一天起就定了两条规矩：**写入前必须备份原值**，**设备不支持就跳过而不是报错**。\n\n代码全是 shell 和原生 JS，没有依赖任何第三方东西，装完断网也能用。\n\n---\n\n## 环境要求\n\n| 项目 | 要求 |\n|---|---|\n| KernelSU | v0.9.0 以上（用到 `ksud module config` 和 initrc 注入） |\n| Android | 10 以上 |\n| 内核 | 4.14+，我用 5.10 GKI 实测 |\n| 架构 | arm64-v8a / x86_64 都行，脚本层没有架构相关代码 |\n\n没在 Magisk 上测过。Magisk 应该也能跑大部分功能，但 `ksud` 相关的那部分（动态模块描述）会直接失效。\n\n---\n\n## 它到底做了什么\n\n### 四档预设\n\n`powersave` / `balanced` / `performance` / `gaming`，切档会连带改动下面这些：\n\n- **CPU 调度器** —— 从设备实际支持的 governor 列表里挑，不是硬写 `performance`。有的内核只有 `walt` 和 `schedutil`，那就挑得出来的那个。\n- **GPU 调频** —— 高通走 `kgsl-3d0`，读 `num_pwrlevels` 算功率档位；Mali 和通用 devfreq 走 `available_governors`。两条路径都试，能中哪条算哪条。\n- **IO 调度器 + 预读** —— `read_ahead_kb` 和 `nr_requests` 一起调，只改调度器其实意义不大。\n- **VM 内存** —— swappiness、脏页回写比例、vfs_cache_pressure。\n- **网络** —— 优先开 BBR，开不了就退到 cubic；收发缓冲区、TCP Fast Open、`tcp_tw_reuse` 一并设。\n- **DNS** —— 按档位切，性能档会开加密 DNS（DoT）。\n- **ZRAM 压缩算法** —— 优先 `zstd`，其次 `lz4`。已经在用的 swap 设备会跳过，不动它。\n\n### 智能驾驶 AutoPilot\n\n一个常驻循环，5 秒一轮，读温度 / 息屏状态 / 充电状态，决定该用哪一档。\n\n```\n温度 >= 阈值        -> 降温档\n温度在降但没到位     -> 继续降温档（滞回）\n屏幕关闭            -> 省电档\n充电中（可选）       -> 性能档\n其他                -> 基准档\n```\n\n**滞回这块是必须的**。最早我写的是\"过热后强制降温 30 秒\"，结果温度卡在阈值附近时会反复切档，比不切还费电。现在改成状态机：只有温度掉回 `AUTO_TEMP_LOW` 以下才解除冷却。\n\n温度取值会跳过 `thermal_zone` 里那些明显无关的传感器，优先看 type 里带 `cpu` / `soc` / `gpu` / `tsens` / `battery` / `skin` 的。有些设备 temp 单位是摄氏度而不是毫摄氏度，代码里判断了（小于 200 就当摄氏度处理）。\n\n### 电池守护 BatteryGuard\n\n充电到设定上限就断电，掉到「上限 - 3%」再恢复，来回循环。\n\n控制节点会按顺序找这几个，找到哪个用哪个：\n\n```\ncharging_enabled    input_suspend    batt_slate_mode\nstore_mode          charge_disable\n```\n\n高通的 `charging_enabled` 和 `charge_disable` 极性是反的，代码里分开处理了。如果这五个节点一个都没有，会直接告诉你不支持，而不是默默失败。\n\n> 提示：上限设 80% 对循环寿命帮助最明显。设 100% 等于没开。\n\n### 应用待机管理\n\n直接操作 Android 的 App Standby Bucket，比\"一刀切杀后台\"温和很多。\n\n档位循环：`active` → `working` → `frequent` → `rare` → `restricted`\n\n可以给任意应用单独设档，也能加白名单让它不受批量操作影响。WebUI 里有搜索框，应用多了不至于翻半天。\n\n### 应用性能策略 AppWatch\n\n按**前台应用**自动切档。打开游戏进游戏档，切回桌面回基准档。\n\n前台包名识别做了三级回退，因为不同 Android 版本 `dumpsys` 的输出差别很大：\n\n```\ndumpsys activity activities   (mResumedActivity / topResumedActivity)\n  ↓ 没结果\ndumpsys window                (mCurrentFocus / mFocusedApp)\n  ↓ 没结果\ndumpsys activity top          (ACTIVITY 行)\n```\n\n实测覆盖了 Android 11 ~ 14 的几种格式，包括多用户（`u10`）和包名带下划线数字的情况。\n\n### 显示调优\n\n- 刷新率：按档位写 `peak_refresh_rate` / `min_refresh_rate`，均衡档会把设置删掉交还给系统\n- 触控采样率：扫描 9 类触控节点，游戏档拉到 300Hz\n\n这块**不是所有机器都有节点**，没有就只调刷新率，不会报错。\n\n### 自定义内核参数\n\n最后加的功能，也是我觉得最实用的。填路径和值就行，模块负责备份原值。\n\n```\n/sys/module/xxx/parameters/yyy   ->  你想要的值\n```\n\n路径限 `/sys` 和 `/proc`，会拦 `..` 和 `|`。每次写入前记录原始值，还原时**只还原自己改过的那几项**，不会动别的模块留下的备份。\n\n### initrc 常驻服务\n\n用 KernelSU 的 initrc 注入，让 init 进程在 `late_start` 阶段直接拉起，比 `service.sh` 更早。\n\n```rc\nservice KernelSU-Tuner_boot   /system/bin/sh .../bin/init-apply.sh\nservice KernelSU-Tuner_watch  /system/bin/sh .../bin/appwatch.sh run\non property:sys.boot_completed=1\n    start KernelSU-Tuner_watch\n```\n\n改完配置想立刻生效的话，跑一下 `ksud initrc refresh`，下次开机用新的。\n\n> late-load 模式下 initrc 注入不可用（KernelSU 本身的限制），这种情况 `service.sh` 会兜底。\n\n---\n\n## 安装\n\n1. KernelSU 管理器 → 模块 → 从本地安装 → 选 zip\n2. 重启\n\nWebUI 在模块列表里点进去就行，动作按钮会按 `省电切档 → 智能驾驶 → 电池守护 → 应用追踪 → 关闭全部` 循环。\n\n---\n\n## 命令行\n\n不想开 WebUI 的话，脚本都能直接调。\n\n```sh\n# 主控\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh status      # 看当前所有状态\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh apply gaming\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh fast gaming  # 只切 CPU/GPU/VM，快一些\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh monitor      # 连采 3 次实时数据\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh revert       # 回滚所有内核参数\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh set CPU_GOV 0\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh trim\n\n# 智能驾驶\nsh .../bin/autopilot.sh start | stop | status\nsh .../bin/autopilot.sh once     # 只跑一次决策，看看现在会选哪档\n\n# 电池守护\nsh .../bin/guard.sh start | stop | status\nsh .../bin/guard.sh node         # 看识别到了哪个控制节点\n\n# 应用待机\nsh .../bin/appctl.sh list\nsh .../bin/appctl.sh set com.xxx.yyy rare\nsh .../bin/appctl.sh optimize    # 全部设成 rare\nsh .../bin/appctl.sh hibernate   # 杀掉后台（跳过前台应用）\n\n# 应用策略\nsh .../bin/appwatch.sh set com.xxx.yyy gaming\nsh .../bin/appwatch.sh fg        # 看当前识别到的前台包名\n\n# 自定义参数\nsh .../bin/custom.sh add /proc/sys/vm/swappiness 100\nsh .../bin/custom.sh apply\nsh .../bin/custom.sh revert\n\n# 显示\nsh .../bin/display.sh status\nsh .../bin/display.sh apply gaming\n\n# 内核扩展调优\nsh .../bin/kernel.sh all gaming     # 一次跑完下面全部\nsh .../bin/kernel.sh devfreq        # 总线与内存控制器调频\nsh .../bin/kernel.sh devfreq-list   # 看设备有哪些 devfreq 节点\nsh .../bin/kernel.sh ksm            # 内存去重\nsh .../bin/kernel.sh thp            # 透明大页\nsh .../bin/kernel.sh schedtune      # 调度增强\nsh .../bin/kernel.sh tcp            # TCP 三层缓冲\nsh .../bin/kernel.sh boost          # 触控 boost\nsh .../bin/kernel.sh fs             # 文件系统上限\nsh .../bin/kernel.sh status         # 各开关状态\n\n# 自定义预设\nsh .../bin/presets.sh list\nsh .../bin/presets.sh save night powersave\nsh .../bin/presets.sh apply night\n\n# 守护看门狗\nsh .../bin/watchdog.sh start | stop | status | log\n\n# 配置读写与迁移\nsh .../bin/cfg.sh version\nsh .../bin/cfg.sh migrate\n```\n\n`status` 的输出是 `KEY=VALUE` 格式，好解析：\n\n```\nCFG_PROFILE=balanced\nLIVE_GOVERNOR=walt\nLIVE_CUR_FREQ=1286400\nLIVE_GPUFREQ=490\n...\n```\n\n---\n\n## 配置文件\n\n`/data/adb/ksu_tuner/config.conf`，`KEY=VALUE` 一行一条。重复的键以**最后一条**为准。\n\n主要几个：\n\n| 键 | 说明 |\n|---|---|\n| `PROFILE` | 当前预设 |\n| `CPU_GOV` `GPU_TUNE` `IO_SCHED` `READ_AHEAD` `VM_TUNE` `NET_TUNE` `DNS_TUNE` `ZRAM_TUNE` | 各子系统开关，1 开 0 关 |\n| `THERMAL_OPEN` | 温控解锁，默认关 |\n| `SELINUX_PERM` | SELinux 宽容，默认关 |\n| `AUTOPILOT` `AUTO_BASE` `AUTO_COOL` `AUTO_TEMP_HIGH` `AUTO_TEMP_LOW` `AUTO_SCREEN` `AUTO_CHARGE` | 智能驾驶 |\n| `BATT_GUARD` `CHARGE_LIMIT` | 电池守护 |\n| `APPWATCH` `WATCH_BASE` | 应用策略 |\n| `DISP_TUNE` | 显示调优 |\n\n温度阈值单位是毫摄氏度，`45000` = 45°C。\n\n改完不用重启，跑一次 `tuner.sh apply` 就生效。\n\n---\n\n## 目录结构\n\n```\n/data/adb/modules/KernelSU-Tuner/\n├── module.prop\n├── customize.sh           安装时初始化配置、设权限\n├── post-fs-data.sh        建目录、校验配置、识别 late-load\n├── service.sh             开机应用预设、拉起守护进程\n├── boot-completed.sh      动画缩放、自动 fstrim、刷新模块描述\n├── action.sh              动作按钮\n├── uninstall.sh           卸载时完整还原\n├── initrc/\n│   └── KernelSU-Tuner.rc  init 常驻服务\n├── bin/\n│   ├── tuner.sh           主控，预设应用与状态查询\n│   ├── autopilot.sh       温度/息屏/充电自适应\n│   ├── guard.sh           充电上限\n│   ├── appctl.sh          Standby Bucket 管理\n│   ├── appwatch.sh        前台应用追踪\n│   ├── custom.sh          自定义参数\n│   ├── display.sh         刷新率与触控\n│   ├── kernel.sh          devfreq/KSM/THP/schedtune/TCP/boost/fs\n│   ├── presets.sh         自定义预设\n│   ├── backup.sh          配置导出导入\n│   ├── wipeshield.sh      防格机\n│   ├── watchdog.sh        守护进程看门狗\n│   ├── cfg.sh             配置原子读写与版本迁移\n│   └── init-apply.sh      initrc 调用的入口\n├── sepolicy.rule          SELinux 规则\n└── webroot/\n    └── index.html         WebUI（单文件，无外部依赖）\n```\n\n运行时数据在 `/data/adb/ksu_tuner/`（与模块 id 解耦，升级不丢配置）：`config.conf` 配置、`backup.conf` 原始值备份、`tuner.log` 日志、各守护进程的 `.pid` 和 `.log`。\n\n---\n\n## 几个坑\n\n**温度阈值别设太低。** 设 40°C 的话日常刷个网页都会触发降温，得不偿失。45~50 比较合理。\n\n**温控解锁和 SELinux 宽容默认关着是有原因的。** 前者会让机身明显更热，长期高温反而伤电池；后者降低安全强度，调试完就该关掉。这俩我不建议长期开着。\n\n**自定义参数改之前先确认节点含义。** 虽然能还原，但写错值可能当场就卡住，得进 recovery 删文件。不确定的先 `cat` 一下看看当前值和取值范围。\n\n**AppWatch 和 AutoPilot 别同时开。** 两个都在抢着切预设，会打架。动作按钮的循环顺序已经考虑到了这点，但手动配置时容易踩。\n\n**`revert` 之后记得重新 `apply`。** 回滚是把值恢复成模块第一次写入前的样子，此时配置里的开关还是开的，不重新应用的话状态和配置就对不上了。\n\n**WebUI 首次打开会读一圈状态，大概 1~2 秒。** 标签页是懒加载的，切到「应用管理」才开始拉应用列表，应用多的话会再等一会儿。\n\n---\n\n## 卸载\n\n直接在管理器里删就行，`uninstall.sh` 会：\n\n1. 杀掉所有守护进程\n2. 还原自定义参数和内核参数\n3. 恢复应用待机档位到 `frequent`\n4. 恢复刷新率和触控设置\n5. 清掉 `/data/adb/ksu_tuner/`\n\n如果哪个环节没跑成功，`backup.conf` 里还有原始值，手动写回去就行。\n\n---\n\n## 测试情况\n\n主控和守护进程都留了注入点，方便不刷机验证逻辑：\n\n- `KSU_SYS=<路径>` 把 `/sys`、`/proc` 的读取重定向到别处\n- `autopilot.sh once` 只跑一次决策\n- `appwatch.sh fg` / `once` 单独看前台识别结果\n\n我用这套跑了这些场景：\n\n- AutoPilot 决策矩阵 12 组（常规 / 息屏 / 过热 / 临界 45°C / 充电提速 / 改基准档 / 关息屏省电 / 动态改阈值）\n- 冷却滞回时序（46°C 触发 → 43°C 保持 → 39°C 解除）\n- BatteryGuard 充放电循环 5 组（85% 断电 / 79% 保持 / 76% 恢复 / 再次断电 / 停止时恢复充电）\n- 前台识别 7 组（含 3 级回退链、多用户、特殊包名）\n- 自定义参数增删改查、非法路径拦截、节点缺失降级\n\n在骁龙 8 Gen 2 / 内核 5.10.236 的机器上实机验证通过。\n\n---\n\n## 许可\n\nGPL-3.0\n",
+  "readmeHTML": "<h1>KernelSU Tuner</h1>\n\n<p><a href=\"README.en.md\">English</a> | 简体中文</p>\n\n<p>给 KernelSU 写的一个调优模块。主要想解决两件事：把散在各个 <code>sysfs</code> / <code>proc</code> 节点的性能参数集中管起来，以及让这些参数能根据实际情况自己切换。</p>\n\n<p>起因是之前用过的那些\"性能优化\"脚本，改完之后想还原只能重刷，而且很多脚本不看机型，往同一个值上怼。所以这个模块从第一天起就定了两条规矩：<b>写入前必须备份原值</b>，<b>设备不支持就跳过而不是报错</b>。</p>\n\n<p>代码全是 shell 和原生 JS，没有依赖任何第三方东西，装完断网也能用。</p>\n\n<p>---</p>\n\n<h2>环境要求</h2>\n\n<p>| 项目 | 要求 |</p>\n<p>|---|---|</p>\n<p>| KernelSU | v0.9.0 以上（用到 <code>ksud module config</code> 和 initrc 注入） |</p>\n<p>| Android | 10 以上 |</p>\n<p>| 内核 | 4.14+，我用 5.10 GKI 实测 |</p>\n<p>| 架构 | arm64-v8a / x86_64 都行，脚本层没有架构相关代码 |</p>\n\n<p>没在 Magisk 上测过。Magisk 应该也能跑大部分功能，但 <code>ksud</code> 相关的那部分（动态模块描述）会直接失效。</p>\n\n<p>---</p>\n\n<h2>它到底做了什么</h2>\n\n<h3>四档预设</h3>\n\n<p><code>powersave</code> / <code>balanced</code> / <code>performance</code> / <code>gaming</code>，切档会连带改动下面这些：</p>\n\n<li>**CPU 调度器** —— 从设备实际支持的 governor 列表里挑，不是硬写 `performance`。有的内核只有 `walt` 和 `schedutil`，那就挑得出来的那个。</li>\n<li>**GPU 调频** —— 高通走 `kgsl-3d0`，读 `num_pwrlevels` 算功率档位；Mali 和通用 devfreq 走 `available_governors`。两条路径都试，能中哪条算哪条。</li>\n<li>**IO 调度器 + 预读** —— `read_ahead_kb` 和 `nr_requests` 一起调，只改调度器其实意义不大。</li>\n<li>**VM 内存** —— swappiness、脏页回写比例、vfs_cache_pressure。</li>\n<li>**网络** —— 优先开 BBR，开不了就退到 cubic；收发缓冲区、TCP Fast Open、`tcp_tw_reuse` 一并设。</li>\n<li>**DNS** —— 按档位切，性能档会开加密 DNS（DoT）。</li>\n<li>**ZRAM 压缩算法** —— 优先 `zstd`，其次 `lz4`。已经在用的 swap 设备会跳过，不动它。</li>\n\n<h3>智能驾驶 AutoPilot</h3>\n\n<p>一个常驻循环，5 秒一轮，读温度 / 息屏状态 / 充电状态，决定该用哪一档。</p>\n\n<pre>温度 &gt;= 阈值        -&gt; 降温档\n温度在降但没到位     -&gt; 继续降温档（滞回）\n屏幕关闭            -&gt; 省电档\n充电中（可选）       -&gt; 性能档\n其他                -&gt; 基准档</pre>\n\n<p><b>滞回这块是必须的</b>。最早我写的是\"过热后强制降温 30 秒\"，结果温度卡在阈值附近时会反复切档，比不切还费电。现在改成状态机：只有温度掉回 <code>AUTO_TEMP_LOW</code> 以下才解除冷却。</p>\n\n<p>温度取值会跳过 <code>thermal_zone</code> 里那些明显无关的传感器，优先看 type 里带 <code>cpu</code> / <code>soc</code> / <code>gpu</code> / <code>tsens</code> / <code>battery</code> / <code>skin</code> 的。有些设备 temp 单位是摄氏度而不是毫摄氏度，代码里判断了（小于 200 就当摄氏度处理）。</p>\n\n<h3>电池守护 BatteryGuard</h3>\n\n<p>充电到设定上限就断电，掉到「上限 - 3%」再恢复，来回循环。</p>\n\n<p>控制节点会按顺序找这几个，找到哪个用哪个：</p>\n\n<pre>charging_enabled    input_suspend    batt_slate_mode\nstore_mode          charge_disable</pre>\n\n<p>高通的 <code>charging_enabled</code> 和 <code>charge_disable</code> 极性是反的，代码里分开处理了。如果这五个节点一个都没有，会直接告诉你不支持，而不是默默失败。</p>\n\n<p>> 提示：上限设 80% 对循环寿命帮助最明显。设 100% 等于没开。</p>\n\n<h3>应用待机管理</h3>\n\n<p>直接操作 Android 的 App Standby Bucket，比\"一刀切杀后台\"温和很多。</p>\n\n<p>档位循环：<code>active</code> → <code>working</code> → <code>frequent</code> → <code>rare</code> → <code>restricted</code></p>\n\n<p>可以给任意应用单独设档，也能加白名单让它不受批量操作影响。WebUI 里有搜索框，应用多了不至于翻半天。</p>\n\n<h3>应用性能策略 AppWatch</h3>\n\n<p>按<b>前台应用</b>自动切档。打开游戏进游戏档，切回桌面回基准档。</p>\n\n<p>前台包名识别做了三级回退，因为不同 Android 版本 <code>dumpsys</code> 的输出差别很大：</p>\n\n<pre>dumpsys activity activities   (mResumedActivity / topResumedActivity)\n  ↓ 没结果\ndumpsys window                (mCurrentFocus / mFocusedApp)\n  ↓ 没结果\ndumpsys activity top          (ACTIVITY 行)</pre>\n\n<p>实测覆盖了 Android 11 ~ 14 的几种格式，包括多用户（<code>u10</code>）和包名带下划线数字的情况。</p>\n\n<h3>显示调优</h3>\n\n<li>刷新率：按档位写 `peak_refresh_rate` / `min_refresh_rate`，均衡档会把设置删掉交还给系统</li>\n<li>触控采样率：扫描 9 类触控节点，游戏档拉到 300Hz</li>\n\n<p>这块<b>不是所有机器都有节点</b>，没有就只调刷新率，不会报错。</p>\n\n<h3>自定义内核参数</h3>\n\n<p>最后加的功能，也是我觉得最实用的。填路径和值就行，模块负责备份原值。</p>\n\n<pre>/sys/module/xxx/parameters/yyy   -&gt;  你想要的值</pre>\n\n<p>路径限 <code>/sys</code> 和 <code>/proc</code>，会拦 <code>..</code> 和 <code>|</code>。每次写入前记录原始值，还原时<b>只还原自己改过的那几项</b>，不会动别的模块留下的备份。</p>\n\n<h3>initrc 常驻服务</h3>\n\n<p>用 KernelSU 的 initrc 注入，让 init 进程在 <code>late_start</code> 阶段直接拉起，比 <code>service.sh</code> 更早。</p>\n\n<pre>service KernelSU-Tuner_boot   /system/bin/sh .../bin/init-apply.sh\nservice KernelSU-Tuner_watch  /system/bin/sh .../bin/appwatch.sh run\non property:sys.boot_completed=1\n    start KernelSU-Tuner_watch</pre>\n\n<p>改完配置想立刻生效的话，跑一下 <code>ksud initrc refresh</code>，下次开机用新的。</p>\n\n<p>> late-load 模式下 initrc 注入不可用（KernelSU 本身的限制），这种情况 <code>service.sh</code> 会兜底。</p>\n\n<p>---</p>\n\n<h2>安装</h2>\n\n<li>KernelSU 管理器 → 模块 → 从本地安装 → 选 zip</li>\n<li>重启</li>\n\n<p>WebUI 在模块列表里点进去就行，动作按钮会按 <code>省电切档 → 智能驾驶 → 电池守护 → 应用追踪 → 关闭全部</code> 循环。</p>\n\n<p>---</p>\n\n<h2>命令行</h2>\n\n<p>不想开 WebUI 的话，脚本都能直接调。</p>\n\n<pre># 主控\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh status      # 看当前所有状态\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh apply gaming\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh fast gaming  # 只切 CPU/GPU/VM，快一些\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh monitor      # 连采 3 次实时数据\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh revert       # 回滚所有内核参数\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh set CPU_GOV 0\nsh /data/adb/modules/KernelSU-Tuner/bin/tuner.sh trim\n\n# 智能驾驶\nsh .../bin/autopilot.sh start | stop | status\nsh .../bin/autopilot.sh once     # 只跑一次决策，看看现在会选哪档\n\n# 电池守护\nsh .../bin/guard.sh start | stop | status\nsh .../bin/guard.sh node         # 看识别到了哪个控制节点\n\n# 应用待机\nsh .../bin/appctl.sh list\nsh .../bin/appctl.sh set com.xxx.yyy rare\nsh .../bin/appctl.sh optimize    # 全部设成 rare\nsh .../bin/appctl.sh hibernate   # 杀掉后台（跳过前台应用）\n\n# 应用策略\nsh .../bin/appwatch.sh set com.xxx.yyy gaming\nsh .../bin/appwatch.sh fg        # 看当前识别到的前台包名\n\n# 自定义参数\nsh .../bin/custom.sh add /proc/sys/vm/swappiness 100\nsh .../bin/custom.sh apply\nsh .../bin/custom.sh revert\n\n# 显示\nsh .../bin/display.sh status\nsh .../bin/display.sh apply gaming\n\n# 内核扩展调优\nsh .../bin/kernel.sh all gaming     # 一次跑完下面全部\nsh .../bin/kernel.sh devfreq        # 总线与内存控制器调频\nsh .../bin/kernel.sh devfreq-list   # 看设备有哪些 devfreq 节点\nsh .../bin/kernel.sh ksm            # 内存去重\nsh .../bin/kernel.sh thp            # 透明大页\nsh .../bin/kernel.sh schedtune      # 调度增强\nsh .../bin/kernel.sh tcp            # TCP 三层缓冲\nsh .../bin/kernel.sh boost          # 触控 boost\nsh .../bin/kernel.sh fs             # 文件系统上限\nsh .../bin/kernel.sh status         # 各开关状态\n\n# 自定义预设\nsh .../bin/presets.sh list\nsh .../bin/presets.sh save night powersave\nsh .../bin/presets.sh apply night\n\n# 守护看门狗\nsh .../bin/watchdog.sh start | stop | status | log\n\n# 配置读写与迁移\nsh .../bin/cfg.sh version\nsh .../bin/cfg.sh migrate</pre>\n\n<p><code>status</code> 的输出是 <code>KEY=VALUE</code> 格式，好解析：</p>\n\n<pre>CFG_PROFILE=balanced\nLIVE_GOVERNOR=walt\nLIVE_CUR_FREQ=1286400\nLIVE_GPUFREQ=490\n...</pre>\n\n<p>---</p>\n\n<h2>配置文件</h2>\n\n<p><code>/data/adb/ksu_tuner/config.conf</code>，<code>KEY=VALUE</code> 一行一条。重复的键以<b>最后一条</b>为准。</p>\n\n<p>主要几个：</p>\n\n<p>| 键 | 说明 |</p>\n<p>|---|---|</p>\n<p>| <code>PROFILE</code> | 当前预设 |</p>\n<p>| <code>CPU_GOV</code> <code>GPU_TUNE</code> <code>IO_SCHED</code> <code>READ_AHEAD</code> <code>VM_TUNE</code> <code>NET_TUNE</code> <code>DNS_TUNE</code> <code>ZRAM_TUNE</code> | 各子系统开关，1 开 0 关 |</p>\n<p>| <code>THERMAL_OPEN</code> | 温控解锁，默认关 |</p>\n<p>| <code>SELINUX_PERM</code> | SELinux 宽容，默认关 |</p>\n<p>| <code>AUTOPILOT</code> <code>AUTO_BASE</code> <code>AUTO_COOL</code> <code>AUTO_TEMP_HIGH</code> <code>AUTO_TEMP_LOW</code> <code>AUTO_SCREEN</code> <code>AUTO_CHARGE</code> | 智能驾驶 |</p>\n<p>| <code>BATT_GUARD</code> <code>CHARGE_LIMIT</code> | 电池守护 |</p>\n<p>| <code>APPWATCH</code> <code>WATCH_BASE</code> | 应用策略 |</p>\n<p>| <code>DISP_TUNE</code> | 显示调优 |</p>\n\n<p>温度阈值单位是毫摄氏度，<code>45000</code> = 45°C。</p>\n\n<p>改完不用重启，跑一次 <code>tuner.sh apply</code> 就生效。</p>\n\n<p>---</p>\n\n<h2>目录结构</h2>\n\n<pre>/data/adb/modules/KernelSU-Tuner/\n├── module.prop\n├── customize.sh           安装时初始化配置、设权限\n├── post-fs-data.sh        建目录、校验配置、识别 late-load\n├── service.sh             开机应用预设、拉起守护进程\n├── boot-completed.sh      动画缩放、自动 fstrim、刷新模块描述\n├── action.sh              动作按钮\n├── uninstall.sh           卸载时完整还原\n├── initrc/\n│   └── KernelSU-Tuner.rc  init 常驻服务\n├── bin/\n│   ├── tuner.sh           主控，预设应用与状态查询\n│   ├── autopilot.sh       温度/息屏/充电自适应\n│   ├── guard.sh           充电上限\n│   ├── appctl.sh          Standby Bucket 管理\n│   ├── appwatch.sh        前台应用追踪\n│   ├── custom.sh          自定义参数\n│   ├── display.sh         刷新率与触控\n│   ├── kernel.sh          devfreq/KSM/THP/schedtune/TCP/boost/fs\n│   ├── presets.sh         自定义预设\n│   ├── backup.sh          配置导出导入\n│   ├── wipeshield.sh      防格机\n│   ├── watchdog.sh        守护进程看门狗\n│   ├── cfg.sh             配置原子读写与版本迁移\n│   └── init-apply.sh      initrc 调用的入口\n├── sepolicy.rule          SELinux 规则\n└── webroot/\n    └── index.html         WebUI（单文件，无外部依赖）</pre>\n\n<p>运行时数据在 <code>/data/adb/ksu_tuner/</code>（与模块 id 解耦，升级不丢配置）：<code>config.conf</code> 配置、<code>backup.conf</code> 原始值备份、<code>tuner.log</code> 日志、各守护进程的 <code>.pid</code> 和 <code>.log</code>。</p>\n\n<p>---</p>\n\n<h2>几个坑</h2>\n\n<p><b>温度阈值别设太低。</b> 设 40°C 的话日常刷个网页都会触发降温，得不偿失。45~50 比较合理。</p>\n\n<p><b>温控解锁和 SELinux 宽容默认关着是有原因的。</b> 前者会让机身明显更热，长期高温反而伤电池；后者降低安全强度，调试完就该关掉。这俩我不建议长期开着。</p>\n\n<p><b>自定义参数改之前先确认节点含义。</b> 虽然能还原，但写错值可能当场就卡住，得进 recovery 删文件。不确定的先 <code>cat</code> 一下看看当前值和取值范围。</p>\n\n<p><b>AppWatch 和 AutoPilot 别同时开。</b> 两个都在抢着切预设，会打架。动作按钮的循环顺序已经考虑到了这点，但手动配置时容易踩。</p>\n\n<p><b><code>revert</code> 之后记得重新 <code>apply</code>。</b> 回滚是把值恢复成模块第一次写入前的样子，此时配置里的开关还是开的，不重新应用的话状态和配置就对不上了。</p>\n\n<p><b>WebUI 首次打开会读一圈状态，大概 1~2 秒。</b> 标签页是懒加载的，切到「应用管理」才开始拉应用列表，应用多的话会再等一会儿。</p>\n\n<p>---</p>\n\n<h2>卸载</h2>\n\n<p>直接在管理器里删就行，<code>uninstall.sh</code> 会：</p>\n\n<li>杀掉所有守护进程</li>\n<li>还原自定义参数和内核参数</li>\n<li>恢复应用待机档位到 `frequent`</li>\n<li>恢复刷新率和触控设置</li>\n<li>清掉 `/data/adb/ksu_tuner/`</li>\n\n<p>如果哪个环节没跑成功，<code>backup.conf</code> 里还有原始值，手动写回去就行。</p>\n\n<p>---</p>\n\n<h2>测试情况</h2>\n\n<p>主控和守护进程都留了注入点，方便不刷机验证逻辑：</p>\n\n<li>`KSU_SYS=<路径>` 把 `/sys`、`/proc` 的读取重定向到别处</li>\n<li>`autopilot.sh once` 只跑一次决策</li>\n<li>`appwatch.sh fg` / `once` 单独看前台识别结果</li>\n\n<p>我用这套跑了这些场景：</p>\n\n<li>AutoPilot 决策矩阵 12 组（常规 / 息屏 / 过热 / 临界 45°C / 充电提速 / 改基准档 / 关息屏省电 / 动态改阈值）</li>\n<li>冷却滞回时序（46°C 触发 → 43°C 保持 → 39°C 解除）</li>\n<li>BatteryGuard 充放电循环 5 组（85% 断电 / 79% 保持 / 76% 恢复 / 再次断电 / 停止时恢复充电）</li>\n<li>前台识别 7 组（含 3 级回退链、多用户、特殊包名）</li>\n<li>自定义参数增删改查、非法路径拦截、节点缺失降级</li>\n\n<p>在骁龙 8 Gen 2 / 内核 5.10.236 的机器上实机验证通过。</p>\n\n<p>---</p>\n\n<h2>许可</h2>\n\n<p>GPL-3.0</p>",
+  "homepageUrl": "https://kernelsu.org",
+  "sourceUrl": "https://github.com/ylh440104/KernelSU-Tuner",
+  "url": "https://github.com/ylh440104/KernelSU-Tuner",
+  "latestRelease": {
+    "name": "v3.4.2",
+    "version": "v3.4.2",
+    "time": "2026-10-26T00:02:55Z",
+    "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.4.2/KernelSU-Tuner-30042-v3.4.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.4.2",
+      "tagName": "v3.4.2",
+      "publishedAt": "2026-10-26T00:02:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30042-v3.4.2.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.4.2/KernelSU-Tuner-30042-v3.4.2.zip",
+          "size": 53029,
+          "downloadCount": 1091
+        }
+      ]
+    },
+    {
+      "name": "v3.4.1",
+      "tagName": "v3.4.1",
+      "publishedAt": "2026-10-13T10:52:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30041-v3.4.1.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.4.1/KernelSU-Tuner-30041-v3.4.1.zip",
+          "size": 53024,
+          "downloadCount": 1974
+        }
+      ]
+    },
+    {
+      "name": "v3.4.0",
+      "tagName": "v3.4.0",
+      "publishedAt": "2026-10-11T15:36:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30040-v3.4.0.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.4.0/KernelSU-Tuner-30040-v3.4.0.zip",
+          "size": 53132,
+          "downloadCount": 289
+        }
+      ]
+    },
+    {
+      "name": "v3.3.0",
+      "tagName": "v3.3.0",
+      "publishedAt": "2026-10-11T12:58:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30030-v3.3.0.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.3.0/KernelSU-Tuner-30030-v3.3.0.zip",
+          "size": 44390,
+          "downloadCount": 64
+        }
+      ]
+    },
+    {
+      "name": "v3.2.0",
+      "tagName": "v3.2.0",
+      "publishedAt": "2026-10-11T12:40:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30020-v3.2.0.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.2.0/KernelSU-Tuner-30020-v3.2.0.zip",
+          "size": 41138,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "v3.1.0",
+      "tagName": "v3.1.0",
+      "publishedAt": "2026-10-11T11:42:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30010-v3.1.0.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.1.0/KernelSU-Tuner-30010-v3.1.0.zip",
+          "size": 36076,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v3.0.3",
+      "tagName": "v3.0.3",
+      "publishedAt": "2026-10-11T08:45:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30003-v3.0.3.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.0.3/KernelSU-Tuner-30003-v3.0.3.zip",
+          "size": 31324,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v3.0.2",
+      "tagName": "v3.0.2",
+      "publishedAt": "2026-10-11T08:25:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-30002-v3.0.2.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.0.2/KernelSU-Tuner-30002-v3.0.2.zip",
+          "size": 31264,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-10-11T08:08:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU-Tuner-v3.0.0.zip",
+          "downloadUrl": "https://github.com/ylh440104/KernelSU-Tuner/releases/download/v3.0.0/KernelSU-Tuner-v3.0.0.zip",
+          "size": 31264,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

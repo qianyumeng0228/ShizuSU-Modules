@@ -1,0 +1,29 @@
+{
+  "readme": "# ReZygisk Next\n\nReZygisk 的 Zygisk 独立实现，提供增强的反检测能力。支持 **Magisk**、**KernelSU** 和 **APatch**。\n\n以纯 C 全面重写，内置自定义 linker，不依赖系统 linker 加载，从根本上绕过 linker 级检测。\n\n## 特性\n\n- **纯 C 重写** — 更轻量、更快的二进制文件，代码逻辑清晰可审计\n- **自定义 linker** — 基于 CSOLoader，在正常流程中完全绕过系统 linker\n- **多级反检测** — 进程名伪装、抽象 socket、加密通信协议、MADV_FREE 内存清理\n- **Payload 纯 syscall 引导** — 零 libc 依赖的最小化引导代码，绕过用户态 hook\n- **process_vm_writev 注入** — 避免使用 ptrace，降低被检测风险\n- **mremap 隐藏加载** — 不创建新 VMA 条目，隐蔽加载动态库\n- **字符串混淆** — 编译时/运行时字符串加密\n- **OLLVM 混淆支持** — 可选的控制流平坦化、指令替换等混淆\n\n## 支持的 Root 方案\n\n| Root 方案 | 最低版本 |\n|-----------|---------|\n| Magisk | 26402 |\n| KernelSU | 10940 |\n| APatch | 10655 |\n\n## 兼容性\n\n- **Android**: 7.1+ (API 25+)\n- **架构**: arm64-v8a, armeabi-v7a, x86, x86_64\n- **Zygisk API**: 完全兼容 Zygisk API v4 模块\n\n## 安装\n\n1. 从 [Releases](https://github.com/AYwlilwYA/ReZygisk_Next/releases) 下载对应版本\n   - `release` — 日常使用，优化过的二进制文件，无调试日志\n   - `debug` — 仅调试用，包含详细日志\n2. 在 Root 管理器（Magisk/KernelSU/APatch）的模块页面刷入 zip\n3. **Magisk 用户**：请在设置中关闭内置 Zygisk，否则会冲突\n4. 重启设备\n\n安装后可在模块描述中查看运行状态，正常应显示 `[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅]`。\n\n## 构建\n\n### 依赖\n\n- Android NDK (r27+)\n- GNU Make\n- Python 3\n\n### 构建命令\n\n```sh\n# Debug 构建\nmake debug\n\n# Release 构建\nmake release\n\n# OLLVM 混淆构建 (需要 OLLVM/Hikari 工具链)\nmake OBFUSCATE=1 BUILD_TYPE=release\n```\n\n输出文件位于 `build/out/` 目录。\n\n## 许可\n\nReZygisk Next 基于 [AGPL 3.0](./LICENSE) 许可。\n",
+  "readmeHTML": "<h1>ReZygisk Next</h1>\n\n<p>ReZygisk 的 Zygisk 独立实现，提供增强的反检测能力。支持 <b>Magisk</b>、<b>KernelSU</b> 和 <b>APatch</b>。</p>\n\n<p>以纯 C 全面重写，内置自定义 linker，不依赖系统 linker 加载，从根本上绕过 linker 级检测。</p>\n\n<h2>特性</h2>\n\n<li>**纯 C 重写** — 更轻量、更快的二进制文件，代码逻辑清晰可审计</li>\n<li>**自定义 linker** — 基于 CSOLoader，在正常流程中完全绕过系统 linker</li>\n<li>**多级反检测** — 进程名伪装、抽象 socket、加密通信协议、MADV_FREE 内存清理</li>\n<li>**Payload 纯 syscall 引导** — 零 libc 依赖的最小化引导代码，绕过用户态 hook</li>\n<li>**process_vm_writev 注入** — 避免使用 ptrace，降低被检测风险</li>\n<li>**mremap 隐藏加载** — 不创建新 VMA 条目，隐蔽加载动态库</li>\n<li>**字符串混淆** — 编译时/运行时字符串加密</li>\n<li>**OLLVM 混淆支持** — 可选的控制流平坦化、指令替换等混淆</li>\n\n<h2>支持的 Root 方案</h2>\n\n<p>| Root 方案 | 最低版本 |</p>\n<p>|-----------|---------|</p>\n<p>| Magisk | 26402 |</p>\n<p>| KernelSU | 10940 |</p>\n<p>| APatch | 10655 |</p>\n\n<h2>兼容性</h2>\n\n<li>**Android**: 7.1+ (API 25+)</li>\n<li>**架构**: arm64-v8a, armeabi-v7a, x86, x86_64</li>\n<li>**Zygisk API**: 完全兼容 Zygisk API v4 模块</li>\n\n<h2>安装</h2>\n\n<li>从 [Releases](https://github.com/AYwlilwYA/ReZygisk_Next/releases) 下载对应版本</li>\n<p>   - <code>release</code> — 日常使用，优化过的二进制文件，无调试日志</p>\n<p>   - <code>debug</code> — 仅调试用，包含详细日志</p>\n<li>在 Root 管理器（Magisk/KernelSU/APatch）的模块页面刷入 zip</li>\n<li>**Magisk 用户**：请在设置中关闭内置 Zygisk，否则会冲突</li>\n<li>重启设备</li>\n\n<p>安装后可在模块描述中查看运行状态，正常应显示 <code>[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅]</code>。</p>\n\n<h2>构建</h2>\n\n<h3>依赖</h3>\n\n<li>Android NDK (r27+)</li>\n<li>GNU Make</li>\n<li>Python 3</li>\n\n<h3>构建命令</h3>\n\n<pre># Debug 构建\nmake debug\n\n# Release 构建\nmake release\n\n# OLLVM 混淆构建 (需要 OLLVM/Hikari 工具链)\nmake OBFUSCATE=1 BUILD_TYPE=release</pre>\n\n<p>输出文件位于 <code>build/out/</code> 目录。</p>\n\n<h2>许可</h2>\n\n<p>ReZygisk Next 基于 <a href=\"./LICENSE\">AGPL 3.0</a> 许可。</p>",
+  "homepageUrl": "https://github.com/AYwlilwYA/ReZygisk_Next",
+  "sourceUrl": "https://github.com/AYwlilwYA/ReZygisk_Next",
+  "url": "https://github.com/AYwlilwYA/ReZygisk_Next",
+  "latestRelease": {
+    "name": "v2.0.0",
+    "version": "v2.0.0",
+    "time": "2026-08-11T04:55:17Z",
+    "downloadUrl": "https://github.com/AYwlilwYA/ReZygisk_Next/releases/download/v2.0.0/ReZygisk_Next-v2.0.0-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-08-11T04:55:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk_Next-v2.0.0-release.zip",
+          "downloadUrl": "https://github.com/AYwlilwYA/ReZygisk_Next/releases/download/v2.0.0/ReZygisk_Next-v2.0.0-release.zip",
+          "size": 510785,
+          "downloadCount": 158
+        }
+      ]
+    }
+  ]
+}

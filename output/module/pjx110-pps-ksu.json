@@ -1,0 +1,49 @@
+{
+  "readme": "# 一加 Ace 3 Pro PPS\n\n适用于 **PJX110 / corvette** 的 KernelSU 模块。在 WebUI 查看充电信息，切换原厂、33W PPS（11V / 3A）或 55W PPS（11V / 5A）。\n\n> **仅 `PJX110_16.0.2.400` 已实机验证。其他固件为实验性支持，结构校验通过不保证能开机或正常充电。**\n\n## 使用\n\n1. Bootloader 必须保持真实解锁，先准备当前固件原厂 DTBO 的电脑副本。\n2. 在 KernelSU 安装模块 ZIP 并重启，打开模块 WebUI。不要刷入 GitHub 的源码 ZIP。\n3. 按页面提示检测或选择档位，确认写入成功后重启生效。\n\n55W 需要支持对应 5A PPS 档位的充电器与线材。档位不是实时功率，实际充电受电量、温度及充电设备限制。\n\n## 两种模式\n\n- **全分区：** 使用完整镜像集。内置 ColorOS 15/16 共 19 个固件，安装时按 DTBO SHA256 只解压匹配版本的原厂 / 33W / 55W 三张镜像（约 72 MiB），随后删除压缩集。未知 DTBO 不安装内置镜像。\n- **补丁：** 先检测原厂 DTBO、驱动与 AVB，验证备份及救援快照后启用；切换档位时按需生成镜像。检测不通过则禁止启用。\n\n**两种模式均写入完整 DTBO，不是局部写入。** 补丁可手动校验后转为全分区；同一 DTBO 版本转为全分区后不能返回补丁，不能混用两套操作。\n\n## OTA 后\n\n缺少当前版本镜像集时，WebUI 禁用对应操作。重装模块提取新镜像集；如果换入不同版本的原厂 DTBO，且页面开放“检测并使用补丁”，也可手动重新检测并登记。不会自动切换模式或沿用旧版本备份。\n\n## 安全与恢复\n\n- 只读写可信活动槽的 `dtbo_a` 或 `dtbo_b`，绝不操作其他分区。\n- 必须保留完整 AVB footer 和 VBMeta；禁止删除、截断或绕过校验。写入前验证镜像结构、SHA256 和分区大小，写入后校验完整回读。不确定或校验失败时拒绝写入。\n- 卸载前先在 WebUI 恢复原厂，重启确认正常后再卸载。\n- 卡开机时，禁用或删除模块不会撤销已写入的 DTBO，按 [恢复指南](RECOVERY.md) 使用 Recovery 或 fastboot 恢复。\n\n独立救援目录：`/data/adb/PJX110_PPS_KSU/rescue/`。生成后请保存电脑副本；清除 `/data` 会丢失手机内的备份。\n\n## 文档\n\n- [支持固件与完整 SHA256](FIRMWARES.md)\n- [启动失败恢复指南](RECOVERY.md)\n- [第三方来源与声明](THIRD_PARTY_NOTICES.md)\n- [许可证](LICENSE)\n",
+  "readmeHTML": "<h1>一加 Ace 3 Pro PPS</h1>\n\n<p>适用于 <b>PJX110 / corvette</b> 的 KernelSU 模块。在 WebUI 查看充电信息，切换原厂、33W PPS（11V / 3A）或 55W PPS（11V / 5A）。</p>\n\n<p>> <b>仅 <code>PJX110_16.0.2.400</code> 已实机验证。其他固件为实验性支持，结构校验通过不保证能开机或正常充电。</b></p>\n\n<h2>使用</h2>\n\n<li>Bootloader 必须保持真实解锁，先准备当前固件原厂 DTBO 的电脑副本。</li>\n<li>在 KernelSU 安装模块 ZIP 并重启，打开模块 WebUI。不要刷入 GitHub 的源码 ZIP。</li>\n<li>按页面提示检测或选择档位，确认写入成功后重启生效。</li>\n\n<p>55W 需要支持对应 5A PPS 档位的充电器与线材。档位不是实时功率，实际充电受电量、温度及充电设备限制。</p>\n\n<h2>两种模式</h2>\n\n<li>**全分区：** 使用完整镜像集。内置 ColorOS 15/16 共 19 个固件，安装时按 DTBO SHA256 只解压匹配版本的原厂 / 33W / 55W 三张镜像（约 72 MiB），随后删除压缩集。未知 DTBO 不安装内置镜像。</li>\n<li>**补丁：** 先检测原厂 DTBO、驱动与 AVB，验证备份及救援快照后启用；切换档位时按需生成镜像。检测不通过则禁止启用。</li>\n\n<p><b>两种模式均写入完整 DTBO，不是局部写入。</b> 补丁可手动校验后转为全分区；同一 DTBO 版本转为全分区后不能返回补丁，不能混用两套操作。</p>\n\n<h2>OTA 后</h2>\n\n<p>缺少当前版本镜像集时，WebUI 禁用对应操作。重装模块提取新镜像集；如果换入不同版本的原厂 DTBO，且页面开放“检测并使用补丁”，也可手动重新检测并登记。不会自动切换模式或沿用旧版本备份。</p>\n\n<h2>安全与恢复</h2>\n\n<li>只读写可信活动槽的 `dtbo_a` 或 `dtbo_b`，绝不操作其他分区。</li>\n<li>必须保留完整 AVB footer 和 VBMeta；禁止删除、截断或绕过校验。写入前验证镜像结构、SHA256 和分区大小，写入后校验完整回读。不确定或校验失败时拒绝写入。</li>\n<li>卸载前先在 WebUI 恢复原厂，重启确认正常后再卸载。</li>\n<li>卡开机时，禁用或删除模块不会撤销已写入的 DTBO，按 [恢复指南](RECOVERY.md) 使用 Recovery 或 fastboot 恢复。</li>\n\n<p>独立救援目录：<code>/data/adb/PJX110_PPS_KSU/rescue/</code>。生成后请保存电脑副本；清除 <code>/data</code> 会丢失手机内的备份。</p>\n\n<h2>文档</h2>\n\n<li>[支持固件与完整 SHA256](FIRMWARES.md)</li>\n<li>[启动失败恢复指南](RECOVERY.md)</li>\n<li>[第三方来源与声明](THIRD_PARTY_NOTICES.md)</li>\n<li>[许可证](LICENSE)</li>",
+  "homepageUrl": "https://github.com/qimaoww/PJX110-PPS-KSU",
+  "sourceUrl": "https://github.com/qimaoww/PJX110-PPS-KSU",
+  "url": "https://github.com/qimaoww/PJX110-PPS-KSU",
+  "latestRelease": {
+    "name": "v1.1.1",
+    "version": "v1.1.1",
+    "time": "2026-08-17T13:39:00Z",
+    "downloadUrl": "https://github.com/qimaoww/PJX110-PPS-KSU/releases/download/v1.1.1/PJX110-PPS-KSU-v1.1.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-10-08T21:37:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PJX110-PPS-KSU-v1.2.0.zip",
+          "downloadUrl": "https://github.com/qimaoww/PJX110-PPS-KSU/releases/download/v1.2.0/PJX110-PPS-KSU-v1.2.0.zip",
+          "size": 19521920,
+          "downloadCount": 54
+        },
+        {
+          "name": "SHA256SUMS-v1.2.0.txt",
+          "downloadUrl": "https://github.com/qimaoww/PJX110-PPS-KSU/releases/download/v1.2.0/SHA256SUMS-v1.2.0.txt",
+          "size": 92,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-08-17T13:39:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PJX110-PPS-KSU-v1.1.1.zip",
+          "downloadUrl": "https://github.com/qimaoww/PJX110-PPS-KSU/releases/download/v1.1.1/PJX110-PPS-KSU-v1.1.1.zip",
+          "size": 3680816,
+          "downloadCount": 163
+        }
+      ]
+    }
+  ]
+}

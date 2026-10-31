@@ -1,0 +1,145 @@
+{
+  "readme": "# Android-Hotspot-Web\n\n面向已 Root 安卓设备的本地热点管理模块，当前主要在小米/Redmi 设备上测试。\n\n本项目通过 KernelSU 模块在手机本地运行轻量 Web 管理后台，允许连接热点的设备查看状态、开关热点、修改热点参数、管理客户端、统计流量并配置自动化、消息通知与透明代理。\n\n> 当前主要在 Xiaomi 14 / HyperOS 3 / Android 16 / KernelSU 上完成测试；其他设备通过动态能力检测运行，未验证机型标记为 Experimental。\n\n## 功能\n\n### 热点控制\n- 一键开启、关闭热点\n- 手动关闭后，本次开机不再被保活或定时任务自动拉起\n- 重启手机后按照\"开机自动启动\"设置执行\n- 关闭热点不停止短信转发和消息通知\n- 修改热点名称、密码、加密方式、频段、信道\n- 隐藏 SSID（不广播热点名称，需手动输入名称和密码连接；仅隐藏名称广播，不是安全机制；保存前自动检测系统是否支持 -h，不支持则禁用开关，启动失败自动回滚为广播）\n- 设置最大连接设备数\n- 显示实际运行状态与已保存配置\n- 热点异常掉线自动恢复（保活）\n\n### 自动化\n- 开机自动启动热点\n- 热点异常保活\n- 空闲无客户端自动关闭\n- 每天、工作日、周末定时开关\n- 支持跨午夜定时\n- 手动关闭与自动策略状态区分\n- 显示最近一次策略关闭原因\n\n### 流量管理\n- 今日热点流量\n- 本月热点流量\n- 当前账期用量\n- 套餐总量、剩余流量和使用百分比\n- 自定义账期起始日\n- 最近多日流量图表\n- 历史账期记录\n- 自定义流量提醒节点\n- 流量耗尽预测（按当前日均消耗估算剩余可用天数）\n- 超额仅提醒或自动关闭热点\n- 重置流量累计\n\n> 流量统计仅计算热点客户端的转发流量，不包含手机自身使用的移动数据。统计结果可能与运营商账单存在差异。\n\n### 设备管理\n- 查看当前连接设备\n- 显示 IP、MAC、厂商及在线状态\n- 历史设备记录\n- 添加设备备注\n- 禁止或恢复设备上网\n- MAC 访问控制双模式：黑名单 / 白名单（仅允许名单内设备上网）\n- 临时断网\n- 实验性设备限速\n- 清空名单\n\n> 设备限速为实验性功能，不同内核和 ROM 的 tc 支持可能不同；系统无 tc 时该入口自动隐藏。\n\n### 消息通知\n- PushPlus 微信通知\n- 钉钉群机器人通知（支持加签）\n- Bark（iPhone 推送）\n- 自定义流量提醒节点\n- 低电量提醒\n- 短信转发到 PushPlus、钉钉或 Bark\n- 通知渠道健康状态\n- 失败重试和待发送队列\n- 测试通知功能\n\n### 科学上网（Mihomo）\n- 安装时自动下载 Mihomo ARM64 核心（v1.19.31），多镜像 fallback\n- 支持 Clash/Mihomo 订阅、AUTO 自动选择、FALLBACK 故障转移、MANUAL 手动选节点\n- 热点客户端 TCP/DNS 透明代理，国内 IP 直连、其它流量按代理策略处理\n- 节点测速、订阅更新、节点健康检查和异常自动恢复\n- 代理范围（仅热点设备 / 仅手机本机 / 两者）在「高级设置」中调整；默认仅代理热点设备，不影响手机自身联网\n- 本机代理与热点客户端代理使用独立 iptables 链，可单独启停，互不影响\n\n> 当前透明代理仍以 REDIRECT/TCP 为主；UDP/443 默认通过阻止 QUIC 促使应用回落到 TCP。完整 UDP/TPROXY 尚未作为默认模式。\n\n### 管理与诊断\n- 局域网 Web 管理\n- 亮色、暗色主题\n- 手机端响应式布局\n- 修改后台密码\n- 修改 Web 端口\n- 配置导入、导出\n- 服务日志查看\n- 一键诊断报告\n- 模块服务重启\n- CSRF 和后台密码校验\n- 设备适配检测（Root 框架 / Android 版本 / 核心工具可用性）\n- 短信正文二次验证\n\n## 兼容性说明（v1.7.6 起：通用兼容架构）\n\n本项目采用 **Android 通用兼容架构**：所有热点读取/修改/启动/停止/状态检测统一走 **Hotspot Compatibility Layer**（`lib/compat.sh`），能力由内置 **Binder Bridge probe 实测**（枚举 IWifiManager 方法签名、SoftApConfiguration.Builder 方法、反射 Framework 安全/频段常量），**不针对品牌/ROM/版本写死**；Web UI 按能力动态显示支持项，不支持的参数自动隐藏或禁用。\n\n系统热点配置（Android 持久 **SoftApConfiguration**）是**唯一数据源**，系统设置与 Web 双向同步（同步级别：A=完整读写 / B=只读 / C=仅开关与状态，页面会显示当前级别）。写入一律走 Wi-Fi Framework 的 `setSoftApConfiguration()`（经内置 **Binder Bridge**，与系统设置应用同一持久化路径），`WifiConfigStore.xml` 仅在读取时作为只读兜底。\n\n| 设备/环境 | 状态 |\n|---|---|\n| Xiaomi 14（houji） | 已验证（主要测试设备） |\n| HyperOS 3 / Android 16 | 已验证 |\n| KernelSU | 已验证 |\n| Magisk / APatch | 未完整测试 |\n| 其他已 Root 安卓设备 | 按系统能力自动降级，欢迎反馈测试结果 |\n| Pixel / AOSP | 架构支持，未验证 |\n| Samsung One UI / OPPO / vivo | 架构支持，未验证 |\n\n其他设备必须同时满足：\n- 已取得 Root 权限\n- 系统提供 `cmd wifi start-softap` 和 `cmd wifi stop-softap`\n- Root CGI 进程能够调用 Android 系统服务\n- BusyBox 包含项目所需命令\n- 系统内核支持 iptables 和相关网络统计能力\n- ROM 没有额外限制 SoftAP、Binder 或后台 Root 进程\n- 热点接口、IP 地址及 dumpsys 输出能够被正确识别\n\n不同厂商 ROM 可能修改热点命令、网络接口名称、SELinux 策略、短信数据库或系统状态输出，因此其他设备可能出现部分功能不可用。\n\n### 已知限制\n\n- **v1.7.6 起热点配置已与系统设置合一**：网页修改的热点名称/密码/频段等经 **Binder Bridge** 调用系统 `setSoftApConfiguration(config, packageName)` 持久化（标准 AOSP 两参签名，运行时枚举兼容 OEM 变体；该接口才真正写入 `WifiApConfigStore`），系统设置页同步可见；系统设置里手动修改同样会反映到 Web。**不使用** `cmd wifi start-softap <参数>`（它只临时启动、不写系统配置），也不直接改写 `WifiConfigStore.xml`（内存配置不会随之更新、会被系统写回覆盖）。热点**开关**经 Bridge 调用系统 Tethering（`IConnectivityManager.startTethering/stopTethering`，与设置应用同一路径；`cmd connectivity tether` 为 fallback 2，`cmd wifi` 为最后 fallback）。热点开启时保存会重启一次应用新配置；关闭时保存不启动、下次开启生效；写失败时热点保持原状态不掉线。\n- 单 Wi-Fi 硬件不能 STA+AP 并发；普通 Wi-Fi 开启时热点可保持运行，但上游联网是否可共享给客户端取决于 ROM 路由策略（页面有检测提示）。\n- 定时/保活/空闲关闭由模块 watchdog 每 15 秒轮询驱动，误差在 15 秒以内。\n- 流量限额口径为热点客户端转发流量，与运营商账单口径可能有差异，仅供参考。\n- 各 ROM 可能修改热点命令、接口名称、SELinux 策略或系统状态输出；不支持的参数按能力自动隐藏/禁用。\n\n## 安装要求\n\n- Xiaomi 14（houji）\n- HyperOS 3 / Android 16\n- 已解锁 Bootloader\n- 已安装并正常运行 KernelSU\n- 模块拥有 Root 权限\n- 建议使用 Chrome 或系统 WebView 访问后台\n\n## 安装步骤\n\n1. 在 KernelSU 中安装模块 ZIP\n2. 重启手机\n3. 连接手机热点\n4. 打开模块显示的管理地址\n5. 首次登录后立即修改后台密码\n6. 根据需要配置热点、流量、通知和自动化功能\n\n首选管理地址为 `http://192.168.43.1:8080`。如果 ROM 不允许绑定固定别名，请使用页面或诊断报告显示的实际网关地址。\n\n> 关闭热点后，当前通过热点连接的设备会立即断开管理页面。短信转发、PushPlus 和钉钉通知等后台服务仍会继续运行。\n\n## Roadmap\n\n- [ ] 安卓本机管理 APK\n- [ ] 关闭热点后从本机重新开启\n- [ ] 更多设备适配\n- [ ] Magisk 和 APatch 兼容性测试\n- [ ] 通用设备适配检测脚本\n- [ ] 前后端自动化回归测试\n\n## Bug 反馈\n\n提交 Issue 时请提供：\n\n- 手机型号及设备代号\n- ROM 名称和版本\n- Android 版本\n- KernelSU / Magisk / APatch 版本\n- 模块版本\n- 问题复现步骤\n- 页面截图\n- 浏览器控制台错误\n- 模块诊断报告\n- 相关服务日志\n\n请在提交前删除 Token、Webhook、手机号、短信正文、热点密码及其他隐私信息。\n\n## License\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<h1>Android-Hotspot-Web</h1>\n\n<p>面向已 Root 安卓设备的本地热点管理模块，当前主要在小米/Redmi 设备上测试。</p>\n\n<p>本项目通过 KernelSU 模块在手机本地运行轻量 Web 管理后台，允许连接热点的设备查看状态、开关热点、修改热点参数、管理客户端、统计流量并配置自动化、消息通知与透明代理。</p>\n\n<p>> 当前主要在 Xiaomi 14 / HyperOS 3 / Android 16 / KernelSU 上完成测试；其他设备通过动态能力检测运行，未验证机型标记为 Experimental。</p>\n\n<h2>功能</h2>\n\n<h3>热点控制</h3>\n<li>一键开启、关闭热点</li>\n<li>手动关闭后，本次开机不再被保活或定时任务自动拉起</li>\n<li>重启手机后按照\"开机自动启动\"设置执行</li>\n<li>关闭热点不停止短信转发和消息通知</li>\n<li>修改热点名称、密码、加密方式、频段、信道</li>\n<li>隐藏 SSID（不广播热点名称，需手动输入名称和密码连接；仅隐藏名称广播，不是安全机制；保存前自动检测系统是否支持 -h，不支持则禁用开关，启动失败自动回滚为广播）</li>\n<li>设置最大连接设备数</li>\n<li>显示实际运行状态与已保存配置</li>\n<li>热点异常掉线自动恢复（保活）</li>\n\n<h3>自动化</h3>\n<li>开机自动启动热点</li>\n<li>热点异常保活</li>\n<li>空闲无客户端自动关闭</li>\n<li>每天、工作日、周末定时开关</li>\n<li>支持跨午夜定时</li>\n<li>手动关闭与自动策略状态区分</li>\n<li>显示最近一次策略关闭原因</li>\n\n<h3>流量管理</h3>\n<li>今日热点流量</li>\n<li>本月热点流量</li>\n<li>当前账期用量</li>\n<li>套餐总量、剩余流量和使用百分比</li>\n<li>自定义账期起始日</li>\n<li>最近多日流量图表</li>\n<li>历史账期记录</li>\n<li>自定义流量提醒节点</li>\n<li>流量耗尽预测（按当前日均消耗估算剩余可用天数）</li>\n<li>超额仅提醒或自动关闭热点</li>\n<li>重置流量累计</li>\n\n<p>> 流量统计仅计算热点客户端的转发流量，不包含手机自身使用的移动数据。统计结果可能与运营商账单存在差异。</p>\n\n<h3>设备管理</h3>\n<li>查看当前连接设备</li>\n<li>显示 IP、MAC、厂商及在线状态</li>\n<li>历史设备记录</li>\n<li>添加设备备注</li>\n<li>禁止或恢复设备上网</li>\n<li>MAC 访问控制双模式：黑名单 / 白名单（仅允许名单内设备上网）</li>\n<li>临时断网</li>\n<li>实验性设备限速</li>\n<li>清空名单</li>\n\n<p>> 设备限速为实验性功能，不同内核和 ROM 的 tc 支持可能不同；系统无 tc 时该入口自动隐藏。</p>\n\n<h3>消息通知</h3>\n<li>PushPlus 微信通知</li>\n<li>钉钉群机器人通知（支持加签）</li>\n<li>Bark（iPhone 推送）</li>\n<li>自定义流量提醒节点</li>\n<li>低电量提醒</li>\n<li>短信转发到 PushPlus、钉钉或 Bark</li>\n<li>通知渠道健康状态</li>\n<li>失败重试和待发送队列</li>\n<li>测试通知功能</li>\n\n<h3>科学上网（Mihomo）</h3>\n<li>安装时自动下载 Mihomo ARM64 核心（v1.19.31），多镜像 fallback</li>\n<li>支持 Clash/Mihomo 订阅、AUTO 自动选择、FALLBACK 故障转移、MANUAL 手动选节点</li>\n<li>热点客户端 TCP/DNS 透明代理，国内 IP 直连、其它流量按代理策略处理</li>\n<li>节点测速、订阅更新、节点健康检查和异常自动恢复</li>\n<li>代理范围（仅热点设备 / 仅手机本机 / 两者）在「高级设置」中调整；默认仅代理热点设备，不影响手机自身联网</li>\n<li>本机代理与热点客户端代理使用独立 iptables 链，可单独启停，互不影响</li>\n\n<p>> 当前透明代理仍以 REDIRECT/TCP 为主；UDP/443 默认通过阻止 QUIC 促使应用回落到 TCP。完整 UDP/TPROXY 尚未作为默认模式。</p>\n\n<h3>管理与诊断</h3>\n<li>局域网 Web 管理</li>\n<li>亮色、暗色主题</li>\n<li>手机端响应式布局</li>\n<li>修改后台密码</li>\n<li>修改 Web 端口</li>\n<li>配置导入、导出</li>\n<li>服务日志查看</li>\n<li>一键诊断报告</li>\n<li>模块服务重启</li>\n<li>CSRF 和后台密码校验</li>\n<li>设备适配检测（Root 框架 / Android 版本 / 核心工具可用性）</li>\n<li>短信正文二次验证</li>\n\n<h2>兼容性说明（v1.7.6 起：通用兼容架构）</h2>\n\n<p>本项目采用 <b>Android 通用兼容架构</b>：所有热点读取/修改/启动/停止/状态检测统一走 <b>Hotspot Compatibility Layer</b>（<code>lib/compat.sh</code>），能力由内置 <b>Binder Bridge probe 实测</b>（枚举 IWifiManager 方法签名、SoftApConfiguration.Builder 方法、反射 Framework 安全/频段常量），<b>不针对品牌/ROM/版本写死</b>；Web UI 按能力动态显示支持项，不支持的参数自动隐藏或禁用。</p>\n\n<p>系统热点配置（Android 持久 <b>SoftApConfiguration</b>）是<b>唯一数据源</b>，系统设置与 Web 双向同步（同步级别：A=完整读写 / B=只读 / C=仅开关与状态，页面会显示当前级别）。写入一律走 Wi-Fi Framework 的 <code>setSoftApConfiguration()</code>（经内置 <b>Binder Bridge</b>，与系统设置应用同一持久化路径），<code>WifiConfigStore.xml</code> 仅在读取时作为只读兜底。</p>\n\n<p>| 设备/环境 | 状态 |</p>\n<p>|---|---|</p>\n<p>| Xiaomi 14（houji） | 已验证（主要测试设备） |</p>\n<p>| HyperOS 3 / Android 16 | 已验证 |</p>\n<p>| KernelSU | 已验证 |</p>\n<p>| Magisk / APatch | 未完整测试 |</p>\n<p>| 其他已 Root 安卓设备 | 按系统能力自动降级，欢迎反馈测试结果 |</p>\n<p>| Pixel / AOSP | 架构支持，未验证 |</p>\n<p>| Samsung One UI / OPPO / vivo | 架构支持，未验证 |</p>\n\n<p>其他设备必须同时满足：</p>\n<li>已取得 Root 权限</li>\n<li>系统提供 `cmd wifi start-softap` 和 `cmd wifi stop-softap`</li>\n<li>Root CGI 进程能够调用 Android 系统服务</li>\n<li>BusyBox 包含项目所需命令</li>\n<li>系统内核支持 iptables 和相关网络统计能力</li>\n<li>ROM 没有额外限制 SoftAP、Binder 或后台 Root 进程</li>\n<li>热点接口、IP 地址及 dumpsys 输出能够被正确识别</li>\n\n<p>不同厂商 ROM 可能修改热点命令、网络接口名称、SELinux 策略、短信数据库或系统状态输出，因此其他设备可能出现部分功能不可用。</p>\n\n<h3>已知限制</h3>\n\n<li>**v1.7.6 起热点配置已与系统设置合一**：网页修改的热点名称/密码/频段等经 **Binder Bridge** 调用系统 `setSoftApConfiguration(config, packageName)` 持久化（标准 AOSP 两参签名，运行时枚举兼容 OEM 变体；该接口才真正写入 `WifiApConfigStore`），系统设置页同步可见；系统设置里手动修改同样会反映到 Web。**不使用** `cmd wifi start-softap <参数>`（它只临时启动、不写系统配置），也不直接改写 `WifiConfigStore.xml`（内存配置不会随之更新、会被系统写回覆盖）。热点**开关**经 Bridge 调用系统 Tethering（`IConnectivityManager.startTethering/stopTethering`，与设置应用同一路径；`cmd connectivity tether` 为 fallback 2，`cmd wifi` 为最后 fallback）。热点开启时保存会重启一次应用新配置；关闭时保存不启动、下次开启生效；写失败时热点保持原状态不掉线。</li>\n<li>单 Wi-Fi 硬件不能 STA+AP 并发；普通 Wi-Fi 开启时热点可保持运行，但上游联网是否可共享给客户端取决于 ROM 路由策略（页面有检测提示）。</li>\n<li>定时/保活/空闲关闭由模块 watchdog 每 15 秒轮询驱动，误差在 15 秒以内。</li>\n<li>流量限额口径为热点客户端转发流量，与运营商账单口径可能有差异，仅供参考。</li>\n<li>各 ROM 可能修改热点命令、接口名称、SELinux 策略或系统状态输出；不支持的参数按能力自动隐藏/禁用。</li>\n\n<h2>安装要求</h2>\n\n<li>Xiaomi 14（houji）</li>\n<li>HyperOS 3 / Android 16</li>\n<li>已解锁 Bootloader</li>\n<li>已安装并正常运行 KernelSU</li>\n<li>模块拥有 Root 权限</li>\n<li>建议使用 Chrome 或系统 WebView 访问后台</li>\n\n<h2>安装步骤</h2>\n\n<li>在 KernelSU 中安装模块 ZIP</li>\n<li>重启手机</li>\n<li>连接手机热点</li>\n<li>打开模块显示的管理地址</li>\n<li>首次登录后立即修改后台密码</li>\n<li>根据需要配置热点、流量、通知和自动化功能</li>\n\n<p>首选管理地址为 <code>http://192.168.43.1:8080</code>。如果 ROM 不允许绑定固定别名，请使用页面或诊断报告显示的实际网关地址。</p>\n\n<p>> 关闭热点后，当前通过热点连接的设备会立即断开管理页面。短信转发、PushPlus 和钉钉通知等后台服务仍会继续运行。</p>\n\n<h2>Roadmap</h2>\n\n<li>[ ] 安卓本机管理 APK</li>\n<li>[ ] 关闭热点后从本机重新开启</li>\n<li>[ ] 更多设备适配</li>\n<li>[ ] Magisk 和 APatch 兼容性测试</li>\n<li>[ ] 通用设备适配检测脚本</li>\n<li>[ ] 前后端自动化回归测试</li>\n\n<h2>Bug 反馈</h2>\n\n<p>提交 Issue 时请提供：</p>\n\n<li>手机型号及设备代号</li>\n<li>ROM 名称和版本</li>\n<li>Android 版本</li>\n<li>KernelSU / Magisk / APatch 版本</li>\n<li>模块版本</li>\n<li>问题复现步骤</li>\n<li>页面截图</li>\n<li>浏览器控制台错误</li>\n<li>模块诊断报告</li>\n<li>相关服务日志</li>\n\n<p>请在提交前删除 Token、Webhook、手机号、短信正文、热点密码及其他隐私信息。</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web",
+  "sourceUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web",
+  "url": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web",
+  "latestRelease": {
+    "name": "v1.9.3-beta",
+    "version": "v1.9.3-beta",
+    "time": "2026-09-25T16:20:31Z",
+    "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.3-beta/Android-Hotspot-Web_KSU_v1.9.3-beta.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.9.3-beta",
+      "tagName": "v1.9.3-beta",
+      "publishedAt": "2026-09-25T16:20:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.3-beta.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.3-beta/Android-Hotspot-Web_KSU_v1.9.3-beta.zip",
+          "size": 259361,
+          "downloadCount": 30
+        },
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.3-beta_full.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.3-beta/Android-Hotspot-Web_KSU_v1.9.3-beta_full.zip",
+          "size": 26922956,
+          "downloadCount": 36
+        }
+      ]
+    },
+    {
+      "name": "v1.9.2-beta",
+      "tagName": "v1.9.2-beta",
+      "publishedAt": "2026-09-25T15:40:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.2-beta.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.2-beta/Android-Hotspot-Web_KSU_v1.9.2-beta.zip",
+          "size": 259427,
+          "downloadCount": 1
+        },
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.2-beta_full.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.2-beta/Android-Hotspot-Web_KSU_v1.9.2-beta_full.zip",
+          "size": 26923022,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.9.1-beta",
+      "tagName": "v1.9.1-beta",
+      "publishedAt": "2026-09-25T07:45:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.1-beta.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.1-beta/Android-Hotspot-Web_KSU_v1.9.1-beta.zip",
+          "size": 259074,
+          "downloadCount": 4
+        },
+        {
+          "name": "Android-Hotspot-Web_KSU_v1.9.1-beta_full.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.9.1-beta/Android-Hotspot-Web_KSU_v1.9.1-beta_full.zip",
+          "size": 26922669,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0-beta.6",
+      "tagName": "v1.6.0-beta.6",
+      "publishedAt": "2026-09-20T05:37:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_v1.6.0-beta.6.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.6.0-beta.6/Android-Hotspot-Web_v1.6.0-beta.6.zip",
+          "size": 26274693,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0-beta.5",
+      "tagName": "v1.6.0-beta.5",
+      "publishedAt": "2026-09-20T04:05:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_v1.6.0-beta.5.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.6.0-beta.5/Android-Hotspot-Web_v1.6.0-beta.5.zip",
+          "size": 26274289,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "v1.5.24-beta.5",
+      "tagName": "v1.5.24-beta.5",
+      "publishedAt": "2026-09-20T00:43:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_v1.5.24-beta.5_config-fix.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.5.24-beta.5/Android-Hotspot-Web_v1.5.24-beta.5_config-fix.zip",
+          "size": 26264466,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.5.24-beta.2",
+      "tagName": "v1.5.24-beta.2",
+      "publishedAt": "2026-09-19T17:18:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_v1.5.24-beta.2.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.5.24-beta.2/Android-Hotspot-Web_v1.5.24-beta.2.zip",
+          "size": 26118916,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.5.24-beta.1",
+      "tagName": "v1.5.24-beta.1",
+      "publishedAt": "2026-09-19T17:06:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Android-Hotspot-Web_v1.5.24-beta.1.zip",
+          "downloadUrl": "https://github.com/chenchaosuperman-cell/Android-Hotspot-Web/releases/download/v1.5.24-beta.1/Android-Hotspot-Web_v1.5.24-beta.1.zip",
+          "size": 26118924,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

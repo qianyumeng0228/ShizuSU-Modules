@@ -1,0 +1,127 @@
+{
+  "readme": "# Enable Wi-Fi 6GHz & Wi-Fi 7\n\nA Magisk / KernelSU / APatch module that enables Wi-Fi 6GHz and Wi-Fi 7 (802.11be) on Qualcomm-based Android devices.\n\nThis is a fork of [AndroPlus-org/magisk-module-wifi7](https://github.com/AndroPlus-org/magisk-module-wifi7) with additional device detection and driver-level unlock logic. Chinese documentation is available in [README.zh-CN.md](README.zh-CN.md).\n\n## Overview\n\nVendors restrict 6GHz and Wi-Fi 7 functionality at several layers: driver configuration (`WCNSS_qcom_cfg.ini`), framework country-code handling, and regional channel tables. This module addresses those layers on Qualcomm platforms:\n\n- Locates the chip-specific driver configuration and applies unlock parameters at install time.\n- Forces the WiFi country code to AU at boot, overriding framework and telephony updates.\n- Disables 802.11d and framework country-code scanning to prevent the code from being reverted.\n\n## Features\n\n- Enables 6GHz STA operation (channel availability depends on regulatory tables and hardware).\n- Enables Wi-Fi 7 (802.11be) parameters, including MLD.\n- Driver-level unlock: `BandCapability`, `oem_6g_support_disable`, ETSI SRD SAP channels, indoor-channel support.\n- Forced country code (AU) via `resetprop`, `WifiConfigStore.xml` rewrite, and `cmd wifi force-country-code`.\n- Disables 802.11d (`g11dSupportEnabled=0`) and framework country-code scan/fallback.\n- Multi-vendor detection: Xiaomi, OPPO, OnePlus, Samsung (persist), Lenovo, and generic Qualcomm.\n- Multi-SKU chip detection: reads the actual chip name (e.g. `kiwi_v2`, `peach_v2`) from `dumpsys wifi`, so the correct SKU directory is patched instead of a wildcard guess.\n- Dynamic status in module description: the module description is updated at boot with live unlock state (country code, 6GHz STA/SAP channel counts, 802.11be, driver ini status). Supported by KernelSU Manager and MMRL.\n\n## Requirements\n\n- Magisk 20.4+ / KernelSU / APatch\n- A Qualcomm device with a 6GHz-capable WiFi chip (e.g. WCN6856, WCN7850, WCN7750)\n- KernelSU users additionally need a metamodule (such as `meta-overlayfs`) for `system/` overlay mounting. A bind-mount fallback is included.\n\n## Installation\n\n1. Download the latest `enable-wifi-7-vXX.zip` from the [Releases](https://github.com/preca-hoshino/enable-wifi-7/releases) page.\n2. Flash the zip in Magisk / KernelSU / APatch.\n3. **Reboot** — the status description is refreshed by `service.sh` at boot. To refresh without rebooting: `sh /data/adb/modules/enable-wifi-7/status.sh`.\n\nTo uninstall, remove the module in the manager and reboot.\n\n## Verification\n\n```sh\n# Country code should be AU\nadb shell cmd wifi get-country-code\n\n# 6GHz STA channels should be non-empty\nadb shell cmd wifi get-allowed-channel -b 8\n\n# Driver parameters (example: Xiaomi 15, peach_v2)\nadb shell grep -E \"g11dSupportEnabled|oem_6g_support_disable|gindoor_channel_support\" \\\n  /vendor/etc/wifi/peach_v2/WCNSS_qcom_cfg.ini\n```\n\n## How It Works\n\n1. **Install time** (`customize.sh`): detects vendor / SoC / board, locates the chip-specific ini directory, applies the unlock parameter table, and places the patched ini in the module's `system/` overlay path.\n2. **Boot** (`post-fs-data.sh`): bind-mounts the patched ini if the overlay did not take effect; sets `ro.boot.wificountrycode=AU` via `resetprop`.\n3. **Post-boot** (`service.sh`): rewrites the country code in `WifiConfigStore.xml` (CN to AU), overrides framework scan configs, and runs `cmd wifi force-country-code enabled AU`.\n4. **Status reporting** (`status.sh`): detects and writes the live unlock state (country code, 6GHz STA/SAP channels, 802.11be, driver ini) into the module description — first via a direct `module.prop` rewrite (works on all loaders), then via `ksud module config set override.description` on KernelSU. Runs at boot from `service.sh`; refresh manually with `sh /data/adb/modules/enable-wifi-7/status.sh`.\n\n## Compatibility\n\nVerified on:\n\n- Xiaomi 15 (`dada`, SM8750, PEACH_V2)\n- Xiaomi Pad 6S Pro (`sheng`, SM8550, KIWI_V2)\n\nOther devices with similar Qualcomm WiFi chips are expected to work but are not verified.\n\n## Known Limitations\n\n- **6GHz hotspot (SAP)**: Qualcomm drivers do not expose 6GHz channels in SAP / P2P-GO mode (the SAP channel list reported by `get-allowed-channel` is empty), and Xiaomi's driver patch `gindoor_channel_support` requires the STA to be connected to the same indoor channel before SAP can use it. This is a driver/firmware constraint that the module cannot bypass. Reliable 6GHz hotspot operation is therefore not expected.\n- 6GHz availability ultimately depends on driver firmware and antenna hardware; results vary by device.\n\n## Legal Notice\n\nThe 6GHz band is restricted in many countries and regions (including mainland China). This module forces the country code to AU (Australia) and is intended for development, testing, and educational purposes only. Do not use it in environments where it violates local radio regulations. Use at your own risk.\n\n## Upstream\n\n- Repository: [AndroPlus-org/magisk-module-wifi7](https://github.com/AndroPlus-org/magisk-module-wifi7)\n- Author: [AndroPlus](https://github.com/AndroPlus-org)\n\n## License\n\n[GNU Affero General Public License v3.0](LICENSE) - Copyright (c) 2026 preca-hoshino\n\nPortions derived from [AndroPlus-org/magisk-module-wifi7](https://github.com/AndroPlus-org/magisk-module-wifi7), Copyright (c) AndroPlus.\n",
+  "readmeHTML": "<h1>Enable Wi-Fi 6GHz & Wi-Fi 7</h1>\n\n<p>A Magisk / KernelSU / APatch module that enables Wi-Fi 6GHz and Wi-Fi 7 (802.11be) on Qualcomm-based Android devices.</p>\n\n<p>This is a fork of <a href=\"https://github.com/AndroPlus-org/magisk-module-wifi7\">AndroPlus-org/magisk-module-wifi7</a> with additional device detection and driver-level unlock logic. Chinese documentation is available in <a href=\"README.zh-CN.md\">README.zh-CN.md</a>.</p>\n\n<h2>Overview</h2>\n\n<p>Vendors restrict 6GHz and Wi-Fi 7 functionality at several layers: driver configuration (<code>WCNSS_qcom_cfg.ini</code>), framework country-code handling, and regional channel tables. This module addresses those layers on Qualcomm platforms:</p>\n\n<li>Locates the chip-specific driver configuration and applies unlock parameters at install time.</li>\n<li>Forces the WiFi country code to AU at boot, overriding framework and telephony updates.</li>\n<li>Disables 802.11d and framework country-code scanning to prevent the code from being reverted.</li>\n\n<h2>Features</h2>\n\n<li>Enables 6GHz STA operation (channel availability depends on regulatory tables and hardware).</li>\n<li>Enables Wi-Fi 7 (802.11be) parameters, including MLD.</li>\n<li>Driver-level unlock: `BandCapability`, `oem_6g_support_disable`, ETSI SRD SAP channels, indoor-channel support.</li>\n<li>Forced country code (AU) via `resetprop`, `WifiConfigStore.xml` rewrite, and `cmd wifi force-country-code`.</li>\n<li>Disables 802.11d (`g11dSupportEnabled=0`) and framework country-code scan/fallback.</li>\n<li>Multi-vendor detection: Xiaomi, OPPO, OnePlus, Samsung (persist), Lenovo, and generic Qualcomm.</li>\n<li>Multi-SKU chip detection: reads the actual chip name (e.g. `kiwi_v2`, `peach_v2`) from `dumpsys wifi`, so the correct SKU directory is patched instead of a wildcard guess.</li>\n<li>Dynamic status in module description: the module description is updated at boot with live unlock state (country code, 6GHz STA/SAP channel counts, 802.11be, driver ini status). Supported by KernelSU Manager and MMRL.</li>\n\n<h2>Requirements</h2>\n\n<li>Magisk 20.4+ / KernelSU / APatch</li>\n<li>A Qualcomm device with a 6GHz-capable WiFi chip (e.g. WCN6856, WCN7850, WCN7750)</li>\n<li>KernelSU users additionally need a metamodule (such as `meta-overlayfs`) for `system/` overlay mounting. A bind-mount fallback is included.</li>\n\n<h2>Installation</h2>\n\n<li>Download the latest `enable-wifi-7-vXX.zip` from the [Releases](https://github.com/preca-hoshino/enable-wifi-7/releases) page.</li>\n<li>Flash the zip in Magisk / KernelSU / APatch.</li>\n<li>**Reboot** — the status description is refreshed by `service.sh` at boot. To refresh without rebooting: `sh /data/adb/modules/enable-wifi-7/status.sh`.</li>\n\n<p>To uninstall, remove the module in the manager and reboot.</p>\n\n<h2>Verification</h2>\n\n<pre># Country code should be AU\nadb shell cmd wifi get-country-code\n\n# 6GHz STA channels should be non-empty\nadb shell cmd wifi get-allowed-channel -b 8\n\n# Driver parameters (example: Xiaomi 15, peach_v2)\nadb shell grep -E \"g11dSupportEnabled|oem_6g_support_disable|gindoor_channel_support\" \\\n  /vendor/etc/wifi/peach_v2/WCNSS_qcom_cfg.ini</pre>\n\n<h2>How It Works</h2>\n\n<li>**Install time** (`customize.sh`): detects vendor / SoC / board, locates the chip-specific ini directory, applies the unlock parameter table, and places the patched ini in the module's `system/` overlay path.</li>\n<li>**Boot** (`post-fs-data.sh`): bind-mounts the patched ini if the overlay did not take effect; sets `ro.boot.wificountrycode=AU` via `resetprop`.</li>\n<li>**Post-boot** (`service.sh`): rewrites the country code in `WifiConfigStore.xml` (CN to AU), overrides framework scan configs, and runs `cmd wifi force-country-code enabled AU`.</li>\n<li>**Status reporting** (`status.sh`): detects and writes the live unlock state (country code, 6GHz STA/SAP channels, 802.11be, driver ini) into the module description — first via a direct `module.prop` rewrite (works on all loaders), then via `ksud module config set override.description` on KernelSU. Runs at boot from `service.sh`; refresh manually with `sh /data/adb/modules/enable-wifi-7/status.sh`.</li>\n\n<h2>Compatibility</h2>\n\n<p>Verified on:</p>\n\n<li>Xiaomi 15 (`dada`, SM8750, PEACH_V2)</li>\n<li>Xiaomi Pad 6S Pro (`sheng`, SM8550, KIWI_V2)</li>\n\n<p>Other devices with similar Qualcomm WiFi chips are expected to work but are not verified.</p>\n\n<h2>Known Limitations</h2>\n\n<li>**6GHz hotspot (SAP)**: Qualcomm drivers do not expose 6GHz channels in SAP / P2P-GO mode (the SAP channel list reported by `get-allowed-channel` is empty), and Xiaomi's driver patch `gindoor_channel_support` requires the STA to be connected to the same indoor channel before SAP can use it. This is a driver/firmware constraint that the module cannot bypass. Reliable 6GHz hotspot operation is therefore not expected.</li>\n<li>6GHz availability ultimately depends on driver firmware and antenna hardware; results vary by device.</li>\n\n<h2>Legal Notice</h2>\n\n<p>The 6GHz band is restricted in many countries and regions (including mainland China). This module forces the country code to AU (Australia) and is intended for development, testing, and educational purposes only. Do not use it in environments where it violates local radio regulations. Use at your own risk.</p>\n\n<h2>Upstream</h2>\n\n<li>Repository: [AndroPlus-org/magisk-module-wifi7](https://github.com/AndroPlus-org/magisk-module-wifi7)</li>\n<li>Author: [AndroPlus](https://github.com/AndroPlus-org)</li>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">GNU Affero General Public License v3.0</a> - Copyright (c) 2026 preca-hoshino</p>\n\n<p>Portions derived from <a href=\"https://github.com/AndroPlus-org/magisk-module-wifi7\">AndroPlus-org/magisk-module-wifi7</a>, Copyright (c) AndroPlus.</p>",
+  "homepageUrl": "https://github.com/AndroPlus-org/magisk-module-wifi7",
+  "sourceUrl": "https://github.com/preca-hoshino/enable-wifi-7",
+  "url": "https://github.com/preca-hoshino/enable-wifi-7",
+  "latestRelease": {
+    "name": "v15",
+    "version": "v15",
+    "time": "2026-08-14T18:35:47Z",
+    "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v15/enable-wifi-7-v15.zip"
+  },
+  "releases": [
+    {
+      "name": "v15",
+      "tagName": "v15",
+      "publishedAt": "2026-08-14T18:35:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v15.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v15/enable-wifi-7-v15.zip",
+          "size": 38325,
+          "downloadCount": 664
+        }
+      ]
+    },
+    {
+      "name": "v14",
+      "tagName": "v14",
+      "publishedAt": "2026-08-14T18:05:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v14.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v14/enable-wifi-7-v14.zip",
+          "size": 36413,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v12",
+      "tagName": "v12",
+      "publishedAt": "2026-08-14T17:37:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v12.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v12/enable-wifi-7-v12.zip",
+          "size": 16442,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v11",
+      "tagName": "v11",
+      "publishedAt": "2026-08-14T17:20:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v11.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v11/enable-wifi-7-v11.zip",
+          "size": 16337,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v10",
+      "tagName": "v10",
+      "publishedAt": "2026-08-14T17:13:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v10.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v10/enable-wifi-7-v10.zip",
+          "size": 16185,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v09",
+      "tagName": "v09",
+      "publishedAt": "2026-08-14T17:03:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v09.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v09/enable-wifi-7-v09.zip",
+          "size": 16184,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v08",
+      "tagName": "v08",
+      "publishedAt": "2026-08-14T16:32:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v08.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v08/enable-wifi-7-v08.zip",
+          "size": 16143,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v07",
+      "tagName": "v07",
+      "publishedAt": "2026-08-14T16:09:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-wifi-7-v07.zip",
+          "downloadUrl": "https://github.com/preca-hoshino/enable-wifi-7/releases/download/v07/enable-wifi-7-v07.zip",
+          "size": 13944,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "readme": "# OWC — ColorOS 亮屏快充模块\n\n> ⚡ 解锁 ColorOS 亮屏充电限速，控制中心一键热切换，边玩边满功率快充\n>\n> @author bomo · Inspired by AaTempSpoof\n\n> [!IMPORTANT]\n> **目前仅在一加 15T（PLZ110 · ColorOS 16 · Android 16）上完整实测可用。**\n> 其他机型理论上原理相通，但节点路径/服务名因机型与系统版本可能不同，\n> **需要自行测试**。本项目为个人自用工具开源，**随缘更新**，不承诺适配。\n> 适配反馈请附 `tmp/warp_charge.log` 与机型信息。\n\n[![Version](https://img.shields.io/badge/version-v1.4.1-blue)]()\n[![Platform](https://img.shields.io/badge/platform-ColorOS%2016%20%2F%20Android%2016-green)]()\n[![Root](https://img.shields.io/badge/root-Magisk%20%7C%20KernelSU-orange)]()\n\n---\n\n## 这是什么\n\n一加 / OPPO / realme（ColorOS / OxygenOS）的\"亮屏降速充电\"是系统的**有意行为**：亮屏时充电内核写入降流档，功率直接砍半以上（实测一加 15T：亮屏 ~22W → 解锁后 ~45W，以充电头显示为准）。\n\nOWC（OP WarpCharge）按通用模块设计，把这套限流完整解开，并提供**控制中心磁贴**随时热切换：\n\n> ⚠️ **目前仅一加 15T 实测确认。其他机型请自测，适配随缘更新。**\n\n| 场景 | 磁贴关闭 | 磁贴开启 |\n| --- | --- | --- |\n| **亮屏充电（充电头显示）** | **~22 W** | **~45 W** |\n\n> 功率以充电头显示屏读数为准。测量电流节点的换算值（电压×电流×电芯数）因\n> 双电芯报告口径存在歧义，不作为对外数据。\n\n**事件驱动**：点击磁贴 → App 经 `su` 直接触发模块动作，秒级生效，无轮询等待。\n\n## 工作原理\n\n亮屏慢充由三层限流叠加，OWC 全部拆解（缺一则功率打折）：\n\n| 层 | 系统行为 | OWC 对策 |\n| --- | --- | --- |\n| 壳温 | `horae` 读取壳温限制充电功率 | `dumpsys horae testmode` 切换数据源 + `/proc/shell-temp` 伪装 34°C |\n| 电池温度 | 充电算法读取电池 `thermal_zone`（实测 43°C 时降流 16%） | 电池类 zone `emul_temp` 伪装 30°C |\n| **亮屏降流** | **亮屏时写 `oplus_chg/battery/cool_down=5`（降流档）** | 归零 + 守护每轮对抗系统重写 |\n\n> `cool_down` 为本项目实测发现：ColorOS 16 上亮屏时系统写入 5（降流档），\n> 写 0 后 1 秒内恢复满功率。常见\"亮屏快充\"实现（停 ORMS 等）在此平台已过时——\n> 实测 `vendor.oplus.ormsHalService` 服务不存在，停了也没有效果。\n\n## 架构\n\n```\n┌─ 控制中心磁贴 / App（Java，零依赖）──────────────────┐\n│  onClick → su -c \"写状态文件 + 调用守护 CLI 动作\"      │\n└──────────────────┬────────────────────────────────┘\n                   │ /data/adb/owc/enabled (0/1)\n┌──────────────────▼────────────────────────────────┐\n│  Magisk/KernelSU 模块守护 warp_charge.sh            │\n│  · apply/restore CLI 单次动作（事件驱动，秒级生效）  │\n│  · 每轮巡检：cool_down 对抗 + horae 重应用（4s）     │\n│  · 安全栏（见下）                                    │\n└────────────────────────────────────────────────────┘\n```\n\nApp 只是遥控器，全部业务逻辑在 shell 守护中（单一实现，防复制漂移）。\n\n## 安全栏（不可关闭，随守护常驻）\n\n实测充电热失控风险真实存在，以下保护**优先级高于一切开关**：\n\n- 🎮 **游戏运行中自动暂停**（壳温伪装会致盲系统温控，游戏中继续 = SoC 热失控）\n- 🔋 电池真实温度 ≥ **46°C** 自动暂停\n- 🖥️ CPU/SoC ≥ **85°C** 自动暂停（防 PMIC 95°C 硬复位，留 10°C 余量）\n- 🔌 充电断开 / 守护退出 → 完整恢复系统状态（ORMS + horae + cool_down）\n- ⏱️ 开机有界等待 + PID/cmdline 双验证锁 + watchdog 保活\n\n> ⚠️ 注意：满功率亮屏充电发热明显是物理现实。安全栏只是兜底，不是免死金牌。\n\n## ⛔ 兼容性限制\n\n- **不与其他充电类模块兼容**（AaTempSpoof 及一切写\n  `cool_down` / `oplus_chg` 温度 / `shell-temp` / horae 的模块）——OWC 直接写\n  充电内核节点，共存会互相覆盖，充电行为不可预期。安装脚本会自动检测并\n  **拒绝安装**。\n- **机型确认**：仅一加 15T（PLZ110）经过验证。其他机型安装时安装器会提示\n  未验证，并要求**按音量键显式确认**：`音量上 = 继续安装`、\n  `音量下 = 取消`、**10 秒无操作自动取消**（安全默认）。无效请到项目帖/issue\n  留言，作者随缘更新。\n\n## 安装\n\n### 模块（必需）\n\n1. 下载 [Releases](../../releases) 中的模块 zip（或自行打包本仓库根目录）\n2. Magisk / KernelSU 管理器刷入，重启\n   - 非 PLZ110 设备会提示未验证机型，按 **音量上** 确认继续（音量下或\n     10 秒无操作则取消安装）\n\n### App（可选，用于控制中心磁贴）\n\n```bash\ncd app\nbash build.sh   # 需要 JDK17 + Android SDK (build-tools 35, platform 36)\nadb install owc-app-debug.apk\n```\n\n然后在 KernelSU 中授予 App root，控制中心 → 编辑 → 添加\"亮屏快充\"磁贴。\n\n> 不装 App 也可以：手动 `su -c \"echo 1/0 > /data/adb/owc/enabled\"` 同样热切换。\n\n## 兼容性\n\n> **本项目按通用模块设计，但目前仅在一加 15T 上实测确认可用。**\n> 其他机型理论兼容（依赖 oplus_chg / horae 通用节点），但节点路径与充电策略\n> 因机型/系统版本而异，**请自行测试**，效果随缘。作者仅随缘更新适配，\n> 欢迎提交 PR / issue 反馈其他机型的实测情况（附 `warp_charge.log` 与机型信息）。\n\n| 项目 | 状态 | 说明 |\n| --- | --- | --- |\n| 一加 15T · ColorOS 16 · Android 16 | ✅ **唯一实测** | 双电芯 100W，亮屏 ~22W → ~45W（充电头读数） |\n| 其他一加 / OPPO / realme（ColorOS 系） | ⚠️ 自测 | 理论兼容，随缘适配 |\n| 非 OPlus 系统 | ❌ | 依赖 oplus_chg / horae 私有节点，无法使用 |\n\n**自测要点**：确认 `/sys/class/oplus_chg/battery/cool_down`、\n`/proc/shell-temp`、`/sys/class/thermal/thermal_zone*/emul_temp` 节点存在，\n再看 `warp_charge.log` 中激活后电流是否上升。\n\n## 项目结构\n\n```\n├── module.prop / service.sh / uninstall.sh   模块骨架\n├── META-INF/…                                Magisk 安装模板\n├── vtools/\n│   ├── warp_charge.sh        核心：WARP + cool_down 对抗 + 安全栏\n│   ├── watchdog.sh           守护保活（120s 巡检 / 5 次失败冷却）\n│   ├── lib_common.sh         公共函数库（温度读取/充电检测/日志轮转）\n│   └── game_blacklist.txt    游戏名单（前缀 ^ / 精确 = / 子串 * 规则）\n└── app/                                      控制中心磁贴 App（纯 Java）\n    ├── src/…/OwcTileService.java             QS 磁贴\n    ├── src/…/MainActivity.java               状态页\n    └── build.sh                              零 gradle 手工构建链\n```\n\n## 免责声明\n\n本项目通过伪装系统温度传感器解除充电限制，**可能加速电池老化、增加发热**，\n由此产生的任何硬件损耗、安全事故与作者无关。请在通风环境使用，勿覆盖床上\n充电。游戏场景已自动暂停保护，但请理解风险后使用。\n\n## 致谢\n\n- [AaTempSpoof](https://github.com/) — 温度伪装思路与 watchdog 模式来源\n- [Wangshu (Aestas)](https://github.com/) — 有界等待 / 单一实现 / 防误杀哲学\n- [GKD](https://github.com/gkd-li/gkd) — TileService 注册控制中心参考\n\n## License\n\nMIT © bomo\n",
+  "readmeHTML": "<h1>OWC — ColorOS 亮屏快充模块</h1>\n\n<p>> ⚡ 解锁 ColorOS 亮屏充电限速，控制中心一键热切换，边玩边满功率快充</p>\n<p>></p>\n<p>> @author bomo · Inspired by AaTempSpoof</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>目前仅在一加 15T（PLZ110 · ColorOS 16 · Android 16）上完整实测可用。</b></p>\n<p>> 其他机型理论上原理相通，但节点路径/服务名因机型与系统版本可能不同，</p>\n<p>> <b>需要自行测试</b>。本项目为个人自用工具开源，<b>随缘更新</b>，不承诺适配。</p>\n<p>> 适配反馈请附 <code>tmp/warp_charge.log</code> 与机型信息。</p>\n\n<p><a href=\"https://img.shields.io/badge/version-v1.4.1-blue\">![Version</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/platform-ColorOS%2016%20%2F%20Android%2016-green\">![Platform</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/root-Magisk%20%7C%20KernelSU-orange\">![Root</a>]()</p>\n\n<p>---</p>\n\n<h2>这是什么</h2>\n\n<p>一加 / OPPO / realme（ColorOS / OxygenOS）的\"亮屏降速充电\"是系统的<b>有意行为</b>：亮屏时充电内核写入降流档，功率直接砍半以上（实测一加 15T：亮屏 ~22W → 解锁后 ~45W，以充电头显示为准）。</p>\n\n<p>OWC（OP WarpCharge）按通用模块设计，把这套限流完整解开，并提供<b>控制中心磁贴</b>随时热切换：</p>\n\n<p>> ⚠️ <b>目前仅一加 15T 实测确认。其他机型请自测，适配随缘更新。</b></p>\n\n<p>| 场景 | 磁贴关闭 | 磁贴开启 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <b>亮屏充电（充电头显示）</b> | <b>~22 W</b> | <b>~45 W</b> |</p>\n\n<p>> 功率以充电头显示屏读数为准。测量电流节点的换算值（电压×电流×电芯数）因</p>\n<p>> 双电芯报告口径存在歧义，不作为对外数据。</p>\n\n<p><b>事件驱动</b>：点击磁贴 → App 经 <code>su</code> 直接触发模块动作，秒级生效，无轮询等待。</p>\n\n<h2>工作原理</h2>\n\n<p>亮屏慢充由三层限流叠加，OWC 全部拆解（缺一则功率打折）：</p>\n\n<p>| 层 | 系统行为 | OWC 对策 |</p>\n<p>| --- | --- | --- |</p>\n<p>| 壳温 | <code>horae</code> 读取壳温限制充电功率 | <code>dumpsys horae testmode</code> 切换数据源 + <code>/proc/shell-temp</code> 伪装 34°C |</p>\n<p>| 电池温度 | 充电算法读取电池 <code>thermal_zone</code>（实测 43°C 时降流 16%） | 电池类 zone <code>emul_temp</code> 伪装 30°C |</p>\n<p>| <b>亮屏降流</b> | <b>亮屏时写 <code>oplus_chg/battery/cool_down=5</code>（降流档）</b> | 归零 + 守护每轮对抗系统重写 |</p>\n\n<p>> <code>cool_down</code> 为本项目实测发现：ColorOS 16 上亮屏时系统写入 5（降流档），</p>\n<p>> 写 0 后 1 秒内恢复满功率。常见\"亮屏快充\"实现（停 ORMS 等）在此平台已过时——</p>\n<p>> 实测 <code>vendor.oplus.ormsHalService</code> 服务不存在，停了也没有效果。</p>\n\n<h2>架构</h2>\n\n<pre>┌─ 控制中心磁贴 / App（Java，零依赖）──────────────────┐\n│  onClick → su -c \"写状态文件 + 调用守护 CLI 动作\"      │\n└──────────────────┬────────────────────────────────┘\n                   │ /data/adb/owc/enabled (0/1)\n┌──────────────────▼────────────────────────────────┐\n│  Magisk/KernelSU 模块守护 warp_charge.sh            │\n│  · apply/restore CLI 单次动作（事件驱动，秒级生效）  │\n│  · 每轮巡检：cool_down 对抗 + horae 重应用（4s）     │\n│  · 安全栏（见下）                                    │\n└────────────────────────────────────────────────────┘</pre>\n\n<p>App 只是遥控器，全部业务逻辑在 shell 守护中（单一实现，防复制漂移）。</p>\n\n<h2>安全栏（不可关闭，随守护常驻）</h2>\n\n<p>实测充电热失控风险真实存在，以下保护<b>优先级高于一切开关</b>：</p>\n\n<li>🎮 **游戏运行中自动暂停**（壳温伪装会致盲系统温控，游戏中继续 = SoC 热失控）</li>\n<li>🔋 电池真实温度 ≥ **46°C** 自动暂停</li>\n<li>🖥️ CPU/SoC ≥ **85°C** 自动暂停（防 PMIC 95°C 硬复位，留 10°C 余量）</li>\n<li>🔌 充电断开 / 守护退出 → 完整恢复系统状态（ORMS + horae + cool_down）</li>\n<li>⏱️ 开机有界等待 + PID/cmdline 双验证锁 + watchdog 保活</li>\n\n<p>> ⚠️ 注意：满功率亮屏充电发热明显是物理现实。安全栏只是兜底，不是免死金牌。</p>\n\n<h2>⛔ 兼容性限制</h2>\n\n<li>**不与其他充电类模块兼容**（AaTempSpoof 及一切写</li>\n<p>  <code>cool_down</code> / <code>oplus_chg</code> 温度 / <code>shell-temp</code> / horae 的模块）——OWC 直接写</p>\n<p>  充电内核节点，共存会互相覆盖，充电行为不可预期。安装脚本会自动检测并</p>\n<p>  <b>拒绝安装</b>。</p>\n<li>**机型确认**：仅一加 15T（PLZ110）经过验证。其他机型安装时安装器会提示</li>\n<p>  未验证，并要求<b>按音量键显式确认</b>：<code>音量上 = 继续安装</code>、</p>\n<p>  <code>音量下 = 取消</code>、<b>10 秒无操作自动取消</b>（安全默认）。无效请到项目帖/issue</p>\n<p>  留言，作者随缘更新。</p>\n\n<h2>安装</h2>\n\n<h3>模块（必需）</h3>\n\n<li>下载 [Releases](../../releases) 中的模块 zip（或自行打包本仓库根目录）</li>\n<li>Magisk / KernelSU 管理器刷入，重启</li>\n<p>   - 非 PLZ110 设备会提示未验证机型，按 <b>音量上</b> 确认继续（音量下或</p>\n<p>     10 秒无操作则取消安装）</p>\n\n<h3>App（可选，用于控制中心磁贴）</h3>\n\n<pre>cd app\nbash build.sh   # 需要 JDK17 + Android SDK (build-tools 35, platform 36)\nadb install owc-app-debug.apk</pre>\n\n<p>然后在 KernelSU 中授予 App root，控制中心 → 编辑 → 添加\"亮屏快充\"磁贴。</p>\n\n<p>> 不装 App 也可以：手动 <code>su -c \"echo 1/0 > /data/adb/owc/enabled\"</code> 同样热切换。</p>\n\n<h2>兼容性</h2>\n\n<p>> <b>本项目按通用模块设计，但目前仅在一加 15T 上实测确认可用。</b></p>\n<p>> 其他机型理论兼容（依赖 oplus_chg / horae 通用节点），但节点路径与充电策略</p>\n<p>> 因机型/系统版本而异，<b>请自行测试</b>，效果随缘。作者仅随缘更新适配，</p>\n<p>> 欢迎提交 PR / issue 反馈其他机型的实测情况（附 <code>warp_charge.log</code> 与机型信息）。</p>\n\n<p>| 项目 | 状态 | 说明 |</p>\n<p>| --- | --- | --- |</p>\n<p>| 一加 15T · ColorOS 16 · Android 16 | ✅ <b>唯一实测</b> | 双电芯 100W，亮屏 ~22W → ~45W（充电头读数） |</p>\n<p>| 其他一加 / OPPO / realme（ColorOS 系） | ⚠️ 自测 | 理论兼容，随缘适配 |</p>\n<p>| 非 OPlus 系统 | ❌ | 依赖 oplus_chg / horae 私有节点，无法使用 |</p>\n\n<p><b>自测要点</b>：确认 <code>/sys/class/oplus_chg/battery/cool_down</code>、</p>\n<p><code>/proc/shell-temp</code>、<code>/sys/class/thermal/thermal_zone*/emul_temp</code> 节点存在，</p>\n<p>再看 <code>warp_charge.log</code> 中激活后电流是否上升。</p>\n\n<h2>项目结构</h2>\n\n<pre>├── module.prop / service.sh / uninstall.sh   模块骨架\n├── META-INF/…                                Magisk 安装模板\n├── vtools/\n│   ├── warp_charge.sh        核心：WARP + cool_down 对抗 + 安全栏\n│   ├── watchdog.sh           守护保活（120s 巡检 / 5 次失败冷却）\n│   ├── lib_common.sh         公共函数库（温度读取/充电检测/日志轮转）\n│   └── game_blacklist.txt    游戏名单（前缀 ^ / 精确 = / 子串 * 规则）\n└── app/                                      控制中心磁贴 App（纯 Java）\n    ├── src/…/OwcTileService.java             QS 磁贴\n    ├── src/…/MainActivity.java               状态页\n    └── build.sh                              零 gradle 手工构建链</pre>\n\n<h2>免责声明</h2>\n\n<p>本项目通过伪装系统温度传感器解除充电限制，<b>可能加速电池老化、增加发热</b>，</p>\n<p>由此产生的任何硬件损耗、安全事故与作者无关。请在通风环境使用，勿覆盖床上</p>\n<p>充电。游戏场景已自动暂停保护，但请理解风险后使用。</p>\n\n<h2>致谢</h2>\n\n<li>[AaTempSpoof](https://github.com/) — 温度伪装思路与 watchdog 模式来源</li>\n<li>[Wangshu (Aestas)](https://github.com/) — 有界等待 / 单一实现 / 防误杀哲学</li>\n<li>[GKD](https://github.com/gkd-li/gkd) — TileService 注册控制中心参考</li>\n\n<h2>License</h2>\n\n<p>MIT © bomo</p>",
+  "homepageUrl": "https://github.com/Sillybomo/OWC",
+  "sourceUrl": "https://github.com/Sillybomo/OWC",
+  "url": "https://github.com/Sillybomo/OWC",
+  "latestRelease": {
+    "name": "v1.4.10",
+    "version": "v1.4.10",
+    "time": "2026-09-16T11:36:33Z",
+    "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.4.10/OWC_v1.4.10.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.4.10",
+      "tagName": "v1.4.10",
+      "publishedAt": "2026-09-16T11:36:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.4.10.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.4.10/OWC_v1.4.10.zip",
+          "size": 48566,
+          "downloadCount": 83
+        }
+      ]
+    },
+    {
+      "name": "v1.4.2",
+      "tagName": "v1.4.2",
+      "publishedAt": "2026-09-15T14:33:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.4.2.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.4.2/OWC_v1.4.2.zip",
+          "size": 42063,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2026-09-15T13:00:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.4.1.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.4.1/OWC_v1.4.1.zip",
+          "size": 40930,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-09-13T02:34:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.4.0.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.4.0/OWC_v1.4.0.zip",
+          "size": 41079,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2026-09-06T16:39:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.3.3.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.3.3/OWC_v1.3.3.zip",
+          "size": 40579,
+          "downloadCount": 26
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2026-09-06T16:19:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC_v1.3.2.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.3.2/OWC_v1.3.2.zip",
+          "size": 40076,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2026-09-06T15:35:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OWC-App-v1.1.apk",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.3.1/OWC-App-v1.1.apk",
+          "size": 12751,
+          "downloadCount": 5
+        },
+        {
+          "name": "OWC_v1.3.1.zip",
+          "downloadUrl": "https://github.com/Sillybomo/OWC/releases/download/v1.3.1/OWC_v1.3.1.zip",
+          "size": 30671,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

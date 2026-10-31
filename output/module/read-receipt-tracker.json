@@ -1,0 +1,1029 @@
+{
+  "readme": "<div align=\"center\">\n\n# 📬 read-receipt-tracker\n\n### 轻量级消息已读追踪服务\n\n**像素埋点 · 管理后台 · 多端部署 · 可选 IP 定位**\n\n<br>\n\n[![Build Status](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/actions/workflows/build.yml/badge.svg)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/actions/workflows/build.yml)\n[![Downloads](https://img.shields.io/github/downloads/gaigebeckmanChristinaJames/read-receipt-tracker/total?color=green&label=Downloads)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n[![Stars](https://img.shields.io/github/stars/gaigebeckmanChristinaJames/read-receipt-tracker?style=flat&color=yellow)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/stargazers)\n[![Forks](https://img.shields.io/github/forks/gaigebeckmanChristinaJames/read-receipt-tracker?style=flat&color=blue)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/network/members)\n[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)]()\n[![C++](https://img.shields.io/badge/C++-17-00599C?logo=cplusplus&logoColor=white)]()\n[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)]()\n[![License](https://img.shields.io/badge/License-MIT-green.svg)]()\n\n<br>\n\n[**📦 立即下载**](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n&nbsp;&nbsp;·&nbsp;&nbsp;\n[**📖 查看文档**](#-简介)\n&nbsp;&nbsp;·&nbsp;&nbsp;\n[**💖 爱发电赞助**](https://www.ifdian.net/a/zuomeng13)\n\n</div>\n\n---\n\n## 📋 目录\n\n- [简介](#intro)\n- [核心特性](#features)\n- [快速开始](#quick-start)\n- [下载](#download)\n- [客户端方案](#clients)\n- [服务器部署](#server)\n- [公网访问](#tunnel)\n- [API 文档](#api)\n- [管理后台](#admin)\n- [项目结构](#structure)\n- [配置](#config)\n- [技术栈](#tech)\n- [常见问题](#faq)\n- [贡献](#contributing)\n- [许可证](#license)\n\n---\n\n<a id=\"intro\"></a>\n## 📖 简介\n\n一个极简的 **消息已读回执追踪服务**：注册消息后得到一个 URL，将该 URL 作为 1×1 透明像素嵌入消息，对方打开时自动记录已读。提供 Web 管理面板查看统计和每条消息的读取详情。\n\n> 🎯 **适用场景**\n> - 为微信模块 **WeKit / WuYu / WAuxiliary / HChat** 提供已读回执后端\n> - 邮件营销已读率分析\n> - 消息回执追踪\n> - 网页埋点统计\n\n---\n\n<a id=\"features\"></a>\n## ✨ 核心特性\n\n<div align=\"center\">\n\n| 🔌 一行注册 | 👁 透明无感 | 📊 管理后台 |\n|:---:|:---:|:---:|\n| `POST /register` 传入消息内容，返回追踪链接 | 1×1 透明 GIF，用户完全感知不到 | Web 界面查看统计、消息列表、搜索、导出 CSV |\n\n| 🌍 IP 定位 | ⚡ 请求限流 | 🔐 API 认证 |\n|:---:|:---:|:---:|\n| 自动获取读取者国家/省份/城市/运营商 | IP 级频率限制，防止滥用 | 管理接口支持 API Key 保护 |\n\n| 🔒 智能去重 | 📦 双语言后端 | 🐳 多端部署 |\n|:---:|:---:|:---:|\n| 同一消息 + 同一 IP 只计一次已读 | Python (Flask) + C++ (原生 HTTP) | Docker / Linux / Termux / Java 插件 |\n\n</div>\n\n---\n\n<a id=\"quick-start\"></a>\n## 🚀 快速开始\n\n### 方式一：WeKit 正式版 APK（最简单，推荐）\n\n1. 下载 [最新版 WeKit 正式版 APK](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)（standard / legacy 两种入口）\n2. 在 LSPosed 中启用模块并作用于微信\n3. 重启微信，在 WeKit 设置中启用已读追踪\n4. 发送消息时自动生成追踪链接\n\n\n> 📌 **本仓库提供的是 WeKit 正式版**，基于上游最新 dev 分支，已修复「已读追踪注册失败」和「Java 插件混淆规则」问题，开箱即用。\n### 方式二：Java 插件版\n\n1. 下载 [Java 服务端插件 + 客户端插件](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n2. 在微信模块中加载服务端插件，启动隧道获取公网地址\n3. 加载客户端插件，配置服务器地址\n4. 发送 `#消息内容` 即可追踪已读\n\n### 方式三：自建服务器\n\n```bash\ngit clone https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker.git\ncd read-receipt-tracker\npip install flask\npython run.py\n```\n\n访问 `http://localhost:5000` 打开管理面板。\n\n---\n\n<a id=\"download\"></a>\n## 📦 下载\n\n> 🔄 **CI 自动构建**：每次推送主分支即发布最新版本\n\n<div align=\"center\">\n\n| 产物 | 说明 | 下载 |\n|:---:|:---|:---:|\n| 📱 **WeKit APK** | 微信 Xposed 模块（已修复 DEX 缓存更新问题，内置已读追踪） | [**下载**](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n| 📱 **已读服务器 APP** | 独立 Android 应用，无需 Root/Xposed，内置服务器+隧道 | [**下载**](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n| 🖥️ **Java 服务端插件** | 内置 HTTP + cloudflared 隧道 + Web 控制台 | [**下载**](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n| 🔌 **Java 客户端插件** | `#消息` 发送追踪，`/已读` 查询人数 | [**下载**](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n\n</div>\n\n---\n\n<a id=\"clients\"></a>\n## 📱 客户端方案\n\n### 🟢 WeKit 无服务器版（正式版 APK，推荐）\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n基于 [WeKit](https://github.com/Ujhhgtg/WeKit) 的微信 Xposed 模块，已修复 DEX 缓存更新问题，**内置已读追踪服务端**，无需额外部署服务器，开箱即用。\n\n<div align=\"center\">\n\n[![📦 下载 WeKit 正式版 APK](https://img.shields.io/badge/📦%20下载-WeKit%20APK-2ea44f?style=for-the-badge)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n\n</div>\n\n| 项目 | 说明 |\n|:---|:---|\n| **上游仓库** | https://github.com/Ujhhgtg/WeKit |\n| **特点** | 模块内直接启用已读追踪，消息注册、已读统计、访客信息一体化 |\n| **环境要求** | Android 9.0+ / Root + LSPosed（或 Zygisk）/ 微信 8.0.65 - 8.0.76 |\n| **源码** | [`wekit-module/`](wekit-module/) |\n\n</details>\n\n### 🔵 WeKit 有服务器版（原版）\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n使用原版 [WeKit](https://github.com/Ujhhgtg/WeKit)，配合本项目提供的自建服务器使用。适合已有服务器或想在 Termux/Java 插件中运行服务端的用户。\n\n- **特点**：原版 WeKit 不变，服务端独立部署，可选择 Linux / Windows / Termux / Java 插件等多种方式\n- **下载**：[WeKit 原版 Release](https://github.com/Ujhhgtg/WeKit/releases)\n\n</details>\n\n### 🟣 Java 插件版（支持 WeKit / WAuxiliary / WuYu / HChat）\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n轻量级 Java 插件，无需编译 APK，在支持 Java 脚本的微信模块中加载即可使用。包含**服务端**和**客户端**两个配套插件：\n\n| 插件 | 作用 | 下载 |\n|:---|:---|:---:|\n| **已读服务器（服务端）** | 内置 HTTP 服务 + cloudflared 公网隧道 + Web 控制台 | [read-tracker-java-server.zip](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n| **已读追踪（客户端）** | `#消息` 发送追踪卡片，`/已读` 查询人数，已读统计在浏览器控制台查看 | [read-tracker-java-client.zip](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) |\n\n<div align=\"center\">\n\n[![📦 下载 Java 插件包](https://img.shields.io/badge/📦%20下载-Java插件包-2ea44f?style=for-the-badge)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n\n</div>\n\n> 💡 **兼容模块**：WeKit、WAuxiliary (WA)、WuYu、HChat 等\n>\n> 📝 **使用流程**：先装服务端并启动隧道 → 再装客户端并配置服务器地址\n\n**源码**：[`plugins/java-read-tracker/`](plugins/java-read-tracker/) · [`plugins/read-tracker-client/`](plugins/read-tracker-client/)\n\n</details>\n\n---\n\n<a id=\"server\"></a>\n## 🖥️ 服务器部署\n\n### 🐧 Linux 服务器\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n**Python 后端（推荐）：**\n```bash\ngit clone https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker.git\ncd read-receipt-tracker\npip install flask\npython run.py\n```\n\n**C++ 后端（高性能）：**\n```bash\napt install meson ninja-build libsqlite3-dev libssl-dev\ncd cpp\nmeson setup builddir && meson compile -C builddir\n./builddir/rrtracker-server 5000 receipts.db\n```\n\n**一键部署（systemd 托管）：**\n```bash\nbash scripts/setup-linux.sh                # 后台托管\nbash scripts/setup-linux.sh --foreground   # 前台运行\nbash scripts/setup-linux.sh --tunnel       # 自动隧道保活\n```\n\n</details>\n\n### 🪟 Windows\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n```powershell\npip install flask\npython run.py\n```\n\n打开 `http://localhost:5000` 即可访问管理面板。\n\n</details>\n\n### 📱 Termux / Android（手机本地部署）\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n**标准版（含 IP 定位）：**\n```bash\npkg update -y && pkg install curl -y\nbash <(curl -fL \"https://cdn.jsdelivr.net/gh/gaigebeckmanChristinaJames/read-receipt-tracker@main/scripts/ultimate-setup.sh\")\n```\n\n**Lite 版（无 IP 定位）：**\n```bash\nbash <(curl -fL \"https://cdn.jsdelivr.net/gh/gaigebeckmanChristinaJames/read-receipt-tracker@main/scripts/ultimate-setup-lite.sh\")\n```\n\n需要公网地址时另开会话：\n```bash\npkg install cloudflared\ncloudflared tunnel --protocol http2 --url http://127.0.0.1:5000\n```\n\n</details>\n\n### 📱 APP 版（独立 Android 应用，推荐）\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n独立的 Android APP，**无需 Root / Xposed**，安装后直接运行已读追踪服务器，内置 cloudflared 公网隧道和 Web 控制台。零第三方依赖，纯 Android 框架 API。\n\n<div align=\"center\">\n\n[![📦 下载已读服务器 APP](https://img.shields.io/badge/📦%20下载-已读服务器APP-2ea44f?style=for-the-badge)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n\n</div>\n\n| 项目 | 说明 |\n|:---|:---|\n| **特点** | 零依赖、后台服务、通知栏常驻、内置 cloudflared 隧道、Web 控制台 |\n| **环境要求** | Android 5.0+ (minSdk 21)，无需 Root |\n| **源码** | [`app-server/`](app-server/) |\n\n</details>\n\n### ☕ Java 插件版服务器\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n无需单独部署服务器，直接在微信模块中加载「已读服务器」Java 插件即可，内置 HTTP 服务和 cloudflared 公网隧道。\n\n<div align=\"center\">\n\n[![📦 下载 Java 服务端插件](https://img.shields.io/badge/📦%20下载-Java服务端插件-2ea44f?style=for-the-badge)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n\n</div>\n\n- **文件名**：`read-tracker-java-server.zip`\n- **支持模块**：WeKit / WAuxiliary / WuYu / HChat\n\n</details>\n\n### 🐳 Docker\n\n<details>\n<summary><b>📖 点击展开详情</b></summary>\n\n<br>\n\n```bash\ndocker compose up -d\n# 或\ndocker build -t read-receipt-tracker .\ndocker run -d -p 5000:5000 -v $(pwd)/data:/app/data read-receipt-tracker\n```\n\n</details>\n\n> 💡 **提示**：所有部署形态均可用环境变量 `ENABLE_GEO=0` 关闭 IP 定位（Lite 模式）。\n\n---\n\n<a id=\"tunnel\"></a>\n## 🌐 公网访问\n\n| 部署场景 | 需要 Tunnel？ | 说明 |\n|:---|:---:|:---|\n| VPS / 云服务器 | ❌ | 自带公网 IP，直接访问 |\n| 本地电脑 | ❌ | `localhost:5000` 即可 |\n| 树莓派 / 内网服务器 | ✅ | 需要 Tunnel |\n| Termux (Android) | ✅ | 脚本默认自动配置 |\n\n**Linux 一键启用 Tunnel：**\n```bash\nbash scripts/setup-linux.sh --tunnel\ncat .tunnel_url.txt   # 查看公网地址\n```\n\n---\n\n<a id=\"api\"></a>\n## 📡 API 文档\n\n<details>\n<summary><b>📝 注册消息</b></summary>\n\n<br>\n\n```http\nPOST /register\nContent-Type: application/json\n\n{ \"wxId\": \"user123\", \"content\": \"你好\", \"createTime\": 1700000000000 }\n```\n\n**响应**：返回 `pixel_url`，嵌入消息即可追踪。\n\n</details>\n\n<details>\n<summary><b>👁 已读追踪像素</b></summary>\n\n<br>\n\n```http\nGET /pixel?wxId=user123&id=xxx\n```\n\n返回 1×1 透明 GIF。\n\n</details>\n\n<details>\n<summary><b>🔢 查询已读数</b></summary>\n\n<br>\n\n```http\nGET /count?wxId=user123&id=xxx\n```\n\n```json\n{ \"count\": 5, \"msg_id\": \"xxx\" }\n```\n\n</details>\n\n<details>\n<summary><b>📋 批量查询 / 健康检查</b></summary>\n\n<br>\n\n```http\nGET /batch-status?ids=id1,id2,id3\nGET /health\n```\n\n</details>\n\n---\n\n<a id=\"admin\"></a>\n## 📊 管理后台\n\n| 页面 | 路由 | 说明 |\n|:---|:---|:---|\n| **仪表盘** | `/` | 统计 + 消息列表 + 搜索 + CSV 导出 |\n| **消息详情** | `/message/<id>` | 消息内容 + IP/地理位置/UA/时间 |\n\n---\n\n<a id=\"structure\"></a>\n## 🗂 项目结构\n\n```\nread-receipt-tracker/\n├── python/                    # Python 后端 (Flask)\n├── cpp/                       # C++ 后端 (meson + ninja)\n├── app-server/                # 独立 Android APP 版已读服务器\n├── scripts/                   # 部署脚本 (Termux / Linux)\n├── plugins/\n│   ├── java-read-tracker/     # Java 服务端插件\n│   └── read-tracker-client/   # Java 客户端插件\n├── wekit-module/              # WeKit 模块源码 (CI 构建 APK)\n├── docs/                      # 文档\n├── .github/workflows/         # CI 自动构建 & 发布\n├── ROADMAP.md                 # 开发路线图\n└── run.py                     # Python 启动入口\n```\n\n---\n\n<a id=\"config\"></a>\n## 🔧 配置\n\n| 变量 | 默认值 | 说明 |\n|:---|:---|:---|\n| `DATABASE_PATH` | `receipts.db` | 数据库路径 |\n| `API_KEY` | *(空)* | 管理后台认证密钥 |\n| `ENABLE_GEO` | `1` | IP 定位开关 |\n| `RATE_LIMIT_PER_MINUTE` | `60` | 请求频率限制 |\n| `PORT` | `5000` | 监听端口 |\n\n---\n\n<a id=\"tech\"></a>\n## 🛠 技术栈\n\n| 层级 | Python | C++ |\n|:---|:---|:---|\n| **框架** | Flask 2.3+ | 自建 HTTP 服务 |\n| **数据库** | SQLite (WAL) | SQLite3 C API |\n| **包管理** | uv | meson + ninja |\n| **部署** | Docker / systemd / Termux | 原生二进制 |\n\n---\n\n<a id=\"faq\"></a>\n## ❓ 常见问题\n\n<details>\n<summary><b>WeKit 启动后一直提示\"115个功能需要更新\"怎么办？</b></summary>\n\n<br>\n\n这是 WeKit 的 DEX 缓存问题。本项目提供的正式版 APK 已修复此问题，直接下载 [最新版](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest) 安装即可。\n\n</details>\n\n<details>\n<summary><b>Java 插件版怎么查看已读数量？</b></summary>\n\n<br>\n\nJava 客户端插件的已读统计需要在**浏览器控制台**中查看。发送 `#消息` 后，打开管理面板的浏览器控制台即可看到已读人数。\n\n</details>\n\n<details>\n<summary><b>必须要有公网服务器吗？</b></summary>\n\n<br>\n\n不一定。有三种选择：\n1. **WeKit 正式版 APK**：内置服务端，完全不需要服务器\n2. **Java 插件版**：内置 cloudflared 隧道，自动获取公网地址\n3. **自建服务器**：Linux/Windows/Termux/Docker 均可\n\n</details>\n\n<details>\n<summary><b>IP 定位不准确怎么办？</b></summary>\n\n<br>\n\nIP 定位使用三级接口自动备份（ip-api.com → ipwho.is → ipinfo.io），如果都不准确可以用 `ENABLE_GEO=0` 关闭定位功能。\n\n</details>\n\n---\n\n<a id=\"contributing\"></a>\n## 🤝 贡献\n\n欢迎提交 Issue 和 Pull Request！\n\n- 📋 开发计划见 [ROADMAP.md](ROADMAP.md)\n- 🐛 发现问题请提 [Issue](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/issues)\n- 💡 有新想法欢迎 [讨论](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/discussions)\n\n---\n\n<div align=\"center\">\n\n### 如果这个项目对你有帮助\n\n**请点个 ⭐ Star 支持一下！**\n\n<br>\n\n[![💖 爱发电赞助](https://img.shields.io/badge/💖%20爱发电-支持作者-ff69b4?style=for-the-badge)](https://www.ifdian.net/a/zuomeng13)\n&nbsp;&nbsp;\n[![📦 下载最新版](https://img.shields.io/badge/📦%20下载-最新版本-2ea44f?style=for-the-badge)](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)\n\n</div>\n\n---\n\n<a id=\"license\"></a>\n## 📄 License\n\nMIT © [gaigebeckmanChristinaJames](https://github.com/gaigebeckmanChristinaJames)\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<h1>📬 read-receipt-tracker</h1>\n\n<h3>轻量级消息已读追踪服务</h3>\n\n<p><b>像素埋点 · 管理后台 · 多端部署 · 可选 IP 定位</b></p>\n\n<p><br></p>\n\n<p><a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/actions/workflows/build.yml/badge.svg\">![Build Status</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/actions/workflows/build.yml)</p>\n<p><a href=\"https://img.shields.io/github/downloads/gaigebeckmanChristinaJames/read-receipt-tracker/total?color=green&label=Downloads\">![Downloads</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/stars/gaigebeckmanChristinaJames/read-receipt-tracker?style=flat&color=yellow\">![Stars</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/stargazers)</p>\n<p><a href=\"https://img.shields.io/github/forks/gaigebeckmanChristinaJames/read-receipt-tracker?style=flat&color=blue\">![Forks</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/network/members)</p>\n<p><a href=\"https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white\">![Python</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/C++-17-00599C?logo=cplusplus&logoColor=white\">![C++</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white\">![Docker</a>]()</p>\n<p><a href=\"https://img.shields.io/badge/License-MIT-green.svg\">![License</a>]()</p>\n\n<p><br></p>\n\n<p><a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\"><b>📦 立即下载</b></a></p>\n<p>&nbsp;&nbsp;·&nbsp;&nbsp;</p>\n<p><a href=\"#-简介\"><b>📖 查看文档</b></a></p>\n<p>&nbsp;&nbsp;·&nbsp;&nbsp;</p>\n<p><a href=\"https://www.ifdian.net/a/zuomeng13\"><b>💖 爱发电赞助</b></a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>📋 目录</h2>\n\n<li>[简介](#intro)</li>\n<li>[核心特性](#features)</li>\n<li>[快速开始](#quick-start)</li>\n<li>[下载](#download)</li>\n<li>[客户端方案](#clients)</li>\n<li>[服务器部署](#server)</li>\n<li>[公网访问](#tunnel)</li>\n<li>[API 文档](#api)</li>\n<li>[管理后台](#admin)</li>\n<li>[项目结构](#structure)</li>\n<li>[配置](#config)</li>\n<li>[技术栈](#tech)</li>\n<li>[常见问题](#faq)</li>\n<li>[贡献](#contributing)</li>\n<li>[许可证](#license)</li>\n\n<p>---</p>\n\n<p><a id=\"intro\"></a></p>\n<h2>📖 简介</h2>\n\n<p>一个极简的 <b>消息已读回执追踪服务</b>：注册消息后得到一个 URL，将该 URL 作为 1×1 透明像素嵌入消息，对方打开时自动记录已读。提供 Web 管理面板查看统计和每条消息的读取详情。</p>\n\n<p>> 🎯 <b>适用场景</b></p>\n<p>> - 为微信模块 <b>WeKit / WuYu / WAuxiliary / HChat</b> 提供已读回执后端</p>\n<p>> - 邮件营销已读率分析</p>\n<p>> - 消息回执追踪</p>\n<p>> - 网页埋点统计</p>\n\n<p>---</p>\n\n<p><a id=\"features\"></a></p>\n<h2>✨ 核心特性</h2>\n\n<p><div align=\"center\"></p>\n\n<p>| 🔌 一行注册 | 👁 透明无感 | 📊 管理后台 |</p>\n<p>|:---:|:---:|:---:|</p>\n<p>| <code>POST /register</code> 传入消息内容，返回追踪链接 | 1×1 透明 GIF，用户完全感知不到 | Web 界面查看统计、消息列表、搜索、导出 CSV |</p>\n\n<p>| 🌍 IP 定位 | ⚡ 请求限流 | 🔐 API 认证 |</p>\n<p>|:---:|:---:|:---:|</p>\n<p>| 自动获取读取者国家/省份/城市/运营商 | IP 级频率限制，防止滥用 | 管理接口支持 API Key 保护 |</p>\n\n<p>| 🔒 智能去重 | 📦 双语言后端 | 🐳 多端部署 |</p>\n<p>|:---:|:---:|:---:|</p>\n<p>| 同一消息 + 同一 IP 只计一次已读 | Python (Flask) + C++ (原生 HTTP) | Docker / Linux / Termux / Java 插件 |</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><a id=\"quick-start\"></a></p>\n<h2>🚀 快速开始</h2>\n\n<h3>方式一：WeKit 正式版 APK（最简单，推荐）</h3>\n\n<li>下载 [最新版 WeKit 正式版 APK](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)（standard / legacy 两种入口）</li>\n<li>在 LSPosed 中启用模块并作用于微信</li>\n<li>重启微信，在 WeKit 设置中启用已读追踪</li>\n<li>发送消息时自动生成追踪链接</li>\n\n\n<p>> 📌 <b>本仓库提供的是 WeKit 正式版</b>，基于上游最新 dev 分支，已修复「已读追踪注册失败」和「Java 插件混淆规则」问题，开箱即用。</p>\n<h3>方式二：Java 插件版</h3>\n\n<li>下载 [Java 服务端插件 + 客户端插件](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</li>\n<li>在微信模块中加载服务端插件，启动隧道获取公网地址</li>\n<li>加载客户端插件，配置服务器地址</li>\n<li>发送 `#消息内容` 即可追踪已读</li>\n\n<h3>方式三：自建服务器</h3>\n\n<pre>git clone https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker.git\ncd read-receipt-tracker\npip install flask\npython run.py</pre>\n\n<p>访问 <code>http://localhost:5000</code> 打开管理面板。</p>\n\n<p>---</p>\n\n<p><a id=\"download\"></a></p>\n<h2>📦 下载</h2>\n\n<p>> 🔄 <b>CI 自动构建</b>：每次推送主分支即发布最新版本</p>\n\n<p><div align=\"center\"></p>\n\n<p>| 产物 | 说明 | 下载 |</p>\n<p>|:---:|:---|:---:|</p>\n<p>| 📱 <b>WeKit APK</b> | 微信 Xposed 模块（已修复 DEX 缓存更新问题，内置已读追踪） | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\"><b>下载</b></a> |</p>\n<p>| 📱 <b>已读服务器 APP</b> | 独立 Android 应用，无需 Root/Xposed，内置服务器+隧道 | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\"><b>下载</b></a> |</p>\n<p>| 🖥️ <b>Java 服务端插件</b> | 内置 HTTP + cloudflared 隧道 + Web 控制台 | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\"><b>下载</b></a> |</p>\n<p>| 🔌 <b>Java 客户端插件</b> | <code>#消息</code> 发送追踪，<code>/已读</code> 查询人数 | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\"><b>下载</b></a> |</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><a id=\"clients\"></a></p>\n<h2>📱 客户端方案</h2>\n\n<h3>🟢 WeKit 无服务器版（正式版 APK，推荐）</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p>基于 <a href=\"https://github.com/Ujhhgtg/WeKit\">WeKit</a> 的微信 Xposed 模块，已修复 DEX 缓存更新问题，<b>内置已读追踪服务端</b>，无需额外部署服务器，开箱即用。</p>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/📦%20下载-WeKit%20APK-2ea44f?style=for-the-badge\">![📦 下载 WeKit 正式版 APK</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n\n<p></div></p>\n\n<p>| 项目 | 说明 |</p>\n<p>|:---|:---|</p>\n<p>| <b>上游仓库</b> | https://github.com/Ujhhgtg/WeKit |</p>\n<p>| <b>特点</b> | 模块内直接启用已读追踪，消息注册、已读统计、访客信息一体化 |</p>\n<p>| <b>环境要求</b> | Android 9.0+ / Root + LSPosed（或 Zygisk）/ 微信 8.0.65 - 8.0.76 |</p>\n<p>| <b>源码</b> | <a href=\"wekit-module/\"><code>wekit-module/</code></a> |</p>\n\n<p></details></p>\n\n<h3>🔵 WeKit 有服务器版（原版）</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p>使用原版 <a href=\"https://github.com/Ujhhgtg/WeKit\">WeKit</a>，配合本项目提供的自建服务器使用。适合已有服务器或想在 Termux/Java 插件中运行服务端的用户。</p>\n\n<li>**特点**：原版 WeKit 不变，服务端独立部署，可选择 Linux / Windows / Termux / Java 插件等多种方式</li>\n<li>**下载**：[WeKit 原版 Release](https://github.com/Ujhhgtg/WeKit/releases)</li>\n\n<p></details></p>\n\n<h3>🟣 Java 插件版（支持 WeKit / WAuxiliary / WuYu / HChat）</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p>轻量级 Java 插件，无需编译 APK，在支持 Java 脚本的微信模块中加载即可使用。包含<b>服务端</b>和<b>客户端</b>两个配套插件：</p>\n\n<p>| 插件 | 作用 | 下载 |</p>\n<p>|:---|:---|:---:|</p>\n<p>| <b>已读服务器（服务端）</b> | 内置 HTTP 服务 + cloudflared 公网隧道 + Web 控制台 | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\">read-tracker-java-server.zip</a> |</p>\n<p>| <b>已读追踪（客户端）</b> | <code>#消息</code> 发送追踪卡片，<code>/已读</code> 查询人数，已读统计在浏览器控制台查看 | <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\">read-tracker-java-client.zip</a> |</p>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/📦%20下载-Java插件包-2ea44f?style=for-the-badge\">![📦 下载 Java 插件包</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n\n<p></div></p>\n\n<p>> 💡 <b>兼容模块</b>：WeKit、WAuxiliary (WA)、WuYu、HChat 等</p>\n<p>></p>\n<p>> 📝 <b>使用流程</b>：先装服务端并启动隧道 → 再装客户端并配置服务器地址</p>\n\n<p><b>源码</b>：<a href=\"plugins/java-read-tracker/\"><code>plugins/java-read-tracker/</code></a> · <a href=\"plugins/read-tracker-client/\"><code>plugins/read-tracker-client/</code></a></p>\n\n<p></details></p>\n\n<p>---</p>\n\n<p><a id=\"server\"></a></p>\n<h2>🖥️ 服务器部署</h2>\n\n<h3>🐧 Linux 服务器</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p><b>Python 后端（推荐）：</b></p>\n<pre>git clone https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker.git\ncd read-receipt-tracker\npip install flask\npython run.py</pre>\n\n<p><b>C++ 后端（高性能）：</b></p>\n<pre>apt install meson ninja-build libsqlite3-dev libssl-dev\ncd cpp\nmeson setup builddir &amp;&amp; meson compile -C builddir\n./builddir/rrtracker-server 5000 receipts.db</pre>\n\n<p><b>一键部署（systemd 托管）：</b></p>\n<pre>bash scripts/setup-linux.sh                # 后台托管\nbash scripts/setup-linux.sh --foreground   # 前台运行\nbash scripts/setup-linux.sh --tunnel       # 自动隧道保活</pre>\n\n<p></details></p>\n\n<h3>🪟 Windows</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<pre>pip install flask\npython run.py</pre>\n\n<p>打开 <code>http://localhost:5000</code> 即可访问管理面板。</p>\n\n<p></details></p>\n\n<h3>📱 Termux / Android（手机本地部署）</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p><b>标准版（含 IP 定位）：</b></p>\n<pre>pkg update -y &amp;&amp; pkg install curl -y\nbash &lt;(curl -fL \"https://cdn.jsdelivr.net/gh/gaigebeckmanChristinaJames/read-receipt-tracker@main/scripts/ultimate-setup.sh\")</pre>\n\n<p><b>Lite 版（无 IP 定位）：</b></p>\n<pre>bash &lt;(curl -fL \"https://cdn.jsdelivr.net/gh/gaigebeckmanChristinaJames/read-receipt-tracker@main/scripts/ultimate-setup-lite.sh\")</pre>\n\n<p>需要公网地址时另开会话：</p>\n<pre>pkg install cloudflared\ncloudflared tunnel --protocol http2 --url http://127.0.0.1:5000</pre>\n\n<p></details></p>\n\n<h3>📱 APP 版（独立 Android 应用，推荐）</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p>独立的 Android APP，<b>无需 Root / Xposed</b>，安装后直接运行已读追踪服务器，内置 cloudflared 公网隧道和 Web 控制台。零第三方依赖，纯 Android 框架 API。</p>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/📦%20下载-已读服务器APP-2ea44f?style=for-the-badge\">![📦 下载已读服务器 APP</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n\n<p></div></p>\n\n<p>| 项目 | 说明 |</p>\n<p>|:---|:---|</p>\n<p>| <b>特点</b> | 零依赖、后台服务、通知栏常驻、内置 cloudflared 隧道、Web 控制台 |</p>\n<p>| <b>环境要求</b> | Android 5.0+ (minSdk 21)，无需 Root |</p>\n<p>| <b>源码</b> | <a href=\"app-server/\"><code>app-server/</code></a> |</p>\n\n<p></details></p>\n\n<h3>☕ Java 插件版服务器</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<p>无需单独部署服务器，直接在微信模块中加载「已读服务器」Java 插件即可，内置 HTTP 服务和 cloudflared 公网隧道。</p>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/📦%20下载-Java服务端插件-2ea44f?style=for-the-badge\">![📦 下载 Java 服务端插件</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n\n<p></div></p>\n\n<li>**文件名**：`read-tracker-java-server.zip`</li>\n<li>**支持模块**：WeKit / WAuxiliary / WuYu / HChat</li>\n\n<p></details></p>\n\n<h3>🐳 Docker</h3>\n\n<p><details></p>\n<p><summary><b>📖 点击展开详情</b></summary></p>\n\n<p><br></p>\n\n<pre>docker compose up -d\n# 或\ndocker build -t read-receipt-tracker .\ndocker run -d -p 5000:5000 -v $(pwd)/data:/app/data read-receipt-tracker</pre>\n\n<p></details></p>\n\n<p>> 💡 <b>提示</b>：所有部署形态均可用环境变量 <code>ENABLE_GEO=0</code> 关闭 IP 定位（Lite 模式）。</p>\n\n<p>---</p>\n\n<p><a id=\"tunnel\"></a></p>\n<h2>🌐 公网访问</h2>\n\n<p>| 部署场景 | 需要 Tunnel？ | 说明 |</p>\n<p>|:---|:---:|:---|</p>\n<p>| VPS / 云服务器 | ❌ | 自带公网 IP，直接访问 |</p>\n<p>| 本地电脑 | ❌ | <code>localhost:5000</code> 即可 |</p>\n<p>| 树莓派 / 内网服务器 | ✅ | 需要 Tunnel |</p>\n<p>| Termux (Android) | ✅ | 脚本默认自动配置 |</p>\n\n<p><b>Linux 一键启用 Tunnel：</b></p>\n<pre>bash scripts/setup-linux.sh --tunnel\ncat .tunnel_url.txt   # 查看公网地址</pre>\n\n<p>---</p>\n\n<p><a id=\"api\"></a></p>\n<h2>📡 API 文档</h2>\n\n<p><details></p>\n<p><summary><b>📝 注册消息</b></summary></p>\n\n<p><br></p>\n\n<pre>POST /register\nContent-Type: application/json\n\n{ \"wxId\": \"user123\", \"content\": \"你好\", \"createTime\": 1700000000000 }</pre>\n\n<p><b>响应</b>：返回 <code>pixel_url</code>，嵌入消息即可追踪。</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>👁 已读追踪像素</b></summary></p>\n\n<p><br></p>\n\n<pre>GET /pixel?wxId=user123&amp;id=xxx</pre>\n\n<p>返回 1×1 透明 GIF。</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>🔢 查询已读数</b></summary></p>\n\n<p><br></p>\n\n<pre>GET /count?wxId=user123&amp;id=xxx</pre>\n\n<pre>{ \"count\": 5, \"msg_id\": \"xxx\" }</pre>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>📋 批量查询 / 健康检查</b></summary></p>\n\n<p><br></p>\n\n<pre>GET /batch-status?ids=id1,id2,id3\nGET /health</pre>\n\n<p></details></p>\n\n<p>---</p>\n\n<p><a id=\"admin\"></a></p>\n<h2>📊 管理后台</h2>\n\n<p>| 页面 | 路由 | 说明 |</p>\n<p>|:---|:---|:---|</p>\n<p>| <b>仪表盘</b> | <code>/</code> | 统计 + 消息列表 + 搜索 + CSV 导出 |</p>\n<p>| <b>消息详情</b> | <code>/message/<id></code> | 消息内容 + IP/地理位置/UA/时间 |</p>\n\n<p>---</p>\n\n<p><a id=\"structure\"></a></p>\n<h2>🗂 项目结构</h2>\n\n<pre>read-receipt-tracker/\n├── python/                    # Python 后端 (Flask)\n├── cpp/                       # C++ 后端 (meson + ninja)\n├── app-server/                # 独立 Android APP 版已读服务器\n├── scripts/                   # 部署脚本 (Termux / Linux)\n├── plugins/\n│   ├── java-read-tracker/     # Java 服务端插件\n│   └── read-tracker-client/   # Java 客户端插件\n├── wekit-module/              # WeKit 模块源码 (CI 构建 APK)\n├── docs/                      # 文档\n├── .github/workflows/         # CI 自动构建 &amp; 发布\n├── ROADMAP.md                 # 开发路线图\n└── run.py                     # Python 启动入口</pre>\n\n<p>---</p>\n\n<p><a id=\"config\"></a></p>\n<h2>🔧 配置</h2>\n\n<p>| 变量 | 默认值 | 说明 |</p>\n<p>|:---|:---|:---|</p>\n<p>| <code>DATABASE_PATH</code> | <code>receipts.db</code> | 数据库路径 |</p>\n<p>| <code>API_KEY</code> | *(空)* | 管理后台认证密钥 |</p>\n<p>| <code>ENABLE_GEO</code> | <code>1</code> | IP 定位开关 |</p>\n<p>| <code>RATE_LIMIT_PER_MINUTE</code> | <code>60</code> | 请求频率限制 |</p>\n<p>| <code>PORT</code> | <code>5000</code> | 监听端口 |</p>\n\n<p>---</p>\n\n<p><a id=\"tech\"></a></p>\n<h2>🛠 技术栈</h2>\n\n<p>| 层级 | Python | C++ |</p>\n<p>|:---|:---|:---|</p>\n<p>| <b>框架</b> | Flask 2.3+ | 自建 HTTP 服务 |</p>\n<p>| <b>数据库</b> | SQLite (WAL) | SQLite3 C API |</p>\n<p>| <b>包管理</b> | uv | meson + ninja |</p>\n<p>| <b>部署</b> | Docker / systemd / Termux | 原生二进制 |</p>\n\n<p>---</p>\n\n<p><a id=\"faq\"></a></p>\n<h2>❓ 常见问题</h2>\n\n<p><details></p>\n<p><summary><b>WeKit 启动后一直提示\"115个功能需要更新\"怎么办？</b></summary></p>\n\n<p><br></p>\n\n<p>这是 WeKit 的 DEX 缓存问题。本项目提供的正式版 APK 已修复此问题，直接下载 <a href=\"https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest\">最新版</a> 安装即可。</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Java 插件版怎么查看已读数量？</b></summary></p>\n\n<p><br></p>\n\n<p>Java 客户端插件的已读统计需要在<b>浏览器控制台</b>中查看。发送 <code>#消息</code> 后，打开管理面板的浏览器控制台即可看到已读人数。</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>必须要有公网服务器吗？</b></summary></p>\n\n<p><br></p>\n\n<p>不一定。有三种选择：</p>\n<li>**WeKit 正式版 APK**：内置服务端，完全不需要服务器</li>\n<li>**Java 插件版**：内置 cloudflared 隧道，自动获取公网地址</li>\n<li>**自建服务器**：Linux/Windows/Termux/Docker 均可</li>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>IP 定位不准确怎么办？</b></summary></p>\n\n<p><br></p>\n\n<p>IP 定位使用三级接口自动备份（ip-api.com → ipwho.is → ipinfo.io），如果都不准确可以用 <code>ENABLE_GEO=0</code> 关闭定位功能。</p>\n\n<p></details></p>\n\n<p>---</p>\n\n<p><a id=\"contributing\"></a></p>\n<h2>🤝 贡献</h2>\n\n<p>欢迎提交 Issue 和 Pull Request！</p>\n\n<li>📋 开发计划见 [ROADMAP.md](ROADMAP.md)</li>\n<li>🐛 发现问题请提 [Issue](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/issues)</li>\n<li>💡 有新想法欢迎 [讨论](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/discussions)</li>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n\n<h3>如果这个项目对你有帮助</h3>\n\n<p><b>请点个 ⭐ Star 支持一下！</b></p>\n\n<p><br></p>\n\n<p><a href=\"https://img.shields.io/badge/💖%20爱发电-支持作者-ff69b4?style=for-the-badge\">![💖 爱发电赞助</a>](https://www.ifdian.net/a/zuomeng13)</p>\n<p>&nbsp;&nbsp;</p>\n<p><a href=\"https://img.shields.io/badge/📦%20下载-最新版本-2ea44f?style=for-the-badge\">![📦 下载最新版</a>](https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/latest)</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><a id=\"license\"></a></p>\n<h2>📄 License</h2>\n\n<p>MIT © <a href=\"https://github.com/gaigebeckmanChristinaJames\">gaigebeckmanChristinaJames</a></p>",
+  "homepageUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker",
+  "sourceUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker",
+  "url": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-08-20T07:12:39Z",
+    "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/read-tracker-java-client.zip"
+  },
+  "releases": [
+    {
+      "name": "ci-20260822-0350",
+      "tagName": "ci-20260822-0350",
+      "publishedAt": "2026-08-22T03:50:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0350/app-debug.apk",
+          "size": 10576096,
+          "downloadCount": 38
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0350/app-legacy-debug.apk",
+          "size": 113319729,
+          "downloadCount": 9
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0350/app-standard-debug.apk",
+          "size": 113336624,
+          "downloadCount": 12
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0350/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 38
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0350/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0348",
+      "tagName": "ci-20260822-0348",
+      "publishedAt": "2026-08-22T03:48:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0348/app-debug.apk",
+          "size": 10576097,
+          "downloadCount": 5
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0348/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0348/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 3
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0348/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0348/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0335",
+      "tagName": "ci-20260822-0335",
+      "publishedAt": "2026-08-22T03:35:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0335/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0335/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0335/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0335/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0335/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0322",
+      "tagName": "ci-20260822-0322",
+      "publishedAt": "2026-08-22T03:22:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0322/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0322/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0322/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0322/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0322/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0321",
+      "tagName": "ci-20260822-0321",
+      "publishedAt": "2026-08-22T03:21:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0321/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0321/app-legacy-debug.apk",
+          "size": 113319729,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0321/app-standard-debug.apk",
+          "size": 113336624,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0321/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0321/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0251",
+      "tagName": "ci-20260822-0251",
+      "publishedAt": "2026-08-22T02:51:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0251/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0251/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0251/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0251/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0251/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0245",
+      "tagName": "ci-20260822-0245",
+      "publishedAt": "2026-08-22T02:45:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0245/app-debug.apk",
+          "size": 10576098,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0245/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0245/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0245/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0245/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "ci-20260822-0238",
+      "tagName": "ci-20260822-0238",
+      "publishedAt": "2026-08-22T02:38:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0238/app-debug.apk",
+          "size": 10576097,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0238/app-legacy-debug.apk",
+          "size": 113319725,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0238/app-standard-debug.apk",
+          "size": 113336620,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0238/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260822-0238/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-08-20T07:12:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/app-debug.apk",
+          "size": 10576093,
+          "downloadCount": 53
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/app-legacy-debug.apk",
+          "size": 113319389,
+          "downloadCount": 30
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/app-standard-debug.apk",
+          "size": 113336284,
+          "downloadCount": 60
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 17
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.1/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "ci-20260820-0533",
+      "tagName": "ci-20260820-0533",
+      "publishedAt": "2026-08-20T05:33:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0533/app-debug.apk",
+          "size": 10576095,
+          "downloadCount": 6
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0533/app-legacy-debug.apk",
+          "size": 113116149,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0533/app-standard-debug.apk",
+          "size": 113149428,
+          "downloadCount": 4
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0533/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0533/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260820-0517",
+      "tagName": "ci-20260820-0517",
+      "publishedAt": "2026-08-20T05:17:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0517/app-debug.apk",
+          "size": 10576098,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-legacy-release.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0517/app-legacy-release.apk",
+          "size": 24245827,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-release.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0517/app-standard-release.apk",
+          "size": 24263540,
+          "downloadCount": 5
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0517/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0517/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260820-0456",
+      "tagName": "ci-20260820-0456",
+      "publishedAt": "2026-08-20T04:56:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0456/app-debug.apk",
+          "size": 10576095,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0456/app-legacy-debug.apk",
+          "size": 113116149,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0456/app-standard-debug.apk",
+          "size": 113149428,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0456/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260820-0456/read-tracker-java-server.zip",
+          "size": 171498,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260819-1241",
+      "tagName": "ci-20260819-1241",
+      "publishedAt": "2026-08-19T12:41:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1241/app-debug.apk",
+          "size": 10576092,
+          "downloadCount": 7
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1241/app-legacy-debug.apk",
+          "size": 113116169,
+          "downloadCount": 4
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1241/app-standard-debug.apk",
+          "size": 113149448,
+          "downloadCount": 9
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1241/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1241/read-tracker-java-server.zip",
+          "size": 171411,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "ci-20260819-1228",
+      "tagName": "ci-20260819-1228",
+      "publishedAt": "2026-08-19T12:29:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1228/app-debug.apk",
+          "size": 10576098,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1228/app-legacy-debug.apk",
+          "size": 113116169,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1228/app-standard-debug.apk",
+          "size": 113149448,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1228/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260819-1228/read-tracker-java-server.zip",
+          "size": 171411,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-08-18T15:09:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.0/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 647
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.0/app-legacy-debug.apk",
+          "size": 113116149,
+          "downloadCount": 232
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.0/app-standard-debug.apk",
+          "size": 113149428,
+          "downloadCount": 782
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.0/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 210
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/v1.0.0/read-tracker-java-server.zip",
+          "size": 171411,
+          "downloadCount": 219
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-2358",
+      "tagName": "ci-20260818-2358",
+      "publishedAt": "2026-08-18T23:58:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-2358/app-debug.apk",
+          "size": 10576094,
+          "downloadCount": 8
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-2358/app-legacy-debug.apk",
+          "size": 113116165,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-2358/app-standard-debug.apk",
+          "size": 113149444,
+          "downloadCount": 8
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-2358/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 4
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-2358/read-tracker-java-server.zip",
+          "size": 171411,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-1223",
+      "tagName": "ci-20260818-1223",
+      "publishedAt": "2026-08-18T12:23:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-1223/app-debug.apk",
+          "size": 10575538,
+          "downloadCount": 24
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-1223/app-legacy-debug.apk",
+          "size": 113116149,
+          "downloadCount": 13
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-1223/app-standard-debug.apk",
+          "size": 113149428,
+          "downloadCount": 38
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-1223/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 14
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-1223/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0638",
+      "tagName": "ci-20260818-0638",
+      "publishedAt": "2026-08-18T06:38:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0638/app-debug.apk",
+          "size": 10575536,
+          "downloadCount": 117
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0638/app-legacy-debug.apk",
+          "size": 124266612,
+          "downloadCount": 31
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0638/app-standard-debug.apk",
+          "size": 124294509,
+          "downloadCount": 86
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0638/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 27
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0638/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0557",
+      "tagName": "ci-20260818-0557",
+      "publishedAt": "2026-08-18T05:57:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0557/app-debug.apk",
+          "size": 10575535,
+          "downloadCount": 30
+        },
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0557/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 9
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0557/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 20
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0557/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 3
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0557/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0548",
+      "tagName": "ci-20260818-0548",
+      "publishedAt": "2026-08-18T05:48:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0548/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 8
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0548/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 13
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0548/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 3
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0548/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0547",
+      "tagName": "ci-20260818-0547",
+      "publishedAt": "2026-08-18T05:47:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0547/app-legacy-debug.apk",
+          "size": 124267792,
+          "downloadCount": 3
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0547/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0547/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0547/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0540",
+      "tagName": "ci-20260818-0540",
+      "publishedAt": "2026-08-18T05:40:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0540/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 0
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0540/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0540/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0540/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0532",
+      "tagName": "ci-20260818-0532",
+      "publishedAt": "2026-08-18T05:32:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0532/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 1
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0532/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0532/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0532/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0530",
+      "tagName": "ci-20260818-0530",
+      "publishedAt": "2026-08-18T05:30:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0530/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 4
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0530/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 4
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0530/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0530/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0523",
+      "tagName": "ci-20260818-0523",
+      "publishedAt": "2026-08-18T05:23:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-legacy-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0523/app-legacy-debug.apk",
+          "size": 124267796,
+          "downloadCount": 0
+        },
+        {
+          "name": "app-standard-debug.apk",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0523/app-standard-debug.apk",
+          "size": 124295689,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0523/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0523/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0521",
+      "tagName": "ci-20260818-0521",
+      "publishedAt": "2026-08-18T05:21:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0521/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0521/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0519",
+      "tagName": "ci-20260818-0519",
+      "publishedAt": "2026-08-18T05:19:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0519/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 2
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0519/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0518",
+      "tagName": "ci-20260818-0518",
+      "publishedAt": "2026-08-18T05:18:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0518/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 1
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0518/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0513",
+      "tagName": "ci-20260818-0513",
+      "publishedAt": "2026-08-18T05:13:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0513/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0513/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ci-20260818-0511",
+      "tagName": "ci-20260818-0511",
+      "publishedAt": "2026-08-18T05:11:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "read-tracker-java-client.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0511/read-tracker-java-client.zip",
+          "size": 11936,
+          "downloadCount": 0
+        },
+        {
+          "name": "read-tracker-java-server.zip",
+          "downloadUrl": "https://github.com/gaigebeckmanChristinaJames/read-receipt-tracker/releases/download/ci-20260818-0511/read-tracker-java-server.zip",
+          "size": 170598,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "readme": "# Samsung Exynos 990 NetHunter Kernel 🐉\n\n![Kernel Version](https://img.shields.io/badge/Kernel-4.19.x-blue.svg)\n![Android Version](https://img.shields.io/badge/Android13-green.svg)\n![Platform](https://img.shields.io/badge/Platform-Exynos%20990-orange.svg)\n![Status](https://img.shields.io/badge/Status-Unmaintained-lightgrey.svg)\n\nA custom kernel for the Samsung Galaxy Note 20 Ultra (Exynos 990, `c2s`) specifically optimized for **Kali NetHunter**. This kernel enables advanced penetration testing features directly from your mobile device.\n\n---\n\n## ⚠️ Project Status: Unmaintained\n\n**This project is no longer actively developed.** The Note 20 Ultra it was built\nand tested on has been retired. Its battery failed and replacements are no\nlonger available here, so there is no longer a device to test changes on.\n\n**V4.4 is the final release, and it is complete and working.** Everything listed\nbelow was verified on hardware, including internal Bluetooth, which was the last\nfeature to land. Nothing is left half-finished.\n\n### Where to get it\n\nThe kernel stays available in the **Kali NetHunter repository**, and in this\nrepository's **GitHub Releases**. Those two are the preferred way to install it,\nbecause they come bundled with everything needed to make the features actually\nwork, the KernelSU modules and the installer scripts for monitor mode, Bluetooth\nArsenal, Docker and USB Arsenal. Building from source gives you the kernel on its\nown, and you would have to assemble the rest yourself.\n\nThe repository is deliberately **not archived**. Issues and pull requests remain\nopen, and forks are welcome. If you have an Exynos 990 Note 20 Ultra and want to\ncarry this forward, please do. The tree builds as-is, and the commit messages\ndocument the non-obvious findings in detail, particularly around the BCM4375B1\nBluetooth and Wi-Fi firmware paths.\n\n---\n\n## 🚀 Key Features\n\n* **Wireless Injection:** Support for external Wi-Fi adapters (TP-Link, Alfa, etc.).\n* **Bluetooth Arsenal:** Full HCI socket support, using either an external USB adapter or the phone’s own BCM4375B1 via the `btmode` module (kernel-side patchram).\n* **HID Support:** Keyboard/Mouse hijacking (BadUSB/Rubber Ducky attacks). (Not compatible with ADB)\n* **DriveDroid Support:** Use your phone as a bootable USB drive. (Not compatible with ADB)\n* **Network Protocols:** Full support for IEEE 802.11, Bluetooth HCI, and SDR.\n* **Wireguard:** Secure and encrypted network tunneling for privacy and penetration testing.\n* **Battery bypass:** Power components directly from the outlet reducing heat and increasing battery life.\n* **Optimized Performance:** Debloated and tuned for better efficiency under heavy loads.\n* **Custom SUSFS system** Deeply hide root access, Zygisk, and LSPosed from detection by apps, bypassing root checks for banking apps, games, or other sensitive software.\n* **And much more.....**\n---\n\n## 🛠 Supported Devices\n\nBuilt from Samsung's **N986B** source release for the **Exynos 990 (universal9830)** platform.\n\n* **Galaxy Note 20 Ultra (`c2s`, e.g. N985F / N986B), supported and tested.**\n\n**No other Exynos 990 device is supported by this tree.** Samsung ships device trees per model, and only `c2s` is present here: `arch/arm64/boot/dts/samsung/` contains nothing else, and `build/dtconfigs/` has only `c2s.cfg`.\n\nThat includes the **Galaxy Note 20 (`c1s`, SM-N980F)** and the **S20 series** (`x1s` / `y2s` / `z3s`). Do not flash this on them. The installer writes both `boot.img` and `dtbo.img`, and both carry c2s panel, touch controller and sensor descriptions. On another model that means a bootloop or a dead display. It is recoverable with Odin, but it will not boot.\n\nPorting to another model means pulling that model's device trees from opensource.samsung.com, adding a defconfig and a dtbo config for it, and rebuilding. It is not a matter of reflashing this zip.\n\n---\n\n## 🏗 Build Instructions\n\nFollow these steps to build the kernel from source on an **Arch Linux** or Ubuntu environment.\n\n### 1. Clone the Repository\n```bash\ngit clone https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter\ncd android_kernel_samsung_exynos990_nethunter\n```\n\n### 2. Execution\nRun the automated build script provided in the repository:\n```bash\nchmod +x build_kernel.sh\n./build_kernel.sh\n```\nThe script will handle the environment setup, configuration, and compilation. Once finished, the flashable Zip will be automatically created.\n\n---\n\n## 📲 Installation\n\n1. **Backup:** Always perform a full Nandroid backup in TWRP before flashing.\n2. **Flash:**\n   * Reboot to Recovery.\n   * Formate data.\n   * Reboot to Recovery.\n   * Flash the generated `.zip` file(you may need to flash samsung multidisabler after kernel zip).\n   * Formate data.\n3. * Download and install KernelSU app v0.9.5\n   **NetHunter App:** Install the Kali NetHunter app to manage HID and Wireless features.\n\n---\n\n## ⚠️ Disclaimer\n\n> **WARNING:** Flashing a custom kernel modifies your system partitions. I am not responsible for bricked devices, dead SD cards, or thermonuclear war. You are choosing to make these modifications at your own risk. **Knox will be tripped.**\n\n---\n\n## 🤝 Contributing\n\nContributions are welcome! If you find a bug or want to add support for a specific driver:\n1. Fork the Project.\n2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).\n3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).\n4. Push to the Branch (`git push origin feature/AmazingFeature`).\n5. Open a Pull Request.\n\n## Credits\nThis repository is a downstream fork of the Exynos990 KSU-Next project by Hargriv (H-K-Systems): https://gitlab.com/Hargriv/exynos990-note20ultra-ksunext.\n\nNexmon monitor mode, frame injection concepts, firmware patching framework, and the `NEX_INJECT_FRAME` injection ABI are originally developed by the Nexmon team.\n\nInitial BCM4375B1 18.41.117 firmware patch support was added in 0xIO32's Nexmon fork by 0xIO32 / Markus Probst.\n\nMy work in this project is the downstream Samsung Exynos990/NetHunter integration: adapting the BCM4375B1 18.41.117 Nexmon patchset for this device/kernel setup, monitor/channel handling, monpass/tooling fixes, KernelSU firmware overlay packaging, and the Samsung `bcmdhd` driver integration.\n\nRelated Nexmon fork: [MocLG/nexmon bcm4375b1_18_41_117_patch](https://github.com/MocLG/nexmon/tree/bcm4375b1_18_41_117_patch).\n\n---\n\n**Developed with ❤️ for the NetHunter Community.**\n*\n",
+  "readmeHTML": "<h1>Samsung Exynos 990 NetHunter Kernel 🐉</h1>\n\n<p>!<a href=\"https://img.shields.io/badge/Kernel-4.19.x-blue.svg\">Kernel Version</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Android13-green.svg\">Android Version</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Platform-Exynos%20990-orange.svg\">Platform</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Status-Unmaintained-lightgrey.svg\">Status</a></p>\n\n<p>A custom kernel for the Samsung Galaxy Note 20 Ultra (Exynos 990, <code>c2s</code>) specifically optimized for <b>Kali NetHunter</b>. This kernel enables advanced penetration testing features directly from your mobile device.</p>\n\n<p>---</p>\n\n<h2>⚠️ Project Status: Unmaintained</h2>\n\n<p><b>This project is no longer actively developed.</b> The Note 20 Ultra it was built</p>\n<p>and tested on has been retired. Its battery failed and replacements are no</p>\n<p>longer available here, so there is no longer a device to test changes on.</p>\n\n<p><b>V4.4 is the final release, and it is complete and working.</b> Everything listed</p>\n<p>below was verified on hardware, including internal Bluetooth, which was the last</p>\n<p>feature to land. Nothing is left half-finished.</p>\n\n<h3>Where to get it</h3>\n\n<p>The kernel stays available in the <b>Kali NetHunter repository</b>, and in this</p>\n<p>repository's <b>GitHub Releases</b>. Those two are the preferred way to install it,</p>\n<p>because they come bundled with everything needed to make the features actually</p>\n<p>work, the KernelSU modules and the installer scripts for monitor mode, Bluetooth</p>\n<p>Arsenal, Docker and USB Arsenal. Building from source gives you the kernel on its</p>\n<p>own, and you would have to assemble the rest yourself.</p>\n\n<p>The repository is deliberately <b>not archived</b>. Issues and pull requests remain</p>\n<p>open, and forks are welcome. If you have an Exynos 990 Note 20 Ultra and want to</p>\n<p>carry this forward, please do. The tree builds as-is, and the commit messages</p>\n<p>document the non-obvious findings in detail, particularly around the BCM4375B1</p>\n<p>Bluetooth and Wi-Fi firmware paths.</p>\n\n<p>---</p>\n\n<h2>🚀 Key Features</h2>\n\n<li>**Wireless Injection:** Support for external Wi-Fi adapters (TP-Link, Alfa, etc.).</li>\n<li>**Bluetooth Arsenal:** Full HCI socket support, using either an external USB adapter or the phone’s own BCM4375B1 via the `btmode` module (kernel-side patchram).</li>\n<li>**HID Support:** Keyboard/Mouse hijacking (BadUSB/Rubber Ducky attacks). (Not compatible with ADB)</li>\n<li>**DriveDroid Support:** Use your phone as a bootable USB drive. (Not compatible with ADB)</li>\n<li>**Network Protocols:** Full support for IEEE 802.11, Bluetooth HCI, and SDR.</li>\n<li>**Wireguard:** Secure and encrypted network tunneling for privacy and penetration testing.</li>\n<li>**Battery bypass:** Power components directly from the outlet reducing heat and increasing battery life.</li>\n<li>**Optimized Performance:** Debloated and tuned for better efficiency under heavy loads.</li>\n<li>**Custom SUSFS system** Deeply hide root access, Zygisk, and LSPosed from detection by apps, bypassing root checks for banking apps, games, or other sensitive software.</li>\n<li>**And much more.....**</li>\n<p>---</p>\n\n<h2>🛠 Supported Devices</h2>\n\n<p>Built from Samsung's <b>N986B</b> source release for the <b>Exynos 990 (universal9830)</b> platform.</p>\n\n<li>**Galaxy Note 20 Ultra (`c2s`, e.g. N985F / N986B), supported and tested.**</li>\n\n<p><b>No other Exynos 990 device is supported by this tree.</b> Samsung ships device trees per model, and only <code>c2s</code> is present here: <code>arch/arm64/boot/dts/samsung/</code> contains nothing else, and <code>build/dtconfigs/</code> has only <code>c2s.cfg</code>.</p>\n\n<p>That includes the <b>Galaxy Note 20 (<code>c1s</code>, SM-N980F)</b> and the <b>S20 series</b> (<code>x1s</code> / <code>y2s</code> / <code>z3s</code>). Do not flash this on them. The installer writes both <code>boot.img</code> and <code>dtbo.img</code>, and both carry c2s panel, touch controller and sensor descriptions. On another model that means a bootloop or a dead display. It is recoverable with Odin, but it will not boot.</p>\n\n<p>Porting to another model means pulling that model's device trees from opensource.samsung.com, adding a defconfig and a dtbo config for it, and rebuilding. It is not a matter of reflashing this zip.</p>\n\n<p>---</p>\n\n<h2>🏗 Build Instructions</h2>\n\n<p>Follow these steps to build the kernel from source on an <b>Arch Linux</b> or Ubuntu environment.</p>\n\n<h3>1. Clone the Repository</h3>\n<pre>git clone https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter\ncd android_kernel_samsung_exynos990_nethunter</pre>\n\n<h3>2. Execution</h3>\n<p>Run the automated build script provided in the repository:</p>\n<pre>chmod +x build_kernel.sh\n./build_kernel.sh</pre>\n<p>The script will handle the environment setup, configuration, and compilation. Once finished, the flashable Zip will be automatically created.</p>\n\n<p>---</p>\n\n<h2>📲 Installation</h2>\n\n<li>**Backup:** Always perform a full Nandroid backup in TWRP before flashing.</li>\n<li>**Flash:**</li>\n<p>   * Reboot to Recovery.</p>\n<p>   * Formate data.</p>\n<p>   * Reboot to Recovery.</p>\n<p>   * Flash the generated <code>.zip</code> file(you may need to flash samsung multidisabler after kernel zip).</p>\n<p>   * Formate data.</p>\n<li>* Download and install KernelSU app v0.9.5</li>\n<p>   <b>NetHunter App:</b> Install the Kali NetHunter app to manage HID and Wireless features.</p>\n\n<p>---</p>\n\n<h2>⚠️ Disclaimer</h2>\n\n<p>> <b>WARNING:</b> Flashing a custom kernel modifies your system partitions. I am not responsible for bricked devices, dead SD cards, or thermonuclear war. You are choosing to make these modifications at your own risk. <b>Knox will be tripped.</b></p>\n\n<p>---</p>\n\n<h2>🤝 Contributing</h2>\n\n<p>Contributions are welcome! If you find a bug or want to add support for a specific driver:</p>\n<li>Fork the Project.</li>\n<li>Create your Feature Branch (`git checkout -b feature/AmazingFeature`).</li>\n<li>Commit your Changes (`git commit -m 'Add some AmazingFeature'`).</li>\n<li>Push to the Branch (`git push origin feature/AmazingFeature`).</li>\n<li>Open a Pull Request.</li>\n\n<h2>Credits</h2>\n<p>This repository is a downstream fork of the Exynos990 KSU-Next project by Hargriv (H-K-Systems): https://gitlab.com/Hargriv/exynos990-note20ultra-ksunext.</p>\n\n<p>Nexmon monitor mode, frame injection concepts, firmware patching framework, and the <code>NEX_INJECT_FRAME</code> injection ABI are originally developed by the Nexmon team.</p>\n\n<p>Initial BCM4375B1 18.41.117 firmware patch support was added in 0xIO32's Nexmon fork by 0xIO32 / Markus Probst.</p>\n\n<p>My work in this project is the downstream Samsung Exynos990/NetHunter integration: adapting the BCM4375B1 18.41.117 Nexmon patchset for this device/kernel setup, monitor/channel handling, monpass/tooling fixes, KernelSU firmware overlay packaging, and the Samsung <code>bcmdhd</code> driver integration.</p>\n\n<p>Related Nexmon fork: <a href=\"https://github.com/MocLG/nexmon/tree/bcm4375b1_18_41_117_patch\">MocLG/nexmon bcm4375b1_18_41_117_patch</a>.</p>\n\n<p>---</p>\n\n<p><b>Developed with ❤️ for the NetHunter Community.</b></p>\n<p>*</p>",
+  "homepageUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter",
+  "sourceUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter",
+  "url": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter",
+  "latestRelease": {
+    "name": "v4.4.0",
+    "version": "v4.4.0",
+    "time": "2026-08-17T10:27:14Z",
+    "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v4.4.0/kernel-nethunter-20260816_183615-c2s-oui-ksu-thirteen.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.4.0",
+      "tagName": "v4.4.0",
+      "publishedAt": "2026-08-17T10:27:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-nethunter-20260816_183615-c2s-oui-ksu-thirteen.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v4.4.0/kernel-nethunter-20260816_183615-c2s-oui-ksu-thirteen.zip",
+          "size": 39152666,
+          "downloadCount": 33
+        }
+      ]
+    },
+    {
+      "name": "v4.2.0",
+      "tagName": "v4.2.0",
+      "publishedAt": "2026-06-12T07:08:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-nethunter-20260611_210434-c2s-oui-ksu-thirteen.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v4.2.0/kernel-nethunter-20260611_210434-c2s-oui-ksu-thirteen.zip",
+          "size": 38913854,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "v4.1.0",
+      "tagName": "v4.1.0",
+      "publishedAt": "2026-06-09T07:21:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernel-nethunter-20260608_183427-c2s-oui-ksu-thirteen.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v4.1.0/kernel-nethunter-20260608_183427-c2s-oui-ksu-thirteen.zip",
+          "size": 35393779,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.5.0",
+      "tagName": "v3.5.0",
+      "publishedAt": "2026-06-09T07:33:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetHunter-Extreme-KSU-V3.5_c2s.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v3.5.0/NetHunter-Extreme-KSU-V3.5_c2s.zip",
+          "size": 17924287,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-06-09T07:33:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetHunter-Extreme-V3_c2s.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v3.0.0/NetHunter-Extreme-V3_c2s.zip",
+          "size": 17893030,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-06-09T07:33:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetHunter-Extreme-V2_c2s.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v2.0.0/NetHunter-Extreme-V2_c2s.zip",
+          "size": 17557835,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-06-09T07:34:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NetHunter-Extreme-V1_c2s.zip",
+          "downloadUrl": "https://github.com/MocLG/android_kernel_samsung_exynos990_nethunter/releases/download/v1.0.0/NetHunter-Extreme-V1_c2s.zip",
+          "size": 17557718,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

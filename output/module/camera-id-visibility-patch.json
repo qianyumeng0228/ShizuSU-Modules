@@ -1,0 +1,70 @@
+{
+  "readme": "# Camera ID Visibility Patch\n\nSystemless module toolkit for rooted Android test devices where the public Camera2 device list does not match the lower camera provider inventory.\n\nThis repository does not include proprietary system files, patched binaries, generated module zips, device dumps, or application-derived output. It provides a reproducible local build pipeline that consumes files extracted from hardware or firmware you are allowed to modify.\n\n## What It Does\n\n- Builds a KernelSU/Magisk-compatible module zip from local input blobs.\n- Applies byte-level patches from a profile file.\n- Places patched files under a module `system/` tree for systemless overlay.\n- Keeps all extracted blobs and generated artifacts out of git.\n\nThe intended use is research and controlled device bring-up. A bad profile can break camera service startup or boot stability. Keep a recovery path ready before installing any generated module.\n\n## Repository Layout\n\n```text\nmodule/                 Module template files (scriptable placeholder)\nprofiles/               Example and CI patch profiles\nscripts/build-module.sh Build a flashable module zip from a profile\nscripts/patch-bytes.sh  Offset-based binary patch helper\nscripts/create-fixtures.sh\n                        CI-only dummy inputs\ndocs/                   Operational notes\n\nmagisk/camera-hiddenid-provider-patch/\n                        Source tree of the camera_hiddenid_provider_patch\n                        KernelSU module (system-layer ID visibility).\n                        See magisk/camera-hiddenid-provider-patch/README.md.\n\nlsposed/camera2-alias-lsposed/\n                        Source tree of the camera2_alias_lsposed_config\n                        KernelSU module (process-layer ID compatibility\n                        for lv.mcprotector.mcpro24fps). The hook\n                        AndroidManifest.xml / Java / build.sh are\n                        committed; the wrapper module zip is published\n                        as a release asset only.\n                        See lsposed/camera2-alias-lsposed/README.md.\n```\n\n## Quick Start\n\nCreate a local profile from the example:\n\n```sh\ncp profiles/example.conf local/profile.conf\n```\n\nPut your own extracted input files under `local/blobs/`, then edit:\n\n- `PATCH_ENTRIES`\n- source paths\n- destination paths under the module `system/` overlay\n- offsets\n- expected bytes\n- replacement bytes\n\nBuild:\n\n```sh\nscripts/build-module.sh local/profile.conf\n```\n\nThe zip is written to `build/dist/`.\n\nInstall with your root manager or from a root shell:\n\n```sh\nksud module install build/dist/camera_id_visibility_patch-0.1.0.zip\nreboot\n```\n\nVerify after reboot:\n\n```sh\nadb shell dumpsys media.camera | sed -n '1,80p'\nadb shell logcat -b crash -d -v threadtime\n```\n\n## Patch Profiles\n\nProfiles are shell files with module metadata and `PATCH_ENTRIES`.\n\nEach entry is:\n\n```text\nsource|module-destination|offset-hex|expected-hex|replacement-hex\n```\n\nExample:\n\n```sh\nPATCH_ENTRIES=(\n  \"local/blobs/camera-service32.so|system/lib/libcameraservice.so|85b40|89f0baef6067d4f8c41001a889f0b8ee|072000bf6067d4f8c41001a889f040ed\"\n)\n```\n\nThe builder refuses to patch if the bytes at the offset do not match `expected-hex`.\n\n## Recovery\n\nDisable the module before reboot if needed:\n\n```sh\ntouch /data/adb/modules/camera_id_visibility_patch/disable\n```\n\nRemove it from a root shell:\n\n```sh\nrm -rf /data/adb/modules/camera_id_visibility_patch\nreboot\n```\n\n## Legal And Safety Notes\n\n- Do not publish proprietary blobs or patched binaries.\n- Do not use this on devices you do not own or administer.\n- Treat every profile as device-build-specific.\n- Prefer one small patch per test cycle and keep crash logs for rollback decisions.\n",
+  "readmeHTML": "<h1>Camera ID Visibility Patch</h1>\n\n<p>Systemless module toolkit for rooted Android test devices where the public Camera2 device list does not match the lower camera provider inventory.</p>\n\n<p>This repository does not include proprietary system files, patched binaries, generated module zips, device dumps, or application-derived output. It provides a reproducible local build pipeline that consumes files extracted from hardware or firmware you are allowed to modify.</p>\n\n<h2>What It Does</h2>\n\n<li>Builds a KernelSU/Magisk-compatible module zip from local input blobs.</li>\n<li>Applies byte-level patches from a profile file.</li>\n<li>Places patched files under a module `system/` tree for systemless overlay.</li>\n<li>Keeps all extracted blobs and generated artifacts out of git.</li>\n\n<p>The intended use is research and controlled device bring-up. A bad profile can break camera service startup or boot stability. Keep a recovery path ready before installing any generated module.</p>\n\n<h2>Repository Layout</h2>\n\n<pre>module/                 Module template files (scriptable placeholder)\nprofiles/               Example and CI patch profiles\nscripts/build-module.sh Build a flashable module zip from a profile\nscripts/patch-bytes.sh  Offset-based binary patch helper\nscripts/create-fixtures.sh\n                        CI-only dummy inputs\ndocs/                   Operational notes\n\nmagisk/camera-hiddenid-provider-patch/\n                        Source tree of the camera_hiddenid_provider_patch\n                        KernelSU module (system-layer ID visibility).\n                        See magisk/camera-hiddenid-provider-patch/README.md.\n\nlsposed/camera2-alias-lsposed/\n                        Source tree of the camera2_alias_lsposed_config\n                        KernelSU module (process-layer ID compatibility\n                        for lv.mcprotector.mcpro24fps). The hook\n                        AndroidManifest.xml / Java / build.sh are\n                        committed; the wrapper module zip is published\n                        as a release asset only.\n                        See lsposed/camera2-alias-lsposed/README.md.</pre>\n\n<h2>Quick Start</h2>\n\n<p>Create a local profile from the example:</p>\n\n<pre>cp profiles/example.conf local/profile.conf</pre>\n\n<p>Put your own extracted input files under <code>local/blobs/</code>, then edit:</p>\n\n<li>`PATCH_ENTRIES`</li>\n<li>source paths</li>\n<li>destination paths under the module `system/` overlay</li>\n<li>offsets</li>\n<li>expected bytes</li>\n<li>replacement bytes</li>\n\n<p>Build:</p>\n\n<pre>scripts/build-module.sh local/profile.conf</pre>\n\n<p>The zip is written to <code>build/dist/</code>.</p>\n\n<p>Install with your root manager or from a root shell:</p>\n\n<pre>ksud module install build/dist/camera_id_visibility_patch-0.1.0.zip\nreboot</pre>\n\n<p>Verify after reboot:</p>\n\n<pre>adb shell dumpsys media.camera | sed -n '1,80p'\nadb shell logcat -b crash -d -v threadtime</pre>\n\n<h2>Patch Profiles</h2>\n\n<p>Profiles are shell files with module metadata and <code>PATCH_ENTRIES</code>.</p>\n\n<p>Each entry is:</p>\n\n<pre>source|module-destination|offset-hex|expected-hex|replacement-hex</pre>\n\n<p>Example:</p>\n\n<pre>PATCH_ENTRIES=(\n  \"local/blobs/camera-service32.so|system/lib/libcameraservice.so|85b40|89f0baef6067d4f8c41001a889f0b8ee|072000bf6067d4f8c41001a889f040ed\"\n)</pre>\n\n<p>The builder refuses to patch if the bytes at the offset do not match <code>expected-hex</code>.</p>\n\n<h2>Recovery</h2>\n\n<p>Disable the module before reboot if needed:</p>\n\n<pre>touch /data/adb/modules/camera_id_visibility_patch/disable</pre>\n\n<p>Remove it from a root shell:</p>\n\n<pre>rm -rf /data/adb/modules/camera_id_visibility_patch\nreboot</pre>\n\n<h2>Legal And Safety Notes</h2>\n\n<li>Do not publish proprietary blobs or patched binaries.</li>\n<li>Do not use this on devices you do not own or administer.</li>\n<li>Treat every profile as device-build-specific.</li>\n<li>Prefer one small patch per test cycle and keep crash logs for rollback decisions.</li>",
+  "homepageUrl": "https://github.com/Tinnci/camera-id-visibility-patch",
+  "sourceUrl": "https://github.com/Tinnci/camera-id-visibility-patch",
+  "url": "https://github.com/Tinnci/camera-id-visibility-patch",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-06-05T11:53:01Z",
+    "downloadUrl": "https://github.com/Tinnci/camera-id-visibility-patch/releases/download/v1.0.0/camera2_alias_lsposed_config-1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-06-05T11:53:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "camera2_alias_lsposed_config-1.0.zip",
+          "downloadUrl": "https://github.com/Tinnci/camera-id-visibility-patch/releases/download/v1.0.0/camera2_alias_lsposed_config-1.0.zip",
+          "size": 16556,
+          "downloadCount": 9
+        },
+        {
+          "name": "camera_hiddenid_provider_patch-1.0.zip",
+          "downloadUrl": "https://github.com/Tinnci/camera-id-visibility-patch/releases/download/v1.0.0/camera_hiddenid_provider_patch-1.0.zip",
+          "size": 14942945,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v0.6.0",
+      "tagName": "v0.6.0",
+      "publishedAt": "2026-06-05T03:56:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "camera_hiddenid_provider_patch-0.6.0.zip",
+          "downloadUrl": "https://github.com/Tinnci/camera-id-visibility-patch/releases/download/v0.6.0/camera_hiddenid_provider_patch-0.6.0.zip",
+          "size": 14942498,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-06-05T11:36:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "camera2_alias_lsposed_config-0.2.0.zip",
+          "downloadUrl": "https://github.com/Tinnci/camera-id-visibility-patch/releases/download/v0.2.0/camera2_alias_lsposed_config-0.2.0.zip",
+          "size": 16595,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-06-05T02:34:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    }
+  ]
+}

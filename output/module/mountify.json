@@ -1,0 +1,435 @@
+{
+  "readme": "# Mountify\n\n#### Globally mounted modules via OverlayFS.\n\n- acts as a KernelSU [metamodule](https://kernelsu.org/guide/metamodule.html)\n- works on APatch and Magisk too\n- **CONFIG_OVERLAY_FS=y** is required \n- **CONFIG_TMPFS_XATTR=y** is highly encouraged\n- tries to mimic an OEM mount, like /mnt/vendor/my_bigball\n- for module devs, you can also use [this standalone script](https://github.com/backslashxx/mountify/tree/standalone-script)\n\n## Methodology\n### tmpfs mode \n#### - tmpfs backed\n1. `touch /data/adb/modules/module_id/skip_mount`\n2. copies contents of `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`\n3. mirrors SELinux context of every file from `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`\n4. loops 2 and 3 for all modules\n5. overlays `/mnt/vendor/fake_folder_name/system/bin` to `/system/bin` and other folders\n\n### ext4 sparse mode \n#### - ext4-sparse-on-tmpfs backed\n1. `touch /data/adb/modules/module_id/skip_mount`\n2. create an ext4 sparse image, mount it on `/mnt/vendor/fake_folder_name`\n3. copies contents of `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`\n4. mirrors SELinux context of every file from `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`\n5. loops 3 and 4 for all modules\n6. unmounts and remounts sparse image to `/mnt/vendor/fake_folder_name`\n7. overlays `/mnt/vendor/fake_folder_name/system/bin` to `/system/bin` and other folders\n\n## Why?\n- Magic mount drastically increases mount count, making detection possible (zimperium)\n- OverlayFS mounting with ext4 image upperdir is detectable due to it creating device nodes on /proc/fs, while yes ext4 /data as overlay source is possible, this is rare nowadays.\n- F2FS /data as overlay source fails with native casefolding (ovl_dentry_weird), so only sdcardfs users can use /data as overlay source.\n- Frankly, I dont see a way to this module mounting situation, this shit is more of a shitty band-aid\n\n### but ext4 sparse mode creates ext4 nodes!\n- this is added to accomodate something like GPU drivers\n- this causes detections but YMMV.\n- this is not my problem, this is a fallback, not the main recommendation.\n- and yes this is basically how Official KernelSU used to do it.\n- if you're on GKI 5.10+, theres an experimental LKM that nukes these nodes.\n- if you're on KernelSU 22105+ this is automatically handled.\n\n## Usage\n- user-friendly config editing is available on the WebUI\n- otherwise you can modify /data/adb/mountify/config.sh\n\n### General\n- by default, mountify mounts all modules with a system folder. `mountify_mounts=2`\n- to mount specific modules only, edit config.sh, `mountify_mounts=1` then modify modules.txt to list modules you want mounted\n\n```\nmodule_id\nAdreno_Gpu_Driver\nDisplayFeatures\nViPER4Android-RE-Fork\nmountify_whiteouts\n```\n- `FAKE_MOUNT_NAME=\"mountify\"` to set a custom fake folder name\n- `mountify_stop_start=1` to restart android at service (needed for certain modules)\n\n#### tmpfs specific\n- `test_decoy_mount=1` to enable testing for decoy mounts on tmpfs mode\n\n#### ext4 specific\n- `use_ext4_sparse=1` to force using ext4 mode if your setup is tmpfs_xattr capable\n- `spoof_sparse=1` to try spoof sparse mount as an android service\n- `FAKE_APEX_NAME=\"com.android.mntservice\"` to customize that android service spoofed name\n- `sparse_size=\"2048\"` to set your sparse size (in MB) to whatever you want\n- `enable_lkm_nuke=1` to try load an experimental LKM.\n- `lkm_filename=\"nuke.ko\"` to define LKM's filename\n\n### Need Unmount?\n- use either NeoZygisk, ReZygisk, Zygisk Assistant, Zygisk Next\n- on Zygisk Next, set Denylist Policy to \"Enforced\" or \"Unmount Only\"\n- then edit config.sh\n   - `MOUNT_DEVICE_NAME=\"APatch\"` if you're on APatch\n   - `MOUNT_DEVICE_NAME=\"KSU\"` if you're on KernelSU forks\n   - `MOUNT_DEVICE_NAME=\"magisk\"` if you're on Magisk\n- `mountify_custom_umount=0` modify this value to enable known in-kernel umount methods.\n   - NOTE: zygisk provider umount is still better, this is here as a second choice.\n\n#### I need mountify to skip mounting my module!\n- `skip_mount` is respected on metamodule mode (KSU / APatch)\n- however on Magisk make sure to use `skip_mountify` instead\n- mountify checks these on /data/adb/modules/module_name\n\n### Advanced / Debugging\n- remove `metamodule=true` from module.prop before installing to force non-metamodule mode\n- create `/data/adb/mountify/explicit_I_want_a_bootloop` to disable anti-bootloop protection\n- set `mountify_expert_mode=1` to force expert mode (disables safety checks)\n- create `/data/adb/mountify/explicit_I_want_symlink` to force symlink mode before installing\n  - unsupported and deprecated, meant for legacy devices\n- sh whiteout_gen.sh to generate a whiteout module (deprecated but its still there)\n\n## Limitations / Recommendations\n- fails with [De-Bloater](https://github.com/sunilpaulmathew/De-Bloater), as it [uses dummy text, NOT proper whiteouts](https://github.com/sunilpaulmathew/De-Bloater/blob/cadd523f0ad8208eab31e7db51f855b89ed56ffe/app/src/main/java/com/sunilpaulmathew/debloater/utils/Utils.java#L112)\n- I recommend [System App Nuker](https://github.com/ChiseWaguri/systemapp_nuker/releases) instead. It uses proper whiteouts.\n\n## License\n- module is on [The Unlicense](https://github.com/backslashxx/mountify/blob/master/LICENSE)\n- LKM is on [GPLv2](https://github.com/backslashxx/mountify/blob/master/nuke_ext4_lkm/LICENSE)\n- WebUI is on [MIT](https://github.com/backslashxx/mountify/blob/master/webui/LICENSE)\n\n## Support / Warranty\n- None, none at all. I am handing you a sharp knife, it is not on me if you stab yourself with it.\n\n## Links\n[Download](https://github.com/backslashxx/mountify/releases)\n\n\n",
+  "readmeHTML": "<h1>Mountify</h1>\n\n<p>#### Globally mounted modules via OverlayFS.</p>\n\n<li>acts as a KernelSU [metamodule](https://kernelsu.org/guide/metamodule.html)</li>\n<li>works on APatch and Magisk too</li>\n<li>**CONFIG_OVERLAY_FS=y** is required</li>\n<li>**CONFIG_TMPFS_XATTR=y** is highly encouraged</li>\n<li>tries to mimic an OEM mount, like /mnt/vendor/my_bigball</li>\n<li>for module devs, you can also use [this standalone script](https://github.com/backslashxx/mountify/tree/standalone-script)</li>\n\n<h2>Methodology</h2>\n<h3>tmpfs mode</h3>\n<p>#### - tmpfs backed</p>\n<li>`touch /data/adb/modules/module_id/skip_mount`</li>\n<li>copies contents of `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`</li>\n<li>mirrors SELinux context of every file from `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`</li>\n<li>loops 2 and 3 for all modules</li>\n<li>overlays `/mnt/vendor/fake_folder_name/system/bin` to `/system/bin` and other folders</li>\n\n<h3>ext4 sparse mode</h3>\n<p>#### - ext4-sparse-on-tmpfs backed</p>\n<li>`touch /data/adb/modules/module_id/skip_mount`</li>\n<li>create an ext4 sparse image, mount it on `/mnt/vendor/fake_folder_name`</li>\n<li>copies contents of `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`</li>\n<li>mirrors SELinux context of every file from `/data/adb/modules/module_id` to `/mnt/vendor/fake_folder_name`</li>\n<li>loops 3 and 4 for all modules</li>\n<li>unmounts and remounts sparse image to `/mnt/vendor/fake_folder_name`</li>\n<li>overlays `/mnt/vendor/fake_folder_name/system/bin` to `/system/bin` and other folders</li>\n\n<h2>Why?</h2>\n<li>Magic mount drastically increases mount count, making detection possible (zimperium)</li>\n<li>OverlayFS mounting with ext4 image upperdir is detectable due to it creating device nodes on /proc/fs, while yes ext4 /data as overlay source is possible, this is rare nowadays.</li>\n<li>F2FS /data as overlay source fails with native casefolding (ovl_dentry_weird), so only sdcardfs users can use /data as overlay source.</li>\n<li>Frankly, I dont see a way to this module mounting situation, this shit is more of a shitty band-aid</li>\n\n<h3>but ext4 sparse mode creates ext4 nodes!</h3>\n<li>this is added to accomodate something like GPU drivers</li>\n<li>this causes detections but YMMV.</li>\n<li>this is not my problem, this is a fallback, not the main recommendation.</li>\n<li>and yes this is basically how Official KernelSU used to do it.</li>\n<li>if you're on GKI 5.10+, theres an experimental LKM that nukes these nodes.</li>\n<li>if you're on KernelSU 22105+ this is automatically handled.</li>\n\n<h2>Usage</h2>\n<li>user-friendly config editing is available on the WebUI</li>\n<li>otherwise you can modify /data/adb/mountify/config.sh</li>\n\n<h3>General</h3>\n<li>by default, mountify mounts all modules with a system folder. `mountify_mounts=2`</li>\n<li>to mount specific modules only, edit config.sh, `mountify_mounts=1` then modify modules.txt to list modules you want mounted</li>\n\n<pre>module_id\nAdreno_Gpu_Driver\nDisplayFeatures\nViPER4Android-RE-Fork\nmountify_whiteouts</pre>\n<li>`FAKE_MOUNT_NAME=\"mountify\"` to set a custom fake folder name</li>\n<li>`mountify_stop_start=1` to restart android at service (needed for certain modules)</li>\n\n<p>#### tmpfs specific</p>\n<li>`test_decoy_mount=1` to enable testing for decoy mounts on tmpfs mode</li>\n\n<p>#### ext4 specific</p>\n<li>`use_ext4_sparse=1` to force using ext4 mode if your setup is tmpfs_xattr capable</li>\n<li>`spoof_sparse=1` to try spoof sparse mount as an android service</li>\n<li>`FAKE_APEX_NAME=\"com.android.mntservice\"` to customize that android service spoofed name</li>\n<li>`sparse_size=\"2048\"` to set your sparse size (in MB) to whatever you want</li>\n<li>`enable_lkm_nuke=1` to try load an experimental LKM.</li>\n<li>`lkm_filename=\"nuke.ko\"` to define LKM's filename</li>\n\n<h3>Need Unmount?</h3>\n<li>use either NeoZygisk, ReZygisk, Zygisk Assistant, Zygisk Next</li>\n<li>on Zygisk Next, set Denylist Policy to \"Enforced\" or \"Unmount Only\"</li>\n<li>then edit config.sh</li>\n<p>   - <code>MOUNT_DEVICE_NAME=\"APatch\"</code> if you're on APatch</p>\n<p>   - <code>MOUNT_DEVICE_NAME=\"KSU\"</code> if you're on KernelSU forks</p>\n<p>   - <code>MOUNT_DEVICE_NAME=\"magisk\"</code> if you're on Magisk</p>\n<li>`mountify_custom_umount=0` modify this value to enable known in-kernel umount methods.</li>\n<p>   - NOTE: zygisk provider umount is still better, this is here as a second choice.</p>\n\n<p>#### I need mountify to skip mounting my module!</p>\n<li>`skip_mount` is respected on metamodule mode (KSU / APatch)</li>\n<li>however on Magisk make sure to use `skip_mountify` instead</li>\n<li>mountify checks these on /data/adb/modules/module_name</li>\n\n<h3>Advanced / Debugging</h3>\n<li>remove `metamodule=true` from module.prop before installing to force non-metamodule mode</li>\n<li>create `/data/adb/mountify/explicit_I_want_a_bootloop` to disable anti-bootloop protection</li>\n<li>set `mountify_expert_mode=1` to force expert mode (disables safety checks)</li>\n<li>create `/data/adb/mountify/explicit_I_want_symlink` to force symlink mode before installing</li>\n<p>  - unsupported and deprecated, meant for legacy devices</p>\n<li>sh whiteout_gen.sh to generate a whiteout module (deprecated but its still there)</li>\n\n<h2>Limitations / Recommendations</h2>\n<li>fails with [De-Bloater](https://github.com/sunilpaulmathew/De-Bloater), as it [uses dummy text, NOT proper whiteouts](https://github.com/sunilpaulmathew/De-Bloater/blob/cadd523f0ad8208eab31e7db51f855b89ed56ffe/app/src/main/java/com/sunilpaulmathew/debloater/utils/Utils.java#L112)</li>\n<li>I recommend [System App Nuker](https://github.com/ChiseWaguri/systemapp_nuker/releases) instead. It uses proper whiteouts.</li>\n\n<h2>License</h2>\n<li>module is on [The Unlicense](https://github.com/backslashxx/mountify/blob/master/LICENSE)</li>\n<li>LKM is on [GPLv2](https://github.com/backslashxx/mountify/blob/master/nuke_ext4_lkm/LICENSE)</li>\n<li>WebUI is on [MIT](https://github.com/backslashxx/mountify/blob/master/webui/LICENSE)</li>\n\n<h2>Support / Warranty</h2>\n<li>None, none at all. I am handing you a sharp knife, it is not on me if you stab yourself with it.</li>\n\n<h2>Links</h2>\n<p><a href=\"https://github.com/backslashxx/mountify/releases\">Download</a></p>\n\n",
+  "homepageUrl": "https://github.com/backslashxx/mountify",
+  "sourceUrl": "https://github.com/backslashxx/mountify",
+  "url": "https://github.com/backslashxx/mountify",
+  "latestRelease": {
+    "name": "205",
+    "version": "205",
+    "time": "2026-10-15T06:39:30Z",
+    "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/205/mountify.zip"
+  },
+  "releases": [
+    {
+      "name": "205",
+      "tagName": "205",
+      "publishedAt": "2026-10-15T06:39:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/205/mountify.zip",
+          "size": 554882,
+          "downloadCount": 15953
+        }
+      ]
+    },
+    {
+      "name": "204",
+      "tagName": "204",
+      "publishedAt": "2026-08-25T05:14:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/204/mountify.zip",
+          "size": 554873,
+          "downloadCount": 35295
+        }
+      ]
+    },
+    {
+      "name": "203",
+      "tagName": "203",
+      "publishedAt": "2026-06-25T15:03:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/203/mountify.zip",
+          "size": 555271,
+          "downloadCount": 34702
+        }
+      ]
+    },
+    {
+      "name": "202",
+      "tagName": "202",
+      "publishedAt": "2026-06-23T03:45:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/202/mountify.zip",
+          "size": 555109,
+          "downloadCount": 4944
+        }
+      ]
+    },
+    {
+      "name": "201",
+      "tagName": "201",
+      "publishedAt": "2026-05-05T00:28:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/201/mountify.zip",
+          "size": 553153,
+          "downloadCount": 26989
+        }
+      ]
+    },
+    {
+      "name": "200",
+      "tagName": "200",
+      "publishedAt": "2026-05-04T02:56:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/200/mountify.zip",
+          "size": 553255,
+          "downloadCount": 1656
+        }
+      ]
+    },
+    {
+      "name": "199",
+      "tagName": "199",
+      "publishedAt": "2026-04-25T14:43:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/199/mountify.zip",
+          "size": 553178,
+          "downloadCount": 7293
+        }
+      ]
+    },
+    {
+      "name": "198",
+      "tagName": "198",
+      "publishedAt": "2026-04-15T11:00:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/198/mountify.zip",
+          "size": 553077,
+          "downloadCount": 7975
+        }
+      ]
+    },
+    {
+      "name": "197",
+      "tagName": "197",
+      "publishedAt": "2026-04-01T15:50:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/197/mountify.zip",
+          "size": 552999,
+          "downloadCount": 9692
+        }
+      ]
+    },
+    {
+      "name": "196",
+      "tagName": "196",
+      "publishedAt": "2026-03-22T04:15:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/196/mountify.zip",
+          "size": 553015,
+          "downloadCount": 4334
+        }
+      ]
+    },
+    {
+      "name": "195",
+      "tagName": "195",
+      "publishedAt": "2026-03-17T10:57:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/195/mountify.zip",
+          "size": 553488,
+          "downloadCount": 382
+        }
+      ]
+    },
+    {
+      "name": "194",
+      "tagName": "194",
+      "publishedAt": "2026-03-14T17:10:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/194/mountify.zip",
+          "size": 553398,
+          "downloadCount": 262
+        }
+      ]
+    },
+    {
+      "name": "193",
+      "tagName": "193",
+      "publishedAt": "2026-03-11T07:49:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/193/mountify.zip",
+          "size": 549115,
+          "downloadCount": 1640
+        }
+      ]
+    },
+    {
+      "name": "192",
+      "tagName": "192",
+      "publishedAt": "2026-02-19T10:55:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/192/mountify.zip",
+          "size": 548982,
+          "downloadCount": 8727
+        }
+      ]
+    },
+    {
+      "name": "191",
+      "tagName": "191",
+      "publishedAt": "2026-01-21T05:18:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/191/mountify.zip",
+          "size": 548962,
+          "downloadCount": 14212
+        }
+      ]
+    },
+    {
+      "name": "190",
+      "tagName": "190",
+      "publishedAt": "2026-01-14T04:48:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/190/mountify.zip",
+          "size": 548953,
+          "downloadCount": 4279
+        }
+      ]
+    },
+    {
+      "name": "189",
+      "tagName": "189",
+      "publishedAt": "2026-01-11T16:10:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/189/mountify.zip",
+          "size": 548946,
+          "downloadCount": 2206
+        }
+      ]
+    },
+    {
+      "name": "188",
+      "tagName": "188",
+      "publishedAt": "2026-01-11T11:23:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/188/mountify.zip",
+          "size": 549112,
+          "downloadCount": 567
+        }
+      ]
+    },
+    {
+      "name": "187",
+      "tagName": "187",
+      "publishedAt": "2025-12-25T04:46:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/187/mountify.zip",
+          "size": 547019,
+          "downloadCount": 6524
+        }
+      ]
+    },
+    {
+      "name": "186",
+      "tagName": "186",
+      "publishedAt": "2025-12-04T04:45:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/186/mountify.zip",
+          "size": 547021,
+          "downloadCount": 6916
+        }
+      ]
+    },
+    {
+      "name": "185",
+      "tagName": "185",
+      "publishedAt": "2025-12-03T02:06:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/185/mountify.zip",
+          "size": 547022,
+          "downloadCount": 1170
+        }
+      ]
+    },
+    {
+      "name": "181",
+      "tagName": "181",
+      "publishedAt": "2025-11-26T12:14:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/181/mountify.zip",
+          "size": 546885,
+          "downloadCount": 3105
+        }
+      ]
+    },
+    {
+      "name": "180",
+      "tagName": "180",
+      "publishedAt": "2025-11-25T02:27:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/180/mountify.zip",
+          "size": 544165,
+          "downloadCount": 938
+        }
+      ]
+    },
+    {
+      "name": "178",
+      "tagName": "178",
+      "publishedAt": "2025-11-24T12:28:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/178/mountify.zip",
+          "size": 544241,
+          "downloadCount": 519
+        }
+      ]
+    },
+    {
+      "name": "177",
+      "tagName": "177",
+      "publishedAt": "2025-11-23T07:10:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/177/mountify.zip",
+          "size": 544246,
+          "downloadCount": 752
+        }
+      ]
+    },
+    {
+      "name": "176",
+      "tagName": "176",
+      "publishedAt": "2025-11-22T12:55:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/176/mountify.zip",
+          "size": 544014,
+          "downloadCount": 471
+        }
+      ]
+    },
+    {
+      "name": "175",
+      "tagName": "175",
+      "publishedAt": "2025-11-22T08:23:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/175/mountify.zip",
+          "size": 540495,
+          "downloadCount": 213
+        }
+      ]
+    },
+    {
+      "name": "174",
+      "tagName": "174",
+      "publishedAt": "2025-11-21T05:03:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/174/mountify.zip",
+          "size": 540292,
+          "downloadCount": 879
+        }
+      ]
+    },
+    {
+      "name": "173",
+      "tagName": "173",
+      "publishedAt": "2025-11-20T02:32:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/173/mountify.zip",
+          "size": 540291,
+          "downloadCount": 385
+        }
+      ]
+    },
+    {
+      "name": "172",
+      "tagName": "172",
+      "publishedAt": "2025-11-19T02:50:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "mountify.zip",
+          "downloadUrl": "https://github.com/backslashxx/mountify/releases/download/172/mountify.zip",
+          "size": 540118,
+          "downloadCount": 244
+        }
+      ]
+    }
+  ]
+}

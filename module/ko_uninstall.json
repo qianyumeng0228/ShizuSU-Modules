@@ -1,0 +1,85 @@
+{
+  "readme": "# KO卸载\n\n> **卸载 inte.ko —— 一加 / OPPO / 真我 ColorOS 的内核完整性检测模块，让 inte 彻底失效。**\n> 开机自动卸载 inte 及其关联 KO 模块（`oplus_integrity` / `oplus_kohashpro` / `oplus_secure_guard(_new)`），守护进程全天候盯防，模块一旦复活立即再次卸载。\n\n**作者：Kazaf** · **版本：v3.2** · **License：MIT**\n\n---\n\n## 它做什么\n\n| 能力 | 说明 |\n| --- | --- |\n| 卸载 inte.ko | 开机早期卸载 inte 及关联 KO 模块，使其失去检测能力 |\n| 防复活 | 守护进程按秒复核，inte 被重新加载即再次卸载；激进模式下自动收紧到 1s |\n| 即时响应 | 模式 / 复核间隔 / 屏蔽强度切换 1s 内生效，无需重启；WebUI / APP 直读守护状态缓存，操作零卡顿 |\n| 精准打击 | 只碰白名单内的 inte 家族模块，`cdt_integrity` 等系统模块绝不触碰 |\n| 深度检测 | 12 维检测：`/proc/inte_*` 节点、`/proc/modules`、`/sys/module`、kallsyms、/dev 节点、.ko 文件、cmdline、refcnt、initstate |\n| 开机自保护 | 旧砖模式：连续 3 次未完成开机自动禁用本模块防砖，boot.log 全程记录 |\n| 在线升级 | `update.json` 远程更新，Root 管理器直接检测安装 |\n| 管理 APP | 原生管理 APP，安装模块时自动安装，直读状态缓存秒级响应，与 WebUI 并存，桌面直控；v3.1 液态玻璃三屏 UI（首页/检测/设置）复刻 KernelSU/SukiSU 管理器视觉，root 缺失全屏提示 |\n| 多管理器 | Magisk / KernelSU / SukiSU / KernelSU-Next / RKSU / APatch |\n\n## 安装\n\n1. 下载 Release 中的 `KOUninstall-v3.1.zip`\n2. Root 管理器 → 模块 → 从本地安装\n3. 重启生效（升级旧版可覆盖安装，会自动清理旧守护；管理 APP 自动安装）\n\n## 兼容与安全\n\n- 仅卸载白名单模块，保护名单（`cdt_integrity` 等）绝不触碰\n- 守护进程隐藏运行，无模块路径痕迹\n- 卸载模块后守护进程立即停止，清理所有临时文件\n- 纯 rmmod 卸载方案，不注入任何挂载/内核模块，无 bootloop 风险\n\n## 免责声明\n\n本项目仅用于个人设备研究与学习。内核模块卸载属于高风险操作，请在确认理解后果后使用，作者不对任何设备损坏负责。\n",
+  "readmeHTML": "<h1>KO卸载</h1>\n\n<p>> <b>卸载 inte.ko —— 一加 / OPPO / 真我 ColorOS 的内核完整性检测模块，让 inte 彻底失效。</b></p>\n<p>> 开机自动卸载 inte 及其关联 KO 模块（<code>oplus_integrity</code> / <code>oplus_kohashpro</code> / <code>oplus_secure_guard(_new)</code>），守护进程全天候盯防，模块一旦复活立即再次卸载。</p>\n\n<p><b>作者：Kazaf</b> · <b>版本：v3.2</b> · <b>License：MIT</b></p>\n\n<p>---</p>\n\n<h2>它做什么</h2>\n\n<p>| 能力 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| 卸载 inte.ko | 开机早期卸载 inte 及关联 KO 模块，使其失去检测能力 |</p>\n<p>| 防复活 | 守护进程按秒复核，inte 被重新加载即再次卸载；激进模式下自动收紧到 1s |</p>\n<p>| 即时响应 | 模式 / 复核间隔 / 屏蔽强度切换 1s 内生效，无需重启；WebUI / APP 直读守护状态缓存，操作零卡顿 |</p>\n<p>| 精准打击 | 只碰白名单内的 inte 家族模块，<code>cdt_integrity</code> 等系统模块绝不触碰 |</p>\n<p>| 深度检测 | 12 维检测：<code>/proc/inte_*</code> 节点、<code>/proc/modules</code>、<code>/sys/module</code>、kallsyms、/dev 节点、.ko 文件、cmdline、refcnt、initstate |</p>\n<p>| 开机自保护 | 旧砖模式：连续 3 次未完成开机自动禁用本模块防砖，boot.log 全程记录 |</p>\n<p>| 在线升级 | <code>update.json</code> 远程更新，Root 管理器直接检测安装 |</p>\n<p>| 管理 APP | 原生管理 APP，安装模块时自动安装，直读状态缓存秒级响应，与 WebUI 并存，桌面直控；v3.1 液态玻璃三屏 UI（首页/检测/设置）复刻 KernelSU/SukiSU 管理器视觉，root 缺失全屏提示 |</p>\n<p>| 多管理器 | Magisk / KernelSU / SukiSU / KernelSU-Next / RKSU / APatch |</p>\n\n<h2>安装</h2>\n\n<li>下载 Release 中的 `KOUninstall-v3.1.zip`</li>\n<li>Root 管理器 → 模块 → 从本地安装</li>\n<li>重启生效（升级旧版可覆盖安装，会自动清理旧守护；管理 APP 自动安装）</li>\n\n<h2>兼容与安全</h2>\n\n<li>仅卸载白名单模块，保护名单（`cdt_integrity` 等）绝不触碰</li>\n<li>守护进程隐藏运行，无模块路径痕迹</li>\n<li>卸载模块后守护进程立即停止，清理所有临时文件</li>\n<li>纯 rmmod 卸载方案，不注入任何挂载/内核模块，无 bootloop 风险</li>\n\n<h2>免责声明</h2>\n\n<p>本项目仅用于个人设备研究与学习。内核模块卸载属于高风险操作，请在确认理解后果后使用，作者不对任何设备损坏负责。</p>",
+  "homepageUrl": "https://github.com/kazaf080726/ko_uninstall",
+  "sourceUrl": "https://github.com/kazaf080726/ko_uninstall",
+  "url": "https://github.com/kazaf080726/ko_uninstall",
+  "latestRelease": {
+    "name": "v3.2",
+    "version": "v3.2",
+    "time": "2026-10-11T09:56:40Z",
+    "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v3.2/KOUninstall-v3.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.2",
+      "tagName": "v3.2",
+      "publishedAt": "2026-10-11T09:56:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KOUninstall-v3.2.zip",
+          "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v3.2/KOUninstall-v3.2.zip",
+          "size": 540583,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v3.1",
+      "tagName": "v3.1",
+      "publishedAt": "2026-10-11T07:38:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KOUninstall-v3.1.zip",
+          "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v3.1/KOUninstall-v3.1.zip",
+          "size": 118045,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v3.0-beta",
+      "tagName": "v3.0-beta",
+      "publishedAt": "2026-10-11T07:25:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KOUninstall-v3.0-beta.zip",
+          "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v3.0-beta/KOUninstall-v3.0-beta.zip",
+          "size": 113519,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-10-11T05:24:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KOUninstall-v1.1.0.zip",
+          "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v1.1.0/KOUninstall-v1.1.0.zip",
+          "size": 62362,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.00",
+      "tagName": "v1.00",
+      "publishedAt": "2026-10-10T19:07:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KOUninstall-v1.00.zip",
+          "downloadUrl": "https://github.com/kazaf080726/ko_uninstall/releases/download/v1.00/KOUninstall-v1.00.zip",
+          "size": 57702,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

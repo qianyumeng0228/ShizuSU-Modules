@@ -1,0 +1,71 @@
+{
+  "readme": "\n![project banner](resources/banner.png)\n\n<h1 align=\"center\">tnsvn-tapaz-plus</h1>\n<p align=\"center\">\n  <i>Optimizations and improvements for the Xiaomi Redmi Note 12 4G (tapas/topaz).</i>\n</p>\n\n## Features\n\n- Tested on the non-NFC variant of the Redmi Note 12 4G (`tapas`) running Xiaomi.eu\n- Optimized scheduler latencies based on @tytydraco's work on [KTweak](https://github.com/tytydraco/KTweak)\n- Match migration margins to `core_ctl` busy thresholds to avoid often scaling to higher frequencies across all CPUs\n- Allow CPUs 2-7 to go to low power mode on low overall loads\n- Conservatively pack small tasks to Silver CPUs\n- Restrict unimportant tasks to Silver cores\n- Make it easier for `top-app` tasks to move to the Gold cluster by boosting them using UClamp\n- Schedule and colocate `top-app` threads to idle CPUs as much as possible to improve app performance\n- Set up rate limits to CPU scaling on both Silver and Gold clusters\n- Add related task group (RTG) boosting to the Silver cluster\n- Mimic a behavior done by Google and Samsung and boost `foreground` tasks to Gold cores on input\n- Tuned memory writeback ratio and timings\n- Optimized Qualcomm performance hints to remove unnecessary boosts\n- Enable control center blur and locking app to memory for all variants\n- Use two threads for MIUI animator\n- Reduce logging by disabling logs to certain unimportant components\n- Pin SystemUI to memory on MIUI\n- Enable core multi-gen LRU (MGLRU) functionality to reduce CPU usage due to memory management\n- Some touch hacks that [somehow still works](https://github.com/Ardjlon/android_device_xiaomi_surya/commit/e47375294471b38037db1a1c3541c82c4ad8a9be)\n\n## [Download 📦](https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases)\n\n## Installation \n- Install the module via Magisk Manager or KernelSU\n\n## Author\n\n👤 **John Vincent**\n\n* Twitter: [@TenSeventy7](https://twitter.com/TenSeventy7)\n* Github: [@TenSeventy7](https://github.com/TenSeventy7)\n\n## License 📝\n\nCopyright © 2023 [John Vincent](https://github.com/TenSeventy7).\n\nThis project is licensed under the [GNU General Public License v3.0](LICENSE).\n",
+  "readmeHTML": "\n<p>!<a href=\"resources/banner.png\">project banner</a></p>\n\n<p><h1 align=\"center\">tnsvn-tapaz-plus</h1></p>\n<p><p align=\"center\"></p>\n<p>  <i>Optimizations and improvements for the Xiaomi Redmi Note 12 4G (tapas/topaz).</i></p>\n<p></p></p>\n\n<h2>Features</h2>\n\n<li>Tested on the non-NFC variant of the Redmi Note 12 4G (`tapas`) running Xiaomi.eu</li>\n<li>Optimized scheduler latencies based on @tytydraco's work on [KTweak](https://github.com/tytydraco/KTweak)</li>\n<li>Match migration margins to `core_ctl` busy thresholds to avoid often scaling to higher frequencies across all CPUs</li>\n<li>Allow CPUs 2-7 to go to low power mode on low overall loads</li>\n<li>Conservatively pack small tasks to Silver CPUs</li>\n<li>Restrict unimportant tasks to Silver cores</li>\n<li>Make it easier for `top-app` tasks to move to the Gold cluster by boosting them using UClamp</li>\n<li>Schedule and colocate `top-app` threads to idle CPUs as much as possible to improve app performance</li>\n<li>Set up rate limits to CPU scaling on both Silver and Gold clusters</li>\n<li>Add related task group (RTG) boosting to the Silver cluster</li>\n<li>Mimic a behavior done by Google and Samsung and boost `foreground` tasks to Gold cores on input</li>\n<li>Tuned memory writeback ratio and timings</li>\n<li>Optimized Qualcomm performance hints to remove unnecessary boosts</li>\n<li>Enable control center blur and locking app to memory for all variants</li>\n<li>Use two threads for MIUI animator</li>\n<li>Reduce logging by disabling logs to certain unimportant components</li>\n<li>Pin SystemUI to memory on MIUI</li>\n<li>Enable core multi-gen LRU (MGLRU) functionality to reduce CPU usage due to memory management</li>\n<li>Some touch hacks that [somehow still works](https://github.com/Ardjlon/android_device_xiaomi_surya/commit/e47375294471b38037db1a1c3541c82c4ad8a9be)</li>\n\n<h2>[Download 📦](https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases)</h2>\n\n<h2>Installation</h2>\n<li>Install the module via Magisk Manager or KernelSU</li>\n\n<h2>Author</h2>\n\n<p>👤 <b>John Vincent</b></p>\n\n<li>Twitter: [@TenSeventy7](https://twitter.com/TenSeventy7)</li>\n<li>Github: [@TenSeventy7](https://github.com/TenSeventy7)</li>\n\n<h2>License 📝</h2>\n\n<p>Copyright © 2023 <a href=\"https://github.com/TenSeventy7\">John Vincent</a>.</p>\n\n<p>This project is licensed under the <a href=\"LICENSE\">GNU General Public License v3.0</a>.</p>",
+  "homepageUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus",
+  "sourceUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus",
+  "url": "https://github.com/TenSeventy7/tnsvn-tapaz-plus",
+  "latestRelease": {
+    "name": "23073101",
+    "version": "23073101",
+    "time": "2023-07-31T02:48:52Z",
+    "downloadUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases/download/23073101/tnsvn-tapazplus_SpanishGem_23073101.zip"
+  },
+  "releases": [
+    {
+      "name": "23073101",
+      "tagName": "23073101",
+      "publishedAt": "2023-07-31T02:48:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "tnsvn-tapazplus_SpanishGem_23073101.zip",
+          "downloadUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases/download/23073101/tnsvn-tapazplus_SpanishGem_23073101.zip",
+          "size": 15753,
+          "downloadCount": 1132
+        }
+      ]
+    },
+    {
+      "name": "23072317",
+      "tagName": "23072317",
+      "publishedAt": "2023-07-23T12:54:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "tnsvn-tapazplus_SpanishGem_23072317.zip",
+          "downloadUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases/download/23072317/tnsvn-tapazplus_SpanishGem_23072317.zip",
+          "size": 12418,
+          "downloadCount": 66
+        }
+      ]
+    },
+    {
+      "name": "23072204",
+      "tagName": "23072204",
+      "publishedAt": "2023-07-22T05:44:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "tnsvn-tapazplus_SpanishGem_23072204.zip",
+          "downloadUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases/download/23072204/tnsvn-tapazplus_SpanishGem_23072204.zip",
+          "size": 12464,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "23072111",
+      "tagName": "23072111",
+      "publishedAt": "2023-07-21T11:03:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "tnsvn-tapazplus_SpanishGem_23072111.zip",
+          "downloadUrl": "https://github.com/TenSeventy7/tnsvn-tapaz-plus/releases/download/23072111/tnsvn-tapazplus_SpanishGem_23072111.zip",
+          "size": 12436,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ]
+}

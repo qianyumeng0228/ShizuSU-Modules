@@ -1,0 +1,305 @@
+{
+  "readme": "# DNSCrypt Proxy Root\n\nRun dnscrypt-proxy on a rooted Android device for encrypted DNS, managed domain/IP lists, and a\nlocal DNS upstream.\n\n[Releases](https://github.com/Night114514/dnscrypt-proxy-root/releases) ·\n[繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)\n\n> **v1.0.0 status:** the module tracks dnscrypt-proxy 2.1.18. Published physical-device evidence\n> covers Xiaomi 14T Pro / Android 16 / KernelSU for upgrade, `upstream_only`, the Privacy preset,\n> anonymized routing, and two-reboot persistence on the merged pre-release baseline; see the\n> [dated acceptance report](REAL_DEVICE_ACCEPTANCE_2026-09-29_KernelSU_Xiaomi14TPro.md). Automated\n> checks still do not certify `strict`, Magisk/APatch, VPN/lockdown, every device, or every DNS frontend.\n\n## Choose the integration mode\n\n| | `strict` (default) | `upstream_only` |\n|---|---|---|\n| Intended use | Let this module handle ordinary system Do53 | Let another DNS frontend or proxy own interception and routing |\n| Local service | `127.0.0.1:5354` | `127.0.0.1:5354` |\n| IPv4 Do53 | Redirected to the local service, with daemon-UID and loopback exemptions | No module-owned global redirect |\n| IPv6 Do53 | Blocked in module-owned chains, with the daemon UID exempted | No module-owned blocking policy |\n| Android Private DNS | Saved and disabled while strict policy is active; restored on stop or mode exit | Preserved/restored |\n| Coexistence | Audit rule order and loops when another component also handles DNS | Configure the frontend explicitly to use this module as an upstream |\n\n`upstream_only` does not make every app use the module. The frontend must be able to reach\n`127.0.0.1:5354` in its network namespace and must perform its own DNS interception/routing.\n\nThe integration mode is separate from WebUI resolver presets. `strict`/`upstream_only` controls\nAndroid routing policy; `quick-mode` selects resolver/protocol preferences.\n\n### Resolver presets\n\n| Preset | Selection |\n|---|---|\n| `fastest` | Curated low-latency / non-filtering-oriented candidates; this is not a measured latency ranking or enforced no-filter guarantee. |\n| `privacy` | Empty `server_names`: select DNSCrypt resolvers whose metadata advertises DNSSEC and no-logging properties. Use the configured anonymized relay routes and skip incompatible resolvers. |\n| `family` | Curated family-filtering resolvers. Filtering policies are defined by those providers. |\n\nThe advertised no-logging property is resolver metadata; `require_nolog` does not\ntechnically verify a provider's actual logging practices or guarantee no logging.\n\nWhen `server_names` is nonempty, upstream does **not** apply `require_dnssec`,\n`require_nolog`, or `require_nofilter` as property filters. Protocol switches still\napply. These flags therefore do not enforce those properties for `fastest` or\n`family`. Presets leave `ipv4_servers`/`ipv6_servers` unchanged. With upstream\n2.1.18, the explicit IPv6-only `cloudflare-ipv6` candidate is excluded when\n`ipv4_servers = true` and `ipv6_servers = false`, and included when IPv6 is enabled.\n\n`get-mode` recognizes the canonical preset fields and anonymized routes emitted\nby `quick-mode`; partial matches and other configurations return `custom`.\nRecognition is conservative: alternative TOML spellings may also return `custom`.\nThe shipped default resolver selection is unchanged.\n\nThe real upstream integration test uses an isolated configuration snapshot and\nsigned official resolver caches. It never starts a daemon:\n\n```sh\nDNSCRYPT_PROXY_TEST_BIN=/absolute/path/to/dnscrypt-proxy \\\nDNSCRYPT_RESOLVER_CACHE=/absolute/path/to/signed-resolver-caches \\\nnode tests/test-resolver-presets.js\n```\n\nThe cache directory must contain `public-resolvers`, `relays`, `odoh-servers`, and\n`odoh-relays`, each with its official `.md` and `.md.minisig` files. The test checks\nall three presets with `-check` and verifies selection using `-list -json`.\n\n## Requirements\n\n- Target: Android 7.0+; actual support depends on device and root-manager acceptance.\n- Magisk, KernelSU, or APatch module environment.\n- `strict` requires suitable iptables/ip6tables, NAT, owner, and comment support.\n- Root shell tools for locking and diagnostics; a root manager's BusyBox supplies some fallbacks.\n- GitHub connectivity during installation/core updates and possibly the initial resolver-source load.\n\nThe WebUI is intended for KernelSU/APatch. Magisk users can use the module action button and the\nroot-shell control script.\n\n| Device ABI | Upstream release asset |\n|---|---|\n| arm64-v8a | `android_arm64` |\n| armeabi-v7a | `android_arm` |\n| x86_64 | `android_x86_64` |\n| x86 | `android_i386` |\n\n## Install or upgrade\n\n1. Download `dnscrypt-proxy-root-v1.0.0.zip` from [Releases](https://github.com/Night114514/dnscrypt-proxy-root/releases).\n2. Install it in your root manager.\n3. Reboot.\n4. Check the full service state, then select the integration mode that matches your DNS topology.\n\nThe module ZIP does not embed the dnscrypt-proxy executable. Installation attempts to download the\ncorrect official asset and validates its release digest and reported version. A failed download\nwarns without abandoning module installation; first boot or a later manual update can retry.\n\n> **Upgrading from v0.9.0 or older:** export or record configuration, lists, and subscriptions\n> first. Those layouts do not meet the hardened migration-provenance boundary and are replaced with\n> audited defaults. Reboot, then reapply the desired inputs. Direct upgrades from v0.6.0 through\n> v0.8.0 must reboot so indistinguishable legacy per-boot IPv6 rules disappear safely. A trusted\n> v0.9.1 canonical generation is preserved by the v1.0.0 installer.\n\n## First verification and common controls\n\nRun these commands in an **Android root shell**. With ADB, enter `adb shell` and then `su` first.\n\n```sh\nDPR_CTL=/data/adb/modules/dnscrypt-proxy-root/scripts/dnscrypt-control.sh\n\nsh \"$DPR_CTL\" status\nsh \"$DPR_CTL\" get-dns-mode\nsh \"$DPR_CTL\" logs\n```\n\nA running process alone does not prove working DNS protection. Inspect `healthy`, `service_state`,\n`listener`, `local_dns`, `firewall`, `upstream`, `config_apply_state`, and `start_failure` together.\n\n| State example | Meaning |\n|---|---|\n| `healthy` | Local DNS and the selected policy pass checks; the upstream probe may still be unknown |\n| `degraded` | Local service/policy works, but the latest upstream probe failed |\n| `starting` | A bounded startup/preflight is still in progress |\n| `policy_fault` | The process may exist, but the selected system policy failed verification |\n| `stopped` / `start_*` | Intentionally stopped, or failed at a named startup stage |\n\nCommon actions:\n\n```sh\nsh \"$DPR_CTL\" start\nsh \"$DPR_CTL\" stop\nsh \"$DPR_CTL\" restart\n\nsh \"$DPR_CTL\" set-dns-mode upstream_only\nsh \"$DPR_CTL\" set-dns-mode strict\n```\n\nThese are alternatives, not a sequence to run blindly. A live mode change keeps a healthy daemon\nprocess running and applies only the selected Android policy. When the daemon is stopped, changing\nmode records the choice but does not start it.\n\n## WebUI and canonical generations\n\nOpen the module WebUI from KernelSU/APatch to see backend-reported status, edit TOML and managed\nlists, choose resolvers, manage subscriptions, inspect statistics/logs, run bounded diagnostics,\nupdate the core, and export/import a generation. The TOML control is a plain text editor.\n\nThe v1.0.0 WebUI is built from the dependency-free source in `webui/src/`; the committed five-file\noutput in `webroot/` is deterministic and contains no development React bundle or remote analytics.\nThe bridge allowlists control actions and leaves path, ownership, lock, validation, and rollback\nenforcement to the root backend.\n\n| Path | Purpose |\n|---|---|\n| `/data/adb/modules/dnscrypt-proxy-root/config/` | Audited install templates, not the live source of truth |\n| `/data/local/dnscrypt-proxy-root-runtime/config/` | Canonical TOML, four managed lists, and subscriptions |\n| `/data/local/dnscrypt-proxy-root-runtime/active/` | Read-only snapshot used by the current daemon generation |\n| `/data/local/dnscrypt-proxy-root-runtime/data/` | Resolver cache and configured query/NX logs |\n\nDo not edit `active/`. Use the WebUI/backend or carefully edit the canonical location as root.\n\nSaving and applying are intentionally distinct:\n\n- **Configuration – Save (pending):** validates and atomically replaces the canonical TOML. It does\n  not change the running snapshot until a successful restart.\n- **Configuration – Save & restart:** saves first, then requests a restart. If restart fails, the\n  saved TOML remains canonical and the failure is reported explicitly.\n- **Managed list – Save (pending):** updates one canonical list without restarting.\n- **Managed list – Save + apply:** if the service is running and no canonical input is already\n  pending, restarts it with the new generation. If that start fails, it restores the previous\n  canonical list and restarts the known-working one. An existing pending or unavailable generation\n  is refused before the selected list is changed; restart or restore that generation first. If the\n  rollback replacement itself fails, the backend retains and reports the validated old-list backup\n  path for manual recovery.\n- `status.config_apply_state` is `pending`, `applied`, or `unavailable`; use it instead of inferring\n  apply state from a successful save message.\n\nManaged-list reads and writes use the same canonical backend API. The WebUI never reads an install\ntemplate while writing a different runtime path.\n\n## Backup and restore\n\n`export-config` emits one strict generation manifest (schema v2) containing TOML, four managed\nlists, and subscriptions. The Android integration mode is intentionally separate and is not changed\nby import.\n\nAn import accepts only the exact v1/v2 field layout, applies per-field size limits, decodes and\nprotects all fields in a private staging directory, and runs dnscrypt-proxy validation against the\nstaged lists. Only then does it begin the canonical commit. A full previous generation and recovery\nmarker are retained so any commit failure or interruption restores every canonical input. A\npending recovery is completed before the next control action—including `status`—is dispatched. A\nsuccessful import is still pending until restart.\n\nSubscriptions use a strict JSON array. Every entry must contain exactly an HTTPS `url` string and an\n`enabled` boolean (either field order is accepted); unknown fields, duplicate fields, escaped or\nunsafe URLs, and mistyped booleans are rejected. Ordinary multiline JSON whitespace is accepted.\n\nBack up before upgrades or major edits. Do not include transient PID, lock, active-snapshot, or log\nfiles in a configuration backup.\n\n## Updating dnscrypt-proxy\n\n```sh\nsh \"$DPR_CTL\" check-update\nsh \"$DPR_CTL\" update\n```\n\n- **Module updates** arrive as Release ZIPs through the root manager and may require reboot.\n- **Core updates** use the WebUI or `update`; `check-update` only compares versions.\n- Boot triggers a background core check subject to the default 24-hour success interval. This is not\n  a resident scheduler that wakes every 24 hours.\n- The updater validates the release asset digest, executable version, staged configuration, and\n  rollback path. A GitHub release checksum establishes consistency with that channel, not an\n  independent publisher signature.\n- Interrupted runs clean only their exact owned `tmp/update-<pid>` workspace.\n\n## Diagnostic, privacy, and routing limits\n\n- `strict` primarily governs ordinary Do53. It does not guarantee interception of app-owned DoH/DoT,\n  every VPN DNS path, or every network namespace.\n- Strict mode blocks IPv6 Do53 rather than redirecting it to an IPv6 listener. That is separate from\n  returning AAAA records or using an IPv6 upstream. IPv6-only networks require device testing.\n- Startup/recovery removes old policy before local readiness and adds strict policy only after the\n  bounded preflight succeeds. That interval is deliberately fail-open.\n- Query logging is enabled in the default template for statistics and sampled route checks. Inspect\n  domain data before sharing logs. Resolver `require_nolog` is a server-selection property; it does\n  not disable local query logging.\n- `leak-test` checks whether four generated sample names appear in configured query/NX logs. Its\n  legacy `protected`/`partial`/`leaking` labels do not prove the state of every DNS path, and the test\n  is not applicable to system-wide interception in `upstream_only`.\n- In `strict`, the named-destination query in `dns-test` is redirected by the current policy. The\n  result is labeled `comparison_scope=policy_affected` and is not a direct DNS bypass measurement.\n\n## Troubleshooting\n\n| Symptom | Check first |\n|---|---|\n| Installed but not started | `status.start_failure`, download connectivity, and `logs` |\n| Breakage with a VPN/DNS module | Who owns Do53, whether `upstream_only` is appropriate, upstream address, and loops |\n| Allow-list entry still blocked | Canonical list content, `config_apply_state`, and filtering by another frontend/upstream |\n| Process exists but policy fails | `service_state` and `firewall`, not only `running` |\n| Remove/disable the module | Run `stop`, verify the result, then disable/remove in the manager and reboot if requested |\n\nThe watchdog checks the local service and selected policy. An intentional stop is not a fault, and\nan upstream-only outage does not cause an unbounded restart loop.\n\nWhen reporting a problem, include module/root-manager/Android versions, integration mode, relevant\nerrors, and redacted logs. Never post private subscription tokens or unreviewed query history.\n\n## Development and verification\n\nUseful repository checks:\n\n```sh\nnode webui/build.mjs --check\nnode tests/test-webui-bridge.js\nnode tests/test-v100-release.js\nenv DNSCRYPT_UPDATE_INTERVAL_SECONDS=0 TEST_SHELL_KIND=dash dash tests/test-update-dnscrypt.sh\nenv TEST_SHELL_KIND=dash dash tests/test-dnscrypt-control.sh\nenv DNSCRYPT_UPDATE_INTERVAL_SECONDS=0 TEST_SHELL_KIND=busybox-ash busybox ash tests/test-update-dnscrypt.sh\nenv TEST_SHELL_KIND=busybox-ash busybox ash tests/test-dnscrypt-control.sh\n```\n\n`node webui/build.mjs` intentionally replaces `webroot/` with the deterministic files declared by\nthe build script. CI also checks shell syntax, ShellCheck, JavaScript syntax, both shell matrices,\nrelease metadata, executable/data modes, archive exclusions, and legal files. These checks are not\nevidence of actual Android installation, SELinux, firewall, VPN, or packet-path behavior; record\nnew evidence in a dated acceptance report; [REAL_DEVICE_ACCEPTANCE.md](REAL_DEVICE_ACCEPTANCE.md) remains the historical v0.9.2 matrix.\n\nAutomatic release packaging checks out the exact event SHA that passed the reusable test job and\naborts if `master` has advanced. Release tags and ZIPs are therefore not built from a later untested\nbranch tip.\n\n## License and third-party material\n\nProject-owned code is available under the [MIT License](LICENSE). Third-party material remains under\nits own terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [LICENSES/](LICENSES/).\n\nThe module ZIP includes a verbatim Magisk installer script under GPL-3.0-only with pinned source/blob\nprovenance. The dnscrypt-proxy executable is not bundled, but the updater installs the official\nISC-licensed 2.1.18 asset on device, so its ISC notice is also included in the module ZIP.\n",
+  "readmeHTML": "<h1>DNSCrypt Proxy Root</h1>\n\n<p>Run dnscrypt-proxy on a rooted Android device for encrypted DNS, managed domain/IP lists, and a</p>\n<p>local DNS upstream.</p>\n\n<p><a href=\"https://github.com/Night114514/dnscrypt-proxy-root/releases\">Releases</a> ·</p>\n<p><a href=\"README.zh-TW.md\">繁體中文</a> · <a href=\"README.zh-CN.md\">简体中文</a> · <a href=\"CHANGELOG.md\">Changelog</a></p>\n\n<p>> <b>v1.0.0 status:</b> the module tracks dnscrypt-proxy 2.1.18. Published physical-device evidence</p>\n<p>> covers Xiaomi 14T Pro / Android 16 / KernelSU for upgrade, <code>upstream_only</code>, the Privacy preset,</p>\n<p>> anonymized routing, and two-reboot persistence on the merged pre-release baseline; see the</p>\n<p>> <a href=\"REAL_DEVICE_ACCEPTANCE_2026-09-29_KernelSU_Xiaomi14TPro.md\">dated acceptance report</a>. Automated</p>\n<p>> checks still do not certify <code>strict</code>, Magisk/APatch, VPN/lockdown, every device, or every DNS frontend.</p>\n\n<h2>Choose the integration mode</h2>\n\n<p>| | <code>strict</code> (default) | <code>upstream_only</code> |</p>\n<p>|---|---|---|</p>\n<p>| Intended use | Let this module handle ordinary system Do53 | Let another DNS frontend or proxy own interception and routing |</p>\n<p>| Local service | <code>127.0.0.1:5354</code> | <code>127.0.0.1:5354</code> |</p>\n<p>| IPv4 Do53 | Redirected to the local service, with daemon-UID and loopback exemptions | No module-owned global redirect |</p>\n<p>| IPv6 Do53 | Blocked in module-owned chains, with the daemon UID exempted | No module-owned blocking policy |</p>\n<p>| Android Private DNS | Saved and disabled while strict policy is active; restored on stop or mode exit | Preserved/restored |</p>\n<p>| Coexistence | Audit rule order and loops when another component also handles DNS | Configure the frontend explicitly to use this module as an upstream |</p>\n\n<p><code>upstream_only</code> does not make every app use the module. The frontend must be able to reach</p>\n<p><code>127.0.0.1:5354</code> in its network namespace and must perform its own DNS interception/routing.</p>\n\n<p>The integration mode is separate from WebUI resolver presets. <code>strict</code>/<code>upstream_only</code> controls</p>\n<p>Android routing policy; <code>quick-mode</code> selects resolver/protocol preferences.</p>\n\n<h3>Resolver presets</h3>\n\n<p>| Preset | Selection |</p>\n<p>|---|---|</p>\n<p>| <code>fastest</code> | Curated low-latency / non-filtering-oriented candidates; this is not a measured latency ranking or enforced no-filter guarantee. |</p>\n<p>| <code>privacy</code> | Empty <code>server_names</code>: select DNSCrypt resolvers whose metadata advertises DNSSEC and no-logging properties. Use the configured anonymized relay routes and skip incompatible resolvers. |</p>\n<p>| <code>family</code> | Curated family-filtering resolvers. Filtering policies are defined by those providers. |</p>\n\n<p>The advertised no-logging property is resolver metadata; <code>require_nolog</code> does not</p>\n<p>technically verify a provider's actual logging practices or guarantee no logging.</p>\n\n<p>When <code>server_names</code> is nonempty, upstream does <b>not</b> apply <code>require_dnssec</code>,</p>\n<p><code>require_nolog</code>, or <code>require_nofilter</code> as property filters. Protocol switches still</p>\n<p>apply. These flags therefore do not enforce those properties for <code>fastest</code> or</p>\n<p><code>family</code>. Presets leave <code>ipv4_servers</code>/<code>ipv6_servers</code> unchanged. With upstream</p>\n<p>2.1.18, the explicit IPv6-only <code>cloudflare-ipv6</code> candidate is excluded when</p>\n<p><code>ipv4_servers = true</code> and <code>ipv6_servers = false</code>, and included when IPv6 is enabled.</p>\n\n<p><code>get-mode</code> recognizes the canonical preset fields and anonymized routes emitted</p>\n<p>by <code>quick-mode</code>; partial matches and other configurations return <code>custom</code>.</p>\n<p>Recognition is conservative: alternative TOML spellings may also return <code>custom</code>.</p>\n<p>The shipped default resolver selection is unchanged.</p>\n\n<p>The real upstream integration test uses an isolated configuration snapshot and</p>\n<p>signed official resolver caches. It never starts a daemon:</p>\n\n<pre>DNSCRYPT_PROXY_TEST_BIN=/absolute/path/to/dnscrypt-proxy \\\nDNSCRYPT_RESOLVER_CACHE=/absolute/path/to/signed-resolver-caches \\\nnode tests/test-resolver-presets.js</pre>\n\n<p>The cache directory must contain <code>public-resolvers</code>, <code>relays</code>, <code>odoh-servers</code>, and</p>\n<p><code>odoh-relays</code>, each with its official <code>.md</code> and <code>.md.minisig</code> files. The test checks</p>\n<p>all three presets with <code>-check</code> and verifies selection using <code>-list -json</code>.</p>\n\n<h2>Requirements</h2>\n\n<li>Target: Android 7.0+; actual support depends on device and root-manager acceptance.</li>\n<li>Magisk, KernelSU, or APatch module environment.</li>\n<li>`strict` requires suitable iptables/ip6tables, NAT, owner, and comment support.</li>\n<li>Root shell tools for locking and diagnostics; a root manager's BusyBox supplies some fallbacks.</li>\n<li>GitHub connectivity during installation/core updates and possibly the initial resolver-source load.</li>\n\n<p>The WebUI is intended for KernelSU/APatch. Magisk users can use the module action button and the</p>\n<p>root-shell control script.</p>\n\n<p>| Device ABI | Upstream release asset |</p>\n<p>|---|---|</p>\n<p>| arm64-v8a | <code>android_arm64</code> |</p>\n<p>| armeabi-v7a | <code>android_arm</code> |</p>\n<p>| x86_64 | <code>android_x86_64</code> |</p>\n<p>| x86 | <code>android_i386</code> |</p>\n\n<h2>Install or upgrade</h2>\n\n<li>Download `dnscrypt-proxy-root-v1.0.0.zip` from [Releases](https://github.com/Night114514/dnscrypt-proxy-root/releases).</li>\n<li>Install it in your root manager.</li>\n<li>Reboot.</li>\n<li>Check the full service state, then select the integration mode that matches your DNS topology.</li>\n\n<p>The module ZIP does not embed the dnscrypt-proxy executable. Installation attempts to download the</p>\n<p>correct official asset and validates its release digest and reported version. A failed download</p>\n<p>warns without abandoning module installation; first boot or a later manual update can retry.</p>\n\n<p>> <b>Upgrading from v0.9.0 or older:</b> export or record configuration, lists, and subscriptions</p>\n<p>> first. Those layouts do not meet the hardened migration-provenance boundary and are replaced with</p>\n<p>> audited defaults. Reboot, then reapply the desired inputs. Direct upgrades from v0.6.0 through</p>\n<p>> v0.8.0 must reboot so indistinguishable legacy per-boot IPv6 rules disappear safely. A trusted</p>\n<p>> v0.9.1 canonical generation is preserved by the v1.0.0 installer.</p>\n\n<h2>First verification and common controls</h2>\n\n<p>Run these commands in an <b>Android root shell</b>. With ADB, enter <code>adb shell</code> and then <code>su</code> first.</p>\n\n<pre>DPR_CTL=/data/adb/modules/dnscrypt-proxy-root/scripts/dnscrypt-control.sh\n\nsh \"$DPR_CTL\" status\nsh \"$DPR_CTL\" get-dns-mode\nsh \"$DPR_CTL\" logs</pre>\n\n<p>A running process alone does not prove working DNS protection. Inspect <code>healthy</code>, <code>service_state</code>,</p>\n<p><code>listener</code>, <code>local_dns</code>, <code>firewall</code>, <code>upstream</code>, <code>config_apply_state</code>, and <code>start_failure</code> together.</p>\n\n<p>| State example | Meaning |</p>\n<p>|---|---|</p>\n<p>| <code>healthy</code> | Local DNS and the selected policy pass checks; the upstream probe may still be unknown |</p>\n<p>| <code>degraded</code> | Local service/policy works, but the latest upstream probe failed |</p>\n<p>| <code>starting</code> | A bounded startup/preflight is still in progress |</p>\n<p>| <code>policy_fault</code> | The process may exist, but the selected system policy failed verification |</p>\n<p>| <code>stopped</code> / <code>start_*</code> | Intentionally stopped, or failed at a named startup stage |</p>\n\n<p>Common actions:</p>\n\n<pre>sh \"$DPR_CTL\" start\nsh \"$DPR_CTL\" stop\nsh \"$DPR_CTL\" restart\n\nsh \"$DPR_CTL\" set-dns-mode upstream_only\nsh \"$DPR_CTL\" set-dns-mode strict</pre>\n\n<p>These are alternatives, not a sequence to run blindly. A live mode change keeps a healthy daemon</p>\n<p>process running and applies only the selected Android policy. When the daemon is stopped, changing</p>\n<p>mode records the choice but does not start it.</p>\n\n<h2>WebUI and canonical generations</h2>\n\n<p>Open the module WebUI from KernelSU/APatch to see backend-reported status, edit TOML and managed</p>\n<p>lists, choose resolvers, manage subscriptions, inspect statistics/logs, run bounded diagnostics,</p>\n<p>update the core, and export/import a generation. The TOML control is a plain text editor.</p>\n\n<p>The v1.0.0 WebUI is built from the dependency-free source in <code>webui/src/</code>; the committed five-file</p>\n<p>output in <code>webroot/</code> is deterministic and contains no development React bundle or remote analytics.</p>\n<p>The bridge allowlists control actions and leaves path, ownership, lock, validation, and rollback</p>\n<p>enforcement to the root backend.</p>\n\n<p>| Path | Purpose |</p>\n<p>|---|---|</p>\n<p>| <code>/data/adb/modules/dnscrypt-proxy-root/config/</code> | Audited install templates, not the live source of truth |</p>\n<p>| <code>/data/local/dnscrypt-proxy-root-runtime/config/</code> | Canonical TOML, four managed lists, and subscriptions |</p>\n<p>| <code>/data/local/dnscrypt-proxy-root-runtime/active/</code> | Read-only snapshot used by the current daemon generation |</p>\n<p>| <code>/data/local/dnscrypt-proxy-root-runtime/data/</code> | Resolver cache and configured query/NX logs |</p>\n\n<p>Do not edit <code>active/</code>. Use the WebUI/backend or carefully edit the canonical location as root.</p>\n\n<p>Saving and applying are intentionally distinct:</p>\n\n<li>**Configuration – Save (pending):** validates and atomically replaces the canonical TOML. It does</li>\n<p>  not change the running snapshot until a successful restart.</p>\n<li>**Configuration – Save & restart:** saves first, then requests a restart. If restart fails, the</li>\n<p>  saved TOML remains canonical and the failure is reported explicitly.</p>\n<li>**Managed list – Save (pending):** updates one canonical list without restarting.</li>\n<li>**Managed list – Save + apply:** if the service is running and no canonical input is already</li>\n<p>  pending, restarts it with the new generation. If that start fails, it restores the previous</p>\n<p>  canonical list and restarts the known-working one. An existing pending or unavailable generation</p>\n<p>  is refused before the selected list is changed; restart or restore that generation first. If the</p>\n<p>  rollback replacement itself fails, the backend retains and reports the validated old-list backup</p>\n<p>  path for manual recovery.</p>\n<li>`status.config_apply_state` is `pending`, `applied`, or `unavailable`; use it instead of inferring</li>\n<p>  apply state from a successful save message.</p>\n\n<p>Managed-list reads and writes use the same canonical backend API. The WebUI never reads an install</p>\n<p>template while writing a different runtime path.</p>\n\n<h2>Backup and restore</h2>\n\n<p><code>export-config</code> emits one strict generation manifest (schema v2) containing TOML, four managed</p>\n<p>lists, and subscriptions. The Android integration mode is intentionally separate and is not changed</p>\n<p>by import.</p>\n\n<p>An import accepts only the exact v1/v2 field layout, applies per-field size limits, decodes and</p>\n<p>protects all fields in a private staging directory, and runs dnscrypt-proxy validation against the</p>\n<p>staged lists. Only then does it begin the canonical commit. A full previous generation and recovery</p>\n<p>marker are retained so any commit failure or interruption restores every canonical input. A</p>\n<p>pending recovery is completed before the next control action—including <code>status</code>—is dispatched. A</p>\n<p>successful import is still pending until restart.</p>\n\n<p>Subscriptions use a strict JSON array. Every entry must contain exactly an HTTPS <code>url</code> string and an</p>\n<p><code>enabled</code> boolean (either field order is accepted); unknown fields, duplicate fields, escaped or</p>\n<p>unsafe URLs, and mistyped booleans are rejected. Ordinary multiline JSON whitespace is accepted.</p>\n\n<p>Back up before upgrades or major edits. Do not include transient PID, lock, active-snapshot, or log</p>\n<p>files in a configuration backup.</p>\n\n<h2>Updating dnscrypt-proxy</h2>\n\n<pre>sh \"$DPR_CTL\" check-update\nsh \"$DPR_CTL\" update</pre>\n\n<li>**Module updates** arrive as Release ZIPs through the root manager and may require reboot.</li>\n<li>**Core updates** use the WebUI or `update`; `check-update` only compares versions.</li>\n<li>Boot triggers a background core check subject to the default 24-hour success interval. This is not</li>\n<p>  a resident scheduler that wakes every 24 hours.</p>\n<li>The updater validates the release asset digest, executable version, staged configuration, and</li>\n<p>  rollback path. A GitHub release checksum establishes consistency with that channel, not an</p>\n<p>  independent publisher signature.</p>\n<li>Interrupted runs clean only their exact owned `tmp/update-<pid>` workspace.</li>\n\n<h2>Diagnostic, privacy, and routing limits</h2>\n\n<li>`strict` primarily governs ordinary Do53. It does not guarantee interception of app-owned DoH/DoT,</li>\n<p>  every VPN DNS path, or every network namespace.</p>\n<li>Strict mode blocks IPv6 Do53 rather than redirecting it to an IPv6 listener. That is separate from</li>\n<p>  returning AAAA records or using an IPv6 upstream. IPv6-only networks require device testing.</p>\n<li>Startup/recovery removes old policy before local readiness and adds strict policy only after the</li>\n<p>  bounded preflight succeeds. That interval is deliberately fail-open.</p>\n<li>Query logging is enabled in the default template for statistics and sampled route checks. Inspect</li>\n<p>  domain data before sharing logs. Resolver <code>require_nolog</code> is a server-selection property; it does</p>\n<p>  not disable local query logging.</p>\n<li>`leak-test` checks whether four generated sample names appear in configured query/NX logs. Its</li>\n<p>  legacy <code>protected</code>/<code>partial</code>/<code>leaking</code> labels do not prove the state of every DNS path, and the test</p>\n<p>  is not applicable to system-wide interception in <code>upstream_only</code>.</p>\n<li>In `strict`, the named-destination query in `dns-test` is redirected by the current policy. The</li>\n<p>  result is labeled <code>comparison_scope=policy_affected</code> and is not a direct DNS bypass measurement.</p>\n\n<h2>Troubleshooting</h2>\n\n<p>| Symptom | Check first |</p>\n<p>|---|---|</p>\n<p>| Installed but not started | <code>status.start_failure</code>, download connectivity, and <code>logs</code> |</p>\n<p>| Breakage with a VPN/DNS module | Who owns Do53, whether <code>upstream_only</code> is appropriate, upstream address, and loops |</p>\n<p>| Allow-list entry still blocked | Canonical list content, <code>config_apply_state</code>, and filtering by another frontend/upstream |</p>\n<p>| Process exists but policy fails | <code>service_state</code> and <code>firewall</code>, not only <code>running</code> |</p>\n<p>| Remove/disable the module | Run <code>stop</code>, verify the result, then disable/remove in the manager and reboot if requested |</p>\n\n<p>The watchdog checks the local service and selected policy. An intentional stop is not a fault, and</p>\n<p>an upstream-only outage does not cause an unbounded restart loop.</p>\n\n<p>When reporting a problem, include module/root-manager/Android versions, integration mode, relevant</p>\n<p>errors, and redacted logs. Never post private subscription tokens or unreviewed query history.</p>\n\n<h2>Development and verification</h2>\n\n<p>Useful repository checks:</p>\n\n<pre>node webui/build.mjs --check\nnode tests/test-webui-bridge.js\nnode tests/test-v100-release.js\nenv DNSCRYPT_UPDATE_INTERVAL_SECONDS=0 TEST_SHELL_KIND=dash dash tests/test-update-dnscrypt.sh\nenv TEST_SHELL_KIND=dash dash tests/test-dnscrypt-control.sh\nenv DNSCRYPT_UPDATE_INTERVAL_SECONDS=0 TEST_SHELL_KIND=busybox-ash busybox ash tests/test-update-dnscrypt.sh\nenv TEST_SHELL_KIND=busybox-ash busybox ash tests/test-dnscrypt-control.sh</pre>\n\n<p><code>node webui/build.mjs</code> intentionally replaces <code>webroot/</code> with the deterministic files declared by</p>\n<p>the build script. CI also checks shell syntax, ShellCheck, JavaScript syntax, both shell matrices,</p>\n<p>release metadata, executable/data modes, archive exclusions, and legal files. These checks are not</p>\n<p>evidence of actual Android installation, SELinux, firewall, VPN, or packet-path behavior; record</p>\n<p>new evidence in a dated acceptance report; <a href=\"REAL_DEVICE_ACCEPTANCE.md\">REAL_DEVICE_ACCEPTANCE.md</a> remains the historical v0.9.2 matrix.</p>\n\n<p>Automatic release packaging checks out the exact event SHA that passed the reusable test job and</p>\n<p>aborts if <code>master</code> has advanced. Release tags and ZIPs are therefore not built from a later untested</p>\n<p>branch tip.</p>\n\n<h2>License and third-party material</h2>\n\n<p>Project-owned code is available under the <a href=\"LICENSE\">MIT License</a>. Third-party material remains under</p>\n<p>its own terms; see <a href=\"THIRD_PARTY_NOTICES.md\">THIRD_PARTY_NOTICES.md</a> and <a href=\"LICENSES/\">LICENSES/</a>.</p>\n\n<p>The module ZIP includes a verbatim Magisk installer script under GPL-3.0-only with pinned source/blob</p>\n<p>provenance. The dnscrypt-proxy executable is not bundled, but the updater installs the official</p>\n<p>ISC-licensed 2.1.18 asset on device, so its ISC notice is also included in the module ZIP.</p>",
+  "homepageUrl": "https://github.com/Night114514/dnscrypt-proxy-root",
+  "sourceUrl": "https://github.com/Night114514/dnscrypt-proxy-root",
+  "url": "https://github.com/Night114514/dnscrypt-proxy-root",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-10-01T10:47:07Z",
+    "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v1.0.0/dnscrypt-proxy-root-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-10-01T10:47:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v1.0.0/CHANGELOG.md",
+          "size": 21636,
+          "downloadCount": 1
+        },
+        {
+          "name": "dnscrypt-proxy-root-v1.0.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v1.0.0/dnscrypt-proxy-root-v1.0.0.zip",
+          "size": 111892,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v1.0.0/update.json",
+          "size": 281,
+          "downloadCount": 198
+        }
+      ]
+    },
+    {
+      "name": "v0.9.2",
+      "tagName": "v0.9.2",
+      "publishedAt": "2026-09-09T05:17:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.2/CHANGELOG.md",
+          "size": 18329,
+          "downloadCount": 3
+        },
+        {
+          "name": "dnscrypt-proxy-root-v0.9.2.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.2/dnscrypt-proxy-root-v0.9.2.zip",
+          "size": 105956,
+          "downloadCount": 8
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.2/update.json",
+          "size": 281,
+          "downloadCount": 30
+        }
+      ]
+    },
+    {
+      "name": "v0.9.1",
+      "tagName": "v0.9.1",
+      "publishedAt": "2026-09-07T23:31:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.1/CHANGELOG.md",
+          "size": 15074,
+          "downloadCount": 0
+        },
+        {
+          "name": "dnscrypt-proxy-root-v0.9.1.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.1/dnscrypt-proxy-root-v0.9.1.zip",
+          "size": 415170,
+          "downloadCount": 1
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.1/update.json",
+          "size": 281,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.9.0",
+      "tagName": "v0.9.0",
+      "publishedAt": "2026-08-28T21:43:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CHANGELOG.md",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.0/CHANGELOG.md",
+          "size": 4447,
+          "downloadCount": 1
+        },
+        {
+          "name": "dnscrypt-proxy-root-v0.9.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.0/dnscrypt-proxy-root-v0.9.0.zip",
+          "size": 386269,
+          "downloadCount": 4
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.9.0/update.json",
+          "size": 281,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v0.8.0",
+      "tagName": "v0.8.0",
+      "publishedAt": "2026-08-17T19:30:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.8.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.8.0/dnscrypt-proxy-root-v0.8.0.zip",
+          "size": 372118,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.8.0/update.json",
+          "size": 266,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.1.18",
+      "tagName": "v2.1.18",
+      "publishedAt": "2026-08-01T02:51:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v2.1.18.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v2.1.18/dnscrypt-proxy-root-v2.1.18.zip",
+          "size": 371128,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v2.1.18/update.json",
+          "size": 269,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.7.0",
+      "tagName": "v0.7.0",
+      "publishedAt": "2026-07-23T02:33:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.7.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.7.0/dnscrypt-proxy-root-v0.7.0.zip",
+          "size": 371113,
+          "downloadCount": 3
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.7.0/update.json",
+          "size": 257,
+          "downloadCount": 102
+        }
+      ]
+    },
+    {
+      "name": "v0.6.0",
+      "tagName": "v0.6.0",
+      "publishedAt": "2026-06-26T14:56:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.6.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.6.0/dnscrypt-proxy-root-v0.6.0.zip",
+          "size": 363766,
+          "downloadCount": 8
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.6.0/update.json",
+          "size": 257,
+          "downloadCount": 34
+        }
+      ]
+    },
+    {
+      "name": "v0.5.1",
+      "tagName": "v0.5.1",
+      "publishedAt": "2026-06-26T14:03:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.5.0-source.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.5.1/dnscrypt-proxy-root-v0.5.0-source.zip",
+          "size": 2117152,
+          "downloadCount": 0
+        },
+        {
+          "name": "dnscrypt-proxy-root-v0.5.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.5.1/dnscrypt-proxy-root-v0.5.0.zip",
+          "size": 361732,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.5.1/update.json",
+          "size": 256,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-06-26T13:27:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.4.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.4.0/dnscrypt-proxy-root-v0.4.0.zip",
+          "size": 355704,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.4.0/update.json",
+          "size": 256,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-06-26T12:43:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.3.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.3.0/dnscrypt-proxy-root-v0.3.0.zip",
+          "size": 434404,
+          "downloadCount": 0
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.3.0/update.json",
+          "size": 258,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-06-16T17:01:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root-v0.2.0.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.2.0/dnscrypt-proxy-root-v0.2.0.zip",
+          "size": 340532,
+          "downloadCount": 6
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.2.0/update.json",
+          "size": 258,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-06-10T13:01:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dnscrypt-proxy-root.zip",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.1.0/dnscrypt-proxy-root.zip",
+          "size": 306357,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/Night114514/dnscrypt-proxy-root/releases/download/v0.1.0/update.json",
+          "size": 251,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}

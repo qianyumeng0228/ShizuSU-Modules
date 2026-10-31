@@ -1,0 +1,85 @@
+{
+  "readme": "# DeepDoze Enforcer\n\nBattery-saving module for **Magisk**, **KernelSU** and **APatch**. It can enforce Doze and temporarily restrict background apps while your phone is locked, without changing Wi-Fi, Bluetooth, network, location or sensor settings. CPU throttling is available as an opt-in experimental control.\n\nApp restrictions are tied to the **lock state**, while forced Doze and optional CPU throttling only run with the display off. Waking the lock screen releases Doze and the CPU cap for responsiveness; the original app state is restored after unlock on the next detection cycle (normally within 10 seconds). With no lock screen, savings fall back to screen-off.\n\n## Compatibility\n\n- Android 8.0 (API 26) and newer\n- Magisk 24.0+, KernelSU 1.0+, APatch\n- No custom kernel is required; the optional CPU control depends on standard CPU-frequency interfaces exposed by the device\n\n## What it does\n\n**Deep sleep enforcement**\n- Forces the device into deep Doze shortly after you lock the phone\n- Records forced-Doze ownership so it can recover safely after a service crash\n\n**Background restrictions**\n- Moves non-whitelisted apps into the `rare` (gentle) or `restricted` (balanced / aggressive) standby bucket while the phone is locked\n- Denies the `RUN_ANY_IN_BACKGROUND` app-op for non-whitelisted apps in balanced and aggressive modes\n- In aggressive mode, also force-stops idle non-foreground apps\n- The restricted bucket is what the OS uses to defer their jobs, alarms and network — the module sets the bucket, it does not cancel jobs or alarms directly\n- The original bucket and app-op are recorded and restored at unlock\n- If another tool changes a managed value after DeepDoze, DeepDoze leaves that newer value alone\n- Apps already exempted from Android battery optimization are not restricted\n\n**Google Play Services optimization**\n- No dedicated GMS / GSF throttling is currently implemented\n- Google packages are handled like other apps: protected when whitelisted, otherwise eligible for the same while-locked background restrictions\n\n**Network, location and sensors**\n- Does not change Wi-Fi, Bluetooth scanning, network scoring, location mode or sensor settings\n- Savings while locked come from Doze enforcement, CPU throttling and app standby / background-run restrictions for eligible third-party apps\n\n## Respects your choices\n\nThe module does **not** touch or override any of these system settings:\n- Battery-saver / low-power mode\n- Location mode and toggles\n- Account sync preferences\n- Animation scales, screen-off timeout and always-on display\n- Android tracing properties\n\nNo battery module can guarantee a fixed saving on every device. Results depend on the phone, ROM, radio signal, installed apps and workload. Forced Doze and background restrictions can delay non-critical notifications or sync; use the default Gentle mode first and whitelist apps that must remain responsive. Avoid enabling CPU throttling alongside a kernel/performance manager.\n\n## Configuration\n\nA config file is generated on first boot at:\n\n```\n/data/adb/deepdoze/config\n```\n\nEdit it to change the mode (`gentle`, the default; `balanced`; `aggressive`; or `off` to disable app restrictions) or to toggle features such as `enable_cpu_throttle` (off by default) and `enable_force_doze`, then reboot. The whitelist is a separate file with one package per line at `/data/adb/deepdoze/whitelist`.\n\nFor meaningful validation, compare several overnight idle sessions with and without the module under the same signal, Always-On Display and app conditions. The WebUI current reading is useful for spotting large drains, but it is not a controlled battery benchmark.\n\n## WebUI\n\nOpen the module in the **KernelSU** or **APatch** manager (or MMRL) to view the live status dashboard and control panel.\n\n## Installation\n\nFlash the zip in your root manager and reboot. Battery savings begin after the first reboot.\n\n## Contact\n\nTelegram: https://t.me/necotinx\n",
+  "readmeHTML": "<h1>DeepDoze Enforcer</h1>\n\n<p>Battery-saving module for <b>Magisk</b>, <b>KernelSU</b> and <b>APatch</b>. It can enforce Doze and temporarily restrict background apps while your phone is locked, without changing Wi-Fi, Bluetooth, network, location or sensor settings. CPU throttling is available as an opt-in experimental control.</p>\n\n<p>App restrictions are tied to the <b>lock state</b>, while forced Doze and optional CPU throttling only run with the display off. Waking the lock screen releases Doze and the CPU cap for responsiveness; the original app state is restored after unlock on the next detection cycle (normally within 10 seconds). With no lock screen, savings fall back to screen-off.</p>\n\n<h2>Compatibility</h2>\n\n<li>Android 8.0 (API 26) and newer</li>\n<li>Magisk 24.0+, KernelSU 1.0+, APatch</li>\n<li>No custom kernel is required; the optional CPU control depends on standard CPU-frequency interfaces exposed by the device</li>\n\n<h2>What it does</h2>\n\n<p><b>Deep sleep enforcement</b></p>\n<li>Forces the device into deep Doze shortly after you lock the phone</li>\n<li>Records forced-Doze ownership so it can recover safely after a service crash</li>\n\n<p><b>Background restrictions</b></p>\n<li>Moves non-whitelisted apps into the `rare` (gentle) or `restricted` (balanced / aggressive) standby bucket while the phone is locked</li>\n<li>Denies the `RUN_ANY_IN_BACKGROUND` app-op for non-whitelisted apps in balanced and aggressive modes</li>\n<li>In aggressive mode, also force-stops idle non-foreground apps</li>\n<li>The restricted bucket is what the OS uses to defer their jobs, alarms and network — the module sets the bucket, it does not cancel jobs or alarms directly</li>\n<li>The original bucket and app-op are recorded and restored at unlock</li>\n<li>If another tool changes a managed value after DeepDoze, DeepDoze leaves that newer value alone</li>\n<li>Apps already exempted from Android battery optimization are not restricted</li>\n\n<p><b>Google Play Services optimization</b></p>\n<li>No dedicated GMS / GSF throttling is currently implemented</li>\n<li>Google packages are handled like other apps: protected when whitelisted, otherwise eligible for the same while-locked background restrictions</li>\n\n<p><b>Network, location and sensors</b></p>\n<li>Does not change Wi-Fi, Bluetooth scanning, network scoring, location mode or sensor settings</li>\n<li>Savings while locked come from Doze enforcement, CPU throttling and app standby / background-run restrictions for eligible third-party apps</li>\n\n<h2>Respects your choices</h2>\n\n<p>The module does <b>not</b> touch or override any of these system settings:</p>\n<li>Battery-saver / low-power mode</li>\n<li>Location mode and toggles</li>\n<li>Account sync preferences</li>\n<li>Animation scales, screen-off timeout and always-on display</li>\n<li>Android tracing properties</li>\n\n<p>No battery module can guarantee a fixed saving on every device. Results depend on the phone, ROM, radio signal, installed apps and workload. Forced Doze and background restrictions can delay non-critical notifications or sync; use the default Gentle mode first and whitelist apps that must remain responsive. Avoid enabling CPU throttling alongside a kernel/performance manager.</p>\n\n<h2>Configuration</h2>\n\n<p>A config file is generated on first boot at:</p>\n\n<pre>/data/adb/deepdoze/config</pre>\n\n<p>Edit it to change the mode (<code>gentle</code>, the default; <code>balanced</code>; <code>aggressive</code>; or <code>off</code> to disable app restrictions) or to toggle features such as <code>enable_cpu_throttle</code> (off by default) and <code>enable_force_doze</code>, then reboot. The whitelist is a separate file with one package per line at <code>/data/adb/deepdoze/whitelist</code>.</p>\n\n<p>For meaningful validation, compare several overnight idle sessions with and without the module under the same signal, Always-On Display and app conditions. The WebUI current reading is useful for spotting large drains, but it is not a controlled battery benchmark.</p>\n\n<h2>WebUI</h2>\n\n<p>Open the module in the <b>KernelSU</b> or <b>APatch</b> manager (or MMRL) to view the live status dashboard and control panel.</p>\n\n<h2>Installation</h2>\n\n<p>Flash the zip in your root manager and reboot. Battery savings begin after the first reboot.</p>\n\n<h2>Contact</h2>\n\n<p>Telegram: https://t.me/necotinx</p>",
+  "homepageUrl": "https://github.com/Azyrn/DeepDoze-Enforcer",
+  "sourceUrl": "https://github.com/Azyrn/DeepDoze-Enforcer",
+  "url": "https://github.com/Azyrn/DeepDoze-Enforcer",
+  "latestRelease": {
+    "name": "v3.5.2",
+    "version": "v3.5.2",
+    "time": "2026-08-06T21:34:55Z",
+    "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.5.2/DeepDoze-Enforcer-v3.5.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.5.2",
+      "tagName": "v3.5.2",
+      "publishedAt": "2026-08-06T21:34:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DeepDoze-Enforcer-v3.5.2.zip",
+          "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.5.2/DeepDoze-Enforcer-v3.5.2.zip",
+          "size": 679091,
+          "downloadCount": 3058
+        }
+      ]
+    },
+    {
+      "name": "v3.5.1",
+      "tagName": "v3.5.1",
+      "publishedAt": "2026-07-03T04:22:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DeepDoze-Enforcer-v3.5.1.zip",
+          "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.5.1/DeepDoze-Enforcer-v3.5.1.zip",
+          "size": 671644,
+          "downloadCount": 961
+        }
+      ]
+    },
+    {
+      "name": "v3.5.0",
+      "tagName": "v3.5.0",
+      "publishedAt": "2026-06-27T01:40:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DeepDoze-Enforcer-v3.5.0.zip",
+          "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.5.0/DeepDoze-Enforcer-v3.5.0.zip",
+          "size": 744000,
+          "downloadCount": 81
+        }
+      ]
+    },
+    {
+      "name": "v3.4.1",
+      "tagName": "v3.4.1",
+      "publishedAt": "2026-06-25T23:58:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DeepDoze-Enforcer-v3.4.1.zip",
+          "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.4.1/DeepDoze-Enforcer-v3.4.1.zip",
+          "size": 743146,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v3.4",
+      "tagName": "v3.4",
+      "publishedAt": "2026-06-25T00:39:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DeepDoze-Enforcer-v3.4.zip",
+          "downloadUrl": "https://github.com/Azyrn/DeepDoze-Enforcer/releases/download/v3.4/DeepDoze-Enforcer-v3.4.zip",
+          "size": 739104,
+          "downloadCount": 40
+        }
+      ]
+    }
+  ]
+}
