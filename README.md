@@ -59,12 +59,14 @@ https://qianyumeng0228.github.io/ShizuSU-Modules
 
 见 [CONTRIBUTING.md](CONTRIBUTING.md)：开源+源码+许可证+可下载 release 为硬门槛；支持人工提交、topic 自动发现、手机端上传+审批三种收录路径。
 
-## 内容清单（共 546 个模块）
+## 内容清单（共 861 个模块）
 
-覆盖 KernelSU 模块全网生态 19 个分类：Root 隐藏 / Play Integrity、元模块（挂载引擎）、Zygisk 实现、性能调度、网络代理、广告拦截、音频、字体显示、备份救砖、Xposed/LSPosed 等。模块按「开源 + 许可证 + 可下载 release」硬门槛收录（来源：KernelSU 模块全网汇总 1,532 条清单筛选）。
+覆盖 KernelSU 模块全网生态 19 个分类：Root 隐藏 / Play Integrity、元模块（挂载引擎）、Zygisk 实现、性能调度、网络代理、广告拦截、音频、字体显示、备份救砖、Xposed/LSPosed 等。模块按「开源 + 可下载 release」门槛收录（来源：KernelSU 模块全网汇总 1,532 条清单筛选）。
 
-- 根 `modules.json`（A 路线）：546 个模块目录与详情
-- `json/modules.json`（B 路线 / MMRL / BakaSU）：499 个可安装模块索引
+其中 **322 个为管理员背书收录**（`adminApproved`）：上游仓库许可证未声明或不明确（NOASSERTION/无 LICENSE 文件），由仓库管理员审核后收录，条目带 `note` 说明，使用时需自行评估风险。
+
+- 根 `modules.json`（A 路线）：861 个模块目录与详情
+- `json/modules.json`（B 路线 / MMRL / BakaSU）：794 个可安装模块索引
 - `catalog/candidates.json`：topic 自动发现的候选清单
 
 每日 GitHub Actions 自动更新版本、下载链接与统计。
