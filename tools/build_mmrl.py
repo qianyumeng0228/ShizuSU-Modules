@@ -108,7 +108,7 @@ def build_update_json(mid, catalog_by_id):
     }
 
 
-def build_modules_json(catalog, tracks):
+def build_modules_json(catalog, tracks, repo_name, repo_id, repo_desc):
     now = datetime.now(timezone.utc).timestamp()
     modules_out = []
     for entry in catalog:
@@ -120,14 +120,23 @@ def build_modules_json(catalog, tracks):
         version = latest.get("name") or ""
         version_code = int(latest.get("versionCode") or 0)
         zip_url = latest.get("downloadUrl") or ""
+        # 无可下载产物（无 release / 手动模块缺 zip）的模块不进 MMRL 索引：
+        # BakaSU/MMRL 的解析器遇到空 zipUrl 会把整个 feed 判为 INVALID_FEED。
+        if not zip_url:
+            continue
         try:
             ts = datetime.strptime(latest.get("time") or "", "%Y-%m-%dT%H:%M:%SZ").timestamp()
         except (ValueError, TypeError):
             ts = now
         modules_out.append({
             "id": mid,
+            "name": entry.get("moduleName") or mid,
             "version": version,
             "versionCode": version_code,
+            "author": next(iter([a.get("name") for a in (entry.get("authors") or []) if a.get("name")]), ""),
+            "description": entry.get("summary") or entry.get("summaryZh") or "",
+            "stars": int(entry.get("stargazerCount") or 0),
+            "timestamp": ts,
             "latest": {"zipUrl": zip_url, "changelog": ""},
             "versions": [{
                 "timestamp": ts,
@@ -135,12 +144,19 @@ def build_modules_json(catalog, tracks):
                 "versionCode": version_code,
                 "zipUrl": zip_url,
                 "changelog": "",
-                "size": 0,
+                "size": int(latest.get("size") or 0),
             }],
             "track": track,
-            "timestamp": ts,
+            "readme": "",
+            "icon": "",
         })
-    return {"modules": modules_out, "metadata": {"timestamp": now}}
+    return {
+        "id": repo_id,
+        "name": repo_name,
+        "description": repo_desc,
+        "modules": modules_out,
+        "metadata": {"version": 1, "timestamp": now},
+    }
 
 
 def main():
@@ -179,7 +195,7 @@ def main():
         json.dumps(repo_config, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    # tracks + update.json
+    # tracks + update.json（仅收录有可下载产物的模块，与 MMRL 索引保持一致）
     tracks = {}
     modules_dir = OUT_DIR / "modules"
     # 全量重建：清空旧 track/update，避免失效模块残留
@@ -190,6 +206,10 @@ def main():
             old.unlink()
     catalog_by_id = {e["moduleId"]: e for e in catalog}
     for mid, mod in by_id.items():
+        entry = catalog_by_id.get(mid) or {}
+        latest = entry.get("latestRelease") or {}
+        if not latest.get("downloadUrl"):
+            continue  # 无下载产物：不进入 MMRL/BakaSU 索引
         audit_entry = audit.get(mid)
         track = build_track(mid, mod, audit_entry)
         tracks[mid] = track
@@ -203,7 +223,7 @@ def main():
         )
 
     # modules.json（MMRL 索引）
-    mmrl_index = build_modules_json(catalog, tracks)
+    mmrl_index = build_modules_json(catalog, tracks, args.name, args.id, repo_config["description"])
     (json_dir / "modules.json").write_text(
         json.dumps(mmrl_index, ensure_ascii=False, indent=2), encoding="utf-8"
     )
