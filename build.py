@@ -39,6 +39,10 @@ from pathlib import Path
 BASE = "https://api.github.com"
 RAW_BASE = "https://raw.githubusercontent.com"
 USER_AGENT = "shizusu-module-repo-builder/1.0"
+GRAPHQL_BATCH = 40  # 单次 GraphQL 批量查询的仓库数
+
+# 批量预取缓存：spec -> (repo_dict|None, releases_list|None)；None 表示仓库不存在（404 语义）
+_PREFETCH = {}
 
 HERE = Path(__file__).resolve().parent
 CONFIG_PATH = HERE / "modules.config.json"
@@ -146,6 +150,10 @@ def cache_get(key, ttl, fetcher, token=None):
 # ---------------------------------------------------------------------------
 
 def fetch_repo(spec, token):
+    if spec in _PREFETCH:
+        if _PREFETCH[spec][0] is None:
+            raise ApiError(404, "repository not found (gql prefetch)")
+        return _PREFETCH[spec][0]
     owner, name = spec.split("/", 1)
     key = f"repo_{owner}_{name}"
     return cache_get(
@@ -157,6 +165,10 @@ def fetch_repo(spec, token):
 
 
 def fetch_releases(spec, token):
+    if spec in _PREFETCH:
+        if _PREFETCH[spec][0] is None:
+            raise ApiError(404, "repository not found (gql prefetch)")
+        return _PREFETCH[spec][1]
     owner, name = spec.split("/", 1)
     key = f"releases_{owner}_{name}"
     return cache_get(
@@ -168,19 +180,117 @@ def fetch_releases(spec, token):
 
 
 def fetch_readme(spec, token):
-    """优先 GitHub readme API（自动解析大小写变体/重定向），raw 回退。"""
+    """优先 raw.githubusercontent（不占 API 配额），API readme 兜底。"""
     owner, name = spec.split("/", 1)
+    for candidate in ("README.md", "readme.md", "README.MD", "README", "readme"):
+        text = raw_get(owner, name, candidate, token=token)
+        if text is not None:
+            return text
     try:
         data = api_get(f"repos/{owner}/{name}/readme", token=token)
         if data and data.get("content"):
             return base64.b64decode(data["content"]).decode("utf-8", errors="replace")
     except ApiError:
         pass
-    for candidate in ("README.md", "readme.md", "README"):
-        text = raw_get(owner, name, candidate, token=token)
-        if text is not None:
-            return text
     return None
+
+
+def _normalize_gql(spec, node):
+    """GraphQL repository 节点 -> REST 兼容结构（repo dict + releases list）。"""
+    owner_login = (node.get("owner") or {}).get("login") or spec.split("/")[0]
+    repo = {
+        "full_name": spec,
+        "name": spec.split("/")[1],
+        "owner": {
+            "login": owner_login,
+            "html_url": (node.get("owner") or {}).get("url") or f"https://github.com/{owner_login}",
+        },
+        "stargazers_count": node.get("stargazerCount") or 0,
+        "pushed_at": node.get("pushedAt") or "",
+        "updated_at": node.get("pushedAt") or "",
+        "created_at": node.get("createdAt") or "",
+        "description": node.get("description") or "",
+        "homepage": node.get("homepageUrl") or "",
+        "html_url": f"https://github.com/{spec}",
+    }
+    rels = []
+    for r in (node.get("releases") or {}).get("nodes") or []:
+        tag = r.get("tagName") or ""
+        assets = []
+        for a in (r.get("releaseAssets") or {}).get("nodes") or []:
+            aname = a.get("name") or ""
+            assets.append({
+                "name": aname,
+                "size": a.get("size") or 0,
+                "download_count": a.get("downloadCount") or 0,
+                "browser_download_url": f"https://github.com/{spec}/releases/download/{urllib.parse.quote(tag)}/{urllib.parse.quote(aname)}",
+            })
+        rels.append({
+            "tag_name": tag,
+            "published_at": r.get("publishedAt") or "",
+            "created_at": r.get("publishedAt") or "",
+            "draft": bool(r.get("isDraft")),
+            "prerelease": bool(r.get("isPrerelease")),
+            "assets": assets,
+        })
+    return repo, rels
+
+
+def batch_prefetch(specs, token):
+    """GraphQL 批量预取仓库元数据 + 最近 10 个 release，替代逐仓库 REST 调用。
+
+    单次请求查 GRAPHQL_BATCH 个仓库，881 个模块仅需 ~23 次请求，
+    彻底规避 GITHUB_TOKEN 每小时 1000 次 REST 配额。
+    """
+    global _PREFETCH
+    todo = [s for s in specs if s and s not in _PREFETCH]
+    if not todo:
+        return 0
+    if not token:
+        print("  提示：无 GITHUB_TOKEN，跳过批量预取，走 REST 逐仓库（可能限流）", file=sys.stderr)
+        return 0
+    fields = (
+        "stargazerCount pushedAt createdAt description homepageUrl "
+        "owner { login url } "
+        "releases(last: 10) { nodes { tagName publishedAt isPrerelease isDraft "
+        "releaseAssets(first: 30) { nodes { name size downloadCount url } } } }"
+    )
+    done = 0
+    for i in range(0, len(todo), GRAPHQL_BATCH):
+        chunk = todo[i:i + GRAPHQL_BATCH]
+        aliases = []
+        for j, spec in enumerate(chunk):
+            owner, name = spec.split("/", 1)
+            aliases.append(
+                f'r{j}: repository(owner: {json.dumps(owner)}, name: {json.dumps(name)}) {{ {fields} }}'
+            )
+        query = "query {\n" + "\n".join(aliases) + "\n}"
+        body = json.dumps({"query": query}).encode("utf-8")
+        req = urllib.request.Request(
+            f"{BASE}/graphql",
+            data=body,
+            headers={"Authorization": f"Bearer {token}", "User-Agent": USER_AGENT,
+                     "Content-Type": "application/json"},
+        )
+        try:
+            with _proxy_opener().open(req, timeout=60) as resp:
+                data = json.loads(resp.read().decode("utf-8", errors="replace"))
+            if data.get("errors"):
+                msgs = [e.get("message", "") for e in data["errors"]][:3]
+                print(f"  [gql] 字段错误: {msgs}", file=sys.stderr)
+            for j, spec in enumerate(chunk):
+                node = (data.get("data") or {}).get(f"r{j}")
+                if node is None:
+                    _PREFETCH[spec] = (None, None)  # 仓库不存在/无权限
+                else:
+                    _PREFETCH[spec] = _normalize_gql(spec, node)
+                done += 1
+            print(f"  [gql] 批次 {i // GRAPHQL_BATCH + 1}/{(len(todo) + GRAPHQL_BATCH - 1) // GRAPHQL_BATCH} "
+                  f"完成（{len(chunk)} 仓库）", file=sys.stderr)
+        except (urllib.error.HTTPError, urllib.error.URLError, OSError, TimeoutError) as e:
+            # GraphQL 失败：不写入缓存，后续 fetch_* 自动回退 REST 逐仓库
+            print(f"  [gql] 批次失败 {e}，本批回退 REST 逐仓库", file=sys.stderr)
+    return done
 
 
 def pick_latest_release(releases):
@@ -513,6 +623,11 @@ def main():
         print(f"已清理 {removed} 个旧详情文件（全量重建）")
 
     print(f"开始生成 {len(modules)} 个模块...")
+    specs = [m["repo"] for m in modules if m.get("repo")]
+    if specs:
+        print(f"GraphQL 批量预取 {len(specs)} 个仓库（单批 {GRAPHQL_BATCH}，约 "
+              f"{(len(specs) + GRAPHQL_BATCH - 1) // GRAPHQL_BATCH} 次请求）...")
+        batch_prefetch(specs, token)
     catalog = []
     errors = []
     skipped_ids = set()
