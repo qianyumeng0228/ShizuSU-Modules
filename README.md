@@ -5,6 +5,8 @@
 [![模块数](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fqianyumeng0228.github.io%2FShizuSU-Modules%2Fmodules.json&query=length&label=%E6%A8%A1%E5%9D%97%E6%80%BB%E6%95%B0&color=blue)](https://qianyumeng0228.github.io/ShizuSU-Modules/modules.json)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
+**语言：** 中文 · [English](docs/i18n/README.en.md) · [Deutsch](docs/i18n/README.de.md) · [Русский](docs/i18n/README.ru.md) · [日本語](docs/i18n/README.ja.md) · [Français](docs/i18n/README.fr.md) · [Italiano](docs/i18n/README.it.md) · [Español](docs/i18n/README.es.md)
+
 面向 **KernelSU / Magisk / APatch** 生态的开源模块仓库源：一套配置，同时输出 **ShizuSU / SukiSU-Ultra（A 路线）** 与 **MMRL / BakaSU（B 路线）** 两种兼容格式，替代已失效的官方源 `modules.kernelsu.org`。
 
 收录 **1,532 条全网清单** 筛选出的开源模块，每日自动构建更新版本与下载链接。
