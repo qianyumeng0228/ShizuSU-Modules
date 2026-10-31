@@ -83,9 +83,9 @@ Los datos se generan con `build.py` (ruta A) + `tools/build_mmrl.py` (ruta B) + 
 
 ## Contenido recopilado
 
-- **861 módulos** en el índice de la ruta A; **794** instalables directamente vía MMRL/BakaSU
+- **871 módulos** en el índice de la ruta A; **804** instalables directamente vía MMRL/BakaSU
 - **19 categorías** cubiertas: ocultamiento de Root / Play Integrity, meta-módulos (motores de montaje), implementaciones Zygisk, optimización de rendimiento, proxys de red, bloqueo de publicidad, audio, fuentes/display, copia de seguridad y rescate, Xposed/LSPosed, WebUI, etc.
-- **322 aprobados por el administrador** (`adminApproved`): licencia ascendente no declarada o poco clara — recopilados tras revisión del administrador, cada entrada lleva una `note`; evaluar los riesgos por su cuenta
+- **324 aprobados por el administrador** (`adminApproved`): licencia ascendente no declarada o poco clara — recopilados tras revisión del administrador, cada entrada lleva una `note`; evaluar los riesgos por su cuenta
 - Fuente de datos: resumen global de módulos KernelSU (lista deduplicada de 1.532 entradas)
 
 ## Criterios de recopilación
