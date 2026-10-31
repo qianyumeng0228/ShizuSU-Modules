@@ -42,6 +42,19 @@ https://qianyumeng0228.github.io/ShizuSU-Modules/
 
 MMRL 读取 `json/config.json` 与 `json/modules.json`，可直接浏览/安装其中已收录的模块。
 
+## 在 BakaSU 中添加本仓库
+
+BakaSU 的「仓库设置 → + 添加仓库」支持自定义源，接入本仓库：
+
+- **API 格式：必须选 `MMRL`**（本仓库输出 MMRL 兼容格式；不要选 `KernelSU Modules API`——那是 Registry 协议，本仓库不提供 `api/v1` 接口，且 BakaSU 对 Registry 源下载强制校验真实 SHA-256，会 404/安装失败）
+- **服务器 URL**（不带 `/json/modules.json` 后缀）：
+
+```
+https://qianyumeng0228.github.io/ShizuSU-Modules
+```
+
+添加后即可浏览/安装其中已收录的模块，每日构建自动更新索引。
+
 ## 收录与审核
 
 见 [CONTRIBUTING.md](CONTRIBUTING.md)：开源+源码+许可证+可下载 release 为硬门槛；支持人工提交、topic 自动发现、手机端上传+审批三种收录路径。
