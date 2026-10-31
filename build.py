@@ -39,7 +39,7 @@ from pathlib import Path
 BASE = "https://api.github.com"
 RAW_BASE = "https://raw.githubusercontent.com"
 USER_AGENT = "shizusu-module-repo-builder/1.0"
-GRAPHQL_BATCH = 40  # 单次 GraphQL 批量查询的仓库数
+GRAPHQL_BATCH = 20  # 单次 GraphQL 批量查询的仓库数（过大触发 Resource limits）
 
 # 批量预取缓存：spec -> (repo_dict|None, releases_list|None)；None 表示仓库不存在（404 语义）
 _PREFETCH = {}
@@ -252,8 +252,8 @@ def batch_prefetch(specs, token):
     fields = (
         "stargazerCount pushedAt createdAt description homepageUrl "
         "owner { login url } "
-        "releases(last: 10) { nodes { tagName publishedAt isPrerelease isDraft "
-        "releaseAssets(first: 30) { nodes { name size downloadCount url } } } }"
+        "releases(last: 6) { nodes { tagName publishedAt isPrerelease isDraft "
+        "releaseAssets(first: 15) { nodes { name size downloadCount url } } } }"
     )
     done = 0
     for i in range(0, len(todo), GRAPHQL_BATCH):
@@ -278,12 +278,25 @@ def batch_prefetch(specs, token):
             if data.get("errors"):
                 msgs = [e.get("message", "") for e in data["errors"]][:3]
                 print(f"  [gql] 字段错误: {msgs}", file=sys.stderr)
+            # 区分「仓库不存在」与「查询超限/其他错误」：后者回退 REST，不当 404 跳过
+            error_aliases = set()
+            for e in data.get("errors") or []:
+                p = e.get("path") or []
+                if len(p) >= 2 and isinstance(p[1], str) and p[1].startswith("r"):
+                    error_aliases.add(p[1])
             for j, spec in enumerate(chunk):
                 node = (data.get("data") or {}).get(f"r{j}")
                 if node is None:
-                    _PREFETCH[spec] = (None, None)  # 仓库不存在/无权限
+                    if f"r{j}" in error_aliases:
+                        _PREFETCH.pop(spec, None)  # 超限/异常：不缓存，fetch 回退 REST
+                    else:
+                        _PREFETCH[spec] = (None, None)  # 仓库不存在
                 else:
-                    _PREFETCH[spec] = _normalize_gql(spec, node)
+                    try:
+                        _PREFETCH[spec] = _normalize_gql(spec, node)
+                    except Exception as e:  # noqa: BLE001 单仓库归一化失败回退 REST
+                        print(f"  [gql] {spec} 归一化失败 {e}，回退 REST", file=sys.stderr)
+                        _PREFETCH.pop(spec, None)
                 done += 1
             print(f"  [gql] 批次 {i // GRAPHQL_BATCH + 1}/{(len(todo) + GRAPHQL_BATCH - 1) // GRAPHQL_BATCH} "
                   f"完成（{len(chunk)} 仓库）", file=sys.stderr)
