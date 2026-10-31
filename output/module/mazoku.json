@@ -1,0 +1,30 @@
+{
+  "readme": "# Mazoku\n\nAn Zygisk Module to intercept ACE requests and effectively replace malicious modifications to a genuine attestation.\n\n## Current supported versions\n- CODM 1.0.48 (Working as of now/Current state of the source code)\n\n## Requirments\n\nTo build this project you need to :\n- have the target app to use external objects or simply check presence of `[anon:object_external_alloc]` in `/proc/self/maps` of target app.\n- have the necessary offsets:\n  - GetExternalObjects\n  - CreateSWBackedIntegrity\n  This part can be ignored if your target app isn't totally caring about updating its ACE backend (comm/mua).\n  - Treaters\n  - CustomCall\n  - Param\n- have the objects that are suspected for target scans.\n- have the necessary patches to override the responses.\n\nMore guide to how to obtain these will be available soon.\n\n## Usage\n\n1. Disable all modules & malicious modifiers towards target app.\n2. Install this module & set configuration in `/data/adb/mazoku/spoof_target_libs.txt` with `?` flag (to create hardware backed copy of libraries) or `!` flag (to strictly check for specified hardware backed copy & verify its integrity).\n3. Reboot & open target app.\n4. Check for hardware copies in `/data/user/0/com.example/files/.mazoku` & compare sha256 of blocks to verify verity of backed copies.\n5. Enable your modifiers.\n\n# Notes\n- Does not work against system libraries such as libc.so, etc...\n- Does not hide itself against the process (Shamiko might help but not a permanent solution, see more about susfs).\n- Does not hide modifiers from exposition in target process.\n",
+  "readmeHTML": "<h1>Mazoku</h1>\n\n<p>An Zygisk Module to intercept ACE requests and effectively replace malicious modifications to a genuine attestation.</p>\n\n<h2>Current supported versions</h2>\n<li>CODM 1.0.48 (Working as of now/Current state of the source code)</li>\n\n<h2>Requirments</h2>\n\n<p>To build this project you need to :</p>\n<li>have the target app to use external objects or simply check presence of `[anon:object_external_alloc]` in `/proc/self/maps` of target app.</li>\n<li>have the necessary offsets:</li>\n<p>  - GetExternalObjects</p>\n<p>  - CreateSWBackedIntegrity</p>\n<p>  This part can be ignored if your target app isn't totally caring about updating its ACE backend (comm/mua).</p>\n<p>  - Treaters</p>\n<p>  - CustomCall</p>\n<p>  - Param</p>\n<li>have the objects that are suspected for target scans.</li>\n<li>have the necessary patches to override the responses.</li>\n\n<p>More guide to how to obtain these will be available soon.</p>\n\n<h2>Usage</h2>\n\n<li>Disable all modules & malicious modifiers towards target app.</li>\n<li>Install this module & set configuration in `/data/adb/mazoku/spoof_target_libs.txt` with `?` flag (to create hardware backed copy of libraries) or `!` flag (to strictly check for specified hardware backed copy & verify its integrity).</li>\n<li>Reboot & open target app.</li>\n<li>Check for hardware copies in `/data/user/0/com.example/files/.mazoku` & compare sha256 of blocks to verify verity of backed copies.</li>\n<li>Enable your modifiers.</li>\n\n<h1>Notes</h1>\n<li>Does not work against system libraries such as libc.so, etc...</li>\n<li>Does not hide itself against the process (Shamiko might help but not a permanent solution, see more about susfs).</li>\n<li>Does not hide modifiers from exposition in target process.</li>",
+  "homepageUrl": "https://github.com/MhmRdd/mazoku",
+  "sourceUrl": "https://github.com/MhmRdd/mazoku",
+  "url": "https://github.com/MhmRdd/mazoku",
+  "latestRelease": {
+    "name": "32f030f",
+    "version": "32f030f",
+    "time": "2024-12-15T20:26:48Z",
+    "downloadUrl": "https://github.com/MhmRdd/mazoku/releases/download/32f030f/Mazoku-v1.0.0-41-32f030f-release.zip"
+  },
+  "releases": [
+    {
+      "name": "32f030f",
+      "tagName": "32f030f",
+      "publishedAt": "2024-12-15T20:26:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Mazoku-v1.0.0-41-32f030f-release.zip",
+          "downloadUrl": "https://github.com/MhmRdd/mazoku/releases/download/32f030f/Mazoku-v1.0.0-41-32f030f-release.zip",
+          "size": 125416,
+          "downloadCount": 132
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

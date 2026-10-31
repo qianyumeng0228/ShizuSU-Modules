@@ -1,0 +1,100 @@
+{
+  "readme": "# Enable The \"Remove Game FPS Limit\" Dev Setting Automatically Magisk & KSU Module\n\n<p align=\"center\">\n  <img src=\"https://raw.githubusercontent.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/refs/heads/main/overview.png?raw=true\" alt=\"ÆSIR Header Image\"/>\n</p>\n\nA Magisk / KernelSU module that automatically enables the **\"Remove Game FPS Limit\"** developer setting on every boot so you don't have to re-enable it manually each time.\n\n> ### ⚠️ DISCLAIMER ⚠️\n> **I am not responsible** for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!\n\n## What Does It Do?\n\nAndroid has a hidden developer option that removes the 60 Hz frame rate cap in games. However, this setting resets to disabled after every reboot. This module sets the system property `debug.graphics.game_default_frame_rate.disabled` to its enabled state automatically after each boot.\n\n## How It Works\n\n1. Waits for the device to fully boot.\n2. Reads the current value of `debug.graphics.game_default_frame_rate.disabled` to detect the device's property format.\n3. Sets the property to the correct enabled value for that format.\n4. Verifies the change and reports the result in the module description.\n\n### Property Format Compatibility\n\nDifferent devices store this property in different formats:\n\n| Device Type | Disabled Value | Enabled Value |\n|---|---|---|\n| String format | `false` | `true` |\n| Numeric format | `0` | `1` |\n\nThe module auto-detects which format your device uses and sets the value accordingly. If the first attempt fails, it automatically falls back to the other format.\n\n# Installation\n1. [Download the latest release](https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/latest/download/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip).\n2. Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.\n3. Reboot the device.\n4. Verify that the setting is enabled (see below).\n5. You're all set!\n6. If you experience any issues, please let me know through the [Issues](https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/issues) panel.\n\n# Compatibility\n- Android 8.0+\n- KernelSU or KernelSU Next or Magisk\n",
+  "readmeHTML": "<h1>Enable The \"Remove Game FPS Limit\" Dev Setting Automatically Magisk & KSU Module</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/refs/heads/main/overview.png?raw=true\" alt=\"ÆSIR Header Image\"/></p>\n<p></p></p>\n\n<p>A Magisk / KernelSU module that automatically enables the <b>\"Remove Game FPS Limit\"</b> developer setting on every boot so you don't have to re-enable it manually each time.</p>\n\n<p>> ### ⚠️ DISCLAIMER ⚠️</p>\n<p>> <b>I am not responsible</b> for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!</p>\n\n<h2>What Does It Do?</h2>\n\n<p>Android has a hidden developer option that removes the 60 Hz frame rate cap in games. However, this setting resets to disabled after every reboot. This module sets the system property <code>debug.graphics.game_default_frame_rate.disabled</code> to its enabled state automatically after each boot.</p>\n\n<h2>How It Works</h2>\n\n<li>Waits for the device to fully boot.</li>\n<li>Reads the current value of `debug.graphics.game_default_frame_rate.disabled` to detect the device's property format.</li>\n<li>Sets the property to the correct enabled value for that format.</li>\n<li>Verifies the change and reports the result in the module description.</li>\n\n<h3>Property Format Compatibility</h3>\n\n<p>Different devices store this property in different formats:</p>\n\n<p>| Device Type | Disabled Value | Enabled Value |</p>\n<p>|---|---|---|</p>\n<p>| String format | <code>false</code> | <code>true</code> |</p>\n<p>| Numeric format | <code>0</code> | <code>1</code> |</p>\n\n<p>The module auto-detects which format your device uses and sets the value accordingly. If the first attempt fails, it automatically falls back to the other format.</p>\n\n<h1>Installation</h1>\n<li>[Download the latest release](https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/latest/download/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip).</li>\n<li>Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.</li>\n<li>Reboot the device.</li>\n<li>Verify that the setting is enabled (see below).</li>\n<li>You're all set!</li>\n<li>If you experience any issues, please let me know through the [Issues](https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/issues) panel.</li>\n\n<h1>Compatibility</h1>\n<li>Android 8.0+</li>\n<li>KernelSU or KernelSU Next or Magisk</li>",
+  "homepageUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule",
+  "sourceUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule",
+  "url": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule",
+  "latestRelease": {
+    "name": "v1.2.2",
+    "version": "v1.2.2",
+    "time": "2026-02-24T04:20:35Z",
+    "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.2.2/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.2",
+      "tagName": "v1.2.2",
+      "publishedAt": "2026-02-24T04:20:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.2.2/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 10169,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-02-24T04:14:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.2.1/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 10119,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-02-24T04:02:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.2/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 10220,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-02-23T00:59:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.1.1/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 9308,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-02-23T00:50:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.1/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 9200,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-02-05T00:56:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule/releases/download/v1.0/EnableTheRemoveGameFPSLimitDevSettingAutomatically-Magisk-KSUModule-main.zip",
+          "size": 5131,
+          "downloadCount": 8
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

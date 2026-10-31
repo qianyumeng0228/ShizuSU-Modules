@@ -1,0 +1,100 @@
+{
+  "readme": "# SkiaVK\n\n<p align=\"center\">\n  <img src=\"vulkan.webp\" alt=\"SkiaVK Logo\" width=\"600\">\n</p>\n\n<p align=\"center\">\n  <strong>Force Vulkan 2D hardware rendering on Android with built-in bootloop protection.</strong>\n</p>\n\n<p align=\"center\">\n  <img src=\"https://img.shields.io/badge/License-MIT-c0392b?style=for-the-badge\" alt=\"License\">\n  <img src=\"https://img.shields.io/badge/Android-10.0%2B-d32f2f?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\">\n  <img src=\"https://img.shields.io/badge/Version-3.0.0-b71c1c?style=for-the-badge&logo=github&logoColor=white\" alt=\"Version\">\n  <img src=\"https://img.shields.io/badge/Root-KSU%20%7C%20APatch%20%7C%20Magisk-880e4f?style=for-the-badge&logo=linux&logoColor=white\" alt=\"Root\">\n</p>\n\n## Overview\n\nSkiaVK is a root module that switches Android's 2D application rendering pipeline from legacy OpenGL to Vulkan (`skiavk`).\n\nSkiaVK started because too many vendor ROMs default to outdated OpenGL pipelines that stutter during rapid UI scrolling and leave GPU compute queues idle. Manual property tweaks often caused bootloops whenever an unstable vendor update dropped. This v3.0 rewrite brings deterministic boot-safety guards, atomic state concurrency, and kernel pipe buffer protection. You flash it once, reboot, and your interface renders through Vulkan without manual babying.\n\n\n## Why Use SkiaVK?\n\n- **Asynchronous GPU queue submission**: Moves 2D UI drawing commands off the main thread onto dedicated hardware Vulkan queues, reducing frame pacing jitter and smoothing app scrolling.\n- **SurfaceFlinger anti-flicker synchronization**: Automatically enforces GPU backpressure (`debug.sf.enable_gl_backpressure=1`, `debug.sf.latch_unsignaled=0`, `debug.sf.disable_backpressure=0`) when RenderEngine is active, preventing frame latching race conditions.\n- **Automated shader cache sanitization**: Purges stale OpenGL pipeline caches from application cache trees on install, guarding against Qualcomm Adreno deserialization faults without touching app libraries.\n- **Fail-safe 3-strike bootloop guard**: Monitors boot progress automatically. If your device fails to reach boot completion three times consecutively, the module disarms itself and disables property injection so your device recovers cleanly.\n- **Zero kernel pipe deadlock risk**: Isolates heavy forensic traces into physical disk files, keeping manager UI terminal output strictly bounded and responsive.\n- **Atomic VFS concurrency locking**: Uses POSIX directory locks during early boot and action runs to prevent corrupt state files if the phone hard-reboots.\n- **Pre-flight emulator blacklist**: Detects and aborts installation immediately on software CPU emulators like SwiftShader or Lavapipe, preventing severe UI freezes.\n- **Live graphics diagnostic card**: Displays active renderer backends, HAL driver names, and guard strike status in an aligned terminal card via your root manager's Action button.\n\n\n## How to Use\n\n### 1. Installation\n* Download `SkiaVK.zip` from [Releases](https://github.com/dyokism/SkiaVK/releases).\n* Flash the archive using your root manager (KernelSU, APatch, or Magisk).\n* **Reboot** your device to activate Vulkan pipeline injection.\n\n### 2. Live Graphics Diagnostics & Action Button\nTap the **Action** button next to SkiaVK inside KernelSU, APatch, or compatible Magisk managers to inspect your graphics stack in real time.\n\nSkiaVK displays an aligned summary card directly in your manager terminal:\n\n```text\nSkiaVK\nversion      : (your version)\nrenderer     : skiavk\nrenderengine : skiavkthreaded\ndriver       : vulkan.adreno.so\nplatform     : kalama (API 36)\nmanager      : KernelSU\nguard        : normal (0/3)\n```\n\nIf unstable vendor drivers ever trip the bootloop safeguard, tapping Action resets the crash counter, re-enables the module, and displays recovery confirmation below the report.\n\n### 3. Monitoring Status and Logs\n* **Live status**: Check the SkiaVK module description inside KernelSU, APatch, or Magisk. It dynamically updates during boot milestones (e.g. `status: active (skiavk+RE) | boot: normal`).\n* **Live log streaming**:\n  ```sh\n  su -c tail -f /data/adb/modules_config/skia_vulkan/skia_vulkan.log\n  ```\n* **Kernel ring buffer**:\n  ```sh\n  su -c dmesg | grep skia_vulkan\n  ```\n* **Full diagnostic report**:\n  ```sh\n  su -c cat /data/adb/modules_config/skia_vulkan/diagnostics.txt\n  ```\n\n### 4. Optional RenderEngine Vulkan Composition\nSurfaceFlinger can also compose system display layers using multithreaded Vulkan (`skiavkthreaded`). Because compositor stability depends on your vendor driver's handling of image memory transitions, it remains an explicit opt-in. When enabled, SkiaVK automatically enforces anti-flicker synchronization guards (`debug.sf.latch_unsignaled=0`, `debug.sf.enable_gl_backpressure=1`, `debug.sf.disable_backpressure=0`) to prevent fence race conditions.\n\n> [!WARNING]\n> If your vendor graphics driver mismanages image transitions, SurfaceFlinger Vulkan composition can cause display flickering.\n\n* Enable threaded RenderEngine:\n  ```bash\n  su -c \"mkdir -p /data/adb/modules_config/skia_vulkan && touch /data/adb/modules_config/skia_vulkan/renderengine\"\n  ```\n* Set single-threaded Vulkan:\n  ```bash\n  su -c \"echo skiavk > /data/adb/modules_config/skia_vulkan/renderengine\"\n  ```\n* Disable RenderEngine and revert to default composition:\n  ```bash\n  su -c \"rm -f /data/adb/modules_config/skia_vulkan/renderengine\"\n  ```\nReboot after modifying RenderEngine settings.\n\n\n## Technical Details\n\n### Early-Boot Memory Injection (`post-fs-data.sh`)\n* **Init IPC bypass**: Uses `resetprop -n` exclusively to mutate system property memory blocks directly. This avoids triggering Android init's property_service socket, eliminating circular deadlocks during early boot milestones.\n* **Failsafe strike counter**: Records monotonic boot milestones before system server initialization. If `sys.boot_completed` is not confirmed within three attempts, the module flags itself tripped and stops injecting properties.\n* **Scoped cache sanitization**: Purges stale shader and pipeline caches strictly within `cache/` and `code_cache/` trees, protecting application binaries while preventing Adreno pipeline cache faults.\n\n### Late-Boot Verification & Vendor Override Defense (`service.sh`)\n* **Vendor override mitigation**: Polls `sys.boot_completed` with a 120-second timeout. Once boot finishes, it audits `debug.hwui.renderer` to catch and correct aggressive OEM scripts that try reverting the renderer back to OpenGL.\n* **Crash buffer watchdog**: Scans `logcat -b crash` for `VK_ERROR_DEVICE_LOST` or Qualcomm compiler faults, reverting immediately to `skiagl` if driver initialization fails.\n* **Clean guard disarm**: Releases bootloop tracking and updates the module badge to normal status once the system reaches a stable state.\n\n### POSIX Concurrency & Pipe Safety (`util.sh` & `action.sh`)\n* **Atomic VFS locking**: Standard Toybox and Ash environments lack `flock`. SkiaVK implements directory-level mutual exclusion using `mkdir`, guaranteed atomic at the Linux VFS layer, with automatic stale-lock recovery.\n* **Kernel pipe buffer guard**: Linux standard pipe buffers are capped at 64KB. Unbuffered diagnostic dumps can deadlock manager UI reader threads in `pipe_write()`. SkiaVK stages raw dumps to `diagnostics.txt` on disk and passes bounded summaries to stdout.\n\n\n## Requirements\n\n| Requirement | Details |\n|-------------|---------|\n| Android | 10.0+ (API 29 to API 36+) |\n| Graphics Driver | Hardware Vulkan HAL library (`vulkan.*.so`) |\n| Architecture | arm64, arm, x86_64, or x86 |\n| Root | KernelSU v0.6.0+, APatch v0.10.0+, or Magisk v20.4+ |\n\n\n## License\n\nThis project is licensed under the MIT License. See [LICENSE](LICENSE) for details.\n",
+  "readmeHTML": "<h1>SkiaVK</h1>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"vulkan.webp\" alt=\"SkiaVK Logo\" width=\"600\"></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <strong>Force Vulkan 2D hardware rendering on Android with built-in bootloop protection.</strong></p>\n<p></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://img.shields.io/badge/License-MIT-c0392b?style=for-the-badge\" alt=\"License\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Android-10.0%2B-d32f2f?style=for-the-badge&logo=android&logoColor=white\" alt=\"Android\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Version-3.0.0-b71c1c?style=for-the-badge&logo=github&logoColor=white\" alt=\"Version\"></p>\n<p>  <img src=\"https://img.shields.io/badge/Root-KSU%20%7C%20APatch%20%7C%20Magisk-880e4f?style=for-the-badge&logo=linux&logoColor=white\" alt=\"Root\"></p>\n<p></p></p>\n\n<h2>Overview</h2>\n\n<p>SkiaVK is a root module that switches Android's 2D application rendering pipeline from legacy OpenGL to Vulkan (<code>skiavk</code>).</p>\n\n<p>SkiaVK started because too many vendor ROMs default to outdated OpenGL pipelines that stutter during rapid UI scrolling and leave GPU compute queues idle. Manual property tweaks often caused bootloops whenever an unstable vendor update dropped. This v3.0 rewrite brings deterministic boot-safety guards, atomic state concurrency, and kernel pipe buffer protection. You flash it once, reboot, and your interface renders through Vulkan without manual babying.</p>\n\n\n<h2>Why Use SkiaVK?</h2>\n\n<li>**Asynchronous GPU queue submission**: Moves 2D UI drawing commands off the main thread onto dedicated hardware Vulkan queues, reducing frame pacing jitter and smoothing app scrolling.</li>\n<li>**SurfaceFlinger anti-flicker synchronization**: Automatically enforces GPU backpressure (`debug.sf.enable_gl_backpressure=1`, `debug.sf.latch_unsignaled=0`, `debug.sf.disable_backpressure=0`) when RenderEngine is active, preventing frame latching race conditions.</li>\n<li>**Automated shader cache sanitization**: Purges stale OpenGL pipeline caches from application cache trees on install, guarding against Qualcomm Adreno deserialization faults without touching app libraries.</li>\n<li>**Fail-safe 3-strike bootloop guard**: Monitors boot progress automatically. If your device fails to reach boot completion three times consecutively, the module disarms itself and disables property injection so your device recovers cleanly.</li>\n<li>**Zero kernel pipe deadlock risk**: Isolates heavy forensic traces into physical disk files, keeping manager UI terminal output strictly bounded and responsive.</li>\n<li>**Atomic VFS concurrency locking**: Uses POSIX directory locks during early boot and action runs to prevent corrupt state files if the phone hard-reboots.</li>\n<li>**Pre-flight emulator blacklist**: Detects and aborts installation immediately on software CPU emulators like SwiftShader or Lavapipe, preventing severe UI freezes.</li>\n<li>**Live graphics diagnostic card**: Displays active renderer backends, HAL driver names, and guard strike status in an aligned terminal card via your root manager's Action button.</li>\n\n\n<h2>How to Use</h2>\n\n<h3>1. Installation</h3>\n<li>Download `SkiaVK.zip` from [Releases](https://github.com/dyokism/SkiaVK/releases).</li>\n<li>Flash the archive using your root manager (KernelSU, APatch, or Magisk).</li>\n<li>**Reboot** your device to activate Vulkan pipeline injection.</li>\n\n<h3>2. Live Graphics Diagnostics & Action Button</h3>\n<p>Tap the <b>Action</b> button next to SkiaVK inside KernelSU, APatch, or compatible Magisk managers to inspect your graphics stack in real time.</p>\n\n<p>SkiaVK displays an aligned summary card directly in your manager terminal:</p>\n\n<pre>SkiaVK\nversion      : (your version)\nrenderer     : skiavk\nrenderengine : skiavkthreaded\ndriver       : vulkan.adreno.so\nplatform     : kalama (API 36)\nmanager      : KernelSU\nguard        : normal (0/3)</pre>\n\n<p>If unstable vendor drivers ever trip the bootloop safeguard, tapping Action resets the crash counter, re-enables the module, and displays recovery confirmation below the report.</p>\n\n<h3>3. Monitoring Status and Logs</h3>\n<li>**Live status**: Check the SkiaVK module description inside KernelSU, APatch, or Magisk. It dynamically updates during boot milestones (e.g. `status: active (skiavk+RE) | boot: normal`).</li>\n<li>**Live log streaming**:</li>\n<p>  ```sh</p>\n<p>  su -c tail -f /data/adb/modules_config/skia_vulkan/skia_vulkan.log</p>\n<p>  ```</p>\n<li>**Kernel ring buffer**:</li>\n<p>  ```sh</p>\n<p>  su -c dmesg | grep skia_vulkan</p>\n<p>  ```</p>\n<li>**Full diagnostic report**:</li>\n<p>  ```sh</p>\n<p>  su -c cat /data/adb/modules_config/skia_vulkan/diagnostics.txt</p>\n<p>  ```</p>\n\n<h3>4. Optional RenderEngine Vulkan Composition</h3>\n<p>SurfaceFlinger can also compose system display layers using multithreaded Vulkan (<code>skiavkthreaded</code>). Because compositor stability depends on your vendor driver's handling of image memory transitions, it remains an explicit opt-in. When enabled, SkiaVK automatically enforces anti-flicker synchronization guards (<code>debug.sf.latch_unsignaled=0</code>, <code>debug.sf.enable_gl_backpressure=1</code>, <code>debug.sf.disable_backpressure=0</code>) to prevent fence race conditions.</p>\n\n<p>> [!WARNING]</p>\n<p>> If your vendor graphics driver mismanages image transitions, SurfaceFlinger Vulkan composition can cause display flickering.</p>\n\n<li>Enable threaded RenderEngine:</li>\n<p>  ```bash</p>\n<p>  su -c \"mkdir -p /data/adb/modules_config/skia_vulkan && touch /data/adb/modules_config/skia_vulkan/renderengine\"</p>\n<p>  ```</p>\n<li>Set single-threaded Vulkan:</li>\n<p>  ```bash</p>\n<p>  su -c \"echo skiavk > /data/adb/modules_config/skia_vulkan/renderengine\"</p>\n<p>  ```</p>\n<li>Disable RenderEngine and revert to default composition:</li>\n<p>  ```bash</p>\n<p>  su -c \"rm -f /data/adb/modules_config/skia_vulkan/renderengine\"</p>\n<p>  ```</p>\n<p>Reboot after modifying RenderEngine settings.</p>\n\n\n<h2>Technical Details</h2>\n\n<h3>Early-Boot Memory Injection (`post-fs-data.sh`)</h3>\n<li>**Init IPC bypass**: Uses `resetprop -n` exclusively to mutate system property memory blocks directly. This avoids triggering Android init's property_service socket, eliminating circular deadlocks during early boot milestones.</li>\n<li>**Failsafe strike counter**: Records monotonic boot milestones before system server initialization. If `sys.boot_completed` is not confirmed within three attempts, the module flags itself tripped and stops injecting properties.</li>\n<li>**Scoped cache sanitization**: Purges stale shader and pipeline caches strictly within `cache/` and `code_cache/` trees, protecting application binaries while preventing Adreno pipeline cache faults.</li>\n\n<h3>Late-Boot Verification & Vendor Override Defense (`service.sh`)</h3>\n<li>**Vendor override mitigation**: Polls `sys.boot_completed` with a 120-second timeout. Once boot finishes, it audits `debug.hwui.renderer` to catch and correct aggressive OEM scripts that try reverting the renderer back to OpenGL.</li>\n<li>**Crash buffer watchdog**: Scans `logcat -b crash` for `VK_ERROR_DEVICE_LOST` or Qualcomm compiler faults, reverting immediately to `skiagl` if driver initialization fails.</li>\n<li>**Clean guard disarm**: Releases bootloop tracking and updates the module badge to normal status once the system reaches a stable state.</li>\n\n<h3>POSIX Concurrency & Pipe Safety (`util.sh` & `action.sh`)</h3>\n<li>**Atomic VFS locking**: Standard Toybox and Ash environments lack `flock`. SkiaVK implements directory-level mutual exclusion using `mkdir`, guaranteed atomic at the Linux VFS layer, with automatic stale-lock recovery.</li>\n<li>**Kernel pipe buffer guard**: Linux standard pipe buffers are capped at 64KB. Unbuffered diagnostic dumps can deadlock manager UI reader threads in `pipe_write()`. SkiaVK stages raw dumps to `diagnostics.txt` on disk and passes bounded summaries to stdout.</li>\n\n\n<h2>Requirements</h2>\n\n<p>| Requirement | Details |</p>\n<p>|-------------|---------|</p>\n<p>| Android | 10.0+ (API 29 to API 36+) |</p>\n<p>| Graphics Driver | Hardware Vulkan HAL library (<code>vulkan.*.so</code>) |</p>\n<p>| Architecture | arm64, arm, x86_64, or x86 |</p>\n<p>| Root | KernelSU v0.6.0+, APatch v0.10.0+, or Magisk v20.4+ |</p>\n\n\n<h2>License</h2>\n\n<p>This project is licensed under the MIT License. See <a href=\"LICENSE\">LICENSE</a> for details.</p>",
+  "homepageUrl": "https://github.com/dyokism/SkiaVK",
+  "sourceUrl": "https://github.com/dyokism/SkiaVK",
+  "url": "https://github.com/dyokism/SkiaVK",
+  "latestRelease": {
+    "name": "1.5",
+    "version": "1.5",
+    "time": "2026-06-05T01:43:12Z",
+    "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.5/SkiaVK.zip"
+  },
+  "releases": [
+    {
+      "name": "1.5",
+      "tagName": "1.5",
+      "publishedAt": "2026-06-05T01:43:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVK.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.5/SkiaVK.zip",
+          "size": 7308,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "1.4",
+      "tagName": "1.4",
+      "publishedAt": "2026-06-03T23:50:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVulkan.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.4/SkiaVulkan.zip",
+          "size": 6524,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "1.3",
+      "tagName": "1.3",
+      "publishedAt": "2026-06-03T02:24:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVulkan.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.3/SkiaVulkan.zip",
+          "size": 6485,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "1.2",
+      "tagName": "1.2",
+      "publishedAt": "2026-05-31T02:24:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVulkan.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.2/SkiaVulkan.zip",
+          "size": 5761,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "1.1",
+      "tagName": "1.1",
+      "publishedAt": "2026-05-31T00:52:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVulkan.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.1/SkiaVulkan.zip",
+          "size": 5323,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "1.0",
+      "tagName": "1.0",
+      "publishedAt": "2026-05-29T12:16:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SkiaVulkan.zip",
+          "downloadUrl": "https://github.com/dyokism/SkiaVK/releases/download/1.0/SkiaVulkan.zip",
+          "size": 5721,
+          "downloadCount": 7
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

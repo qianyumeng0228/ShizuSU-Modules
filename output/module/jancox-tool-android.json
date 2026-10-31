@@ -1,0 +1,240 @@
+{
+  "readme": "# Jancox tool\n\nUnpack and repack Android ROM zips on Android, Linux and Windows.\n\nJancox is one `jancox` binary, written in Rust, with no dependencies. Unpacking and repacking need no root.\n\n- Unpack a ROM zip into folders you can edit:\n  - recovery ROMs (`*.new.dat.br` / `*.new.dat` + `*.transfer.list`)\n  - fastboot ROMs such as Pixel factory images (`<device>-<build>/image-*.zip`, flashed with `flash-all.sh`), or an `image-*.zip` on its own\n  - A/B OTA zips with `payload.bin` (full OTAs, or a bare `payload.bin`), repacked as a new signed OTA zip and/or a fastboot ROM\n  - ROMs with a `super.img` (raw or sparse): Xiaomi fastboot ROMs (`<device>_images_<version>.tgz`) and zips\n- ext4 and EROFS partitions.\n- Repack the folders into a new ROM zip of the same kind.\n- Keeps owners, permissions, SELinux labels and capabilities in metadata files, so it works on `/sdcard` and on Windows too.\n- Grows full dynamic partitions and updates `dynamic_partitions_op_list`.\n\nDevices and ROMs it has been tested with: [device_tested.md](device_tested.md).\n\n## Install\n\n### Android (root: Magisk, KernelSU, APatch)\n\n1. Download `Jancox-tool-android-v<version>.zip` from [Releases](https://github.com/wahyu6070/jancox/releases).\n2. Install it as a module in the Magisk / KernelSU / APatch app (or flash it in recovery), then reboot.\n3. Open a terminal app (e.g. Termux) and run `jancox --help`.\n\nThe module installs `jancox` for your CPU into `/system/bin`, and also into Termux when Termux is installed.\n\n### Termux (no root)\n\n```sh\npkg install curl\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh\n```\n\n`jancox` goes into `$PREFIX/bin`. To work on files in your internal storage, run `termux-setup-storage` once. The Termux home (`~`) is faster than `/sdcard` and keeps symlinks.\n\n### Ubuntu / Debian\n\n```sh\nsudo apt install curl\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh\n```\n\n`jancox` goes into `/usr/local/bin` (the script asks for your sudo password). It is a static binary, so it has no other dependencies.\n\n### Other Linux\n\nThe same one line works on any Linux with `curl` (or `wget`) and `sh`. Without sudo it installs into `~/.local/bin`. Options go after `sh -s --`:\n\n```sh\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --version v3.0.1\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --dir ~/.local/bin\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --uninstall\n```\n\nYou can also download `Jancox-tool-linux-<arch>-v<version>.zip`, extract it and run `./jancox` in that folder.\n\n### Windows\n\n1. Download `Jancox-tool-windows-x86_64-v<version>.zip` (`arm64` for ARM PCs) from [Releases](https://github.com/wahyu6070/jancox/releases).\n2. Extract it to a folder you can write to, e.g. `D:\\jancox` (not `C:\\Program Files`).\n3. Open cmd or PowerShell in that folder and run `jancox --help`. It doesn't need administrator rights.\n\nIf SmartScreen says \"Windows protected your PC\", click **More info → Run anyway** (the binary isn't signed). You can also right-click the zip → Properties → **Unblock** before extracting it.\n\n## Download\n\nGet the zips from [Releases](https://github.com/wahyu6070/jancox/releases).\n\n| File | What it is |\n|------|------------|\n| `Jancox-tool-android-v<version>.zip` | Magisk / recovery module. Installs `jancox` for the device's CPU (arm, arm64, x86, x86_64) into `/system/bin`, and into Termux when it is installed. |\n| `Jancox-tool-linux-<arch>-v<version>.zip` | `jancox` + empty `input/` and `output/`. Static binary, `arch` = `x86_64`, `arm64`, `x86`, `arm`. |\n| `Jancox-tool-windows-<arch>-v<version>.zip` | `jancox.exe` + empty `input/` and `output/`. `arch` = `x86_64`, `x86`, `arm64`. |\n| `jancox-<os>-<arch>` | The plain binaries, used by `install.sh`. |\n\n## Usage\n\n`jancox` works in the folder you run it from (or the folder given with `-w`).\n\n1. `jancox init` makes `input/`, `output/` and `jancox.prop` (optional; `unpack` does it too when no ROM is found).\n2. Put the ROM in `input/`: a zip, `.tgz` / `.tar.gz`, `.tar` or a bare `payload.bin`, with any name. Without `input/`, `input.zip`, `input.tgz`, `input.tar.gz`, `input.tar` or `payload.bin` in the work folder are used.\n3. `jancox unpack`\n4. Edit the files in `partition/system/`, `partition/vendor/`, `partition/product/`, ...\n5. `jancox repack`. The new ROM is written to `output/NewROM-<date>.zip`.\n6. `jancox cleanup` removes the unpacked files. It keeps `input/`, `output/` and `jancox.prop` (`--all` also removes `output/`).\n\nAfter `unpack` the folder looks like this:\n\n```\ninput/                               your ROM zip\noutput/                              new ROMs\njancox.prop                          settings (brotli.level, zip.level; default 1)\nrom/                                 the rest of the ROM (META-INF, boot.img, firmware, ...)\npartition/system/ vendor/ ...        partition files, edit these\npartition/config/<part>_fs_config    owner, group, mode, capabilities\npartition/config/<part>_file_contexts SELinux labels\npartition/config/<part>_symlinks     symlinks\npartition/config/<part>_info         filesystem parameters (size, UUID, ...)\n```\n\n- Added files get default owners and modes (`0 0 0644`, or `0 2000 0755` in `bin/`) and the SELinux label of their folder. To change them, edit `partition/config/<part>_fs_config` and `<part>_file_contexts`.\n- Deleted files are left out of the new image.\n- Where the storage can't hold symlinks (`/sdcard`, Windows), `unpack` says so, and symlinks live only in `partition/config/<part>_symlinks`; `repack` puts them back. Remove a line there to delete a symlink. Working in a folder with symlink support (e.g. the Termux home `~`) shows them as real symlinks.\n\n### Fastboot ROMs (Pixel factory images)\n\nPut the factory zip (e.g. `cubs-cd1a.260905.001.b1-factory-3bd92fff.zip` from [developers.google.com/android/images](https://developers.google.com/android/images)) in `input/` and run `jancox unpack` as usual.\n\n- The logical partitions listed in `super_empty.img` (system, system_ext, product, vendor, system_dlkm, vendor_dlkm) go to `partition/`. They are read straight from the zip, so no temporary images are written.\n- Everything else goes to `rom/<device>-<build>/`, and the files of `image-*.zip` go to `rom/<device>-<build>/image-<device>-<build>/`. Firmware images such as modem, radio and bootloader, plus `system_other.img`, are kept as they are.\n- `jancox repack` rebuilds each partition with its original filesystem (EROFS on Pixels). It checks that they fit the super partition group, sets the disable-verity flags in `vbmeta.img`, and writes `output/NewROM-<date>.zip` with the same layout. Flash it with `flash-all.sh` / `flash-all.bat` on an unlocked device.\n\n### payload.bin ROMs (A/B OTA zips)\n\nFull OTA zips with a `payload.bin` (e.g. ASUS, Xiaomi, OnePlus stock ROMs) unpack with `jancox unpack` as usual. Incremental OTAs are refused.\n\n- The logical partitions (system, system_ext, product, vendor, odm, ...) go to `partition/`.\n- The other images (boot, vendor_boot, dtbo, vbmeta, modem, bootloader, ...) go to `rom/payload/<name>.img`.\n- Every image is checked against the SHA-256 in the payload.\n\nWith `output.format=auto`, `jancox repack` makes what `payload.output` in `jancox.prop` says:\n\n| `payload.output` | Result |\n|---|---|\n| `payload` (default) | `output/NewROM-<date>.zip`: a new OTA zip with `payload.bin`. Flash it in a custom recovery (TWRP, OrangeFox, ...) or with `adb sideload`. |\n| `fastboot` | `output/NewROM-<date>.zip` with all images and `flash-all.sh` / `flash-all.bat`: firmware in the bootloader, the logical partitions in fastbootd. |\n| `both` | both zips (`NewROM-<date>.zip` and `NewROM-<date>-fastboot.zip`). |\n\n- The logical partitions are rebuilt. An image in `rom/payload/` that you replaced (e.g. a patched `boot.img`) is encoded again. Unchanged images are copied from the old payload as they are.\n- `vbmeta.img` gets the disable-verity/verification flags, so the device must be unlocked.\n- `payload.bin` and the zip are signed with the AOSP test key. TWRP, OrangeFox and other test-keys recoveries accept it; stock recoveries only take the vendor's key. Set `sign.key` / `sign.cert` in `jancox.prop` to sign with your own key.\n- `payload.xz_level` (0-9, default 1) sets the xz level of the rebuilt partitions: 6 makes a ~7% smaller zip but is about 4x slower.\n- Images made with block sharing (`shared_blocks`, most Android 10+ ext4 images) are rebuilt with it, so they keep their size.\n\n`jancox payload ota.zip -o images/` only dumps the images (like payload-dumper); `-p boot,vendor_boot` picks some, `-l` lists them.\n\n### Output format\n\n`output.format` in `jancox.prop` (or `repack -t`) picks what repack makes; a list like `sdat,fastboot` makes one zip each. Missing or `auto` means the same kind of ROM as the input.\n\n| Input \\ `output.format` | `auto` | `fastboot` | `sdat` | `payload` | `super` |\n|---|---|---|---|---|---|\n| Recovery ROM (`*.new.dat[.br]`) | recovery ROM | images + `flash-all.sh/.bat` | ✅ | ❌ | ❌ |\n| payload.bin ROM | `payload.output` | images + `flash-all.sh/.bat` | ❌ | ✅ | ❌ |\n| Pixel factory ROM | factory ROM | (it is one) | ❌ | ❌ | ❌ |\n| Xiaomi fastboot / super.img ROM | same archive | (it is one) | ❌ | ❌ | ✅ |\n\nA generated fastboot ROM flashes the firmware and boot images in the bootloader and the logical (dynamic) partitions in fastbootd. The ❌ cases are refused with the reason: a recovery ROM needs the original updater-script, a payload the manifest of an A/B OTA, a super.img the super metadata of the device.\n\n### Xiaomi fastboot ROMs (super.img)\n\nPut the fastboot ROM (e.g. `munch_global_images_V14.0.6.0.TLMMIXM_..._13.0_global_418d21cc7e.tgz`) in `input/` and run `jancox unpack`.\n\n- The archive is unpacked to `rom/`, except `images/super.img`: its ext4/EROFS partitions (slot a) go to `partition/`, its metadata and any other logical partition to `super/`. The sparse super.img is read in place, without a raw copy.\n- `jancox repack` rebuilds the partitions, writes a new `super.img` with the same groups and size (sparse again), sets the disable-verity flags in `vbmeta.img`, and writes `output/NewROM-<date>.tgz` with the original files in their original order.\n- Xiaomi's `flash_all.sh` flashes `images/crclist.txt` and `images/sparsecrclist.txt` first, and the bootloader refuses images that don't match them. Repack computes new lines for `super` and `vbmeta_ab` the way the ROM's own `flash_gen_crc_list.py` does.\n- Flash with `flash_all.sh` / `flash_all.bat` on an unlocked device (they wipe data; `flash_all_except_storage` keeps it).\n\n`jancox super super.img -o images/` only dumps the partitions of a super image (raw or sparse, like lpunpack); `-l` lists them.\n\n### Commands\n\n```\njancox init     [-w workdir]\njancox unpack   [rom] [-w workdir]                      zip / tgz / tar / payload.bin\njancox repack   [-w workdir] [-o out.zip] [-b brotli_quality] [-z zip_level] [-t auto|fastboot|sdat|payload|super,...]\njancox cleanup  [-w workdir] [--all]\n\njancox extract  <image> [-o outdir] [-p name]           ext4/EROFS image -> folder + metadata\njancox payload  <payload.bin|ota.zip> [-o outdir] [-p name,...] [-l]  payload -> images\njancox super    <super.img> [-o outdir] [-p name,...] [-l] [-s slot]   super.img -> images\njancox build    <workdir> <part> [-o image] [-s size|auto]  folder + metadata -> ext4/EROFS image\njancox sdat2img <transfer_list> <new_dat[.br]> [image]\njancox img2sdat <image> [-o outdir] [-v version] [-p prefix] [-b quality]\njancox brotli   [-d] [-q quality] [-w window] [-o output] <file>\n```\n\n`repack` uses brotli quality 1 by default, which is fast but gives a bigger zip than most ROMs ship with. Set `brotli.level=6` or higher in `jancox.prop` (or pass `-b 6`) for a smaller zip.\n\n## Limitations\n\n- EROFS images are read with any compression (lz4, lzma, deflate, zstd). A compressed partition is rebuilt with lz4 (one-block clusters, like mkfs.erofs' default, readable by Android kernels since 5.4), whatever algorithm it had.\n- Incremental OTAs (payload.bin patches) are refused.\n- Older Xiaomi fastboot ROMs without `super.img` (separate `system.img`, ...) are not supported.\n- A repacked partition no longer matches its dm-verity hashtree / AVB data, so the ROM only boots with verification disabled (as with older Jancox versions). For fastboot ROMs, repack sets the \"disable verity + verification\" flags in `vbmeta.img`; this needs an unlocked bootloader, and the first flash with these flags needs a data wipe (`flash-all.sh` wipes by default).\n- Paths with spaces can't be stored in `fs_config` and get a warning.\n- Hard links become separate files.\n\n## Build\n\nYou need [Rust](https://rustup.rs) 1.88 or newer.\n\n```sh\ncargo build --release          # target/release/jancox\n./build.sh                     # every release zip into dist/\n```\n\n`build.sh` needs [zig](https://ziglang.org/download/) + [cargo-zigbuild](https://github.com/rust-cross/cargo-zigbuild) for Linux and Windows, the [Android NDK](https://developer.android.com/ndk/downloads) for Android (set `ANDROID_NDK_HOME` or extract it into `~/Android`), and `zip`.\n\n## Credits\n\n- [sdat2img-rust](https://github.com/wahyu6070/sdat2img-rust) and [img2sdat-rust](https://github.com/wahyu6070/img2sdat-rust), Rust ports of [xpirt/sdat2img](https://github.com/xpirt/sdat2img) and [xpirt/img2sdat](https://github.com/xpirt/img2sdat) (with AOSP `blockimgdiff.py`)\n- [rust-brotli](https://github.com/dropbox/rust-brotli) (Dropbox)\n- [zip](https://github.com/zip-rs/zip2)\n- Older versions: [Jamflux SUR](https://github.com/jamflux/SUR), busybox, payload-dumper-go\n\n## Links\n\n- [YouTube](https://www.youtube.com/c/wahyu6070)\n- [Telegram](https://t.me/wahyu6070group)\n",
+  "readmeHTML": "<h1>Jancox tool</h1>\n\n<p>Unpack and repack Android ROM zips on Android, Linux and Windows.</p>\n\n<p>Jancox is one <code>jancox</code> binary, written in Rust, with no dependencies. Unpacking and repacking need no root.</p>\n\n<li>Unpack a ROM zip into folders you can edit:</li>\n<p>  - recovery ROMs (<code>*.new.dat.br</code> / <code>*.new.dat</code> + <code>*.transfer.list</code>)</p>\n<p>  - fastboot ROMs such as Pixel factory images (<code><device>-<build>/image-*.zip</code>, flashed with <code>flash-all.sh</code>), or an <code>image-*.zip</code> on its own</p>\n<p>  - A/B OTA zips with <code>payload.bin</code> (full OTAs, or a bare <code>payload.bin</code>), repacked as a new signed OTA zip and/or a fastboot ROM</p>\n<p>  - ROMs with a <code>super.img</code> (raw or sparse): Xiaomi fastboot ROMs (<code><device>_images_<version>.tgz</code>) and zips</p>\n<li>ext4 and EROFS partitions.</li>\n<li>Repack the folders into a new ROM zip of the same kind.</li>\n<li>Keeps owners, permissions, SELinux labels and capabilities in metadata files, so it works on `/sdcard` and on Windows too.</li>\n<li>Grows full dynamic partitions and updates `dynamic_partitions_op_list`.</li>\n\n<p>Devices and ROMs it has been tested with: <a href=\"device_tested.md\">device_tested.md</a>.</p>\n\n<h2>Install</h2>\n\n<h3>Android (root: Magisk, KernelSU, APatch)</h3>\n\n<li>Download `Jancox-tool-android-v<version>.zip` from [Releases](https://github.com/wahyu6070/jancox/releases).</li>\n<li>Install it as a module in the Magisk / KernelSU / APatch app (or flash it in recovery), then reboot.</li>\n<li>Open a terminal app (e.g. Termux) and run `jancox --help`.</li>\n\n<p>The module installs <code>jancox</code> for your CPU into <code>/system/bin</code>, and also into Termux when Termux is installed.</p>\n\n<h3>Termux (no root)</h3>\n\n<pre>pkg install curl\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh</pre>\n\n<p><code>jancox</code> goes into <code>$PREFIX/bin</code>. To work on files in your internal storage, run <code>termux-setup-storage</code> once. The Termux home (<code>~</code>) is faster than <code>/sdcard</code> and keeps symlinks.</p>\n\n<h3>Ubuntu / Debian</h3>\n\n<pre>sudo apt install curl\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh</pre>\n\n<p><code>jancox</code> goes into <code>/usr/local/bin</code> (the script asks for your sudo password). It is a static binary, so it has no other dependencies.</p>\n\n<h3>Other Linux</h3>\n\n<p>The same one line works on any Linux with <code>curl</code> (or <code>wget</code>) and <code>sh</code>. Without sudo it installs into <code>~/.local/bin</code>. Options go after <code>sh -s --</code>:</p>\n\n<pre>curl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --version v3.0.1\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --dir ~/.local/bin\ncurl -fsSL https://raw.githubusercontent.com/wahyu6070/jancox/master/install.sh | sh -s -- --uninstall</pre>\n\n<p>You can also download <code>Jancox-tool-linux-<arch>-v<version>.zip</code>, extract it and run <code>./jancox</code> in that folder.</p>\n\n<h3>Windows</h3>\n\n<li>Download `Jancox-tool-windows-x86_64-v<version>.zip` (`arm64` for ARM PCs) from [Releases](https://github.com/wahyu6070/jancox/releases).</li>\n<li>Extract it to a folder you can write to, e.g. `D:\\jancox` (not `C:\\Program Files`).</li>\n<li>Open cmd or PowerShell in that folder and run `jancox --help`. It doesn't need administrator rights.</li>\n\n<p>If SmartScreen says \"Windows protected your PC\", click <b>More info → Run anyway</b> (the binary isn't signed). You can also right-click the zip → Properties → <b>Unblock</b> before extracting it.</p>\n\n<h2>Download</h2>\n\n<p>Get the zips from <a href=\"https://github.com/wahyu6070/jancox/releases\">Releases</a>.</p>\n\n<p>| File | What it is |</p>\n<p>|------|------------|</p>\n<p>| <code>Jancox-tool-android-v<version>.zip</code> | Magisk / recovery module. Installs <code>jancox</code> for the device's CPU (arm, arm64, x86, x86_64) into <code>/system/bin</code>, and into Termux when it is installed. |</p>\n<p>| <code>Jancox-tool-linux-<arch>-v<version>.zip</code> | <code>jancox</code> + empty <code>input/</code> and <code>output/</code>. Static binary, <code>arch</code> = <code>x86_64</code>, <code>arm64</code>, <code>x86</code>, <code>arm</code>. |</p>\n<p>| <code>Jancox-tool-windows-<arch>-v<version>.zip</code> | <code>jancox.exe</code> + empty <code>input/</code> and <code>output/</code>. <code>arch</code> = <code>x86_64</code>, <code>x86</code>, <code>arm64</code>. |</p>\n<p>| <code>jancox-<os>-<arch></code> | The plain binaries, used by <code>install.sh</code>. |</p>\n\n<h2>Usage</h2>\n\n<p><code>jancox</code> works in the folder you run it from (or the folder given with <code>-w</code>).</p>\n\n<li>`jancox init` makes `input/`, `output/` and `jancox.prop` (optional; `unpack` does it too when no ROM is found).</li>\n<li>Put the ROM in `input/`: a zip, `.tgz` / `.tar.gz`, `.tar` or a bare `payload.bin`, with any name. Without `input/`, `input.zip`, `input.tgz`, `input.tar.gz`, `input.tar` or `payload.bin` in the work folder are used.</li>\n<li>`jancox unpack`</li>\n<li>Edit the files in `partition/system/`, `partition/vendor/`, `partition/product/`, ...</li>\n<li>`jancox repack`. The new ROM is written to `output/NewROM-<date>.zip`.</li>\n<li>`jancox cleanup` removes the unpacked files. It keeps `input/`, `output/` and `jancox.prop` (`--all` also removes `output/`).</li>\n\n<p>After <code>unpack</code> the folder looks like this:</p>\n\n<pre>input/                               your ROM zip\noutput/                              new ROMs\njancox.prop                          settings (brotli.level, zip.level; default 1)\nrom/                                 the rest of the ROM (META-INF, boot.img, firmware, ...)\npartition/system/ vendor/ ...        partition files, edit these\npartition/config/&lt;part&gt;_fs_config    owner, group, mode, capabilities\npartition/config/&lt;part&gt;_file_contexts SELinux labels\npartition/config/&lt;part&gt;_symlinks     symlinks\npartition/config/&lt;part&gt;_info         filesystem parameters (size, UUID, ...)</pre>\n\n<li>Added files get default owners and modes (`0 0 0644`, or `0 2000 0755` in `bin/`) and the SELinux label of their folder. To change them, edit `partition/config/<part>_fs_config` and `<part>_file_contexts`.</li>\n<li>Deleted files are left out of the new image.</li>\n<li>Where the storage can't hold symlinks (`/sdcard`, Windows), `unpack` says so, and symlinks live only in `partition/config/<part>_symlinks`; `repack` puts them back. Remove a line there to delete a symlink. Working in a folder with symlink support (e.g. the Termux home `~`) shows them as real symlinks.</li>\n\n<h3>Fastboot ROMs (Pixel factory images)</h3>\n\n<p>Put the factory zip (e.g. <code>cubs-cd1a.260905.001.b1-factory-3bd92fff.zip</code> from <a href=\"https://developers.google.com/android/images\">developers.google.com/android/images</a>) in <code>input/</code> and run <code>jancox unpack</code> as usual.</p>\n\n<li>The logical partitions listed in `super_empty.img` (system, system_ext, product, vendor, system_dlkm, vendor_dlkm) go to `partition/`. They are read straight from the zip, so no temporary images are written.</li>\n<li>Everything else goes to `rom/<device>-<build>/`, and the files of `image-*.zip` go to `rom/<device>-<build>/image-<device>-<build>/`. Firmware images such as modem, radio and bootloader, plus `system_other.img`, are kept as they are.</li>\n<li>`jancox repack` rebuilds each partition with its original filesystem (EROFS on Pixels). It checks that they fit the super partition group, sets the disable-verity flags in `vbmeta.img`, and writes `output/NewROM-<date>.zip` with the same layout. Flash it with `flash-all.sh` / `flash-all.bat` on an unlocked device.</li>\n\n<h3>payload.bin ROMs (A/B OTA zips)</h3>\n\n<p>Full OTA zips with a <code>payload.bin</code> (e.g. ASUS, Xiaomi, OnePlus stock ROMs) unpack with <code>jancox unpack</code> as usual. Incremental OTAs are refused.</p>\n\n<li>The logical partitions (system, system_ext, product, vendor, odm, ...) go to `partition/`.</li>\n<li>The other images (boot, vendor_boot, dtbo, vbmeta, modem, bootloader, ...) go to `rom/payload/<name>.img`.</li>\n<li>Every image is checked against the SHA-256 in the payload.</li>\n\n<p>With <code>output.format=auto</code>, <code>jancox repack</code> makes what <code>payload.output</code> in <code>jancox.prop</code> says:</p>\n\n<p>| <code>payload.output</code> | Result |</p>\n<p>|---|---|</p>\n<p>| <code>payload</code> (default) | <code>output/NewROM-<date>.zip</code>: a new OTA zip with <code>payload.bin</code>. Flash it in a custom recovery (TWRP, OrangeFox, ...) or with <code>adb sideload</code>. |</p>\n<p>| <code>fastboot</code> | <code>output/NewROM-<date>.zip</code> with all images and <code>flash-all.sh</code> / <code>flash-all.bat</code>: firmware in the bootloader, the logical partitions in fastbootd. |</p>\n<p>| <code>both</code> | both zips (<code>NewROM-<date>.zip</code> and <code>NewROM-<date>-fastboot.zip</code>). |</p>\n\n<li>The logical partitions are rebuilt. An image in `rom/payload/` that you replaced (e.g. a patched `boot.img`) is encoded again. Unchanged images are copied from the old payload as they are.</li>\n<li>`vbmeta.img` gets the disable-verity/verification flags, so the device must be unlocked.</li>\n<li>`payload.bin` and the zip are signed with the AOSP test key. TWRP, OrangeFox and other test-keys recoveries accept it; stock recoveries only take the vendor's key. Set `sign.key` / `sign.cert` in `jancox.prop` to sign with your own key.</li>\n<li>`payload.xz_level` (0-9, default 1) sets the xz level of the rebuilt partitions: 6 makes a ~7% smaller zip but is about 4x slower.</li>\n<li>Images made with block sharing (`shared_blocks`, most Android 10+ ext4 images) are rebuilt with it, so they keep their size.</li>\n\n<p><code>jancox payload ota.zip -o images/</code> only dumps the images (like payload-dumper); <code>-p boot,vendor_boot</code> picks some, <code>-l</code> lists them.</p>\n\n<h3>Output format</h3>\n\n<p><code>output.format</code> in <code>jancox.prop</code> (or <code>repack -t</code>) picks what repack makes; a list like <code>sdat,fastboot</code> makes one zip each. Missing or <code>auto</code> means the same kind of ROM as the input.</p>\n\n<p>| Input \\ <code>output.format</code> | <code>auto</code> | <code>fastboot</code> | <code>sdat</code> | <code>payload</code> | <code>super</code> |</p>\n<p>|---|---|---|---|---|---|</p>\n<p>| Recovery ROM (<code>*.new.dat[.br]</code>) | recovery ROM | images + <code>flash-all.sh/.bat</code> | ✅ | ❌ | ❌ |</p>\n<p>| payload.bin ROM | <code>payload.output</code> | images + <code>flash-all.sh/.bat</code> | ❌ | ✅ | ❌ |</p>\n<p>| Pixel factory ROM | factory ROM | (it is one) | ❌ | ❌ | ❌ |</p>\n<p>| Xiaomi fastboot / super.img ROM | same archive | (it is one) | ❌ | ❌ | ✅ |</p>\n\n<p>A generated fastboot ROM flashes the firmware and boot images in the bootloader and the logical (dynamic) partitions in fastbootd. The ❌ cases are refused with the reason: a recovery ROM needs the original updater-script, a payload the manifest of an A/B OTA, a super.img the super metadata of the device.</p>\n\n<h3>Xiaomi fastboot ROMs (super.img)</h3>\n\n<p>Put the fastboot ROM (e.g. <code>munch_global_images_V14.0.6.0.TLMMIXM_..._13.0_global_418d21cc7e.tgz</code>) in <code>input/</code> and run <code>jancox unpack</code>.</p>\n\n<li>The archive is unpacked to `rom/`, except `images/super.img`: its ext4/EROFS partitions (slot a) go to `partition/`, its metadata and any other logical partition to `super/`. The sparse super.img is read in place, without a raw copy.</li>\n<li>`jancox repack` rebuilds the partitions, writes a new `super.img` with the same groups and size (sparse again), sets the disable-verity flags in `vbmeta.img`, and writes `output/NewROM-<date>.tgz` with the original files in their original order.</li>\n<li>Xiaomi's `flash_all.sh` flashes `images/crclist.txt` and `images/sparsecrclist.txt` first, and the bootloader refuses images that don't match them. Repack computes new lines for `super` and `vbmeta_ab` the way the ROM's own `flash_gen_crc_list.py` does.</li>\n<li>Flash with `flash_all.sh` / `flash_all.bat` on an unlocked device (they wipe data; `flash_all_except_storage` keeps it).</li>\n\n<p><code>jancox super super.img -o images/</code> only dumps the partitions of a super image (raw or sparse, like lpunpack); <code>-l</code> lists them.</p>\n\n<h3>Commands</h3>\n\n<pre>jancox init     [-w workdir]\njancox unpack   [rom] [-w workdir]                      zip / tgz / tar / payload.bin\njancox repack   [-w workdir] [-o out.zip] [-b brotli_quality] [-z zip_level] [-t auto|fastboot|sdat|payload|super,...]\njancox cleanup  [-w workdir] [--all]\n\njancox extract  &lt;image&gt; [-o outdir] [-p name]           ext4/EROFS image -&gt; folder + metadata\njancox payload  &lt;payload.bin|ota.zip&gt; [-o outdir] [-p name,...] [-l]  payload -&gt; images\njancox super    &lt;super.img&gt; [-o outdir] [-p name,...] [-l] [-s slot]   super.img -&gt; images\njancox build    &lt;workdir&gt; &lt;part&gt; [-o image] [-s size|auto]  folder + metadata -&gt; ext4/EROFS image\njancox sdat2img &lt;transfer_list&gt; &lt;new_dat[.br]&gt; [image]\njancox img2sdat &lt;image&gt; [-o outdir] [-v version] [-p prefix] [-b quality]\njancox brotli   [-d] [-q quality] [-w window] [-o output] &lt;file&gt;</pre>\n\n<p><code>repack</code> uses brotli quality 1 by default, which is fast but gives a bigger zip than most ROMs ship with. Set <code>brotli.level=6</code> or higher in <code>jancox.prop</code> (or pass <code>-b 6</code>) for a smaller zip.</p>\n\n<h2>Limitations</h2>\n\n<li>EROFS images are read with any compression (lz4, lzma, deflate, zstd). A compressed partition is rebuilt with lz4 (one-block clusters, like mkfs.erofs' default, readable by Android kernels since 5.4), whatever algorithm it had.</li>\n<li>Incremental OTAs (payload.bin patches) are refused.</li>\n<li>Older Xiaomi fastboot ROMs without `super.img` (separate `system.img`, ...) are not supported.</li>\n<li>A repacked partition no longer matches its dm-verity hashtree / AVB data, so the ROM only boots with verification disabled (as with older Jancox versions). For fastboot ROMs, repack sets the \"disable verity + verification\" flags in `vbmeta.img`; this needs an unlocked bootloader, and the first flash with these flags needs a data wipe (`flash-all.sh` wipes by default).</li>\n<li>Paths with spaces can't be stored in `fs_config` and get a warning.</li>\n<li>Hard links become separate files.</li>\n\n<h2>Build</h2>\n\n<p>You need <a href=\"https://rustup.rs\">Rust</a> 1.88 or newer.</p>\n\n<pre>cargo build --release          # target/release/jancox\n./build.sh                     # every release zip into dist/</pre>\n\n<p><code>build.sh</code> needs <a href=\"https://ziglang.org/download/\">zig</a> + <a href=\"https://github.com/rust-cross/cargo-zigbuild\">cargo-zigbuild</a> for Linux and Windows, the <a href=\"https://developer.android.com/ndk/downloads\">Android NDK</a> for Android (set <code>ANDROID_NDK_HOME</code> or extract it into <code>~/Android</code>), and <code>zip</code>.</p>\n\n<h2>Credits</h2>\n\n<li>[sdat2img-rust](https://github.com/wahyu6070/sdat2img-rust) and [img2sdat-rust](https://github.com/wahyu6070/img2sdat-rust), Rust ports of [xpirt/sdat2img](https://github.com/xpirt/sdat2img) and [xpirt/img2sdat](https://github.com/xpirt/img2sdat) (with AOSP `blockimgdiff.py`)</li>\n<li>[rust-brotli](https://github.com/dropbox/rust-brotli) (Dropbox)</li>\n<li>[zip](https://github.com/zip-rs/zip2)</li>\n<li>Older versions: [Jamflux SUR](https://github.com/jamflux/SUR), busybox, payload-dumper-go</li>\n\n<h2>Links</h2>\n\n<li>[YouTube](https://www.youtube.com/c/wahyu6070)</li>\n<li>[Telegram](https://t.me/wahyu6070group)</li>",
+  "homepageUrl": "https://github.com/Wahyu6070/Jancox-tool-android",
+  "sourceUrl": "https://github.com/Wahyu6070/Jancox-tool-android",
+  "url": "https://github.com/Wahyu6070/Jancox-tool-android",
+  "latestRelease": {
+    "name": "v3.0.1",
+    "version": "v3.0.1",
+    "time": "2026-09-30T07:03:02Z",
+    "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-linux-x86_64-v3.0.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0.1",
+      "tagName": "v3.0.1",
+      "publishedAt": "2026-09-30T07:03:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Jancox-tool-linux-x86_64-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-linux-x86_64-v3.0.1.zip",
+          "size": 1970177,
+          "downloadCount": 13
+        },
+        {
+          "name": "Jancox-tool-linux-arm64-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-linux-arm64-v3.0.1.zip",
+          "size": 1819238,
+          "downloadCount": 14
+        },
+        {
+          "name": "Jancox-tool-linux-x86-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-linux-x86-v3.0.1.zip",
+          "size": 2017533,
+          "downloadCount": 10
+        },
+        {
+          "name": "Jancox-tool-linux-arm-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-linux-arm-v3.0.1.zip",
+          "size": 1930674,
+          "downloadCount": 13
+        },
+        {
+          "name": "Jancox-tool-android-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-android-v3.0.1.zip",
+          "size": 7504456,
+          "downloadCount": 112
+        },
+        {
+          "name": "Jancox-tool-windows-arm64-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-windows-arm64-v3.0.1.zip",
+          "size": 1757664,
+          "downloadCount": 22
+        },
+        {
+          "name": "Jancox-tool-windows-x86-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-windows-x86-v3.0.1.zip",
+          "size": 2035416,
+          "downloadCount": 24
+        },
+        {
+          "name": "Jancox-tool-windows-x86_64-v3.0.1.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/Jancox-tool-windows-x86_64-v3.0.1.zip",
+          "size": 1918147,
+          "downloadCount": 62
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/SHA256SUMS",
+          "size": 1760,
+          "downloadCount": 35
+        },
+        {
+          "name": "jancox-android-arm",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-android-arm",
+          "size": 2948244,
+          "downloadCount": 19
+        },
+        {
+          "name": "jancox-android-arm64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-android-arm64",
+          "size": 3697120,
+          "downloadCount": 44
+        },
+        {
+          "name": "jancox-android-x86",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-android-x86",
+          "size": 4481648,
+          "downloadCount": 2
+        },
+        {
+          "name": "jancox-android-x86_64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-android-x86_64",
+          "size": 4352536,
+          "downloadCount": 15
+        },
+        {
+          "name": "jancox-linux-arm",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-linux-arm",
+          "size": 3923992,
+          "downloadCount": 4
+        },
+        {
+          "name": "jancox-linux-arm64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.1/jancox-linux-arm64",
+          "size": 3664568,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-09-25T12:08:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Jancox-tool-android-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-android-v3.0.0.zip",
+          "size": 4760922,
+          "downloadCount": 12
+        },
+        {
+          "name": "Jancox-tool-linux-arm-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-linux-arm-v3.0.0.zip",
+          "size": 1205312,
+          "downloadCount": 7
+        },
+        {
+          "name": "Jancox-tool-linux-x86-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-linux-x86-v3.0.0.zip",
+          "size": 1260295,
+          "downloadCount": 5
+        },
+        {
+          "name": "Jancox-tool-linux-x86_64-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-linux-x86_64-v3.0.0.zip",
+          "size": 1248807,
+          "downloadCount": 5
+        },
+        {
+          "name": "Jancox-tool-linux-arm64-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-linux-arm64-v3.0.0.zip",
+          "size": 1169083,
+          "downloadCount": 5
+        },
+        {
+          "name": "Jancox-tool-windows-arm64-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-windows-arm64-v3.0.0.zip",
+          "size": 1121926,
+          "downloadCount": 3
+        },
+        {
+          "name": "jancox-android-arm",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-android-arm",
+          "size": 1863700,
+          "downloadCount": 2
+        },
+        {
+          "name": "jancox-android-arm64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-android-arm64",
+          "size": 2269664,
+          "downloadCount": 7
+        },
+        {
+          "name": "Jancox-tool-windows-x86-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-windows-x86-v3.0.0.zip",
+          "size": 1260388,
+          "downloadCount": 1
+        },
+        {
+          "name": "Jancox-tool-windows-x86_64-v3.0.0.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/Jancox-tool-windows-x86_64-v3.0.0.zip",
+          "size": 1217385,
+          "downloadCount": 10
+        },
+        {
+          "name": "jancox-android-x86",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-android-x86",
+          "size": 2644536,
+          "downloadCount": 1
+        },
+        {
+          "name": "jancox-android-x86_64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-android-x86_64",
+          "size": 2618080,
+          "downloadCount": 2
+        },
+        {
+          "name": "jancox-linux-arm",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-linux-arm",
+          "size": 2338564,
+          "downloadCount": 1
+        },
+        {
+          "name": "jancox-linux-arm64",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-linux-arm64",
+          "size": 2253056,
+          "downloadCount": 1
+        },
+        {
+          "name": "jancox-linux-x86",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v3.0.0/jancox-linux-x86",
+          "size": 2475212,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "stable",
+      "tagName": "stable",
+      "publishedAt": "2025-02-09T03:44:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Jancox-tool-android-v2.5.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/stable/Jancox-tool-android-v2.5.zip",
+          "size": 11243365,
+          "downloadCount": 1352
+        }
+      ]
+    },
+    {
+      "name": "v4.4",
+      "tagName": "v4.4",
+      "publishedAt": "2025-01-30T17:19:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Jancox-tool-android-v2.4.zip",
+          "downloadUrl": "https://github.com/Wahyu6070/Jancox-tool-android/releases/download/v4.4/Jancox-tool-android-v2.4.zip",
+          "size": 3347311,
+          "downloadCount": 103
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

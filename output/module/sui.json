@@ -1,0 +1,72 @@
+{
+  "readme": "# Sui\n\nModern super user interface (SUI) implementation on Android. <del>The name, Sui, also comes from [a character](https://www.pixiv.net/artworks/71435059).</del>\n\n## Introduction\n\nSui provides Java APIs, [Shizuku API](https://github.com/RikkaApps/Shizuku-API), for root apps. It mainly provides the ability to use Android APIs directly (almost in Java as the identity of the root, and start app's own AIDL-style Java service under root. This will make root app development much more comfortable.\n\nAnother advantage is that Sui does not add binaries to `PATH` and does not install a manager app. This means we no longer need to spend a huge amount of time to fight with apps that detect them.\n\nTo be clear, the full implementation of \"root\" is far more than \"su\" itself, there is a lot of hard work to be done before. Sui is not a full root solution, it requires Magisk to run.\n\n<details>\n  <summary>Why \"su\" is unfriendly for app development</summary>\n\nThe \"su\", a \"shell\" runs as root, is too far from the Android world.\n\nTo explain this, we need to talk about how system API works. For example, we can use `PackageManager#getInstalledApplications` to get the app list. This is actually an interprocess communication (IPC) process of the app process and system server process, just the Android framework did the inner works for us. Android uses `Binder` to do this type of IPC. `Binder` allows the server-side to learn the uid and pid of the client-side so that the system server can check if the app has the permission to do the operation.\n\nBack to \"su\", there are commands provided by the Android system. In the same example, to get the app list with \"su\", we have to use `pm list`. This is too painful.\n\n1. Text-based, this means there is no structured data like `PackageInfo` in Java. You have to parse the output text.\n2. It is much slower because run a command means at least one new process is started. And `PackageManager#getInstalledApplications` is used inside `pm list`.\n3. The possibility is limited to how the command can do. The command only covers a little amount of Android APIs.\n\nAlthough it is possible to use Java APIs as root with `app_process` (there are libraries like libsu and librootjava), transfer binder between app process and root process is painful. If you want the root process to run as a daemon. When the app process restarts, it has no cheap way to get the binder of the root process.\n\nIn fact, for Magisk and other root solutions, makes the \"su\" to work is not that easy as some people think (let \"su\" itself work and the communication between the \"su\" and the manager app have a lot of unhappy work behind).\n\n</details>\n\n## User guide\n\nNote, the behavior of existing apps that only supports \"su\" will NOT change.\n\n### Install\n\nYou can download and install Sui from Magisk directly. Or, download the zip from [release](https://github.com/RikkaApps/Sui/releases/) and use \"Install from storage\" in Magisk.\n\n### Management UI\n\n- (Android 8.0+, Sui 12.1+) Long press system settings from the home app, you will find the shortcut of Sui\n- (Android 8.0+, Sui 12+) Enter \"Developer options\" in system settings, the system will ask you to add the shortcut of Sui\n- Enter `*#*#784784#*#*` in the default dialer app\n\nNote, the shortcut way requires your home app supports shortcut APIs that adds from Android 7.0 and 8.0. Unless you are using a old home app, you can the shortcut with no problem.\n\n### Interactive shell\n\nSui provides interactive shell.\n\nSince Sui does not add files to `PATH`, the files need to be copied manually. See `/data/adb/sui/post-install.example.sh` to learn how to do this automatically.\n\nAfter the files are correctly copied, use `rish` as 'sh'.\n\n## Application development guide\n\nhttps://github.com/RikkaApps/Shizuku-API\n\n## Build\n\nClone with `git clone --recurse-submodules`.\n\nGradle tasks:\n\n`Flavor` could be `Riru` and `Zygisk`, and `BuildType` could be `Debug` and `Release`.\n\n* `:module:assemble<Flavor><BuildType>`\n\n   Generate Magisk module zip to `out`.\n\n* `:module:push<Flavor><BuildType>`\n\n   Push the zip with adb to `/data/local/tmp`.\n\n* `:module:flash<Flavor><BuildType>`\n\n   Install the zip with `adb shell su -c magisk --install-module`.\n\n* `:module:flashAndReboot<Flavor><BuildType>`\n\n   Install the zip and reboot the device.\n\n## Internals\n\nSui requires [Magisk](https://github.com/topjohnwu/Magisk) (and [Riru](https://github.com/RikkaApps) for non-Zygisk version). Magisk allows us to run processes as uid 0 and a \"do anything\" SELinux context. Riru or Zygisk allows us to inject into system server process and app processes.\n\nIn short, there are four parts:\n\n- Root process\n\n  This is a root process started by Magisk. This process starts a Java server that implements Shizuku API and private APIs used by other parts.\n\n- SystemServer inject\n\n  - Hooks `Binder#execTransact` and finally allow us to handle an unused binder call\n  - Implements \"get binder\", \"set binder\" logic in that binder call, so that root process can send its binder to the system server, and the apps can acquire root process's binder\n\n- SystemUI inject\n\n  - Acquire the fd of our apk from the root server, create a `Resource` instance from it\n  - Show confirmation window with our `Resource` and `ClassLoader` when recevied callback from the root server\n\n- Settings inject\n\n  - Acquire the fd of our apk from the root server, create a `Resource` instance from it\n  - Publish shortcut which targets an existing `Acitivty` but with a special intent extra\n  - Replace `ActivityThread#mInstrumentation` to intervene the `Acitivty` instantiate process, if the intent has the speical extra, create our `Activity` which uses our `Resource` and `ClassLoader`\n",
+  "readmeHTML": "<h1>Sui</h1>\n\n<p>Modern super user interface (SUI) implementation on Android. <del>The name, Sui, also comes from <a href=\"https://www.pixiv.net/artworks/71435059\">a character</a>.</del></p>\n\n<h2>Introduction</h2>\n\n<p>Sui provides Java APIs, <a href=\"https://github.com/RikkaApps/Shizuku-API\">Shizuku API</a>, for root apps. It mainly provides the ability to use Android APIs directly (almost in Java as the identity of the root, and start app's own AIDL-style Java service under root. This will make root app development much more comfortable.</p>\n\n<p>Another advantage is that Sui does not add binaries to <code>PATH</code> and does not install a manager app. This means we no longer need to spend a huge amount of time to fight with apps that detect them.</p>\n\n<p>To be clear, the full implementation of \"root\" is far more than \"su\" itself, there is a lot of hard work to be done before. Sui is not a full root solution, it requires Magisk to run.</p>\n\n<p><details></p>\n<p>  <summary>Why \"su\" is unfriendly for app development</summary></p>\n\n<p>The \"su\", a \"shell\" runs as root, is too far from the Android world.</p>\n\n<p>To explain this, we need to talk about how system API works. For example, we can use <code>PackageManager#getInstalledApplications</code> to get the app list. This is actually an interprocess communication (IPC) process of the app process and system server process, just the Android framework did the inner works for us. Android uses <code>Binder</code> to do this type of IPC. <code>Binder</code> allows the server-side to learn the uid and pid of the client-side so that the system server can check if the app has the permission to do the operation.</p>\n\n<p>Back to \"su\", there are commands provided by the Android system. In the same example, to get the app list with \"su\", we have to use <code>pm list</code>. This is too painful.</p>\n\n<li>Text-based, this means there is no structured data like `PackageInfo` in Java. You have to parse the output text.</li>\n<li>It is much slower because run a command means at least one new process is started. And `PackageManager#getInstalledApplications` is used inside `pm list`.</li>\n<li>The possibility is limited to how the command can do. The command only covers a little amount of Android APIs.</li>\n\n<p>Although it is possible to use Java APIs as root with <code>app_process</code> (there are libraries like libsu and librootjava), transfer binder between app process and root process is painful. If you want the root process to run as a daemon. When the app process restarts, it has no cheap way to get the binder of the root process.</p>\n\n<p>In fact, for Magisk and other root solutions, makes the \"su\" to work is not that easy as some people think (let \"su\" itself work and the communication between the \"su\" and the manager app have a lot of unhappy work behind).</p>\n\n<p></details></p>\n\n<h2>User guide</h2>\n\n<p>Note, the behavior of existing apps that only supports \"su\" will NOT change.</p>\n\n<h3>Install</h3>\n\n<p>You can download and install Sui from Magisk directly. Or, download the zip from <a href=\"https://github.com/RikkaApps/Sui/releases/\">release</a> and use \"Install from storage\" in Magisk.</p>\n\n<h3>Management UI</h3>\n\n<li>(Android 8.0+, Sui 12.1+) Long press system settings from the home app, you will find the shortcut of Sui</li>\n<li>(Android 8.0+, Sui 12+) Enter \"Developer options\" in system settings, the system will ask you to add the shortcut of Sui</li>\n<li>Enter `*#*#784784#*#*` in the default dialer app</li>\n\n<p>Note, the shortcut way requires your home app supports shortcut APIs that adds from Android 7.0 and 8.0. Unless you are using a old home app, you can the shortcut with no problem.</p>\n\n<h3>Interactive shell</h3>\n\n<p>Sui provides interactive shell.</p>\n\n<p>Since Sui does not add files to <code>PATH</code>, the files need to be copied manually. See <code>/data/adb/sui/post-install.example.sh</code> to learn how to do this automatically.</p>\n\n<p>After the files are correctly copied, use <code>rish</code> as 'sh'.</p>\n\n<h2>Application development guide</h2>\n\n<p>https://github.com/RikkaApps/Shizuku-API</p>\n\n<h2>Build</h2>\n\n<p>Clone with <code>git clone --recurse-submodules</code>.</p>\n\n<p>Gradle tasks:</p>\n\n<p><code>Flavor</code> could be <code>Riru</code> and <code>Zygisk</code>, and <code>BuildType</code> could be <code>Debug</code> and <code>Release</code>.</p>\n\n<li>`:module:assemble<Flavor><BuildType>`</li>\n\n<p>   Generate Magisk module zip to <code>out</code>.</p>\n\n<li>`:module:push<Flavor><BuildType>`</li>\n\n<p>   Push the zip with adb to <code>/data/local/tmp</code>.</p>\n\n<li>`:module:flash<Flavor><BuildType>`</li>\n\n<p>   Install the zip with <code>adb shell su -c magisk --install-module</code>.</p>\n\n<li>`:module:flashAndReboot<Flavor><BuildType>`</li>\n\n<p>   Install the zip and reboot the device.</p>\n\n<h2>Internals</h2>\n\n<p>Sui requires <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a> (and <a href=\"https://github.com/RikkaApps\">Riru</a> for non-Zygisk version). Magisk allows us to run processes as uid 0 and a \"do anything\" SELinux context. Riru or Zygisk allows us to inject into system server process and app processes.</p>\n\n<p>In short, there are four parts:</p>\n\n<li>Root process</li>\n\n<p>  This is a root process started by Magisk. This process starts a Java server that implements Shizuku API and private APIs used by other parts.</p>\n\n<li>SystemServer inject</li>\n\n<p>  - Hooks <code>Binder#execTransact</code> and finally allow us to handle an unused binder call</p>\n<p>  - Implements \"get binder\", \"set binder\" logic in that binder call, so that root process can send its binder to the system server, and the apps can acquire root process's binder</p>\n\n<li>SystemUI inject</li>\n\n<p>  - Acquire the fd of our apk from the root server, create a <code>Resource</code> instance from it</p>\n<p>  - Show confirmation window with our <code>Resource</code> and <code>ClassLoader</code> when recevied callback from the root server</p>\n\n<li>Settings inject</li>\n\n<p>  - Acquire the fd of our apk from the root server, create a <code>Resource</code> instance from it</p>\n<p>  - Publish shortcut which targets an existing <code>Acitivty</code> but with a special intent extra</p>\n<p>  - Replace <code>ActivityThread#mInstrumentation</code> to intervene the <code>Acitivty</code> instantiate process, if the intent has the speical extra, create our <code>Activity</code> which uses our <code>Resource</code> and <code>ClassLoader</code></p>",
+  "homepageUrl": "https://github.com/RikkaApps/Sui",
+  "sourceUrl": "https://github.com/RikkaApps/Sui",
+  "url": "https://github.com/RikkaApps/Sui",
+  "latestRelease": {
+    "name": "v11.4.1",
+    "version": "v11.4.1",
+    "time": "2021-02-07T04:47:51Z",
+    "downloadUrl": "https://github.com/RikkaApps/Sui/releases/download/v11.4.1/riru-sui-v11.4.1-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v11.4.1",
+      "tagName": "v11.4.1",
+      "publishedAt": "2021-02-07T04:47:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-sui-v11.4.1-release.zip",
+          "downloadUrl": "https://github.com/RikkaApps/Sui/releases/download/v11.4.1/riru-sui-v11.4.1-release.zip",
+          "size": 318740,
+          "downloadCount": 415
+        }
+      ]
+    },
+    {
+      "name": "v11.4",
+      "tagName": "v11.4",
+      "publishedAt": "2021-01-26T09:15:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-sui-v11.4-release.zip",
+          "downloadUrl": "https://github.com/RikkaApps/Sui/releases/download/v11.4/riru-sui-v11.4-release.zip",
+          "size": 320338,
+          "downloadCount": 1678
+        }
+      ]
+    },
+    {
+      "name": "v11.3",
+      "tagName": "v11.3",
+      "publishedAt": "2021-01-18T18:15:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v11.2",
+      "tagName": "v11.2",
+      "publishedAt": "2021-01-17T15:01:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v11.1",
+      "tagName": "v11.1",
+      "publishedAt": "2021-01-15T16:39:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v11.0",
+      "tagName": "v11.0",
+      "publishedAt": "2021-01-15T10:58:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,136 @@
+{
+  "readme": "# KernelSU 短信转发模块 (SmsForwarder to WeChat)\n\n这是一个 KernelSU/Magisk 模块，通过安装一个系统应用，将已 Root 的 Android 设备收到的短信自动转发到微信（通过 PushPlus API）。\n\n## 核心功能\n- **自动转发**: 实时监听并秒级转发接收到的短信。\n- **微信推送**: 集成 PushPlus API，确保推送到微信。\n- **后台保活**: 包含前台服务通知，防止进程被杀。\n- **电量优化**: 自动申请忽略电池优化，并利用 Root 权限将应用加入系统白名单。\n- **ADB 调试**: 模块启动时自动开启 ADB 网络调试 (端口 5555)。\n- **开机自启**: 设备重启后自动启动服务。\n- **重试机制**: 使用 Android WorkManager，网络故障时自动进入重试队列。\n- **配置界面**: 提供简洁的 App 界面用于设置 PushPlus Token 和测试推送。\n\n## 环境要求\n- Android 8.0+ (SDK 26+)\n- 已安装 KernelSU 或 Magisk 的 Root 环境\n- 互联网连接\n\n## 安装说明\n1. 下载模块 ZIP 包（或自行编译，详见 [INSTALL.md](INSTALL.md)）。\n2. 打开 KernelSU 或 Magisk 管理器。\n3. 进入 \"模块\" -> \"从本地安装\"。\n4. 选择 ZIP 文件刷入。\n5. 重启手机。\n\n## 配置指南\n1. 重启后，在桌面上打开 \"SMS Forwarder\" 应用。\n2. 授予必要的权限（短信、通知）。\n3. 输入您的 PushPlus Token (获取地址: [http://www.pushplus.plus/](http://www.pushplus.plus/))。\n4. 点击 \"Save Configuration\" 保存。\n5. 开启 \"Enable Monitoring Service\" 开关。\n6. 点击 \"Test Push\" 测试是否能收到微信通知。\n7. 点击 \"Request Ignore Battery Optimization\" 确保应用不会被系统休眠。\n\n## 常见问题\n- 如果无法发送，请查看 App 内的 \"Last Log\"。\n- 确保通知栏中有 \"Monitoring SMS...\" 的常驻通知。\n- 检查网络连接是否正常。\n",
+  "readmeHTML": "<h1>KernelSU 短信转发模块 (SmsForwarder to WeChat)</h1>\n\n<p>这是一个 KernelSU/Magisk 模块，通过安装一个系统应用，将已 Root 的 Android 设备收到的短信自动转发到微信（通过 PushPlus API）。</p>\n\n<h2>核心功能</h2>\n<li>**自动转发**: 实时监听并秒级转发接收到的短信。</li>\n<li>**微信推送**: 集成 PushPlus API，确保推送到微信。</li>\n<li>**后台保活**: 包含前台服务通知，防止进程被杀。</li>\n<li>**电量优化**: 自动申请忽略电池优化，并利用 Root 权限将应用加入系统白名单。</li>\n<li>**ADB 调试**: 模块启动时自动开启 ADB 网络调试 (端口 5555)。</li>\n<li>**开机自启**: 设备重启后自动启动服务。</li>\n<li>**重试机制**: 使用 Android WorkManager，网络故障时自动进入重试队列。</li>\n<li>**配置界面**: 提供简洁的 App 界面用于设置 PushPlus Token 和测试推送。</li>\n\n<h2>环境要求</h2>\n<li>Android 8.0+ (SDK 26+)</li>\n<li>已安装 KernelSU 或 Magisk 的 Root 环境</li>\n<li>互联网连接</li>\n\n<h2>安装说明</h2>\n<li>下载模块 ZIP 包（或自行编译，详见 [INSTALL.md](INSTALL.md)）。</li>\n<li>打开 KernelSU 或 Magisk 管理器。</li>\n<li>进入 \"模块\" -> \"从本地安装\"。</li>\n<li>选择 ZIP 文件刷入。</li>\n<li>重启手机。</li>\n\n<h2>配置指南</h2>\n<li>重启后，在桌面上打开 \"SMS Forwarder\" 应用。</li>\n<li>授予必要的权限（短信、通知）。</li>\n<li>输入您的 PushPlus Token (获取地址: [http://www.pushplus.plus/](http://www.pushplus.plus/))。</li>\n<li>点击 \"Save Configuration\" 保存。</li>\n<li>开启 \"Enable Monitoring Service\" 开关。</li>\n<li>点击 \"Test Push\" 测试是否能收到微信通知。</li>\n<li>点击 \"Request Ignore Battery Optimization\" 确保应用不会被系统休眠。</li>\n\n<h2>常见问题</h2>\n<li>如果无法发送，请查看 App 内的 \"Last Log\"。</li>\n<li>确保通知栏中有 \"Monitoring SMS...\" 的常驻通知。</li>\n<li>检查网络连接是否正常。</li>",
+  "homepageUrl": "https://github.com/HHXXYY123/SmsForwarderModule",
+  "sourceUrl": "https://github.com/HHXXYY123/SmsForwarderModule",
+  "url": "https://github.com/HHXXYY123/SmsForwarderModule",
+  "latestRelease": {
+    "name": "v1.0.0-12",
+    "version": "v1.0.0-12",
+    "time": "2026-03-19T05:28:27Z",
+    "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-12/SmsForwarderModule.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0-12",
+      "tagName": "v1.0.0-12",
+      "publishedAt": "2026-03-19T05:28:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-12/app-debug.apk",
+          "size": 6799061,
+          "downloadCount": 0
+        },
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-12/SmsForwarderModule.zip",
+          "size": 5807219,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-11",
+      "tagName": "v1.0.0-11",
+      "publishedAt": "2026-03-18T06:52:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-11/app-debug.apk",
+          "size": 6795777,
+          "downloadCount": 0
+        },
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-11/SmsForwarderModule.zip",
+          "size": 5804598,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-9",
+      "tagName": "v1.0.0-9",
+      "publishedAt": "2026-03-15T07:10:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-9/app-debug.apk",
+          "size": 6795777,
+          "downloadCount": 0
+        },
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-9/SmsForwarderModule.zip",
+          "size": 5804559,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-8",
+      "tagName": "v1.0.0-8",
+      "publishedAt": "2026-03-15T07:02:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-8/app-debug.apk",
+          "size": 6795605,
+          "downloadCount": 0
+        },
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-8/SmsForwarderModule.zip",
+          "size": 5804455,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-7",
+      "tagName": "v1.0.0-7",
+      "publishedAt": "2026-03-15T06:39:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-7/SmsForwarderModule.zip",
+          "size": 5804129,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-7/app-debug.apk",
+          "size": 6795129,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-10",
+      "tagName": "v1.0.0-10",
+      "publishedAt": "2026-03-15T07:19:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmsForwarderModule.zip",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-10/SmsForwarderModule.zip",
+          "size": 5804540,
+          "downloadCount": 2
+        },
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/HHXXYY123/SmsForwarderModule/releases/download/v1.0.0-10/app-debug.apk",
+          "size": 6795777,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

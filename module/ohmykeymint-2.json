@@ -1,0 +1,136 @@
+{
+  "readme": "# Oh My Keymint\n\n[![Telegram](https://img.shields.io/static/v1?label=Telegram&message=@OhMyKeymint&color=0088cc)](https://t.me/OhMyKeymint)  [![CI Build](https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml/badge.svg)](https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml)\n\nCustom keystore implementation for Android Keystore Spoofer\n\n## What is this?\n\nThis is a complete implementation of the keystore, which fully implements the AOSP AIDL interface, referencing the official AOSP implementation.\n\nIn theory, this would make it harder for detectors to identify behavior inconsistent with AOSP, thus achieving greater stealth than the FOSS branch of TrickyStore or other TrickyStore-based module like TEESimulator.\n\n## Install and configure\n\n**Android 12 or above required.**\n\n1. Install this module.\n\n2. [Configure OMK](docs/CONFIGURATION.md) if needed.\n\n3. Replace template keybox.xml (if you need)\n\nThe keybox file should be a **valid** XML file with at least the EC chain; when no RSA entry is present, attestation for RSA keys is signed with the EC key and its certificate chain. There should be no extra content in it like watermark or invisible characters.\n\nThe active files are `/data/misc/keystore/omk/config.toml` and\n`/data/misc/keystore/omk/injector.toml`. Read the\n[Configuration Guide](docs/CONFIGURATION.md) for complete annotated examples,\nfield-by-field explanations, safety notes, and restart requirements.\n\n## Restarting keymint and injector\n\nThe module ships two background daemons: one for `keymint`, one for `injector`.\nYou can restart them by following commands.\n\n```sh\ntouch /data/adb/omk/restart.keymint\ntouch /data/adb/omk/restart.injector\ntouch /data/adb/omk/restart.all\n```\n\nSee the [Configuration Guide](docs/CONFIGURATION.md#how-changes-are-loaded) for\nwhich changes need a component restart or a full device reboot.\n\n## License\n\n**YOU MUST AGREE TO BOTH OF THE LICENSE BEFORE USING THIS SOFTWARE.**\n\n`General License Agreement`\n\n```plaintext\nOhMyKeymint - Custom keymint implementation for Android Keystore Spoofer\nCopyright (C) 2026 James Clef <qwq233@qwq2333.top>\n\nThis program is open source software: you can redistribute it and/or \nmodify it under the terms of the General License Agreement as\npublished by James Clef, either version 4 of the\nLicense, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGeneral License Agreement for more details.\n\nYou should have received a copy of the General License Agreement\nalong with this program.  If not, see <https://github.com/qwq233/license/>.\n```\n\n`Oh My Keymint License`\n\n```plaintext\n1. 除经本软件作者书面许可外，不得将本软件名称或与其近似的名称用于修改版、衍生作\n   品或相关服务的命名、宣传；法律允许的指名性使用除外。本软件的修改版或衍生作品\n   如与本软件存在明显区别，须使用其他名称。例如，包含不属于本软件原版的功能或附\n   属资源，或使用本软件名称可能导致公众误认为该修改版由原项目作者发布、认可或存\n   在关联，即属于此类情形。上述作品须保留本软件的著作权声明、作者署名及许可证文\n   件并以显著方式标注该作品为本软件的衍生作品，且不得暗示本软件作者对其承担任何\n   责任。即使不属于上述须更名情形的修改版或衍生作品，本软件作者认为有必要时，仍\n   有权要求其更名。\n\n2. 除非您所在的司法管辖区的适用法律另行规定，您同意将纠纷或争议提交至中国大陆境\n   内有管辖权的人民法院管辖。\n\n3. 本协议与General License Agreement共同发挥效力。\n```\n\n## Credit\n\nSome code from [AOSP](https://source.android.com/)\n\nLicense: `Apache-2.0`\n\n```plaintext\nCopyright 2022, The Android Open Source Project\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n```\n",
+  "readmeHTML": "<h1>Oh My Keymint</h1>\n\n<p><a href=\"https://img.shields.io/static/v1?label=Telegram&message=@OhMyKeymint&color=0088cc\">![Telegram</a>](https://t.me/OhMyKeymint)  <a href=\"https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml/badge.svg\">![CI Build</a>](https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml)</p>\n\n<p>Custom keystore implementation for Android Keystore Spoofer</p>\n\n<h2>What is this?</h2>\n\n<p>This is a complete implementation of the keystore, which fully implements the AOSP AIDL interface, referencing the official AOSP implementation.</p>\n\n<p>In theory, this would make it harder for detectors to identify behavior inconsistent with AOSP, thus achieving greater stealth than the FOSS branch of TrickyStore or other TrickyStore-based module like TEESimulator.</p>\n\n<h2>Install and configure</h2>\n\n<p><b>Android 12 or above required.</b></p>\n\n<li>Install this module.</li>\n\n<li>[Configure OMK](docs/CONFIGURATION.md) if needed.</li>\n\n<li>Replace template keybox.xml (if you need)</li>\n\n<p>The keybox file should be a <b>valid</b> XML file with at least the EC chain; when no RSA entry is present, attestation for RSA keys is signed with the EC key and its certificate chain. There should be no extra content in it like watermark or invisible characters.</p>\n\n<p>The active files are <code>/data/misc/keystore/omk/config.toml</code> and</p>\n<p><code>/data/misc/keystore/omk/injector.toml</code>. Read the</p>\n<p><a href=\"docs/CONFIGURATION.md\">Configuration Guide</a> for complete annotated examples,</p>\n<p>field-by-field explanations, safety notes, and restart requirements.</p>\n\n<h2>Restarting keymint and injector</h2>\n\n<p>The module ships two background daemons: one for <code>keymint</code>, one for <code>injector</code>.</p>\n<p>You can restart them by following commands.</p>\n\n<pre>touch /data/adb/omk/restart.keymint\ntouch /data/adb/omk/restart.injector\ntouch /data/adb/omk/restart.all</pre>\n\n<p>See the <a href=\"docs/CONFIGURATION.md#how-changes-are-loaded\">Configuration Guide</a> for</p>\n<p>which changes need a component restart or a full device reboot.</p>\n\n<h2>License</h2>\n\n<p><b>YOU MUST AGREE TO BOTH OF THE LICENSE BEFORE USING THIS SOFTWARE.</b></p>\n\n<p><code>General License Agreement</code></p>\n\n<pre>OhMyKeymint - Custom keymint implementation for Android Keystore Spoofer\nCopyright (C) 2026 James Clef &lt;qwq233@qwq2333.top&gt;\n\nThis program is open source software: you can redistribute it and/or\nmodify it under the terms of the General License Agreement as\npublished by James Clef, either version 4 of the\nLicense, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGeneral License Agreement for more details.\n\nYou should have received a copy of the General License Agreement\nalong with this program.  If not, see &lt;https://github.com/qwq233/license/&gt;.</pre>\n\n<p><code>Oh My Keymint License</code></p>\n\n<pre>1. 除经本软件作者书面许可外，不得将本软件名称或与其近似的名称用于修改版、衍生作\n   品或相关服务的命名、宣传；法律允许的指名性使用除外。本软件的修改版或衍生作品\n   如与本软件存在明显区别，须使用其他名称。例如，包含不属于本软件原版的功能或附\n   属资源，或使用本软件名称可能导致公众误认为该修改版由原项目作者发布、认可或存\n   在关联，即属于此类情形。上述作品须保留本软件的著作权声明、作者署名及许可证文\n   件并以显著方式标注该作品为本软件的衍生作品，且不得暗示本软件作者对其承担任何\n   责任。即使不属于上述须更名情形的修改版或衍生作品，本软件作者认为有必要时，仍\n   有权要求其更名。\n\n2. 除非您所在的司法管辖区的适用法律另行规定，您同意将纠纷或争议提交至中国大陆境\n   内有管辖权的人民法院管辖。\n\n3. 本协议与General License Agreement共同发挥效力。</pre>\n\n<h2>Credit</h2>\n\n<p>Some code from <a href=\"https://source.android.com/\">AOSP</a></p>\n\n<p>License: <code>Apache-2.0</code></p>\n\n<pre>Copyright 2022, The Android Open Source Project\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.</pre>",
+  "homepageUrl": "https://github.com/qwq233/OhMyKeymint",
+  "sourceUrl": "https://github.com/qwq233/OhMyKeymint",
+  "url": "https://github.com/qwq233/OhMyKeymint",
+  "latestRelease": {
+    "name": "v1.2.0-67dc5e7",
+    "version": "v1.2.0-67dc5e7",
+    "time": "2026-06-16T20:28:47Z",
+    "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.2.0-67dc5e7/OhMyKeymint-release-arm64-v8a-1.2.0-67dc5e7.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0-67dc5e7",
+      "tagName": "v1.2.0-67dc5e7",
+      "publishedAt": "2026-06-16T20:28:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-arm64-v8a-1.2.0-67dc5e7.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.2.0-67dc5e7/OhMyKeymint-release-arm64-v8a-1.2.0-67dc5e7.zip",
+          "size": 3605406,
+          "downloadCount": 5601
+        },
+        {
+          "name": "OhMyKeymint-debug-arm64-v8a-1.2.0-67dc5e7.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.2.0-67dc5e7/OhMyKeymint-debug-arm64-v8a-1.2.0-67dc5e7.zip",
+          "size": 10575896,
+          "downloadCount": 3070
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1-ef38a44",
+      "tagName": "v1.1.1-ef38a44",
+      "publishedAt": "2026-05-25T12:19:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-arm64-v8a-1.1.1-ef38a44.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.1.1-ef38a44/OhMyKeymint-release-arm64-v8a-1.1.1-ef38a44.zip",
+          "size": 3425821,
+          "downloadCount": 422
+        },
+        {
+          "name": "OhMyKeymint-debug-arm64-v8a-1.1.1-ef38a44.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.1.1-ef38a44/OhMyKeymint-debug-arm64-v8a-1.1.1-ef38a44.zip",
+          "size": 16285947,
+          "downloadCount": 98
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0-424f7b9",
+      "tagName": "v1.1.0-424f7b9",
+      "publishedAt": "2026-05-23T13:22:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-arm64-v8a-1.1.0-424f7b9.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.1.0-424f7b9/OhMyKeymint-release-arm64-v8a-1.1.0-424f7b9.zip",
+          "size": 3421977,
+          "downloadCount": 26
+        },
+        {
+          "name": "OhMyKeymint-debug-arm64-v8a-1.1.0-424f7b9.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.1.0-424f7b9/OhMyKeymint-debug-arm64-v8a-1.1.0-424f7b9.zip",
+          "size": 14877967,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-e9fecf0",
+      "tagName": "v1.0.0-e9fecf0",
+      "publishedAt": "2026-05-06T16:37:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-arm64-v8a-1.0.0-e9fecf0.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.0.0-e9fecf0/OhMyKeymint-release-arm64-v8a-1.0.0-e9fecf0.zip",
+          "size": 3295435,
+          "downloadCount": 23
+        },
+        {
+          "name": "OhMyKeymint-debug-arm64-v8a-1.0.0-e9fecf0.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v1.0.0-e9fecf0/OhMyKeymint-debug-arm64-v8a-1.0.0-e9fecf0.zip",
+          "size": 14351664,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v0.1.2-e5ac4d6",
+      "tagName": "v0.1.2-e5ac4d6",
+      "publishedAt": "2025-11-14T16:05:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-0.1.2-e5ac4d6.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v0.1.2-e5ac4d6/OhMyKeymint-release-0.1.2-e5ac4d6.zip",
+          "size": 2492023,
+          "downloadCount": 46
+        },
+        {
+          "name": "OhMyKeymint-debug-0.1.2-e5ac4d6.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v0.1.2-e5ac4d6/OhMyKeymint-debug-0.1.2-e5ac4d6.zip",
+          "size": 6653972,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1-7e79397",
+      "tagName": "v0.1.1-7e79397",
+      "publishedAt": "2025-10-24T15:31:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-0.1.1-7e79397.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v0.1.1-7e79397/OhMyKeymint-release-0.1.1-7e79397.zip",
+          "size": 2516473,
+          "downloadCount": 34
+        },
+        {
+          "name": "OhMyKeymint-debug-0.1.1-7e79397.zip",
+          "downloadUrl": "https://github.com/qwq233/OhMyKeymint/releases/download/v0.1.1-7e79397/OhMyKeymint-debug-0.1.1-7e79397.zip",
+          "size": 6682448,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

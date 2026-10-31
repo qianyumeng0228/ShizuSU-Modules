@@ -1,0 +1,130 @@
+{
+  "readme": "# **LMKD PSI Activator** 🚀💾\n\n**A Magisk module to supercharge RAM management** by activating **PSI mode in LMKD**, offering a **faster, more stable, and more efficient** alternative to outdated `minfree_levels`-based memory management.\n\n---\n\n> [!CAUTION]\n> **MIUI USER**. This module may cause MIUI to aggressively kill apps like **VPNs**.  \n> **Fix:** Install the [NoSwipeToKill](https://github.com/dantmnf/NoSwipeToKill) LSPosed module by [dantmnf](https://github.com/dantmnf).\n\n---\n\n>[!NOTE]\n>I use SWAP and ZRAM term interchangeably in this module.\n\n---\n\n## **✨ Features**\n\n### **🧬 Kernel Support Required**\n\n- **🗑️ UFFD Garbage Collection** – Activates **Userfaultfd (UFFD) garbage collection**, optimizing memory management and reducing swap-related overhead.\n- **🔄 ZRAM Deduplication** – Enables **data deduplication in ZRAM** (if supported by kernel). **Deduplicate** ZRAM data to reduce amount of memory consumption.\n\n### **No Kernel Support Required**\n\n- **🚀 Multi-ZRAM Support** – Dynamically manages **multiple ZRAM partitions** for better memory management.\n- **📂 Swap Creation & Removal** – Manage swap **on demand** via `action.sh` (max swap = RAM size).\n- 📈 **Incremental Dynamic Swap** – Expands swap space progressively based on real-time system pressure.\n- ⚡ **Migrated to C++** – Rewritten in C++ for faster execution, lower CPU utilization, and improved overall system stability compared to older implementations.\n- **🔄 Advanced Dynamic Swappiness** – Adjusts `swappiness` **in real-time** depending on memory pressure, ensuring an optimal balance between performance and multitask.\n- **🛠️ LMKD PSI Optimizations** – Fine-tuned **Low Memory Killer Daemon (LMKD) PSI parameters**, improving low-memory handling and responsiveness based on real-world testing.\n- **📝 YAML-Based Configuration** – **Customizable** settings via `config.yaml`.\n- **📊 Memory Pressure Monitoring** – **Reports live RAM pressure** through Magisk.\n\n---\n\n## **🔧 Configuration**\n\n- Configurable via a **YAML file**:\n\n  ```markdown\n  Internal storage → Android/fmiop/config.yaml\n  ```\n\n### **📜 Example config.yaml**\n\n```yaml\nconfig_version: 1.4\ndynamic_swappiness:\n  enable: true # Wether to enable dynamic swappiness or not\n  threshold_type: \"psi\" # \"psi\" or \"legacy\".\n  swappiness_range:\n    max: 140\n    min: 40\n  threshold_psi:\n    mode: \"auto\" # \"auto\" or \"manual\"\n    # Max and min sparsed into [40 57 73 90 107 123 140] for 6 levels\n    # 6 levels would be [40 57 73 90 107 123 140]\n    levels: 6\n    # Each of auto settings below control swappiness sensitivity\n    # higher range from min to max means less sensitive, careful low range could lead to oscilations\n    # which could lead to system instability\n    auto_cpu:\n      max: 80\n      min: 0\n      time_window: \"avg60\" # Choose between: avg10, avg60, avg300. Smaller means more sensitive\n    auto_memory:\n      max: 20\n      min: 0\n      time_window: \"avg60\"\n    auto_io:\n      max: 25\n      min: 0\n      time_window: \"avg60\"\n    # Pairs of pressure values and their corresponding swappiness values\n    # Choose the highest value any pressure reached\n    # Default to if higher pressure then lower swappiness\n    cpu_pressure: [[5, 120], [10, 100], [20, 80], [60, 60], [100, 40]]\n    memory_pressure: [[5, 120], [10, 100], [15, 90], [20, 60], [25, 40]]\n    io_pressure: [[10, 120], [15, 100], [25, 60], [30, 40]]\n  # Percentage of memory usage to activate swappiness\n  # Lower memory pressure values means higher memory pressure\n  # which is confusing, ask google why.\n  threshold_mem_pressure: [[60, 80], [50, 60], [40, 40]]\nvirtual_memory:\n  enable: true # Wether to enable dynamic zram or not\n  pressure_binding: false # True means only activate zram when pressure is high\n  # Wether to deactivate zram when system is in sleep or immediately\n  deactivate_in_sleep: true\n  wait_timeout: 600 # Time in seconds to wait before deactivating zram, default to 10 minutes.\n  zram:\n    # Percentage of ZRAM usage to activate next zram\n    activation_threshold: 80\n    # Minimum size in MB of used swap to deactivate zram\n    deactivation_threshold: 55\n  swap:\n    activation_threshold: 90\n    deactivation_threshold: 40\n```\n\n---\n\n## **📖 Explanation of Key Settings**\n\n### **🧠 What You Wanna Use**\n\n- **swappiness_range**: To control multitasking performance, also performance during high pressure. Low min will kill more apps which should improve performance. Lower min → more aggressive app killing = faster.\n  - **enable**: If you have issue with dynamic swappiness you can turn it off.\n- **threshold_psi**: Control dynamic swappiness sensitivity—higher values = less sensitive changes.\n  - **auto_cpu**: This is more influential, changes a lot, control sensitivity of dynamic swappiness based on cpu presure, the idea is _when high cpu pressure we should decrease swapping to improve performance_, I never really test it but here is the module.\n\n### **🌀 Dynamic Swappiness**\n\n- **swappiness_range** – Controls swap limit:\n  - **Min** – (e.g, 40). - Use less ZRAM/SWAP, kill more apps, improve performance.\n  - **High (e.g., 140)** – Move memory to ZRAM/SWAP, improve multitasking. Lower this if your phone get laggy.\n- **threshold_psi** – Threshold to adjusts swappiness based on system pressure:\n  - **mode**\n    - **auto**: `auto` will generate swappiness levels between your min and max. Like [40 60 80 100 120] for 4 levels between 40 and 120 swappiness, the program will automatically choose which swappiness to use based on system pressures.\n    - **auto_cpu and else**: Sensitivity for each hardware pressure.\n      - **time_window**: Pick between `avg10`, `avg60`, `avg300`. Smaller = more sensitive, so far avg60 is a nice spot.\n  - **cpu_pressure and else**: Manual configuration for each pressure range. It's a pair in `[pressure, swappiness]`, if the pressure reached then use that swappiness.\n\n### **🗃️ Virtual Memory (VM) Optimization**\n\n- **enable** – Enables VM optimizations (**recommended** for multitasking).\n- ~~**pressure_binding** – Activates swap **only under pressure** (⚠️ experimental). **This function is broken**.~~\n- **deactivate_in_sleep** – Only deactivate in sleep to be more **battery** friendly.\n- **zram**: Handles **incremental ZRAM management**\n  - **activation_threshold**: Percentage of ZRAM usage to activate next zram\n  - **deactivation_threshold**: Minimum size in MB of used swap to deactivate zram. The default is 55MB, deactivating ZRAM when high usage can increase cpu usage. It's why only deactivate in sleep, the program also deactivate swap automatically when usage only 10MB.\n- **swap**: You get it, its same as above except this one for SWAP.\n\n---\n\n## **📂 Source Code & Contributions**\n\n💻 **View full source code & contribute:**  \n🔗 [**LMKD-PSI-Activator Repository**](https://github.com/lululoid/LMKD-PSI-Activator)\n\n---\n\n## **🛠️ TODO**\n\n- [ ] **MIUI Fix** – Install [NoSwipeToKill](https://github.com/dantmnf/NoSwipeToKill) by [dantmnf](https://github.com/dantmnf) for better compatibility.\n\n---\n\n### **🚀 TL;DR – What This Module Does:**\n\n✔️ **Boosts RAM performance** 🔥  \n✔️ **Smarter ZRAM & swap handling** 📈  \n✔️ **Dynamic memory tuning** 🧠  \n✔️ **C++ powered speed & efficiency** ⚡\n⚙️ **Tuning example** ⇒ [Performance tuning](https://github.com/lululoid/LMKD-PSI-Activator/blob/main/tuning_example.md)\n\n### Want to see how the module works?\n\nTry opening a bunch of apps or gaming while opening other apps then use this command on termux:\n\n```shell\nsudo logcat -s fmiop -v brief\n```\n\nOr on your computer(Make sure your developer mode active, and you authorized your computer):\n\n```shell\nadb logcat -s fmiop -v brief\n```\n\nOr just check log in:\n\n``` markdown\n Internal storage → Android/fmiop/archives\n```\n",
+  "readmeHTML": "<h1>**LMKD PSI Activator** 🚀💾</h1>\n\n<p><b>A Magisk module to supercharge RAM management</b> by activating <b>PSI mode in LMKD</b>, offering a <b>faster, more stable, and more efficient</b> alternative to outdated <code>minfree_levels</code>-based memory management.</p>\n\n<p>---</p>\n\n<p>> [!CAUTION]</p>\n<p>> <b>MIUI USER</b>. This module may cause MIUI to aggressively kill apps like <b>VPNs</b>.</p>\n<p>> <b>Fix:</b> Install the <a href=\"https://github.com/dantmnf/NoSwipeToKill\">NoSwipeToKill</a> LSPosed module by <a href=\"https://github.com/dantmnf\">dantmnf</a>.</p>\n\n<p>---</p>\n\n<p>>[!NOTE]</p>\n<p>>I use SWAP and ZRAM term interchangeably in this module.</p>\n\n<p>---</p>\n\n<h2>**✨ Features**</h2>\n\n<h3>**🧬 Kernel Support Required**</h3>\n\n<li>**🗑️ UFFD Garbage Collection** – Activates **Userfaultfd (UFFD) garbage collection**, optimizing memory management and reducing swap-related overhead.</li>\n<li>**🔄 ZRAM Deduplication** – Enables **data deduplication in ZRAM** (if supported by kernel). **Deduplicate** ZRAM data to reduce amount of memory consumption.</li>\n\n<h3>**No Kernel Support Required**</h3>\n\n<li>**🚀 Multi-ZRAM Support** – Dynamically manages **multiple ZRAM partitions** for better memory management.</li>\n<li>**📂 Swap Creation & Removal** – Manage swap **on demand** via `action.sh` (max swap = RAM size).</li>\n<li>📈 **Incremental Dynamic Swap** – Expands swap space progressively based on real-time system pressure.</li>\n<li>⚡ **Migrated to C++** – Rewritten in C++ for faster execution, lower CPU utilization, and improved overall system stability compared to older implementations.</li>\n<li>**🔄 Advanced Dynamic Swappiness** – Adjusts `swappiness` **in real-time** depending on memory pressure, ensuring an optimal balance between performance and multitask.</li>\n<li>**🛠️ LMKD PSI Optimizations** – Fine-tuned **Low Memory Killer Daemon (LMKD) PSI parameters**, improving low-memory handling and responsiveness based on real-world testing.</li>\n<li>**📝 YAML-Based Configuration** – **Customizable** settings via `config.yaml`.</li>\n<li>**📊 Memory Pressure Monitoring** – **Reports live RAM pressure** through Magisk.</li>\n\n<p>---</p>\n\n<h2>**🔧 Configuration**</h2>\n\n<li>Configurable via a **YAML file**:</li>\n\n<p>  ```markdown</p>\n<p>  Internal storage → Android/fmiop/config.yaml</p>\n<p>  ```</p>\n\n<h3>**📜 Example config.yaml**</h3>\n\n<pre>config_version: 1.4\ndynamic_swappiness:\n  enable: true # Wether to enable dynamic swappiness or not\n  threshold_type: \"psi\" # \"psi\" or \"legacy\".\n  swappiness_range:\n    max: 140\n    min: 40\n  threshold_psi:\n    mode: \"auto\" # \"auto\" or \"manual\"\n    # Max and min sparsed into [40 57 73 90 107 123 140] for 6 levels\n    # 6 levels would be [40 57 73 90 107 123 140]\n    levels: 6\n    # Each of auto settings below control swappiness sensitivity\n    # higher range from min to max means less sensitive, careful low range could lead to oscilations\n    # which could lead to system instability\n    auto_cpu:\n      max: 80\n      min: 0\n      time_window: \"avg60\" # Choose between: avg10, avg60, avg300. Smaller means more sensitive\n    auto_memory:\n      max: 20\n      min: 0\n      time_window: \"avg60\"\n    auto_io:\n      max: 25\n      min: 0\n      time_window: \"avg60\"\n    # Pairs of pressure values and their corresponding swappiness values\n    # Choose the highest value any pressure reached\n    # Default to if higher pressure then lower swappiness\n    cpu_pressure: [[5, 120], [10, 100], [20, 80], [60, 60], [100, 40]]\n    memory_pressure: [[5, 120], [10, 100], [15, 90], [20, 60], [25, 40]]\n    io_pressure: [[10, 120], [15, 100], [25, 60], [30, 40]]\n  # Percentage of memory usage to activate swappiness\n  # Lower memory pressure values means higher memory pressure\n  # which is confusing, ask google why.\n  threshold_mem_pressure: [[60, 80], [50, 60], [40, 40]]\nvirtual_memory:\n  enable: true # Wether to enable dynamic zram or not\n  pressure_binding: false # True means only activate zram when pressure is high\n  # Wether to deactivate zram when system is in sleep or immediately\n  deactivate_in_sleep: true\n  wait_timeout: 600 # Time in seconds to wait before deactivating zram, default to 10 minutes.\n  zram:\n    # Percentage of ZRAM usage to activate next zram\n    activation_threshold: 80\n    # Minimum size in MB of used swap to deactivate zram\n    deactivation_threshold: 55\n  swap:\n    activation_threshold: 90\n    deactivation_threshold: 40</pre>\n\n<p>---</p>\n\n<h2>**📖 Explanation of Key Settings**</h2>\n\n<h3>**🧠 What You Wanna Use**</h3>\n\n<li>**swappiness_range**: To control multitasking performance, also performance during high pressure. Low min will kill more apps which should improve performance. Lower min → more aggressive app killing = faster.</li>\n<p>  - <b>enable</b>: If you have issue with dynamic swappiness you can turn it off.</p>\n<li>**threshold_psi**: Control dynamic swappiness sensitivity—higher values = less sensitive changes.</li>\n<p>  - <b>auto_cpu</b>: This is more influential, changes a lot, control sensitivity of dynamic swappiness based on cpu presure, the idea is _when high cpu pressure we should decrease swapping to improve performance_, I never really test it but here is the module.</p>\n\n<h3>**🌀 Dynamic Swappiness**</h3>\n\n<li>**swappiness_range** – Controls swap limit:</li>\n<p>  - <b>Min</b> – (e.g, 40). - Use less ZRAM/SWAP, kill more apps, improve performance.</p>\n<p>  - <b>High (e.g., 140)</b> – Move memory to ZRAM/SWAP, improve multitasking. Lower this if your phone get laggy.</p>\n<li>**threshold_psi** – Threshold to adjusts swappiness based on system pressure:</li>\n<p>  - <b>mode</b></p>\n<p>    - <b>auto</b>: <code>auto</code> will generate swappiness levels between your min and max. Like [40 60 80 100 120] for 4 levels between 40 and 120 swappiness, the program will automatically choose which swappiness to use based on system pressures.</p>\n<p>    - <b>auto_cpu and else</b>: Sensitivity for each hardware pressure.</p>\n<p>      - <b>time_window</b>: Pick between <code>avg10</code>, <code>avg60</code>, <code>avg300</code>. Smaller = more sensitive, so far avg60 is a nice spot.</p>\n<p>  - <b>cpu_pressure and else</b>: Manual configuration for each pressure range. It's a pair in <code>[pressure, swappiness]</code>, if the pressure reached then use that swappiness.</p>\n\n<h3>**🗃️ Virtual Memory (VM) Optimization**</h3>\n\n<li>**enable** – Enables VM optimizations (**recommended** for multitasking).</li>\n<li>~~**pressure_binding** – Activates swap **only under pressure** (⚠️ experimental). **This function is broken**.~~</li>\n<li>**deactivate_in_sleep** – Only deactivate in sleep to be more **battery** friendly.</li>\n<li>**zram**: Handles **incremental ZRAM management**</li>\n<p>  - <b>activation_threshold</b>: Percentage of ZRAM usage to activate next zram</p>\n<p>  - <b>deactivation_threshold</b>: Minimum size in MB of used swap to deactivate zram. The default is 55MB, deactivating ZRAM when high usage can increase cpu usage. It's why only deactivate in sleep, the program also deactivate swap automatically when usage only 10MB.</p>\n<li>**swap**: You get it, its same as above except this one for SWAP.</li>\n\n<p>---</p>\n\n<h2>**📂 Source Code & Contributions**</h2>\n\n<p>💻 <b>View full source code & contribute:</b></p>\n<p>🔗 <a href=\"https://github.com/lululoid/LMKD-PSI-Activator\"><b>LMKD-PSI-Activator Repository</b></a></p>\n\n<p>---</p>\n\n<h2>**🛠️ TODO**</h2>\n\n<li>[ ] **MIUI Fix** – Install [NoSwipeToKill](https://github.com/dantmnf/NoSwipeToKill) by [dantmnf](https://github.com/dantmnf) for better compatibility.</li>\n\n<p>---</p>\n\n<h3>**🚀 TL;DR – What This Module Does:**</h3>\n\n<p>✔️ <b>Boosts RAM performance</b> 🔥</p>\n<p>✔️ <b>Smarter ZRAM & swap handling</b> 📈</p>\n<p>✔️ <b>Dynamic memory tuning</b> 🧠</p>\n<p>✔️ <b>C++ powered speed & efficiency</b> ⚡</p>\n<p>⚙️ <b>Tuning example</b> ⇒ <a href=\"https://github.com/lululoid/LMKD-PSI-Activator/blob/main/tuning_example.md\">Performance tuning</a></p>\n\n<h3>Want to see how the module works?</h3>\n\n<p>Try opening a bunch of apps or gaming while opening other apps then use this command on termux:</p>\n\n<pre>sudo logcat -s fmiop -v brief</pre>\n\n<p>Or on your computer(Make sure your developer mode active, and you authorized your computer):</p>\n\n<pre>adb logcat -s fmiop -v brief</pre>\n\n<p>Or just check log in:</p>\n\n<pre> Internal storage → Android/fmiop/archives</pre>",
+  "homepageUrl": "https://github.com/lululoid/LMKD-PSI-Activator",
+  "sourceUrl": "https://github.com/lululoid/LMKD-PSI-Activator",
+  "url": "https://github.com/lululoid/LMKD-PSI-Activator",
+  "latestRelease": {
+    "name": "v3.0_1515",
+    "version": "v3.0_1515",
+    "time": "2025-03-25T01:17:34Z",
+    "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0_1515/fmiop-v3.0_1515-beta.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0_1515",
+      "tagName": "v3.0_1515",
+      "publishedAt": "2025-03-25T01:17:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v3.0_1515-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0_1515/fmiop-v3.0_1515-beta.zip",
+          "size": 5261725,
+          "downloadCount": 25
+        },
+        {
+          "name": "fmiop-v3.0_1515-changelog.md",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0_1515/fmiop-v3.0_1515-changelog.md",
+          "size": 217,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v3.0_1500",
+      "tagName": "v3.0_1500",
+      "publishedAt": "2025-03-24T08:52:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v3.0_1500-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0_1500/fmiop-v3.0_1500-beta.zip",
+          "size": 5258066,
+          "downloadCount": 42
+        },
+        {
+          "name": "fmiop-v3.0_1500-changelog.md",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0_1500/fmiop-v3.0_1500-changelog.md",
+          "size": 432,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v3.0",
+      "tagName": "v3.0",
+      "publishedAt": "2025-03-23T22:32:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v3.0_1494-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0/fmiop-v3.0_1494-beta.zip",
+          "size": 5257740,
+          "downloadCount": 53
+        },
+        {
+          "name": "fmiop-v3.0_1494-changelog.md",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0/fmiop-v3.0_1494-changelog.md",
+          "size": 368,
+          "downloadCount": 6
+        },
+        {
+          "name": "fmiop-v3.0_1496-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v3.0/fmiop-v3.0_1496-beta.zip",
+          "size": 5258067,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v2.8",
+      "tagName": "v2.8",
+      "publishedAt": "2025-03-06T06:53:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v2.8_1226-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v2.8/fmiop-v2.8_1226-beta.zip",
+          "size": 4004642,
+          "downloadCount": 479
+        },
+        {
+          "name": "fmiop-v2.8_1226-changelog.md",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v2.8/fmiop-v2.8_1226-changelog.md",
+          "size": 783,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2025-02-19T05:22:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v2.3_941-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v2.3/fmiop-v2.3_941-beta.zip",
+          "size": 90002,
+          "downloadCount": 165
+        }
+      ]
+    },
+    {
+      "name": "v1.9",
+      "tagName": "v1.9",
+      "publishedAt": "2025-01-29T05:00:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "fmiop-v1.9_751-beta.zip",
+          "downloadUrl": "https://github.com/lululoid/LMKD-PSI-Activator/releases/download/v1.9/fmiop-v1.9_751-beta.zip",
+          "size": 87301,
+          "downloadCount": 1018
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

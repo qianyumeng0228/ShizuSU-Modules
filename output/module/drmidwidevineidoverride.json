@@ -1,0 +1,30 @@
+{
+  "readme": "# drmid — Widevine `deviceUniqueId` 逆向与改写\n\n一个针对 Android Widevine DRM 的**逆向研究 + Root 模块工程**：让\n`MediaDrm.getPropertyByteArray(\"deviceUniqueId\")` 按应用返回自定义的 32 字节值。\n\n## 目录\n\n| 路径 | 内容 |\n| --- | --- |\n| [`drmdaemon-hook/`](drmdaemon-hook/) | **主交付物**：Zygisk Next 模块（源码、打包模板、WebUI、构建脚本、发布用 README/CHANGELOG） |\n| [`docs/POSTMORTEM-investigation-log.md`](docs/POSTMORTEM-investigation-log.md) | 完整调试复盘：调用链推导、5 个 bug 的证据链（readelf / objdump / tombstone / addr2line） |\n| [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) | **发布前必读**：哪些第三方/专有文件不应随仓库发布 |\n| [`docs/tombstones/`](docs/tombstones/) | 4 次崩溃现场（含对照表；注意含设备 fingerprint） |\n| [`docs/history/`](docs/history/) | 方案演进中的旧实现 |\n| `libwvhidl.so`、`android.hardware.drm@1.3-service.*`、`drmserver`、`libdrmframework*.so` | 分析用的目标 ELF（**厂商/AOSP 二进制，发布时请删除**，见清单） |\n| `aosp-src/` | 引用的 AOSP Android 12 源码片段（Apache-2.0，发布时建议裁剪并加 NOTICE） |\n| `ZN-AuditPatch/` | 第三方项目克隆（**不要发布**） |\n\n## 快速开始\n\n```bash\n# 1) 构建模块（需要 NDK）\nANDROID_NDK=/path/to/android-ndk ./drmdaemon-hook/build.sh\n\n# 2) 阅读安装/配置/排错\nless drmdaemon-hook/README.md\n\n# 3) 发布前的取舍\nless docs/RELEASE-CHECKLIST.md\n```\n\n## 技术要点速览\n\n- **落点**：`libwvhidl.so` 的 `WVDrmPlugin::getPropertyByteArray`（vendor HAL 返回值产生处，\n  Java 与 NDK 两条路径共用）。\n- **配置通道**：Zygisk Next **companion**（HAL 域读不了 `/data`，由 root 侧 companion 读文件后\n  经 unix socket 推送，inotify + 300ms 哈希轮询 ⇒ 改配置约 0.3s 生效，无需重启）。\n- **踩过的四类 ABI 陷阱**：隐藏返回指针 `x8`、虚基类的 **VTT 参数**、`this` 调整 thunk、\n  以及**跨 libc++ 边界**（平台 `std::__1` vs NDK `std::__ndk1`）与**库内 WEAK 符号的 PLT 重定位**。\n  详见 `drmdaemon-hook/README.md` §1.3 与 `docs/POSTMORTEM-investigation-log.md`。\n# DrmIDWidevineIDOverride\n",
+  "readmeHTML": "<h1>drmid — Widevine `deviceUniqueId` 逆向与改写</h1>\n\n<p>一个针对 Android Widevine DRM 的<b>逆向研究 + Root 模块工程</b>：让</p>\n<p><code>MediaDrm.getPropertyByteArray(\"deviceUniqueId\")</code> 按应用返回自定义的 32 字节值。</p>\n\n<h2>目录</h2>\n\n<p>| 路径 | 内容 |</p>\n<p>| --- | --- |</p>\n<p>| <a href=\"drmdaemon-hook/\"><code>drmdaemon-hook/</code></a> | <b>主交付物</b>：Zygisk Next 模块（源码、打包模板、WebUI、构建脚本、发布用 README/CHANGELOG） |</p>\n<p>| <a href=\"docs/POSTMORTEM-investigation-log.md\"><code>docs/POSTMORTEM-investigation-log.md</code></a> | 完整调试复盘：调用链推导、5 个 bug 的证据链（readelf / objdump / tombstone / addr2line） |</p>\n<p>| <a href=\"docs/RELEASE-CHECKLIST.md\"><code>docs/RELEASE-CHECKLIST.md</code></a> | <b>发布前必读</b>：哪些第三方/专有文件不应随仓库发布 |</p>\n<p>| <a href=\"docs/tombstones/\"><code>docs/tombstones/</code></a> | 4 次崩溃现场（含对照表；注意含设备 fingerprint） |</p>\n<p>| <a href=\"docs/history/\"><code>docs/history/</code></a> | 方案演进中的旧实现 |</p>\n<p>| <code>libwvhidl.so</code>、<code>android.hardware.drm@1.3-service.*</code>、<code>drmserver</code>、<code>libdrmframework*.so</code> | 分析用的目标 ELF（<b>厂商/AOSP 二进制，发布时请删除</b>，见清单） |</p>\n<p>| <code>aosp-src/</code> | 引用的 AOSP Android 12 源码片段（Apache-2.0，发布时建议裁剪并加 NOTICE） |</p>\n<p>| <code>ZN-AuditPatch/</code> | 第三方项目克隆（<b>不要发布</b>） |</p>\n\n<h2>快速开始</h2>\n\n<pre># 1) 构建模块（需要 NDK）\nANDROID_NDK=/path/to/android-ndk ./drmdaemon-hook/build.sh\n\n# 2) 阅读安装/配置/排错\nless drmdaemon-hook/README.md\n\n# 3) 发布前的取舍\nless docs/RELEASE-CHECKLIST.md</pre>\n\n<h2>技术要点速览</h2>\n\n<li>**落点**：`libwvhidl.so` 的 `WVDrmPlugin::getPropertyByteArray`（vendor HAL 返回值产生处，</li>\n<p>  Java 与 NDK 两条路径共用）。</p>\n<li>**配置通道**：Zygisk Next **companion**（HAL 域读不了 `/data`，由 root 侧 companion 读文件后</li>\n<p>  经 unix socket 推送，inotify + 300ms 哈希轮询 ⇒ 改配置约 0.3s 生效，无需重启）。</p>\n<li>**踩过的四类 ABI 陷阱**：隐藏返回指针 `x8`、虚基类的 **VTT 参数**、`this` 调整 thunk、</li>\n<p>  以及<b>跨 libc++ 边界</b>（平台 <code>std::__1</code> vs NDK <code>std::__ndk1</code>）与<b>库内 WEAK 符号的 PLT 重定位</b>。</p>\n<p>  详见 <code>drmdaemon-hook/README.md</code> §1.3 与 <code>docs/POSTMORTEM-investigation-log.md</code>。</p>\n<h1>DrmIDWidevineIDOverride</h1>",
+  "homepageUrl": "https://github.com/f401/DrmIDWidevineIDOverride",
+  "sourceUrl": "https://github.com/f401/DrmIDWidevineIDOverride",
+  "url": "https://github.com/f401/DrmIDWidevineIDOverride",
+  "latestRelease": {
+    "name": "v1.1.0",
+    "version": "v1.1.0",
+    "time": "2026-09-18T16:15:02Z",
+    "downloadUrl": "https://github.com/f401/DrmIDWidevineIDOverride/releases/download/v1.1.0/drmdaemon-hook.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-09-18T16:15:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "drmdaemon-hook.zip",
+          "downloadUrl": "https://github.com/f401/DrmIDWidevineIDOverride/releases/download/v1.1.0/drmdaemon-hook.zip",
+          "size": 166944,
+          "downloadCount": 15
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

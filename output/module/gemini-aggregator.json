@@ -1,0 +1,94 @@
+{
+  "readme": "# 📱 全能系统管家 (AIO-KSU-Toolbox)\n\n这是一个基于 KernelSU / APatch WebUI 机制打造的 **All-In-One (AIO) 极客聚合模块**。\n\n本项目致力于打造一个零耗电、零卡顿、极具交互美学的“全能底座”。彻底抛弃了传统的“终端黑框框”和“物理音量键盲操”，为你带来原生、直观的可视化系统控制台。\n\n* **项目主页**: [https://github.com/Zgt00086/Gemini-Aggregator](https://github.com/Zgt00086/Gemini-Aggregator)\n\n## ✨ 核心特性\n* **🚀 运存防线引擎 (V13 新增)**：智能监控内存阈值，基于多任务底层接口 (`dumpsys activity recents`)，严格按时间倒序揪出最老应用精准释放。支持 WebUI 实时配置触发阈值与黑白名单，告别“杀错正在用的后台”。\n* **📦 模块自动归档引擎**：后台零耗电静默监控 QQ、微信、TG 等多个下载路径（完美兼容带空格路径）。采用纯内存 (`/dev`) 时间戳对比与 MD5 哈希防碰撞技术，精准拦截并归纳 ZIP 模块，提供 WebUI 实时可视化归档日志。\n* **🔑 Tricky Keybox 更新器**：针对 TrickyStore 打造的硬核多层解码引擎。支持一键抓取并剥离高达 10 层的 Base64 嵌套与 ROT13 混淆，实时校验 XML 证书链，实现底层级破解密钥的无缝注入。\n* **🛡️ 系统更新屏蔽器**：通过底层物理挂载空文件彻底冻结系统更新组件，支持防误触 Toast 提示与重启持久化状态明示。\n* **⚡ Smart DexOpt 引擎**：采用原生 V4 引擎深度扫描。纯 Native C++ 底层排查，配合异步防杀守护，无死角掌控应用满血编译状态。\n* **🧩 模块跳转中心**：一键聚合本机所有 KSU 模块，直达 MT 管理器对应目录。\n* **👻 后台静默守护中心**：内置零耗电开机脚本，如 **Gemini 唤醒自动修复**，在 WebUI 底部静默展示，默默守护系统稳定。\n\n---\n\n## 👨‍💻 开发者/AI 协作指南：如何无缝融合新模块？\n\n如果你想让 AI 帮你写新功能并融合进本模块，请直接复制以下“咒语”发送给 AI：\n\n> **【AIO 聚合管家 - 插件注入请求】**\n> 我正在维护一个基于 KernelSU / APatch WebUI 的 AIO 模块（当前为 V13 架构）。\n> \n> **底层开发排版规则：**\n> 1. **交互功能**：以 MIUIX 折叠卡片 `<details class=\"miuix-card\">` 格式，按时间顺序插入在 `index.html` 的上方。\n> 2. **异步不阻塞**：必须使用 `nohup` + `Base64` 转码注入的方法将耗时 Shell 放入底层运行，绝不能引发 WebUI 超时崩溃。\n> 3. **强反馈原则**：所有执行动作必须包含人工视觉延迟、震动反馈以及 Toast 提示，带进度的需提供百分比动画。\n> 4. **静默功能**：不需要卡片，固定排在 `index.html` 最下方。相关代码写入 `service.sh` 并挂入后台。\n> \n> **本次我要新增的功能是：** [此处填写你的需求]\n> \n> **请直接给我：**\n> 1. 需要追加到 `service.sh` 的代码。\n> 2. 需要插入 `index.html` 的 HTML/CSS/JS 代码，并明确说明插入位置。\n",
+  "readmeHTML": "<h1>📱 全能系统管家 (AIO-KSU-Toolbox)</h1>\n\n<p>这是一个基于 KernelSU / APatch WebUI 机制打造的 <b>All-In-One (AIO) 极客聚合模块</b>。</p>\n\n<p>本项目致力于打造一个零耗电、零卡顿、极具交互美学的“全能底座”。彻底抛弃了传统的“终端黑框框”和“物理音量键盲操”，为你带来原生、直观的可视化系统控制台。</p>\n\n<li>**项目主页**: [https://github.com/Zgt00086/Gemini-Aggregator](https://github.com/Zgt00086/Gemini-Aggregator)</li>\n\n<h2>✨ 核心特性</h2>\n<li>**🚀 运存防线引擎 (V13 新增)**：智能监控内存阈值，基于多任务底层接口 (`dumpsys activity recents`)，严格按时间倒序揪出最老应用精准释放。支持 WebUI 实时配置触发阈值与黑白名单，告别“杀错正在用的后台”。</li>\n<li>**📦 模块自动归档引擎**：后台零耗电静默监控 QQ、微信、TG 等多个下载路径（完美兼容带空格路径）。采用纯内存 (`/dev`) 时间戳对比与 MD5 哈希防碰撞技术，精准拦截并归纳 ZIP 模块，提供 WebUI 实时可视化归档日志。</li>\n<li>**🔑 Tricky Keybox 更新器**：针对 TrickyStore 打造的硬核多层解码引擎。支持一键抓取并剥离高达 10 层的 Base64 嵌套与 ROT13 混淆，实时校验 XML 证书链，实现底层级破解密钥的无缝注入。</li>\n<li>**🛡️ 系统更新屏蔽器**：通过底层物理挂载空文件彻底冻结系统更新组件，支持防误触 Toast 提示与重启持久化状态明示。</li>\n<li>**⚡ Smart DexOpt 引擎**：采用原生 V4 引擎深度扫描。纯 Native C++ 底层排查，配合异步防杀守护，无死角掌控应用满血编译状态。</li>\n<li>**🧩 模块跳转中心**：一键聚合本机所有 KSU 模块，直达 MT 管理器对应目录。</li>\n<li>**👻 后台静默守护中心**：内置零耗电开机脚本，如 **Gemini 唤醒自动修复**，在 WebUI 底部静默展示，默默守护系统稳定。</li>\n\n<p>---</p>\n\n<h2>👨‍💻 开发者/AI 协作指南：如何无缝融合新模块？</h2>\n\n<p>如果你想让 AI 帮你写新功能并融合进本模块，请直接复制以下“咒语”发送给 AI：</p>\n\n<p>> <b>【AIO 聚合管家 - 插件注入请求】</b></p>\n<p>> 我正在维护一个基于 KernelSU / APatch WebUI 的 AIO 模块（当前为 V13 架构）。</p>\n<p>></p>\n<p>> <b>底层开发排版规则：</b></p>\n<p>> 1. <b>交互功能</b>：以 MIUIX 折叠卡片 <code><details class=\"miuix-card\"></code> 格式，按时间顺序插入在 <code>index.html</code> 的上方。</p>\n<p>> 2. <b>异步不阻塞</b>：必须使用 <code>nohup</code> + <code>Base64</code> 转码注入的方法将耗时 Shell 放入底层运行，绝不能引发 WebUI 超时崩溃。</p>\n<p>> 3. <b>强反馈原则</b>：所有执行动作必须包含人工视觉延迟、震动反馈以及 Toast 提示，带进度的需提供百分比动画。</p>\n<p>> 4. <b>静默功能</b>：不需要卡片，固定排在 <code>index.html</code> 最下方。相关代码写入 <code>service.sh</code> 并挂入后台。</p>\n<p>></p>\n<p>> <b>本次我要新增的功能是：</b> [此处填写你的需求]</p>\n<p>></p>\n<p>> <b>请直接给我：</b></p>\n<p>> 1. 需要追加到 <code>service.sh</code> 的代码。</p>\n<p>> 2. 需要插入 <code>index.html</code> 的 HTML/CSS/JS 代码，并明确说明插入位置。</p>",
+  "homepageUrl": "https://github.com/Zgt00086/Gemini-Aggregator",
+  "sourceUrl": "https://github.com/Zgt00086/Gemini-Aggregator",
+  "url": "https://github.com/Zgt00086/Gemini-Aggregator",
+  "latestRelease": {
+    "name": "v9.9.9-test",
+    "version": "v9.9.9-test",
+    "time": "2026-05-17T12:09:57Z",
+    "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/%E4%BF%AE%E6%94%B9%E7%89%88/V13.1.zip",
+    "note": "最新版 v9.9.9-test 未打包 zip，回退至 修改版 下载"
+  },
+  "releases": [
+    {
+      "name": "v9.9.9-test",
+      "tagName": "v9.9.9-test",
+      "publishedAt": "2026-05-17T12:09:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "修改版",
+      "tagName": "修改版",
+      "publishedAt": "2026-05-17T11:14:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V13.1.zip",
+          "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/%E4%BF%AE%E6%94%B9%E7%89%88/V13.1.zip",
+          "size": 19242,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "V13",
+      "tagName": "V13",
+      "publishedAt": "2026-05-15T09:27:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V13.zip",
+          "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/V13/V13.zip",
+          "size": 19596,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v12",
+      "tagName": "v12",
+      "publishedAt": "2026-05-12T14:28:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V12.zip",
+          "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/v12/V12.zip",
+          "size": 17134,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v11",
+      "tagName": "v11",
+      "publishedAt": "2026-05-12T14:03:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V11.zip",
+          "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/v11/V11.zip",
+          "size": 15208,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v10.1",
+      "tagName": "v10.1",
+      "publishedAt": "2026-05-11T02:09:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V10.1.zip",
+          "downloadUrl": "https://github.com/Zgt00086/Gemini-Aggregator/releases/download/v10.1/V10.1.zip",
+          "size": 11515,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

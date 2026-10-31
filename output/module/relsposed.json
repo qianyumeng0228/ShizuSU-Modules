@@ -1,0 +1,76 @@
+{
+  "readme": "# LSPosed Framework\n\n[![Build](https://img.shields.io/github/actions/workflow/status/ThePedroo/ReLSPosed/core.yml?branch=master&event=push&logo=github&label=Build)](https://github.com/ThePedroo/ReLSPosed/actions/workflows/core.yml?query=event%3Apush+branch%3Amaster+is%3Acompleted) [![Crowdin](https://img.shields.io/badge/Localization-Crowdin-blueviolet?logo=Crowdin)](https://crowdin.com/project/lsposed_jingmatrix) [![Download](https://img.shields.io/github/v/release/ThePedroo/ReLSPosed?color=orange&logoColor=orange&label=Download&logo=DocuSign)](https://github.com/ThePedroo/ReLSPosed/releases/latest) [![Total](https://shields.io/github/downloads/ThePedroo/ReLSPosed/total?logo=Bookmeter&label=Counts&logoColor=yellow&color=yellow)](https://github.com/ThePedroo/ReLSPosed/releases)\n\n## Introduction \n\nA Zygisk module trying to provide an ART hooking framework which delivers consistent APIs with the OG Xposed, leveraging LSPlant hooking framework.\n\n> Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That's great because it means that modules can work for different versions and even ROMs without any changes (as long as the original code was not changed too much). It's also easy to undo. As all changes are done in the memory, you just need to deactivate the module and reboot to get your original system back. There are many other advantages, but here is just one more: multiple modules can do changes to the same part of the system or app. With modified APKs, you have to choose one. No way to combine them, unless the author builds multiple APKs with different combinations.\n\n## Supported Versions\n\nAndroid 8.1 ~ 16\n\n## Install\n\n1. Install Magisk v26+\n2. [Download](#download) and install LSPosed in Magisk app\n3. Reboot\n4. Open ReLSPosed manager from notification\n5. Have fun :)\n\n## Download\n\n- For stable releases, please go to [Github Releases page](https://github.com/ThePedroo/ReLSPosed/releases)\n- For canary build, please check [Github Actions](https://github.com/ThePedroo/ReLSPosed/actions/workflows/core.yml?query=branch%3Amaster)\n\nNote: debug builds are only available in Github Actions.\n\n## Get Help\n**Only bug reports from **THE LATEST DEBUG BUILD** will be accepted.**\n- GitHub issues: [Issues](https://github.com/ThePedroo/ReLSPosed/issues/)\n- (For Chinese speakers) 本项目只接受英语**标题**的issue。如果您不懂英语，请使用[翻译工具](https://www.deepl.com/zh/translator)\n\n## For Developers\n\nDevelopers are welcome to write Xposed modules with hooks based on LSPosed Framework. A module based on LSPosed framework is fully compatible with the original Xposed Framework, and vice versa, a Xposed Framework-based module will work well with LSPosed framework too.\n\n- [Xposed Framework API](https://api.xposed.info/)\n\nWe use our own module repository. We welcome developers to submit modules to our repository, and then modules can be downloaded in LSPosed.\n\n- [LSPosed Module Repository](https://github.com/Xposed-Modules-Repo)\n\n## Community Discussion\n\n[Troubleshooting guide](https://github.com/ThePedroo/ReLSPosed/issues/123) and [Disscusions](https://github.com/ThePedroo/ReLSPosed/discussions).\n\n## Translation Contributing\n\nYou can contribute translation [here](https://crowdin.com/project/lsposed_jingmatrix).\n\n## Credits \n\n- [Magisk](https://github.com/topjohnwu/Magisk/): makes all these possible\n- [XposedBridge](https://github.com/rovo89/XposedBridge): the OG Xposed framework APIs\n- [LSPlant](https://github.com/JingMatrix/LSPlant): the core ART hooking framework\n- [Dobby](https://github.com/JingMatrix/Dobby): inline hooker for `LSPlant` and `native_api` implement\n- [EdXposed](https://github.com/ElderDrivers/EdXposed): fork source\n- [xz-embedded](https://github.com/tukaani-project/xz-embedded): decompress `.gnu_debugdata` header section of stripped `libart.so`\n- ~~[Riru](https://github.com/RikkaApps/Riru): provides a way to inject code into zygote process~~\n- ~[SandHook](https://github.com/ganyao114/SandHook/): ART hooking framework for SandHook variant~\n- ~[YAHFA](https://github.com/rk700/YAHFA): previous ART hooking framework~\n- ~[dexmaker](https://github.com/linkedin/dexmaker) and [dalvikdx](https://github.com/JakeWharton/dalvik-dx): to dynamically generate YAHFA hooker classes~\n- ~[DexBuilder](https://github.com/LSPosed/DexBuilder): to dynamically generate YAHFA hooker classes~\n\n## License\n\nLSPosed is licensed under the **GNU General Public License v3 (GPL-3)** (http://www.gnu.org/copyleft/gpl.html).\n",
+  "readmeHTML": "<h1>LSPosed Framework</h1>\n\n<p><a href=\"https://img.shields.io/github/actions/workflow/status/ThePedroo/ReLSPosed/core.yml?branch=master&event=push&logo=github&label=Build\">![Build</a>](https://github.com/ThePedroo/ReLSPosed/actions/workflows/core.yml?query=event%3Apush+branch%3Amaster+is%3Acompleted) <a href=\"https://img.shields.io/badge/Localization-Crowdin-blueviolet?logo=Crowdin\">![Crowdin</a>](https://crowdin.com/project/lsposed_jingmatrix) <a href=\"https://img.shields.io/github/v/release/ThePedroo/ReLSPosed?color=orange&logoColor=orange&label=Download&logo=DocuSign\">![Download</a>](https://github.com/ThePedroo/ReLSPosed/releases/latest) <a href=\"https://shields.io/github/downloads/ThePedroo/ReLSPosed/total?logo=Bookmeter&label=Counts&logoColor=yellow&color=yellow\">![Total</a>](https://github.com/ThePedroo/ReLSPosed/releases)</p>\n\n<h2>Introduction</h2>\n\n<p>A Zygisk module trying to provide an ART hooking framework which delivers consistent APIs with the OG Xposed, leveraging LSPlant hooking framework.</p>\n\n<p>> Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That's great because it means that modules can work for different versions and even ROMs without any changes (as long as the original code was not changed too much). It's also easy to undo. As all changes are done in the memory, you just need to deactivate the module and reboot to get your original system back. There are many other advantages, but here is just one more: multiple modules can do changes to the same part of the system or app. With modified APKs, you have to choose one. No way to combine them, unless the author builds multiple APKs with different combinations.</p>\n\n<h2>Supported Versions</h2>\n\n<p>Android 8.1 ~ 16</p>\n\n<h2>Install</h2>\n\n<li>Install Magisk v26+</li>\n<li>[Download](#download) and install LSPosed in Magisk app</li>\n<li>Reboot</li>\n<li>Open ReLSPosed manager from notification</li>\n<li>Have fun :)</li>\n\n<h2>Download</h2>\n\n<li>For stable releases, please go to [Github Releases page](https://github.com/ThePedroo/ReLSPosed/releases)</li>\n<li>For canary build, please check [Github Actions](https://github.com/ThePedroo/ReLSPosed/actions/workflows/core.yml?query=branch%3Amaster)</li>\n\n<p>Note: debug builds are only available in Github Actions.</p>\n\n<h2>Get Help</h2>\n<p><b>Only bug reports from </b>THE LATEST DEBUG BUILD<b> will be accepted.</b></p>\n<li>GitHub issues: [Issues](https://github.com/ThePedroo/ReLSPosed/issues/)</li>\n<li>(For Chinese speakers) 本项目只接受英语**标题**的issue。如果您不懂英语，请使用[翻译工具](https://www.deepl.com/zh/translator)</li>\n\n<h2>For Developers</h2>\n\n<p>Developers are welcome to write Xposed modules with hooks based on LSPosed Framework. A module based on LSPosed framework is fully compatible with the original Xposed Framework, and vice versa, a Xposed Framework-based module will work well with LSPosed framework too.</p>\n\n<li>[Xposed Framework API](https://api.xposed.info/)</li>\n\n<p>We use our own module repository. We welcome developers to submit modules to our repository, and then modules can be downloaded in LSPosed.</p>\n\n<li>[LSPosed Module Repository](https://github.com/Xposed-Modules-Repo)</li>\n\n<h2>Community Discussion</h2>\n\n<p><a href=\"https://github.com/ThePedroo/ReLSPosed/issues/123\">Troubleshooting guide</a> and <a href=\"https://github.com/ThePedroo/ReLSPosed/discussions\">Disscusions</a>.</p>\n\n<h2>Translation Contributing</h2>\n\n<p>You can contribute translation <a href=\"https://crowdin.com/project/lsposed_jingmatrix\">here</a>.</p>\n\n<h2>Credits</h2>\n\n<li>[Magisk](https://github.com/topjohnwu/Magisk/): makes all these possible</li>\n<li>[XposedBridge](https://github.com/rovo89/XposedBridge): the OG Xposed framework APIs</li>\n<li>[LSPlant](https://github.com/JingMatrix/LSPlant): the core ART hooking framework</li>\n<li>[Dobby](https://github.com/JingMatrix/Dobby): inline hooker for `LSPlant` and `native_api` implement</li>\n<li>[EdXposed](https://github.com/ElderDrivers/EdXposed): fork source</li>\n<li>[xz-embedded](https://github.com/tukaani-project/xz-embedded): decompress `.gnu_debugdata` header section of stripped `libart.so`</li>\n<li>~~[Riru](https://github.com/RikkaApps/Riru): provides a way to inject code into zygote process~~</li>\n<li>~[SandHook](https://github.com/ganyao114/SandHook/): ART hooking framework for SandHook variant~</li>\n<li>~[YAHFA](https://github.com/rk700/YAHFA): previous ART hooking framework~</li>\n<li>~[dexmaker](https://github.com/linkedin/dexmaker) and [dalvikdx](https://github.com/JakeWharton/dalvik-dx): to dynamically generate YAHFA hooker classes~</li>\n<li>~[DexBuilder](https://github.com/LSPosed/DexBuilder): to dynamically generate YAHFA hooker classes~</li>\n\n<h2>License</h2>\n\n<p>LSPosed is licensed under the <b>GNU General Public License v3 (GPL-3)</b> (http://www.gnu.org/copyleft/gpl.html).</p>",
+  "homepageUrl": "https://modules.lsposed.org/",
+  "sourceUrl": "https://github.com/ThePedroo/ReLSPosed",
+  "url": "https://github.com/ThePedroo/ReLSPosed",
+  "latestRelease": {
+    "name": "v1.0.2",
+    "version": "v1.0.2",
+    "time": "2026-01-22T18:45:49Z",
+    "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/v1.0.2/ReLSPosed-v1.0.2-7211-zygisk-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-01-22T18:45:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReLSPosed-v1.0.2-7211-zygisk-release.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/v1.0.2/ReLSPosed-v1.0.2-7211-zygisk-release.zip",
+          "size": 6849209,
+          "downloadCount": 279837
+        },
+        {
+          "name": "ReLSPosed-v1.0.2-7211-zygisk-debug.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/v1.0.2/ReLSPosed-v1.0.2-7211-zygisk-debug.zip",
+          "size": 15766046,
+          "downloadCount": 283757
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2025-08-08T16:30:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.0.1-7190-zygisk-release.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/v1.0.1/LSPosed-v1.0.1-7190-zygisk-release.zip",
+          "size": 6437684,
+          "downloadCount": 66232
+        },
+        {
+          "name": "LSPosed-v1.0.1-7190-zygisk-debug.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/v1.0.1/LSPosed-v1.0.1-7190-zygisk-debug.zip",
+          "size": 14911948,
+          "downloadCount": 41294
+        }
+      ]
+    },
+    {
+      "name": "1.0.0",
+      "tagName": "1.0.0",
+      "publishedAt": "2025-08-08T10:27:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-v1.0-7189-zygisk-release.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/1.0.0/LSPosed-v1.0-7189-zygisk-release.zip",
+          "size": 6528887,
+          "downloadCount": 563
+        },
+        {
+          "name": "LSPosed-v1.0-7189-zygisk-debug.zip",
+          "downloadUrl": "https://github.com/ThePedroo/ReLSPosed/releases/download/1.0.0/LSPosed-v1.0-7189-zygisk-debug.zip",
+          "size": 15097761,
+          "downloadCount": 129
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

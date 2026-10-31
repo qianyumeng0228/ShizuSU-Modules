@@ -1,0 +1,70 @@
+{
+  "readme": "# Android SSHD KernelSU 模块\n\nAndroid SSHD 是一个面向 KernelSU 的 Android 主机 SSH 服务模块。目标是在手机上提供可控的 `sshd`，SSH 登录后进入 Android shell 环境，PATH 包含常用 Android 命令目录，并在 `/data/adb/ksu/bin` 暴露 `ssh`、`sshd`、`android-sshd` 命令。\n\n## 功能\n\n- KernelSU 模块布局：`module.prop`、`customize.sh`、`service.sh`、`uninstall.sh`、`webroot/`。\n- WebUI：查看状态、启动/停止/重启、修改端口和监听地址、修改密码、切换自启、查看日志和诊断。\n- WebUI 启动隔离：`service.sh` 会启动模块侧 supervisor，WebUI 只提交 start/stop/restart 请求，由 service 上下文执行 daemon 启停，避免后台 WebUI 后 SSH 被 App freezer 冻结。\n- Android shell 环境：`ANDROID_ROOT`、`ANDROID_DATA`、`EXTERNAL_STORAGE`、`SHELL`、`HOME`、`PATH`。\n- 命令包装器：安装到 `/data/adb/ksu/bin/ssh`、`/data/adb/ksu/bin/sshd`、`/data/adb/ksu/bin/android-sshd`。\n- 测试清理脚本：设备验证后删除端口转发、临时 zip、测试状态和 wrapper。\n\n## SSH provider 资产\n\n项目默认使用 `provider/openssh-android` 构建 Android arm64 OpenSSH provider；源码目录缺失时，`scripts/build-openssh-provider.sh` 会 clone `ccc007ccc/openssh-android` 并应用 `patches/openssh-android-ksu.patch`。产物放到：\n\n```text\nassets/arm64-v8a/bin/sshd\nassets/arm64-v8a/bin/sshd-session\nassets/arm64-v8a/bin/sshd-auth\nassets/arm64-v8a/bin/ssh-keygen\nassets/arm64-v8a/bin/ssh\n```\n\n来源、构建参数、本地适配补丁状态和 SHA256 记录在：\n\n```text\nassets/arm64-v8a/PROVENANCE.md\n```\n\n如果后续要替换 provider，`scripts/verify-assets.sh` 仍支持 Dropbear、OpenSSH 或自定义 daemon 布局；缺少可用 provider 资产时，`scripts/package.sh` 会明确失败。\n\n## 构建\n\n如果使用本项目内的 OpenSSH fork 作为 provider，先构建 Android arm64 资产：\n\n```sh\nscripts/build-openssh-provider.sh\n```\n\n再构建 WebUI 和模块 zip：\n\n```sh\nnpm --prefix webui install\nnpm --prefix webui run build\nscripts/verify-assets.sh\nscripts/package.sh\n```\n\n输出：\n\n```text\nout/android-sshd/\nout/android-sshd.zip\n```\n\n## 使用\n\n安装模块后，在 root shell 中：\n\n```sh\nandroid-sshd status\nandroid-sshd set-password\nandroid-sshd set-port 8022\nandroid-sshd set-listen 0.0.0.0\nsshd start\nsshd status\n```\n\nWebUI 会调用：\n\n```text\n/data/adb/modules/android-sshd/android-sshd/bin/android-sshd-webui-api.sh\n```\n\n默认连接方式：\n\n```sh\nadb.exe forward tcp:2222 tcp:8022\nssh -p 2222 root@127.0.0.1\n```\n\nWebUI 会尽量显示设备本地检测到的局域网 IPv4 连接命令；真实公网 IP 受 NAT、热点、蜂窝网络和路由器配置影响，模块不会静默访问第三方服务查询，需要用户手动确认。\n\n更多命令见 `docs/runtime-usage.md`，设备验证和清理见 `docs/device-testing.md`，可复现构建见 `docs/reproducible-build.md`，安全说明见 `docs/security.md`。\n",
+  "readmeHTML": "<h1>Android SSHD KernelSU 模块</h1>\n\n<p>Android SSHD 是一个面向 KernelSU 的 Android 主机 SSH 服务模块。目标是在手机上提供可控的 <code>sshd</code>，SSH 登录后进入 Android shell 环境，PATH 包含常用 Android 命令目录，并在 <code>/data/adb/ksu/bin</code> 暴露 <code>ssh</code>、<code>sshd</code>、<code>android-sshd</code> 命令。</p>\n\n<h2>功能</h2>\n\n<li>KernelSU 模块布局：`module.prop`、`customize.sh`、`service.sh`、`uninstall.sh`、`webroot/`。</li>\n<li>WebUI：查看状态、启动/停止/重启、修改端口和监听地址、修改密码、切换自启、查看日志和诊断。</li>\n<li>WebUI 启动隔离：`service.sh` 会启动模块侧 supervisor，WebUI 只提交 start/stop/restart 请求，由 service 上下文执行 daemon 启停，避免后台 WebUI 后 SSH 被 App freezer 冻结。</li>\n<li>Android shell 环境：`ANDROID_ROOT`、`ANDROID_DATA`、`EXTERNAL_STORAGE`、`SHELL`、`HOME`、`PATH`。</li>\n<li>命令包装器：安装到 `/data/adb/ksu/bin/ssh`、`/data/adb/ksu/bin/sshd`、`/data/adb/ksu/bin/android-sshd`。</li>\n<li>测试清理脚本：设备验证后删除端口转发、临时 zip、测试状态和 wrapper。</li>\n\n<h2>SSH provider 资产</h2>\n\n<p>项目默认使用 <code>provider/openssh-android</code> 构建 Android arm64 OpenSSH provider；源码目录缺失时，<code>scripts/build-openssh-provider.sh</code> 会 clone <code>ccc007ccc/openssh-android</code> 并应用 <code>patches/openssh-android-ksu.patch</code>。产物放到：</p>\n\n<pre>assets/arm64-v8a/bin/sshd\nassets/arm64-v8a/bin/sshd-session\nassets/arm64-v8a/bin/sshd-auth\nassets/arm64-v8a/bin/ssh-keygen\nassets/arm64-v8a/bin/ssh</pre>\n\n<p>来源、构建参数、本地适配补丁状态和 SHA256 记录在：</p>\n\n<pre>assets/arm64-v8a/PROVENANCE.md</pre>\n\n<p>如果后续要替换 provider，<code>scripts/verify-assets.sh</code> 仍支持 Dropbear、OpenSSH 或自定义 daemon 布局；缺少可用 provider 资产时，<code>scripts/package.sh</code> 会明确失败。</p>\n\n<h2>构建</h2>\n\n<p>如果使用本项目内的 OpenSSH fork 作为 provider，先构建 Android arm64 资产：</p>\n\n<pre>scripts/build-openssh-provider.sh</pre>\n\n<p>再构建 WebUI 和模块 zip：</p>\n\n<pre>npm --prefix webui install\nnpm --prefix webui run build\nscripts/verify-assets.sh\nscripts/package.sh</pre>\n\n<p>输出：</p>\n\n<pre>out/android-sshd/\nout/android-sshd.zip</pre>\n\n<h2>使用</h2>\n\n<p>安装模块后，在 root shell 中：</p>\n\n<pre>android-sshd status\nandroid-sshd set-password\nandroid-sshd set-port 8022\nandroid-sshd set-listen 0.0.0.0\nsshd start\nsshd status</pre>\n\n<p>WebUI 会调用：</p>\n\n<pre>/data/adb/modules/android-sshd/android-sshd/bin/android-sshd-webui-api.sh</pre>\n\n<p>默认连接方式：</p>\n\n<pre>adb.exe forward tcp:2222 tcp:8022\nssh -p 2222 root@127.0.0.1</pre>\n\n<p>WebUI 会尽量显示设备本地检测到的局域网 IPv4 连接命令；真实公网 IP 受 NAT、热点、蜂窝网络和路由器配置影响，模块不会静默访问第三方服务查询，需要用户手动确认。</p>\n\n<p>更多命令见 <code>docs/runtime-usage.md</code>，设备验证和清理见 <code>docs/device-testing.md</code>，可复现构建见 <code>docs/reproducible-build.md</code>，安全说明见 <code>docs/security.md</code>。</p>",
+  "homepageUrl": "https://github.com/ccc007ccc/android-sshd-ksu",
+  "sourceUrl": "https://github.com/ccc007ccc/android-sshd-ksu",
+  "url": "https://github.com/ccc007ccc/android-sshd-ksu",
+  "latestRelease": {
+    "name": "v0.1.2",
+    "version": "v0.1.2",
+    "time": "2026-06-16T20:31:13Z",
+    "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.2/android-sshd.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.2",
+      "tagName": "v0.1.2",
+      "publishedAt": "2026-06-16T20:31:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-sshd.zip",
+          "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.2/android-sshd.zip",
+          "size": 1551188,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-05-14T16:06:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-sshd.zip",
+          "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.1/android-sshd.zip",
+          "size": 1548341,
+          "downloadCount": 9
+        },
+        {
+          "name": "android-sshd.zip.sha256",
+          "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.1/android-sshd.zip.sha256",
+          "size": 83,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-05-14T13:28:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-sshd.zip",
+          "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.0/android-sshd.zip",
+          "size": 1547613,
+          "downloadCount": 0
+        },
+        {
+          "name": "android-sshd.zip.sha256",
+          "downloadUrl": "https://github.com/ccc007ccc/android-sshd-ksu/releases/download/v0.1.0/android-sshd.zip.sha256",
+          "size": 132,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,142 @@
+{
+  "readme": "# 青龙面板 Android Root 模块\n\n把 [青龙面板](https://github.com/whyour/qinglong)（whyour/qinglong **v2.20.2**）跑在 Android ARM64 设备上的 Magisk / KernelSU 系 Root 模块。无需 Termux、无需 Docker、无需 Chroot，刷入即用。\n\n> 已实测环境：**SukiSU Ultra** + **联想 Y700 四代**。KernelSU 理论兼容（未实机验证）；Magisk 官方 App 无模块「执行」按钮，不推荐。\n\n## 下载\n\n前往 [Releases](https://github.com/BlackLK/qinglong-2.20.2/releases) 下载：\n\n| 文件 | 说明 |\n|---|---|\n| `QingLong-Android-Root-Module-vX.X.X.zip` | 青龙面板主模块（必需） |\n| `QingLong-DataWipe-vX.X.X.zip` | 用户数据清除工具（可选，彻底重置时用） |\n| `node.real` | Node.js linux-arm64 主程序，仅克隆源码自行构建时需要 |\n\n## 功能\n\n- **单按钮智能启停**：在 Root 管理器里点「执行」启动面板（同时自动开启开机自启），再点一次停止（关闭自启）\n- **启动资源报告**：启动时在日志打印内存（RAM）与磁盘占用、用户数据统计（任务/环境变量/依赖数量）\n- **安装占用报告**：刷入完成时打印各部分磁盘占用明细\n- **完整任务环境**：内置 `bash`、`python3.11`（含 pip）、`pnpm`，以及 `jq / curl / wget / openssl / tar / unzip / sed` 等 Linux 工具\n- **依赖管理**：面板内可直接安装 NodeJS / Python3 / Linux 三类依赖\n- **网络开箱即用**：内置本地 DNS 转发器与 CA 证书修复，HTTPS / GitHub 直连可用\n- **数据与程序分离**：程序装在 `/data/adb/qinglong`，用户数据（脚本/数据库/配置/已装依赖）在 `/data/adb/qinglong-data`，卸载重刷不丢数据\n\n## 刷入与使用\n\n1. 在 Root 管理器中刷入主模块 zip（解压部署约 1~3 分钟，属正常现象）\n2. **重启设备**（首次刷入后面板默认不自启）\n3. 管理器中点击「青龙面板」模块的 **执行** 按钮 → 日志出现 `ALL SERVICES READY` 即启动成功\n4. 浏览器访问 `http://<设备IP>:5700/`\n\n> 单进程架构说明：原版青龙使用 Node.js cluster 多进程编排，在 Android 的动态链接器环境下 worker 无法初始化。本模块将服务合并为单进程（`app_single.js`）以绕过该限制，gRPC(5500) 与 HTTP(5700) 由同一进程监听。\n\n## 数据清除工具（可选模块）\n\n独立小模块，装上后管理器多一个「执行」按钮：\n\n- **第一次点击**：仅显示危险警告，不会删除任何东西\n- **2 分钟内再次点击**：停止面板并永久清除 `/data/adb/qinglong-data`\n- 超过 2 分钟未确认，操作自动作废\n\n普通卸载/升级主模块**不需要**安装它。\n\n## 从源码构建\n\n```bash\ngit clone https://github.com/BlackLK/qinglong-2.20.2.git\ncd qinglong-2.20.2\n\n# node.real 超过 GitHub 100MB 单文件限制，未入库，需自行放置：\n# 从 https://nodejs.org/dist/latest-v20.x/ 下载 node-v20.x.x-linux-arm64.tar.xz\n# 解出 bin/node，重命名为 node.real，放到 module_src/payload/runtime/bin/node.real\n\npython build_module.py       # 生成主模块 zip\npython build_wipe_module.py  # 生成清除数据模块 zip\n```\n\n## 目录结构\n\n```\n├── module_src/            # 青龙面板主模块源码\n│   ├── customize.sh       # 刷入安装脚本（分段进度日志）\n│   ├── service.sh         # 开机自启（受 autostart.conf 控制）\n│   ├── action.sh          # 管理器「执行」按钮（智能启停）\n│   ├── manager/           # 启动/停止/状态/资源报告脚本\n│   └── payload/\n│       ├── ql/            # 青龙 2.20.2 程序 + app_single.js 单进程入口\n│       └── runtime/       # bash / python3 / pnpm / node 及 glibc 运行库\n├── module_src_wipe/       # 用户数据清除模块源码\n├── build_module.py        # 主模块打包脚本\n├── build_wipe_module.py   # 清除模块打包脚本\n└── docs/                  # 发布文案等文档\n```\n\n## 已知限制\n\n- 仅支持 **ARM64** 设备\n- 基于 Debian arm64 官方包裁剪，部分依赖 `apt` 的 Linux 程序不可用（面板不会崩溃，仅提示不支持）\n- 面板内「在线更新青龙版本」不可用，升级方式为重刷新版模块\n\n## 免责声明\n\n本项目仅供学习研究，请遵守目标网站的服务条款，勿用于非法用途。使用本模块产生的一切后果由使用者自行承担。\n\n## 鸣谢\n\n- [whyour/qinglong](https://github.com/whyour/qinglong) — 青龙面板官方项目\n- [KernelSU](https://github.com/tiann/KernelSU) / [SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra) — Root 方案\n",
+  "readmeHTML": "<h1>青龙面板 Android Root 模块</h1>\n\n<p>把 <a href=\"https://github.com/whyour/qinglong\">青龙面板</a>（whyour/qinglong <b>v2.20.2</b>）跑在 Android ARM64 设备上的 Magisk / KernelSU 系 Root 模块。无需 Termux、无需 Docker、无需 Chroot，刷入即用。</p>\n\n<p>> 已实测环境：<b>SukiSU Ultra</b> + <b>联想 Y700 四代</b>。KernelSU 理论兼容（未实机验证）；Magisk 官方 App 无模块「执行」按钮，不推荐。</p>\n\n<h2>下载</h2>\n\n<p>前往 <a href=\"https://github.com/BlackLK/qinglong-2.20.2/releases\">Releases</a> 下载：</p>\n\n<p>| 文件 | 说明 |</p>\n<p>|---|---|</p>\n<p>| <code>QingLong-Android-Root-Module-vX.X.X.zip</code> | 青龙面板主模块（必需） |</p>\n<p>| <code>QingLong-DataWipe-vX.X.X.zip</code> | 用户数据清除工具（可选，彻底重置时用） |</p>\n<p>| <code>node.real</code> | Node.js linux-arm64 主程序，仅克隆源码自行构建时需要 |</p>\n\n<h2>功能</h2>\n\n<li>**单按钮智能启停**：在 Root 管理器里点「执行」启动面板（同时自动开启开机自启），再点一次停止（关闭自启）</li>\n<li>**启动资源报告**：启动时在日志打印内存（RAM）与磁盘占用、用户数据统计（任务/环境变量/依赖数量）</li>\n<li>**安装占用报告**：刷入完成时打印各部分磁盘占用明细</li>\n<li>**完整任务环境**：内置 `bash`、`python3.11`（含 pip）、`pnpm`，以及 `jq / curl / wget / openssl / tar / unzip / sed` 等 Linux 工具</li>\n<li>**依赖管理**：面板内可直接安装 NodeJS / Python3 / Linux 三类依赖</li>\n<li>**网络开箱即用**：内置本地 DNS 转发器与 CA 证书修复，HTTPS / GitHub 直连可用</li>\n<li>**数据与程序分离**：程序装在 `/data/adb/qinglong`，用户数据（脚本/数据库/配置/已装依赖）在 `/data/adb/qinglong-data`，卸载重刷不丢数据</li>\n\n<h2>刷入与使用</h2>\n\n<li>在 Root 管理器中刷入主模块 zip（解压部署约 1~3 分钟，属正常现象）</li>\n<li>**重启设备**（首次刷入后面板默认不自启）</li>\n<li>管理器中点击「青龙面板」模块的 **执行** 按钮 → 日志出现 `ALL SERVICES READY` 即启动成功</li>\n<li>浏览器访问 `http://<设备IP>:5700/`</li>\n\n<p>> 单进程架构说明：原版青龙使用 Node.js cluster 多进程编排，在 Android 的动态链接器环境下 worker 无法初始化。本模块将服务合并为单进程（<code>app_single.js</code>）以绕过该限制，gRPC(5500) 与 HTTP(5700) 由同一进程监听。</p>\n\n<h2>数据清除工具（可选模块）</h2>\n\n<p>独立小模块，装上后管理器多一个「执行」按钮：</p>\n\n<li>**第一次点击**：仅显示危险警告，不会删除任何东西</li>\n<li>**2 分钟内再次点击**：停止面板并永久清除 `/data/adb/qinglong-data`</li>\n<li>超过 2 分钟未确认，操作自动作废</li>\n\n<p>普通卸载/升级主模块<b>不需要</b>安装它。</p>\n\n<h2>从源码构建</h2>\n\n<pre>git clone https://github.com/BlackLK/qinglong-2.20.2.git\ncd qinglong-2.20.2\n\n# node.real 超过 GitHub 100MB 单文件限制，未入库，需自行放置：\n# 从 https://nodejs.org/dist/latest-v20.x/ 下载 node-v20.x.x-linux-arm64.tar.xz\n# 解出 bin/node，重命名为 node.real，放到 module_src/payload/runtime/bin/node.real\n\npython build_module.py       # 生成主模块 zip\npython build_wipe_module.py  # 生成清除数据模块 zip</pre>\n\n<h2>目录结构</h2>\n\n<pre>├── module_src/            # 青龙面板主模块源码\n│   ├── customize.sh       # 刷入安装脚本（分段进度日志）\n│   ├── service.sh         # 开机自启（受 autostart.conf 控制）\n│   ├── action.sh          # 管理器「执行」按钮（智能启停）\n│   ├── manager/           # 启动/停止/状态/资源报告脚本\n│   └── payload/\n│       ├── ql/            # 青龙 2.20.2 程序 + app_single.js 单进程入口\n│       └── runtime/       # bash / python3 / pnpm / node 及 glibc 运行库\n├── module_src_wipe/       # 用户数据清除模块源码\n├── build_module.py        # 主模块打包脚本\n├── build_wipe_module.py   # 清除模块打包脚本\n└── docs/                  # 发布文案等文档</pre>\n\n<h2>已知限制</h2>\n\n<li>仅支持 **ARM64** 设备</li>\n<li>基于 Debian arm64 官方包裁剪，部分依赖 `apt` 的 Linux 程序不可用（面板不会崩溃，仅提示不支持）</li>\n<li>面板内「在线更新青龙版本」不可用，升级方式为重刷新版模块</li>\n\n<h2>免责声明</h2>\n\n<p>本项目仅供学习研究，请遵守目标网站的服务条款，勿用于非法用途。使用本模块产生的一切后果由使用者自行承担。</p>\n\n<h2>鸣谢</h2>\n\n<li>[whyour/qinglong](https://github.com/whyour/qinglong) — 青龙面板官方项目</li>\n<li>[KernelSU](https://github.com/tiann/KernelSU) / [SukiSU Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra) — Root 方案</li>",
+  "homepageUrl": "https://github.com/BlackLK/qinglong-2.20.2",
+  "sourceUrl": "https://github.com/BlackLK/qinglong-2.20.2",
+  "url": "https://github.com/BlackLK/qinglong-2.20.2",
+  "latestRelease": {
+    "name": "v1.0.16",
+    "version": "v1.0.16",
+    "time": "2026-09-01T15:42:40Z",
+    "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.16/QingLong-DataWipe-v1.0.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.16",
+      "tagName": "v1.0.16",
+      "publishedAt": "2026-09-01T15:42:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QingLong-DataWipe-v1.0.4.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.16/QingLong-DataWipe-v1.0.4.zip",
+          "size": 3081,
+          "downloadCount": 0
+        },
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.16.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.16/QingLong-Android-Root-Module-v1.0.16.zip",
+          "size": 189596104,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.15",
+      "tagName": "v1.0.15",
+      "publishedAt": "2026-09-01T15:10:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QingLong-DataWipe-v1.0.4.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.15/QingLong-DataWipe-v1.0.4.zip",
+          "size": 3081,
+          "downloadCount": 0
+        },
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.15.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.15/QingLong-Android-Root-Module-v1.0.15.zip",
+          "size": 189596104,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.14",
+      "tagName": "v1.0.14",
+      "publishedAt": "2026-08-30T06:33:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.14.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.14/QingLong-Android-Root-Module-v1.0.14.zip",
+          "size": 182330762,
+          "downloadCount": 16
+        },
+        {
+          "name": "QingLong-DataWipe-v1.0.4.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.14/QingLong-DataWipe-v1.0.4.zip",
+          "size": 3081,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.0.13",
+      "tagName": "v1.0.13",
+      "publishedAt": "2026-08-27T14:37:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QingLong-DataWipe-v1.0.4.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.13/QingLong-DataWipe-v1.0.4.zip",
+          "size": 3081,
+          "downloadCount": 15
+        },
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.13.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.13/QingLong-Android-Root-Module-v1.0.13.zip",
+          "size": 182330210,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v1.0.12",
+      "tagName": "v1.0.12",
+      "publishedAt": "2026-08-27T14:26:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QingLong-DataWipe-v1.0.3.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.12/QingLong-DataWipe-v1.0.3.zip",
+          "size": 3080,
+          "downloadCount": 0
+        },
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.12.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.12/QingLong-Android-Root-Module-v1.0.12.zip",
+          "size": 182330085,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.10",
+      "tagName": "v1.0.10",
+      "publishedAt": "2026-08-27T14:10:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "node.real",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.10/node.real",
+          "size": 120592136,
+          "downloadCount": 0
+        },
+        {
+          "name": "QingLong-DataWipe-v1.0.1.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.10/QingLong-DataWipe-v1.0.1.zip",
+          "size": 2994,
+          "downloadCount": 0
+        },
+        {
+          "name": "QingLong-Android-Root-Module-v1.0.10.zip",
+          "downloadUrl": "https://github.com/BlackLK/qinglong-2.20.2/releases/download/v1.0.10/QingLong-Android-Root-Module-v1.0.10.zip",
+          "size": 182330096,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

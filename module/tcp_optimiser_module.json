@@ -1,0 +1,100 @@
+{
+  "readme": "# TCP_Optimiser_Module\nA Magisk/KernelSU module to change tcp congestion algorithm based on current active internet type and some network enhancements.\n\n# Why?\nIn certain kernel, TCP Congestion Algorithm BBR might be enabled. Or you want to enable certain algorithm or settings based on what interface you are using. I observed that in my kernel, when i use BBR with WiFi I get 50-60 Mbps more upload speed compared to cubic, but BBR gives bad upload speed in cellular. So I designed this module to switch based on active internet facing interface.\n\n# Features\n1. Set TCP Congestion Algorithm based on interface(Wi-Fi/Cellular).\n2. Auto Change TCP Congestion Algorithm on interface change.\n3. Set initcwnd and initrwnd value to max.\n\n# How to use\n1. Install the module.\n2. It creates 2 files `wlan_{algo}_{qdisc}` and `rmnet_data_{algo}_{qdisc}` in module folder.\n3. Reboot device.\n4. Basic Functionality of module must run normally on boot.\n\n# Tuning Module by files [/data/adb/modules/tcp_optimiser]\n1. TCP Congestion Algorithm can be changed for given interface by editing `{algo}` part of file name. `wlan_{algo}_{qdisc}` for Wi-Fi and `rmnet_data_{algo}_qdisc` for Cellular.\n2. Queuing Disciplines can be changed for given interface by editing `{qdisc}` part of file name. `wlan_{algo}_{qdisc}` for Wi-Fi and `rmnet_data_{algo}_qdisc` for Cellular.\n3. Create an empty file named `initcwnd_initrwnd` to set initcwnd and initrwnd value to max values.\n4. Create an empty file named `kill_connections` to kill all connections during switch. [Be carefull!]\n5. Create an empty file named `force_apply` to apply changes immediately.\n\n# Tuning Module by WebUI\nAll the module settings can be controlled using Module WebUI in KSU and APatch or KsuWebUIStandalone app for Magisk.\n\n## Note:\n1. `{algo}` in filename can be any TCP congestion algorithm (cubic, bbr, reno etc..). \n2. `{qdisc}` in filename can be any Queuing Disciplines (fq, fq_codel, pfifo_fast etc..). \n3. Default algorithm is **cubic** for **cellular**.\n4. Default algorithm is **bbr** if exists for **WiFi**. Else **cubic**.\n5. There is an option to kill current tcp connections during algorithm change. This will stop downloads, uploads or other ongoing connections. So apps affected might need to be restarted. This is disabled by default.\n6. Algorithm is applied only if present in kernel.\n7. Module logs are present in `/data/adb/modules/tcp_optimiser/service.log`.\n",
+  "readmeHTML": "<h1>TCP_Optimiser_Module</h1>\n<p>A Magisk/KernelSU module to change tcp congestion algorithm based on current active internet type and some network enhancements.</p>\n\n<h1>Why?</h1>\n<p>In certain kernel, TCP Congestion Algorithm BBR might be enabled. Or you want to enable certain algorithm or settings based on what interface you are using. I observed that in my kernel, when i use BBR with WiFi I get 50-60 Mbps more upload speed compared to cubic, but BBR gives bad upload speed in cellular. So I designed this module to switch based on active internet facing interface.</p>\n\n<h1>Features</h1>\n<li>Set TCP Congestion Algorithm based on interface(Wi-Fi/Cellular).</li>\n<li>Auto Change TCP Congestion Algorithm on interface change.</li>\n<li>Set initcwnd and initrwnd value to max.</li>\n\n<h1>How to use</h1>\n<li>Install the module.</li>\n<li>It creates 2 files `wlan_{algo}_{qdisc}` and `rmnet_data_{algo}_{qdisc}` in module folder.</li>\n<li>Reboot device.</li>\n<li>Basic Functionality of module must run normally on boot.</li>\n\n<h1>Tuning Module by files [/data/adb/modules/tcp_optimiser]</h1>\n<li>TCP Congestion Algorithm can be changed for given interface by editing `{algo}` part of file name. `wlan_{algo}_{qdisc}` for Wi-Fi and `rmnet_data_{algo}_qdisc` for Cellular.</li>\n<li>Queuing Disciplines can be changed for given interface by editing `{qdisc}` part of file name. `wlan_{algo}_{qdisc}` for Wi-Fi and `rmnet_data_{algo}_qdisc` for Cellular.</li>\n<li>Create an empty file named `initcwnd_initrwnd` to set initcwnd and initrwnd value to max values.</li>\n<li>Create an empty file named `kill_connections` to kill all connections during switch. [Be carefull!]</li>\n<li>Create an empty file named `force_apply` to apply changes immediately.</li>\n\n<h1>Tuning Module by WebUI</h1>\n<p>All the module settings can be controlled using Module WebUI in KSU and APatch or KsuWebUIStandalone app for Magisk.</p>\n\n<h2>Note:</h2>\n<li>`{algo}` in filename can be any TCP congestion algorithm (cubic, bbr, reno etc..).</li>\n<li>`{qdisc}` in filename can be any Queuing Disciplines (fq, fq_codel, pfifo_fast etc..).</li>\n<li>Default algorithm is **cubic** for **cellular**.</li>\n<li>Default algorithm is **bbr** if exists for **WiFi**. Else **cubic**.</li>\n<li>There is an option to kill current tcp connections during algorithm change. This will stop downloads, uploads or other ongoing connections. So apps affected might need to be restarted. This is disabled by default.</li>\n<li>Algorithm is applied only if present in kernel.</li>\n<li>Module logs are present in `/data/adb/modules/tcp_optimiser/service.log`.</li>",
+  "homepageUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module",
+  "sourceUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module",
+  "url": "https://github.com/fatalcoder524/TCP_Optimiser_Module",
+  "latestRelease": {
+    "name": "v1.7",
+    "version": "v1.7",
+    "time": "2025-05-10T15:06:34Z",
+    "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.7/TCP_Optimiser-1.7-8.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2025-05-10T15:06:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.7-8.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.7/TCP_Optimiser-1.7-8.zip",
+          "size": 53352,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2025-05-10T14:18:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.6-7.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.6/TCP_Optimiser-1.6-7.zip",
+          "size": 1130460,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2025-05-10T13:45:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.5-6.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.5/TCP_Optimiser-1.5-6.zip",
+          "size": 53196,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2025-05-10T13:25:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.4-5.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.4/TCP_Optimiser-1.4-5.zip",
+          "size": 53191,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2025-05-10T11:56:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.1-2.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.1/TCP_Optimiser-1.1-2.zip",
+          "size": 53184,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-05-09T18:46:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TCP_Optimiser-1.0-1.zip",
+          "downloadUrl": "https://github.com/fatalcoder524/TCP_Optimiser_Module/releases/download/v1.0/TCP_Optimiser-1.0-1.zip",
+          "size": 50974,
+          "downloadCount": 11
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

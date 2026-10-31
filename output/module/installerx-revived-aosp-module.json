@@ -1,0 +1,58 @@
+{
+  "readme": "# InstallerX Revived AOSP Module\n\nAuto-synced Magisk / KernelSU / APatch module that installs [InstallerX Revived](https://github.com/wxxsfxyzm/InstallerX-Revived) as the system package installer (`com.android.packageinstaller`).\n\n将 InstallerX Revived 替换为系统安装器的模块，自动跟随上游最新发布版本构建。\n\n## How it works\n\n- Every 2 hours a GitHub Actions job checks the newest upstream release (stable or preview, whichever is newer).\n- If it has not been built yet, the job builds it from source with `-PAPP_ID=com.android.packageinstaller`, signs it with this repo's own fixed key, and packs it in the same layout as the official AOSP module (`system/priv-app/PackageInstaller/PackageInstaller.apk`).\n- `update.json` is updated, so your root manager shows the update and installs it in one tap.\n\n## Install\n\n1. Download the zip from [Releases](../../releases/latest) and flash it in Magisk / KernelSU / APatch.\n2. Reboot.\n\nNew releases are announced on the Telegram channel [@ByteJuno](https://t.me/ByteJuno). 新版本发布会推送到 Telegram 频道 [@ByteJuno](https://t.me/ByteJuno)，欢迎关注。\n\nThe module id is `com.android.packageinstaller`, the same as the official AOSP module, so it updates that module in place.\n\n## Notes\n\n- The APK is signed with this repo's key, not upstream's. Switching from the official module changes the system installer's signature once; after that it stays stable.\n- APK `versionCode` is `1000000000 + upstream's` (git commit count). It must outrank the vendor installer at the same package name (ColorOS 17 ships 17000001), otherwise PackageManager ignores this copy. Updates never downgrade.\n- Do not install a `com.android.packageinstaller` APK on top manually: a `/data` update with a higher versionCode hides the module's copy.\n- Builds are unmodified upstream source apart from the application id. Report app bugs upstream only if they reproduce with official builds.\n\n## License\n\nModule scripts: GPL-3.0, same as upstream.\n",
+  "readmeHTML": "<h1>InstallerX Revived AOSP Module</h1>\n\n<p>Auto-synced Magisk / KernelSU / APatch module that installs <a href=\"https://github.com/wxxsfxyzm/InstallerX-Revived\">InstallerX Revived</a> as the system package installer (<code>com.android.packageinstaller</code>).</p>\n\n<p>将 InstallerX Revived 替换为系统安装器的模块，自动跟随上游最新发布版本构建。</p>\n\n<h2>How it works</h2>\n\n<li>Every 2 hours a GitHub Actions job checks the newest upstream release (stable or preview, whichever is newer).</li>\n<li>If it has not been built yet, the job builds it from source with `-PAPP_ID=com.android.packageinstaller`, signs it with this repo's own fixed key, and packs it in the same layout as the official AOSP module (`system/priv-app/PackageInstaller/PackageInstaller.apk`).</li>\n<li>`update.json` is updated, so your root manager shows the update and installs it in one tap.</li>\n\n<h2>Install</h2>\n\n<li>Download the zip from [Releases](../../releases/latest) and flash it in Magisk / KernelSU / APatch.</li>\n<li>Reboot.</li>\n\n<p>New releases are announced on the Telegram channel <a href=\"https://t.me/ByteJuno\">@ByteJuno</a>. 新版本发布会推送到 Telegram 频道 <a href=\"https://t.me/ByteJuno\">@ByteJuno</a>，欢迎关注。</p>\n\n<p>The module id is <code>com.android.packageinstaller</code>, the same as the official AOSP module, so it updates that module in place.</p>\n\n<h2>Notes</h2>\n\n<li>The APK is signed with this repo's key, not upstream's. Switching from the official module changes the system installer's signature once; after that it stays stable.</li>\n<li>APK `versionCode` is `1000000000 + upstream's` (git commit count). It must outrank the vendor installer at the same package name (ColorOS 17 ships 17000001), otherwise PackageManager ignores this copy. Updates never downgrade.</li>\n<li>Do not install a `com.android.packageinstaller` APK on top manually: a `/data` update with a higher versionCode hides the module's copy.</li>\n<li>Builds are unmodified upstream source apart from the application id. Report app bugs upstream only if they reproduce with official builds.</li>\n\n<h2>License</h2>\n\n<p>Module scripts: GPL-3.0, same as upstream.</p>",
+  "homepageUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module",
+  "sourceUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module",
+  "url": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module",
+  "latestRelease": {
+    "name": "26.10.35d7c7a",
+    "version": "26.10.35d7c7a",
+    "time": "2026-10-20T17:18:17Z",
+    "downloadUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module/releases/download/26.10.35d7c7a/InstallerX-Revived-AOSP-26.10.35d7c7a.zip"
+  },
+  "releases": [
+    {
+      "name": "26.10.35d7c7a",
+      "tagName": "26.10.35d7c7a",
+      "publishedAt": "2026-10-20T17:18:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "InstallerX-Revived-AOSP-26.10.35d7c7a.zip",
+          "downloadUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module/releases/download/26.10.35d7c7a/InstallerX-Revived-AOSP-26.10.35d7c7a.zip",
+          "size": 4532409,
+          "downloadCount": 186
+        }
+      ]
+    },
+    {
+      "name": "26.10.4f3c04b",
+      "tagName": "26.10.4f3c04b",
+      "publishedAt": "2026-10-17T15:49:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "InstallerX-Revived-AOSP-26.10.4f3c04b.zip",
+          "downloadUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module/releases/download/26.10.4f3c04b/InstallerX-Revived-AOSP-26.10.4f3c04b.zip",
+          "size": 4528247,
+          "downloadCount": 78
+        }
+      ]
+    },
+    {
+      "name": "26.10.cb9a24d",
+      "tagName": "26.10.cb9a24d",
+      "publishedAt": "2026-10-12T06:40:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "InstallerX-Revived-AOSP-26.10.cb9a24d.zip",
+          "downloadUrl": "https://github.com/ByteJuno/InstallerX-Revived-AOSP-Module/releases/download/26.10.cb9a24d/InstallerX-Revived-AOSP-26.10.cb9a24d.zip",
+          "size": 4546102,
+          "downloadCount": 24
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

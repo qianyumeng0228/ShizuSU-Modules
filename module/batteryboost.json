@@ -1,0 +1,44 @@
+{
+  "readme": "# BatteryBoost for Realme GT Neo 5 SE (RMX3700 / RE585F)\n\nAdvanced power optimization and scheduler tuning module for **KernelSU** and **Magisk**. Designed for recent builds (Android 15/16) to eliminate idle drain, reduce thermal throttling under basic tasks, and optimize WALT/CPU behavior without dropping UI responsiveness.\n\n---\n\n## Technical Specifications & Features\n\n### CPU & WALT Tuning\n* **ORMS Neutralization:** Complete bypass using a bind-mount stub (`orms_stub`).\n* **WALT Conservative Profile:** Enabled `sched_conservative_pl=1`. Uses conservative load forecasting for minor tasks (notifications, brief wakeups) to prevent unnecessary frequency spikes.\n* **Core Efficiency:** * **Silver (LITTLE):** `need_cpus=0`, 50ms offline delay, `adaptive_low_freq` synchronized with hardware minimum (300MHz) for correct adaptive scaling.\n  * **Gold (Big):** Migration threshold for the second Gold core raised to 4 tasks.\n* **Overhead Reduction:** Disabled `sched_boost`, set `init_task_load=0` and `tunable_scaling=1`.\n\n### Frequency Capping & Reapply Daemons\n* **Early Caps (`post-fs-data.sh`):** Freq caps for Gold (2112000) and Prime (2707200) are enforced at the earliest boot stage to block early-boot power spikes before the main script execution.\n* **Fast Daemon:** Background loop checking 10 key parameters every 15 seconds. Enforces CPU/GPU caps and LLCC/Stune tunables to counter aggressive stock overrides from `vendor.perf`.\n* **Slow Daemon & Logging:** Periodic verification of `gpu_idle_timer=64` and LLCC parameters. Outputs explicit fixed entries to logs (e.g., `Fixed: gold_max_freq`).\n\n### Memory Management\n* **ZRAM Tuning:** Enforced `zstd` compression algorithm with `compaction` interval set to 20.\n* **HybridSwap Integration:** Full compatibility with Realme's hybrid swap architecture. Optimizes `kswapd` behavior to minimize parasitic CPU overhead during memory reclaiming.\n\n### Networking, I/O & IRQs\n* **Network Stability:** Set `netdev_max_backlog=5000` to fix aggressive drop issues and eliminate packet loss/disconnects under load.\n* **I/O Tweaks:** Enforced custom `rq_affinity` parameters and queue optimization across all `dm-` nodes.\n* **Interrupt Filtering:** Stripped firmware-locked instances, `msm_irqbalance`, and redundant UFS IRQs. Cleaned Glink IRQ overhead to eliminate log spam.\n* **Peripherals:** 5-second Wi-Fi autosuspend delay.\n\n### Gaming Logic\n* **Smart Boost:** Dynamic load detection. Automatically suspends all power limits during heavy gaming sessions to sustain maximum FPS, reapplying them instantly upon exit.\n\n  \n[![Download](https://img.shields.io/github/v/release/ZhilkaD/BatteryBoost?label=Download%20ZIP&style=for-the-badge)](https://github.com/ZhilkaD/BatteryBoost/releases/latest)\n",
+  "readmeHTML": "<h1>BatteryBoost for Realme GT Neo 5 SE (RMX3700 / RE585F)</h1>\n\n<p>Advanced power optimization and scheduler tuning module for <b>KernelSU</b> and <b>Magisk</b>. Designed for recent builds (Android 15/16) to eliminate idle drain, reduce thermal throttling under basic tasks, and optimize WALT/CPU behavior without dropping UI responsiveness.</p>\n\n<p>---</p>\n\n<h2>Technical Specifications & Features</h2>\n\n<h3>CPU & WALT Tuning</h3>\n<li>**ORMS Neutralization:** Complete bypass using a bind-mount stub (`orms_stub`).</li>\n<li>**WALT Conservative Profile:** Enabled `sched_conservative_pl=1`. Uses conservative load forecasting for minor tasks (notifications, brief wakeups) to prevent unnecessary frequency spikes.</li>\n<li>**Core Efficiency:** * **Silver (LITTLE):** `need_cpus=0`, 50ms offline delay, `adaptive_low_freq` synchronized with hardware minimum (300MHz) for correct adaptive scaling.</li>\n<p>  * <b>Gold (Big):</b> Migration threshold for the second Gold core raised to 4 tasks.</p>\n<li>**Overhead Reduction:** Disabled `sched_boost`, set `init_task_load=0` and `tunable_scaling=1`.</li>\n\n<h3>Frequency Capping & Reapply Daemons</h3>\n<li>**Early Caps (`post-fs-data.sh`):** Freq caps for Gold (2112000) and Prime (2707200) are enforced at the earliest boot stage to block early-boot power spikes before the main script execution.</li>\n<li>**Fast Daemon:** Background loop checking 10 key parameters every 15 seconds. Enforces CPU/GPU caps and LLCC/Stune tunables to counter aggressive stock overrides from `vendor.perf`.</li>\n<li>**Slow Daemon & Logging:** Periodic verification of `gpu_idle_timer=64` and LLCC parameters. Outputs explicit fixed entries to logs (e.g., `Fixed: gold_max_freq`).</li>\n\n<h3>Memory Management</h3>\n<li>**ZRAM Tuning:** Enforced `zstd` compression algorithm with `compaction` interval set to 20.</li>\n<li>**HybridSwap Integration:** Full compatibility with Realme's hybrid swap architecture. Optimizes `kswapd` behavior to minimize parasitic CPU overhead during memory reclaiming.</li>\n\n<h3>Networking, I/O & IRQs</h3>\n<li>**Network Stability:** Set `netdev_max_backlog=5000` to fix aggressive drop issues and eliminate packet loss/disconnects under load.</li>\n<li>**I/O Tweaks:** Enforced custom `rq_affinity` parameters and queue optimization across all `dm-` nodes.</li>\n<li>**Interrupt Filtering:** Stripped firmware-locked instances, `msm_irqbalance`, and redundant UFS IRQs. Cleaned Glink IRQ overhead to eliminate log spam.</li>\n<li>**Peripherals:** 5-second Wi-Fi autosuspend delay.</li>\n\n<h3>Gaming Logic</h3>\n<li>**Smart Boost:** Dynamic load detection. Automatically suspends all power limits during heavy gaming sessions to sustain maximum FPS, reapplying them instantly upon exit.</li>\n\n\n<p><a href=\"https://img.shields.io/github/v/release/ZhilkaD/BatteryBoost?label=Download%20ZIP&style=for-the-badge\">![Download</a>](https://github.com/ZhilkaD/BatteryBoost/releases/latest)</p>",
+  "homepageUrl": "https://github.com/ZhilkaD/BatteryBoost",
+  "sourceUrl": "https://github.com/ZhilkaD/BatteryBoost",
+  "url": "https://github.com/ZhilkaD/BatteryBoost",
+  "latestRelease": {
+    "name": "v3.1.0",
+    "version": "v3.1.0",
+    "time": "2026-06-17T15:15:34Z",
+    "downloadUrl": "https://github.com/ZhilkaD/BatteryBoost/releases/download/v3.1.0/BatteryBoost_GTNeo5SE_v3_1.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.1.0",
+      "tagName": "v3.1.0",
+      "publishedAt": "2026-06-17T15:15:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BatteryBoost_GTNeo5SE_v3_1.zip",
+          "downloadUrl": "https://github.com/ZhilkaD/BatteryBoost/releases/download/v3.1.0/BatteryBoost_GTNeo5SE_v3_1.zip",
+          "size": 30009,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2026-06-14T18:21:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BatteryBoost_GTNeo5SE_v3.zip",
+          "downloadUrl": "https://github.com/ZhilkaD/BatteryBoost/releases/download/v3.0.0/BatteryBoost_GTNeo5SE_v3.zip",
+          "size": 21141,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

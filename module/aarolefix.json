@@ -1,0 +1,44 @@
+{
+  "readme": "# Android Auto Role Fix for MIUI / HyperOS\n\nA companion module for [aa4mg](https://github.com/sn-00-x/aa4mg). Fixes Android Auto role definitions on Xiaomi's CN ROMs (MIUI / HyperOS).\n\n## Disclaimer\n\nTested only on **Mi 10 with MIUI 14**. Use on other devices or ROM versions at your own risk. Modifications to your system may be required.\n\n### The Problem\n\nOn Xiaomi's stock CN ROMs, Android Auto crashes on launch with a `java.lang.SecurityException`. Logcat analysis reveals this is because the app fails to acquire the `android.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION` permission.\n\nThis critical permission is managed by the Android system's Role Manager. To obtain it, an app must be granted the `SYSTEM_AUTOMOTIVE_PROJECTION` role.\n\nThe root cause is that the role definition file on CN ROMs, `GmsCnConfigOverlay.apk`, is stripped down and does **not** define this necessary role.\n\n### The Fix\n\nThis module replaces the incomplete `GmsCnConfigOverlay.apk` with the full version (`GmsConfigOverlayCommon.apk`) from the Global ROM. This restored APK correctly defines the `SYSTEM_AUTOMOTIVE_PROJECTION` role, allowing the system to grant it—and its associated permissions, including `REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION`—to Android Auto.\n\n### Usage\n\nIf you have already correctly installed `aa4mg` but the phone shows no reaction without any error, then try installing this module alongside the `aa4mg` module to resolve the issue.\n### Credits\n\n- Core solution discovered and detailed from [here](https://zhuanlan.zhihu.com/p/743030058).\n",
+  "readmeHTML": "<h1>Android Auto Role Fix for MIUI / HyperOS</h1>\n\n<p>A companion module for <a href=\"https://github.com/sn-00-x/aa4mg\">aa4mg</a>. Fixes Android Auto role definitions on Xiaomi's CN ROMs (MIUI / HyperOS).</p>\n\n<h2>Disclaimer</h2>\n\n<p>Tested only on <b>Mi 10 with MIUI 14</b>. Use on other devices or ROM versions at your own risk. Modifications to your system may be required.</p>\n\n<h3>The Problem</h3>\n\n<p>On Xiaomi's stock CN ROMs, Android Auto crashes on launch with a <code>java.lang.SecurityException</code>. Logcat analysis reveals this is because the app fails to acquire the <code>android.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION</code> permission.</p>\n\n<p>This critical permission is managed by the Android system's Role Manager. To obtain it, an app must be granted the <code>SYSTEM_AUTOMOTIVE_PROJECTION</code> role.</p>\n\n<p>The root cause is that the role definition file on CN ROMs, <code>GmsCnConfigOverlay.apk</code>, is stripped down and does <b>not</b> define this necessary role.</p>\n\n<h3>The Fix</h3>\n\n<p>This module replaces the incomplete <code>GmsCnConfigOverlay.apk</code> with the full version (<code>GmsConfigOverlayCommon.apk</code>) from the Global ROM. This restored APK correctly defines the <code>SYSTEM_AUTOMOTIVE_PROJECTION</code> role, allowing the system to grant it—and its associated permissions, including <code>REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION</code>—to Android Auto.</p>\n\n<h3>Usage</h3>\n\n<p>If you have already correctly installed <code>aa4mg</code> but the phone shows no reaction without any error, then try installing this module alongside the <code>aa4mg</code> module to resolve the issue.</p>\n<h3>Credits</h3>\n\n<li>Core solution discovered and detailed from [here](https://zhuanlan.zhihu.com/p/743030058).</li>",
+  "homepageUrl": "https://github.com/Choultion-Rudas/AARoleFix",
+  "sourceUrl": "https://github.com/Choultion-Rudas/AARoleFix",
+  "url": "https://github.com/Choultion-Rudas/AARoleFix",
+  "latestRelease": {
+    "name": "v0.2",
+    "version": "v0.2",
+    "time": "2025-08-04T00:49:39Z",
+    "downloadUrl": "https://github.com/Choultion-Rudas/AARoleFix/releases/download/v0.2/AARoleFix.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2",
+      "tagName": "v0.2",
+      "publishedAt": "2025-08-04T00:49:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AARoleFix.zip",
+          "downloadUrl": "https://github.com/Choultion-Rudas/AARoleFix/releases/download/v0.2/AARoleFix.zip",
+          "size": 12931,
+          "downloadCount": 242
+        }
+      ]
+    },
+    {
+      "name": "v0.1",
+      "tagName": "v0.1",
+      "publishedAt": "2025-07-29T14:16:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AARoleFix.zip",
+          "downloadUrl": "https://github.com/Choultion-Rudas/AARoleFix/releases/download/v0.1/AARoleFix.zip",
+          "size": 12863,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

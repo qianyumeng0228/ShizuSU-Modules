@@ -1,0 +1,44 @@
+{
+  "readme": "# Bluetooth Volume Boost v1.9\n\n[English](#english) | [中文](#中文)\n\n---\n\n## English\n\nKernelSU/Magisk module: Bluetooth volume unlock + Hi-Res audio support with optimized speaker output.\n\n### Features\n\n**Volume Control**\n- 150-step fine volume control\n- Disable Bluetooth absolute volume (independent phone/BT device volume)\n- Bypass safe media volume warning\n- Attempt to disable LowPerfMode (RedMagic auto-gain feature)\n\n**Optimized Audio Architecture**\n- Speaker: 48kHz native output (no unnecessary resampling)\n- Hi-Res players (HiBy, UAPP): up to 384kHz via direct_pcm\n- USB DAC: up to 384kHz direct output\n- Wired headphones: up to 192kHz Hi-Res\n- Bluetooth A2DP: up to 192kHz (LDAC/LHDC)\n\n**Bluetooth Codec Support**\n- LDAC, LHDC v5, aptX HD, aptX Adaptive\n- SBC high bitrate mode\n- A2DP Offload optimization\n- AAC VBR frame control\n\n### Audio Flow\n\n```\nApp Audio\n    ↓\n┌───────────────────────────────────────────┐\n│ Regular Apps (YouTube, etc.)              │\n│ → deep_buffer (48kHz) → Speaker (48kHz)   │  ← No resampling!\n├───────────────────────────────────────────┤\n│ Hi-Res Players (HiBy, UAPP)               │\n│ → direct_pcm (384kHz) → USB DAC (384kHz)  │  ← Bit-perfect!\n│ → direct_pcm (192kHz) → Wired (192kHz)    │\n│ → direct_pcm (96kHz) → BT LDAC (96kHz)    │\n└───────────────────────────────────────────┘\n```\n\n### Installation\n\n1. Install module via KernelSU or Magisk\n2. Reboot device\n3. For Bluetooth: Set phone volume to max, adjust volume on BT device\n\n### Compatibility\n\n- Android 10+\n- KernelSU / Magisk\n- Tested: NX729J (RedMagic 8 Pro), Qualcomm Kalama (SM8550)\n\n### Notes\n\n- Enable DTS audio effect when using speaker (avoids LowPerfMode noise)\n- Hi-Res playback requires apps that support direct_pcm output (HiBy, UAPP, Neutron, etc.)\n\n---\n\n## 中文\n\nKernelSU/Magisk 模块：蓝牙音量解锁 + Hi-Res 音频支持，优化喇叭输出。\n\n### 功能\n\n**音量控制**\n- 150 级音量精细控制\n- 禁用蓝牙绝对音量（手机和蓝牙设备音量独立控制）\n- 绕过安全音量警告\n- 尝试禁用 LowPerfMode（红魔自动增益功能）\n\n**优化的音频架构**\n- 喇叭：48kHz 原生输出（无需降采样）\n- Hi-Res 播放器（海贝、UAPP）：通过 direct_pcm 支持 384kHz\n- USB DAC：支持 384kHz 直通\n- 有线耳机：支持 192kHz Hi-Res\n- 蓝牙 A2DP：支持 192kHz（LDAC/LHDC）\n\n**蓝牙编解码器支持**\n- LDAC, LHDC v5, aptX HD, aptX Adaptive\n- SBC 高比特率模式\n- A2DP Offload 优化\n\n### 音频流程\n\n```\nApp 音频\n    ↓\n┌───────────────────────────────────────────┐\n│ 普通 App（YouTube 等）                     │\n│ → deep_buffer (48kHz) → 喇叭 (48kHz)      │  ← 无需降采样！\n├───────────────────────────────────────────┤\n│ Hi-Res 播放器（海贝、UAPP）                │\n│ → direct_pcm (384kHz) → USB DAC (384kHz)  │  ← 比特完美！\n│ → direct_pcm (192kHz) → 有线耳机 (192kHz) │\n│ → direct_pcm (96kHz) → 蓝牙 LDAC (96kHz)  │\n└───────────────────────────────────────────┘\n```\n\n### 安装\n\n1. 通过 KernelSU 或 Magisk 安装模块\n2. 重启设备\n3. 蓝牙使用：手机音量调到最大，用蓝牙设备调节音量\n\n### 兼容性\n\n- Android 10+\n- KernelSU / Magisk\n- 已测试：NX729J (红魔8 Pro), Qualcomm Kalama (SM8550)\n\n### 注意事项\n\n- 喇叭播放建议开启 DTS 音效（避免 LowPerfMode 导致的底噪）\n- Hi-Res 播放需要支持 direct_pcm 输出的 App（海贝、UAPP、Neutron 等）\n\n---\n\n## License\n\nMIT\n",
+  "readmeHTML": "<h1>Bluetooth Volume Boost v1.9</h1>\n\n<p><a href=\"#english\">English</a> | <a href=\"#中文\">中文</a></p>\n\n<p>---</p>\n\n<h2>English</h2>\n\n<p>KernelSU/Magisk module: Bluetooth volume unlock + Hi-Res audio support with optimized speaker output.</p>\n\n<h3>Features</h3>\n\n<p><b>Volume Control</b></p>\n<li>150-step fine volume control</li>\n<li>Disable Bluetooth absolute volume (independent phone/BT device volume)</li>\n<li>Bypass safe media volume warning</li>\n<li>Attempt to disable LowPerfMode (RedMagic auto-gain feature)</li>\n\n<p><b>Optimized Audio Architecture</b></p>\n<li>Speaker: 48kHz native output (no unnecessary resampling)</li>\n<li>Hi-Res players (HiBy, UAPP): up to 384kHz via direct_pcm</li>\n<li>USB DAC: up to 384kHz direct output</li>\n<li>Wired headphones: up to 192kHz Hi-Res</li>\n<li>Bluetooth A2DP: up to 192kHz (LDAC/LHDC)</li>\n\n<p><b>Bluetooth Codec Support</b></p>\n<li>LDAC, LHDC v5, aptX HD, aptX Adaptive</li>\n<li>SBC high bitrate mode</li>\n<li>A2DP Offload optimization</li>\n<li>AAC VBR frame control</li>\n\n<h3>Audio Flow</h3>\n\n<pre>App Audio\n    ↓\n┌───────────────────────────────────────────┐\n│ Regular Apps (YouTube, etc.)              │\n│ → deep_buffer (48kHz) → Speaker (48kHz)   │  ← No resampling!\n├───────────────────────────────────────────┤\n│ Hi-Res Players (HiBy, UAPP)               │\n│ → direct_pcm (384kHz) → USB DAC (384kHz)  │  ← Bit-perfect!\n│ → direct_pcm (192kHz) → Wired (192kHz)    │\n│ → direct_pcm (96kHz) → BT LDAC (96kHz)    │\n└───────────────────────────────────────────┘</pre>\n\n<h3>Installation</h3>\n\n<li>Install module via KernelSU or Magisk</li>\n<li>Reboot device</li>\n<li>For Bluetooth: Set phone volume to max, adjust volume on BT device</li>\n\n<h3>Compatibility</h3>\n\n<li>Android 10+</li>\n<li>KernelSU / Magisk</li>\n<li>Tested: NX729J (RedMagic 8 Pro), Qualcomm Kalama (SM8550)</li>\n\n<h3>Notes</h3>\n\n<li>Enable DTS audio effect when using speaker (avoids LowPerfMode noise)</li>\n<li>Hi-Res playback requires apps that support direct_pcm output (HiBy, UAPP, Neutron, etc.)</li>\n\n<p>---</p>\n\n<h2>中文</h2>\n\n<p>KernelSU/Magisk 模块：蓝牙音量解锁 + Hi-Res 音频支持，优化喇叭输出。</p>\n\n<h3>功能</h3>\n\n<p><b>音量控制</b></p>\n<li>150 级音量精细控制</li>\n<li>禁用蓝牙绝对音量（手机和蓝牙设备音量独立控制）</li>\n<li>绕过安全音量警告</li>\n<li>尝试禁用 LowPerfMode（红魔自动增益功能）</li>\n\n<p><b>优化的音频架构</b></p>\n<li>喇叭：48kHz 原生输出（无需降采样）</li>\n<li>Hi-Res 播放器（海贝、UAPP）：通过 direct_pcm 支持 384kHz</li>\n<li>USB DAC：支持 384kHz 直通</li>\n<li>有线耳机：支持 192kHz Hi-Res</li>\n<li>蓝牙 A2DP：支持 192kHz（LDAC/LHDC）</li>\n\n<p><b>蓝牙编解码器支持</b></p>\n<li>LDAC, LHDC v5, aptX HD, aptX Adaptive</li>\n<li>SBC 高比特率模式</li>\n<li>A2DP Offload 优化</li>\n\n<h3>音频流程</h3>\n\n<pre>App 音频\n    ↓\n┌───────────────────────────────────────────┐\n│ 普通 App（YouTube 等）                     │\n│ → deep_buffer (48kHz) → 喇叭 (48kHz)      │  ← 无需降采样！\n├───────────────────────────────────────────┤\n│ Hi-Res 播放器（海贝、UAPP）                │\n│ → direct_pcm (384kHz) → USB DAC (384kHz)  │  ← 比特完美！\n│ → direct_pcm (192kHz) → 有线耳机 (192kHz) │\n│ → direct_pcm (96kHz) → 蓝牙 LDAC (96kHz)  │\n└───────────────────────────────────────────┘</pre>\n\n<h3>安装</h3>\n\n<li>通过 KernelSU 或 Magisk 安装模块</li>\n<li>重启设备</li>\n<li>蓝牙使用：手机音量调到最大，用蓝牙设备调节音量</li>\n\n<h3>兼容性</h3>\n\n<li>Android 10+</li>\n<li>KernelSU / Magisk</li>\n<li>已测试：NX729J (红魔8 Pro), Qualcomm Kalama (SM8550)</li>\n\n<h3>注意事项</h3>\n\n<li>喇叭播放建议开启 DTS 音效（避免 LowPerfMode 导致的底噪）</li>\n<li>Hi-Res 播放需要支持 direct_pcm 输出的 App（海贝、UAPP、Neutron 等）</li>\n\n<p>---</p>\n\n<h2>License</h2>\n\n<p>MIT</p>",
+  "homepageUrl": "https://github.com/mq0227/BluetoothVolumeBoost",
+  "sourceUrl": "https://github.com/mq0227/BluetoothVolumeBoost",
+  "url": "https://github.com/mq0227/BluetoothVolumeBoost",
+  "latestRelease": {
+    "name": "v1.9",
+    "version": "v1.9",
+    "time": "2026-01-04T14:34:52Z",
+    "downloadUrl": "https://github.com/mq0227/BluetoothVolumeBoost/releases/download/v1.9/BluetoothVolumeBoost-v1.9.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.9",
+      "tagName": "v1.9",
+      "publishedAt": "2026-01-04T14:34:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BluetoothVolumeBoost-v1.9.zip",
+          "downloadUrl": "https://github.com/mq0227/BluetoothVolumeBoost/releases/download/v1.9/BluetoothVolumeBoost-v1.9.zip",
+          "size": 14773,
+          "downloadCount": 419
+        }
+      ]
+    },
+    {
+      "name": "v1.8",
+      "tagName": "v1.8",
+      "publishedAt": "2026-01-04T11:40:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BluetoothVolumeBoost-v1.8.zip",
+          "downloadUrl": "https://github.com/mq0227/BluetoothVolumeBoost/releases/download/v1.8/BluetoothVolumeBoost-v1.8.zip",
+          "size": 15031,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

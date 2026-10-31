@@ -1,0 +1,100 @@
+{
+  "readme": "# Riru - IFWEnhance\n\nA module of [Riru](https://github.com/RikkaApps/Riru)/[Zygisk](https://github.com/topjohnwu/zygisk-module-sample). Allows Intent Firewall to filter results of queryIntent(Activities/Services) APIs.\n\n## Requirements\n\n* Zygote inject framework installed\n  - Riru >= 26.0\n  - Zygisk >= 24000\n* Android 8.0+\n\n## Feature\n\nAllows Intent Firewall to filter results of follow APIs.\n\n- `IPackageManager.queryIntentActivities`\n- `IPackageManager.queryIntentActivityOptions`\n- `IPackageManager.queryIntentServices`\n\n\n## Build\n\n1. Install JDK, Android SDK\n\n2. Configure sdk path in local.properties \n\n   ```properties\n   sdk.dir=/path/to/android/sdk\n   ```\n\n3. Build\n\n    ``` bash \n    ./gradlew module:assembleRelease\n    ```\n    \n4. Pick `<loader>-ifw-enhance-<version>.zip` from `module/build/outputs/<loader>/release`\n\n",
+  "readmeHTML": "<h1>Riru - IFWEnhance</h1>\n\n<p>A module of <a href=\"https://github.com/RikkaApps/Riru\">Riru</a>/<a href=\"https://github.com/topjohnwu/zygisk-module-sample\">Zygisk</a>. Allows Intent Firewall to filter results of queryIntent(Activities/Services) APIs.</p>\n\n<h2>Requirements</h2>\n\n<li>Zygote inject framework installed</li>\n<p>  - Riru >= 26.0</p>\n<p>  - Zygisk >= 24000</p>\n<li>Android 8.0+</li>\n\n<h2>Feature</h2>\n\n<p>Allows Intent Firewall to filter results of follow APIs.</p>\n\n<li>`IPackageManager.queryIntentActivities`</li>\n<li>`IPackageManager.queryIntentActivityOptions`</li>\n<li>`IPackageManager.queryIntentServices`</li>\n\n\n<h2>Build</h2>\n\n<li>Install JDK, Android SDK</li>\n\n<li>Configure sdk path in local.properties</li>\n\n<p>   ```properties</p>\n<p>   sdk.dir=/path/to/android/sdk</p>\n<p>   ```</p>\n\n<li>Build</li>\n\n<p>    ``` bash</p>\n<p>    ./gradlew module:assembleRelease</p>\n<p>    ```</p>\n\n<li>Pick `<loader>-ifw-enhance-<version>.zip` from `module/build/outputs/<loader>/release`</li>\n",
+  "homepageUrl": "https://github.com/Kr328/Riru-IFWEnhance",
+  "sourceUrl": "https://github.com/Kr328/Riru-IFWEnhance",
+  "url": "https://github.com/Kr328/Riru-IFWEnhance",
+  "latestRelease": {
+    "name": "v8",
+    "version": "v8",
+    "time": "2021-04-27T14:59:44Z",
+    "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v8/riru-ifw-enhance-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v8",
+      "tagName": "v8",
+      "publishedAt": "2021-04-27T14:59:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance-release.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v8/riru-ifw-enhance-release.zip",
+          "size": 25271,
+          "downloadCount": 823
+        }
+      ]
+    },
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2020-10-25T04:02:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance-release.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v5/riru-ifw-enhance-release.zip",
+          "size": 27299,
+          "downloadCount": 453
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2019-11-12T06:24:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v4/riru-ifw-enhance.zip",
+          "size": 157860,
+          "downloadCount": 508
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2019-07-13T06:35:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v3/riru-ifw-enhance.zip",
+          "size": 159662,
+          "downloadCount": 110
+        }
+      ]
+    },
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2019-07-10T15:19:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v2/riru-ifw-enhance.zip",
+          "size": 158732,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2019-06-26T11:18:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "riru-ifw-enhance.zip",
+          "downloadUrl": "https://github.com/Kr328/Riru-IFWEnhance/releases/download/v1/riru-ifw-enhance.zip",
+          "size": 158346,
+          "downloadCount": 70
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

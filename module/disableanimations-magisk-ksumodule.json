@@ -1,0 +1,30 @@
+{
+  "readme": "# Disable Animations Magisk & KSU Module\n\nA Magisk / KernelSU module that automatically sets all animation scales to `0.0` on every boot to reduce micro-stutter in some games on such gpu-layered systems like WSA.\n\n> ### ⚠️ DISCLAIMER ⚠️\n> **I am not responsible** for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!\n\n## What Does It Do?\n\nSometimes Android resets animation scales to their defaults on every restart. This module sets the following global settings to `0.0` automatically after each boot:\n\n- `window_animation_scale`\n- `transition_animation_scale`\n- `animator_duration_scale`\n\nDisabling these animations reduces rendering overhead in software graphics translation layer, which can help reduce periodic frame time spikes in games.\n\n## How It Works\n\n1. Waits for the device to fully boot.\n2. Sets all three animation scales to `0.0` via the `settings` command.\n3. Verifies the changes and reports the result in the module description.\n\n## Installation\n\n1. [Download the latest release](https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/releases/latest/download/DisableAnimations-Magisk-KSUModule-main.zip\n).\n2. Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.\n3. Reboot.\n4. Verify via: `adb shell settings get global window_animation_scale` should return `0.0`.\n5. You're all set!\n6. If you experience any issues, please open one through the [Issues](https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/issues) panel.\n\n## Uninstallation\n\nUninstalling the module via Magisk/KSU Manager and rebooting will automatically restore all animation scales to `1.0`.\n\n## Compatibility\n\n- Android 8.0+\n- Magisk or KernelSU or KernelSU Next\n",
+  "readmeHTML": "<h1>Disable Animations Magisk & KSU Module</h1>\n\n<p>A Magisk / KernelSU module that automatically sets all animation scales to <code>0.0</code> on every boot to reduce micro-stutter in some games on such gpu-layered systems like WSA.</p>\n\n<p>> ### ⚠️ DISCLAIMER ⚠️</p>\n<p>> <b>I am not responsible</b> for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!</p>\n\n<h2>What Does It Do?</h2>\n\n<p>Sometimes Android resets animation scales to their defaults on every restart. This module sets the following global settings to <code>0.0</code> automatically after each boot:</p>\n\n<li>`window_animation_scale`</li>\n<li>`transition_animation_scale`</li>\n<li>`animator_duration_scale`</li>\n\n<p>Disabling these animations reduces rendering overhead in software graphics translation layer, which can help reduce periodic frame time spikes in games.</p>\n\n<h2>How It Works</h2>\n\n<li>Waits for the device to fully boot.</li>\n<li>Sets all three animation scales to `0.0` via the `settings` command.</li>\n<li>Verifies the changes and reports the result in the module description.</li>\n\n<h2>Installation</h2>\n\n<li>[Download the latest release](https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/releases/latest/download/DisableAnimations-Magisk-KSUModule-main.zip</li>\n<p>).</p>\n<li>Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.</li>\n<li>Reboot.</li>\n<li>Verify via: `adb shell settings get global window_animation_scale` should return `0.0`.</li>\n<li>You're all set!</li>\n<li>If you experience any issues, please open one through the [Issues](https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/issues) panel.</li>\n\n<h2>Uninstallation</h2>\n\n<p>Uninstalling the module via Magisk/KSU Manager and rebooting will automatically restore all animation scales to <code>1.0</code>.</p>\n\n<h2>Compatibility</h2>\n\n<li>Android 8.0+</li>\n<li>Magisk or KernelSU or KernelSU Next</li>",
+  "homepageUrl": "https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule",
+  "sourceUrl": "https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule",
+  "url": "https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-04-26T13:21:44Z",
+    "downloadUrl": "https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/releases/download/v1.0.0/DisableAnimations-Magisk-KSUModule-main.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-04-26T13:21:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DisableAnimations-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/DisableAnimations-Magisk-KSUModule/releases/download/v1.0.0/DisableAnimations-Magisk-KSUModule-main.zip",
+          "size": 6556,
+          "downloadCount": 172
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

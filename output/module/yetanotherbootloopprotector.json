@@ -1,0 +1,100 @@
+{
+  "readme": "# Yet Another Bootloop Protector.\n- This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules.\n-  Generally , This Module can fix these type of bootloops if their cause is Magisk Modules.\n  1)  The device repeatedly restarts but may show the boot animation  before crashing and restarting again.\n  2)  The device gets stuck at the boot animation and never progresses to the lock screen.\n  3)  device boots successfully, but SystemUI fails to start, causing a black or unresponsive screen.\"\n\n## Installation\n\n- Flash it in `Magisk`,`KSU` or `Apatch`\n- if you flash it in `custom recovery` , it will disable all the magisk/KSU/APatch modules for no reason. Flash it in `TWRP` only when necessary.\n\n\n ### Bootloop\n\n- If a bootloop is detected, , it will automatically disable every Magisk/KSU/APatch module and set the permissions of all general scripts (scripts placed in `/data/adb/service.d` , `/data/adb/post-fs-data.d` `/data/adb/post-mount.d` and `/data/adb/boot-completed.d`) to 644\n\n- You can manually enable each module, or you can use the action button. Using the action button will also set executable permissions `chmod +x` for all general scripts\n\n\n##  Recovery\n- Flashing this module in `TWRP` or `custom recoveries` will automatically disable all Magisk/KSU/APatch modules and general scripts. Your data partition should be accessible otherwise, it won't work.\n\n- It may not work with all recoveries.\n\n\n\n## How does it work?\n• Each time the device fails to complete the boot, the module creates a \"marker\"\n- No marker files: it creates the first marker (marker1).\n- One marker file: it creates a second marker (marker2).\n- Two marker files: it creates a third marker (marker3).\n- When three markers are present, the module considers the device to be in a boot loop , and  it disables all Magisk modules by creating a disable file in each module's folder. This action prevents those modules from loading during the next boot, which may help the device boot correctly.\n- The module waits for the boot to complete, checking every 5 seconds.\nIf the boot does not complete within a set timeout period (2 minutes by default), the module assumes there is a boot problem, disables all Magisk modules and general scrips, and reboots the device.\n- The module also monitors the state of `zygote` during booting and disables all modules if unusual behavior is detected.\n\n  ### whitelist\n- you can add module-id to `/data/adb/YABP/allowed-modules.txt` ,and script names to allowed-scripts.txt, those scripts/modules wont be disabled even if a bootloop is detected\n\n## SystemUI Monitor (optional)\n\n- some modules, especially `customization modules`, may sometimes cause SystemUI to crash. Enabling this could help in tracking and resolving such issues.\n- You will be prompted to disable or enable system ui monitor while installing the module.\n- if enabled , then The Module checks the status of the SystemUI process every 5 seconds.\n- If SystemUI is not running, the module starts tracking it and if SystemUI remains inactive for more than 25  seconds , or if it crashes too often the module assumes a failure of the device and it `disables` all the magisk modules and general scripts and triggers a `reboot`\n\n- To  `disable` the systemUi Monitor , you can create a file named `systemui.monitor.disable` in `/data/adb` or you can just run\n```\nsu -c touch /data/adb/systemui.monitor.disable\n```\nto `enable` the systemui monitor , you can just remove that file, or you can run , (changes will take place after the next boot)\n```\nsu -c rm -f /data/adb/systemui.monitor.disable\n```\n\n- Logs of this module will be found at `/data/local/tmp/service.log`\n- you can run `rm -f /data/local/tmp/service.log` to clear the logs.\n\n\n### Limitations \n\n- If the cause of the bootloop is not related to Magisk/KSU/APatch modules, this module won't help.\n- If any modules directly modify system files, this module won't help.\n- In cases where a module uses an incompatible `system.prop` or causes a bootloop during the early boot stages (post-fs-data), this module may not be able to disable it in time.\n\n> In these cases , you can always flash it in TWRP to disable Modules \n\n\n---\n\nSupport Me\n\nHii! I'm [rhythmcache](https://github.com/rhythmcache), the developer of [YetAnotherBootloopProtector](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector).\n\nIf you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!\n\n- ☕ [Buy me a coffee](https://www.buymeacoffee.com/triple_fault)\n- 💖 [Sponsor on GitHub](https://github.com/sponsors/rhythmcache)\n\n\n\n[![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://t.me/tr1ple_fault)\n\n\n[![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)\n",
+  "readmeHTML": "<h1>Yet Another Bootloop Protector.</h1>\n<li>This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules.</li>\n<li> Generally , This Module can fix these type of bootloops if their cause is Magisk Modules.</li>\n<p>  1)  The device repeatedly restarts but may show the boot animation  before crashing and restarting again.</p>\n<p>  2)  The device gets stuck at the boot animation and never progresses to the lock screen.</p>\n<p>  3)  device boots successfully, but SystemUI fails to start, causing a black or unresponsive screen.\"</p>\n\n<h2>Installation</h2>\n\n<li>Flash it in `Magisk`,`KSU` or `Apatch`</li>\n<li>if you flash it in `custom recovery` , it will disable all the magisk/KSU/APatch modules for no reason. Flash it in `TWRP` only when necessary.</li>\n\n\n<p> ### Bootloop</p>\n\n<li>If a bootloop is detected, , it will automatically disable every Magisk/KSU/APatch module and set the permissions of all general scripts (scripts placed in `/data/adb/service.d` , `/data/adb/post-fs-data.d` `/data/adb/post-mount.d` and `/data/adb/boot-completed.d`) to 644</li>\n\n<li>You can manually enable each module, or you can use the action button. Using the action button will also set executable permissions `chmod +x` for all general scripts</li>\n\n\n<h2> Recovery</h2>\n<li>Flashing this module in `TWRP` or `custom recoveries` will automatically disable all Magisk/KSU/APatch modules and general scripts. Your data partition should be accessible otherwise, it won't work.</li>\n\n<li>It may not work with all recoveries.</li>\n\n\n\n<h2>How does it work?</h2>\n<p>• Each time the device fails to complete the boot, the module creates a \"marker\"</p>\n<li>No marker files: it creates the first marker (marker1).</li>\n<li>One marker file: it creates a second marker (marker2).</li>\n<li>Two marker files: it creates a third marker (marker3).</li>\n<li>When three markers are present, the module considers the device to be in a boot loop , and  it disables all Magisk modules by creating a disable file in each module's folder. This action prevents those modules from loading during the next boot, which may help the device boot correctly.</li>\n<li>The module waits for the boot to complete, checking every 5 seconds.</li>\n<p>If the boot does not complete within a set timeout period (2 minutes by default), the module assumes there is a boot problem, disables all Magisk modules and general scrips, and reboots the device.</p>\n<li>The module also monitors the state of `zygote` during booting and disables all modules if unusual behavior is detected.</li>\n\n<p>  ### whitelist</p>\n<li>you can add module-id to `/data/adb/YABP/allowed-modules.txt` ,and script names to allowed-scripts.txt, those scripts/modules wont be disabled even if a bootloop is detected</li>\n\n<h2>SystemUI Monitor (optional)</h2>\n\n<li>some modules, especially `customization modules`, may sometimes cause SystemUI to crash. Enabling this could help in tracking and resolving such issues.</li>\n<li>You will be prompted to disable or enable system ui monitor while installing the module.</li>\n<li>if enabled , then The Module checks the status of the SystemUI process every 5 seconds.</li>\n<li>If SystemUI is not running, the module starts tracking it and if SystemUI remains inactive for more than 25  seconds , or if it crashes too often the module assumes a failure of the device and it `disables` all the magisk modules and general scripts and triggers a `reboot`</li>\n\n<li>To  `disable` the systemUi Monitor , you can create a file named `systemui.monitor.disable` in `/data/adb` or you can just run</li>\n<pre>su -c touch /data/adb/systemui.monitor.disable</pre>\n<p>to <code>enable</code> the systemui monitor , you can just remove that file, or you can run , (changes will take place after the next boot)</p>\n<pre>su -c rm -f /data/adb/systemui.monitor.disable</pre>\n\n<li>Logs of this module will be found at `/data/local/tmp/service.log`</li>\n<li>you can run `rm -f /data/local/tmp/service.log` to clear the logs.</li>\n\n\n<h3>Limitations</h3>\n\n<li>If the cause of the bootloop is not related to Magisk/KSU/APatch modules, this module won't help.</li>\n<li>If any modules directly modify system files, this module won't help.</li>\n<li>In cases where a module uses an incompatible `system.prop` or causes a bootloop during the early boot stages (post-fs-data), this module may not be able to disable it in time.</li>\n\n<p>> In these cases , you can always flash it in TWRP to disable Modules</p>\n\n\n<p>---</p>\n\n<p>Support Me</p>\n\n<p>Hii! I'm <a href=\"https://github.com/rhythmcache\">rhythmcache</a>, the developer of <a href=\"https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector\">YetAnotherBootloopProtector</a>.</p>\n\n<p>If you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!</p>\n\n<li>☕ [Buy me a coffee](https://www.buymeacoffee.com/triple_fault)</li>\n<li>💖 [Sponsor on GitHub](https://github.com/sponsors/rhythmcache)</li>\n\n\n\n<p><a href=\"https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram\">![Telegram</a>](https://t.me/tr1ple_fault)</p>\n\n\n<p><a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue\">![Download</a>](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector",
+  "latestRelease": {
+    "name": "4.4",
+    "version": "4.4",
+    "time": "2025-03-04T07:26:19Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/4.4/YetAnotherBootloopProtector-21-4.4.zip"
+  },
+  "releases": [
+    {
+      "name": "4.4",
+      "tagName": "4.4",
+      "publishedAt": "2025-03-04T07:26:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-21-4.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/4.4/YetAnotherBootloopProtector-21-4.4.zip",
+          "size": 16401,
+          "downloadCount": 21507
+        }
+      ]
+    },
+    {
+      "name": "v4.3.2",
+      "tagName": "v4.3.2",
+      "publishedAt": "2025-02-16T13:23:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-v4.3.2-fix.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/v4.3.2/YetAnotherBootloopProtector-v4.3.2-fix.zip",
+          "size": 13218,
+          "downloadCount": 669
+        }
+      ]
+    },
+    {
+      "name": "v4.3.1",
+      "tagName": "v4.3.1",
+      "publishedAt": "2025-01-24T03:56:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-v4.3.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/v4.3.1/YetAnotherBootloopProtector-v4.3.1.zip",
+          "size": 8120,
+          "downloadCount": 1187
+        }
+      ]
+    },
+    {
+      "name": "v4.3",
+      "tagName": "v4.3",
+      "publishedAt": "2025-01-22T07:34:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-v4.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/v4.3/YetAnotherBootloopProtector-v4.3.zip",
+          "size": 8018,
+          "downloadCount": 216
+        }
+      ]
+    },
+    {
+      "name": "V4.2",
+      "tagName": "V4.2",
+      "publishedAt": "2025-01-12T12:51:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-main-v4.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/V4.2/YetAnotherBootloopProtector-main-v4.2.zip",
+          "size": 7437,
+          "downloadCount": 182
+        }
+      ]
+    },
+    {
+      "name": "V4.1",
+      "tagName": "V4.1",
+      "publishedAt": "2025-01-11T11:48:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "YetAnotherBootloopProtector-main.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/V4.1/YetAnotherBootloopProtector-main.zip",
+          "size": 5726,
+          "downloadCount": 36
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

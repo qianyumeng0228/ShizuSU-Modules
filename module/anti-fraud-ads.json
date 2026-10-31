@@ -1,0 +1,100 @@
+{
+  "readme": "# 项目介绍\n\n屏蔽 ColorOS 反诈 + 去广告 + 隐私防护 Magisk / KernelSU / APatch 模块\n\n> 本模块仅用于保护个人隐私，请勿用于非法用途。\n\n## v260828新版调整说明\n\n**调整原因：拦截广告能力过弱。**\n\n- 经实测，原先依赖 hosts 云端订阅的方案，实际拦截广告能力过弱，因此本版**去除 hosts 订阅去广告**：\n  - 移除 `mod/update_rules.sh` 云端订阅拉取逻辑（不再开机自动拉取/合并云端规则）；\n  - 仅保留**少部分基础 host**（`system/etc/hosts`，国内广告 SDK 精准拦截）与**其他增强去广告能力**（iptables 定向拦截、广告缓存 / SQLite 锁定、广告组件冻结等）。\n- **需要 hosts 订阅的用户，请下载旧版本**；也可以改用 `AdGuard for root` 这类 Magisk 模块（也可选择其他同类模块，通常有更多定向优化）。\n\n## hosts 订阅推荐（国内）\n\n> 以下规则仅推荐给需要 hosts 订阅的用户，搭配 `AdGuard for root` 等模块使用；本模块不再内置订阅。\n\n- 实测拦截率约 96%（测试站点：<https://paileactivist.github.io/toolz/adblock.html>）\n\n1. **10007 去广完整订阅规则**\n   `https://raw.githubusercontent.com/lingeringsound/10007/main/all`\n2. **秋风广告规则**\n   `https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/AWAvenue-Ads-Rule.txt`\n3. **GOODBYEADS**\n   `https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/dns.txt`\n\n## 使用注意事项\n\n- hosts 订阅类方案可能存在**误杀率过高**的问题：\n  - 某个软件出现异常时，先打开该软件查看日志，对被拦截的域名点击**放行**；\n  - 临时应对可以直接**关闭模块运行**，重启后恢复。\n- 模块建议从 GitHub 下载使用，三方渠道获取存在风险。\n\n## 主要功能\n\n- 屏蔽系统内置反诈组件，拦截国家反诈相关 IP（iptables DROP）\n- 冻结 / 禁用系统广告与隐私监控相关包（`com.oplus.thirdkit`、`com.opos.ads`）\n- 广告缓存目录清理 + SQLite 空壳替换 + `chattr +i` 锁定（ads_lock）\n- 少量静态 hosts，国内广告 SDK 精准拦截\n\n## 安装\n\nMagisk / KernelSU / APatch 刷入 zip，重启生效。\n\n## 实际测试效果\n\n- 手动开机 3~5 min 后再测试，完全生效需要时间\n- 自检脚本：`/data/adb/modules/anti_fraud_ads/mod/self_check.sh`\n- 自检日志：`/data/adb/modules/anti_fraud_ads/self_check.log`\n\n## 致谢\n\n- [lingeringsound/10007](https://github.com/lingeringsound/10007) — 10007 的 hosts 订阅规则源\n- [TG-Twilight/AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) — 秋风广告规则\n- [8680/GOODBYEADS](https://github.com/8680/GOODBYEADS) — GOODBYEADS 规则\n",
+  "readmeHTML": "<h1>项目介绍</h1>\n\n<p>屏蔽 ColorOS 反诈 + 去广告 + 隐私防护 Magisk / KernelSU / APatch 模块</p>\n\n<p>> 本模块仅用于保护个人隐私，请勿用于非法用途。</p>\n\n<h2>v260828新版调整说明</h2>\n\n<p><b>调整原因：拦截广告能力过弱。</b></p>\n\n<li>经实测，原先依赖 hosts 云端订阅的方案，实际拦截广告能力过弱，因此本版**去除 hosts 订阅去广告**：</li>\n<p>  - 移除 <code>mod/update_rules.sh</code> 云端订阅拉取逻辑（不再开机自动拉取/合并云端规则）；</p>\n<p>  - 仅保留<b>少部分基础 host</b>（<code>system/etc/hosts</code>，国内广告 SDK 精准拦截）与<b>其他增强去广告能力</b>（iptables 定向拦截、广告缓存 / SQLite 锁定、广告组件冻结等）。</p>\n<li>**需要 hosts 订阅的用户，请下载旧版本**；也可以改用 `AdGuard for root` 这类 Magisk 模块（也可选择其他同类模块，通常有更多定向优化）。</li>\n\n<h2>hosts 订阅推荐（国内）</h2>\n\n<p>> 以下规则仅推荐给需要 hosts 订阅的用户，搭配 <code>AdGuard for root</code> 等模块使用；本模块不再内置订阅。</p>\n\n<li>实测拦截率约 96%（测试站点：<https://paileactivist.github.io/toolz/adblock.html>）</li>\n\n<li>**10007 去广完整订阅规则**</li>\n<p>   <code>https://raw.githubusercontent.com/lingeringsound/10007/main/all</code></p>\n<li>**秋风广告规则**</li>\n<p>   <code>https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/AWAvenue-Ads-Rule.txt</code></p>\n<li>**GOODBYEADS**</li>\n<p>   <code>https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/dns.txt</code></p>\n\n<h2>使用注意事项</h2>\n\n<li>hosts 订阅类方案可能存在**误杀率过高**的问题：</li>\n<p>  - 某个软件出现异常时，先打开该软件查看日志，对被拦截的域名点击<b>放行</b>；</p>\n<p>  - 临时应对可以直接<b>关闭模块运行</b>，重启后恢复。</p>\n<li>模块建议从 GitHub 下载使用，三方渠道获取存在风险。</li>\n\n<h2>主要功能</h2>\n\n<li>屏蔽系统内置反诈组件，拦截国家反诈相关 IP（iptables DROP）</li>\n<li>冻结 / 禁用系统广告与隐私监控相关包（`com.oplus.thirdkit`、`com.opos.ads`）</li>\n<li>广告缓存目录清理 + SQLite 空壳替换 + `chattr +i` 锁定（ads_lock）</li>\n<li>少量静态 hosts，国内广告 SDK 精准拦截</li>\n\n<h2>安装</h2>\n\n<p>Magisk / KernelSU / APatch 刷入 zip，重启生效。</p>\n\n<h2>实际测试效果</h2>\n\n<li>手动开机 3~5 min 后再测试，完全生效需要时间</li>\n<li>自检脚本：`/data/adb/modules/anti_fraud_ads/mod/self_check.sh`</li>\n<li>自检日志：`/data/adb/modules/anti_fraud_ads/self_check.log`</li>\n\n<h2>致谢</h2>\n\n<li>[lingeringsound/10007](https://github.com/lingeringsound/10007) — 10007 的 hosts 订阅规则源</li>\n<li>[TG-Twilight/AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule) — 秋风广告规则</li>\n<li>[8680/GOODBYEADS](https://github.com/8680/GOODBYEADS) — GOODBYEADS 规则</li>",
+  "homepageUrl": "https://github.com/BaiLai7513/anti-fraud-ads",
+  "sourceUrl": "https://github.com/BaiLai7513/anti-fraud-ads",
+  "url": "https://github.com/BaiLai7513/anti-fraud-ads",
+  "latestRelease": {
+    "name": "v260818",
+    "version": "v260818",
+    "time": "2026-08-16T07:38:29Z",
+    "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260818/anti_fraud_ads_v260818.zip"
+  },
+  "releases": [
+    {
+      "name": "v260818",
+      "tagName": "v260818",
+      "publishedAt": "2026-08-16T07:38:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads_v260818.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260818/anti_fraud_ads_v260818.zip",
+          "size": 25321,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v260817",
+      "tagName": "v260817",
+      "publishedAt": "2026-08-16T05:04:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads_v260817.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260817/anti_fraud_ads_v260817.zip",
+          "size": 15057,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v260812",
+      "tagName": "v260812",
+      "publishedAt": "2026-08-11T17:45:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads_v260812.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260812/anti_fraud_ads_v260812.zip",
+          "size": 14034,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v260718",
+      "tagName": "v260718",
+      "publishedAt": "2026-07-17T01:24:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads_v260718.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260718/anti_fraud_ads_v260718.zip",
+          "size": 136246,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "V20260703",
+      "tagName": "V20260703",
+      "publishedAt": "2026-07-01T10:18:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/V20260703/anti_fraud_ads.zip",
+          "size": 128483,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v260627",
+      "tagName": "v260627",
+      "publishedAt": "2026-07-01T05:23:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "anti_fraud_ads.zip",
+          "downloadUrl": "https://github.com/BaiLai7513/anti-fraud-ads/releases/download/v260627/anti_fraud_ads.zip",
+          "size": 131128,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

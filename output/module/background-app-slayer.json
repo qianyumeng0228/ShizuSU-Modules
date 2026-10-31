@@ -1,0 +1,98 @@
+{
+  "readme": "![Background-App-Slayer logo](./LOGO.png)\n\n# Background App Slayer (BAS)\n\n**Modul Magisk pembasmi aplikasi latar belakang otomatis.**  \nVersi ini adalah pembaruan besar dari proyek [SmartAppClose](http://github.com/UNKNUW/SmartAppClose) lama.\n\n## ✨ Deskripsi Modul\n\nBackground App Slayer (BAS) membantu kamu mendapatkan performa maksimal dan menghemat baterai saat bermain game.  \nDengan cara menutup aplikasi-aplikasi latar belakang secara otomatis saat game dijalankan.  \nDirancang modular agar mudah disesuaikan hanya dengan edit file teks, tanpa perlu termux atau coding ulang.\n\n## ⚙️ Fitur Unggulan\n\n- Auto-kill aplikasi background saat game aktif.\n- 3 Mode kerja:\n  - `1` **Normal** – ringan dan aman.\n  - `2` **Aggressive** – lebih banyak aplikasi ditutup.\n  - `3` **Extreme** – semua dibantai (termasuk app sistem yang ga penting) KECUALI list extreme.txt\n- Konfigurasi lewat file teks:\n  - `gamelist.txt` – daftar game yang memicu aksi.\n  - `whitelist.txt` – aplikasi yang tidak akan ditutup.\n  - `extreme.txt` – daftar aplikasi yang akan dilindungi di Mode 3.\n  - `mode.txt` – menentukan mode kerja (1, 2, 3).\n- Logging aktivitas di `/data/adb/modules/appslayer/log/`\n- Ringan, fleksibel, tidak perlu reboot saat ganti konfigurasi.\n- Action Button di Magisk/KSU Manager untuk cek status mode dan sistem.\n\n## 🆚 Perbandingan dengan SmartAppClose\n\n| Fitur | SmartAppClose | BAS v5.0.5 |\n|-------|----------------|------------|\n| Mode kerja | ❌ Tidak ada | ✅ Ada 3 mode |\n| Modular | ❌ | ✅ |\n| Logging | Minimal | Lengkap |\n| Fleksibilitas | Rendah | Tinggi |\n| User friendly | Cukup | ✅ Sangat |\n\n## 🛠️ Cara Install\n\n1. **Install via Magisk Manager / KernelSU / KSU Next**\n   - Buka Magisk > Modules > Install from storage\n   - Pilih ZIP dari modul BAS\n   - Reboot\n\n2. **Atur Konfigurasi:**\n   - Buka folder `/data/adb/modules/appslayer/`\n   - Edit file:\n     - `mode.txt` → isi `1`, `2`, atau `3`\n     - `gamelist.txt` → isi dengan nama package game\n     - `whitelist.txt` → aplikasi penting yang wajib hidup\n     - `extreme.txt` → aplikasi yang akan DILINDUNGI di mode 3\n\n## ⚠️ Penting Tentang Mode Extreme\n\nMode 3 (Extreme) akan menutup semua aplikasi **kecuali** yang ada di `extreme.txt`.  \nJANGAN hapus isi default file tersebut — itu bisa membuat SISTEM ERROR dan FREEZE \n\nKalau ingin menambahkan aplikasi untuk dilindungi:\n- Tambahkan di **baris paling atas** atau **paling bawah** file `extreme.txt`.\n\n## 🚨 Peringatan\n\n- Gunakan **sesuai kebutuhan**, terutama untuk Mode 3.\n- Jangan aktifkan Mode Extreme terus-menerus, HP kamu bisa ngambek!\n- Kalau ada bug, **jangan lapor ke service center**, apalagi **lapor polisi**. Lapornya ke sini saja:\n  [TELEGRAM](https://t.me/unknuwprojects)\n\n## 🤖 Untuk Users Android 11  \nJika mengalami error saat install, pakai cara yang sama seperti project sebelumnya [klik di sini](https://github.com/UNKNUW/SmartAppClose/blob/main/for_Android_11.md)\n\n---\n\n> **DO WITH YOUR OWN RISK**  \n> Kamu tanggung sendiri kalau terjadi sesuatu.\n\n---\n\n**Selamat ngoprek dan semoga lancar gaming-nya!**  \n_– @unknuw Projects Team_\n",
+  "readmeHTML": "<p>!<a href=\"./LOGO.png\">Background-App-Slayer logo</a></p>\n\n<h1>Background App Slayer (BAS)</h1>\n\n<p><b>Modul Magisk pembasmi aplikasi latar belakang otomatis.</b></p>\n<p>Versi ini adalah pembaruan besar dari proyek <a href=\"http://github.com/UNKNUW/SmartAppClose\">SmartAppClose</a> lama.</p>\n\n<h2>✨ Deskripsi Modul</h2>\n\n<p>Background App Slayer (BAS) membantu kamu mendapatkan performa maksimal dan menghemat baterai saat bermain game.</p>\n<p>Dengan cara menutup aplikasi-aplikasi latar belakang secara otomatis saat game dijalankan.</p>\n<p>Dirancang modular agar mudah disesuaikan hanya dengan edit file teks, tanpa perlu termux atau coding ulang.</p>\n\n<h2>⚙️ Fitur Unggulan</h2>\n\n<li>Auto-kill aplikasi background saat game aktif.</li>\n<li>3 Mode kerja:</li>\n<p>  - <code>1</code> <b>Normal</b> – ringan dan aman.</p>\n<p>  - <code>2</code> <b>Aggressive</b> – lebih banyak aplikasi ditutup.</p>\n<p>  - <code>3</code> <b>Extreme</b> – semua dibantai (termasuk app sistem yang ga penting) KECUALI list extreme.txt</p>\n<li>Konfigurasi lewat file teks:</li>\n<p>  - <code>gamelist.txt</code> – daftar game yang memicu aksi.</p>\n<p>  - <code>whitelist.txt</code> – aplikasi yang tidak akan ditutup.</p>\n<p>  - <code>extreme.txt</code> – daftar aplikasi yang akan dilindungi di Mode 3.</p>\n<p>  - <code>mode.txt</code> – menentukan mode kerja (1, 2, 3).</p>\n<li>Logging aktivitas di `/data/adb/modules/appslayer/log/`</li>\n<li>Ringan, fleksibel, tidak perlu reboot saat ganti konfigurasi.</li>\n<li>Action Button di Magisk/KSU Manager untuk cek status mode dan sistem.</li>\n\n<h2>🆚 Perbandingan dengan SmartAppClose</h2>\n\n<p>| Fitur | SmartAppClose | BAS v5.0.5 |</p>\n<p>|-------|----------------|------------|</p>\n<p>| Mode kerja | ❌ Tidak ada | ✅ Ada 3 mode |</p>\n<p>| Modular | ❌ | ✅ |</p>\n<p>| Logging | Minimal | Lengkap |</p>\n<p>| Fleksibilitas | Rendah | Tinggi |</p>\n<p>| User friendly | Cukup | ✅ Sangat |</p>\n\n<h2>🛠️ Cara Install</h2>\n\n<li>**Install via Magisk Manager / KernelSU / KSU Next**</li>\n<p>   - Buka Magisk > Modules > Install from storage</p>\n<p>   - Pilih ZIP dari modul BAS</p>\n<p>   - Reboot</p>\n\n<li>**Atur Konfigurasi:**</li>\n<p>   - Buka folder <code>/data/adb/modules/appslayer/</code></p>\n<p>   - Edit file:</p>\n<p>     - <code>mode.txt</code> → isi <code>1</code>, <code>2</code>, atau <code>3</code></p>\n<p>     - <code>gamelist.txt</code> → isi dengan nama package game</p>\n<p>     - <code>whitelist.txt</code> → aplikasi penting yang wajib hidup</p>\n<p>     - <code>extreme.txt</code> → aplikasi yang akan DILINDUNGI di mode 3</p>\n\n<h2>⚠️ Penting Tentang Mode Extreme</h2>\n\n<p>Mode 3 (Extreme) akan menutup semua aplikasi <b>kecuali</b> yang ada di <code>extreme.txt</code>.</p>\n<p>JANGAN hapus isi default file tersebut — itu bisa membuat SISTEM ERROR dan FREEZE</p>\n\n<p>Kalau ingin menambahkan aplikasi untuk dilindungi:</p>\n<li>Tambahkan di **baris paling atas** atau **paling bawah** file `extreme.txt`.</li>\n\n<h2>🚨 Peringatan</h2>\n\n<li>Gunakan **sesuai kebutuhan**, terutama untuk Mode 3.</li>\n<li>Jangan aktifkan Mode Extreme terus-menerus, HP kamu bisa ngambek!</li>\n<li>Kalau ada bug, **jangan lapor ke service center**, apalagi **lapor polisi**. Lapornya ke sini saja:</li>\n<p>  <a href=\"https://t.me/unknuwprojects\">TELEGRAM</a></p>\n\n<h2>🤖 Untuk Users Android 11</h2>\n<p>Jika mengalami error saat install, pakai cara yang sama seperti project sebelumnya <a href=\"https://github.com/UNKNUW/SmartAppClose/blob/main/for_Android_11.md\">klik di sini</a></p>\n\n<p>---</p>\n\n<p>> <b>DO WITH YOUR OWN RISK</b></p>\n<p>> Kamu tanggung sendiri kalau terjadi sesuatu.</p>\n\n<p>---</p>\n\n<p><b>Selamat ngoprek dan semoga lancar gaming-nya!</b></p>\n<p>_– @unknuw Projects Team_</p>",
+  "homepageUrl": "https://github.com/UNKNUW/Background-App-Slayer",
+  "sourceUrl": "https://github.com/UNKNUW/Background-App-Slayer",
+  "url": "https://github.com/UNKNUW/Background-App-Slayer",
+  "latestRelease": {
+    "name": "5.1.2",
+    "version": "5.1.2",
+    "time": "2025-06-05T01:11:26Z",
+    "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.1.2/BAS_LOOP.zip"
+  },
+  "releases": [
+    {
+      "name": "5.1.2",
+      "tagName": "5.1.2",
+      "publishedAt": "2025-06-05T01:11:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BAS_LOOP.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.1.2/BAS_LOOP.zip",
+          "size": 2865004,
+          "downloadCount": 350
+        },
+        {
+          "name": "BAS.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.1.2/BAS.zip",
+          "size": 2865099,
+          "downloadCount": 790
+        }
+      ]
+    },
+    {
+      "name": "5.1.1",
+      "tagName": "5.1.1",
+      "publishedAt": "2025-05-28T06:58:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BAS.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.1.1/BAS.zip",
+          "size": 2863945,
+          "downloadCount": 5
+        },
+        {
+          "name": "BAS_LOOP.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.1.1/BAS_LOOP.zip",
+          "size": 2863664,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "5.0.7",
+      "tagName": "5.0.7",
+      "publishedAt": "2025-05-08T11:02:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BAS_5.0.7.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.0.7/BAS_5.0.7.zip",
+          "size": 2860096,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "5.0.6",
+      "tagName": "5.0.6",
+      "publishedAt": "2025-05-05T23:41:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "BAS_5.0.6.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.0.6/BAS_5.0.6.zip",
+          "size": 2859893,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "5.0.5",
+      "tagName": "5.0.5",
+      "publishedAt": "2025-05-02T14:35:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Background_App_Slayer_5.0.5.zip",
+          "downloadUrl": "https://github.com/UNKNUW/Background-App-Slayer/releases/download/5.0.5/Background_App_Slayer_5.0.5.zip",
+          "size": 2858385,
+          "downloadCount": 8
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

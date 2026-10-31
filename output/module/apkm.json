@@ -1,0 +1,48 @@
+{
+  "readme": "[![Português Brasileiro](https://img.shields.io/badge/Language-PT--BR-green.svg)](README.pt-BR.md)\n[![English](https://img.shields.io/badge/Language-EN-green.svg)](README.md)\n[![Espanhol](https://img.shields.io/badge/Language-ES-green.svg)](README.es.md)\n\n# apkm\nMagisk/KernelSU module that offers an online package manager for Android with native access to repositories and AddOns to facilitate sideloading Apps from any Web source.\n\nThe goal of the project is to create an environment free from Google API restrictions. Use on Android AOSP is recommended, but it works perfectly on certified devices as long as they are running a Magisk-based root manager.\n\n# Screenshots:\n<img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/1e00e32c-c14b-4e17-ae84-85a59f03fb67\" />\n<img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/e28994b1-b81a-4361-b31c-da0684be1a98\" />\n<img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/98f0a6de-426b-4c0a-9964-ed8cfcea7557\" />\n<img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/71b51a42-d1e3-4b6e-866b-a11dfb0f6c13\" />\n\n## How it works:\n\nThe manager is called apkm, which is an abbreviation for Android Package Manager.\nThe manager is a terminal program without a UI, meaning access to a terminal emulator or ADB is required. To have a UI, install APKM Store.\n\nType: \n```bash\napkm\n```\nin the terminal to get the available commands.\n\nAddons or repository servers are required to have packages available.\n\nIt must be run with sudo or in a root terminal; otherwise, errors will occur.\n\n## Notices:\n\nThis manager has not had its security effectiveness proven and does not guarantee system security; use it at your own risk.\n\nChanges will be made to SELinux policies so that APKM Store (UI Assistant for non-technical users) can execute the program's sockets correctly without being blocked by context locks.\n\nThe official binary was compiled and tested on Android 16; other versions have not yet been tested.\n\n## How to compile:\n\nThe compilation process can be done in three ways. Compiling the libraries with the binary (run without quotes), example for 64-bit arm: \n```bash \nmake build arch=aarch64\n``` \ngenerates the libraries, the apkm binary, and the magisk module.\n\nThe second way only works after the first one has been completed for the first time. It is useful when it is convenient to recompile only the apkm binary without recompiling the auxiliary libraries for quick tests. If the architecture changes, it is necessary to recompile the libraries again:\n\n```bash\nmake build_apkm arch=aarch64\n```\ngenerates only the apkm binary and the magisk module.\n\nThe third way generates the magisk module directly:\n```bash\nmake build_module\n```\ngenerates the magisk module.\n\n## Libraries/toolchins used:\njson: https://github.com/nlohmann/json\nlibzip: https://github.com/nih-at/libzip\nlibcurl https://github.com/curl/curl\nopenssl https://github.com/openssl/openssl\nAndroid NDK: https://dl.google.com/android/repository/android-ndk-r29-linux.zip\n",
+  "readmeHTML": "<p><a href=\"https://img.shields.io/badge/Language-PT--BR-green.svg\">![Português Brasileiro</a>](README.pt-BR.md)</p>\n<p><a href=\"https://img.shields.io/badge/Language-EN-green.svg\">![English</a>](README.md)</p>\n<p><a href=\"https://img.shields.io/badge/Language-ES-green.svg\">![Espanhol</a>](README.es.md)</p>\n\n<h1>apkm</h1>\n<p>Magisk/KernelSU module that offers an online package manager for Android with native access to repositories and AddOns to facilitate sideloading Apps from any Web source.</p>\n\n<p>The goal of the project is to create an environment free from Google API restrictions. Use on Android AOSP is recommended, but it works perfectly on certified devices as long as they are running a Magisk-based root manager.</p>\n\n<h1>Screenshots:</h1>\n<p><img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/1e00e32c-c14b-4e17-ae84-85a59f03fb67\" /></p>\n<p><img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/e28994b1-b81a-4361-b31c-da0684be1a98\" /></p>\n<p><img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/98f0a6de-426b-4c0a-9964-ed8cfcea7557\" /></p>\n<p><img width=\"2560\" height=\"1600\" alt=\"image\" src=\"https://github.com/user-attachments/assets/71b51a42-d1e3-4b6e-866b-a11dfb0f6c13\" /></p>\n\n<h2>How it works:</h2>\n\n<p>The manager is called apkm, which is an abbreviation for Android Package Manager.</p>\n<p>The manager is a terminal program without a UI, meaning access to a terminal emulator or ADB is required. To have a UI, install APKM Store.</p>\n\n<p>Type:</p>\n<pre>apkm</pre>\n<p>in the terminal to get the available commands.</p>\n\n<p>Addons or repository servers are required to have packages available.</p>\n\n<p>It must be run with sudo or in a root terminal; otherwise, errors will occur.</p>\n\n<h2>Notices:</h2>\n\n<p>This manager has not had its security effectiveness proven and does not guarantee system security; use it at your own risk.</p>\n\n<p>Changes will be made to SELinux policies so that APKM Store (UI Assistant for non-technical users) can execute the program's sockets correctly without being blocked by context locks.</p>\n\n<p>The official binary was compiled and tested on Android 16; other versions have not yet been tested.</p>\n\n<h2>How to compile:</h2>\n\n<p>The compilation process can be done in three ways. Compiling the libraries with the binary (run without quotes), example for 64-bit arm:</p>\n<pre>make build arch=aarch64</pre>\n<p>generates the libraries, the apkm binary, and the magisk module.</p>\n\n<p>The second way only works after the first one has been completed for the first time. It is useful when it is convenient to recompile only the apkm binary without recompiling the auxiliary libraries for quick tests. If the architecture changes, it is necessary to recompile the libraries again:</p>\n\n<pre>make build_apkm arch=aarch64</pre>\n<p>generates only the apkm binary and the magisk module.</p>\n\n<p>The third way generates the magisk module directly:</p>\n<pre>make build_module</pre>\n<p>generates the magisk module.</p>\n\n<h2>Libraries/toolchins used:</h2>\n<p>json: https://github.com/nlohmann/json</p>\n<p>libzip: https://github.com/nih-at/libzip</p>\n<p>libcurl https://github.com/curl/curl</p>\n<p>openssl https://github.com/openssl/openssl</p>\n<p>Android NDK: https://dl.google.com/android/repository/android-ndk-r29-linux.zip</p>",
+  "homepageUrl": "https://github.com/Eryck2486/apkm",
+  "sourceUrl": "https://github.com/Eryck2486/apkm",
+  "url": "https://github.com/Eryck2486/apkm",
+  "latestRelease": {
+    "name": "1.0",
+    "version": "1.0",
+    "time": "2026-04-14T00:04:42Z",
+    "downloadUrl": "https://github.com/Eryck2486/apkm/releases/download/1.0/apkm-module-x86_64-API35.zip"
+  },
+  "releases": [
+    {
+      "name": "1.0",
+      "tagName": "1.0",
+      "publishedAt": "2026-04-14T00:04:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "apkm-module-x86_64-API35.zip",
+          "downloadUrl": "https://github.com/Eryck2486/apkm/releases/download/1.0/apkm-module-x86_64-API35.zip",
+          "size": 3007289,
+          "downloadCount": 16
+        },
+        {
+          "name": "apkm-module-x86-API35.zip",
+          "downloadUrl": "https://github.com/Eryck2486/apkm/releases/download/1.0/apkm-module-x86-API35.zip",
+          "size": 3065198,
+          "downloadCount": 13
+        },
+        {
+          "name": "apkm-module-arm-API35.zip",
+          "downloadUrl": "https://github.com/Eryck2486/apkm/releases/download/1.0/apkm-module-arm-API35.zip",
+          "size": 2547164,
+          "downloadCount": 45
+        },
+        {
+          "name": "apkm-module-arm64-API35.zip",
+          "downloadUrl": "https://github.com/Eryck2486/apkm/releases/download/1.0/apkm-module-arm64-API35.zip",
+          "size": 3309870,
+          "downloadCount": 52
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

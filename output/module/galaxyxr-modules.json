@@ -1,0 +1,136 @@
+{
+  "readme": "# Galaxy XR KernelSU Modules\n\nKernelSU modules for the Samsung Galaxy XR (SM-I610) running Android XR. Tracking and haptic modules apply changes in process memory at runtime. OTA Control changes persistent Android package states and an update setting. No module modifies original system APKs or libraries or flashes partitions. Every package installs **disabled**; you enable it yourself.\nRequires a rooted Samsung Galaxy XR with [KernelSU-GXR](https://github.com/4uva4ek/KernelSU-GXR) (1.0.6 or later for Sources installation).\n\nAdd this repository as a source within the KernelSU Manager with the url: ``https://github.com/4uva4ek/galaxyxr-modules``.\nOpen **Modules → Sources**, select the modules you want and choose **Install selected**. Each module has its own version and update feed, so the Manager offers updates per module. Automatic ZIPs are also attached to [GitHub Releases](https://github.com/4uva4ek/galaxyxr-modules/releases); see [installing from Sources or ZIP](docs/INSTALLING-MODULES.md).\n\nFor memory patches after installation: tick the module's checkbox, then use the Manager's documented soft reboot. The **Action** button only reports live status and recovery steps — it never toggles a patch. Untick the checkbox to restore the original code; a full reboot clears every memory patch, but an enabled module applies again at the next start. OTA Control has separate restore instructions below; reboot does not undo its persistent changes.\n\n## Modules\n\n### Wi-Fi ADB (`gxr_wifi_adb`)\nAutomatically enables authenticated ADB TCP on port 5555 when the module starts.\nInstalls disabled; disabling restores the previous volatile TCP configuration.\nInstallation on Galaxy XR is verified; runtime activation remains untested.\nAvailable through Sources and Releases; approve the computer's RSA prompt.\n[Build, setup and recovery](modules/wifi-adb/README.md).\n\n### Haptic MAIN (`gxr_haptic_main`)\nRoutes standard controller haptics to the **grip (MAIN) motor** instead of the trigger motor, with retuned pulse timing. Works with any app.\n\n### Controller Suite (`gxr_controller_suite`)\nCombines Whitening, Timestamp Precision, HAL Cache Bypass, tail-velocity\ncorrection and HAL-wide LogLevel=0 control. One activation preference and English/Russian WebUI.\n[Components and migration](modules/controller-suite/README.md).\n\n### Steam Link Suite (`gxr_steamlink_suite`) - deprecated\n> **Deprecated 2026-10-19, no successor.** Removed from Sources; 0.1.7 is the final\n> release. Disable it, then remove it in the Manager.\n\nCombines Velocity Frame, Pose Time, OpenXR app priority profiles and optional\nController Extrapolation. The initial priority profile targets selected Steam Link\nthreads at nice=-20 while the app is visible and the headset is awake. Other apps\nremain unchanged until a profile is added. Pose-time compensation defaults to 0;\nextrapolation defaults OFF.\n[Components and migration](modules/steamlink-suite/README.md).\n\nUpdate **KernelSU GXR to 1.0.11 or later** before installing these suites.\nThe Manager asks to restore/remove replaced standalone modules; the suites install\ndisabled. Enable the desired suites, then use the Manager soft restart. Haptic MAIN\nremains separate. Replaced standalone modules are deprecated and removed from Sources; their\nexisting update feeds retain retirement notices.\n\n**Updating to 0.1.2:** disable both suites, update both, then enable them and use\nthe Manager soft restart. Update both before enabling either: HAL LogLevel=0\nownership moved from Steam Link Suite to Controller Suite. Do not enable a mixed\n0.1.1/0.1.2 pair. Startup and active Steam Link checks passed on a headset;\nsee [validation and limits](docs/SUITES-0.1.2-VALIDATION.md).\n\n### OpenXR QUALITY (`gxr_openxr_quality`)\nHolds the camera tracking **QUALITY** request during visible OpenXR sessions.\nExperimental: sleep/app exit releases it; critical thermal severity 4 releases\nit until severity falls to 2. This is not a guarantee of camera frame rate or\nbetter controller motion. [Behavior, validation limits and local 0.1.0 migration](modules/openxr-quality/README.md).\n\n### OTA Control (`gxr_ota_control`)\nBlocks Samsung firmware updates by disabling `com.wssyncmldm` and\n`com.sec.android.soagent` for user 0 and setting `ota_disable_automatic_update=1`.\nSaves the original state for restoration. These changes **survive reboot**;\nunticking the checkbox only stops future reapplication. Run the module's\n`action.sh off` as root to restore the saved baseline. Installs disabled;\nhost-tested, **not yet validated on a headset**.\n[Controls, recovery and validation limits](modules/ota-control/README.md).\n\n### MV-HEVC Eye Fix (`gxr_mvhevc_eye_fix`)\nCorrects the **left/right eye inversion** Samsung Gallery XR shows for MV-HEVC\nspatial videos. The patched `libstagefright.so` and `libaplayer.so` are generated\non the device from the installed stock libraries — hash-checked before and after\npatching — and bind-mounted over them; no vendor binaries ship in the package.\nLeft-primary MV-HEVC video only. [Patches and validation](modules/mvhevc-eye-fix/README.md).\n\n### Framebuffer10 (`gxr_framebuffer10`)\nExperimental **10-bit SDR** compositor output with correct colours (less banding in\ngradients and dark scenes; not HDR). The repaired compositor library is generated on\nthe headset from its own stock library with a project edit script — hash-checked\nbefore and after — and bound read-only only during startup; no vendor code ships in\nthe package. I610UEU2AZF3 only; requires KernelSU GXR 1.0.6+.\n[Experimental release 0.5.1](https://github.com/4uva4ek/galaxyxr-modules/releases/tag/framebuffer10/v0.5.1). Listed with an experimental flag; KernelSU GXR 1.0.16+ displays it in red. Listed only in the experimental catalogue, hidden from older Managers.\n[Colour fix, lifecycle and limits](modules/framebuffer10/README.md).\n\n### Retired\nEarlier tracking experiments (Bracket, IMU Time, HAL 360, native copy) are retired and kept locally; they are not distributed here.\n\n## Safety\n\n- Packages install **disabled**; installation never enables a module.\n- Tracking and haptic patches live only in process RAM and check exact firmware/library compatibility before activation. OTA Control changes persistent Android state and restores a saved baseline.\n- Original APKs and libraries are preserved; modules do not flash partitions or change root setup.\n- Failures disable the module and record the cause for **Action** to show. Follow the module's recovery instructions if restoration is incomplete.\n- Disable memory-patch modules before relying on reboot as rollback — an enabled module reapplies. For OTA Control, use `action.sh off` to restore; reboot alone does not restore updates.\n\nDetails: [startup and recovery](docs/AUTOSTART.md), [Action reports](docs/ACTION-REPORT.md), [cold-boot guards](docs/COLD-BOOT-GUARDS-2026-10-11.md), [update feeds and release process](docs/UPDATES.md).\n\n## Repository layout\n\n```text\nmodules/             Module sources, lifecycle scripts and build definitions\nmodules.json         Public module catalogue for the Manager\nupdates/             Published versions, ZIP URLs and SHA-256 hashes\nchangelogs/          Per-module release notes\ntools/               Shared build, validation and release tools\ndocs/                Installation, deployment, compatibility and validation records\n```\n\n## Building\n\nRaising both `version` and `versionCode` in a public module's `module.prop` and\npushing to `main` builds, checks and publishes its disabled ZIP automatically for\nmodules supported by the CI builder. The two suites currently require their\ndedicated local builders and reviewed release uploads. See [automatic releases](docs/AUTOMATIC-RELEASES.md)\nfor build-only runs, private inputs, validation requirements and recovery.\n\nPython 3.10+ and Android NDK **28.2.13676358**. Build commands never connect to the headset.\n\n```sh\npython tools/build.py haptic-main --ndk /path/to/android-ndk\n# App modules need the compatibility contract generated from your own pinned runtime first:\npython modules/openxr-velocity-frame/prepare.py --ndk /path/to/android-ndk --runtime /path/to/libopenxr_android.so\npython tools/build.py controller-extrapolation --ndk /path/to/android-ndk\n```\n\nOnly `-auto.zip` packages and `.zip.sha256` files are produced under `dist/MODULE/`. Modules with dedicated build commands document them in their READMEs. Proprietary libraries, APKs, device dumps and compiled artifacts are never committed. Release rules: [RELEASING.md](docs/RELEASING.md), source layout: [MODULE-LAYOUT.md](docs/MODULE-LAYOUT.md).\n\nAuthor: **4uva4ek**.\n",
+  "readmeHTML": "<h1>Galaxy XR KernelSU Modules</h1>\n\n<p>KernelSU modules for the Samsung Galaxy XR (SM-I610) running Android XR. Tracking and haptic modules apply changes in process memory at runtime. OTA Control changes persistent Android package states and an update setting. No module modifies original system APKs or libraries or flashes partitions. Every package installs <b>disabled</b>; you enable it yourself.</p>\n<p>Requires a rooted Samsung Galaxy XR with <a href=\"https://github.com/4uva4ek/KernelSU-GXR\">KernelSU-GXR</a> (1.0.6 or later for Sources installation).</p>\n\n<p>Add this repository as a source within the KernelSU Manager with the url: `<code>https://github.com/4uva4ek/galaxyxr-modules</code>`.</p>\n<p>Open <b>Modules → Sources</b>, select the modules you want and choose <b>Install selected</b>. Each module has its own version and update feed, so the Manager offers updates per module. Automatic ZIPs are also attached to <a href=\"https://github.com/4uva4ek/galaxyxr-modules/releases\">GitHub Releases</a>; see <a href=\"docs/INSTALLING-MODULES.md\">installing from Sources or ZIP</a>.</p>\n\n<p>For memory patches after installation: tick the module's checkbox, then use the Manager's documented soft reboot. The <b>Action</b> button only reports live status and recovery steps — it never toggles a patch. Untick the checkbox to restore the original code; a full reboot clears every memory patch, but an enabled module applies again at the next start. OTA Control has separate restore instructions below; reboot does not undo its persistent changes.</p>\n\n<h2>Modules</h2>\n\n<h3>Wi-Fi ADB (`gxr_wifi_adb`)</h3>\n<p>Automatically enables authenticated ADB TCP on port 5555 when the module starts.</p>\n<p>Installs disabled; disabling restores the previous volatile TCP configuration.</p>\n<p>Installation on Galaxy XR is verified; runtime activation remains untested.</p>\n<p>Available through Sources and Releases; approve the computer's RSA prompt.</p>\n<p><a href=\"modules/wifi-adb/README.md\">Build, setup and recovery</a>.</p>\n\n<h3>Haptic MAIN (`gxr_haptic_main`)</h3>\n<p>Routes standard controller haptics to the <b>grip (MAIN) motor</b> instead of the trigger motor, with retuned pulse timing. Works with any app.</p>\n\n<h3>Controller Suite (`gxr_controller_suite`)</h3>\n<p>Combines Whitening, Timestamp Precision, HAL Cache Bypass, tail-velocity</p>\n<p>correction and HAL-wide LogLevel=0 control. One activation preference and English/Russian WebUI.</p>\n<p><a href=\"modules/controller-suite/README.md\">Components and migration</a>.</p>\n\n<h3>Steam Link Suite (`gxr_steamlink_suite`) - deprecated</h3>\n<p>> <b>Deprecated 2026-10-19, no successor.</b> Removed from Sources; 0.1.7 is the final</p>\n<p>> release. Disable it, then remove it in the Manager.</p>\n\n<p>Combines Velocity Frame, Pose Time, OpenXR app priority profiles and optional</p>\n<p>Controller Extrapolation. The initial priority profile targets selected Steam Link</p>\n<p>threads at nice=-20 while the app is visible and the headset is awake. Other apps</p>\n<p>remain unchanged until a profile is added. Pose-time compensation defaults to 0;</p>\n<p>extrapolation defaults OFF.</p>\n<p><a href=\"modules/steamlink-suite/README.md\">Components and migration</a>.</p>\n\n<p>Update <b>KernelSU GXR to 1.0.11 or later</b> before installing these suites.</p>\n<p>The Manager asks to restore/remove replaced standalone modules; the suites install</p>\n<p>disabled. Enable the desired suites, then use the Manager soft restart. Haptic MAIN</p>\n<p>remains separate. Replaced standalone modules are deprecated and removed from Sources; their</p>\n<p>existing update feeds retain retirement notices.</p>\n\n<p><b>Updating to 0.1.2:</b> disable both suites, update both, then enable them and use</p>\n<p>the Manager soft restart. Update both before enabling either: HAL LogLevel=0</p>\n<p>ownership moved from Steam Link Suite to Controller Suite. Do not enable a mixed</p>\n<p>0.1.1/0.1.2 pair. Startup and active Steam Link checks passed on a headset;</p>\n<p>see <a href=\"docs/SUITES-0.1.2-VALIDATION.md\">validation and limits</a>.</p>\n\n<h3>OpenXR QUALITY (`gxr_openxr_quality`)</h3>\n<p>Holds the camera tracking <b>QUALITY</b> request during visible OpenXR sessions.</p>\n<p>Experimental: sleep/app exit releases it; critical thermal severity 4 releases</p>\n<p>it until severity falls to 2. This is not a guarantee of camera frame rate or</p>\n<p>better controller motion. <a href=\"modules/openxr-quality/README.md\">Behavior, validation limits and local 0.1.0 migration</a>.</p>\n\n<h3>OTA Control (`gxr_ota_control`)</h3>\n<p>Blocks Samsung firmware updates by disabling <code>com.wssyncmldm</code> and</p>\n<p><code>com.sec.android.soagent</code> for user 0 and setting <code>ota_disable_automatic_update=1</code>.</p>\n<p>Saves the original state for restoration. These changes <b>survive reboot</b>;</p>\n<p>unticking the checkbox only stops future reapplication. Run the module's</p>\n<p><code>action.sh off</code> as root to restore the saved baseline. Installs disabled;</p>\n<p>host-tested, <b>not yet validated on a headset</b>.</p>\n<p><a href=\"modules/ota-control/README.md\">Controls, recovery and validation limits</a>.</p>\n\n<h3>MV-HEVC Eye Fix (`gxr_mvhevc_eye_fix`)</h3>\n<p>Corrects the <b>left/right eye inversion</b> Samsung Gallery XR shows for MV-HEVC</p>\n<p>spatial videos. The patched <code>libstagefright.so</code> and <code>libaplayer.so</code> are generated</p>\n<p>on the device from the installed stock libraries — hash-checked before and after</p>\n<p>patching — and bind-mounted over them; no vendor binaries ship in the package.</p>\n<p>Left-primary MV-HEVC video only. <a href=\"modules/mvhevc-eye-fix/README.md\">Patches and validation</a>.</p>\n\n<h3>Framebuffer10 (`gxr_framebuffer10`)</h3>\n<p>Experimental <b>10-bit SDR</b> compositor output with correct colours (less banding in</p>\n<p>gradients and dark scenes; not HDR). The repaired compositor library is generated on</p>\n<p>the headset from its own stock library with a project edit script — hash-checked</p>\n<p>before and after — and bound read-only only during startup; no vendor code ships in</p>\n<p>the package. I610UEU2AZF3 only; requires KernelSU GXR 1.0.6+.</p>\n<p><a href=\"https://github.com/4uva4ek/galaxyxr-modules/releases/tag/framebuffer10/v0.5.1\">Experimental release 0.5.1</a>. Listed with an experimental flag; KernelSU GXR 1.0.16+ displays it in red. Listed only in the experimental catalogue, hidden from older Managers.</p>\n<p><a href=\"modules/framebuffer10/README.md\">Colour fix, lifecycle and limits</a>.</p>\n\n<h3>Retired</h3>\n<p>Earlier tracking experiments (Bracket, IMU Time, HAL 360, native copy) are retired and kept locally; they are not distributed here.</p>\n\n<h2>Safety</h2>\n\n<li>Packages install **disabled**; installation never enables a module.</li>\n<li>Tracking and haptic patches live only in process RAM and check exact firmware/library compatibility before activation. OTA Control changes persistent Android state and restores a saved baseline.</li>\n<li>Original APKs and libraries are preserved; modules do not flash partitions or change root setup.</li>\n<li>Failures disable the module and record the cause for **Action** to show. Follow the module's recovery instructions if restoration is incomplete.</li>\n<li>Disable memory-patch modules before relying on reboot as rollback — an enabled module reapplies. For OTA Control, use `action.sh off` to restore; reboot alone does not restore updates.</li>\n\n<p>Details: <a href=\"docs/AUTOSTART.md\">startup and recovery</a>, <a href=\"docs/ACTION-REPORT.md\">Action reports</a>, <a href=\"docs/COLD-BOOT-GUARDS-2026-10-11.md\">cold-boot guards</a>, <a href=\"docs/UPDATES.md\">update feeds and release process</a>.</p>\n\n<h2>Repository layout</h2>\n\n<pre>modules/             Module sources, lifecycle scripts and build definitions\nmodules.json         Public module catalogue for the Manager\nupdates/             Published versions, ZIP URLs and SHA-256 hashes\nchangelogs/          Per-module release notes\ntools/               Shared build, validation and release tools\ndocs/                Installation, deployment, compatibility and validation records</pre>\n\n<h2>Building</h2>\n\n<p>Raising both <code>version</code> and <code>versionCode</code> in a public module's <code>module.prop</code> and</p>\n<p>pushing to <code>main</code> builds, checks and publishes its disabled ZIP automatically for</p>\n<p>modules supported by the CI builder. The two suites currently require their</p>\n<p>dedicated local builders and reviewed release uploads. See <a href=\"docs/AUTOMATIC-RELEASES.md\">automatic releases</a></p>\n<p>for build-only runs, private inputs, validation requirements and recovery.</p>\n\n<p>Python 3.10+ and Android NDK <b>28.2.13676358</b>. Build commands never connect to the headset.</p>\n\n<pre>python tools/build.py haptic-main --ndk /path/to/android-ndk\n# App modules need the compatibility contract generated from your own pinned runtime first:\npython modules/openxr-velocity-frame/prepare.py --ndk /path/to/android-ndk --runtime /path/to/libopenxr_android.so\npython tools/build.py controller-extrapolation --ndk /path/to/android-ndk</pre>\n\n<p>Only <code>-auto.zip</code> packages and <code>.zip.sha256</code> files are produced under <code>dist/MODULE/</code>. Modules with dedicated build commands document them in their READMEs. Proprietary libraries, APKs, device dumps and compiled artifacts are never committed. Release rules: <a href=\"docs/RELEASING.md\">RELEASING.md</a>, source layout: <a href=\"docs/MODULE-LAYOUT.md\">MODULE-LAYOUT.md</a>.</p>\n\n<p>Author: <b>4uva4ek</b>.</p>",
+  "homepageUrl": "https://github.com/4uva4ek/galaxyxr-modules",
+  "sourceUrl": "https://github.com/4uva4ek/galaxyxr-modules",
+  "url": "https://github.com/4uva4ek/galaxyxr-modules",
+  "latestRelease": {
+    "name": "controller-extrapolation/v0.4.0",
+    "version": "controller-extrapolation/v0.4.0",
+    "time": "2026-10-10T23:17:30Z",
+    "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.4.0/gxr-controller-extrapolation-0.4.0-auto.zip"
+  },
+  "releases": [
+    {
+      "name": "haptic-main/v0.4.0",
+      "tagName": "haptic-main/v0.4.0",
+      "publishedAt": "2026-10-10T21:48:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-haptic-main-0.4.0-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/haptic-main/v0.4.0/gxr-haptic-main-0.4.0-auto.zip.sha256",
+          "size": 98,
+          "downloadCount": 0
+        },
+        {
+          "name": "gxr-haptic-main-0.4.0-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/haptic-main/v0.4.0/gxr-haptic-main-0.4.0-auto.zip",
+          "size": 236814,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "haptic-main/v0.3.0",
+      "tagName": "haptic-main/v0.3.0",
+      "publishedAt": "2026-10-10T20:33:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-haptic-main-0.3.0-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/haptic-main/v0.3.0/gxr-haptic-main-0.3.0-auto.zip.sha256",
+          "size": 98,
+          "downloadCount": 0
+        },
+        {
+          "name": "gxr-haptic-main-0.3.0-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/haptic-main/v0.3.0/gxr-haptic-main-0.3.0-auto.zip",
+          "size": 234586,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "controller-extrapolation/v0.4.0",
+      "tagName": "controller-extrapolation/v0.4.0",
+      "publishedAt": "2026-10-10T23:17:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-controller-extrapolation-0.4.0-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.4.0/gxr-controller-extrapolation-0.4.0-auto.zip",
+          "size": 238793,
+          "downloadCount": 3
+        },
+        {
+          "name": "gxr-controller-extrapolation-0.4.0-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.4.0/gxr-controller-extrapolation-0.4.0-auto.zip.sha256",
+          "size": 111,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "controller-extrapolation/v0.3.1",
+      "tagName": "controller-extrapolation/v0.3.1",
+      "publishedAt": "2026-10-10T22:06:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-controller-extrapolation-0.3.1-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.3.1/gxr-controller-extrapolation-0.3.1-auto.zip.sha256",
+          "size": 111,
+          "downloadCount": 0
+        },
+        {
+          "name": "gxr-controller-extrapolation-0.3.1-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.3.1/gxr-controller-extrapolation-0.3.1-auto.zip",
+          "size": 236925,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "controller-extrapolation/v0.3.0",
+      "tagName": "controller-extrapolation/v0.3.0",
+      "publishedAt": "2026-10-10T21:48:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-controller-extrapolation-0.3.0-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.3.0/gxr-controller-extrapolation-0.3.0-auto.zip",
+          "size": 236842,
+          "downloadCount": 1
+        },
+        {
+          "name": "gxr-controller-extrapolation-0.3.0-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.3.0/gxr-controller-extrapolation-0.3.0-auto.zip.sha256",
+          "size": 111,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "controller-extrapolation/v0.2.0",
+      "tagName": "controller-extrapolation/v0.2.0",
+      "publishedAt": "2026-10-10T20:33:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gxr-controller-extrapolation-0.2.0-auto.zip",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.2.0/gxr-controller-extrapolation-0.2.0-auto.zip",
+          "size": 234651,
+          "downloadCount": 2
+        },
+        {
+          "name": "gxr-controller-extrapolation-0.2.0-auto.zip.sha256",
+          "downloadUrl": "https://github.com/4uva4ek/galaxyxr-modules/releases/download/controller-extrapolation/v0.2.0/gxr-controller-extrapolation-0.2.0-auto.zip.sha256",
+          "size": 111,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

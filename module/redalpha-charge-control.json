@@ -1,0 +1,30 @@
+{
+  "readme": "# RedAlpha Charge Control\n\n<img src=\"screenshot.png\" width=\"270\" alt=\"RedAlpha Charge Control WebUI\">\n\nKernelSU/ReSukiSU Manager module for the RedAlpha Poco F3 (`alioth`) kernel.\nIt provides a small WebUI for configuring the kernel's dedicated\n`redalpha_charge_limit` interface.\n\n## What it controls\n\n- `0`: disable the limit and restore normal charging.\n- `1..100`: stop charging at the selected battery percentage.\n- Charging resumes automatically 2 percentage points below the limit.\n- The setting is reapplied at boot from `/data/adb/redalpha-charge-control/limit`.\n\nThe module does not change charging current, float voltage, thermal levels,\nJEITA, USB-PD, or safety controls. It requires the matching RedAlpha kernel;\nit will show an error if `redalpha_charge_limit` is unavailable.\n\n## Requirements\n\n- Poco F3 / `alioth` running the RedAlpha kernel with the dedicated charge-limit ABI.\n- ReSukiSU or compatible KernelSU Manager.\n- Active KernelSU module support and a working metamodule where required.\n- Root access.\n\n## Install\n\n1. Download the latest `redalpha-charge-control-*.zip` from [Releases](https://github.com/raz123/redalpha-charge-control/releases).\n2. Open ReSukiSU Manager → Modules.\n3. Choose **Install from storage** and select the ZIP.\n4. Reboot Android to activate the module.\n5. Open the module's play/WebUI button in ReSukiSU Manager.\n6. Choose a preset or enter a percentage, then tap **Apply limit**.\n\n`0%` disables the feature. The default after installation is disabled until a\nlimit is selected.\n\n## Updating\n\nInstall the newer release ZIP through ReSukiSU Manager and reboot. The setting\nfile is preserved across module updates.\n\n## Uninstall / recovery\n\nDisable or uninstall the module from ReSukiSU Manager, then reboot. If a\nmodule update is pending, reboot is required before the active files change.\nThe kernel feature is fail-safe: writing `0` to the dedicated interface clears\nonly the RedAlpha charge-limit vote.\n\n## Development\n\nThe module is intentionally plain HTML/CSS/JavaScript. Validate locally with:\n\n```sh\nsh -n service.sh\nunzip -t redalpha-charge-control-*.zip\n```\n\nGitHub Actions packages tagged releases and validates the WebUI bridge and\nisolated ABI reference.\n\n## License\n\nGPL-3.0-or-later. See the upstream kernel repository for the kernel-side\nlicense and source obligations.\n",
+  "readmeHTML": "<h1>RedAlpha Charge Control</h1>\n\n<p><img src=\"screenshot.png\" width=\"270\" alt=\"RedAlpha Charge Control WebUI\"></p>\n\n<p>KernelSU/ReSukiSU Manager module for the RedAlpha Poco F3 (<code>alioth</code>) kernel.</p>\n<p>It provides a small WebUI for configuring the kernel's dedicated</p>\n<p><code>redalpha_charge_limit</code> interface.</p>\n\n<h2>What it controls</h2>\n\n<li>`0`: disable the limit and restore normal charging.</li>\n<li>`1..100`: stop charging at the selected battery percentage.</li>\n<li>Charging resumes automatically 2 percentage points below the limit.</li>\n<li>The setting is reapplied at boot from `/data/adb/redalpha-charge-control/limit`.</li>\n\n<p>The module does not change charging current, float voltage, thermal levels,</p>\n<p>JEITA, USB-PD, or safety controls. It requires the matching RedAlpha kernel;</p>\n<p>it will show an error if <code>redalpha_charge_limit</code> is unavailable.</p>\n\n<h2>Requirements</h2>\n\n<li>Poco F3 / `alioth` running the RedAlpha kernel with the dedicated charge-limit ABI.</li>\n<li>ReSukiSU or compatible KernelSU Manager.</li>\n<li>Active KernelSU module support and a working metamodule where required.</li>\n<li>Root access.</li>\n\n<h2>Install</h2>\n\n<li>Download the latest `redalpha-charge-control-*.zip` from [Releases](https://github.com/raz123/redalpha-charge-control/releases).</li>\n<li>Open ReSukiSU Manager → Modules.</li>\n<li>Choose **Install from storage** and select the ZIP.</li>\n<li>Reboot Android to activate the module.</li>\n<li>Open the module's play/WebUI button in ReSukiSU Manager.</li>\n<li>Choose a preset or enter a percentage, then tap **Apply limit**.</li>\n\n<p><code>0%</code> disables the feature. The default after installation is disabled until a</p>\n<p>limit is selected.</p>\n\n<h2>Updating</h2>\n\n<p>Install the newer release ZIP through ReSukiSU Manager and reboot. The setting</p>\n<p>file is preserved across module updates.</p>\n\n<h2>Uninstall / recovery</h2>\n\n<p>Disable or uninstall the module from ReSukiSU Manager, then reboot. If a</p>\n<p>module update is pending, reboot is required before the active files change.</p>\n<p>The kernel feature is fail-safe: writing <code>0</code> to the dedicated interface clears</p>\n<p>only the RedAlpha charge-limit vote.</p>\n\n<h2>Development</h2>\n\n<p>The module is intentionally plain HTML/CSS/JavaScript. Validate locally with:</p>\n\n<pre>sh -n service.sh\nunzip -t redalpha-charge-control-*.zip</pre>\n\n<p>GitHub Actions packages tagged releases and validates the WebUI bridge and</p>\n<p>isolated ABI reference.</p>\n\n<h2>License</h2>\n\n<p>GPL-3.0-or-later. See the upstream kernel repository for the kernel-side</p>\n<p>license and source obligations.</p>",
+  "homepageUrl": "https://github.com/raz123/redalpha-charge-control",
+  "sourceUrl": "https://github.com/raz123/redalpha-charge-control",
+  "url": "https://github.com/raz123/redalpha-charge-control",
+  "latestRelease": {
+    "name": "v0.2.3",
+    "version": "v0.2.3",
+    "time": "2026-07-10T16:36:58Z",
+    "downloadUrl": "https://github.com/raz123/redalpha-charge-control/releases/download/v0.2.3/redalpha-charge-control-0.2.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2.3",
+      "tagName": "v0.2.3",
+      "publishedAt": "2026-07-10T16:36:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "redalpha-charge-control-0.2.3.zip",
+          "downloadUrl": "https://github.com/raz123/redalpha-charge-control/releases/download/v0.2.3/redalpha-charge-control-0.2.3.zip",
+          "size": 285963,
+          "downloadCount": 102
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

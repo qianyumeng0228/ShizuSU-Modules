@@ -1,0 +1,93 @@
+{
+  "readme": "<div align=\"center\">\n  <h1>🔥 RedMagic-FanExtreme—更好的红魔</h1>\n</div>\n\n<div align=\"center\">\n  <a href=\"https://github.com/ling9ling7/RedMagic-FanExtreme/releases/latest\"><img src=\"https://img.shields.io/github/v/release/ling9ling7/RedMagic-FanExtreme?style=flat-square&cacheSeconds=3600\" alt=\"GitHub Release\"></a><a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/License-Custom-red?style=flat-square\" alt=\"License\"></a><a href=\"https://github.com/ling9ling7/RedMagic-FanExtreme/stargazers\"><img src=\"https://img.shields.io/github/stars/ling9ling7/RedMagic-FanExtreme?style=flat-square\" alt=\"Stars\"></a><img src=\"https://img.shields.io/github/downloads/ling9ling7/RedMagic-FanExtreme/total.svg?style=flat-square\" alt=\"Downloads\">\n</div>\n\n一款为 RedMagic 红魔手机打造 KernelSU 模块，**通过修改系统 Sysfs 节点实现对官方功能限制的解除**，节点写入后再用 chmod 444 锁定，防止系统回读覆盖。\n\n<table>\n  <tr>\n    <td><img width=\"350\" alt=\"model-1\" src=\"https://github.com/user-attachments/assets/e2e81a43-2ac4-47f7-98fc-268d0a5e328b\" />\n</td>\n    <td><img width=\"350\" alt=\"mode-2\" src=\"https://github.com/user-attachments/assets/cb051672-b2bc-4c0c-b6b2-283ceb866aa6\" />\n</td>\n  </tr>\n</table>\n\n## ✨ 为什么选择 FanExtreme？\n\n其他模块单独一项功能就一个模块，装多了互相冲突。**FanExtreme 一个模块搞定多个功能**，内置 WebUI 控制面板，开关随心，新手也能用。\n\n- 🎛️ **WebUI 控制面板** — 模块列表直接进入，实时电量/温度/功率监控，充电分离与风扇极速开关自如\n- 🔌 **在线更新** — 模块列表内一键检测新版本，不用手动下载 ZIP\n- 📋 **调试日志** — 一键生成系统运行状态日志，快速定位问题\n- 💬 **社区支持** — 内置 QQ 群入口，问题反馈即时\n\n## 🚀 功能一览\n\n| 功能 | 说明 |\n|------|------|\n| 💧 液冷控制 | 支持红魔11 Pro 内置液冷水泵四档调速，按需主动降温 |\n| 🌀 风扇极速 | 开机自动满速锁死，WebUI 支持 1-5 级挡位切换 |\n| ⚡ 充电分离 | 电量达到设定阈值自动启用，USB 直接供电不伤电池 |\n| ☁️ 云控屏蔽 | 解锁→清空→锁定 cube 云控目录，杜绝远程下发频率限制 |\n| 🔥 温控移除 | 所有温度墙拉到 999°C，满血释放 |\n| 📳 振动增强 | 自定义 AW8697 线性马达增益 / 时长 / 电压上限 |\n| 👆 触控优化 | 跟手度 4 档 + 960Hz 系统层 + 60 秒守护防回退 |\n| 🔋 充电加速 | 解除部分情况下的充电电流限制 |\n| 📈 频率控制 | 自定义CPU和GPU的频率，同时提供了一个省电预设 |\n| 💡 亮度解锁 | 红魔11Pro系列可激发最大屏幕亮度 |\n\n## 📲 安装\n\n1. 下载 [最新 Release](https://github.com/ling9ling7/RedMagic-FanExtreme/releases/latest)\n2. KernelSU Manager → 模块 → 从存储安装\n3. 重启生效\n\n## ⚙️ 配置\n\n模块目录下的 `config.txt`（部分功能需重启生效）：\n\n```\n0=关闭 1=启用\n风扇极速=1\n充电分离=1\n充电分离阈值=100\n云控屏蔽=1\n温控移除=1\n振动增强=1\n振动增益=168\n振动时长=18ms\n振动上限=128\n触控优化=1\n充电加速=1\n亮度解锁=1\n```\n\nWebUI 中可实时开关功能、调整风扇挡位和充电分离阈值。\n\n## 📖 项目结构\n```\nFanExtreme/\n│\n├── module.prop            # 模块元数据\n├── customize.sh           # 安装时执行\n├── service.sh             # 主守护进程\n├── config.txt             # 配置文件\n├── post-fs-data.sh        # 温控配置挂载\n├── update.json            # 在线更新描述\n│\n├── lib/                   # 功能库\n│   ├── common.sh          # cfg() 读 config.txt 配置\n│   ├── features.sh        # 各功能开关实现\n│   ├── status.sh          # 生成 WebUI 状态 JSON\n│   ├── perf.sh            # CPU/GPU 频率与锁频控制\n|   ├── diag.sh            # 运行日志生成\n│   └── loop.sh            # WebUI 命令循环\n│\n├── webroot/               # WebUI 控制面板\n│   ├── index.html         # 页面骨架\n│   ├── style.css          # 样式\n│   ├── app.js             # 前端逻辑\n│   ├── avatar.png         # 页面头像\n│   ├── sponsor.jpg        # 赞助图\n│\n└── vendor/etc/\n    └── thermal-engine.conf   # 温控引擎配置\n```\n\n## 🛠️ 开发环境\n- 纯 shell (system/bin/sh) + JS/CSS\n- 测试设备红魔 9 Pro (NX769J, Android 16, KernelSU)\n\n## ❓ 常见问题\n\n**Q: 为什么安装模块后过一会模块会自己消失？**  \nA: 模块已在 2026年8月7日（v3.1.5版本）开始正式转变为仅赞助用户可安装使用，非授权机型模块会自动卸载，可联系作者了解赞助授权相关信息。\n\n**Q: 控制面板（WebUI）入口在哪？**  \nA: KernelSU Manager → 模块 → 找到「更好的红魔」→ 点击「控制面板」。\n\n**Q: 我是 Magisk 用户，模块列表里没有「控制面板」按钮怎么办？**  \nA: Magisk 暂不支持 WebUI 功能。你可以：① 换用 KernelSU 管理器；② 安装独立的 WebUI 管理软件（如 MMRL、KsuWebUI等）。模块其他功能不受影响。\n\n**Q: 我不是 KernelSU 用户，也能使用吗？**  \nA: 可以。FanExtreme 兼容 KernelSU、KernelSU Next、APatch、Magisk（部分版本）。但 WebUI 控制面板目前仅 KernelSU 系列管理器支持。Magisk 用户功能正常生效，只是没有控制面板界面。\n\n**Q：红魔原生就支持充电分离为什么模块还要做这个功能？**  \nA：红魔原生充电分离的电量触发值范围为 20-90 并不能设置90以上的电量触发分离，模块则完美解决这个问题。\n\n**Q: 装了模块后游戏掉帧？**  \nA: 模块本身不会导致掉帧。如果遇到问题，请用控制面板的「调试日志」功能导出日志反馈。\n\n**Q: 开启触控优化时会在部分场景下断触或误触是为什么？**  \nA: 这不是模块的bug而是系统导致的，触控优化功能提供了两个模式选择“全局”、“指定应用”，推荐使用“指定应用”模式，仅在指定包名的APP运行时才开启触控优化。\n\n## 📱 兼容性\n\n理论支持全版本红魔机型\n\n| 机型 | Android | 适配情况 |\n|------|---------|---------|\n| 红魔 8 Pro | 15 | 完美适配✅ |\n| 红魔 9 Pro | 16 | 完美适配✅ |\n| 红魔 10 Pro | 16 | 完美适配✅ |\n| 红魔 11 Pro | 16 | 完美适配✅ |\n| 红魔 12 Pro | 16 | 完美适配✅ |  \n| 红魔电竞平板 Pro | 16 | 完美适配✅ |\n| 红魔电竞平板 3 Pro | 16 | 完美适配✅ |\n| 红魔电竞平板 5 Pro | 16 | 完美适配✅ |\n\n## 💬 反馈 & 社区\n\n- [酷安 @ling_凌](https://www.coolapk.com/)\n- [QQ 群 777533513](https://qm.qq.com/q/QCBSaor22k)\n- [TG频道](https://t.me/FanExtreme)\n- 控制面板内置调试日志，遇到问题一键导出反馈\n\n## 📄 License\n\nCustom License © 酷安@ling_凌（FanExtreme 自定义许可协议，完整条款见 [LICENSE](LICENSE)）\n\n本模块**保留所有权利**，按版本范围授权：\n\n- **低于 v3.1.5**：免费、源码公开，允许为个人非商业用途修改与调试；禁止商用与公开再分发修改版。\n- **v3.1.5 及之后**：仅授权（赞助）用户可安装使用（设备白名单验证）；源码公开仅供学习与审查，**未授权禁止修改**，**已授权用户可为个人用途修改**，修改版同样禁止商用与公开再分发。\n\n\n## 💰 赞助\n\n<table>\n  <tr>\n    <td><img width=\"350\" alt=\"支付宝支付码\" src=\"https://github.com/user-attachments/assets/ec9146d0-0586-4d31-aabc-2dc825b49b93\" />\n</td>\n    <td><img width=\"350\" alt=\"sponsor\" src=\"https://github.com/user-attachments/assets/f93c533f-fd21-46e7-9e41-2fab894a5540\" />\n</td>\n  </tr>\n</table>\n\n---\n## ⚠️ 新闻\n> ⚠️ **2026年8月7日：FanExtreme 仅赞助用户可用** 自首次发布以来模块已经经过了20以上的版本迭代，随着模块体量的增加，模块的维护与更新成本也在上升。最终在与模块用户的讨论中决定，FanExtreme-更好的红魔 从v3.1.5版本开始正式实施仅赞助用户可安装使用，低于v3.1.5的版本仍然保持免费、源码公开，但不再对其版本进行维护。如有用户想继续更新和使用最新版本，赞助模块 15R 支持开发后联系开发者即可永久使用此模块\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n<p>  <h1>🔥 RedMagic-FanExtreme—更好的红魔</h1></p>\n<p></div></p>\n\n<p><div align=\"center\"></p>\n<p>  <a href=\"https://github.com/ling9ling7/RedMagic-FanExtreme/releases/latest\"><img src=\"https://img.shields.io/github/v/release/ling9ling7/RedMagic-FanExtreme?style=flat-square&cacheSeconds=3600\" alt=\"GitHub Release\"></a><a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/License-Custom-red?style=flat-square\" alt=\"License\"></a><a href=\"https://github.com/ling9ling7/RedMagic-FanExtreme/stargazers\"><img src=\"https://img.shields.io/github/stars/ling9ling7/RedMagic-FanExtreme?style=flat-square\" alt=\"Stars\"></a><img src=\"https://img.shields.io/github/downloads/ling9ling7/RedMagic-FanExtreme/total.svg?style=flat-square\" alt=\"Downloads\"></p>\n<p></div></p>\n\n<p>一款为 RedMagic 红魔手机打造 KernelSU 模块，<b>通过修改系统 Sysfs 节点实现对官方功能限制的解除</b>，节点写入后再用 chmod 444 锁定，防止系统回读覆盖。</p>\n\n<p><table></p>\n<p>  <tr></p>\n<p>    <td><img width=\"350\" alt=\"model-1\" src=\"https://github.com/user-attachments/assets/e2e81a43-2ac4-47f7-98fc-268d0a5e328b\" /></p>\n<p></td></p>\n<p>    <td><img width=\"350\" alt=\"mode-2\" src=\"https://github.com/user-attachments/assets/cb051672-b2bc-4c0c-b6b2-283ceb866aa6\" /></p>\n<p></td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<h2>✨ 为什么选择 FanExtreme？</h2>\n\n<p>其他模块单独一项功能就一个模块，装多了互相冲突。<b>FanExtreme 一个模块搞定多个功能</b>，内置 WebUI 控制面板，开关随心，新手也能用。</p>\n\n<li>🎛️ **WebUI 控制面板** — 模块列表直接进入，实时电量/温度/功率监控，充电分离与风扇极速开关自如</li>\n<li>🔌 **在线更新** — 模块列表内一键检测新版本，不用手动下载 ZIP</li>\n<li>📋 **调试日志** — 一键生成系统运行状态日志，快速定位问题</li>\n<li>💬 **社区支持** — 内置 QQ 群入口，问题反馈即时</li>\n\n<h2>🚀 功能一览</h2>\n\n<p>| 功能 | 说明 |</p>\n<p>|------|------|</p>\n<p>| 💧 液冷控制 | 支持红魔11 Pro 内置液冷水泵四档调速，按需主动降温 |</p>\n<p>| 🌀 风扇极速 | 开机自动满速锁死，WebUI 支持 1-5 级挡位切换 |</p>\n<p>| ⚡ 充电分离 | 电量达到设定阈值自动启用，USB 直接供电不伤电池 |</p>\n<p>| ☁️ 云控屏蔽 | 解锁→清空→锁定 cube 云控目录，杜绝远程下发频率限制 |</p>\n<p>| 🔥 温控移除 | 所有温度墙拉到 999°C，满血释放 |</p>\n<p>| 📳 振动增强 | 自定义 AW8697 线性马达增益 / 时长 / 电压上限 |</p>\n<p>| 👆 触控优化 | 跟手度 4 档 + 960Hz 系统层 + 60 秒守护防回退 |</p>\n<p>| 🔋 充电加速 | 解除部分情况下的充电电流限制 |</p>\n<p>| 📈 频率控制 | 自定义CPU和GPU的频率，同时提供了一个省电预设 |</p>\n<p>| 💡 亮度解锁 | 红魔11Pro系列可激发最大屏幕亮度 |</p>\n\n<h2>📲 安装</h2>\n\n<li>下载 [最新 Release](https://github.com/ling9ling7/RedMagic-FanExtreme/releases/latest)</li>\n<li>KernelSU Manager → 模块 → 从存储安装</li>\n<li>重启生效</li>\n\n<h2>⚙️ 配置</h2>\n\n<p>模块目录下的 <code>config.txt</code>（部分功能需重启生效）：</p>\n\n<pre>0=关闭 1=启用\n风扇极速=1\n充电分离=1\n充电分离阈值=100\n云控屏蔽=1\n温控移除=1\n振动增强=1\n振动增益=168\n振动时长=18ms\n振动上限=128\n触控优化=1\n充电加速=1\n亮度解锁=1</pre>\n\n<p>WebUI 中可实时开关功能、调整风扇挡位和充电分离阈值。</p>\n\n<h2>📖 项目结构</h2>\n<pre>FanExtreme/\n│\n├── module.prop            # 模块元数据\n├── customize.sh           # 安装时执行\n├── service.sh             # 主守护进程\n├── config.txt             # 配置文件\n├── post-fs-data.sh        # 温控配置挂载\n├── update.json            # 在线更新描述\n│\n├── lib/                   # 功能库\n│   ├── common.sh          # cfg() 读 config.txt 配置\n│   ├── features.sh        # 各功能开关实现\n│   ├── status.sh          # 生成 WebUI 状态 JSON\n│   ├── perf.sh            # CPU/GPU 频率与锁频控制\n|   ├── diag.sh            # 运行日志生成\n│   └── loop.sh            # WebUI 命令循环\n│\n├── webroot/               # WebUI 控制面板\n│   ├── index.html         # 页面骨架\n│   ├── style.css          # 样式\n│   ├── app.js             # 前端逻辑\n│   ├── avatar.png         # 页面头像\n│   ├── sponsor.jpg        # 赞助图\n│\n└── vendor/etc/\n    └── thermal-engine.conf   # 温控引擎配置</pre>\n\n<h2>🛠️ 开发环境</h2>\n<li>纯 shell (system/bin/sh) + JS/CSS</li>\n<li>测试设备红魔 9 Pro (NX769J, Android 16, KernelSU)</li>\n\n<h2>❓ 常见问题</h2>\n\n<p><b>Q: 为什么安装模块后过一会模块会自己消失？</b></p>\n<p>A: 模块已在 2026年8月7日（v3.1.5版本）开始正式转变为仅赞助用户可安装使用，非授权机型模块会自动卸载，可联系作者了解赞助授权相关信息。</p>\n\n<p><b>Q: 控制面板（WebUI）入口在哪？</b></p>\n<p>A: KernelSU Manager → 模块 → 找到「更好的红魔」→ 点击「控制面板」。</p>\n\n<p><b>Q: 我是 Magisk 用户，模块列表里没有「控制面板」按钮怎么办？</b></p>\n<p>A: Magisk 暂不支持 WebUI 功能。你可以：① 换用 KernelSU 管理器；② 安装独立的 WebUI 管理软件（如 MMRL、KsuWebUI等）。模块其他功能不受影响。</p>\n\n<p><b>Q: 我不是 KernelSU 用户，也能使用吗？</b></p>\n<p>A: 可以。FanExtreme 兼容 KernelSU、KernelSU Next、APatch、Magisk（部分版本）。但 WebUI 控制面板目前仅 KernelSU 系列管理器支持。Magisk 用户功能正常生效，只是没有控制面板界面。</p>\n\n<p><b>Q：红魔原生就支持充电分离为什么模块还要做这个功能？</b></p>\n<p>A：红魔原生充电分离的电量触发值范围为 20-90 并不能设置90以上的电量触发分离，模块则完美解决这个问题。</p>\n\n<p><b>Q: 装了模块后游戏掉帧？</b></p>\n<p>A: 模块本身不会导致掉帧。如果遇到问题，请用控制面板的「调试日志」功能导出日志反馈。</p>\n\n<p><b>Q: 开启触控优化时会在部分场景下断触或误触是为什么？</b></p>\n<p>A: 这不是模块的bug而是系统导致的，触控优化功能提供了两个模式选择“全局”、“指定应用”，推荐使用“指定应用”模式，仅在指定包名的APP运行时才开启触控优化。</p>\n\n<h2>📱 兼容性</h2>\n\n<p>理论支持全版本红魔机型</p>\n\n<p>| 机型 | Android | 适配情况 |</p>\n<p>|------|---------|---------|</p>\n<p>| 红魔 8 Pro | 15 | 完美适配✅ |</p>\n<p>| 红魔 9 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔 10 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔 11 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔 12 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔电竞平板 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔电竞平板 3 Pro | 16 | 完美适配✅ |</p>\n<p>| 红魔电竞平板 5 Pro | 16 | 完美适配✅ |</p>\n\n<h2>💬 反馈 & 社区</h2>\n\n<li>[酷安 @ling_凌](https://www.coolapk.com/)</li>\n<li>[QQ 群 777533513](https://qm.qq.com/q/QCBSaor22k)</li>\n<li>[TG频道](https://t.me/FanExtreme)</li>\n<li>控制面板内置调试日志，遇到问题一键导出反馈</li>\n\n<h2>📄 License</h2>\n\n<p>Custom License © 酷安@ling_凌（FanExtreme 自定义许可协议，完整条款见 <a href=\"LICENSE\">LICENSE</a>）</p>\n\n<p>本模块<b>保留所有权利</b>，按版本范围授权：</p>\n\n<li>**低于 v3.1.5**：免费、源码公开，允许为个人非商业用途修改与调试；禁止商用与公开再分发修改版。</li>\n<li>**v3.1.5 及之后**：仅授权（赞助）用户可安装使用（设备白名单验证）；源码公开仅供学习与审查，**未授权禁止修改**，**已授权用户可为个人用途修改**，修改版同样禁止商用与公开再分发。</li>\n\n\n<h2>💰 赞助</h2>\n\n<p><table></p>\n<p>  <tr></p>\n<p>    <td><img width=\"350\" alt=\"支付宝支付码\" src=\"https://github.com/user-attachments/assets/ec9146d0-0586-4d31-aabc-2dc825b49b93\" /></p>\n<p></td></p>\n<p>    <td><img width=\"350\" alt=\"sponsor\" src=\"https://github.com/user-attachments/assets/f93c533f-fd21-46e7-9e41-2fab894a5540\" /></p>\n<p></td></p>\n<p>  </tr></p>\n<p></table></p>\n\n<p>---</p>\n<h2>⚠️ 新闻</h2>\n<p>> ⚠️ <b>2026年8月7日：FanExtreme 仅赞助用户可用</b> 自首次发布以来模块已经经过了20以上的版本迭代，随着模块体量的增加，模块的维护与更新成本也在上升。最终在与模块用户的讨论中决定，FanExtreme-更好的红魔 从v3.1.5版本开始正式实施仅赞助用户可安装使用，低于v3.1.5的版本仍然保持免费、源码公开，但不再对其版本进行维护。如有用户想继续更新和使用最新版本，赞助模块 15R 支持开发后联系开发者即可永久使用此模块</p>",
+  "homepageUrl": "https://ling9ling7.github.io/RedMagic-FanExtreme/",
+  "sourceUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme",
+  "url": "https://github.com/ling9ling7/RedMagic-FanExtreme",
+  "latestRelease": {
+    "name": "v1.3.3",
+    "version": "v1.3.3",
+    "time": "2026-07-23T19:26:26Z",
+    "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.3.3/FanExtreme-v1.3.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.3",
+      "tagName": "v1.3.3",
+      "publishedAt": "2026-07-23T19:26:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FanExtreme-v1.3.3.zip",
+          "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.3.3/FanExtreme-v1.3.3.zip",
+          "size": 2769,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.3.2",
+      "tagName": "v1.3.2",
+      "publishedAt": "2026-07-23T19:26:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FanExtreme-v1.3.2.zip",
+          "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.3.2/FanExtreme-v1.3.2.zip",
+          "size": 3085,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2026-07-23T19:26:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FanExtreme-v1.3.1.zip",
+          "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.3.1/FanExtreme-v1.3.1.zip",
+          "size": 2748,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-07-23T19:26:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FanExtreme-v1.3.0.zip",
+          "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.3.0/FanExtreme-v1.3.0.zip",
+          "size": 2635,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-07-23T19:26:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": []
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-07-23T19:26:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FanExtreme-v1.1.0.zip",
+          "downloadUrl": "https://github.com/ling9ling7/RedMagic-FanExtreme/releases/download/v1.1.0/FanExtreme-v1.1.0.zip",
+          "size": 1163,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

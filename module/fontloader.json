@@ -1,0 +1,36 @@
+{
+  "readme": "# FontLoader\n\nModifying fonts is a common scenario using the Magisk module. For example, fonts for CJK languages in the Android system only have one font-weight, users can use the Magisk module to modify font files to add the remaining font weights.\n\nHowever, starting from Android 12, fonts are loaded only when the app needs to render the font. Before, fonts are preloaded in the zygote process. When users revert the change of Magisk (with MagiskHide before or DenyList nowadays), apps will not be able to access font files from modules and finally result in a crash.\n\nThis module is a Zygisk module that is designed to solve the problem. The principle is simple, preload the font when the app has not yet lost access to the font.\n\n## Usage\n\n1. Install FontLoader module in Magisk app\n2. Remove target apps with font customizations out of DenyList\n\nTo be clear, DenyList is NOT for hiding purposes. This is as topjohnwu, the author of Magisk, said. And using DenyList for hiding is not enough.\n\n## Something else\n\n* Why not using the font upgrade feature from Android 12?\n\n  The font upgrade feature cannot set the default font-weight and language. Therefore it can only be used to upgrade/add a font with a single font-weight like emoji font. This is exactly how it is used in the documentation.\n\n  Also, the font upgrade feature requires signing font files. It is impossible to add our key without modifying Magisk.\n",
+  "readmeHTML": "<h1>FontLoader</h1>\n\n<p>Modifying fonts is a common scenario using the Magisk module. For example, fonts for CJK languages in the Android system only have one font-weight, users can use the Magisk module to modify font files to add the remaining font weights.</p>\n\n<p>However, starting from Android 12, fonts are loaded only when the app needs to render the font. Before, fonts are preloaded in the zygote process. When users revert the change of Magisk (with MagiskHide before or DenyList nowadays), apps will not be able to access font files from modules and finally result in a crash.</p>\n\n<p>This module is a Zygisk module that is designed to solve the problem. The principle is simple, preload the font when the app has not yet lost access to the font.</p>\n\n<h2>Usage</h2>\n\n<li>Install FontLoader module in Magisk app</li>\n<li>Remove target apps with font customizations out of DenyList</li>\n\n<p>To be clear, DenyList is NOT for hiding purposes. This is as topjohnwu, the author of Magisk, said. And using DenyList for hiding is not enough.</p>\n\n<h2>Something else</h2>\n\n<li>Why not using the font upgrade feature from Android 12?</li>\n\n<p>  The font upgrade feature cannot set the default font-weight and language. Therefore it can only be used to upgrade/add a font with a single font-weight like emoji font. This is exactly how it is used in the documentation.</p>\n\n<p>  Also, the font upgrade feature requires signing font files. It is impossible to add our key without modifying Magisk.</p>",
+  "homepageUrl": "https://github.com/JingMatrix/FontLoader",
+  "sourceUrl": "https://github.com/JingMatrix/FontLoader",
+  "url": "https://github.com/JingMatrix/FontLoader",
+  "latestRelease": {
+    "name": "v1.1.0",
+    "version": "v1.1.0",
+    "time": "2025-07-23T12:53:33Z",
+    "downloadUrl": "https://github.com/JingMatrix/FontLoader/releases/download/v1.1.0/FontLoader-debug.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2025-07-23T12:53:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FontLoader-debug.zip",
+          "downloadUrl": "https://github.com/JingMatrix/FontLoader/releases/download/v1.1.0/FontLoader-debug.zip",
+          "size": 129079,
+          "downloadCount": 629
+        },
+        {
+          "name": "FontLoader-release.zip",
+          "downloadUrl": "https://github.com/JingMatrix/FontLoader/releases/download/v1.1.0/FontLoader-release.zip",
+          "size": 27600,
+          "downloadCount": 2595
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

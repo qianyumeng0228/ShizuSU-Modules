@@ -1,0 +1,58 @@
+{
+  "readme": "# POTAD — Pixel OTA Disabler\n\nStops Google from pushing system updates to your Pixel. Works with Magisk, KernelSU,\nKernelSU Next, SukiSU and APatch.\n\n## What it does\n\nThree layers, independent of each other. If one fails the other two still work.\n\n| Layer | What | When |\n|---|---|---|\n| A | `pm disable` on every GMS/GSF OTA component that exists on your build | every boot |\n| B | bind-mounts a hosts file that blackholes `ota.googlezip.net` and `update.googleapis.com` | boot |\n| C | `update_engine_client --cancel --reset_status` to clear an already-staged update | action button |\n\nLayer A doesn't rely on a hardcoded list alone. It also scans the live build, so if Google\nrenames a component or a new Android version adds one, it gets picked up without me\nshipping an update. Anything it isn't sure about gets logged as `NEW:` and left running —\nthose are usually Play Store app-update components, and killing those breaks app updates.\n\nLayer B merges into your existing hosts file instead of replacing it, so AdAway and\nsimilar keep working.\n\nNothing here depends on your root manager's mount backend, which is the usual reason these modules quietly stop working.\n\n## Install\n\nGrab the zip from [Releases](https://github.com/ymuuuu/POTAD/releases), flash it, reboot.\n\nOnce installed it'll show up as an update in your root manager when I push a new version.\n\nOr build it yourself:\n\n```sh\n./build.sh\n```\n\n## Using it\n\nPress the module's **Action** button. It shows what state things are in, then asks:\n\n- **Vol Up** — Block. Clears a stuck OTA and re-applies everything. No reboot needed.\n- **Vol Down** — Restore. Undoes everything the module did.\n- **Nothing** — after 15 seconds it does Block, which is the safe one.\n\nLog lives at `/data/adb/potad/potad.log`.\n\n## Undoing it\n\n**Removing the module does not undo anything.** The disabled state belongs to Android, not\nto the module — it's stored in `package-restrictions.xml` and it survives uninstall. So if\nyou want your phone back to stock, run the restore first.\n\nTwo ways:\n\n- Action button → Vol Down\n- `su -c 'sh /data/adb/potad/restore.sh'`\n\nRestore only re-enables the components *this module* disabled. If you'd already disabled\nsomething yourself before installing, it stays disabled — it isn't POTAD's to undo. It also\nlifts the hosts blackhole and cleans up its own files.\n\n`restore.sh` is installed to `/data/adb/potad/` rather than inside the module folder,\nspecifically so it still works after you've removed the module.\n\n## Checking it worked\n\n```sh\nsu -c 'cat /data/adb/potad/potad.log'          # expect a \"layer A:\" line\nsu -c 'grep googlezip /system/etc/hosts'       # expect 127.0.0.1 ota.googlezip.net\n```\n\nThen Settings → System → System update. Should be nothing pending.\n\nIf you use an ad-blocker, check your own hosts entries are still there.\n\n## What it deliberately doesn't do\n\nIt doesn't shadow `/system/bin/update_engine`. That trick works, but it's the one approach that depends on the mount backend, and it's the known failure mode on setups running a mount metamodule like Magic Mount-rs — the module shows as enabled while doing absolutely nothing. It also breaks manual sideloading and Play system updates.\n\nIf an OTA gets through anyway, the log will tell you which layer missed it. Open an issue\nwith the log and I'll look.\n\n## Credits\n\nThis is a consolidation of three modules that came before it. The hard parts were already\nsolved by other people:\n\n- **[TMW1996](https://github.com/TMW1996)** — `PixelSystemupdateBlock_v3`. The hosts-file approach for blackholing the OTA endpoints.\n- **[Badabing2005](https://github.com/badabing2005)** — `block_ota_updates` and `clear_ota_updates`. The `update_engine_client` binaries shipped in `module/bin/` are from `clear_ota_updates`; they're AOSP builds (r28 and r72), and the module tries the newer one first and falls back if it won't link on your device. Also the idea of cancelling a staged update rather than only preventing new ones.\n\nIf you want the originals rather than this, they're worth a look — both authors have been at this a lot longer than I have.\n\n## Development\n\n```sh\nsh tests/run.sh                                    # test suite, no device needed\nshellcheck -s sh module/*.sh module/common/*.sh    # static analysis\n./build.sh                                         # builds dist/POTAD-<version>.zip\n```",
+  "readmeHTML": "<h1>POTAD — Pixel OTA Disabler</h1>\n\n<p>Stops Google from pushing system updates to your Pixel. Works with Magisk, KernelSU,</p>\n<p>KernelSU Next, SukiSU and APatch.</p>\n\n<h2>What it does</h2>\n\n<p>Three layers, independent of each other. If one fails the other two still work.</p>\n\n<p>| Layer | What | When |</p>\n<p>|---|---|---|</p>\n<p>| A | <code>pm disable</code> on every GMS/GSF OTA component that exists on your build | every boot |</p>\n<p>| B | bind-mounts a hosts file that blackholes <code>ota.googlezip.net</code> and <code>update.googleapis.com</code> | boot |</p>\n<p>| C | <code>update_engine_client --cancel --reset_status</code> to clear an already-staged update | action button |</p>\n\n<p>Layer A doesn't rely on a hardcoded list alone. It also scans the live build, so if Google</p>\n<p>renames a component or a new Android version adds one, it gets picked up without me</p>\n<p>shipping an update. Anything it isn't sure about gets logged as <code>NEW:</code> and left running —</p>\n<p>those are usually Play Store app-update components, and killing those breaks app updates.</p>\n\n<p>Layer B merges into your existing hosts file instead of replacing it, so AdAway and</p>\n<p>similar keep working.</p>\n\n<p>Nothing here depends on your root manager's mount backend, which is the usual reason these modules quietly stop working.</p>\n\n<h2>Install</h2>\n\n<p>Grab the zip from <a href=\"https://github.com/ymuuuu/POTAD/releases\">Releases</a>, flash it, reboot.</p>\n\n<p>Once installed it'll show up as an update in your root manager when I push a new version.</p>\n\n<p>Or build it yourself:</p>\n\n<pre>./build.sh</pre>\n\n<h2>Using it</h2>\n\n<p>Press the module's <b>Action</b> button. It shows what state things are in, then asks:</p>\n\n<li>**Vol Up** — Block. Clears a stuck OTA and re-applies everything. No reboot needed.</li>\n<li>**Vol Down** — Restore. Undoes everything the module did.</li>\n<li>**Nothing** — after 15 seconds it does Block, which is the safe one.</li>\n\n<p>Log lives at <code>/data/adb/potad/potad.log</code>.</p>\n\n<h2>Undoing it</h2>\n\n<p><b>Removing the module does not undo anything.</b> The disabled state belongs to Android, not</p>\n<p>to the module — it's stored in <code>package-restrictions.xml</code> and it survives uninstall. So if</p>\n<p>you want your phone back to stock, run the restore first.</p>\n\n<p>Two ways:</p>\n\n<li>Action button → Vol Down</li>\n<li>`su -c 'sh /data/adb/potad/restore.sh'`</li>\n\n<p>Restore only re-enables the components *this module* disabled. If you'd already disabled</p>\n<p>something yourself before installing, it stays disabled — it isn't POTAD's to undo. It also</p>\n<p>lifts the hosts blackhole and cleans up its own files.</p>\n\n<p><code>restore.sh</code> is installed to <code>/data/adb/potad/</code> rather than inside the module folder,</p>\n<p>specifically so it still works after you've removed the module.</p>\n\n<h2>Checking it worked</h2>\n\n<pre>su -c 'cat /data/adb/potad/potad.log'          # expect a \"layer A:\" line\nsu -c 'grep googlezip /system/etc/hosts'       # expect 127.0.0.1 ota.googlezip.net</pre>\n\n<p>Then Settings → System → System update. Should be nothing pending.</p>\n\n<p>If you use an ad-blocker, check your own hosts entries are still there.</p>\n\n<h2>What it deliberately doesn't do</h2>\n\n<p>It doesn't shadow <code>/system/bin/update_engine</code>. That trick works, but it's the one approach that depends on the mount backend, and it's the known failure mode on setups running a mount metamodule like Magic Mount-rs — the module shows as enabled while doing absolutely nothing. It also breaks manual sideloading and Play system updates.</p>\n\n<p>If an OTA gets through anyway, the log will tell you which layer missed it. Open an issue</p>\n<p>with the log and I'll look.</p>\n\n<h2>Credits</h2>\n\n<p>This is a consolidation of three modules that came before it. The hard parts were already</p>\n<p>solved by other people:</p>\n\n<li>**[TMW1996](https://github.com/TMW1996)** — `PixelSystemupdateBlock_v3`. The hosts-file approach for blackholing the OTA endpoints.</li>\n<li>**[Badabing2005](https://github.com/badabing2005)** — `block_ota_updates` and `clear_ota_updates`. The `update_engine_client` binaries shipped in `module/bin/` are from `clear_ota_updates`; they're AOSP builds (r28 and r72), and the module tries the newer one first and falls back if it won't link on your device. Also the idea of cancelling a staged update rather than only preventing new ones.</li>\n\n<p>If you want the originals rather than this, they're worth a look — both authors have been at this a lot longer than I have.</p>\n\n<h2>Development</h2>\n\n<pre>sh tests/run.sh                                    # test suite, no device needed\nshellcheck -s sh module/*.sh module/common/*.sh    # static analysis\n./build.sh                                         # builds dist/POTAD-&lt;version&gt;.zip</pre>",
+  "homepageUrl": "https://github.com/ymuuuu/POTAD",
+  "sourceUrl": "https://github.com/ymuuuu/POTAD",
+  "url": "https://github.com/ymuuuu/POTAD",
+  "latestRelease": {
+    "name": "v0.2.0",
+    "version": "v0.2.0",
+    "time": "2026-08-04T10:41:13Z",
+    "downloadUrl": "https://github.com/ymuuuu/POTAD/releases/download/v0.2.0/POTAD-0.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-08-04T10:41:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "POTAD-0.2.0.zip",
+          "downloadUrl": "https://github.com/ymuuuu/POTAD/releases/download/v0.2.0/POTAD-0.2.0.zip",
+          "size": 59062,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v0.1.1",
+      "tagName": "v0.1.1",
+      "publishedAt": "2026-08-02T22:22:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "POTAD-0.1.1.zip",
+          "downloadUrl": "https://github.com/ymuuuu/POTAD/releases/download/v0.1.1/POTAD-0.1.1.zip",
+          "size": 55673,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-08-02T22:20:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "POTAD-0.1.0.zip",
+          "downloadUrl": "https://github.com/ymuuuu/POTAD/releases/download/v0.1.0/POTAD-0.1.0.zip",
+          "size": 55673,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

@@ -1,0 +1,164 @@
+{
+  "readme": "# VoltageOS 6.1 for Motorola Edge 50 (tank)\n\n<div align=\"center\">\n\n[![Android 17](https://img.shields.io/badge/Android-17.0-blue.svg?style=for-the-badge&logo=android)](https://www.android.com/)\n[![VoltageOS](https://img.shields.io/badge/VoltageOS-v6.1-cyan.svg?style=for-the-badge&logo=lightning)](https://github.com/VoltageOS)\n[![Device](https://img.shields.io/badge/Device-Motorola_Edge_50_(tank)-purple.svg?style=for-the-badge&logo=motorola)](https://github.com/ajimsjames/android_device_motorola_tank)\n[![Build Type](https://img.shields.io/badge/Build-UNOFFICIAL-orange.svg?style=for-the-badge)](https://github.com/ajimsjames/voltageos_tank_releases)\n[![Maintainer](https://img.shields.io/badge/Maintainer-ajugeorge-emerald.svg?style=for-the-badge&logo=github)](https://github.com/ajimsjames)\n[![Website](https://img.shields.io/badge/Release_Portal-Live-00f0ff.svg?style=for-the-badge&logo=google-chrome)](https://ajimsjames.github.io/voltageos_tank_releases/)\n\n**⚡ Pure Performance. Cybernetic Elegance. Android 17 (UNOFFICIAL by ajugeorge). ⚡**\n\n[🌐 **Visit Release Website & Interactive Download Portal**](https://ajimsjames.github.io/voltageos_tank_releases/)\n\n</div>\n\n---\n\n## 📱 Hardware & Device Specifications\n\n| Specification | Details |\n| :--- | :--- |\n| **Device Model** | Motorola Edge 50 |\n| **Codename** | `tank` |\n| **Platform / SoC** | Qualcomm Snapdragon 7s Gen 2 (`SM7450` / 4nm) |\n| **Architecture** | Octa-core (`4x 2.40 GHz Cortex-A78` + `4x 1.95 GHz Cortex-A55`) |\n| **GPU** | Adreno 710 |\n| **Display** | 6.7\" Curved pOLED, 1.5K (1220 x 2712), 120Hz, HDR10+, 1900 nits peak |\n| **Cameras** | 50 MP (Sony LYT-700C, OIS) + 10 MP (Telephoto 3x, OIS) + 13 MP (Ultrawide) \\| 32 MP Front |\n| **Battery & Charging** | 5000 mAh, 68W TurboPower wired, 15W wireless |\n| **Security / Biometrics**| Under-display Optical Fingerprint (Goodix UDFPS), Face Unlock |\n| **Audio & Codecs** | Stereo Speakers, Dolby Atmos, LDAC (990kbps), aptX HD / Adaptive, LHDC v5 |\n| **Google Apps** | Sandboxed Edition |\n| **Build Configuration** | Non-Root (SELinux Enforcing) |\n\n---\n\n## ⚙️ Build & Kernel Information\n\n| Attribute | Value |\n| :--- | :--- |\n| **Maintainer** | ajugeorge (`UNOFFICIAL by ajugeorge`) |\n| **Build Date** | September 16, 2026 (20260916-1602 UTC) |\n| **Build ID** | `CP2A.260605.016` |\n| **Android Security Patch** | September 1, 2026 (2026-09-01) |\n| **Kernel Version** | `5.10.260-gki-g822fb9c274c6` (GKI 5.10) |\n| **Kernel Toolchain** | `Clang 22.0.2 + LLD 22.0.2 (+pgo, +bolt, +lto, +mlgo)` |\n\n---\n\n## ⚡ Highlights & Changelog\n\n### 📱 Device Specific:\n- Initial release for Motorola Edge 50 (`tank`).\n- Non-Root build with pure stock kernel configuration.\n- Sandboxed Google Apps edition included.\n- 120Hz dynamic refresh rate, Sony LYT-700C camera sensor pipeline, UDFPS, Fast Charging 68W, and Hi-Res wireless audio codecs.\n\n### ⚡ VoltageOS (September 2026 ASB):\n- Fixed App Drawer zoom toggle.\n- Fixed workspace items appearing behind the App Drawer when blur is disabled.\n- Fixed lockscreen clock thickness option.\n- Fixed Bluetooth icon disappearing after restarting SystemUI.\n- Fixed blurred background of the default UDPFS icon and notification shelf.\n- Fixed GameSpace screen recording.\n- Fixed some issues related to Call overlay in GameSpace.\n- Added event-based PSA strings to QuickSpace.\n- Added Voltage vertical style to QuickSpace.\n- Added calendar support to QuickSpace.\n- Added answer-on-speaker toggle in GameSpace.\n- Added blur to SystemUI and power menu dialogs.\n- Improved per-app volume.\n- Improved dynamic fonts.\n- Improved mobile data and Bluetooth QS dialogs.\n- Stopped limiting App Drawer search results.\n\n---\n\n## 📥 Download Links\n\nBrowse all builds, mirrors, and fastboot images directly on our [**Release Portal**](https://ajimsjames.github.io/voltageos_tank_releases/).\n\n- **GitHub Releases**: [Releases Page](https://github.com/ajimsjames/voltageos_tank_releases/releases)\n\n---\n\n## 🛠️ Flashing & Installation Guide\n\n> [!IMPORTANT]\n> - Ensure your bootloader is unlocked.\n> - Take a full backup of your internal storage before proceeding.\n> - Ensure you are on the latest stock Motorola Android 14/15 firmware baseline.\n\n### Method 1: Recovery Sideload (Recommended)\n\n1. Reboot your phone to Fastboot mode:\n   ```bash\n   adb reboot bootloader\n   ```\n2. Flash the custom boot/vendor_boot/recovery partitions:\n   ```bash\n   fastboot flash boot boot.img\n   fastboot flash vendor_boot vendor_boot.img\n   fastboot flash dtbo dtbo.img\n   fastboot flash recovery recovery.img\n   ```\n3. Reboot to Recovery:\n   ```bash\n   fastboot reboot recovery\n   ```\n4. In Recovery, perform a **Factory Reset / Format Data** (`Wipe data/factory reset`).\n5. Select **Apply Update** > **Apply from ADB**, and run:\n   ```bash\n   adb sideload voltage-6.1-tank-***.zip\n   ```\n6. Reboot System and enjoy VoltageOS!\n\n---\n\n## 🏗️ Source Code & Building\n\nTo build VoltageOS 6.1 for Motorola Edge 50 (`tank`):\n\n1. Initialize VoltageOS source tree:\n   ```bash\n   repo init -u https://github.com/VoltageOS/manifest.git -b 17\n   ```\n2. Place `sm7450.xml` inside `.repo/local_manifests/`:\n   ```bash\n   mkdir -p .repo/local_manifests\n   curl -sL https://raw.githubusercontent.com/ajimsjames/voltageos_tank_releases/main/sm7450.xml -o .repo/local_manifests/sm7450.xml\n   ```\n3. Sync repository:\n   ```bash\n   repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags\n   ```\n4. Build VoltageOS:\n   ```bash\n   . build/envsetup.sh\n   lunch voltage_tank-userdebug\n   m voltage\n   ```\n\n---\n\n## 🤝 Maintainer & Credits\n\n- **Device Maintainer**: ajugeorge ([ajimsjames](https://github.com/ajimsjames))\n- **VoltageOS Team**: [VoltageOS GitHub](https://github.com/VoltageOS)\n- **Motorola Mobility LLC**: For kernel sources and device components\n\n---\n\n<div align=\"center\">\n  <sub>Maintained with ⚡ for Motorola Edge 50 Community</sub>\n</div>\n",
+  "readmeHTML": "<h1>VoltageOS 6.1 for Motorola Edge 50 (tank)</h1>\n\n<p><div align=\"center\"></p>\n\n<p><a href=\"https://img.shields.io/badge/Android-17.0-blue.svg?style=for-the-badge&logo=android\">![Android 17</a>](https://www.android.com/)</p>\n<p><a href=\"https://img.shields.io/badge/VoltageOS-v6.1-cyan.svg?style=for-the-badge&logo=lightning\">![VoltageOS</a>](https://github.com/VoltageOS)</p>\n<p><a href=\"https://img.shields.io/badge/Device-Motorola_Edge_50_(tank\">![Device</a>-purple.svg?style=for-the-badge&logo=motorola)](https://github.com/ajimsjames/android_device_motorola_tank)</p>\n<p><a href=\"https://img.shields.io/badge/Build-UNOFFICIAL-orange.svg?style=for-the-badge\">![Build Type</a>](https://github.com/ajimsjames/voltageos_tank_releases)</p>\n<p><a href=\"https://img.shields.io/badge/Maintainer-ajugeorge-emerald.svg?style=for-the-badge&logo=github\">![Maintainer</a>](https://github.com/ajimsjames)</p>\n<p><a href=\"https://img.shields.io/badge/Release_Portal-Live-00f0ff.svg?style=for-the-badge&logo=google-chrome\">![Website</a>](https://ajimsjames.github.io/voltageos_tank_releases/)</p>\n\n<p><b>⚡ Pure Performance. Cybernetic Elegance. Android 17 (UNOFFICIAL by ajugeorge). ⚡</b></p>\n\n<p><a href=\"https://ajimsjames.github.io/voltageos_tank_releases/\">🌐 <b>Visit Release Website & Interactive Download Portal</b></a></p>\n\n<p></div></p>\n\n<p>---</p>\n\n<h2>📱 Hardware & Device Specifications</h2>\n\n<p>| Specification | Details |</p>\n<p>| :--- | :--- |</p>\n<p>| <b>Device Model</b> | Motorola Edge 50 |</p>\n<p>| <b>Codename</b> | <code>tank</code> |</p>\n<p>| <b>Platform / SoC</b> | Qualcomm Snapdragon 7s Gen 2 (<code>SM7450</code> / 4nm) |</p>\n<p>| <b>Architecture</b> | Octa-core (<code>4x 2.40 GHz Cortex-A78</code> + <code>4x 1.95 GHz Cortex-A55</code>) |</p>\n<p>| <b>GPU</b> | Adreno 710 |</p>\n<p>| <b>Display</b> | 6.7\" Curved pOLED, 1.5K (1220 x 2712), 120Hz, HDR10+, 1900 nits peak |</p>\n<p>| <b>Cameras</b> | 50 MP (Sony LYT-700C, OIS) + 10 MP (Telephoto 3x, OIS) + 13 MP (Ultrawide) \\| 32 MP Front |</p>\n<p>| <b>Battery & Charging</b> | 5000 mAh, 68W TurboPower wired, 15W wireless |</p>\n<p>| <b>Security / Biometrics</b>| Under-display Optical Fingerprint (Goodix UDFPS), Face Unlock |</p>\n<p>| <b>Audio & Codecs</b> | Stereo Speakers, Dolby Atmos, LDAC (990kbps), aptX HD / Adaptive, LHDC v5 |</p>\n<p>| <b>Google Apps</b> | Sandboxed Edition |</p>\n<p>| <b>Build Configuration</b> | Non-Root (SELinux Enforcing) |</p>\n\n<p>---</p>\n\n<h2>⚙️ Build & Kernel Information</h2>\n\n<p>| Attribute | Value |</p>\n<p>| :--- | :--- |</p>\n<p>| <b>Maintainer</b> | ajugeorge (<code>UNOFFICIAL by ajugeorge</code>) |</p>\n<p>| <b>Build Date</b> | September 16, 2026 (20260916-1602 UTC) |</p>\n<p>| <b>Build ID</b> | <code>CP2A.260605.016</code> |</p>\n<p>| <b>Android Security Patch</b> | September 1, 2026 (2026-09-01) |</p>\n<p>| <b>Kernel Version</b> | <code>5.10.260-gki-g822fb9c274c6</code> (GKI 5.10) |</p>\n<p>| <b>Kernel Toolchain</b> | <code>Clang 22.0.2 + LLD 22.0.2 (+pgo, +bolt, +lto, +mlgo)</code> |</p>\n\n<p>---</p>\n\n<h2>⚡ Highlights & Changelog</h2>\n\n<h3>📱 Device Specific:</h3>\n<li>Initial release for Motorola Edge 50 (`tank`).</li>\n<li>Non-Root build with pure stock kernel configuration.</li>\n<li>Sandboxed Google Apps edition included.</li>\n<li>120Hz dynamic refresh rate, Sony LYT-700C camera sensor pipeline, UDFPS, Fast Charging 68W, and Hi-Res wireless audio codecs.</li>\n\n<h3>⚡ VoltageOS (September 2026 ASB):</h3>\n<li>Fixed App Drawer zoom toggle.</li>\n<li>Fixed workspace items appearing behind the App Drawer when blur is disabled.</li>\n<li>Fixed lockscreen clock thickness option.</li>\n<li>Fixed Bluetooth icon disappearing after restarting SystemUI.</li>\n<li>Fixed blurred background of the default UDPFS icon and notification shelf.</li>\n<li>Fixed GameSpace screen recording.</li>\n<li>Fixed some issues related to Call overlay in GameSpace.</li>\n<li>Added event-based PSA strings to QuickSpace.</li>\n<li>Added Voltage vertical style to QuickSpace.</li>\n<li>Added calendar support to QuickSpace.</li>\n<li>Added answer-on-speaker toggle in GameSpace.</li>\n<li>Added blur to SystemUI and power menu dialogs.</li>\n<li>Improved per-app volume.</li>\n<li>Improved dynamic fonts.</li>\n<li>Improved mobile data and Bluetooth QS dialogs.</li>\n<li>Stopped limiting App Drawer search results.</li>\n\n<p>---</p>\n\n<h2>📥 Download Links</h2>\n\n<p>Browse all builds, mirrors, and fastboot images directly on our <a href=\"https://ajimsjames.github.io/voltageos_tank_releases/\"><b>Release Portal</b></a>.</p>\n\n<li>**GitHub Releases**: [Releases Page](https://github.com/ajimsjames/voltageos_tank_releases/releases)</li>\n\n<p>---</p>\n\n<h2>🛠️ Flashing & Installation Guide</h2>\n\n<p>> [!IMPORTANT]</p>\n<p>> - Ensure your bootloader is unlocked.</p>\n<p>> - Take a full backup of your internal storage before proceeding.</p>\n<p>> - Ensure you are on the latest stock Motorola Android 14/15 firmware baseline.</p>\n\n<h3>Method 1: Recovery Sideload (Recommended)</h3>\n\n<li>Reboot your phone to Fastboot mode:</li>\n<p>   ```bash</p>\n<p>   adb reboot bootloader</p>\n<p>   ```</p>\n<li>Flash the custom boot/vendor_boot/recovery partitions:</li>\n<p>   ```bash</p>\n<p>   fastboot flash boot boot.img</p>\n<p>   fastboot flash vendor_boot vendor_boot.img</p>\n<p>   fastboot flash dtbo dtbo.img</p>\n<p>   fastboot flash recovery recovery.img</p>\n<p>   ```</p>\n<li>Reboot to Recovery:</li>\n<p>   ```bash</p>\n<p>   fastboot reboot recovery</p>\n<p>   ```</p>\n<li>In Recovery, perform a **Factory Reset / Format Data** (`Wipe data/factory reset`).</li>\n<li>Select **Apply Update** > **Apply from ADB**, and run:</li>\n<p>   ```bash</p>\n<p>   adb sideload voltage-6.1-tank-***.zip</p>\n<p>   ```</p>\n<li>Reboot System and enjoy VoltageOS!</li>\n\n<p>---</p>\n\n<h2>🏗️ Source Code & Building</h2>\n\n<p>To build VoltageOS 6.1 for Motorola Edge 50 (<code>tank</code>):</p>\n\n<li>Initialize VoltageOS source tree:</li>\n<p>   ```bash</p>\n<p>   repo init -u https://github.com/VoltageOS/manifest.git -b 17</p>\n<p>   ```</p>\n<li>Place `sm7450.xml` inside `.repo/local_manifests/`:</li>\n<p>   ```bash</p>\n<p>   mkdir -p .repo/local_manifests</p>\n<p>   curl -sL https://raw.githubusercontent.com/ajimsjames/voltageos_tank_releases/main/sm7450.xml -o .repo/local_manifests/sm7450.xml</p>\n<p>   ```</p>\n<li>Sync repository:</li>\n<p>   ```bash</p>\n<p>   repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags</p>\n<p>   ```</p>\n<li>Build VoltageOS:</li>\n<p>   ```bash</p>\n<p>   . build/envsetup.sh</p>\n<p>   lunch voltage_tank-userdebug</p>\n<p>   m voltage</p>\n<p>   ```</p>\n\n<p>---</p>\n\n<h2>🤝 Maintainer & Credits</h2>\n\n<li>**Device Maintainer**: ajugeorge ([ajimsjames](https://github.com/ajimsjames))</li>\n<li>**VoltageOS Team**: [VoltageOS GitHub](https://github.com/VoltageOS)</li>\n<li>**Motorola Mobility LLC**: For kernel sources and device components</li>\n\n<p>---</p>\n\n<p><div align=\"center\"></p>\n<p>  <sub>Maintained with ⚡ for Motorola Edge 50 Community</sub></p>\n<p></div></p>",
+  "homepageUrl": "https://ajimsjames.github.io/voltageos_tank_releases/",
+  "sourceUrl": "https://github.com/ajimsjames/voltageos_tank_releases",
+  "url": "https://github.com/ajimsjames/voltageos_tank_releases",
+  "latestRelease": {
+    "name": "v6.1-tank-20260920",
+    "version": "v6.1-tank-20260920",
+    "time": "2026-09-20T08:08:55Z",
+    "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/voltage-6.1-tank-20260920-0723-UNOFFICIAL.zip"
+  },
+  "releases": [
+    {
+      "name": "v6.1-tank-20260920",
+      "tagName": "v6.1-tank-20260920",
+      "publishedAt": "2026-09-20T08:08:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sha256sum.txt",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/sha256sum.txt",
+          "size": 748,
+          "downloadCount": 1
+        },
+        {
+          "name": "md5sum.txt",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/md5sum.txt",
+          "size": 460,
+          "downloadCount": 1
+        },
+        {
+          "name": "super_empty.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/super_empty.img",
+          "size": 5080,
+          "downloadCount": 5
+        },
+        {
+          "name": "vbmeta.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/vbmeta.img",
+          "size": 65536,
+          "downloadCount": 4
+        },
+        {
+          "name": "vbmeta_system.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/vbmeta_system.img",
+          "size": 65536,
+          "downloadCount": 4
+        },
+        {
+          "name": "dtbo.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/dtbo.img",
+          "size": 25165824,
+          "downloadCount": 6
+        },
+        {
+          "name": "vendor_dlkm.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/vendor_dlkm.img",
+          "size": 74706944,
+          "downloadCount": 4
+        },
+        {
+          "name": "boot.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/boot.img",
+          "size": 100663296,
+          "downloadCount": 9
+        },
+        {
+          "name": "vendor_boot.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/vendor_boot.img",
+          "size": 100663296,
+          "downloadCount": 8
+        },
+        {
+          "name": "recovery.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/recovery.img",
+          "size": 134217728,
+          "downloadCount": 10
+        },
+        {
+          "name": "voltage-6.1-tank-20260920-0723-UNOFFICIAL.zip",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260920/voltage-6.1-tank-20260920-0723-UNOFFICIAL.zip",
+          "size": 1671366459,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v6.1-tank-20260917",
+      "tagName": "v6.1-tank-20260917",
+      "publishedAt": "2026-09-17T05:33:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "super_empty.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/super_empty.img",
+          "size": 5080,
+          "downloadCount": 1
+        },
+        {
+          "name": "vbmeta.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/vbmeta.img",
+          "size": 65536,
+          "downloadCount": 2
+        },
+        {
+          "name": "vbmeta_system.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/vbmeta_system.img",
+          "size": 65536,
+          "downloadCount": 2
+        },
+        {
+          "name": "md5sum.txt",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/md5sum.txt",
+          "size": 460,
+          "downloadCount": 1
+        },
+        {
+          "name": "sha256sum.txt",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/sha256sum.txt",
+          "size": 748,
+          "downloadCount": 3
+        },
+        {
+          "name": "dtbo.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/dtbo.img",
+          "size": 25165824,
+          "downloadCount": 5
+        },
+        {
+          "name": "vendor_dlkm.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/vendor_dlkm.img",
+          "size": 74661888,
+          "downloadCount": 1
+        },
+        {
+          "name": "boot.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/boot.img",
+          "size": 100663296,
+          "downloadCount": 9
+        },
+        {
+          "name": "vendor_boot.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/vendor_boot.img",
+          "size": 100663296,
+          "downloadCount": 6
+        },
+        {
+          "name": "recovery.img",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/recovery.img",
+          "size": 134217728,
+          "downloadCount": 4
+        },
+        {
+          "name": "voltage-6.1-tank-20260916-1610-UNOFFICIAL.zip",
+          "downloadUrl": "https://github.com/ajimsjames/voltageos_tank_releases/releases/download/v6.1-tank-20260917/voltage-6.1-tank-20260916-1610-UNOFFICIAL.zip",
+          "size": 1644600661,
+          "downloadCount": 19
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

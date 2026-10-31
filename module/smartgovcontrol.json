@@ -1,0 +1,100 @@
+{
+  "readme": "# ⚡ SmartGovControl\n\n**SmartGovControl** — это комплексный системный твик и игровой комбайн для Android-устройств (с поддержкой KernelSU и APatch), разработанный с акцентом на тонкое управление производительностью железа и киберспортивные возможности.\n\n---\n\n## ⚙️ Как он работает под капотом\n\n### 🚀 Управление производительностью (Auto-Perf и Планировщик)\nМодуль постоянно мониторит активность системы через фоновые скрипты (`service.sh`). При запуске добавленной в список игры (`auto_perf.txt`) активируется высокопроизводительный профиль процессора и видеоускорителя. Интеллектуальный сканер фокуса (`topResumedActivity`) защищает игровой режим от случайных сбросов при открытии шторки уведомлений или регулировке громкости.\n\n### 🕹 Аппаратные макросы без детекта (`touch_injector`)\nДля реализации макросов модуль не использует стандартные уязвимые службы доступности (Accessibility Services). Вместо этого задействуется нативный C++ бинарник `touch_injector`, который осуществляет прямой впрыск событий ввода на уровне ядра Linux (`/dev/input`), полностью имитируя реальные касания пальцем.\n\n### 🎮 Игровой оверлей (Game Space)\nСервис оверлея (`GameOverlayService`) запускается как foreground-служба только во время игровой сессии. Он выводит телеметрию (FPS, температуры, частоты), управляет кастомным прицелом, блокировкой жестов и рисует по бокам экрана тонкие полупрозрачные индикаторы для быстрого вызова меню. При выходе на рабочий стол оверлей мгновенно выгружается из памяти.\n\n### 🎞 Генерация кадров\nВ модуль интегрирован удобный встроенный установщик приложения-компаньона, позволяющий задействовать технологии интерполяции кадров для повышения плавной картинки в поддерживаемых проектах.\n\n### 🔋 Энергосбережение и питание\n* **Deep Sleep (Глубокий сон):** При выключении экрана скрипт принудительно снижает частоты процессора и GPU до минимальных значений.\n* **Bypass Charging (Обходная зарядка):** Перенаправляет питание в обход аккумулятора, снижая нагрев смартфона во время долгих игровых сессий.\n",
+  "readmeHTML": "<h1>⚡ SmartGovControl</h1>\n\n<p><b>SmartGovControl</b> — это комплексный системный твик и игровой комбайн для Android-устройств (с поддержкой KernelSU и APatch), разработанный с акцентом на тонкое управление производительностью железа и киберспортивные возможности.</p>\n\n<p>---</p>\n\n<h2>⚙️ Как он работает под капотом</h2>\n\n<h3>🚀 Управление производительностью (Auto-Perf и Планировщик)</h3>\n<p>Модуль постоянно мониторит активность системы через фоновые скрипты (<code>service.sh</code>). При запуске добавленной в список игры (<code>auto_perf.txt</code>) активируется высокопроизводительный профиль процессора и видеоускорителя. Интеллектуальный сканер фокуса (<code>topResumedActivity</code>) защищает игровой режим от случайных сбросов при открытии шторки уведомлений или регулировке громкости.</p>\n\n<h3>🕹 Аппаратные макросы без детекта (`touch_injector`)</h3>\n<p>Для реализации макросов модуль не использует стандартные уязвимые службы доступности (Accessibility Services). Вместо этого задействуется нативный C++ бинарник <code>touch_injector</code>, который осуществляет прямой впрыск событий ввода на уровне ядра Linux (<code>/dev/input</code>), полностью имитируя реальные касания пальцем.</p>\n\n<h3>🎮 Игровой оверлей (Game Space)</h3>\n<p>Сервис оверлея (<code>GameOverlayService</code>) запускается как foreground-служба только во время игровой сессии. Он выводит телеметрию (FPS, температуры, частоты), управляет кастомным прицелом, блокировкой жестов и рисует по бокам экрана тонкие полупрозрачные индикаторы для быстрого вызова меню. При выходе на рабочий стол оверлей мгновенно выгружается из памяти.</p>\n\n<h3>🎞 Генерация кадров</h3>\n<p>В модуль интегрирован удобный встроенный установщик приложения-компаньона, позволяющий задействовать технологии интерполяции кадров для повышения плавной картинки в поддерживаемых проектах.</p>\n\n<h3>🔋 Энергосбережение и питание</h3>\n<li>**Deep Sleep (Глубокий сон):** При выключении экрана скрипт принудительно снижает частоты процессора и GPU до минимальных значений.</li>\n<li>**Bypass Charging (Обходная зарядка):** Перенаправляет питание в обход аккумулятора, снижая нагрев смартфона во время долгих игровых сессий.</li>",
+  "homepageUrl": "https://github.com/MudArAa/SmartGovControl",
+  "sourceUrl": "https://github.com/MudArAa/SmartGovControl",
+  "url": "https://github.com/MudArAa/SmartGovControl",
+  "latestRelease": {
+    "name": "v2.7",
+    "version": "v2.7",
+    "time": "2026-10-26T14:36:11Z",
+    "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.7/my.module.universal.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.7",
+      "tagName": "v2.7",
+      "publishedAt": "2026-10-26T14:36:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.7/my.module.universal.zip",
+          "size": 14443390,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v2.6",
+      "tagName": "v2.6",
+      "publishedAt": "2026-10-14T17:53:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.6/my.module.universal.zip",
+          "size": 14498644,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v2.5",
+      "tagName": "v2.5",
+      "publishedAt": "2026-10-06T12:27:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.5/my.module.universal.zip",
+          "size": 14478893,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v2.4",
+      "tagName": "v2.4",
+      "publishedAt": "2026-08-12T13:52:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.4/my.module.universal.zip",
+          "size": 6195212,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v2.3",
+      "tagName": "v2.3",
+      "publishedAt": "2026-08-12T11:51:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.3/my.module.universal.zip",
+          "size": 6192682,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-08-09T10:08:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "my.module.universal.zip",
+          "downloadUrl": "https://github.com/MudArAa/SmartGovControl/releases/download/v2.2/my.module.universal.zip",
+          "size": 21742,
+          "downloadCount": 12
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

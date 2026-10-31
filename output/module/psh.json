@@ -1,0 +1,144 @@
+{
+  "readme": "# psh — Privileged Shell Wrapper for Termux\n\n`psh` is a lightweight C++ utility designed to provide a controlled root-like shell environment on Termux for Android. It wraps around existing `su` binaries to launch commands or shells with privilege escalation, while managing environment variables, user switching, and system paths carefully.\n\n## Overview\n\n`psh` acts as a smart front-end for `su` (superuser) commands in Termux. It provides:\n\n- Switching to root or another user with environment isolation.\n- Customizable PATH manipulation (prepend or append system paths).\n- Support for specifying the shell executable to use.\n- Debug logging for troubleshooting.\n- Compatibility with various Android setups including Magisk and classic `su`.\n- Handling of environment variables to maintain Termux user context inside root shells.\n- Prevention of direct root execution of Termux itself (done externally by install scripts).\n\n## Usage\n\n```bash\npsh [options] [user]\n```\n\n### Options\n\n- `-p, --syspre`\n  Prepend Android system paths (`/system/bin`, etc.) to the PATH.\n\n- `-a, --sysadd`\n  Append Android system paths to the PATH.\n\n- `-s, --shell <shell>`\n  Specify an alternate shell executable to use instead of the default.\n\n- `--version`\n  Show `psh` version.\n\n- `-h, --help`\n  Show usage help.\n\n### Examples\n\n- Run root shell with default environment:\n\n  ```bash\n  psh\n  ```\n\n- Switch to a different user:\n\n  ```bash\n  psh someuser\n  ```\n\n- Run a command as root preserving environment:\n\n  ```bash\n  psh -E ls /root\n  ```\n\n- Specify shell explicitly:\n\n  ```bash\n  psh -s /system/bin/sh\n  ```\n\n## Debugging\n\nRun with the `--dbg` option to enable debug logging to a file `psh_debug_<YYYYMMDD>` in the current directory:\n\n```bash\npsh --dbg ...\n```\n\nDebug logs include environment variables, architecture, Android version, device info, kernel, and command execution details.\n\n## Installation on Termux\n\nYou can install `psh` easily on Termux using the provided install script, which downloads the appropriate binary for your device architecture, sets permissions, and configures ownership:\n\nRun this command directly in Termux (curl or wget):\n\n```bash\ncurl -fsSL https://psh.dergoogler.com/install.sh | bash\n```\n\nOr with wget:\n\n```bash\nwget -qO- https://psh.dergoogler.com/install.sh | bash\n```\n\nBy default, it installs the latest stable release. You can specify a version like so:\n\n```bash\nVERSION=1.0.0 curl -fsSL https://psh.dergoogler.com/install.sh | bash\n```\n\n**Note:** The installer aborts if run as root inside Termux, ensuring safe installation.\n",
+  "readmeHTML": "<h1>psh — Privileged Shell Wrapper for Termux</h1>\n\n<p><code>psh</code> is a lightweight C++ utility designed to provide a controlled root-like shell environment on Termux for Android. It wraps around existing <code>su</code> binaries to launch commands or shells with privilege escalation, while managing environment variables, user switching, and system paths carefully.</p>\n\n<h2>Overview</h2>\n\n<p><code>psh</code> acts as a smart front-end for <code>su</code> (superuser) commands in Termux. It provides:</p>\n\n<li>Switching to root or another user with environment isolation.</li>\n<li>Customizable PATH manipulation (prepend or append system paths).</li>\n<li>Support for specifying the shell executable to use.</li>\n<li>Debug logging for troubleshooting.</li>\n<li>Compatibility with various Android setups including Magisk and classic `su`.</li>\n<li>Handling of environment variables to maintain Termux user context inside root shells.</li>\n<li>Prevention of direct root execution of Termux itself (done externally by install scripts).</li>\n\n<h2>Usage</h2>\n\n<pre>psh [options] [user]</pre>\n\n<h3>Options</h3>\n\n<li>`-p, --syspre`</li>\n<p>  Prepend Android system paths (<code>/system/bin</code>, etc.) to the PATH.</p>\n\n<li>`-a, --sysadd`</li>\n<p>  Append Android system paths to the PATH.</p>\n\n<li>`-s, --shell <shell>`</li>\n<p>  Specify an alternate shell executable to use instead of the default.</p>\n\n<li>`--version`</li>\n<p>  Show <code>psh</code> version.</p>\n\n<li>`-h, --help`</li>\n<p>  Show usage help.</p>\n\n<h3>Examples</h3>\n\n<li>Run root shell with default environment:</li>\n\n<p>  ```bash</p>\n<p>  psh</p>\n<p>  ```</p>\n\n<li>Switch to a different user:</li>\n\n<p>  ```bash</p>\n<p>  psh someuser</p>\n<p>  ```</p>\n\n<li>Run a command as root preserving environment:</li>\n\n<p>  ```bash</p>\n<p>  psh -E ls /root</p>\n<p>  ```</p>\n\n<li>Specify shell explicitly:</li>\n\n<p>  ```bash</p>\n<p>  psh -s /system/bin/sh</p>\n<p>  ```</p>\n\n<h2>Debugging</h2>\n\n<p>Run with the <code>--dbg</code> option to enable debug logging to a file <code>psh_debug_<YYYYMMDD></code> in the current directory:</p>\n\n<pre>psh --dbg ...</pre>\n\n<p>Debug logs include environment variables, architecture, Android version, device info, kernel, and command execution details.</p>\n\n<h2>Installation on Termux</h2>\n\n<p>You can install <code>psh</code> easily on Termux using the provided install script, which downloads the appropriate binary for your device architecture, sets permissions, and configures ownership:</p>\n\n<p>Run this command directly in Termux (curl or wget):</p>\n\n<pre>curl -fsSL https://psh.dergoogler.com/install.sh | bash</pre>\n\n<p>Or with wget:</p>\n\n<pre>wget -qO- https://psh.dergoogler.com/install.sh | bash</pre>\n\n<p>By default, it installs the latest stable release. You can specify a version like so:</p>\n\n<pre>VERSION=1.0.0 curl -fsSL https://psh.dergoogler.com/install.sh | bash</pre>\n\n<p><b>Note:</b> The installer aborts if run as root inside Termux, ensuring safe installation.</p>",
+  "homepageUrl": "https://github.com/DerGoogler/psh",
+  "sourceUrl": "https://github.com/DerGoogler/psh",
+  "url": "https://github.com/DerGoogler/psh",
+  "latestRelease": {
+    "name": "23",
+    "version": "23",
+    "time": "2025-06-14T19:49:59Z",
+    "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/23/psh-arm64-v8a"
+  },
+  "releases": [
+    {
+      "name": "23",
+      "tagName": "23",
+      "publishedAt": "2025-06-14T19:49:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "psh-arm64-v8a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/23/psh-arm64-v8a",
+          "size": 504608,
+          "downloadCount": 195
+        },
+        {
+          "name": "psh-armeabi-v7a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/23/psh-armeabi-v7a",
+          "size": 296516,
+          "downloadCount": 11
+        },
+        {
+          "name": "psh-x86",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/23/psh-x86",
+          "size": 495128,
+          "downloadCount": 4
+        },
+        {
+          "name": "psh-x86_64",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/23/psh-x86_64",
+          "size": 484504,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "21",
+      "tagName": "21",
+      "publishedAt": "2025-06-14T19:19:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "psh-arm64-v8a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/21/psh-arm64-v8a",
+          "size": 504320,
+          "downloadCount": 2
+        },
+        {
+          "name": "psh-armeabi-v7a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/21/psh-armeabi-v7a",
+          "size": 296196,
+          "downloadCount": 0
+        },
+        {
+          "name": "psh-x86",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/21/psh-x86",
+          "size": 494600,
+          "downloadCount": 1
+        },
+        {
+          "name": "psh-x86_64",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/21/psh-x86_64",
+          "size": 484088,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "20",
+      "tagName": "20",
+      "publishedAt": "2025-06-14T18:56:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "psh-arm64-v8a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/20/psh-arm64-v8a",
+          "size": 504304,
+          "downloadCount": 3
+        },
+        {
+          "name": "psh-armeabi-v7a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/20/psh-armeabi-v7a",
+          "size": 296180,
+          "downloadCount": 0
+        },
+        {
+          "name": "psh-x86",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/20/psh-x86",
+          "size": 494584,
+          "downloadCount": 1
+        },
+        {
+          "name": "psh-x86_64",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/20/psh-x86_64",
+          "size": 484104,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "1.0.0",
+      "tagName": "1.0.0",
+      "publishedAt": "2025-06-14T13:12:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "psh-x86",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/1.0.0/psh-x86",
+          "size": 496904,
+          "downloadCount": 4
+        },
+        {
+          "name": "psh-x86_64",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/1.0.0/psh-x86_64",
+          "size": 486840,
+          "downloadCount": 4
+        },
+        {
+          "name": "psh-arm64-v8a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/1.0.0/psh-arm64-v8a",
+          "size": 505344,
+          "downloadCount": 19
+        },
+        {
+          "name": "psh-armeabi-v7a",
+          "downloadUrl": "https://github.com/DerGoogler/psh/releases/download/1.0.0/psh-armeabi-v7a",
+          "size": 297732,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

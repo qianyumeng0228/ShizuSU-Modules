@@ -1,0 +1,100 @@
+{
+  "readme": "# Benchkit\n\nBenchkit is a developer-centric toolkit module for Android with a plethora of tools for in-depth profiling and benchmarking. Many of the tools are focused on kernel benchmarking, but userspace (i.e. Android) benchmarking is also covered by some of them. This module aims to make empirical data-driven development more accessible so people can make optimal tuning decisions based on real results.\n\nThe only supported CPU architecture is little-endian AArch64, which includes almost all modern Android phones.\n\n## Contents\n\nCommand-line utilities:\n\n- [Bonnie++](https://doc.coker.com.au/projects/bonnie/):\n  General filesystem and I/O benchmark\n- [callbench](https://github.com/kdrag0n/callbench):\n  Measure the speed of simple time syscalls (with and without vDSO) and basic in-memory I/O using `mmap(2)` and `read(2)`. A 32-bit version is available as `callbench32` for 32-bit vDSO testing.\n- [cyclictest](https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/tree/src/cyclictest/cyclictest.c?h=stable/devel/v1.0.1):\n  Measure timer jitter, useful for real-time latency testing\n- [Dhrystone](https://github.com/ARM-software/workload-automation/blob/e387e3d9b79e936b50e5985c369aad1654cc9c06/wa/workloads/dhrystone/src/dhrystone.c):\n  Simple CPU integer performance benchmark typically used for calculating CPU capacities for an EAS energy model\n- [Flexible I/O Tester](https://github.com/axboe/fio/tree/4e8c82b4e9804c52bf2c78327cc5bfca9d8aedfc) (`fio`):\n  Flexible generic I/O tester that can simulate a variety of configurable workloads\n- [GTcycles](https://github.com/kdrag0n/gtcycles):\n  Measure the frequency of the CPU's generic timer\n- [Hackbench](https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/tree/src/hackbench/hackbench.c?h=stable/devel/v1.0.1&id=34caa080e0472cf480f2e90538aaf300f9ae487b):\n  Scheduler wakeup latency and pipe benchmark\n- [IOzone](http://www.iozone.org/):\n  General filesystem and I/O benchmark\n- [memcpy](https://github.com/ARM-software/workload-automation/blob/e387e3d9b79e936b50e5985c369aad1654cc9c06/wa/workloads/memcpy/src/memcopy.c):\n  Measure memory bandwidth using libc's `memcpy(3)` function\n- [perf](https://github.com/kdrag0n/proton_bluecross/tree/a9c87582ba82f2ec3889a975bd5e827d846676cd/tools/perf):\n  Profiling tool (from Linux 4.9) for kernel and userspace. Some microbenchmarks are also available in `perf bench`.\n- [rt-app](https://github.com/scheduler-tools/rt-app):\n  Flexible real-time application simulator designed to replicate typical mobile workloads in a reproducible manner. Some reference tests from ARM are available in `/system/etc/rt-app`.\n- [schbench](https://github.com/kdrag0n/schbench/blob/8d075b39d6a4cbb362b24912eddcdd362bf09649/schbench.c):\n  Scheduler wakeup latency benchmark\n- [stress-ng](https://kernel.ubuntu.com/git/cking/stress-ng.git/):\n  Stress-test various hardware and kernel subsystems\n- [sysbench](https://github.com/akopytov/sysbench):\n  Scriptable database and system performance benchmark with several built-in tests\n- [hyperfine](https://github.com/sharkdp/hyperfine):\n  Advanced benchmark runner that makes it easy to run benchmarks in a\n  statistically sound manner and export results into machine-readable formats\n- [synthmark](https://github.com/google/synthmark):\n  Benchmark CPU performance with real-time audio workloads (by Google; CLI version)\n\nAndroid apps:\n\n- [JankBenchX](https://github.com/joshuous/JankBenchX):\n  [joshuous](https://github.com/joshuous/)' modified version of AOSP [JankBench](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/JankBench/) for automatic reproducible UIBench testing\n- [TouchLatency](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/TouchLatency/):\n  Test touch latency and jank in simple scenes (from AOSP)\n- [UIBench](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/UiBench/):\n  Google's AOSP app for testing various mobile workloads and UI rendering tasks\n- [Audio Latency Test](https://superpowered.com/latency) (shows as \"Latency Test\"):\n  Test end-to-end (i.e. speaker to microphone) audio latency (from Superpowered)\n- [SynthMark](https://github.com/google/synthmark):\n  Benchmark CPU performance with real-time audio workloads (by Google; GUI version)\n- [OboeTester](https://github.com/google/oboe):\n  Various audio-related tests including latency and glitch testing (by Google)\n\n## Links\n\n- [**Donate** to show your support](https://paypal.me/dragon5232)\n- [GitHub repository](https://github.com/kdrag0n/benchkit)\n\n## Credits\n\n- ARM for [LISA](https://github.com/ARM-software/lisa) and [Workload Automation](https://github.com/ARM-software/workload-automation)\n- [celtare21](https://github.com/celtare21) for the [IOzone](http://www.iozone.org/) executable\n- The respective authors of all tests included in this module\n",
+  "readmeHTML": "<h1>Benchkit</h1>\n\n<p>Benchkit is a developer-centric toolkit module for Android with a plethora of tools for in-depth profiling and benchmarking. Many of the tools are focused on kernel benchmarking, but userspace (i.e. Android) benchmarking is also covered by some of them. This module aims to make empirical data-driven development more accessible so people can make optimal tuning decisions based on real results.</p>\n\n<p>The only supported CPU architecture is little-endian AArch64, which includes almost all modern Android phones.</p>\n\n<h2>Contents</h2>\n\n<p>Command-line utilities:</p>\n\n<li>[Bonnie++](https://doc.coker.com.au/projects/bonnie/):</li>\n<p>  General filesystem and I/O benchmark</p>\n<li>[callbench](https://github.com/kdrag0n/callbench):</li>\n<p>  Measure the speed of simple time syscalls (with and without vDSO) and basic in-memory I/O using <code>mmap(2)</code> and <code>read(2)</code>. A 32-bit version is available as <code>callbench32</code> for 32-bit vDSO testing.</p>\n<li>[cyclictest](https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/tree/src/cyclictest/cyclictest.c?h=stable/devel/v1.0.1):</li>\n<p>  Measure timer jitter, useful for real-time latency testing</p>\n<li>[Dhrystone](https://github.com/ARM-software/workload-automation/blob/e387e3d9b79e936b50e5985c369aad1654cc9c06/wa/workloads/dhrystone/src/dhrystone.c):</li>\n<p>  Simple CPU integer performance benchmark typically used for calculating CPU capacities for an EAS energy model</p>\n<li>[Flexible I/O Tester](https://github.com/axboe/fio/tree/4e8c82b4e9804c52bf2c78327cc5bfca9d8aedfc) (`fio`):</li>\n<p>  Flexible generic I/O tester that can simulate a variety of configurable workloads</p>\n<li>[GTcycles](https://github.com/kdrag0n/gtcycles):</li>\n<p>  Measure the frequency of the CPU's generic timer</p>\n<li>[Hackbench](https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/tree/src/hackbench/hackbench.c?h=stable/devel/v1.0.1&id=34caa080e0472cf480f2e90538aaf300f9ae487b):</li>\n<p>  Scheduler wakeup latency and pipe benchmark</p>\n<li>[IOzone](http://www.iozone.org/):</li>\n<p>  General filesystem and I/O benchmark</p>\n<li>[memcpy](https://github.com/ARM-software/workload-automation/blob/e387e3d9b79e936b50e5985c369aad1654cc9c06/wa/workloads/memcpy/src/memcopy.c):</li>\n<p>  Measure memory bandwidth using libc's <code>memcpy(3)</code> function</p>\n<li>[perf](https://github.com/kdrag0n/proton_bluecross/tree/a9c87582ba82f2ec3889a975bd5e827d846676cd/tools/perf):</li>\n<p>  Profiling tool (from Linux 4.9) for kernel and userspace. Some microbenchmarks are also available in <code>perf bench</code>.</p>\n<li>[rt-app](https://github.com/scheduler-tools/rt-app):</li>\n<p>  Flexible real-time application simulator designed to replicate typical mobile workloads in a reproducible manner. Some reference tests from ARM are available in <code>/system/etc/rt-app</code>.</p>\n<li>[schbench](https://github.com/kdrag0n/schbench/blob/8d075b39d6a4cbb362b24912eddcdd362bf09649/schbench.c):</li>\n<p>  Scheduler wakeup latency benchmark</p>\n<li>[stress-ng](https://kernel.ubuntu.com/git/cking/stress-ng.git/):</li>\n<p>  Stress-test various hardware and kernel subsystems</p>\n<li>[sysbench](https://github.com/akopytov/sysbench):</li>\n<p>  Scriptable database and system performance benchmark with several built-in tests</p>\n<li>[hyperfine](https://github.com/sharkdp/hyperfine):</li>\n<p>  Advanced benchmark runner that makes it easy to run benchmarks in a</p>\n<p>  statistically sound manner and export results into machine-readable formats</p>\n<li>[synthmark](https://github.com/google/synthmark):</li>\n<p>  Benchmark CPU performance with real-time audio workloads (by Google; CLI version)</p>\n\n<p>Android apps:</p>\n\n<li>[JankBenchX](https://github.com/joshuous/JankBenchX):</li>\n<p>  <a href=\"https://github.com/joshuous/\">joshuous</a>' modified version of AOSP <a href=\"https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/JankBench/\">JankBench</a> for automatic reproducible UIBench testing</p>\n<li>[TouchLatency](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/TouchLatency/):</li>\n<p>  Test touch latency and jank in simple scenes (from AOSP)</p>\n<li>[UIBench](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-9.0.0_r47/tests/UiBench/):</li>\n<p>  Google's AOSP app for testing various mobile workloads and UI rendering tasks</p>\n<li>[Audio Latency Test](https://superpowered.com/latency) (shows as \"Latency Test\"):</li>\n<p>  Test end-to-end (i.e. speaker to microphone) audio latency (from Superpowered)</p>\n<li>[SynthMark](https://github.com/google/synthmark):</li>\n<p>  Benchmark CPU performance with real-time audio workloads (by Google; GUI version)</p>\n<li>[OboeTester](https://github.com/google/oboe):</li>\n<p>  Various audio-related tests including latency and glitch testing (by Google)</p>\n\n<h2>Links</h2>\n\n<li>[**Donate** to show your support](https://paypal.me/dragon5232)</li>\n<li>[GitHub repository](https://github.com/kdrag0n/benchkit)</li>\n\n<h2>Credits</h2>\n\n<li>ARM for [LISA](https://github.com/ARM-software/lisa) and [Workload Automation](https://github.com/ARM-software/workload-automation)</li>\n<li>[celtare21](https://github.com/celtare21) for the [IOzone](http://www.iozone.org/) executable</li>\n<li>The respective authors of all tests included in this module</li>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Repo/benchkit",
+  "sourceUrl": "https://github.com/Magisk-Modules-Repo/benchkit",
+  "url": "https://github.com/Magisk-Modules-Repo/benchkit",
+  "latestRelease": {
+    "name": "v2.3.1",
+    "version": "v2.3.1",
+    "time": "2020-05-22T18:53:49Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.3.1/benchkit-v2.3.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.3.1",
+      "tagName": "v2.3.1",
+      "publishedAt": "2020-05-22T18:53:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.3.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.3.1/benchkit-v2.3.1.zip",
+          "size": 23170308,
+          "downloadCount": 696
+        }
+      ]
+    },
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2020-03-18T21:14:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.2.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.2.1/benchkit-v2.2.1.zip",
+          "size": 17133008,
+          "downloadCount": 101
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2020-03-18T04:17:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.2.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.2.0/benchkit-v2.2.0.zip",
+          "size": 17121115,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2019-09-06T05:22:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.1.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.1.0/benchkit-v2.1.0.zip",
+          "size": 17357883,
+          "downloadCount": 241
+        }
+      ]
+    },
+    {
+      "name": "v2.0.1",
+      "tagName": "v2.0.1",
+      "publishedAt": "2019-08-25T08:20:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.0.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.0.1/benchkit-v2.0.1.zip",
+          "size": 7038595,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2019-08-21T07:09:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "benchkit-v2.0.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Repo/benchkit/releases/download/v2.0.0/benchkit-v2.0.0.zip",
+          "size": 7039563,
+          "downloadCount": 47
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

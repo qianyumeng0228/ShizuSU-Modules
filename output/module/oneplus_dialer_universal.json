@@ -1,0 +1,100 @@
+{
+  "readme": "# OnePlus Dialer & Messages (Android 16)\n\nOxygenOS 16 ships the OnePlus **Phone** and **Dialer** but switches them off, has no **Messages** app, and blocks **call recording** outside a few regions. This module undoes all three.\n\nTested on OnePlus 15 (CPH2747) and OnePlus 11 (CPH2449).\n\n## What it does\n\n- Turns the ROM's own Phone, Dialer and BlackList apps back on, by stripping their `<disable>` lines from `app_v2.xml` at boot.\n- Adds Messages (`com.android.mms`), the one app the ROM genuinely does not ship, with the privileged permissions it needs.\n- Unlocks call recording, in the OnePlus dialer and in Google Phone, and silences both of their \"this call is being recorded\" prompts.\n- Points the system's default phone, SMS and contacts apps at the OnePlus ones instead of Google's.\n\n## Install\n\nFlash in KernelSU or Magisk, reboot. If an app misbehaves, tap the module's Action button once and reboot — it clears the dalvik/app caches and re-applies the configs.\n\n## Notes\n\n- Works with or without NoMount. Under **NoMount Suite** it is served hooklessly with zero mounts; under **Magisk / plain KernelSU** it bind-mounts, registered with SuSFS where available.\n- **v2.0 bundles no Phone/Contacts APKs.** The ROM's copies are enabled instead — on older OxygenOS 16 builds those are simply older versions. Shipping our own stopped being safe once the ROM caught up to the same versionCodes: two builds of one version collide over the ROM's overlay and the app crash-loops. **v1.9** is the last release with them bundled, for a ROM that ships neither.\n- **Boot guard**: three failed boots and the module disables its own overlay. Delete `skip_mount` and `.guard_tripped` to re-arm.\n- The card shows ✅ once live, ⛔ if the boot guard tripped. Your root manager will offer updates when a new release is published.\n- OnePlus has its own path to the same two apps, `*#*#677776#*#*`, which force-installs Contacts and InCallUI and nothing else. It is region-gated and does not cover Messages, recording or the defaults.\n\n## Credits\n\nModule by **XxxY**. OnePlus / OxygenOS components are property of OPlus / OnePlus, redistributed for interoperability on owned devices. No warranty.\n",
+  "readmeHTML": "<h1>OnePlus Dialer & Messages (Android 16)</h1>\n\n<p>OxygenOS 16 ships the OnePlus <b>Phone</b> and <b>Dialer</b> but switches them off, has no <b>Messages</b> app, and blocks <b>call recording</b> outside a few regions. This module undoes all three.</p>\n\n<p>Tested on OnePlus 15 (CPH2747) and OnePlus 11 (CPH2449).</p>\n\n<h2>What it does</h2>\n\n<li>Turns the ROM's own Phone, Dialer and BlackList apps back on, by stripping their `<disable>` lines from `app_v2.xml` at boot.</li>\n<li>Adds Messages (`com.android.mms`), the one app the ROM genuinely does not ship, with the privileged permissions it needs.</li>\n<li>Unlocks call recording, in the OnePlus dialer and in Google Phone, and silences both of their \"this call is being recorded\" prompts.</li>\n<li>Points the system's default phone, SMS and contacts apps at the OnePlus ones instead of Google's.</li>\n\n<h2>Install</h2>\n\n<p>Flash in KernelSU or Magisk, reboot. If an app misbehaves, tap the module's Action button once and reboot — it clears the dalvik/app caches and re-applies the configs.</p>\n\n<h2>Notes</h2>\n\n<li>Works with or without NoMount. Under **NoMount Suite** it is served hooklessly with zero mounts; under **Magisk / plain KernelSU** it bind-mounts, registered with SuSFS where available.</li>\n<li>**v2.0 bundles no Phone/Contacts APKs.** The ROM's copies are enabled instead — on older OxygenOS 16 builds those are simply older versions. Shipping our own stopped being safe once the ROM caught up to the same versionCodes: two builds of one version collide over the ROM's overlay and the app crash-loops. **v1.9** is the last release with them bundled, for a ROM that ships neither.</li>\n<li>**Boot guard**: three failed boots and the module disables its own overlay. Delete `skip_mount` and `.guard_tripped` to re-arm.</li>\n<li>The card shows ✅ once live, ⛔ if the boot guard tripped. Your root manager will offer updates when a new release is published.</li>\n<li>OnePlus has its own path to the same two apps, `*#*#677776#*#*`, which force-installs Contacts and InCallUI and nothing else. It is region-gated and does not cover Messages, recording or the defaults.</li>\n\n<h2>Credits</h2>\n\n<p>Module by <b>XxxY</b>. OnePlus / OxygenOS components are property of OPlus / OnePlus, redistributed for interoperability on owned devices. No warranty.</p>",
+  "homepageUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal",
+  "sourceUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal",
+  "url": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal",
+  "latestRelease": {
+    "name": "v1.6.2",
+    "version": "v1.6.2",
+    "time": "2026-08-21T10:26:29Z",
+    "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.6.2/OnePlus_Dialer_v1.6.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.6.2",
+      "tagName": "v1.6.2",
+      "publishedAt": "2026-08-21T10:26:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.6.2.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.6.2/OnePlus_Dialer_v1.6.2.zip",
+          "size": 97831192,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.6.1",
+      "tagName": "v1.6.1",
+      "publishedAt": "2026-07-26T11:45:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.6.1.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.6.1/OnePlus_Dialer_v1.6.1.zip",
+          "size": 159092055,
+          "downloadCount": 27
+        }
+      ]
+    },
+    {
+      "name": "v1.6",
+      "tagName": "v1.6",
+      "publishedAt": "2026-07-24T21:17:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.6.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.6/OnePlus_Dialer_v1.6.zip",
+          "size": 159091490,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-07-24T18:13:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.5.1.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.5.1/OnePlus_Dialer_v1.5.1.zip",
+          "size": 52453514,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-07-24T17:13:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.5.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.5/OnePlus_Dialer_v1.5.zip",
+          "size": 73615656,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-07-22T01:42:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OnePlus_Dialer_v1.4.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/OnePlus_Dialer_Universal/releases/download/v1.4/OnePlus_Dialer_v1.4.zip",
+          "size": 73741451,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,86 @@
+{
+  "readme": "# Swap File Manager - Magisk Module\n\n![Magisk](https://img.shields.io/badge/Magisk-24%2B-orange)\n![Android](https://img.shields.io/badge/Android-9%2B-green)\n\nAutomatically creates and manages a configurable swap file on rooted Android devices using Magisk.\n\n## Features\n\n- Creates swap file automatically after boot\n- Volume-key based installer selection\n- Choose swap size during installation:\n  - 512MB\n  - 1024MB\n  - 2048MB\n- Automatically enables swap on every boot\n- Automatically applies swappiness\n- Automatically keeps ZRAM at higher priority\n- Creates persistent config file:\n  `/data/adb/modules/swap-file-manager/config/swap-manager.conf`\n- Logs all activity to:\n  `/data/adb/modules/swap-file-manager/logs/swap.log`\n\n---\n\n## Requirements\n\n- Rooted Android device\n- Magisk installed\n- Kernel with swapfile support\n\n---\n\n# Module Structure\n\n```text\nswap-file-manager/\n├── config/\n│   └── swap-manager.conf\n├── logs/\n│   └── swap.log\n├── customize.sh\n├── service.sh\n├── uninstall.sh\n├── module.prop\n└── META-INF/\n```\n\n## Installation\n\n1. Download latest ZIP from Releases\n2. Open Magisk\n3. Go to Modules\n4. Tap \"Install from storage\"\n5. Select module ZIP\n6. Choose swap size using volume keys:\n   - Volume Up = Next option\n   - Volume Down = Select\n7. Reboot device\n\n---\n\n## Verify After Reboot\n\n```bash\nsu -c \"cat /proc/swaps\"\n```\n\nExpected output should contain:\n\n```text\n/data/swap.img\n```\n\n## Log Location \n\n```bash\n/data/adb/modules/swap-file-manager/logs/swap.log\n```\n\n## Config File\n\n```bash\n/data/adb/modules/swap-file-manager/config/swap-manager.conf\n```\n\nExample:\n\n```properties\nSWAP_SIZE_MB=1024\nSWAPPINESS=100\n```\n\n## Compatibility \n\n- Android 9+\n- Magisk 24+\n- Works with ZRAM-enabled devices\n- System automatically handles swap priority\n- Tested on:\n  - Redmi Note 9\n  - MIUI 12\n  - Android 10/11\n\n# Notes \n\n- Swap file is created only if missing\n- Existing swap file is reused on reboot\n- ZRAM remains preferred automatically\n- No hardcoded swap priorities used\n\n## Author \n\nYash Saxena",
+  "readmeHTML": "<h1>Swap File Manager - Magisk Module</h1>\n\n<p>!<a href=\"https://img.shields.io/badge/Magisk-24%2B-orange\">Magisk</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Android-9%2B-green\">Android</a></p>\n\n<p>Automatically creates and manages a configurable swap file on rooted Android devices using Magisk.</p>\n\n<h2>Features</h2>\n\n<li>Creates swap file automatically after boot</li>\n<li>Volume-key based installer selection</li>\n<li>Choose swap size during installation:</li>\n<p>  - 512MB</p>\n<p>  - 1024MB</p>\n<p>  - 2048MB</p>\n<li>Automatically enables swap on every boot</li>\n<li>Automatically applies swappiness</li>\n<li>Automatically keeps ZRAM at higher priority</li>\n<li>Creates persistent config file:</li>\n<p>  <code>/data/adb/modules/swap-file-manager/config/swap-manager.conf</code></p>\n<li>Logs all activity to:</li>\n<p>  <code>/data/adb/modules/swap-file-manager/logs/swap.log</code></p>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<li>Rooted Android device</li>\n<li>Magisk installed</li>\n<li>Kernel with swapfile support</li>\n\n<p>---</p>\n\n<h1>Module Structure</h1>\n\n<pre>swap-file-manager/\n├── config/\n│   └── swap-manager.conf\n├── logs/\n│   └── swap.log\n├── customize.sh\n├── service.sh\n├── uninstall.sh\n├── module.prop\n└── META-INF/</pre>\n\n<h2>Installation</h2>\n\n<li>Download latest ZIP from Releases</li>\n<li>Open Magisk</li>\n<li>Go to Modules</li>\n<li>Tap \"Install from storage\"</li>\n<li>Select module ZIP</li>\n<li>Choose swap size using volume keys:</li>\n<p>   - Volume Up = Next option</p>\n<p>   - Volume Down = Select</p>\n<li>Reboot device</li>\n\n<p>---</p>\n\n<h2>Verify After Reboot</h2>\n\n<pre>su -c \"cat /proc/swaps\"</pre>\n\n<p>Expected output should contain:</p>\n\n<pre>/data/swap.img</pre>\n\n<h2>Log Location</h2>\n\n<pre>/data/adb/modules/swap-file-manager/logs/swap.log</pre>\n\n<h2>Config File</h2>\n\n<pre>/data/adb/modules/swap-file-manager/config/swap-manager.conf</pre>\n\n<p>Example:</p>\n\n<pre>SWAP_SIZE_MB=1024\nSWAPPINESS=100</pre>\n\n<h2>Compatibility</h2>\n\n<li>Android 9+</li>\n<li>Magisk 24+</li>\n<li>Works with ZRAM-enabled devices</li>\n<li>System automatically handles swap priority</li>\n<li>Tested on:</li>\n<p>  - Redmi Note 9</p>\n<p>  - MIUI 12</p>\n<p>  - Android 10/11</p>\n\n<h1>Notes</h1>\n\n<li>Swap file is created only if missing</li>\n<li>Existing swap file is reused on reboot</li>\n<li>ZRAM remains preferred automatically</li>\n<li>No hardcoded swap priorities used</li>\n\n<h2>Author</h2>\n\n<p>Yash Saxena</p>",
+  "homepageUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager",
+  "sourceUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager",
+  "url": "https://github.com/yashsaxena15/magisk-swap-file-manager",
+  "latestRelease": {
+    "name": "v2.1",
+    "version": "v2.1",
+    "time": "2026-05-23T05:39:33Z",
+    "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v2.1/swap-file-manager-v2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-05-23T05:39:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "swap-file-manager-v2.1.zip",
+          "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v2.1/swap-file-manager-v2.1.zip",
+          "size": 3721,
+          "downloadCount": 255
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-05-08T06:51:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "swap-manager-v2.0.zip",
+          "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v2.0/swap-manager-v2.0.zip",
+          "size": 3473,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-05-07T17:03:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "swap-manager-v1.2.zip",
+          "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v1.2/swap-manager-v1.2.zip",
+          "size": 1250,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-05-06T08:17:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "swap-manager-v1.1.zip",
+          "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v1.1/swap-manager-v1.1.zip",
+          "size": 2550,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-05-06T07:09:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "swap-manager-v1.zip",
+          "downloadUrl": "https://github.com/yashsaxena15/magisk-swap-file-manager/releases/download/v1.0/swap-manager-v1.zip",
+          "size": 2287,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

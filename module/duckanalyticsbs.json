@@ -1,0 +1,58 @@
+{
+  "readme": "# DuckAnalyticsBS\n\nTurns off Google Play Services and OxygenOS analytics, and silences the peach_v2 Wi-Fi dmesg flood.\nMagisk / KernelSU / APatch, with a WebUI. The dmesg part serves its patched INI through NoMount\nor SUSFS open-redirect when either is present, otherwise through the module mount on reboot.\n\nEvery target is checked to exist on *this* device before it is touched, verified after, logged, and\nreverted on uninstall. Anything already disabled by something else is never claimed.\n\n**On by default** — GMS telemetry components · OxygenOS telemetry packages\n(`statistics.rom olc logkit metis stdid nhs`) · peach_v2 roam-stats · `hung_task_timeout` 300 s\n\n**Opt in** — GMS location reporting (kills Timeline) · GMS sensor appops (kills step counting) ·\nbackground Wi-Fi scanning\n\n```bash\nsh /data/adb/modules/duckanalyticsbs/ctl.sh report\nsh /data/adb/modules/duckanalyticsbs/ctl.sh revert\nsh /data/adb/modules/duckanalyticsbs/ctl.sh on|off  peach|gmstel|oostel|gmsloc|gmsact|wifiscan|hungtask\n```\n\nDoes not touch Bluetooth, FCM, background execution, standby buckets or runtime permissions.\nState lives in `/data/adb/duckanalyticsbs.{conf,state,log}`; `feat_peach_backend=auto|nomount|susfs|mount`\npins the dmesg backend. Build with `./build.sh`.\n",
+  "readmeHTML": "<h1>DuckAnalyticsBS</h1>\n\n<p>Turns off Google Play Services and OxygenOS analytics, and silences the peach_v2 Wi-Fi dmesg flood.</p>\n<p>Magisk / KernelSU / APatch, with a WebUI. The dmesg part serves its patched INI through NoMount</p>\n<p>or SUSFS open-redirect when either is present, otherwise through the module mount on reboot.</p>\n\n<p>Every target is checked to exist on *this* device before it is touched, verified after, logged, and</p>\n<p>reverted on uninstall. Anything already disabled by something else is never claimed.</p>\n\n<p><b>On by default</b> — GMS telemetry components · OxygenOS telemetry packages</p>\n<p>(<code>statistics.rom olc logkit metis stdid nhs</code>) · peach_v2 roam-stats · <code>hung_task_timeout</code> 300 s</p>\n\n<p><b>Opt in</b> — GMS location reporting (kills Timeline) · GMS sensor appops (kills step counting) ·</p>\n<p>background Wi-Fi scanning</p>\n\n<pre>sh /data/adb/modules/duckanalyticsbs/ctl.sh report\nsh /data/adb/modules/duckanalyticsbs/ctl.sh revert\nsh /data/adb/modules/duckanalyticsbs/ctl.sh on|off  peach|gmstel|oostel|gmsloc|gmsact|wifiscan|hungtask</pre>\n\n<p>Does not touch Bluetooth, FCM, background execution, standby buckets or runtime permissions.</p>\n<p>State lives in <code>/data/adb/duckanalyticsbs.{conf,state,log}</code>; <code>feat_peach_backend=auto|nomount|susfs|mount</code></p>\n<p>pins the dmesg backend. Build with <code>./build.sh</code>.</p>",
+  "homepageUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS",
+  "sourceUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS",
+  "url": "https://github.com/Bouteillepleine/DuckAnalyticsBS",
+  "latestRelease": {
+    "name": "v1.0.3",
+    "version": "v1.0.3",
+    "time": "2026-09-27T10:02:28Z",
+    "downloadUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS/releases/download/v1.0.3/DuckAnalyticsBS-v1.0.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-09-27T10:02:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DuckAnalyticsBS-v1.0.3.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS/releases/download/v1.0.3/DuckAnalyticsBS-v1.0.3.zip",
+          "size": 72874,
+          "downloadCount": 49
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-09-27T09:55:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DuckAnalyticsBS-v1.0.2.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS/releases/download/v1.0.2/DuckAnalyticsBS-v1.0.2.zip",
+          "size": 33097,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-09-27T07:38:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DuckAnalyticsBS-v1.0.1.zip",
+          "downloadUrl": "https://github.com/Bouteillepleine/DuckAnalyticsBS/releases/download/v1.0.1/DuckAnalyticsBS-v1.0.1.zip",
+          "size": 19768,
+          "downloadCount": 51
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

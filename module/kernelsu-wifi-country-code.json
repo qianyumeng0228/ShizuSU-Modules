@@ -1,0 +1,58 @@
+{
+  "readme": "# WiFi Force Country Code — KernelSU Module\n\nA KernelSU / Magisk module that forces your Android device's WiFi country code to any region, unlocking restricted 5 GHz, 6 GHz (WiFi 6E/7), and DFS channels. Fully configurable through a built-in **WebUI** — no terminal needed.\n\n<p align=\"center\">\n  <img src=\"screenshot.png\" alt=\"WebUI Screenshot\" width=\"300\">\n</p>\n\n## Why?\n\nAndroid locks WiFi channels based on your region. Some countries block 5 GHz and 6 GHz channels, limit DFS bands, or reduce transmit power. This module overrides that restriction at boot, giving you access to all channels available in your chosen region.\n\n**Common use cases:**\n- Unlock 5 GHz channels (e.g. channels 100-144) blocked in your region\n- Unlock 6 GHz channels (WiFi 6E/7) in regions where they're available (e.g. US, GB, DE)\n- Access DFS channels for less congested WiFi\n- Match your router's country code for better compatibility\n- Travel between regions without WiFi limitations\n\n## Features\n\n- **181 country codes** — Every code from the maintained Linux wireless-regdb\n- **WebUI configuration** — Search, select, and apply from KernelSU Manager\n- **Live status panel** — See current module state, active country code, and override status\n- **WiFi auto-restart** — Optionally toggles WiFi off/on after applying so changes take effect immediately\n- **Operation log** — Real-time step-by-step log of every action after applying\n- **Persistent config** — Settings survive reboots, applied automatically at boot\n- **Lightweight** — No background processes, no daemons, just a single boot-time command\n\n## Installation\n\n1. Download the latest release ZIP from [Releases](../../releases)\n2. Open **KernelSU Manager** (or Magisk Manager)\n3. Go to **Modules** → **Install from storage**\n4. Select the downloaded ZIP\n5. Reboot\n\n## Configuration\n\n1. Open **KernelSU Manager**\n2. Go to **Modules** → **WiFi Force Country Code**\n3. Tap the **settings icon** to open the WebUI\n4. Select your desired country code\n5. Toggle **Force Country Code** on/off\n6. Check **Restart WiFi after applying** if you want immediate effect\n7. Tap **Save & Apply**\n\n## How It Works\n\nOn every boot, the module runs a single command after the system is ready:\n\n```\ncmd wifi force-country-code enabled <COUNTRY_CODE>\n```\n\nThe country code and enabled state are read from a config file (`country.conf`) that the WebUI manages. That's it — no system files are modified, no partitions are touched.\n\n## Supported Country Codes\n\n| Code | Country | Code | Country | Code | Country |\n|------|---------|------|---------|------|---------|\n| US | United States | JP | Japan | SE | Sweden |\n| GB | United Kingdom | KR | South Korea | NO | Norway |\n| AU | Australia | CN | China | FI | Finland |\n| DE | Germany | IN | India | CH | Switzerland |\n| FR | France | BR | Brazil | NZ | New Zealand |\n| CA | Canada | IT | Italy | SG | Singapore |\n| ES | Spain | NL | Netherlands | TW | Taiwan |\n| TR | Turkey | PL | Poland | HK | Hong Kong |\n\n...and 157 more available in the WebUI. The complete list is checked against the maintained [Linux wireless-regdb](https://git.kernel.org/pub/scm/linux/kernel/git/wens/wireless-regdb.git/) source.\n\n## Requirements\n\n- Android 11+\n- KernelSU or Magisk v20.4+\n- WiFi hardware that supports the `cmd wifi` interface\n\n## Troubleshooting\n\n**Country code doesn't apply:**\n- Make sure the module is enabled in KernelSU/Magisk Manager\n- Reboot after installing\n- Check the operation log in the WebUI for errors\n\n**WiFi won't reconnect after applying:**\n- Manually toggle WiFi from Android settings\n- Some devices need a few seconds to reconnect\n\n**WebUI not showing:**\n- WebUI requires KernelSU Manager — Magisk users need to configure via editing `country.conf` manually\n\n## License\n\nMIT\n",
+  "readmeHTML": "<h1>WiFi Force Country Code — KernelSU Module</h1>\n\n<p>A KernelSU / Magisk module that forces your Android device's WiFi country code to any region, unlocking restricted 5 GHz, 6 GHz (WiFi 6E/7), and DFS channels. Fully configurable through a built-in <b>WebUI</b> — no terminal needed.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"screenshot.png\" alt=\"WebUI Screenshot\" width=\"300\"></p>\n<p></p></p>\n\n<h2>Why?</h2>\n\n<p>Android locks WiFi channels based on your region. Some countries block 5 GHz and 6 GHz channels, limit DFS bands, or reduce transmit power. This module overrides that restriction at boot, giving you access to all channels available in your chosen region.</p>\n\n<p><b>Common use cases:</b></p>\n<li>Unlock 5 GHz channels (e.g. channels 100-144) blocked in your region</li>\n<li>Unlock 6 GHz channels (WiFi 6E/7) in regions where they're available (e.g. US, GB, DE)</li>\n<li>Access DFS channels for less congested WiFi</li>\n<li>Match your router's country code for better compatibility</li>\n<li>Travel between regions without WiFi limitations</li>\n\n<h2>Features</h2>\n\n<li>**181 country codes** — Every code from the maintained Linux wireless-regdb</li>\n<li>**WebUI configuration** — Search, select, and apply from KernelSU Manager</li>\n<li>**Live status panel** — See current module state, active country code, and override status</li>\n<li>**WiFi auto-restart** — Optionally toggles WiFi off/on after applying so changes take effect immediately</li>\n<li>**Operation log** — Real-time step-by-step log of every action after applying</li>\n<li>**Persistent config** — Settings survive reboots, applied automatically at boot</li>\n<li>**Lightweight** — No background processes, no daemons, just a single boot-time command</li>\n\n<h2>Installation</h2>\n\n<li>Download the latest release ZIP from [Releases](../../releases)</li>\n<li>Open **KernelSU Manager** (or Magisk Manager)</li>\n<li>Go to **Modules** → **Install from storage**</li>\n<li>Select the downloaded ZIP</li>\n<li>Reboot</li>\n\n<h2>Configuration</h2>\n\n<li>Open **KernelSU Manager**</li>\n<li>Go to **Modules** → **WiFi Force Country Code**</li>\n<li>Tap the **settings icon** to open the WebUI</li>\n<li>Select your desired country code</li>\n<li>Toggle **Force Country Code** on/off</li>\n<li>Check **Restart WiFi after applying** if you want immediate effect</li>\n<li>Tap **Save & Apply**</li>\n\n<h2>How It Works</h2>\n\n<p>On every boot, the module runs a single command after the system is ready:</p>\n\n<pre>cmd wifi force-country-code enabled &lt;COUNTRY_CODE&gt;</pre>\n\n<p>The country code and enabled state are read from a config file (<code>country.conf</code>) that the WebUI manages. That's it — no system files are modified, no partitions are touched.</p>\n\n<h2>Supported Country Codes</h2>\n\n<p>| Code | Country | Code | Country | Code | Country |</p>\n<p>|------|---------|------|---------|------|---------|</p>\n<p>| US | United States | JP | Japan | SE | Sweden |</p>\n<p>| GB | United Kingdom | KR | South Korea | NO | Norway |</p>\n<p>| AU | Australia | CN | China | FI | Finland |</p>\n<p>| DE | Germany | IN | India | CH | Switzerland |</p>\n<p>| FR | France | BR | Brazil | NZ | New Zealand |</p>\n<p>| CA | Canada | IT | Italy | SG | Singapore |</p>\n<p>| ES | Spain | NL | Netherlands | TW | Taiwan |</p>\n<p>| TR | Turkey | PL | Poland | HK | Hong Kong |</p>\n\n<p>...and 157 more available in the WebUI. The complete list is checked against the maintained <a href=\"https://git.kernel.org/pub/scm/linux/kernel/git/wens/wireless-regdb.git/\">Linux wireless-regdb</a> source.</p>\n\n<h2>Requirements</h2>\n\n<li>Android 11+</li>\n<li>KernelSU or Magisk v20.4+</li>\n<li>WiFi hardware that supports the `cmd wifi` interface</li>\n\n<h2>Troubleshooting</h2>\n\n<p><b>Country code doesn't apply:</b></p>\n<li>Make sure the module is enabled in KernelSU/Magisk Manager</li>\n<li>Reboot after installing</li>\n<li>Check the operation log in the WebUI for errors</li>\n\n<p><b>WiFi won't reconnect after applying:</b></p>\n<li>Manually toggle WiFi from Android settings</li>\n<li>Some devices need a few seconds to reconnect</li>\n\n<p><b>WebUI not showing:</b></p>\n<li>WebUI requires KernelSU Manager — Magisk users need to configure via editing `country.conf` manually</li>\n\n<h2>License</h2>\n\n<p>MIT</p>",
+  "homepageUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code",
+  "sourceUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code",
+  "url": "https://github.com/burakgon/KernelSU-WiFi-Country-Code",
+  "latestRelease": {
+    "name": "v3.0",
+    "version": "v3.0",
+    "time": "2026-04-10T13:38:05Z",
+    "downloadUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code/releases/download/v3.0/WiFi-Force-Country-Code-v3.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0",
+      "tagName": "v3.0",
+      "publishedAt": "2026-04-10T13:38:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WiFi-Force-Country-Code-v3.0.zip",
+          "downloadUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code/releases/download/v3.0/WiFi-Force-Country-Code-v3.0.zip",
+          "size": 13090,
+          "downloadCount": 1981
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-04-10T13:28:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WiFi-Force-Country-Code-v2.1.zip",
+          "downloadUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code/releases/download/v2.1/WiFi-Force-Country-Code-v2.1.zip",
+          "size": 11259,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-04-10T13:17:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WiFi-Force-Country-Code-v2.0.zip",
+          "downloadUrl": "https://github.com/burakgon/KernelSU-WiFi-Country-Code/releases/download/v2.0/WiFi-Force-Country-Code-v2.0.zip",
+          "size": 11021,
+          "downloadCount": 8
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

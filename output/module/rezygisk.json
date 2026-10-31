@@ -1,0 +1,130 @@
+{
+  "readme": "# ReZygisk\n\n[Español(Argentina)](/READMEs/README_es-AR.md)|[Bahasa Indonesia](/READMEs/README_id-ID.md)|[Português Brasileiro](/READMEs/README_pt-BR.md)|[Українська](/READMEs/README_uk-UA.md)|[Tiếng Việt](/READMEs/README_vi-VN.md)|[فارسی](/READMEs/README_fa-IR.md)|[简体中文](/READMEs/README_zh-CN.md)\n\nReZygisk is a fork of Zygisk Next, a standalone implementation of Zygisk, providing Zygisk API support for KernelSU, APatch and Magisk.\n\nThe codebase has been rewritten to C entirely, bringing not only a much cleaner codebase that is easier to follow, but also a lighter binaries that are also faster. Custom linkers also have been introduced to future-proof ReZygisk against future detections, not using system linker at all in normal circunstances, defeating any linker-based detection.\n\n## Why?\n\nThe latest releases of Zygisk Next are not open-source, reserving entirely the code for its developers. Not only does that limit our ability to contribute to the project, but also impossibilities the audit of the code, which is a major security concern, as Zygisk Next is a module that runs with superuser (root) privileges, having access to the entire system.\n\nThe Zygisk Next developers are famous and trusted in the Android community, however, this doesn't mean that the code is not malicious or vulnerable. We (PerformanC) understand they have their reasons to keep the code closed-source, but we believe the contrary.\n\n## Advantages\n\n- FOSS (Forever)\n\n## Dependencies\n\n| Tool            | Description                            |\n|-----------------|----------------------------------------|\n| `Android NDK`   | Native Development Kit for Android     |\n\n### C Dependencies\n\n| Dependency  | Description                   |\n|-------------|-------------------------------|\n| `PLTI`      | Simple PLT Hook for Android   |\n| `CSOLoader` | SOTA Linux custom linker      |\n\n## Installation\n\n### 1. Select the right zip\n\nThe selection of the build/zip is important, as it will determine how hidden and stable ReZygisk will be. This, however, is not a hard task:\n\n- `release` should be the one chosen for most cases, it removes app-level logging and offers more optimized binaries.\n- `debug`, however, offers the opposite, with heavy logging and no optimizations, For this reason, **you should only use it for debugging purposes** and **when obtaining logs for creating an Issue**.\n\nAs for branches, you should always use the `main` branch, unless told otherwise by the developers, or if you want to test upcoming features and are aware of the risks involved.\n\n### 2. Flash the zip\n\nAfter choosing the right build, you should flash it using your current root manager, like Magisk or KernelSU. You can do this by going to the `Modules` section of your root manager and selecting the zip you downloaded.\n\nAfter flashing, check the installation logs to ensure there are no errors, and if everything is fine, you can reboot your device.\n\n> [!WARNING]\n> Magisk users should disable built-in Zygisk, as it will conflict with ReZygisk. This can be done by going to the `Settings` section of Magisk and disabling the `Zygisk` option.\n\n### 3. Verify the installation\n\nAfter rebooting, you can verify if ReZygisk is working properly by checking the module description in the `Modules` section of your root manager. The description should indicate that the necessary daemons are running. For example, if your environment supports both 64-bit and 32-bit, it should look similar to this: `[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅] Standalone implementation of Zygisk.`\n\n## Translation\n\nThere are currently two different ways to contribute translations for ReZygisk:\n\n- For translations of the README, you can create a new file in the `READMEs` folder, following the naming convention of `README_<language>.md`, where `<language>` is the language code (e.g., `README_pt-BR.md` for Brazilian Portuguese), and open a pull request to the `main` branch with your changes.\n- For translations of the ReZygisk WebUI, you should first contribute to our [Crowdin](https://crowdin.com/project/rezygisk). Once approved retrieve the `.json` file from there and open a pull request with your changes -- adding the `.json` file to the `webroot/lang` folder and your credits to the `TRANSLATOR.md` file, in alphabetic order.\n\n## Support\n\nFor any question related to ReZygisk or other PerformanC projects, feel free to join any of the following channels below:\n\n- Discord Channel: [PerformanC](https://discord.gg/uPveNfTuCJ)\n- ReZygisk Telegram Channel: [@rezygisk](https://t.me/rezygisk)\n- PerformanC Telegram Channel: [@performancorg](https://t.me/performancorg)\n- PerformanC Signal Group: [@performanc](https://signal.group/#CjQKID3SS8N5y4lXj3VjjGxVJnzNsTIuaYZjj3i8UhipAS0gEhAedxPjT5WjbOs6FUuXptcT)\n\n## Contribution\n\nIt is mandatory to follow PerformanC's [Contribution Guidelines](https://github.com/PerformanC/contributing) to contribute to ReZygisk. Following its Security Policy, Code of Conduct, and syntax standard.\n\n## License\n\nReZygisk is licensed under [AGPL 3.0](./LICENSE). You can read more about it on [Open Source Initiative](https://opensource.org/licenses/AGPL-3.0).\n",
+  "readmeHTML": "<h1>ReZygisk</h1>\n\n<p><a href=\"/READMEs/README_es-AR.md\">Español(Argentina)</a>|<a href=\"/READMEs/README_id-ID.md\">Bahasa Indonesia</a>|<a href=\"/READMEs/README_pt-BR.md\">Português Brasileiro</a>|<a href=\"/READMEs/README_uk-UA.md\">Українська</a>|<a href=\"/READMEs/README_vi-VN.md\">Tiếng Việt</a>|<a href=\"/READMEs/README_fa-IR.md\">فارسی</a>|<a href=\"/READMEs/README_zh-CN.md\">简体中文</a></p>\n\n<p>ReZygisk is a fork of Zygisk Next, a standalone implementation of Zygisk, providing Zygisk API support for KernelSU, APatch and Magisk.</p>\n\n<p>The codebase has been rewritten to C entirely, bringing not only a much cleaner codebase that is easier to follow, but also a lighter binaries that are also faster. Custom linkers also have been introduced to future-proof ReZygisk against future detections, not using system linker at all in normal circunstances, defeating any linker-based detection.</p>\n\n<h2>Why?</h2>\n\n<p>The latest releases of Zygisk Next are not open-source, reserving entirely the code for its developers. Not only does that limit our ability to contribute to the project, but also impossibilities the audit of the code, which is a major security concern, as Zygisk Next is a module that runs with superuser (root) privileges, having access to the entire system.</p>\n\n<p>The Zygisk Next developers are famous and trusted in the Android community, however, this doesn't mean that the code is not malicious or vulnerable. We (PerformanC) understand they have their reasons to keep the code closed-source, but we believe the contrary.</p>\n\n<h2>Advantages</h2>\n\n<li>FOSS (Forever)</li>\n\n<h2>Dependencies</h2>\n\n<p>| Tool            | Description                            |</p>\n<p>|-----------------|----------------------------------------|</p>\n<p>| <code>Android NDK</code>   | Native Development Kit for Android     |</p>\n\n<h3>C Dependencies</h3>\n\n<p>| Dependency  | Description                   |</p>\n<p>|-------------|-------------------------------|</p>\n<p>| <code>PLTI</code>      | Simple PLT Hook for Android   |</p>\n<p>| <code>CSOLoader</code> | SOTA Linux custom linker      |</p>\n\n<h2>Installation</h2>\n\n<h3>1. Select the right zip</h3>\n\n<p>The selection of the build/zip is important, as it will determine how hidden and stable ReZygisk will be. This, however, is not a hard task:</p>\n\n<li>`release` should be the one chosen for most cases, it removes app-level logging and offers more optimized binaries.</li>\n<li>`debug`, however, offers the opposite, with heavy logging and no optimizations, For this reason, **you should only use it for debugging purposes** and **when obtaining logs for creating an Issue**.</li>\n\n<p>As for branches, you should always use the <code>main</code> branch, unless told otherwise by the developers, or if you want to test upcoming features and are aware of the risks involved.</p>\n\n<h3>2. Flash the zip</h3>\n\n<p>After choosing the right build, you should flash it using your current root manager, like Magisk or KernelSU. You can do this by going to the <code>Modules</code> section of your root manager and selecting the zip you downloaded.</p>\n\n<p>After flashing, check the installation logs to ensure there are no errors, and if everything is fine, you can reboot your device.</p>\n\n<p>> [!WARNING]</p>\n<p>> Magisk users should disable built-in Zygisk, as it will conflict with ReZygisk. This can be done by going to the <code>Settings</code> section of Magisk and disabling the <code>Zygisk</code> option.</p>\n\n<h3>3. Verify the installation</h3>\n\n<p>After rebooting, you can verify if ReZygisk is working properly by checking the module description in the <code>Modules</code> section of your root manager. The description should indicate that the necessary daemons are running. For example, if your environment supports both 64-bit and 32-bit, it should look similar to this: <code>[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅] Standalone implementation of Zygisk.</code></p>\n\n<h2>Translation</h2>\n\n<p>There are currently two different ways to contribute translations for ReZygisk:</p>\n\n<li>For translations of the README, you can create a new file in the `READMEs` folder, following the naming convention of `README_<language>.md`, where `<language>` is the language code (e.g., `README_pt-BR.md` for Brazilian Portuguese), and open a pull request to the `main` branch with your changes.</li>\n<li>For translations of the ReZygisk WebUI, you should first contribute to our [Crowdin](https://crowdin.com/project/rezygisk). Once approved retrieve the `.json` file from there and open a pull request with your changes -- adding the `.json` file to the `webroot/lang` folder and your credits to the `TRANSLATOR.md` file, in alphabetic order.</li>\n\n<h2>Support</h2>\n\n<p>For any question related to ReZygisk or other PerformanC projects, feel free to join any of the following channels below:</p>\n\n<li>Discord Channel: [PerformanC](https://discord.gg/uPveNfTuCJ)</li>\n<li>ReZygisk Telegram Channel: [@rezygisk](https://t.me/rezygisk)</li>\n<li>PerformanC Telegram Channel: [@performancorg](https://t.me/performancorg)</li>\n<li>PerformanC Signal Group: [@performanc](https://signal.group/#CjQKID3SS8N5y4lXj3VjjGxVJnzNsTIuaYZjj3i8UhipAS0gEhAedxPjT5WjbOs6FUuXptcT)</li>\n\n<h2>Contribution</h2>\n\n<p>It is mandatory to follow PerformanC's <a href=\"https://github.com/PerformanC/contributing\">Contribution Guidelines</a> to contribute to ReZygisk. Following its Security Policy, Code of Conduct, and syntax standard.</p>\n\n<h2>License</h2>\n\n<p>ReZygisk is licensed under <a href=\"./LICENSE\">AGPL 3.0</a>. You can read more about it on <a href=\"https://opensource.org/licenses/AGPL-3.0\">Open Source Initiative</a>.</p>",
+  "homepageUrl": "https://github.com/PerformanC/ReZygisk",
+  "sourceUrl": "https://github.com/PerformanC/ReZygisk",
+  "url": "https://github.com/PerformanC/ReZygisk",
+  "latestRelease": {
+    "name": "v1.0.0-rc.6",
+    "version": "v1.0.0-rc.6",
+    "time": "2026-03-24T17:53:25Z",
+    "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.6/ReZygisk-v1.0.0-rc.6-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0-rc.6",
+      "tagName": "v1.0.0-rc.6",
+      "publishedAt": "2026-03-24T17:53:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.6-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.6/ReZygisk-v1.0.0-rc.6-release.zip",
+          "size": 484886,
+          "downloadCount": 5147
+        },
+        {
+          "name": "ReZygisk-v1.0.0-rc.6-debug.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.6/ReZygisk-v1.0.0-rc.6-debug.zip",
+          "size": 721645,
+          "downloadCount": 849
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-rc.5",
+      "tagName": "v1.0.0-rc.5",
+      "publishedAt": "2026-03-16T06:27:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.5-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.5/ReZygisk-v1.0.0-rc.5-release.zip",
+          "size": 482526,
+          "downloadCount": 1208
+        },
+        {
+          "name": "ReZygisk-v1.0.0-rc.5-debug.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.5/ReZygisk-v1.0.0-rc.5-debug.zip",
+          "size": 706404,
+          "downloadCount": 167
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-rc.4",
+      "tagName": "v1.0.0-rc.4",
+      "publishedAt": "2025-10-22T00:00:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.4-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.4/ReZygisk-v1.0.0-rc.4-release.zip",
+          "size": 443582,
+          "downloadCount": 91018
+        },
+        {
+          "name": "ReZygisk-v1.0.0-rc.4-debug.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.4/ReZygisk-v1.0.0-rc.4-debug.zip",
+          "size": 768201,
+          "downloadCount": 19032
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-rc.3",
+      "tagName": "v1.0.0-rc.3",
+      "publishedAt": "2025-07-14T02:20:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.3-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.3/ReZygisk-v1.0.0-rc.3-release.zip",
+          "size": 436048,
+          "downloadCount": 90350
+        },
+        {
+          "name": "ReZygisk-v1.0.0-rc.3-debug.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.3/ReZygisk-v1.0.0-rc.3-debug.zip",
+          "size": 898699,
+          "downloadCount": 19923
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-rc.2",
+      "tagName": "v1.0.0-rc.2",
+      "publishedAt": "2025-04-27T05:32:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.2-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.2/ReZygisk-v1.0.0-rc.2-release.zip",
+          "size": 254591,
+          "downloadCount": 58541
+        },
+        {
+          "name": "ReZygisk-v1.0.0-rc.2-debug.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.2/ReZygisk-v1.0.0-rc.2-debug.zip",
+          "size": 704562,
+          "downloadCount": 15727
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-rc.1",
+      "tagName": "v1.0.0-rc.1",
+      "publishedAt": "2024-11-11T02:54:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ReZygisk-v1.0.0-rc.1-release.zip",
+          "downloadUrl": "https://github.com/PerformanC/ReZygisk/releases/download/v1.0.0-rc.1/ReZygisk-v1.0.0-rc.1-release.zip",
+          "size": 290238,
+          "downloadCount": 39880
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,56 @@
+{
+  "readme": "# jd-cookie\n\nKernelSU 模块 —— 自动读取京东 Cookie 并同步至青龙面板。\n\n搭配 [jdpro](https://github.com/6dylan6/jdpro) 使用，显著减少 Cookie 过期后的手动维护。\n\n## 为什么需要这个模块\n\njdpro 等京东脚本依赖 `JD_COOKIE` 环境变量��但 Cookie 有效期越来越短（部分用户每天过期）。手动抓包费时费力。\n\n本模块无需抓包——直接读取手机京东 App 的 WebView Cookie 数据库（`/data/data/com.jingdong.app.mall/app_webview/Default/Cookies`），提取 `pt_key` / `pt_pin` 后上传青龙面板。只要京东 App 登录态有效，Cookie 就能自动获取，省去反复抓包的麻烦。\n\n## 功能\n\n- 从京东 App WebView Cookie 数据库读取 `pt_key` / `pt_pin`\n- Cookie 去重后自动上传至青龙面板 `JD_COOKIE` 环境变量\n- Go 守护进程，内存占用约 7.5 MB\n- WebUI 配置管理 + SSE 实时日志流\n- Token 鉴权，外部请求一律拒绝\n\n## 完整教程：jdpro + 本模块\n\n### 1. 部署青龙面板\n\n推荐内网部署，青龙 2.15+ 即可。\n\n### 2. 订阅 jdpro\n\n青龙面板 → 订阅管理 → 创建订阅：\n\n```\n名称: jdpro\n类型: 公开仓库\n链接: https://github.com/6dylan6/jdpro.git\n分支: main\n白名单: jd_|jx_|jddj_\n黑名单: backUp\n依赖文件: ^jd[^_]|USER|JD|function|sendNotify|utils\n```\n\n运行订阅 → 依赖安装任务 → 配置通知。\n\n### 3. 安装本模块\n\n下载 [Releases](https://github.com/Gesoy/jd-cookie/releases) 中最新 `jd_assistant.zip`，KernelSU Manager 刷入。\n\n### 4. 配置\n\n1. 手机打开**京东 App** 登录账号（Cookie 写入 WebView 数据库）\n2. KernelSU Manager → 模块 → 京东助手 → 打开\n3. WebUI 填写青龙面板**地址、用户名、密码**，保存\n4. 点击**读取**按钮，或等待自动上传\n\n### 5. 验证\n\n青龙面板 → 环境变量 → `JD_COOKIE` 应出现最新值。jdpro 脚本会自动使用。\n\n## 流程示意\n\n```\n京东 App 登录 → WebView Cookie 数据库\n                    ↓ 本模块自动读取\n            pt_key=xxx;pt_pin=xxx\n                    ↓ 上传青龙面板\n            JD_COOKIE 环境变量\n                    ↓ jdpro 脚本调用\n              自动签到、领豆...\n```\n\n## 结构\n\n```\n├── backend/        Go 守护进程\n├── frontend/       Vue 3 WebUI\n├── kernelsu/       模块打包目录\n│   ├── service.sh  启动脚本\n│   └── module.prop\n└── .github/workflows/  CI/CD\n```\n\n## 构建\n\n```bash\n# 后端\ncd backend\nCGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -ldflags=\"-s -w\" -o ../kernelsu/bin/jd-cookie .\n\n# 前端\ncd frontend && npm install && npm run build\n\n# 打包\ncd kernelsu && zip -r ../jd_assistant.zip .\n```\n\n## License\n\nMIT\n",
+  "readmeHTML": "<h1>jd-cookie</h1>\n\n<p>KernelSU 模块 —— 自动读取京东 Cookie 并同步至青龙面板。</p>\n\n<p>搭配 <a href=\"https://github.com/6dylan6/jdpro\">jdpro</a> 使用，显著减少 Cookie 过期后的手动维护。</p>\n\n<h2>为什么需要这个模块</h2>\n\n<p>jdpro 等京东脚本依赖 <code>JD_COOKIE</code> 环境变量��但 Cookie 有效期越来越短（部分用户每天过期）。手动抓包费时费力。</p>\n\n<p>本模块无需抓包——直接读取手机京东 App 的 WebView Cookie 数据库（<code>/data/data/com.jingdong.app.mall/app_webview/Default/Cookies</code>），提取 <code>pt_key</code> / <code>pt_pin</code> 后上传青龙面板。只要京东 App 登录态有效，Cookie 就能自动获取，省去反复抓包的麻烦。</p>\n\n<h2>功能</h2>\n\n<li>从京东 App WebView Cookie 数据库读取 `pt_key` / `pt_pin`</li>\n<li>Cookie 去重后自动上传至青龙面板 `JD_COOKIE` 环境变量</li>\n<li>Go 守护进程，内存占用约 7.5 MB</li>\n<li>WebUI 配置管理 + SSE 实时日志流</li>\n<li>Token 鉴权，外部请求一律拒绝</li>\n\n<h2>完整教程：jdpro + 本模块</h2>\n\n<h3>1. 部署青龙面板</h3>\n\n<p>推荐内网部署，青龙 2.15+ 即可。</p>\n\n<h3>2. 订阅 jdpro</h3>\n\n<p>青龙面板 → 订阅管理 → 创建订阅：</p>\n\n<pre>名称: jdpro\n类型: 公开仓库\n链接: https://github.com/6dylan6/jdpro.git\n分支: main\n白名单: jd_|jx_|jddj_\n黑名单: backUp\n依赖文件: ^jd[^_]|USER|JD|function|sendNotify|utils</pre>\n\n<p>运行订阅 → 依赖安装任务 → 配置通知。</p>\n\n<h3>3. 安装本模块</h3>\n\n<p>下载 <a href=\"https://github.com/Gesoy/jd-cookie/releases\">Releases</a> 中最新 <code>jd_assistant.zip</code>，KernelSU Manager 刷入。</p>\n\n<h3>4. 配置</h3>\n\n<li>手机打开**京东 App** 登录账号（Cookie 写入 WebView 数据库）</li>\n<li>KernelSU Manager → 模块 → 京东助手 → 打开</li>\n<li>WebUI 填写青龙面板**地址、用户名、密码**，保存</li>\n<li>点击**读取**按钮，或等待自动上传</li>\n\n<h3>5. 验证</h3>\n\n<p>青龙面板 → 环境变量 → <code>JD_COOKIE</code> 应出现最新值。jdpro 脚本会自动使用。</p>\n\n<h2>流程示意</h2>\n\n<pre>京东 App 登录 → WebView Cookie 数据库\n                    ↓ 本模块自动读取\n            pt_key=xxx;pt_pin=xxx\n                    ↓ 上传青龙面板\n            JD_COOKIE 环境变量\n                    ↓ jdpro 脚本调用\n              自动签到、领豆...</pre>\n\n<h2>结构</h2>\n\n<pre>├── backend/        Go 守护进程\n├── frontend/       Vue 3 WebUI\n├── kernelsu/       模块打包目录\n│   ├── service.sh  启动脚本\n│   └── module.prop\n└── .github/workflows/  CI/CD</pre>\n\n<h2>构建</h2>\n\n<pre># 后端\ncd backend\nCGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -ldflags=\"-s -w\" -o ../kernelsu/bin/jd-cookie .\n\n# 前端\ncd frontend &amp;&amp; npm install &amp;&amp; npm run build\n\n# 打包\ncd kernelsu &amp;&amp; zip -r ../jd_assistant.zip .</pre>\n\n<h2>License</h2>\n\n<p>MIT</p>",
+  "homepageUrl": "https://github.com/gesoy/jd-cookie",
+  "sourceUrl": "https://github.com/gesoy/jd-cookie",
+  "url": "https://github.com/gesoy/jd-cookie",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-06-22T16:44:24Z",
+    "downloadUrl": "https://github.com/gesoy/jd-cookie/releases/download/v1.0.1/jd_assistant.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-06-22T16:44:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "jd_assistant.zip.sha256",
+          "downloadUrl": "https://github.com/gesoy/jd-cookie/releases/download/v1.0.1/jd_assistant.zip.sha256",
+          "size": 83,
+          "downloadCount": 2
+        },
+        {
+          "name": "jd_assistant.zip",
+          "downloadUrl": "https://github.com/gesoy/jd-cookie/releases/download/v1.0.1/jd_assistant.zip",
+          "size": 4124236,
+          "downloadCount": 53
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-06-21T04:33:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "jd_assistant.zip.sha256",
+          "downloadUrl": "https://github.com/gesoy/jd-cookie/releases/download/v1.0.0/jd_assistant.zip.sha256",
+          "size": 83,
+          "downloadCount": 0
+        },
+        {
+          "name": "jd_assistant.zip",
+          "downloadUrl": "https://github.com/gesoy/jd-cookie/releases/download/v1.0.0/jd_assistant.zip",
+          "size": 4124644,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

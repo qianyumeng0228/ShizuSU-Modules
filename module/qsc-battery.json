@@ -1,0 +1,100 @@
+{
+  "readme": "# 充电控制（QSC-Battery）\n\n面向 Magisk / KernelSU / APatch 的 **充电管理系统**：电量与温度停充、可选电流控制、分级省电、WebUI 与伴侣 APP。\n\n模块显示名：**充电控制** · 模块 id：`QSC_Battery` · 仓库：[Eikeitsu/QSC-Battery](https://github.com/Eikeitsu/QSC-Battery)\n\n[![Release](https://img.shields.io/github/v/release/Eikeitsu/QSC-Battery?style=flat-square&label=Release)](https://github.com/Eikeitsu/QSC-Battery/releases)\n[![Android](https://img.shields.io/badge/Android-8%2B-3DDC84?style=flat-square&logo=android&logoColor=white)](https://eikeitsu.github.io/QSC-Battery/)\n[![Root](https://img.shields.io/badge/Root-Magisk%20%7C%20KSU%20%7C%20APatch-orange?style=flat-square)](https://eikeitsu.github.io/QSC-Battery/)\n[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-222?style=flat-square&logo=githubpages&logoColor=white)](https://eikeitsu.github.io/QSC-Battery/)\n\n- **在线文档**：[eikeitsu.github.io/QSC-Battery](https://eikeitsu.github.io/QSC-Battery/)\n- **Releases**：[下载模块 / APP / 守护](https://github.com/Eikeitsu/QSC-Battery/releases)\n\n<div align=\"center\">\n  <img src=\"https://skillicons.dev/icons?i=vue,typescript,vite,kotlin,androidstudio,rust,c,bash,nodejs,sass,githubactions\" alt=\"Tech stack\" />\n</div>\n\n> 早期曾基于「定量停充」思路起步，当前代码与交互已独立演进为完整产品，请以本仓库文档为准。\n\n## 产品组成\n\n| 组件             | 作用                                                         | 说明                               |\n| ---------------- | ------------------------------------------------------------ | ---------------------------------- |\n| Magisk 模块      | 真正执行停充 / 限流 / 日志；开机 `service.sh` 常驻           | [`module/`](./module/)             |\n| WebUI（可选）    | 模块管理器内改配置、看曲线与日志                             | [`apps/webui/`](./apps/webui/)     |\n| 伴侣 APP（可选） | Compose 客户端：状态、策略、动态、主题；可内嵌进模块包       | [`apps/android/`](./apps/android/) |\n| qscd（可选）     | 只读 `power_supply` 事件守护，降低未插电轮询                 | [`native/`](./native/)             |\n| CLI              | `/data/adb/qsc/bin/qsc`（`help` / `stats` / `diagnostic` …） | 模块内 / `native/qsc-cli`          |\n\n## 技术栈\n\n| 区域        | 技术                                                                                                        |\n| ----------- | ----------------------------------------------------------------------------------------------------------- |\n| WebUI       | Vue 3 · TypeScript · Vite · Pinia · Vue Router · Vant · Sass                                                |\n| 伴侣 APP    | Kotlin · Jetpack Compose · Material 3 · DataStore · libsu · OkHttp · libxposed · MaterialKolor              |\n| Magisk 模块 | POSIX shell · Magisk / KernelSU / APatch 模块脚本                                                           |\n| Native      | Rust（qscd）· C（qscdc / qsc-cli）· Android NDK 交叉编译                                                    |\n| 文档        | VitePress → GitHub Pages                                                                                    |\n| 工具链      | Node.js · ESLint · Stylelint · ShellCheck · Prettier · Vitest · Python · Spotless / ktlint · GitHub Actions |\n\n图标来自 [Skill Icons](https://skillicons.dev)；徽章来自 [Shields.io](https://shields.io)。\n\n## WebUI 预览\n\n|                        概览                         |                       策略                        |\n| :-------------------------------------------------: | :-----------------------------------------------: |\n| ![概览](docs/public/screenshots/webui-overview.png) | ![策略](docs/public/screenshots/webui-config.png) |\n\n|                      日志                      |                      我的                       |\n| :--------------------------------------------: | :---------------------------------------------: |\n| ![日志](docs/public/screenshots/webui-log.png) | ![我的](docs/public/screenshots/webui-more.png) |\n\n## 能做什么\n\n- **电量 / 温度停充**：到达阈值停充，条件恢复后再充；可关电量停充（`power_stop=110`）只留温控\n- **时段 / App / 无线策略**：电量停充时段、按前台 App 停充、无线可忽略部分策略\n- **电流控制（安装可选，默认关）**：模拟旁路、硬件旁路节点、慢充、温控阶梯限流、游戏限流\n- **分级省电**：`power.conf` 档位 + 息屏加强 / 深睡 / 可选夜间；qscd 事件唤醒；简介按需刷新\n- **事件与历史**：运行日志、充电事件、插电采样曲线、健康趋势\n- **CLI**：`qsc status` / `config` / `stats` / `diagnose` / `daemon` …\n- **机型适配**：MCA / preferred_switch / 测开关 / 设备档案库 / 社区预设\n\n## 快速开始\n\n1. 打开 [Releases](https://github.com/Eikeitsu/QSC-Battery/releases)：多数人下 **`…-full.zip`**；只要脚本可用 **`…-lite.zip`**。各文件含义见 [安装与升级 · Release 说明](docs/guide/install.md#该下哪个先看这三句)\n2. 刷入模块，按音量键确认；按提示选择 WebUI / 电流控制 / 伴侣 APK / 联网下守护（lite 无 WebUI 与内嵌 APK）\n3. 更新时可选保留配置；重启后用 WebUI / APP / 配置文件调整\n4. Action：音量上刷新状态；音量下插电测开关 / 未插电写诊断\n\n旧版 `QuantitativeStopCharging*` 会被自动卸载（**不迁移配置**）。\n\n## 仓库结构\n\n```text\nmodule/          # Magisk 模块本体（含可选 webroot / apk）\napps/webui/      # WebUI 源码（Vue 3）\napps/android/    # 伴侣 APP（Compose）\nnative/          # qscd-rust / qscd-c / qsc-cli\ndocs/            # VitePress 用户文档 → GitHub Pages\ntooling/         # 构建与发版脚本\nARCHITECTURE.md  # 冻结契约与目录约定\n```\n\n## 本地开发\n\n```bash\nnpm install\nnpm run dev:web\nnpm run build:module\n```\n\n说明见 [`tooling/BUILD.md`](tooling/BUILD.md)。发版与更新日志约定见 [`tooling/RELEASE.md`](tooling/RELEASE.md)（开发写根目录 `changelog.md` → `## Unreleased`）。\n\n发版：Actions → **Release Module**，或推送 `v*` 标签。\n\n## 文档与致谢\n\n完整指南见 [`docs/`](docs/) 或 [在线文档](https://eikeitsu.github.io/QSC-Battery/)。  \n维护者 **许小墨**；早期思路致谢见 [致谢](docs/guide/credits.md)。\n",
+  "readmeHTML": "<h1>充电控制（QSC-Battery）</h1>\n\n<p>面向 Magisk / KernelSU / APatch 的 <b>充电管理系统</b>：电量与温度停充、可选电流控制、分级省电、WebUI 与伴侣 APP。</p>\n\n<p>模块显示名：<b>充电控制</b> · 模块 id：<code>QSC_Battery</code> · 仓库：<a href=\"https://github.com/Eikeitsu/QSC-Battery\">Eikeitsu/QSC-Battery</a></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/Eikeitsu/QSC-Battery?style=flat-square&label=Release\">![Release</a>](https://github.com/Eikeitsu/QSC-Battery/releases)</p>\n<p><a href=\"https://img.shields.io/badge/Android-8%2B-3DDC84?style=flat-square&logo=android&logoColor=white\">![Android</a>](https://eikeitsu.github.io/QSC-Battery/)</p>\n<p><a href=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KSU%20%7C%20APatch-orange?style=flat-square\">![Root</a>](https://eikeitsu.github.io/QSC-Battery/)</p>\n<p><a href=\"https://img.shields.io/badge/Docs-GitHub%20Pages-222?style=flat-square&logo=githubpages&logoColor=white\">![Docs</a>](https://eikeitsu.github.io/QSC-Battery/)</p>\n\n<li>**在线文档**：[eikeitsu.github.io/QSC-Battery](https://eikeitsu.github.io/QSC-Battery/)</li>\n<li>**Releases**：[下载模块 / APP / 守护](https://github.com/Eikeitsu/QSC-Battery/releases)</li>\n\n<p><div align=\"center\"></p>\n<p>  <img src=\"https://skillicons.dev/icons?i=vue,typescript,vite,kotlin,androidstudio,rust,c,bash,nodejs,sass,githubactions\" alt=\"Tech stack\" /></p>\n<p></div></p>\n\n<p>> 早期曾基于「定量停充」思路起步，当前代码与交互已独立演进为完整产品，请以本仓库文档为准。</p>\n\n<h2>产品组成</h2>\n\n<p>| 组件             | 作用                                                         | 说明                               |</p>\n<p>| ---------------- | ------------------------------------------------------------ | ---------------------------------- |</p>\n<p>| Magisk 模块      | 真正执行停充 / 限流 / 日志；开机 <code>service.sh</code> 常驻           | <a href=\"./module/\"><code>module/</code></a>             |</p>\n<p>| WebUI（可选）    | 模块管理器内改配置、看曲线与日志                             | <a href=\"./apps/webui/\"><code>apps/webui/</code></a>     |</p>\n<p>| 伴侣 APP（可选） | Compose 客户端：状态、策略、动态、主题；可内嵌进模块包       | <a href=\"./apps/android/\"><code>apps/android/</code></a> |</p>\n<p>| qscd（可选）     | 只读 <code>power_supply</code> 事件守护，降低未插电轮询                 | <a href=\"./native/\"><code>native/</code></a>             |</p>\n<p>| CLI              | <code>/data/adb/qsc/bin/qsc</code>（<code>help</code> / <code>stats</code> / <code>diagnostic</code> …） | 模块内 / <code>native/qsc-cli</code>          |</p>\n\n<h2>技术栈</h2>\n\n<p>| 区域        | 技术                                                                                                        |</p>\n<p>| ----------- | ----------------------------------------------------------------------------------------------------------- |</p>\n<p>| WebUI       | Vue 3 · TypeScript · Vite · Pinia · Vue Router · Vant · Sass                                                |</p>\n<p>| 伴侣 APP    | Kotlin · Jetpack Compose · Material 3 · DataStore · libsu · OkHttp · libxposed · MaterialKolor              |</p>\n<p>| Magisk 模块 | POSIX shell · Magisk / KernelSU / APatch 模块脚本                                                           |</p>\n<p>| Native      | Rust（qscd）· C（qscdc / qsc-cli）· Android NDK 交叉编译                                                    |</p>\n<p>| 文档        | VitePress → GitHub Pages                                                                                    |</p>\n<p>| 工具链      | Node.js · ESLint · Stylelint · ShellCheck · Prettier · Vitest · Python · Spotless / ktlint · GitHub Actions |</p>\n\n<p>图标来自 <a href=\"https://skillicons.dev\">Skill Icons</a>；徽章来自 <a href=\"https://shields.io\">Shields.io</a>。</p>\n\n<h2>WebUI 预览</h2>\n\n<p>|                        概览                         |                       策略                        |</p>\n<p>| :-------------------------------------------------: | :-----------------------------------------------: |</p>\n<p>| !<a href=\"docs/public/screenshots/webui-overview.png\">概览</a> | !<a href=\"docs/public/screenshots/webui-config.png\">策略</a> |</p>\n\n<p>|                      日志                      |                      我的                       |</p>\n<p>| :--------------------------------------------: | :---------------------------------------------: |</p>\n<p>| !<a href=\"docs/public/screenshots/webui-log.png\">日志</a> | !<a href=\"docs/public/screenshots/webui-more.png\">我的</a> |</p>\n\n<h2>能做什么</h2>\n\n<li>**电量 / 温度停充**：到达阈值停充，条件恢复后再充；可关电量停充（`power_stop=110`）只留温控</li>\n<li>**时段 / App / 无线策略**：电量停充时段、按前台 App 停充、无线可忽略部分策略</li>\n<li>**电流控制（安装可选，默认关）**：模拟旁路、硬件旁路节点、慢充、温控阶梯限流、游戏限流</li>\n<li>**分级省电**：`power.conf` 档位 + 息屏加强 / 深睡 / 可选夜间；qscd 事件唤醒；简介按需刷新</li>\n<li>**事件与历史**：运行日志、充电事件、插电采样曲线、健康趋势</li>\n<li>**CLI**：`qsc status` / `config` / `stats` / `diagnose` / `daemon` …</li>\n<li>**机型适配**：MCA / preferred_switch / 测开关 / 设备档案库 / 社区预设</li>\n\n<h2>快速开始</h2>\n\n<li>打开 [Releases](https://github.com/Eikeitsu/QSC-Battery/releases)：多数人下 **`…-full.zip`**；只要脚本可用 **`…-lite.zip`**。各文件含义见 [安装与升级 · Release 说明](docs/guide/install.md#该下哪个先看这三句)</li>\n<li>刷入模块，按音量键确认；按提示选择 WebUI / 电流控制 / 伴侣 APK / 联网下守护（lite 无 WebUI 与内嵌 APK）</li>\n<li>更新时可选保留配置；重启后用 WebUI / APP / 配置文件调整</li>\n<li>Action：音量上刷新状态；音量下插电测开关 / 未插电写诊断</li>\n\n<p>旧版 <code>QuantitativeStopCharging*</code> 会被自动卸载（<b>不迁移配置</b>）。</p>\n\n<h2>仓库结构</h2>\n\n<pre>module/          # Magisk 模块本体（含可选 webroot / apk）\napps/webui/      # WebUI 源码（Vue 3）\napps/android/    # 伴侣 APP（Compose）\nnative/          # qscd-rust / qscd-c / qsc-cli\ndocs/            # VitePress 用户文档 → GitHub Pages\ntooling/         # 构建与发版脚本\nARCHITECTURE.md  # 冻结契约与目录约定</pre>\n\n<h2>本地开发</h2>\n\n<pre>npm install\nnpm run dev:web\nnpm run build:module</pre>\n\n<p>说明见 <a href=\"tooling/BUILD.md\"><code>tooling/BUILD.md</code></a>。发版与更新日志约定见 <a href=\"tooling/RELEASE.md\"><code>tooling/RELEASE.md</code></a>（开发写根目录 <code>changelog.md</code> → <code>## Unreleased</code>）。</p>\n\n<p>发版：Actions → <b>Release Module</b>，或推送 <code>v*</code> 标签。</p>\n\n<h2>文档与致谢</h2>\n\n<p>完整指南见 <a href=\"docs/\"><code>docs/</code></a> 或 <a href=\"https://eikeitsu.github.io/QSC-Battery/\">在线文档</a>。</p>\n<p>维护者 <b>许小墨</b>；早期思路致谢见 <a href=\"docs/guide/credits.md\">致谢</a>。</p>",
+  "homepageUrl": "https://eikeitsu.github.io/QSC-Battery/",
+  "sourceUrl": "https://github.com/Eikeitsu/QSC-Battery",
+  "url": "https://github.com/Eikeitsu/QSC-Battery",
+  "latestRelease": {
+    "name": "v2026.07.23",
+    "version": "v2026.07.23",
+    "time": "2026-07-23T05:17:29Z",
+    "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.23/QSC-Battery_v2026.07.23.zip"
+  },
+  "releases": [
+    {
+      "name": "v2026.07.23",
+      "tagName": "v2026.07.23",
+      "publishedAt": "2026-07-23T05:17:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-Battery_v2026.07.23.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.23/QSC-Battery_v2026.07.23.zip",
+          "size": 113359,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v2026.07.22.2",
+      "tagName": "v2026.07.22.2",
+      "publishedAt": "2026-07-22T06:30:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-Battery_v2026.07.22.2.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.22.2/QSC-Battery_v2026.07.22.2.zip",
+          "size": 105742,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v2026.07.22",
+      "tagName": "v2026.07.22",
+      "publishedAt": "2026-07-22T04:37:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-Battery_v2026.07.22.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.22/QSC-Battery_v2026.07.22.zip",
+          "size": 105383,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v2026.07.21",
+      "tagName": "v2026.07.21",
+      "publishedAt": "2026-07-21T04:43:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-Battery_v2026.07.21.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.21/QSC-Battery_v2026.07.21.zip",
+          "size": 102870,
+          "downloadCount": 17
+        }
+      ]
+    },
+    {
+      "name": "v2026.07.17",
+      "tagName": "v2026.07.17",
+      "publishedAt": "2026-07-17T07:15:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QSC-Battery_v2026.07.17.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v2026.07.17/QSC-Battery_v2026.07.17.zip",
+          "size": 102260,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "v20260716",
+      "tagName": "v20260716",
+      "publishedAt": "2026-07-16T12:55:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "QuantitativeStopCharging_switch_v20260716.zip",
+          "downloadUrl": "https://github.com/Eikeitsu/QSC-Battery/releases/download/v20260716/QuantitativeStopCharging_switch_v20260716.zip",
+          "size": 97446,
+          "downloadCount": 7
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

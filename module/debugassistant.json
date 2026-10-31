@@ -1,0 +1,44 @@
+{
+  "readme": "# Meow's Debug Assistant\n\nThe simplest and most flexible logcat capturer for Android as a Magisk module.\n\n## Features\n\n- Captures logs across 3 boots\n- Logs can be retrieved via ADB/root easily\n- Meow's Debug Assistant's Secure Censor for censoring sensitive information\n\n## Installation\n\n### 1. Download the zip\n\nThe latest release can be found on the [Releases page](https://github.com/ThePedroo/DebugAssistant/releases). Download the latest `DebugAssistant-vX.X.X.zip` file.\n\n### 2. Flash the zip\n\nUsing your preferred root manager app, such as Magisk, KernelSU or APatch, flash the downloaded zip file.\n\n### 3. Reboot\n\nReboot your device to start capturing logs.\n\n## Usage\n\nAfter installation, the module will start capturing logs automatically. The logs will be saved in `/data/local/tmp/` directory with the following files:\n- `DebugAssistant.log` - The oldest log file.\n- `DebugAssistant-Boot1.log` - The second newest log file.\n- `DebugAssistant-Boot2.log` - The newest log file.\n\nThey will be created after each reboot, and all logs will be kept for 3 boots. After the third boot, all logs will be deleted and new logs will be captured, in a cyclic manner.\n\nYou can retrieve the **redacted log** via the action button in the root manager app. When you click the button, it will redact the most recent log file available, and save it as `DebugAssistant-Redacted.log` in the same directory (`/data/local/tmp/`). You can then pull the redacted log file using ADB or access it with root permissions.\n\n## Contribution\n\nIt is mandatory to follow the PerformanC's [contribution guidelines](https://github.com/PerformanC/contributing) to contribute to Debug Assistant. Following its Security Policy, Code of Conduct and syntax standard.\n\n## License\n\nMeow's Debug Assistant is licensed under [BSD 3-Clause License](LICENSE). You can read more about it on [Open Source Initiative](https://opensource.org/licenses/BSD-3-Clause).\n\n* This project is considered as: [leading standard](https://github.com/PerformanC/contributing?tab=readme-ov-file#project-information).\n",
+  "readmeHTML": "<h1>Meow's Debug Assistant</h1>\n\n<p>The simplest and most flexible logcat capturer for Android as a Magisk module.</p>\n\n<h2>Features</h2>\n\n<li>Captures logs across 3 boots</li>\n<li>Logs can be retrieved via ADB/root easily</li>\n<li>Meow's Debug Assistant's Secure Censor for censoring sensitive information</li>\n\n<h2>Installation</h2>\n\n<h3>1. Download the zip</h3>\n\n<p>The latest release can be found on the <a href=\"https://github.com/ThePedroo/DebugAssistant/releases\">Releases page</a>. Download the latest <code>DebugAssistant-vX.X.X.zip</code> file.</p>\n\n<h3>2. Flash the zip</h3>\n\n<p>Using your preferred root manager app, such as Magisk, KernelSU or APatch, flash the downloaded zip file.</p>\n\n<h3>3. Reboot</h3>\n\n<p>Reboot your device to start capturing logs.</p>\n\n<h2>Usage</h2>\n\n<p>After installation, the module will start capturing logs automatically. The logs will be saved in <code>/data/local/tmp/</code> directory with the following files:</p>\n<li>`DebugAssistant.log` - The oldest log file.</li>\n<li>`DebugAssistant-Boot1.log` - The second newest log file.</li>\n<li>`DebugAssistant-Boot2.log` - The newest log file.</li>\n\n<p>They will be created after each reboot, and all logs will be kept for 3 boots. After the third boot, all logs will be deleted and new logs will be captured, in a cyclic manner.</p>\n\n<p>You can retrieve the <b>redacted log</b> via the action button in the root manager app. When you click the button, it will redact the most recent log file available, and save it as <code>DebugAssistant-Redacted.log</code> in the same directory (<code>/data/local/tmp/</code>). You can then pull the redacted log file using ADB or access it with root permissions.</p>\n\n<h2>Contribution</h2>\n\n<p>It is mandatory to follow the PerformanC's <a href=\"https://github.com/PerformanC/contributing\">contribution guidelines</a> to contribute to Debug Assistant. Following its Security Policy, Code of Conduct and syntax standard.</p>\n\n<h2>License</h2>\n\n<p>Meow's Debug Assistant is licensed under <a href=\"LICENSE\">BSD 3-Clause License</a>. You can read more about it on <a href=\"https://opensource.org/licenses/BSD-3-Clause\">Open Source Initiative</a>.</p>\n\n<li>This project is considered as: [leading standard](https://github.com/PerformanC/contributing?tab=readme-ov-file#project-information).</li>",
+  "homepageUrl": "https://github.com/ThePedroo/DebugAssistant",
+  "sourceUrl": "https://github.com/ThePedroo/DebugAssistant",
+  "url": "https://github.com/ThePedroo/DebugAssistant",
+  "latestRelease": {
+    "name": "v3.0.2",
+    "version": "v3.0.2",
+    "time": "2026-01-25T13:04:34Z",
+    "downloadUrl": "https://github.com/ThePedroo/DebugAssistant/releases/download/v3.0.2/DebugAssistant-3.0.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0.2",
+      "tagName": "v3.0.2",
+      "publishedAt": "2026-01-25T13:04:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DebugAssistant-3.0.2.zip",
+          "downloadUrl": "https://github.com/ThePedroo/DebugAssistant/releases/download/v3.0.2/DebugAssistant-3.0.2.zip",
+          "size": 4322,
+          "downloadCount": 444
+        }
+      ]
+    },
+    {
+      "name": "v3.0.0",
+      "tagName": "v3.0.0",
+      "publishedAt": "2025-09-01T22:35:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "DebugAssistant-3.0.0.zip",
+          "downloadUrl": "https://github.com/ThePedroo/DebugAssistant/releases/download/v3.0.0/DebugAssistant-3.0.0.zip",
+          "size": 3314,
+          "downloadCount": 131
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,316 @@
+{
+  "readme": "# SukiSU-Ultra kernels for GrapheneOS\n\n## Warning\n\n- These are **unofficial** builds. They are not affiliated with or endorsed by GrapheneOS or SukiSU-Ultra.\n- Flashing a kernel can **brick your device**, cause data loss, or make it unbootable. You do it **at your own risk**.\n- The authors take **no responsibility** for any damage, data loss, or other consequences.\n- KernelSU weakens the device security model and may break GrapheneOS hardening, verified boot, and Play Integrity / attestation.\n- Unlocking the bootloader **wipes all data** and voids the warranty.\n- Back up your data and make sure you can restore the stock images before flashing.\n\n## Integration\n\nSukiSU-Ultra is integrated with **manual hooks** (no kprobes): the build pins the\n`builtin-new` branch and patches `do_execveat_common()`, `sys_faccessat()`,\n`sys_newfstatat()`, the `sys_newfstat` return path and `sys_reboot()` in the\nGrapheneOS kernel source. The build passes `--disable_randstruct` (the same\nKleaf flag used by GrapheneOS' own `build_lynx.sh`) because SukiSU's LSM hook\nhijacking relies on stable `security_hook_list` offsets. The matching manager\napp is `com.sukisu.ultra`.\n\n## Supported devices\n\n| Device          | Model    |\n| --------------- | -------- |\n| Pixel 6 / 6 Pro | `raviole` |\n| Pixel 6a        | `bluejay` |\n| Pixel 7 / 7 Pro | `pantah` |\n| Pixel 7a        | `lynx`   |\n| Pixel 8 / 8 Pro | `shusky` |\n| Pixel 8a        | `akita`  |\n| Pixel 9 / 9 Pro / 9 Pro XL | `caimito` |\n| Pixel 9 Pro Fold | `comet` |\n| Pixel 9a        | `tegu`   |\n| Pixel 10 / 10 Pro / 10 Pro XL | `muzel` |\n| Pixel 10 Pro Fold | `rango` |\n| Pixel 10a       | `stallion` |\n\n## Builds\n\nEach run publishes an artifact (`ksu-<version>-<target>-<run>`) containing:\n\n- `boot.img`\n- `dtbo.img`\n- `vendor_kernel_boot.img`\n- `system_dlkm.img`\n- `vendor_dlkm.img`\n- `install.sh`\n- `AnyKernel3-<target>.zip`\n\n## Installation\n\nRequirements: unlocked bootloader, `adb` and `fastboot` installed.\n\n1. Download and extract the artifact zip for your device.\n2. Boot into the bootloader:\n\n   ```sh\n   adb reboot bootloader\n   ```\n\n3. Flash:\n\n   ```sh\n   ./install.sh\n   ```\n\n   On Windows, or to flash manually:\n\n   ```sh\n   fastboot oem disable-verification\n   fastboot flash boot boot.img\n   fastboot flash dtbo dtbo.img\n   fastboot flash vendor_kernel_boot vendor_kernel_boot.img\n   fastboot reboot fastboot\n   fastboot flash system_dlkm system_dlkm.img\n   fastboot flash vendor_dlkm vendor_dlkm.img\n   ```\n\n4. Reboot:\n\n   ```sh\n   fastboot reboot\n   ```\n\n5. Install the SukiSU-Ultra manager app (`com.sukisu.ultra`) and verify root.\n\nTo restore the stock kernel, flash the matching GrapheneOS factory image or the original kernel images.\n",
+  "readmeHTML": "<h1>SukiSU-Ultra kernels for GrapheneOS</h1>\n\n<h2>Warning</h2>\n\n<li>These are **unofficial** builds. They are not affiliated with or endorsed by GrapheneOS or SukiSU-Ultra.</li>\n<li>Flashing a kernel can **brick your device**, cause data loss, or make it unbootable. You do it **at your own risk**.</li>\n<li>The authors take **no responsibility** for any damage, data loss, or other consequences.</li>\n<li>KernelSU weakens the device security model and may break GrapheneOS hardening, verified boot, and Play Integrity / attestation.</li>\n<li>Unlocking the bootloader **wipes all data** and voids the warranty.</li>\n<li>Back up your data and make sure you can restore the stock images before flashing.</li>\n\n<h2>Integration</h2>\n\n<p>SukiSU-Ultra is integrated with <b>manual hooks</b> (no kprobes): the build pins the</p>\n<p><code>builtin-new</code> branch and patches <code>do_execveat_common()</code>, <code>sys_faccessat()</code>,</p>\n<p><code>sys_newfstatat()</code>, the <code>sys_newfstat</code> return path and <code>sys_reboot()</code> in the</p>\n<p>GrapheneOS kernel source. The build passes <code>--disable_randstruct</code> (the same</p>\n<p>Kleaf flag used by GrapheneOS' own <code>build_lynx.sh</code>) because SukiSU's LSM hook</p>\n<p>hijacking relies on stable <code>security_hook_list</code> offsets. The matching manager</p>\n<p>app is <code>com.sukisu.ultra</code>.</p>\n\n<h2>Supported devices</h2>\n\n<p>| Device          | Model    |</p>\n<p>| --------------- | -------- |</p>\n<p>| Pixel 6 / 6 Pro | <code>raviole</code> |</p>\n<p>| Pixel 6a        | <code>bluejay</code> |</p>\n<p>| Pixel 7 / 7 Pro | <code>pantah</code> |</p>\n<p>| Pixel 7a        | <code>lynx</code>   |</p>\n<p>| Pixel 8 / 8 Pro | <code>shusky</code> |</p>\n<p>| Pixel 8a        | <code>akita</code>  |</p>\n<p>| Pixel 9 / 9 Pro / 9 Pro XL | <code>caimito</code> |</p>\n<p>| Pixel 9 Pro Fold | <code>comet</code> |</p>\n<p>| Pixel 9a        | <code>tegu</code>   |</p>\n<p>| Pixel 10 / 10 Pro / 10 Pro XL | <code>muzel</code> |</p>\n<p>| Pixel 10 Pro Fold | <code>rango</code> |</p>\n<p>| Pixel 10a       | <code>stallion</code> |</p>\n\n<h2>Builds</h2>\n\n<p>Each run publishes an artifact (<code>ksu-<version>-<target>-<run></code>) containing:</p>\n\n<li>`boot.img`</li>\n<li>`dtbo.img`</li>\n<li>`vendor_kernel_boot.img`</li>\n<li>`system_dlkm.img`</li>\n<li>`vendor_dlkm.img`</li>\n<li>`install.sh`</li>\n<li>`AnyKernel3-<target>.zip`</li>\n\n<h2>Installation</h2>\n\n<p>Requirements: unlocked bootloader, <code>adb</code> and <code>fastboot</code> installed.</p>\n\n<li>Download and extract the artifact zip for your device.</li>\n<li>Boot into the bootloader:</li>\n\n<p>   ```sh</p>\n<p>   adb reboot bootloader</p>\n<p>   ```</p>\n\n<li>Flash:</li>\n\n<p>   ```sh</p>\n<p>   ./install.sh</p>\n<p>   ```</p>\n\n<p>   On Windows, or to flash manually:</p>\n\n<p>   ```sh</p>\n<p>   fastboot oem disable-verification</p>\n<p>   fastboot flash boot boot.img</p>\n<p>   fastboot flash dtbo dtbo.img</p>\n<p>   fastboot flash vendor_kernel_boot vendor_kernel_boot.img</p>\n<p>   fastboot reboot fastboot</p>\n<p>   fastboot flash system_dlkm system_dlkm.img</p>\n<p>   fastboot flash vendor_dlkm vendor_dlkm.img</p>\n<p>   ```</p>\n\n<li>Reboot:</li>\n\n<p>   ```sh</p>\n<p>   fastboot reboot</p>\n<p>   ```</p>\n\n<li>Install the SukiSU-Ultra manager app (`com.sukisu.ultra`) and verify root.</li>\n\n<p>To restore the stock kernel, flash the matching GrapheneOS factory image or the original kernel images.</p>",
+  "homepageUrl": "https://github.com/ArisoN-ext/ksu-grapheneos",
+  "sourceUrl": "https://github.com/ArisoN-ext/ksu-grapheneos",
+  "url": "https://github.com/ArisoN-ext/ksu-grapheneos",
+  "latestRelease": {
+    "name": "ksu-v3.4.1-20261012-9",
+    "version": "ksu-v3.4.1-20261012-9",
+    "time": "2026-10-12T01:09:56Z",
+    "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/bluejay.zip"
+  },
+  "releases": [
+    {
+      "name": "ksu-v3.4.1-ds-20261011-8",
+      "tagName": "ksu-v3.4.1-ds-20261011-8",
+      "publishedAt": "2026-10-11T17:17:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "akita-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/akita-ds.zip",
+          "size": 37817306,
+          "downloadCount": 0
+        },
+        {
+          "name": "comet-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/comet-ds.zip",
+          "size": 38660318,
+          "downloadCount": 0
+        },
+        {
+          "name": "caimito-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/caimito-ds.zip",
+          "size": 39768955,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/lynx-ds.zip",
+          "size": 38995903,
+          "downloadCount": 0
+        },
+        {
+          "name": "bluejay-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/bluejay-ds.zip",
+          "size": 30926366,
+          "downloadCount": 0
+        },
+        {
+          "name": "pantah-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/pantah-ds.zip",
+          "size": 37521446,
+          "downloadCount": 0
+        },
+        {
+          "name": "shusky-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/shusky-ds.zip",
+          "size": 38016399,
+          "downloadCount": 0
+        },
+        {
+          "name": "tegu-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/tegu-ds.zip",
+          "size": 37796547,
+          "downloadCount": 0
+        },
+        {
+          "name": "raviole-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261011-8/raviole-ds.zip",
+          "size": 31832793,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ksu-v3.4.1-20261012-9",
+      "tagName": "ksu-v3.4.1-20261012-9",
+      "publishedAt": "2026-10-12T01:09:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "bluejay.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/bluejay.zip",
+          "size": 30982816,
+          "downloadCount": 0
+        },
+        {
+          "name": "akita.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/akita.zip",
+          "size": 37735013,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/lynx.zip",
+          "size": 38994944,
+          "downloadCount": 0
+        },
+        {
+          "name": "caimito.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/caimito.zip",
+          "size": 39645651,
+          "downloadCount": 0
+        },
+        {
+          "name": "comet.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/comet.zip",
+          "size": 38617352,
+          "downloadCount": 0
+        },
+        {
+          "name": "pantah.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/pantah.zip",
+          "size": 37412203,
+          "downloadCount": 1
+        },
+        {
+          "name": "tegu.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/tegu.zip",
+          "size": 37738094,
+          "downloadCount": 0
+        },
+        {
+          "name": "raviole.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/raviole.zip",
+          "size": 31591646,
+          "downloadCount": 0
+        },
+        {
+          "name": "shusky.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261012-9/shusky.zip",
+          "size": 38113197,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ksu-v3.4.1-ds-20261010-6",
+      "tagName": "ksu-v3.4.1-ds-20261010-6",
+      "publishedAt": "2026-10-10T21:04:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "caimito-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/caimito-ds.zip",
+          "size": 39782546,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/lynx-ds.zip",
+          "size": 38972913,
+          "downloadCount": 0
+        },
+        {
+          "name": "akita-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/akita-ds.zip",
+          "size": 37679807,
+          "downloadCount": 0
+        },
+        {
+          "name": "comet-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/comet-ds.zip",
+          "size": 38663024,
+          "downloadCount": 0
+        },
+        {
+          "name": "bluejay-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/bluejay-ds.zip",
+          "size": 31084897,
+          "downloadCount": 1
+        },
+        {
+          "name": "pantah-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/pantah-ds.zip",
+          "size": 37455155,
+          "downloadCount": 0
+        },
+        {
+          "name": "raviole-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/raviole-ds.zip",
+          "size": 31761752,
+          "downloadCount": 0
+        },
+        {
+          "name": "shusky-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/shusky-ds.zip",
+          "size": 38038435,
+          "downloadCount": 0
+        },
+        {
+          "name": "tegu-ds.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-ds-20261010-6/tegu-ds.zip",
+          "size": 37724287,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ksu-v3.4.1-20261009-5",
+      "tagName": "ksu-v3.4.1-20261009-5",
+      "publishedAt": "2026-10-09T21:20:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "caimito.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/caimito.zip",
+          "size": 39789820,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/lynx.zip",
+          "size": 38858807,
+          "downloadCount": 0
+        },
+        {
+          "name": "akita.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/akita.zip",
+          "size": 37696649,
+          "downloadCount": 0
+        },
+        {
+          "name": "bluejay.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/bluejay.zip",
+          "size": 30958180,
+          "downloadCount": 0
+        },
+        {
+          "name": "comet.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/comet.zip",
+          "size": 38639581,
+          "downloadCount": 0
+        },
+        {
+          "name": "pantah.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/pantah.zip",
+          "size": 37462096,
+          "downloadCount": 0
+        },
+        {
+          "name": "raviole.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/raviole.zip",
+          "size": 31731604,
+          "downloadCount": 0
+        },
+        {
+          "name": "shusky.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/shusky.zip",
+          "size": 37906670,
+          "downloadCount": 1
+        },
+        {
+          "name": "tegu.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.1-20261009-5/tegu.zip",
+          "size": 37617374,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ksu-v3.4.0-20261008-2",
+      "tagName": "ksu-v3.4.0-20261008-2",
+      "publishedAt": "2026-10-08T19:26:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "shusky.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261008-2/shusky.zip",
+          "size": 37829535,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261008-2/lynx.zip",
+          "size": 38858684,
+          "downloadCount": 0
+        },
+        {
+          "name": "akita.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261008-2/akita.zip",
+          "size": 37551799,
+          "downloadCount": 0
+        },
+        {
+          "name": "pantah.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261008-2/pantah.zip",
+          "size": 37289062,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "ksu-v3.4.0-20261006-1",
+      "tagName": "ksu-v3.4.0-20261006-1",
+      "publishedAt": "2026-10-06T09:55:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "shusky.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261006-1/shusky.zip",
+          "size": 37875237,
+          "downloadCount": 0
+        },
+        {
+          "name": "lynx.zip",
+          "downloadUrl": "https://github.com/ArisoN-ext/ksu-grapheneos/releases/download/ksu-v3.4.0-20261006-1/lynx.zip",
+          "size": 38855908,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

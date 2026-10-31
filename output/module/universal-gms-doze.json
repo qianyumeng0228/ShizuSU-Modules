@@ -1,0 +1,100 @@
+{
+  "readme": "# Universal GMS Doze\n\n## Overview\n- Patches Google Play services app and certain processes/services to be able to use battery optimization\n- Support API 23 or later\n- Support Magisk, KernelSU, and APatch root implementations\n\n## Download Links (Archive)\n- [GitHub Releases](https://kutt.it/3FfNzX)\n- [Mediafire](https://app.mediafire.com/16j39nr5uxi4l)\n- [MEGA](https://kutt.it/bE35Ld)\n- [SourceForge](https://kutt.it/69oMi9)\n\n## Troubleshootings\n- Command-line for check optimization (with module installed):\n```\n> su\n> gmsc\n```\n- Command-line for check optimization (in general):   \nThere's a line written `Whitelist (except idle) system apps:` and if `com.google.android.gms` line does not exist it means Google Play services is optimized).\n```\n> su\n> dumpsys deviceidle\n```\n- Command-line for fix delayed incoming messages issue:   \nIf the issue still persist, move the app to Not Optimized battery usage.\n```\n> su\n> cd /data/data\n> find . -type f -name '*gms*' -delete\n```\n- Command-line for disable Find My Device (optional):\n```\n> su\n> pm disable com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver\n```\n\n## Credits\n- topjohnwu / Magisk - Magisk Module Template\n- JumbomanXDA, MrCarb0n / Script fixer and helper\n\n## Extras\n- Donations: [PayPal](https://paypal.me/gloeyisk) - [LiberaPay](https://liberapay.com/gloeyisk) - [Ko-fi](https://ko-fi.com/gloeyisk)\n- Source Code: [GitHub](https://github.com/gloeyisk/universal-gms-doze)\n- Support Thread: [XDA Developers](https://forum.xda-developers.com/apps/magisk/module-universal-gms-doze-t3853710)\n",
+  "readmeHTML": "<h1>Universal GMS Doze</h1>\n\n<h2>Overview</h2>\n<li>Patches Google Play services app and certain processes/services to be able to use battery optimization</li>\n<li>Support API 23 or later</li>\n<li>Support Magisk, KernelSU, and APatch root implementations</li>\n\n<h2>Download Links (Archive)</h2>\n<li>[GitHub Releases](https://kutt.it/3FfNzX)</li>\n<li>[Mediafire](https://app.mediafire.com/16j39nr5uxi4l)</li>\n<li>[MEGA](https://kutt.it/bE35Ld)</li>\n<li>[SourceForge](https://kutt.it/69oMi9)</li>\n\n<h2>Troubleshootings</h2>\n<li>Command-line for check optimization (with module installed):</li>\n<pre>&gt; su\n&gt; gmsc</pre>\n<li>Command-line for check optimization (in general):</li>\n<p>There's a line written <code>Whitelist (except idle) system apps:</code> and if <code>com.google.android.gms</code> line does not exist it means Google Play services is optimized).</p>\n<pre>&gt; su\n&gt; dumpsys deviceidle</pre>\n<li>Command-line for fix delayed incoming messages issue:</li>\n<p>If the issue still persist, move the app to Not Optimized battery usage.</p>\n<pre>&gt; su\n&gt; cd /data/data\n&gt; find . -type f -name '*gms*' -delete</pre>\n<li>Command-line for disable Find My Device (optional):</li>\n<pre>&gt; su\n&gt; pm disable com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver</pre>\n\n<h2>Credits</h2>\n<li>topjohnwu / Magisk - Magisk Module Template</li>\n<li>JumbomanXDA, MrCarb0n / Script fixer and helper</li>\n\n<h2>Extras</h2>\n<li>Donations: [PayPal](https://paypal.me/gloeyisk) - [LiberaPay](https://liberapay.com/gloeyisk) - [Ko-fi](https://ko-fi.com/gloeyisk)</li>\n<li>Source Code: [GitHub](https://github.com/gloeyisk/universal-gms-doze)</li>\n<li>Support Thread: [XDA Developers](https://forum.xda-developers.com/apps/magisk/module-universal-gms-doze-t3853710)</li>",
+  "homepageUrl": "https://github.com/gloeyisk/universal-gms-doze",
+  "sourceUrl": "https://github.com/gloeyisk/universal-gms-doze",
+  "url": "https://github.com/gloeyisk/universal-gms-doze",
+  "latestRelease": {
+    "name": "v1.8.5",
+    "version": "v1.8.5",
+    "time": "2022-02-12T20:08:56Z",
+    "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.5/gms_v1.8.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.8.5",
+      "tagName": "v1.8.5",
+      "publishedAt": "2022-02-12T20:08:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.5.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.5/gms_v1.8.5.zip",
+          "size": 12651,
+          "downloadCount": 27109
+        }
+      ]
+    },
+    {
+      "name": "v1.8.4",
+      "tagName": "v1.8.4",
+      "publishedAt": "2021-08-29T17:20:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.4.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.4/gms_v1.8.4.zip",
+          "size": 11459,
+          "downloadCount": 19454
+        }
+      ]
+    },
+    {
+      "name": "v1.8.3",
+      "tagName": "v1.8.3",
+      "publishedAt": "2021-06-10T08:28:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.3.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.3/gms_v1.8.3.zip",
+          "size": 12050,
+          "downloadCount": 11763
+        }
+      ]
+    },
+    {
+      "name": "v1.8.2",
+      "tagName": "v1.8.2",
+      "publishedAt": "2020-11-15T17:01:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.2.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.2/gms_v1.8.2.zip",
+          "size": 11848,
+          "downloadCount": 20969
+        }
+      ]
+    },
+    {
+      "name": "v1.8.1",
+      "tagName": "v1.8.1",
+      "publishedAt": "2020-09-25T08:53:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.1.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.1/gms_v1.8.1.zip",
+          "size": 11987,
+          "downloadCount": 5687
+        }
+      ]
+    },
+    {
+      "name": "v1.8.0",
+      "tagName": "v1.8.0",
+      "publishedAt": "2020-09-03T11:06:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gms_v1.8.0.zip",
+          "downloadUrl": "https://github.com/gloeyisk/universal-gms-doze/releases/download/v1.8.0/gms_v1.8.0.zip",
+          "size": 11715,
+          "downloadCount": 3422
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

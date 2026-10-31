@@ -1,0 +1,30 @@
+{
+  "readme": "# KernelSU Frida Control\n\nKernelSU Frida Control is an Android module that lets you control, configure, and update the [Frida](https://frida.re/) server through a simple webview interface. Using KernelSU to execute privileged commands, this module allows you to toggle the Frida server on and off, rename the server binary, change its listening port, and  update to the latest release—all from your mobile device.\n\n## Features\n\n- **Toggle Frida Server:** Easily start or stop the Frida server with a single switch.\n- **Custom Configuration:** Change the server’s name and port. The module uses a dedicated folder in `/data/local/tmp` (named with a pattern like `adirf<port>`) to “remember” your configuration.\n- **Automatic Update:** Fetch and install the latest Frida server release from GitHub.\n- **Persistent Settings:** On module startup, the tool auto-detects an existing server configuration (folder and binary) so that your previous settings (custom name and port) are automatically loaded.\n- **Debug Logging:** View debug logs and status messages directly in the webview interface.\n\n## Requirements\n\n- **Android Device with Root Access:** The module requires `su` privileges to control system-level processes.\n- **KernelSU:** This module is built on top of KernelSU for executing commands as root.\n- **BusyBox:** The module depends on BusyBox (with utilities like `wget` and `unxz`) being installed on the device.\n- **Internet Access:** Required to fetch updates from the Frida GitHub releases.\n\n## Installation\n\n1. **Clone the Repository:**\n\n   ```bash\n   git clone https://github.com/yourusername/kernelsu-frida-control.git\n   cd kernelsu-frida-control\n",
+  "readmeHTML": "<h1>KernelSU Frida Control</h1>\n\n<p>KernelSU Frida Control is an Android module that lets you control, configure, and update the <a href=\"https://frida.re/\">Frida</a> server through a simple webview interface. Using KernelSU to execute privileged commands, this module allows you to toggle the Frida server on and off, rename the server binary, change its listening port, and  update to the latest release—all from your mobile device.</p>\n\n<h2>Features</h2>\n\n<li>**Toggle Frida Server:** Easily start or stop the Frida server with a single switch.</li>\n<li>**Custom Configuration:** Change the server’s name and port. The module uses a dedicated folder in `/data/local/tmp` (named with a pattern like `adirf<port>`) to “remember” your configuration.</li>\n<li>**Automatic Update:** Fetch and install the latest Frida server release from GitHub.</li>\n<li>**Persistent Settings:** On module startup, the tool auto-detects an existing server configuration (folder and binary) so that your previous settings (custom name and port) are automatically loaded.</li>\n<li>**Debug Logging:** View debug logs and status messages directly in the webview interface.</li>\n\n<h2>Requirements</h2>\n\n<li>**Android Device with Root Access:** The module requires `su` privileges to control system-level processes.</li>\n<li>**KernelSU:** This module is built on top of KernelSU for executing commands as root.</li>\n<li>**BusyBox:** The module depends on BusyBox (with utilities like `wget` and `unxz`) being installed on the device.</li>\n<li>**Internet Access:** Required to fetch updates from the Frida GitHub releases.</li>\n\n<h2>Installation</h2>\n\n<li>**Clone the Repository:**</li>\n\n<p>   ```bash</p>\n<p>   git clone https://github.com/yourusername/kernelsu-frida-control.git</p>\n<p>   cd kernelsu-frida-control</p>",
+  "homepageUrl": "https://github.com/lupilabs/kernelsu-frida",
+  "sourceUrl": "https://github.com/lupilabs/kernelsu-frida",
+  "url": "https://github.com/lupilabs/kernelsu-frida",
+  "latestRelease": {
+    "name": "v0.9-beta",
+    "version": "v0.9-beta",
+    "time": "2025-02-05T19:52:07Z",
+    "downloadUrl": "https://github.com/lupilabs/kernelsu-frida/releases/download/v0.9-beta/kernelsu-frida.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.9-beta",
+      "tagName": "v0.9-beta",
+      "publishedAt": "2025-02-05T19:52:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "kernelsu-frida.zip",
+          "downloadUrl": "https://github.com/lupilabs/kernelsu-frida/releases/download/v0.9-beta/kernelsu-frida.zip",
+          "size": 19161,
+          "downloadCount": 48
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

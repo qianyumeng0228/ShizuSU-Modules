@@ -1,0 +1,44 @@
+{
+  "readme": "## About\nCustom Certificate Authorities is a Magisk module that moves user-installed certificate authorities into the system trust store, making them trusted by all apps — including those that use BoringSSL (such as Flutter/Dart apps).\n\nWhat sets it apart from similar modules:\n- **No manual certificate preparation required** — just install the certificate through Android Settings and the module handles the rest.\n- **Automatic DER-to-PEM conversion** — certificates in DER (binary) format are automatically converted to PEM, ensuring compatibility with BoringSSL/Flutter apps that require PEM format.\n- **Full Android 14+ support** — certificates are injected into both `/apex/com.android.conscrypt/cacerts` and `/system/etc/security/cacerts` via bind mounts, covering both the modern APEX trust store and the legacy path used by BoringSSL.\n- **Multi-user support** — certificates from all Android user profiles are included.\n\n### Requirements\n- Android 11 or newer\n- [Magisk](https://github.com/topjohnwu/Magisk) v24.1 or newer\n\n### Installing the module\n1. Download the module from the [GitHub releases page](/../../releases).\n2. Install the module with Magisk.\n\n### Adding certificates\n1. Install your CA certificate through **Settings → Security → Encryption & credentials → Install a certificate → CA certificate**.\n2. Reboot.\n\nThe module will automatically copy the certificate from the user store to the system trust store on each boot. DER-encoded certificates are automatically converted to PEM format.\n\n### Removing certificates\n1. Remove the certificate through **Settings → Security → Encryption & credentials → Trusted credentials → User** tab.\n2. Reboot.\n\n### Verifying installation\nAfter rebooting, you can verify the certificate was installed by checking the log file:\n\n```\nadb shell su -c 'cat /data/local/tmp/customcert.log'\n```\n\nThe certificate should also appear under **Settings → Security → Encryption & credentials → Trusted credentials → System** tab.\n\n### Troubleshooting\n\n#### Certificate not trusted by Flutter/Dart apps\nThis module automatically converts DER certificates to PEM and mounts them to `/system/etc/security/cacerts` (the path Flutter's BoringSSL reads from). If you're still having issues, ensure you've rebooted after installing the certificate.\n\n#### Certificate not trusted by any app\nCheck the log file at `/data/local/tmp/customcert.log` for errors. Common issues:\n- The certificate wasn't installed through Android Settings before rebooting.\n- The module is disabled in Magisk.\n\n### Advanced: Manual certificate installation\nIf you prefer to prepare certificates manually (e.g., for certificates not installable through Android Settings):\n\n1. Convert the certificate to the Android hash-named format:\n```\n$ openssl x509 -subject_hash_old -noout -in example.crt\n829893ef\n$ cp example.crt 829893ef.0\n```\n\n2. Using a root file explorer, copy the `.0` file to `/data/misc/user/0/cacerts-added/`.\n3. Reboot.\n",
+  "readmeHTML": "<h2>About</h2>\n<p>Custom Certificate Authorities is a Magisk module that moves user-installed certificate authorities into the system trust store, making them trusted by all apps — including those that use BoringSSL (such as Flutter/Dart apps).</p>\n\n<p>What sets it apart from similar modules:</p>\n<li>**No manual certificate preparation required** — just install the certificate through Android Settings and the module handles the rest.</li>\n<li>**Automatic DER-to-PEM conversion** — certificates in DER (binary) format are automatically converted to PEM, ensuring compatibility with BoringSSL/Flutter apps that require PEM format.</li>\n<li>**Full Android 14+ support** — certificates are injected into both `/apex/com.android.conscrypt/cacerts` and `/system/etc/security/cacerts` via bind mounts, covering both the modern APEX trust store and the legacy path used by BoringSSL.</li>\n<li>**Multi-user support** — certificates from all Android user profiles are included.</li>\n\n<h3>Requirements</h3>\n<li>Android 11 or newer</li>\n<li>[Magisk](https://github.com/topjohnwu/Magisk) v24.1 or newer</li>\n\n<h3>Installing the module</h3>\n<li>Download the module from the [GitHub releases page](/../../releases).</li>\n<li>Install the module with Magisk.</li>\n\n<h3>Adding certificates</h3>\n<li>Install your CA certificate through **Settings → Security → Encryption & credentials → Install a certificate → CA certificate**.</li>\n<li>Reboot.</li>\n\n<p>The module will automatically copy the certificate from the user store to the system trust store on each boot. DER-encoded certificates are automatically converted to PEM format.</p>\n\n<h3>Removing certificates</h3>\n<li>Remove the certificate through **Settings → Security → Encryption & credentials → Trusted credentials → User** tab.</li>\n<li>Reboot.</li>\n\n<h3>Verifying installation</h3>\n<p>After rebooting, you can verify the certificate was installed by checking the log file:</p>\n\n<pre>adb shell su -c 'cat /data/local/tmp/customcert.log'</pre>\n\n<p>The certificate should also appear under <b>Settings → Security → Encryption & credentials → Trusted credentials → System</b> tab.</p>\n\n<h3>Troubleshooting</h3>\n\n<p>#### Certificate not trusted by Flutter/Dart apps</p>\n<p>This module automatically converts DER certificates to PEM and mounts them to <code>/system/etc/security/cacerts</code> (the path Flutter's BoringSSL reads from). If you're still having issues, ensure you've rebooted after installing the certificate.</p>\n\n<p>#### Certificate not trusted by any app</p>\n<p>Check the log file at <code>/data/local/tmp/customcert.log</code> for errors. Common issues:</p>\n<li>The certificate wasn't installed through Android Settings before rebooting.</li>\n<li>The module is disabled in Magisk.</li>\n\n<h3>Advanced: Manual certificate installation</h3>\n<p>If you prefer to prepare certificates manually (e.g., for certificates not installable through Android Settings):</p>\n\n<li>Convert the certificate to the Android hash-named format:</li>\n<pre>$ openssl x509 -subject_hash_old -noout -in example.crt\n829893ef\n$ cp example.crt 829893ef.0</pre>\n\n<li>Using a root file explorer, copy the `.0` file to `/data/misc/user/0/cacerts-added/`.</li>\n<li>Reboot.</li>",
+  "homepageUrl": "https://github.com/loukious",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/custom-certificate-authorities",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/custom-certificate-authorities",
+  "latestRelease": {
+    "name": "1.2.0",
+    "version": "1.2.0",
+    "time": "2026-06-15T05:39:00Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/custom-certificate-authorities/releases/download/1.2.0/Custom_Certificate_Authorities_v1.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "1.2.0",
+      "tagName": "1.2.0",
+      "publishedAt": "2026-06-15T05:39:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Custom_Certificate_Authorities_v1.2.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/custom-certificate-authorities/releases/download/1.2.0/Custom_Certificate_Authorities_v1.2.0.zip",
+          "size": 3774,
+          "downloadCount": 1672
+        }
+      ]
+    },
+    {
+      "name": "1.1.0",
+      "tagName": "1.1.0",
+      "publishedAt": "2024-11-23T00:58:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Custom_Certificate_Authorities_v1.1.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/custom-certificate-authorities/releases/download/1.1.0/Custom_Certificate_Authorities_v1.1.0.zip",
+          "size": 3633,
+          "downloadCount": 2502
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

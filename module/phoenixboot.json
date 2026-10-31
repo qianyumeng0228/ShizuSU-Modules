@@ -1,0 +1,30 @@
+{
+  "readme": "# PhoenixBoot\n\nPhoenixBoot is a low-level watchdog designed to prevent permanent bricks and bootloops on rooted Android devices. It works by monitoring the boot cycle and automatically restoring a verified partition backup if the system fails to reach a stable state.\n\n**Author:** Lysine000\n\n## Core Features\n\n### Kernel Panic Watchdog\nThe installer patches the boot image to include `panic=5` in the kernel cmdline. On a hard kernel panic, the device reboots immediately rather than hanging, allowing the watchdog to increment counters and eventually trigger recovery.\n\n### Raw Partition Recovery\nPhoenixBoot uses `dd` for block-level backups of the boot partition. Backups are SHA256 verified before any restore operation. The module attempts to store redundant copies in `/persist` or `/cache` to survive factory resets.\n\n### Stability Window\nAfter a successful boot, the watchdog waits 300 seconds. If the device remains up, panic counters are reset to 0.\n\n## Installation\n\n1. Flash the zip in Magisk, KernelSU, or APatch.\n2. During installation, use the Volume Keys to confirm your bootloader status when prompted.\n3. The module will backup your current boot image, patch the kernel parameters, and setup the watchdog services.\n\n## Manual Recovery\n\nOriginal boot images are stored at:\n- `/data/adb/phoenixboot/boot_orig.img`\n- `/persist/phoenixboot/boot_orig.img` (if supported)\n\nIf you need to restore manually from a shell:\n`dd if=/data/adb/phoenixboot/boot_orig.img of=/dev/block/by-name/boot`\n",
+  "readmeHTML": "<h1>PhoenixBoot</h1>\n\n<p>PhoenixBoot is a low-level watchdog designed to prevent permanent bricks and bootloops on rooted Android devices. It works by monitoring the boot cycle and automatically restoring a verified partition backup if the system fails to reach a stable state.</p>\n\n<p><b>Author:</b> Lysine000</p>\n\n<h2>Core Features</h2>\n\n<h3>Kernel Panic Watchdog</h3>\n<p>The installer patches the boot image to include <code>panic=5</code> in the kernel cmdline. On a hard kernel panic, the device reboots immediately rather than hanging, allowing the watchdog to increment counters and eventually trigger recovery.</p>\n\n<h3>Raw Partition Recovery</h3>\n<p>PhoenixBoot uses <code>dd</code> for block-level backups of the boot partition. Backups are SHA256 verified before any restore operation. The module attempts to store redundant copies in <code>/persist</code> or <code>/cache</code> to survive factory resets.</p>\n\n<h3>Stability Window</h3>\n<p>After a successful boot, the watchdog waits 300 seconds. If the device remains up, panic counters are reset to 0.</p>\n\n<h2>Installation</h2>\n\n<li>Flash the zip in Magisk, KernelSU, or APatch.</li>\n<li>During installation, use the Volume Keys to confirm your bootloader status when prompted.</li>\n<li>The module will backup your current boot image, patch the kernel parameters, and setup the watchdog services.</li>\n\n<h2>Manual Recovery</h2>\n\n<p>Original boot images are stored at:</p>\n<li>`/data/adb/phoenixboot/boot_orig.img`</li>\n<li>`/persist/phoenixboot/boot_orig.img` (if supported)</li>\n\n<p>If you need to restore manually from a shell:</p>\n<p><code>dd if=/data/adb/phoenixboot/boot_orig.img of=/dev/block/by-name/boot</code></p>",
+  "homepageUrl": "https://github.com/Lysine000/PhoenixBoot",
+  "sourceUrl": "https://github.com/Lysine000/PhoenixBoot",
+  "url": "https://github.com/Lysine000/PhoenixBoot",
+  "latestRelease": {
+    "name": "v1.4",
+    "version": "v1.4",
+    "time": "2026-05-06T17:00:07Z",
+    "downloadUrl": "https://github.com/Lysine000/PhoenixBoot/releases/download/v1.4/PhoenixBoot_v1.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-05-06T17:00:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PhoenixBoot_v1.4.zip",
+          "downloadUrl": "https://github.com/Lysine000/PhoenixBoot/releases/download/v1.4/PhoenixBoot_v1.4.zip",
+          "size": 17692,
+          "downloadCount": 603
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

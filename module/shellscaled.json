@@ -1,0 +1,172 @@
+{
+  "readme": "# Shellscaled\n\n在已 Root 的 Android 上原生运行 Tailscale，不占用 Android VPN。\n\n**简体中文** · [English](README.en.md)\n\n[![Release](https://img.shields.io/github/v/release/KyuubiRan/Shellscaled?style=flat-square&logo=github&label=Release&include_prereleases)](https://github.com/KyuubiRan/Shellscaled/releases)\n\n[下载最新版本](https://github.com/KyuubiRan/Shellscaled/releases) · Magisk / KernelSU · ARM64\n\n> **冲突提示：请与 `magisk-tailscaled` 二选一。** 两者不能同时启用。切换前请停用旧模块并重启，再安装 Shellscaled；旧模块的登录状态不会自动迁移。\n\n<p align=\"center\">\n  <img src=\"docs/images/webui-overview.png\" alt=\"连接状态\" width=\"240\">\n  <img src=\"docs/images/webui-devices.png\" alt=\"设备列表\" width=\"240\">\n  <img src=\"docs/images/webui-settings.png\" alt=\"常用设置\" width=\"240\">\n</p>\n\n<details>\n<summary>首次登录</summary>\n\n<p align=\"center\"><img src=\"docs/images/webui-login.png\" alt=\"登录 Tailscale\" width=\"280\"></p>\n\n</details>\n\n## 功能\n\n- 在管理器中一键连接或断开，模块卡片显示连接状态。\n- KernelSU 页面提供地址复制、设备列表、常用开关和 Tailscale 命令，并可前往控制台或项目主页。\n- 支持简体中文、繁体中文和英文，可跟随系统语言或手动选择。\n- 离线安装，更新保留账号与设置。\n\n## 安装\n\n1. 从 [Release](https://github.com/KyuubiRan/Shellscaled/releases) 下载 **arm64** ZIP 安装包。\n2. 在 **Magisk** 或 **KernelSU** 管理器中选择「从本地安装」，安装该 ZIP。\n3. **重启设备**，点击模块的运行按钮连接，首次使用时按提示登录。KernelSU 用户也可打开模块页面，点击「登录 Tailscale」完成登录。\n\n<details>\n<summary>通过终端登录</summary>\n\n   ```sh\n   su -c 'tailscale login'\n   ```\n\n</details>\n\n## 使用\n\n管理器中的模块按钮可切换连接状态。KernelSU 用户还可打开设置页面，管理子网路由、入站连接和出口节点的局域网访问；开关更改后立即生效。\n\n在 `adb shell` 或终端执行 `su` 后，可直接使用 `tailscale`。`tailscaled` 可启动、停止、重启服务或查看状态。\n\n点击本机地址即可复制；设备页可搜索本机可见的设备，查看在线状态并复制名称或地址。\n\n只更新 Tailscale 时，可在设置中的「二进制更新」选择稳定版或预览版后检查并安装，账号与设置会保留。更新模块界面与功能时，安装新的模块包并重启即可。卸载模块会删除本模块的账号与设置。\n\n## 来源与许可\n\nShellscaled 是第三方项目，基于 [Tailscale](https://github.com/tailscale/tailscale)，Android 移植参考 [anasfanani/tailscale-android-cli](https://github.com/anasfanani/tailscale-android-cli)，源自 [anasfanani/magisk-tailscaled](https://github.com/anasfanani/magisk-tailscaled)。\n\n采用 [BSD-3-Clause 许可](LICENSE)，保留上游版权与专利声明。与 Tailscale Inc. 无隶属关系。\n",
+  "readmeHTML": "<h1>Shellscaled</h1>\n\n<p>在已 Root 的 Android 上原生运行 Tailscale，不占用 Android VPN。</p>\n\n<p><b>简体中文</b> · <a href=\"README.en.md\">English</a></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/KyuubiRan/Shellscaled?style=flat-square&logo=github&label=Release&include_prereleases\">![Release</a>](https://github.com/KyuubiRan/Shellscaled/releases)</p>\n\n<p><a href=\"https://github.com/KyuubiRan/Shellscaled/releases\">下载最新版本</a> · Magisk / KernelSU · ARM64</p>\n\n<p>> <b>冲突提示：请与 <code>magisk-tailscaled</code> 二选一。</b> 两者不能同时启用。切换前请停用旧模块并重启，再安装 Shellscaled；旧模块的登录状态不会自动迁移。</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/images/webui-overview.png\" alt=\"连接状态\" width=\"240\"></p>\n<p>  <img src=\"docs/images/webui-devices.png\" alt=\"设备列表\" width=\"240\"></p>\n<p>  <img src=\"docs/images/webui-settings.png\" alt=\"常用设置\" width=\"240\"></p>\n<p></p></p>\n\n<p><details></p>\n<p><summary>首次登录</summary></p>\n\n<p><p align=\"center\"><img src=\"docs/images/webui-login.png\" alt=\"登录 Tailscale\" width=\"280\"></p></p>\n\n<p></details></p>\n\n<h2>功能</h2>\n\n<li>在管理器中一键连接或断开，模块卡片显示连接状态。</li>\n<li>KernelSU 页面提供地址复制、设备列表、常用开关和 Tailscale 命令，并可前往控制台或项目主页。</li>\n<li>支持简体中文、繁体中文和英文，可跟随系统语言或手动选择。</li>\n<li>离线安装，更新保留账号与设置。</li>\n\n<h2>安装</h2>\n\n<li>从 [Release](https://github.com/KyuubiRan/Shellscaled/releases) 下载 **arm64** ZIP 安装包。</li>\n<li>在 **Magisk** 或 **KernelSU** 管理器中选择「从本地安装」，安装该 ZIP。</li>\n<li>**重启设备**，点击模块的运行按钮连接，首次使用时按提示登录。KernelSU 用户也可打开模块页面，点击「登录 Tailscale」完成登录。</li>\n\n<p><details></p>\n<p><summary>通过终端登录</summary></p>\n\n<p>   ```sh</p>\n<p>   su -c 'tailscale login'</p>\n<p>   ```</p>\n\n<p></details></p>\n\n<h2>使用</h2>\n\n<p>管理器中的模块按钮可切换连接状态。KernelSU 用户还可打开设置页面，管理子网路由、入站连接和出口节点的局域网访问；开关更改后立即生效。</p>\n\n<p>在 <code>adb shell</code> 或终端执行 <code>su</code> 后，可直接使用 <code>tailscale</code>。<code>tailscaled</code> 可启动、停止、重启服务或查看状态。</p>\n\n<p>点击本机地址即可复制；设备页可搜索本机可见的设备，查看在线状态并复制名称或地址。</p>\n\n<p>只更新 Tailscale 时，可在设置中的「二进制更新」选择稳定版或预览版后检查并安装，账号与设置会保留。更新模块界面与功能时，安装新的模块包并重启即可。卸载模块会删除本模块的账号与设置。</p>\n\n<h2>来源与许可</h2>\n\n<p>Shellscaled 是第三方项目，基于 <a href=\"https://github.com/tailscale/tailscale\">Tailscale</a>，Android 移植参考 <a href=\"https://github.com/anasfanani/tailscale-android-cli\">anasfanani/tailscale-android-cli</a>，源自 <a href=\"https://github.com/anasfanani/magisk-tailscaled\">anasfanani/magisk-tailscaled</a>。</p>\n\n<p>采用 <a href=\"LICENSE\">BSD-3-Clause 许可</a>，保留上游版权与专利声明。与 Tailscale Inc. 无隶属关系。</p>",
+  "homepageUrl": "https://github.com/KyuubiRan/Shellscaled",
+  "sourceUrl": "https://github.com/KyuubiRan/Shellscaled",
+  "url": "https://github.com/KyuubiRan/Shellscaled",
+  "latestRelease": {
+    "name": "v1.104.2-r12",
+    "version": "v1.104.2-r12",
+    "time": "2026-10-28T06:56:58Z",
+    "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r12/Shellscaled-1.104.2-r12-arm64.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.104.4-r1",
+      "tagName": "v1.104.4-r1",
+      "publishedAt": "2026-10-30T09:40:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.4-r1-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.4-r1/Shellscaled-1.104.4-r1-arm64.binary.json",
+          "size": 422,
+          "downloadCount": 1
+        },
+        {
+          "name": "Shellscaled-1.104.4-r1-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.4-r1/Shellscaled-1.104.4-r1-arm64.zip.sha256",
+          "size": 99,
+          "downloadCount": 1
+        },
+        {
+          "name": "Shellscaled-1.104.4-r1-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.4-r1/Shellscaled-1.104.4-r1-arm64.zip",
+          "size": 13319019,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r12",
+      "tagName": "v1.104.2-r12",
+      "publishedAt": "2026-10-28T06:56:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.2-r12-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r12/Shellscaled-1.104.2-r12-arm64.zip",
+          "size": 13309364,
+          "downloadCount": 71
+        },
+        {
+          "name": "Shellscaled-1.104.2-r12-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r12/Shellscaled-1.104.2-r12-arm64.binary.json",
+          "size": 419,
+          "downloadCount": 4
+        },
+        {
+          "name": "Shellscaled-1.104.2-r12-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r12/Shellscaled-1.104.2-r12-arm64.zip.sha256",
+          "size": 100,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r10",
+      "tagName": "v1.104.2-r10",
+      "publishedAt": "2026-10-28T06:06:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.2-r10-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r10/Shellscaled-1.104.2-r10-arm64.zip.sha256",
+          "size": 100,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r10-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r10/Shellscaled-1.104.2-r10-arm64.binary.json",
+          "size": 419,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r10-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r10/Shellscaled-1.104.2-r10-arm64.zip",
+          "size": 13309361,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r9",
+      "tagName": "v1.104.2-r9",
+      "publishedAt": "2026-10-28T05:51:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.2-r9-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r9/Shellscaled-1.104.2-r9-arm64.binary.json",
+          "size": 422,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r9-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r9/Shellscaled-1.104.2-r9-arm64.zip",
+          "size": 13309370,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r9-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r9/Shellscaled-1.104.2-r9-arm64.zip.sha256",
+          "size": 99,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r8",
+      "tagName": "v1.104.2-r8",
+      "publishedAt": "2026-10-28T05:23:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.2-r8-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r8/Shellscaled-1.104.2-r8-arm64.binary.json",
+          "size": 422,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r8-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r8/Shellscaled-1.104.2-r8-arm64.zip.sha256",
+          "size": 99,
+          "downloadCount": 3
+        },
+        {
+          "name": "Shellscaled-1.104.2-r8-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r8/Shellscaled-1.104.2-r8-arm64.zip",
+          "size": 13305787,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r11",
+      "tagName": "v1.104.2-r11",
+      "publishedAt": "2026-10-28T06:56:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shellscaled-1.104.2-r11-arm64.zip.sha256",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r11/Shellscaled-1.104.2-r11-arm64.zip.sha256",
+          "size": 100,
+          "downloadCount": 2
+        },
+        {
+          "name": "Shellscaled-1.104.2-r11-arm64.zip",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r11/Shellscaled-1.104.2-r11-arm64.zip",
+          "size": 13309360,
+          "downloadCount": 2
+        },
+        {
+          "name": "Shellscaled-1.104.2-r11-arm64.binary.json",
+          "downloadUrl": "https://github.com/KyuubiRan/Shellscaled/releases/download/v1.104.2-r11/Shellscaled-1.104.2-r11-arm64.binary.json",
+          "size": 423,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

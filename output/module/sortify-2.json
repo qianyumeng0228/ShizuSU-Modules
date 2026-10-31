@@ -1,0 +1,100 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"banner.png\" alt=\"Sortify Banner\" width=\"100%\" />\n</p>\n\n# 📁 Sortify\n\n**Author:** [xCaptaiN09](https://github.com/xCaptaiN09)  \n**Version:** 4.0  \n\nSortify is a powerful **Magisk / KernelSU** module that automatically organizes files in your `/sdcard/Download/` folder into categorized subfolders. Now smarter, safer, and equipped with a **Native WebUI** for easy configuration.\n\n---\n\n## 📦 Features\n\n* **⚡ Automatic Sorting:** Runs automatically in the background (Default: every 5 mins).\n* **🌐 Native WebUI:** **NEW!** Configure sorting intervals directly inside the KernelSU Manager (No browser needed).\n* **▶ Manual Trigger:** Supports Magisk/KSU Action Button to sort instantly.\n* **📂 Smart Categories:** Sorts Documents, Images, Videos, Audio, Archives, Apps, and more.\n* **🛡️ Integrity Protection:** Skips hidden/incomplete files (`.crdownload`, `.partial`, `.tmp`) to prevent corruption.\n* **🗂️ Duplicate Detection:** Automatically moves duplicate files to `/sdcard/Sortify/Duplicates`.\n* **🪶 Lightweight:** 100% offline, uses native system resources.\n\n---\n\n## 🧩 Installation\n\n1.  Download `Sortify-v4.0.zip` from Releases.\n2.  Flash through **Magisk** or **KernelSU**.\n3.  Reboot your device.\n4.  **Done!** Sortify is now running.\n\n---\n\n## ⚙️ Configuration (WebUI)\n\n**Sortify v4.0** introduces a native dashboard to change settings without editing code.\n\n### How to access:\n1.  Open **KernelSU Manager**.\n2.  Go to the **Modules** tab.\n3.  Find **Sortify**.\n4.  Tap the **Settings / Globe Icon** on the module card.\n\n### Settings available:\n* **Sort Interval:** Change how often the background service checks for new files (in seconds).\n    * *Default:* 300 seconds (5 minutes).\n    * *Changes apply immediately.*\n\n---\n\n## ▶ Manual Trigger\n\nYou can force a sort immediately without waiting for the timer:\n* **Magisk/KSU App:** Tap the **Action** button on the module card.\n* **Terminal:** Run `su -c sh /data/adb/modules/sortify/action.sh`\n\n---\n\n## 🧼 Uninstall\n\n1.  Remove Sortify from your Module Manager.\n2.  Reboot.\n3.  *(Optional)* Delete the `/sdcard/Sortify` folder if you no longer need the organized files.\n\n---\n\n## 🧾 Changelog\n\n### v4.0 (2026-01-19)\n* **🌐 Native WebUI:** Added KernelSU `webroot` support for internal configuration (Replaces port 8081 server).\n* **⚡ Optimized Service:** Removed BusyBox HTTPD dependency for lighter footprint.\n* **🚀 Performance:** Improved background service logic.\n* **🔧 Stability:** Fixed permission handling for scripts and config files.\n\n### v3.0 (2026-01-19)\n* ▶ Added manual one-tap sorting via Magisk Action button.\n* ♻️ Refined automatic background sorting.\n\n### v2.0 (2025-10-18)\n* 🆕 Added duplicate detection (moves to `/sdcard/Sortify/Duplicates`).\n* 🛠 Fixed uninstall script path.\n* ⚡ Centralized extension handling.\n* 🔒 Safer file moves (no accidental overwrites).\n\n### v1.3 (2025-10-10)\n* 🚫 Prevented moving hidden/incomplete downloads (`.crdownload`, etc.).\n* 🗂️ Renamed main folder to `/sdcard/Sortify`.\n* 🧾 Updated logs to `sortify.log` with auto-trimming.\n\n---\n\n## 🧡 Credits\n\n* Developed by **[xCaptaiN09](https://github.com/xCaptaiN09)**\n* Powered by BusyBox & Android Shell\n\n[![GitHub release](https://img.shields.io/github/v/release/xCaptaiN09/Sortify)](https://github.com/xCaptaiN09/Sortify/releases)\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"banner.png\" alt=\"Sortify Banner\" width=\"100%\" /></p>\n<p></p></p>\n\n<h1>📁 Sortify</h1>\n\n<p><b>Author:</b> <a href=\"https://github.com/xCaptaiN09\">xCaptaiN09</a></p>\n<p><b>Version:</b> 4.0</p>\n\n<p>Sortify is a powerful <b>Magisk / KernelSU</b> module that automatically organizes files in your <code>/sdcard/Download/</code> folder into categorized subfolders. Now smarter, safer, and equipped with a <b>Native WebUI</b> for easy configuration.</p>\n\n<p>---</p>\n\n<h2>📦 Features</h2>\n\n<li>**⚡ Automatic Sorting:** Runs automatically in the background (Default: every 5 mins).</li>\n<li>**🌐 Native WebUI:** **NEW!** Configure sorting intervals directly inside the KernelSU Manager (No browser needed).</li>\n<li>**▶ Manual Trigger:** Supports Magisk/KSU Action Button to sort instantly.</li>\n<li>**📂 Smart Categories:** Sorts Documents, Images, Videos, Audio, Archives, Apps, and more.</li>\n<li>**🛡️ Integrity Protection:** Skips hidden/incomplete files (`.crdownload`, `.partial`, `.tmp`) to prevent corruption.</li>\n<li>**🗂️ Duplicate Detection:** Automatically moves duplicate files to `/sdcard/Sortify/Duplicates`.</li>\n<li>**🪶 Lightweight:** 100% offline, uses native system resources.</li>\n\n<p>---</p>\n\n<h2>🧩 Installation</h2>\n\n<li> Download `Sortify-v4.0.zip` from Releases.</li>\n<li> Flash through **Magisk** or **KernelSU**.</li>\n<li> Reboot your device.</li>\n<li> **Done!** Sortify is now running.</li>\n\n<p>---</p>\n\n<h2>⚙️ Configuration (WebUI)</h2>\n\n<p><b>Sortify v4.0</b> introduces a native dashboard to change settings without editing code.</p>\n\n<h3>How to access:</h3>\n<li> Open **KernelSU Manager**.</li>\n<li> Go to the **Modules** tab.</li>\n<li> Find **Sortify**.</li>\n<li> Tap the **Settings / Globe Icon** on the module card.</li>\n\n<h3>Settings available:</h3>\n<li>**Sort Interval:** Change how often the background service checks for new files (in seconds).</li>\n<p>    * *Default:* 300 seconds (5 minutes).</p>\n<p>    * *Changes apply immediately.*</p>\n\n<p>---</p>\n\n<h2>▶ Manual Trigger</h2>\n\n<p>You can force a sort immediately without waiting for the timer:</p>\n<li>**Magisk/KSU App:** Tap the **Action** button on the module card.</li>\n<li>**Terminal:** Run `su -c sh /data/adb/modules/sortify/action.sh`</li>\n\n<p>---</p>\n\n<h2>🧼 Uninstall</h2>\n\n<li> Remove Sortify from your Module Manager.</li>\n<li> Reboot.</li>\n<li> *(Optional)* Delete the `/sdcard/Sortify` folder if you no longer need the organized files.</li>\n\n<p>---</p>\n\n<h2>🧾 Changelog</h2>\n\n<h3>v4.0 (2026-01-19)</h3>\n<li>**🌐 Native WebUI:** Added KernelSU `webroot` support for internal configuration (Replaces port 8081 server).</li>\n<li>**⚡ Optimized Service:** Removed BusyBox HTTPD dependency for lighter footprint.</li>\n<li>**🚀 Performance:** Improved background service logic.</li>\n<li>**🔧 Stability:** Fixed permission handling for scripts and config files.</li>\n\n<h3>v3.0 (2026-01-19)</h3>\n<li>▶ Added manual one-tap sorting via Magisk Action button.</li>\n<li>♻️ Refined automatic background sorting.</li>\n\n<h3>v2.0 (2025-10-18)</h3>\n<li>🆕 Added duplicate detection (moves to `/sdcard/Sortify/Duplicates`).</li>\n<li>🛠 Fixed uninstall script path.</li>\n<li>⚡ Centralized extension handling.</li>\n<li>🔒 Safer file moves (no accidental overwrites).</li>\n\n<h3>v1.3 (2025-10-10)</h3>\n<li>🚫 Prevented moving hidden/incomplete downloads (`.crdownload`, etc.).</li>\n<li>🗂️ Renamed main folder to `/sdcard/Sortify`.</li>\n<li>🧾 Updated logs to `sortify.log` with auto-trimming.</li>\n\n<p>---</p>\n\n<h2>🧡 Credits</h2>\n\n<li>Developed by **[xCaptaiN09](https://github.com/xCaptaiN09)**</li>\n<li>Powered by BusyBox & Android Shell</li>\n\n<p><a href=\"https://img.shields.io/github/v/release/xCaptaiN09/Sortify\">![GitHub release</a>](https://github.com/xCaptaiN09/Sortify/releases)</p>",
+  "homepageUrl": "https://github.com/xCaptaiN09/Sortify",
+  "sourceUrl": "https://github.com/xCaptaiN09/Sortify",
+  "url": "https://github.com/xCaptaiN09/Sortify",
+  "latestRelease": {
+    "name": "v4.0",
+    "version": "v4.0",
+    "time": "2026-01-19T18:00:53Z",
+    "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v4.0/Sortify-v4.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.0",
+      "tagName": "v4.0",
+      "publishedAt": "2026-01-19T18:00:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify-v4.0.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v4.0/Sortify-v4.0.zip",
+          "size": 128000,
+          "downloadCount": 1173
+        }
+      ]
+    },
+    {
+      "name": "v3.0",
+      "tagName": "v3.0",
+      "publishedAt": "2026-01-19T05:07:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify-v3.0.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v3.0/Sortify-v3.0.zip",
+          "size": 126060,
+          "downloadCount": 21
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2025-10-18T06:56:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify-v2.0.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v2.0/Sortify-v2.0.zip",
+          "size": 129297,
+          "downloadCount": 161
+        }
+      ]
+    },
+    {
+      "name": "v1.3.1",
+      "tagName": "v1.3.1",
+      "publishedAt": "2025-10-17T17:50:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify.v1.3.1.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v1.3.1/Sortify.v1.3.1.zip",
+          "size": 5215,
+          "downloadCount": 14
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2025-10-17T17:49:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify.v1.3.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v1.3/Sortify.v1.3.zip",
+          "size": 5174,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2025-10-11T10:48:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Sortify.v1.2.zip",
+          "downloadUrl": "https://github.com/xCaptaiN09/Sortify/releases/download/v1.2/Sortify.v1.2.zip",
+          "size": 3913,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

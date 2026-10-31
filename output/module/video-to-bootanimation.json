@@ -1,0 +1,118 @@
+{
+  "readme": "# video-to-bootanimation\nA **Magisk/KernelSU Module** that lets you set an MP4 video as your Android device's **boot animation** — no PC required.\n\n[![Telegram](https://img.shields.io/badge/Telegram-blue?style=flat-square&logo=telegram)](https://tr1ple_fault.t.me)\n![Downloads](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/video-to-bootanimation/total.svg)\n\n---\n\n##  How to Use\n\n1. **Place your video:**\n   - Rename your MP4 video to `bootvideo.mp4`.\n   - Move it to your internal storage:  \n     `/storage/emulated/0/` (or `/sdcard/`).\n\n2. **(Optional) Configure settings:**\n   - Create a file named `cfg.txt` in `/sdcard/` with any of these keys:  \n\n     ```ini\n     # video2boot configuration file\n     # Lines starting with # are ignored. Empty values = auto-detect.\n\n     # Optional custom video path\n     video=/sdcard/bootvideo.mp4\n\n     # Optional output resolution\n     width=1080\n     height=2400\n\n     # Optional frame rate\n     fps=60\n\n     # Include audio from video (on/off)\n     audio=off\n\n     # Target install location\n     # (auto | system/media | system/product/media)\n     output=auto\n     ```\n\n   - Leave values blank or omit lines to let the binary **auto-detect resolution, frame rate, and location**.\n\n3. **Flash the module in Magisk or KernelSU.**\n   - It will automatically convert the video to a bootanimation ZIP during installation.\n   - If `audio=on`, the resulting animation will include sound. ( Not all devices support audio in bootanimation )\n\n---\n\n##  Terminal Commands\n\nAfter installing, you can run the following with **root privileges**:\n\n| Command | Description |\n|----------|-------------|\n| `vid2boot` | Converts a video into a flashable bootanimation Magisk module. |\n| `boot2vid` | Converts a bootanimation.zip back into a video. |\n\nBoth commands support most standard MP4 files and handle scaling, FPS, and audio automatically.\n\n---\n\n##  Compatibility\n\n Works on:\n- Any ROM that uses `bootanimation.zip` under `/system/media/` or `/system/product/media/`.\n\n⚠️ May not work on:\n- **Samsung** devices (use `.QMG` format).\n- **MIUI/HyperOS/OxygenOS** (not tested yet).\n- **Some Custom ROMs**\n\n💡 KernelSU may sometimes show “flashing” indefinitely even after completion — once you see “Done” in the log, simply go back.\n\n---\n\n##  Download\n\n🔽 [Download Latest Release](https://github.com/rhythmcache/video-to-bootanimation/releases/download/V3/video-to-bootanimation-main.zip)\n\n## License\n\n```\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.\n```\n\n---\n\n## Support Me\n\nHii! I'm [rhythmcache](https://github.com/rhythmcache), the developer of [video-to-bootanimation](https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation).\n\nIf you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!\n\n- ☕ [Buy me a coffee](https://www.buymeacoffee.com/triple_fault)\n- 💖 [Sponsor on GitHub](https://github.com/sponsors/rhythmcache)\n\n\n\nMaintained by **@rhythmcache**\n",
+  "readmeHTML": "<h1>video-to-bootanimation</h1>\n<p>A <b>Magisk/KernelSU Module</b> that lets you set an MP4 video as your Android device's <b>boot animation</b> — no PC required.</p>\n\n<p><a href=\"https://img.shields.io/badge/Telegram-blue?style=flat-square&logo=telegram\">![Telegram</a>](https://tr1ple_fault.t.me)</p>\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/video-to-bootanimation/total.svg\">Downloads</a></p>\n\n<p>---</p>\n\n<h2> How to Use</h2>\n\n<li>**Place your video:**</li>\n<p>   - Rename your MP4 video to <code>bootvideo.mp4</code>.</p>\n<p>   - Move it to your internal storage:</p>\n<p>     <code>/storage/emulated/0/</code> (or <code>/sdcard/</code>).</p>\n\n<li>**(Optional) Configure settings:**</li>\n<p>   - Create a file named <code>cfg.txt</code> in <code>/sdcard/</code> with any of these keys:</p>\n\n<p>     ```ini</p>\n<p>     # video2boot configuration file</p>\n<p>     # Lines starting with # are ignored. Empty values = auto-detect.</p>\n\n<p>     # Optional custom video path</p>\n<p>     video=/sdcard/bootvideo.mp4</p>\n\n<p>     # Optional output resolution</p>\n<p>     width=1080</p>\n<p>     height=2400</p>\n\n<p>     # Optional frame rate</p>\n<p>     fps=60</p>\n\n<p>     # Include audio from video (on/off)</p>\n<p>     audio=off</p>\n\n<p>     # Target install location</p>\n<p>     # (auto | system/media | system/product/media)</p>\n<p>     output=auto</p>\n<p>     ```</p>\n\n<p>   - Leave values blank or omit lines to let the binary <b>auto-detect resolution, frame rate, and location</b>.</p>\n\n<li>**Flash the module in Magisk or KernelSU.**</li>\n<p>   - It will automatically convert the video to a bootanimation ZIP during installation.</p>\n<p>   - If <code>audio=on</code>, the resulting animation will include sound. ( Not all devices support audio in bootanimation )</p>\n\n<p>---</p>\n\n<h2> Terminal Commands</h2>\n\n<p>After installing, you can run the following with <b>root privileges</b>:</p>\n\n<p>| Command | Description |</p>\n<p>|----------|-------------|</p>\n<p>| <code>vid2boot</code> | Converts a video into a flashable bootanimation Magisk module. |</p>\n<p>| <code>boot2vid</code> | Converts a bootanimation.zip back into a video. |</p>\n\n<p>Both commands support most standard MP4 files and handle scaling, FPS, and audio automatically.</p>\n\n<p>---</p>\n\n<h2> Compatibility</h2>\n\n<p> Works on:</p>\n<li>Any ROM that uses `bootanimation.zip` under `/system/media/` or `/system/product/media/`.</li>\n\n<p>⚠️ May not work on:</p>\n<li>**Samsung** devices (use `.QMG` format).</li>\n<li>**MIUI/HyperOS/OxygenOS** (not tested yet).</li>\n<li>**Some Custom ROMs**</li>\n\n<p>💡 KernelSU may sometimes show “flashing” indefinitely even after completion — once you see “Done” in the log, simply go back.</p>\n\n<p>---</p>\n\n<h2> Download</h2>\n\n<p>🔽 <a href=\"https://github.com/rhythmcache/video-to-bootanimation/releases/download/V3/video-to-bootanimation-main.zip\">Download Latest Release</a></p>\n\n<h2>License</h2>\n\n<pre>This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pre>\n\n<p>---</p>\n\n<h2>Support Me</h2>\n\n<p>Hii! I'm <a href=\"https://github.com/rhythmcache\">rhythmcache</a>, the developer of <a href=\"https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation\">video-to-bootanimation</a>.</p>\n\n<p>If you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!</p>\n\n<li>☕ [Buy me a coffee](https://www.buymeacoffee.com/triple_fault)</li>\n<li>💖 [Sponsor on GitHub](https://github.com/sponsors/rhythmcache)</li>\n\n\n\n<p>Maintained by <b>@rhythmcache</b></p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation",
+  "latestRelease": {
+    "name": "V7",
+    "version": "V7",
+    "time": "2025-11-06T17:29:43Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V7/video-to-bootanimation-online-V7.zip"
+  },
+  "releases": [
+    {
+      "name": "V7",
+      "tagName": "V7",
+      "publishedAt": "2025-11-06T17:29:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-online-V7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V7/video-to-bootanimation-online-V7.zip",
+          "size": 1936,
+          "downloadCount": 33
+        },
+        {
+          "name": "video-to-bootanimation-offline-V7.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V7/video-to-bootanimation-offline-V7.zip",
+          "size": 33271954,
+          "downloadCount": 91
+        }
+      ]
+    },
+    {
+      "name": "V6",
+      "tagName": "V6",
+      "publishedAt": "2025-11-06T17:18:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-offline-V6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V6/video-to-bootanimation-offline-V6.zip",
+          "size": 33263426,
+          "downloadCount": 18
+        },
+        {
+          "name": "video-to-bootanimation-online-V6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V6/video-to-bootanimation-online-V6.zip",
+          "size": 1927,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "V5",
+      "tagName": "V5",
+      "publishedAt": "2025-11-06T17:05:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-online-V5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V5/video-to-bootanimation-online-V5.zip",
+          "size": 1902,
+          "downloadCount": 13
+        },
+        {
+          "name": "video-to-bootanimation-offline-V5.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V5/video-to-bootanimation-offline-V5.zip",
+          "size": 33276735,
+          "downloadCount": 23
+        }
+      ]
+    },
+    {
+      "name": "V4",
+      "tagName": "V4",
+      "publishedAt": "2025-01-08T20:34:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-main-v4.4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V4/video-to-bootanimation-main-v4.4.zip",
+          "size": 9248690,
+          "downloadCount": 2042
+        }
+      ]
+    },
+    {
+      "name": "V3",
+      "tagName": "V3",
+      "publishedAt": "2024-12-16T13:16:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-main.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V3/video-to-bootanimation-main.zip",
+          "size": 8672289,
+          "downloadCount": 132
+        }
+      ]
+    },
+    {
+      "name": "V1",
+      "tagName": "V1",
+      "publishedAt": "2024-11-22T18:39:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "video-to-bootanimation-main.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/video-to-bootanimation/releases/download/V1/video-to-bootanimation-main.zip",
+          "size": 8410794,
+          "downloadCount": 98
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

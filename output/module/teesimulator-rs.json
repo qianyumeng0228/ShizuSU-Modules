@@ -1,0 +1,124 @@
+{
+  "readme": "<p align=\"center\">\n  <h1 align=\"center\">TEESimulator-RS</h1>\n  <p align=\"center\"><b>Pass hardware security checks on a rooted Android phone</b></p>\n  <p align=\"center\">\n    <a href=\"https://github.com/Enginex0/TEESimulator-RS/actions/workflows/build.yml\"><img src=\"https://github.com/Enginex0/TEESimulator-RS/actions/workflows/build.yml/badge.svg\" alt=\"Build\"></a>\n    <img src=\"https://img.shields.io/badge/Android-10%2B-green?logo=android\" alt=\"Android 10+\">\n    <a href=\"https://t.me/superpowers9\"><img src=\"https://img.shields.io/badge/Telegram-community-blue?logo=telegram\" alt=\"Telegram\"></a>\n  </p>\n</p>\n\n---\n\n> [!NOTE]\n> This is a fork of [JingMatrix/TEESimulator](https://github.com/JingMatrix/TEESimulator). It adds certificate generation written in Rust, generated keys that survive reboots, and attestation behavior that matches stock Android. See the upstream repo for the original project.\n\n## What it does\n\nSome Android apps refuse to run on a rooted phone. They ask the phone to prove it still has a genuine security chip, a check called hardware attestation. A rooted phone normally fails that check.\n\nTEESimulator makes it pass. Android runs a system process named `keystore2` that answers these proof requests. TEESimulator sits in front of `keystore2`, watches for the requests apps make to create keys and read their certificates, and builds the proof itself: a full chain of certificates signed by your `keybox.xml`. To the app, the phone looks genuine.\n\nIt replaces TrickyStore and its forks completely. It reads config from the same files, so you can switch without moving anything, but the internals are rewritten: certificates are generated in Rust, keys are saved across reboots, and each app gets its own limit on how fast it can request hardware-backed keys.\n\n## Requirements\n\n> [!IMPORTANT]\n> You need a valid `keybox.xml`. This is the file used to sign the proof. Without it, TEESimulator can only produce software-only certificates, which strict apps reject.\n\n1. Android 10 or newer\n2. A root manager: KernelSU, Magisk, or APatch\n3. A `keybox.xml` file at `/data/adb/tricky_store/keybox.xml`\n\n## Quick start\n\n1. Download the latest ZIP from [Releases](https://github.com/Enginex0/TEESimulator-RS/releases).\n2. Install it with your root manager, then reboot.\n3. Put your `keybox.xml` at `/data/adb/tricky_store/keybox.xml`.\n4. List the apps you want to cover in `/data/adb/tricky_store/target.txt`.\n5. Check that it works with Play Integrity or the Key Attestation Demo app.\n\n## How it works\n\n```\n   App\n    |  asks the phone to prove it has real security hardware\n    v\n+----------------------------------------------------+\n| keystore2  (the Android process that answers)      |\n|                                                    |\n|   ioctl  <- TEESimulator hooks the call here       |\n|     |                                              |\n|     v                                              |\n|   builds a certificate chain and signs it          |\n|   with your keybox.xml                             |\n+----------------------------------------------------+\n    |  the signed chain goes back to the app\n    v\n   App  ->  sees a genuine, hardware-backed device\n```\n\n**Certificate generation in Rust.** A native library, `libcertgen.so`, builds the X.509 certificate chains in Rust with the `ring` crypto library, encoding the bytes by hand in DER, the standard certificate format. Three key types fall outside `ring`'s support (the P-224, P-521, and Curve25519 curves); for those it falls back to Java's BouncyCastle.\n\n**Hooking keystore2.** Inside the `keystore2` process, TEESimulator redirects `ioctl`, the low-level system call Android uses to pass messages between processes. It does this with `lsplt`, a hooking library. From there it can read and answer three kinds of request: creating a key, importing a key, and fetching a key's certificate.\n\n**Matching stock Android.** The output matches what a real device produces. Keys that are not attested get self-signed certificates. The fields inside the attestation record keep the same order. Fields that only exist on certain Android versions appear only on those versions. The same usage checks run before a key is used.\n\n**Keys that survive reboots.** Generated keys are written to disk and stay valid after a restart. File locking stops two writers from corrupting the store.\n\n**Per-app rate limit.** Each app may request at most 2 hardware-backed keys per 30 seconds, and only 2 at a time. Past that, it receives a software-only certificate.\n\n## Configuration\n\nAll config files live in `/data/adb/tricky_store/`. TEESimulator reloads them the moment you save, so a reboot is not needed.\n\n### target.txt\n\nLists the apps TEESimulator handles, one package name per line. A suffix sets how each app is handled.\n\n| Suffix | What it does |\n|--------|--------------|\n| `!` | Always make a software key |\n| `?` | Keep the real hardware key, patch only its certificate |\n| none | Decide automatically |\n\nTo use more than one keybox, add a `[filename.xml]` header above the apps that should use that file:\n\n```\ncom.google.android.gms!\nio.github.vvb2060.keyattestation?\n\n[aosp_keybox.xml]\ncom.google.android.gsf\n```\n\n### security_patch.txt\n\nSets the security patch dates reported in the attestation certificates. Global defaults go at the top. Override them for one app with a `[package.name]` header.\n\n| Key | What it sets |\n|-----|--------------|\n| `system` | OS patch level |\n| `vendor` | Vendor patch level |\n| `boot` | Boot and kernel patch level |\n| `all` | All three at once |\n\nAccepted values: `today`, a `YYYY-MM-DD` template, `no` to omit the field, `device_default`, or `prop` to read the value from a system property.\n\n```\nsystem=YYYY-MM-05\nvendor=device_default\nboot=no\n\n[com.google.android.gms]\nsystem=2025-10-01\n```\n\n### boot_props_mode\n\nControls global `ro.boot.*` property spoofing. Values: `auto` (default), `force`, or `disable`.\n\nIn `auto`, Oplus-family devices (OnePlus/OPPO/realme/Oplus) skip boot-state prop spoofing to avoid conflicts with vendor TEE services such as ultrasonic fingerprint calibration. Create `/data/adb/tricky_store/boot_props_mode` with `force` to restore the old behavior, or `disable` to turn it off on any device.\n\n## Building from source\n\nYou need JDK 21, the Android SDK and NDK 29, Rust (stable) with the `aarch64-linux-android` target, and `cargo-ndk`.\n\n```bash\ngit clone --recursive https://github.com/Enginex0/TEESimulator-RS.git\ncd TEESimulator-RS\n./gradlew zipRelease zipDebug\n```\n\nThe ZIPs land in `out/`. Gradle runs `cargo ndk` for you to cross-compile `libcertgen.so`. To build on CI instead, push to `main` or run Actions > Build > Run workflow.\n\n## Compatibility\n\n| Root manager | Status |\n|---|---|\n| KernelSU | Tested, including the Action button and lifecycle scripts |\n| Magisk | Supported |\n| APatch | Supported |\n\n## Community\n\n<p align=\"center\">\n  <a href=\"https://t.me/superpowers9\">\n    <img src=\"https://img.shields.io/badge/SuperPowers_Telegram-Join-blue?style=for-the-badge&logo=telegram\" alt=\"Telegram\">\n  </a>\n</p>\n\n## Credits\n\n- [JingMatrix](https://github.com/JingMatrix/TEESimulator) for the original TEESimulator and its interception design\n- [ring](https://github.com/briansmith/ring) for the Rust cryptography\n- [fatalcoder524](https://github.com/fatalcoder524) for contributions and collaboration\n- [huguangares](https://github.com/huguangares) for collaboration and testing\n\n## License\n\n[GNU General Public License v3.0](LICENSE)\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <h1 align=\"center\">TEESimulator-RS</h1></p>\n<p>  <p align=\"center\"><b>Pass hardware security checks on a rooted Android phone</b></p></p>\n<p>  <p align=\"center\"></p>\n<p>    <a href=\"https://github.com/Enginex0/TEESimulator-RS/actions/workflows/build.yml\"><img src=\"https://github.com/Enginex0/TEESimulator-RS/actions/workflows/build.yml/badge.svg\" alt=\"Build\"></a></p>\n<p>    <img src=\"https://img.shields.io/badge/Android-10%2B-green?logo=android\" alt=\"Android 10+\"></p>\n<p>    <a href=\"https://t.me/superpowers9\"><img src=\"https://img.shields.io/badge/Telegram-community-blue?logo=telegram\" alt=\"Telegram\"></a></p>\n<p>  </p></p>\n<p></p></p>\n\n<p>---</p>\n\n<p>> [!NOTE]</p>\n<p>> This is a fork of <a href=\"https://github.com/JingMatrix/TEESimulator\">JingMatrix/TEESimulator</a>. It adds certificate generation written in Rust, generated keys that survive reboots, and attestation behavior that matches stock Android. See the upstream repo for the original project.</p>\n\n<h2>What it does</h2>\n\n<p>Some Android apps refuse to run on a rooted phone. They ask the phone to prove it still has a genuine security chip, a check called hardware attestation. A rooted phone normally fails that check.</p>\n\n<p>TEESimulator makes it pass. Android runs a system process named <code>keystore2</code> that answers these proof requests. TEESimulator sits in front of <code>keystore2</code>, watches for the requests apps make to create keys and read their certificates, and builds the proof itself: a full chain of certificates signed by your <code>keybox.xml</code>. To the app, the phone looks genuine.</p>\n\n<p>It replaces TrickyStore and its forks completely. It reads config from the same files, so you can switch without moving anything, but the internals are rewritten: certificates are generated in Rust, keys are saved across reboots, and each app gets its own limit on how fast it can request hardware-backed keys.</p>\n\n<h2>Requirements</h2>\n\n<p>> [!IMPORTANT]</p>\n<p>> You need a valid <code>keybox.xml</code>. This is the file used to sign the proof. Without it, TEESimulator can only produce software-only certificates, which strict apps reject.</p>\n\n<li>Android 10 or newer</li>\n<li>A root manager: KernelSU, Magisk, or APatch</li>\n<li>A `keybox.xml` file at `/data/adb/tricky_store/keybox.xml`</li>\n\n<h2>Quick start</h2>\n\n<li>Download the latest ZIP from [Releases](https://github.com/Enginex0/TEESimulator-RS/releases).</li>\n<li>Install it with your root manager, then reboot.</li>\n<li>Put your `keybox.xml` at `/data/adb/tricky_store/keybox.xml`.</li>\n<li>List the apps you want to cover in `/data/adb/tricky_store/target.txt`.</li>\n<li>Check that it works with Play Integrity or the Key Attestation Demo app.</li>\n\n<h2>How it works</h2>\n\n<pre>   App\n    |  asks the phone to prove it has real security hardware\n    v\n+----------------------------------------------------+\n| keystore2  (the Android process that answers)      |\n|                                                    |\n|   ioctl  &lt;- TEESimulator hooks the call here       |\n|     |                                              |\n|     v                                              |\n|   builds a certificate chain and signs it          |\n|   with your keybox.xml                             |\n+----------------------------------------------------+\n    |  the signed chain goes back to the app\n    v\n   App  -&gt;  sees a genuine, hardware-backed device</pre>\n\n<p><b>Certificate generation in Rust.</b> A native library, <code>libcertgen.so</code>, builds the X.509 certificate chains in Rust with the <code>ring</code> crypto library, encoding the bytes by hand in DER, the standard certificate format. Three key types fall outside <code>ring</code>'s support (the P-224, P-521, and Curve25519 curves); for those it falls back to Java's BouncyCastle.</p>\n\n<p><b>Hooking keystore2.</b> Inside the <code>keystore2</code> process, TEESimulator redirects <code>ioctl</code>, the low-level system call Android uses to pass messages between processes. It does this with <code>lsplt</code>, a hooking library. From there it can read and answer three kinds of request: creating a key, importing a key, and fetching a key's certificate.</p>\n\n<p><b>Matching stock Android.</b> The output matches what a real device produces. Keys that are not attested get self-signed certificates. The fields inside the attestation record keep the same order. Fields that only exist on certain Android versions appear only on those versions. The same usage checks run before a key is used.</p>\n\n<p><b>Keys that survive reboots.</b> Generated keys are written to disk and stay valid after a restart. File locking stops two writers from corrupting the store.</p>\n\n<p><b>Per-app rate limit.</b> Each app may request at most 2 hardware-backed keys per 30 seconds, and only 2 at a time. Past that, it receives a software-only certificate.</p>\n\n<h2>Configuration</h2>\n\n<p>All config files live in <code>/data/adb/tricky_store/</code>. TEESimulator reloads them the moment you save, so a reboot is not needed.</p>\n\n<h3>target.txt</h3>\n\n<p>Lists the apps TEESimulator handles, one package name per line. A suffix sets how each app is handled.</p>\n\n<p>| Suffix | What it does |</p>\n<p>|--------|--------------|</p>\n<p>| <code>!</code> | Always make a software key |</p>\n<p>| <code>?</code> | Keep the real hardware key, patch only its certificate |</p>\n<p>| none | Decide automatically |</p>\n\n<p>To use more than one keybox, add a <code>[filename.xml]</code> header above the apps that should use that file:</p>\n\n<pre>com.google.android.gms!\nio.github.vvb2060.keyattestation?\n\n[aosp_keybox.xml]\ncom.google.android.gsf</pre>\n\n<h3>security_patch.txt</h3>\n\n<p>Sets the security patch dates reported in the attestation certificates. Global defaults go at the top. Override them for one app with a <code>[package.name]</code> header.</p>\n\n<p>| Key | What it sets |</p>\n<p>|-----|--------------|</p>\n<p>| <code>system</code> | OS patch level |</p>\n<p>| <code>vendor</code> | Vendor patch level |</p>\n<p>| <code>boot</code> | Boot and kernel patch level |</p>\n<p>| <code>all</code> | All three at once |</p>\n\n<p>Accepted values: <code>today</code>, a <code>YYYY-MM-DD</code> template, <code>no</code> to omit the field, <code>device_default</code>, or <code>prop</code> to read the value from a system property.</p>\n\n<pre>system=YYYY-MM-05\nvendor=device_default\nboot=no\n\n[com.google.android.gms]\nsystem=2025-10-01</pre>\n\n<h3>boot_props_mode</h3>\n\n<p>Controls global <code>ro.boot.*</code> property spoofing. Values: <code>auto</code> (default), <code>force</code>, or <code>disable</code>.</p>\n\n<p>In <code>auto</code>, Oplus-family devices (OnePlus/OPPO/realme/Oplus) skip boot-state prop spoofing to avoid conflicts with vendor TEE services such as ultrasonic fingerprint calibration. Create <code>/data/adb/tricky_store/boot_props_mode</code> with <code>force</code> to restore the old behavior, or <code>disable</code> to turn it off on any device.</p>\n\n<h2>Building from source</h2>\n\n<p>You need JDK 21, the Android SDK and NDK 29, Rust (stable) with the <code>aarch64-linux-android</code> target, and <code>cargo-ndk</code>.</p>\n\n<pre>git clone --recursive https://github.com/Enginex0/TEESimulator-RS.git\ncd TEESimulator-RS\n./gradlew zipRelease zipDebug</pre>\n\n<p>The ZIPs land in <code>out/</code>. Gradle runs <code>cargo ndk</code> for you to cross-compile <code>libcertgen.so</code>. To build on CI instead, push to <code>main</code> or run Actions > Build > Run workflow.</p>\n\n<h2>Compatibility</h2>\n\n<p>| Root manager | Status |</p>\n<p>|---|---|</p>\n<p>| KernelSU | Tested, including the Action button and lifecycle scripts |</p>\n<p>| Magisk | Supported |</p>\n<p>| APatch | Supported |</p>\n\n<h2>Community</h2>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://t.me/superpowers9\"></p>\n<p>    <img src=\"https://img.shields.io/badge/SuperPowers_Telegram-Join-blue?style=for-the-badge&logo=telegram\" alt=\"Telegram\"></p>\n<p>  </a></p>\n<p></p></p>\n\n<h2>Credits</h2>\n\n<li>[JingMatrix](https://github.com/JingMatrix/TEESimulator) for the original TEESimulator and its interception design</li>\n<li>[ring](https://github.com/briansmith/ring) for the Rust cryptography</li>\n<li>[fatalcoder524](https://github.com/fatalcoder524) for contributions and collaboration</li>\n<li>[huguangares](https://github.com/huguangares) for collaboration and testing</li>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">GNU General Public License v3.0</a></p>",
+  "homepageUrl": "https://github.com/Enginex0/TEESimulator-RS",
+  "sourceUrl": "https://github.com/Enginex0/TEESimulator-RS",
+  "url": "https://github.com/Enginex0/TEESimulator-RS",
+  "latestRelease": {
+    "name": "v4.4",
+    "version": "v4.4",
+    "time": "2026-03-16T13:09:12Z",
+    "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.4/TEESimulator-v4.4-Debug.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.4",
+      "tagName": "v4.4",
+      "publishedAt": "2026-03-16T13:09:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.4-Debug.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.4/TEESimulator-v4.4-Debug.zip",
+          "size": 12254401,
+          "downloadCount": 8
+        },
+        {
+          "name": "TEESimulator-v4.4-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.4/TEESimulator-v4.4-Release.zip",
+          "size": 2718569,
+          "downloadCount": 59
+        }
+      ]
+    },
+    {
+      "name": "v4.3",
+      "tagName": "v4.3",
+      "publishedAt": "2026-03-11T12:16:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.3-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.3/TEESimulator-v4.3-Release.zip",
+          "size": 2718357,
+          "downloadCount": 597
+        },
+        {
+          "name": "TEESimulator-v4.3-Debug.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.3/TEESimulator-v4.3-Debug.zip",
+          "size": 12254005,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v4.2",
+      "tagName": "v4.2",
+      "publishedAt": "2026-03-11T12:08:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.2-Debug.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.2/TEESimulator-v4.2-Debug.zip",
+          "size": 12253660,
+          "downloadCount": 10
+        },
+        {
+          "name": "TEESimulator-v4.2-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.2/TEESimulator-v4.2-Release.zip",
+          "size": 2718013,
+          "downloadCount": 45
+        }
+      ]
+    },
+    {
+      "name": "v4.1",
+      "tagName": "v4.1",
+      "publishedAt": "2026-03-10T12:06:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.1-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.1/TEESimulator-v4.1-Release.zip",
+          "size": 2726157,
+          "downloadCount": 163
+        }
+      ]
+    },
+    {
+      "name": "v4.0",
+      "tagName": "v4.0",
+      "publishedAt": "2026-03-09T21:48:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v4.0-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v4.0/TEESimulator-v4.0-Release.zip",
+          "size": 2724923,
+          "downloadCount": 591
+        }
+      ]
+    },
+    {
+      "name": "v3.2",
+      "tagName": "v3.2",
+      "publishedAt": "2026-02-06T22:57:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "TEESimulator-v3.2-82-Debug.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v3.2/TEESimulator-v3.2-82-Debug.zip",
+          "size": 7897762,
+          "downloadCount": 148
+        },
+        {
+          "name": "TEESimulator-v3.2-82-Release.zip",
+          "downloadUrl": "https://github.com/Enginex0/TEESimulator-RS/releases/download/v3.2/TEESimulator-v3.2-82-Release.zip",
+          "size": 1900529,
+          "downloadCount": 776
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

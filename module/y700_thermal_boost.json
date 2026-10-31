@@ -1,0 +1,136 @@
+{
+  "readme": "# Y700 统一温控增强 + 充电日志 及配套监控 App\n\n联想拯救者 Y700 平板（三代/四代/五代）的 **Magisk / KernelSU 温控增强模块**，以及**配套的实时充电监控 App**。\n\n| 组成 | 说明 |\n|------|------|\n| **模块** (`module/`) | 温控绕过 + 亮屏快充增强 + 充电日志 |\n| **App** (`app/`) | 实时充电可视化 + 每次充电自动存档（数据独立于模块日志） |\n| **诊断脚本** (`tools/y700_diag.sh`) | 一键检测模块全部作用点 + 动态监控，社区排障用 |\n\n> **最新版本**：[Release v7.0](https://github.com/aweiyry/y700_thermal_boost/releases/latest)\n> —— 含模块 zip、App apk，以及可直下的诊断脚本 [`y700_diag.sh`](https://github.com/aweiyry/y700_thermal_boost/releases/latest/download/y700_diag.sh)。\n\n## 支持机型\n\n| 型号 | 代际 | 状态 |\n|------|------|------|\n| TB321FU | 三代 | ✅ 已验证 40W+ 快充 |\n| TB322FC | 四代 | ✅ 兼容 |\n| TB323FU | 五代 | ✅ 已验证 40W+ 快充 |\n\n---\n\n## 一、模块\n\n### 功能\n\n1. **温控绕过**：禁用充电相关温区 + 伪装温度，消除充电/游戏时的降频限流\n2. **亮屏快充增强**：插电时伪装温度 + 维持温区禁用，实现亮屏高功率充电；拔线后清除伪装、温控保持关闭\n3. **充电日志**：记录每次充电的**电池功率**/温度/分阶段统计/**充电协议**/**输入电压**，保存到 `/sdcard/充电日志/`\n4. **多代适配**：温区按类型自适应扫描，兼容三代 `batt1-therm`/四五代 `batt-pack-therm` 等命名差异\n5. **单实例守护**：开机时 KSU 与 service.d 同时拉起也不重复执行\n6. **兼容性开关（V7.0）**：`ZONE_MODE` 可选「禁用温区+伪装」或「仅伪装」，`KILL_THERMAL` 可开启周期击杀温控进程——\n   用于解决**部分四代/五代机型刷入后充电被锁在 10W** 的平台差异问题\n7. **运行日志（V7.0）**：`/data/local/tmp/y700_thermal_boost/runtime.log` 落盘记录启动参数、生效模式与杀温控动作\n\n> **关于「输入功率」**：SDP / DCP（普通充电）下正常显示；**PD / PPS 快充时平台不向用户空间暴露输入电流**\n> （大电流走电荷泵，已实测确认），此时日志显示「**不可读**」并给出 **PPS 输入电压峰值**。\n> 快充时请以**电池功率**为准（实测可达 **51W+**）。\n>\n> **关于「CCL 解锁」**：模块会尝试把 `charge_control_limit` 写到上限。但在**平台自行管控 CCL 的机型**\n> （如 Y700 五代、部分 OPPO/一加机型）上，写入会被驱动立即改回，**解锁无效**（不影响正常使用，\n> 属平台行为）。诊断脚本第 5 节会实测并明确报告「CCL 可写: 是/否」。\n\n### 安装\n\n1. 从 **[Releases](https://github.com/aweiyry/y700_thermal_boost/releases)** 下载 `y700_thermal_boost_vX.X.zip`（或用 `module/` 目录自行打包）\n2. 通过 Magisk 或 KernelSU 刷入\n3. 重启\n\n### 配置\n\n修改 `/data/adb/modules/y700_thermal_boost/config.prop`（**V7.1 起改完最多 5 秒自动生效，不用重启**）：\n\n```\nENABLE_THERMAL_BYPASS=1   # 温控绕过 (1=开 0=关)\nENABLE_CHARGE_LOG=1       # 充电日志 (1=开 0=关)\nSAMPLE_INTERVAL=5         # 采样间隔(秒)\nFAKE_TEMP_CHG=25000       # 充电区伪装温度 (毫摄氏度, 25000=25C)\nFAKE_TEMP_BATT=28000      # 电池区伪装温度\nFAKE_TEMP_USB=25000       # USB区伪装温度\nFAKE_TEMP_AP=30000        # AP区伪装温度\nLOG_KEEP_COUNT=30         # 日志保留数量\nKILL_INTERVAL=60          # 杀温控进程间隔(秒)\n\n# ==== 兼容性开关 (V7.0 新增) ====\nZONE_MODE=1               # 温区处理: 1=禁用+伪装(默认,性能最好) 2=仅伪装(保持 mode=enabled)\nKILL_THERMAL=0            # 周期杀温控进程: 0=不杀(默认,平台自管) 1=开(每 KILL_INTERVAL 秒杀一次)\n```\n\n### 充电被锁在 10W？按这个顺序排查（V7.0）\n\n部分四代 `TB322FC` / 五代机型刷入后，会出现**温控全部伪装成功、CCL 也已是满值，\n但充电功率仍被压在 ~10W（约 5V/2A）** 的情况。这通常是**平台策略**而非模块没生效，按下面 A/B 定位：\n\n| 步骤 | 操作 | 结果判读 |\n|---|---|---|\n| 0 | 先跑诊断脚本，确认温区伪装、单实例、CCL 均正常 | 若温区/进程异常 → 是模块问题，发报告 |\n| 1 | `ENABLE_THERMAL_BYPASS=0` + 重启，**同电量、同温度**下再充 | 功率恢复 → 确认是模块副作用，继续第 2 步；**仍 10W → 与模块无关**，查充电器/线材/接口/平台策略 |\n| 2 | 改 `ZONE_MODE=2` + 重启（**仅伪装，不解禁温区**） | 禁用温区后部分平台会回落到**保护性小电流**，此模式可绕过该逻辑 |\n| 3 | 再试 `KILL_THERMAL=1` + 重启（开启周期杀温控） | 排除温控服务反复重启对充电策略的干扰（该开关 V7.0 才真正生效） |\n\n> 每一步只改一个变量、保持电量与温度接近，否则结论不可信。改完配置需**重启**或重启模块生效。\n> 日志里会记录当前生效的模式：`模块版本: V7.0 (温区模式 1)`。\n\n### 运行日志（V7.0 新增）\n\n模块会把关键动作落盘到 **`/data/local/tmp/y700_thermal_boost/runtime.log`**（保留最近 200 行）：\n启动参数、生效的温区模式、杀温控进程的每一次动作（含成功/被拦截）、温区禁用清单重建结果。\n`log_me` 的输出走 logcat（容易被刷掉），排查问题时**优先看这个文件**；诊断脚本第 6 节也会摘录其中的杀温控记录。\n\n---\n\n## 二、配套 App（Y700 充电监控）\n\n用 [libsu](https://github.com/topjohnwu/libsu) 直读 `/sys` 节点，Kotlin + Jetpack Compose 实现。\n\n### 功能\n\n- **实时可视化**：环形电量仪表 + 功率/电量/温度三张实时曲线（每秒刷新，每 2 秒落点）\n- **实时指标**：充电协议（PD/PPS/DCP/SDP…）、电池功率、输入电压/电流/功率、温度、电流、电压、CCL、输入电流上限、充电阶段\n- **每次充电自动存档**：自动识别充电开始/结束，全程记录采样点（功率/输入功率/电量/温度/电流/电压）\n- **历史记录**：列表（充入电量、时长、峰值功率、协议、能量）+ 详情页（完整统计 + 该次曲线），支持单条删除/清空\n- **模块状态**：显示模块版本与运行状态（`/proc` 校验，不依赖 `ps`）\n- **输入不可读时如实标注**：PPS 快充下输入电流不可得，显示「不可读」而非骗人的 0\n\n### 数据独立性\n\nApp 数据保存在 **App 私有目录**（`/data/data/com.y700.charge/files/`），仅读取 `/sys` 节点，\n**不读取也不写入模块的 `/sdcard/充电日志/`**，两者完全独立。\n\n### 构建\n\n```bash\ncd app\n./gradlew assembleDebug\n# 产物: app/build/outputs/apk/debug/app-debug.apk\n```\n\n### 使用\n\n1. 从 **[Releases](https://github.com/aweiyry/y700_thermal_boost/releases)** 下载 `y700_charge_monitor_vX.X.apk` 并安装\n2. 打开 App，首次会弹 KernelSU/Magisk root 授权，点「允许」\n3. 即可看到实时充电信息，右上角「历史记录」查看每次充电存档\n\n---\n\n## 故障诊断（模块没生效时用）\n\n社区反馈「模块没生效」时，让用户跑诊断脚本 `tools/y700_diag.sh` —— 自动检测所有作用点并生成报告：\n\n```bash\n# 方式一: 从 Releases 直接下载到平板 (最新版 Release 已附带该脚本)\n#   下载后放到 /sdcard/, 然后执行:\nsu -c \"sh /sdcard/y700_diag.sh\"\n\n# 方式二: 从仓库取脚本并推送到平板\nadb push tools/y700_diag.sh /data/local/tmp/\nsu -c \"sh /data/local/tmp/y700_diag.sh\"\n\n# 可选参数: 采样时长(秒), 默认 60\nsu -c \"sh /data/local/tmp/y700_diag.sh 120\"\n```\n\n脚本运行约 1 分钟后自动生成报告到 **`/sdcard/Y700模块诊断_<时间>.txt`**，包含：\n\n| 检查项 | 说明 |\n|---|---|\n| 环境信息 | 机型 / Android / 内核 / root / SELinux 上下文 / 屏幕状态 / 前台应用 / CPU TOP3 |\n| 模块安装 | 模块目录 / 版本 / 文件完整性 / `disable` 标志 / service.d 自启脚本 / **生效的 `ZONE_MODE`、`KILL_THERMAL`** |\n| 服务进程 | 是否运行（直查 `/proc`，不依赖 `ps`）、是否多实例 |\n| **温区检查** | 设备**全部温区类型**列表 + 目标温区 `mode`/`temp` 与期望伪装值逐项对比（**按当前 `ZONE_MODE` 判读**，模式 2 下「未禁用」不算异常） |\n| 写入权限 | `emul_temp` / `mode` 是否可写（写异值回读，避免写同值造成的假阳性） |\n| 温控进程 | thermal-engine / thermal HAL 状态 + `/proc` 复核 + **`runtime.log` 里的杀温控记录** |\n| 充电与节点 | 充电协议 / 输入电压电流 / CCL / 输入电流上限 / **充电限流冷却设备状态** / IIO 输入电流节点 |\n| **动态采样** | 每分钟 12 次采样，检测温度伪装是否**稳定维持**（抓「有时有效有时无效」） |\n| **充电限流分析** | 按充电协议（PD/PPS 与 SDP/DCP 区别对待）分析温度、CCL、输入利用率与能量守恒 |\n| 自动结论 | 直接列出发现的问题与建议 |\n\n> 脚本已修正四类**误报**：`customize.sh 缺失`（管理器安装后会删除，属正常）、\n> 「电池功率偏低」（SDP 数据口 0.5A 场景下正常）、「CCL 可写」假阳性（写入同值不算可写，现写入不同值实测）、\n> 「温区 `mode` 不可写」假阳性（模块运行中会每 5 秒把温区重新置回 `disabled`，回读不一致不等于不可写，现按写入是否被拒绝判定）。\n\n把生成的报告文件发出来即可定位问题（报告只含系统状态，不含隐私信息）。\n\n---\n\n## 版本历史\n\n### 模块\n\n- **V7.1** — **配置热重载**：主循环每 5 秒重读 `config.prop`，改配置**不用重启**即可生效（`ZONE_MODE`/`ENABLE_THERMAL_BYPASS`/`KILL_THERMAL`/伪装温度/各间隔），\n  变更写入 `runtime.log`；关闭绕过时会**清除伪装温度 + 恢复温区 + 还原 CCL**（「关掉模块 = 回到原始状态」，便于 A/B）；\n  配置项增加**合法性校验**（写错的值回退默认值，不会把模块搞坏）；新增**深度定位脚本** `y700_full_diag.sh`（全节点 dump + 平台证据 + 自动 A/B）\n- **V7.0** — 新增**兼容性开关** `ZONE_MODE`（`1`=禁用温区+伪装 / `2`=仅伪装保持 `mode=enabled`，会把此前禁用的温区写回 `enabled`）\n  与 `KILL_THERMAL`（周期击杀温控进程），解决**部分四代/五代机型充电被锁 10W**；\n  **修复「杀温控进程」长期静默失效**——原实现用 `ps -A -o PID,NAME` 匹配进程名，而模块运行上下文里\n  `ps` 列不出其他进程名（实测命中数恒为 0），V6.x 实际从未杀掉过任何进程；改用 `/proc/<pid>/cmdline` 扫描后实测可命中，\n  因该功能本版才真正生效，默认改为 `0` 避免升级后行为被悄悄改变；\n  温区禁用清单改为**开机校验后重建**（温区编号每次开机变化，旧实现残留上百条脏数据 + 每 5 秒对每温区 `grep` 一次）；\n  新增 `runtime.log` 运行日志；启动与充电日志打印生效模式；诊断脚本作为 Release 附件发布\n- **V6.9** — 上述输入功率**校验收窄为仅 PPS/PD 生效**（SDP/DCP 下节点可靠，避免电池读数尖峰把有效样本误剔除）\n- **V6.8** — 输入功率增加**合理性校验**：部分平台 PPS 下会返回极小垃圾值（如 17637µA → 0.1W）被当成有效样本；现按能量守恒剔除（充电时输入功率必然 ≥ 电池功率），无效时如实显示「不可读」\n- **V6.7** — 杀温控进程改为**按进程名通用匹配**（兼容 `android.hardware.thermal-service@1.0` 等非 `.qti` 命名，提升异机型兼容性）；诊断脚本增强：**CCL 可写性测试** + **电池温度/输入功率/充电限流分析**\n- **V6.6** — 修复开机多实例竞态（原锁文件方案在「创建后内容未写入」时被误判为残留锁，导致两个实例同时运行、日志互相覆盖）；诊断脚本新增「充电限流冷却设备」检查\n- **V6.5** — 输入电流改用 PMIC IIO ADC 节点；PPS 下输入功率不可读时如实标注 + 记录 PPS 电压峰值；新增诊断脚本\n- **V6.4** — 充电日志增加「输入功率」统计；修复充电协议在最终日志恒为「未识别」\n- **V6.3** — 充电日志增加「充电协议」行（PD/PPS/DCP/SCP 等）\n- **V6.2** — 修复单实例锁 pid 复用导致的偶发失效（有时有效有时无效）\n- **V6.1** — 三代 CCL 写入修复（单位不同导致限流 + PPS 反复重协商）\n- **V6.0** — 三代温区适配 + 机型识别 + 单实例锁原子创建\n- **V5.9** — 温区发现按类型自适应扫描\n- **V5.8** — 单实例锁（初版）\n- **V5.7** — 拔线清除伪装 + 杀进程限频 + 写回验证\n\n### App\n\n- **v1.5** — 输入可读性校验同步收窄为**仅 PD/PPS 生效**（与模块逻辑一致）\n- **v1.4** — 输入可读性判断加入**能量守恒校验**（输入功率远小于电池功率时判为不可读，避免显示 PPS 垃圾读数）\n- **v1.3** — 同步输入电流 IIO 节点修复；不可读时明确标注；「充电类型」改名「充电阶段」\n- **v1.2** — 修复模块状态误判为「未运行」（`ps` 不显示完整命令行，改用 `/proc` cmdline 校验）\n- **v1.1** — 实时图表可视化 + 充电会话自动记录 + 历史列表/详情\n- **v1.0** — 首个版本：libsu 直读 `/sys` 实时充电信息\n\n---\n\n## 项目结构\n\n```\n.\n├── module/                 # Magisk/KernelSU 模块源码\n│   ├── service.sh          # 核心逻辑 (温控绕过/伪装/充电日志)\n│   ├── customize.sh        # 安装脚本 (生成 service.d 开机脚本)\n│   ├── uninstall.sh        # 卸载时恢复温区\n│   ├── config.prop         # 用户配置\n│   └── module.prop         # 模块信息\n├── tools/\n│   ├── y700_diag.sh        # 一键诊断脚本 (10 节快照 + 动态采样, Release 附件)\n│   └── y700_full_diag.sh   # 深度定位脚本 (全节点 dump + 平台证据 + 自动 A/B, 无需重启)\n├── docs/\n│   ├── release-notes/      # 各版本 Release 说明存档 (与 GitHub Release 内容一致)\n│   └── issues/             # 社区问题回复存档 (与 GitHub Issue 内容一致)\n├── promo/                  # 宣传海报与生成脚本\n│   ├── poster_v6.4.png\n│   └── make_poster.ps1\n└── app/                    # 配套 Android App\n    ├── app/src/main/java/com/y700/charge/\n    │   ├── MainActivity.kt         # 导航\n    │   ├── data/ChargeReader.kt    # libsu 读取 /sys\n    │   ├── data/ChargeRepo.kt      # 轮询 + 会话记录\n    │   ├── data/Models.kt          # 数据模型 + JSON\n    │   ├── data/SessionStore.kt    # 会话持久化\n    │   └── ui/                     # Compose 界面与图表\n    └── README.md\n```\n\n## 免责声明\n\n温控绕过属硬件保护修改，高温/边充边玩有风险，自担风险。搬运请标明出处。\n\n作者：酷安@妲你小己吧 \n\n\n请我喝点小甜水可以扫描下面赞赏码，不强求，大家随意\n<img width=\"1206\" height=\"1185\" alt=\"IMG_3472(20251123-142501)\" src=\"https://github.com/user-attachments/assets/6eb53662-b068-4d7f-9376-9de919fc2610\" />\n\n\n\n小tips，有刷机救砖需要可以闲鱼搜索：专业刷机救砖  6级鱼小铺的就是我   提供专业价廉的服务\n",
+  "readmeHTML": "<h1>Y700 统一温控增强 + 充电日志 及配套监控 App</h1>\n\n<p>联想拯救者 Y700 平板（三代/四代/五代）的 <b>Magisk / KernelSU 温控增强模块</b>，以及<b>配套的实时充电监控 App</b>。</p>\n\n<p>| 组成 | 说明 |</p>\n<p>|------|------|</p>\n<p>| <b>模块</b> (<code>module/</code>) | 温控绕过 + 亮屏快充增强 + 充电日志 |</p>\n<p>| <b>App</b> (<code>app/</code>) | 实时充电可视化 + 每次充电自动存档（数据独立于模块日志） |</p>\n<p>| <b>诊断脚本</b> (<code>tools/y700_diag.sh</code>) | 一键检测模块全部作用点 + 动态监控，社区排障用 |</p>\n\n<p>> <b>最新版本</b>：<a href=\"https://github.com/aweiyry/y700_thermal_boost/releases/latest\">Release v7.0</a></p>\n<p>> —— 含模块 zip、App apk，以及可直下的诊断脚本 <a href=\"https://github.com/aweiyry/y700_thermal_boost/releases/latest/download/y700_diag.sh\"><code>y700_diag.sh</code></a>。</p>\n\n<h2>支持机型</h2>\n\n<p>| 型号 | 代际 | 状态 |</p>\n<p>|------|------|------|</p>\n<p>| TB321FU | 三代 | ✅ 已验证 40W+ 快充 |</p>\n<p>| TB322FC | 四代 | ✅ 兼容 |</p>\n<p>| TB323FU | 五代 | ✅ 已验证 40W+ 快充 |</p>\n\n<p>---</p>\n\n<h2>一、模块</h2>\n\n<h3>功能</h3>\n\n<li>**温控绕过**：禁用充电相关温区 + 伪装温度，消除充电/游戏时的降频限流</li>\n<li>**亮屏快充增强**：插电时伪装温度 + 维持温区禁用，实现亮屏高功率充电；拔线后清除伪装、温控保持关闭</li>\n<li>**充电日志**：记录每次充电的**电池功率**/温度/分阶段统计/**充电协议**/**输入电压**，保存到 `/sdcard/充电日志/`</li>\n<li>**多代适配**：温区按类型自适应扫描，兼容三代 `batt1-therm`/四五代 `batt-pack-therm` 等命名差异</li>\n<li>**单实例守护**：开机时 KSU 与 service.d 同时拉起也不重复执行</li>\n<li>**兼容性开关（V7.0）**：`ZONE_MODE` 可选「禁用温区+伪装」或「仅伪装」，`KILL_THERMAL` 可开启周期击杀温控进程——</li>\n<p>   用于解决<b>部分四代/五代机型刷入后充电被锁在 10W</b> 的平台差异问题</p>\n<li>**运行日志（V7.0）**：`/data/local/tmp/y700_thermal_boost/runtime.log` 落盘记录启动参数、生效模式与杀温控动作</li>\n\n<p>> <b>关于「输入功率」</b>：SDP / DCP（普通充电）下正常显示；<b>PD / PPS 快充时平台不向用户空间暴露输入电流</b></p>\n<p>> （大电流走电荷泵，已实测确认），此时日志显示「<b>不可读</b>」并给出 <b>PPS 输入电压峰值</b>。</p>\n<p>> 快充时请以<b>电池功率</b>为准（实测可达 <b>51W+</b>）。</p>\n<p>></p>\n<p>> <b>关于「CCL 解锁」</b>：模块会尝试把 <code>charge_control_limit</code> 写到上限。但在<b>平台自行管控 CCL 的机型</b></p>\n<p>> （如 Y700 五代、部分 OPPO/一加机型）上，写入会被驱动立即改回，<b>解锁无效</b>（不影响正常使用，</p>\n<p>> 属平台行为）。诊断脚本第 5 节会实测并明确报告「CCL 可写: 是/否」。</p>\n\n<h3>安装</h3>\n\n<li>从 **[Releases](https://github.com/aweiyry/y700_thermal_boost/releases)** 下载 `y700_thermal_boost_vX.X.zip`（或用 `module/` 目录自行打包）</li>\n<li>通过 Magisk 或 KernelSU 刷入</li>\n<li>重启</li>\n\n<h3>配置</h3>\n\n<p>修改 <code>/data/adb/modules/y700_thermal_boost/config.prop</code>（<b>V7.1 起改完最多 5 秒自动生效，不用重启</b>）：</p>\n\n<pre>ENABLE_THERMAL_BYPASS=1   # 温控绕过 (1=开 0=关)\nENABLE_CHARGE_LOG=1       # 充电日志 (1=开 0=关)\nSAMPLE_INTERVAL=5         # 采样间隔(秒)\nFAKE_TEMP_CHG=25000       # 充电区伪装温度 (毫摄氏度, 25000=25C)\nFAKE_TEMP_BATT=28000      # 电池区伪装温度\nFAKE_TEMP_USB=25000       # USB区伪装温度\nFAKE_TEMP_AP=30000        # AP区伪装温度\nLOG_KEEP_COUNT=30         # 日志保留数量\nKILL_INTERVAL=60          # 杀温控进程间隔(秒)\n\n# ==== 兼容性开关 (V7.0 新增) ====\nZONE_MODE=1               # 温区处理: 1=禁用+伪装(默认,性能最好) 2=仅伪装(保持 mode=enabled)\nKILL_THERMAL=0            # 周期杀温控进程: 0=不杀(默认,平台自管) 1=开(每 KILL_INTERVAL 秒杀一次)</pre>\n\n<h3>充电被锁在 10W？按这个顺序排查（V7.0）</h3>\n\n<p>部分四代 <code>TB322FC</code> / 五代机型刷入后，会出现**温控全部伪装成功、CCL 也已是满值，</p>\n<p>但充电功率仍被压在 ~10W（约 5V/2A）<b> 的情况。这通常是</b>平台策略**而非模块没生效，按下面 A/B 定位：</p>\n\n<p>| 步骤 | 操作 | 结果判读 |</p>\n<p>|---|---|---|</p>\n<p>| 0 | 先跑诊断脚本，确认温区伪装、单实例、CCL 均正常 | 若温区/进程异常 → 是模块问题，发报告 |</p>\n<p>| 1 | <code>ENABLE_THERMAL_BYPASS=0</code> + 重启，<b>同电量、同温度</b>下再充 | 功率恢复 → 确认是模块副作用，继续第 2 步；<b>仍 10W → 与模块无关</b>，查充电器/线材/接口/平台策略 |</p>\n<p>| 2 | 改 <code>ZONE_MODE=2</code> + 重启（<b>仅伪装，不解禁温区</b>） | 禁用温区后部分平台会回落到<b>保护性小电流</b>，此模式可绕过该逻辑 |</p>\n<p>| 3 | 再试 <code>KILL_THERMAL=1</code> + 重启（开启周期杀温控） | 排除温控服务反复重启对充电策略的干扰（该开关 V7.0 才真正生效） |</p>\n\n<p>> 每一步只改一个变量、保持电量与温度接近，否则结论不可信。改完配置需<b>重启</b>或重启模块生效。</p>\n<p>> 日志里会记录当前生效的模式：<code>模块版本: V7.0 (温区模式 1)</code>。</p>\n\n<h3>运行日志（V7.0 新增）</h3>\n\n<p>模块会把关键动作落盘到 <b><code>/data/local/tmp/y700_thermal_boost/runtime.log</code></b>（保留最近 200 行）：</p>\n<p>启动参数、生效的温区模式、杀温控进程的每一次动作（含成功/被拦截）、温区禁用清单重建结果。</p>\n<p><code>log_me</code> 的输出走 logcat（容易被刷掉），排查问题时<b>优先看这个文件</b>；诊断脚本第 6 节也会摘录其中的杀温控记录。</p>\n\n<p>---</p>\n\n<h2>二、配套 App（Y700 充电监控）</h2>\n\n<p>用 <a href=\"https://github.com/topjohnwu/libsu\">libsu</a> 直读 <code>/sys</code> 节点，Kotlin + Jetpack Compose 实现。</p>\n\n<h3>功能</h3>\n\n<li>**实时可视化**：环形电量仪表 + 功率/电量/温度三张实时曲线（每秒刷新，每 2 秒落点）</li>\n<li>**实时指标**：充电协议（PD/PPS/DCP/SDP…）、电池功率、输入电压/电流/功率、温度、电流、电压、CCL、输入电流上限、充电阶段</li>\n<li>**每次充电自动存档**：自动识别充电开始/结束，全程记录采样点（功率/输入功率/电量/温度/电流/电压）</li>\n<li>**历史记录**：列表（充入电量、时长、峰值功率、协议、能量）+ 详情页（完整统计 + 该次曲线），支持单条删除/清空</li>\n<li>**模块状态**：显示模块版本与运行状态（`/proc` 校验，不依赖 `ps`）</li>\n<li>**输入不可读时如实标注**：PPS 快充下输入电流不可得，显示「不可读」而非骗人的 0</li>\n\n<h3>数据独立性</h3>\n\n<p>App 数据保存在 <b>App 私有目录</b>（<code>/data/data/com.y700.charge/files/</code>），仅读取 <code>/sys</code> 节点，</p>\n<p><b>不读取也不写入模块的 <code>/sdcard/充电日志/</code></b>，两者完全独立。</p>\n\n<h3>构建</h3>\n\n<pre>cd app\n./gradlew assembleDebug\n# 产物: app/build/outputs/apk/debug/app-debug.apk</pre>\n\n<h3>使用</h3>\n\n<li>从 **[Releases](https://github.com/aweiyry/y700_thermal_boost/releases)** 下载 `y700_charge_monitor_vX.X.apk` 并安装</li>\n<li>打开 App，首次会弹 KernelSU/Magisk root 授权，点「允许」</li>\n<li>即可看到实时充电信息，右上角「历史记录」查看每次充电存档</li>\n\n<p>---</p>\n\n<h2>故障诊断（模块没生效时用）</h2>\n\n<p>社区反馈「模块没生效」时，让用户跑诊断脚本 <code>tools/y700_diag.sh</code> —— 自动检测所有作用点并生成报告：</p>\n\n<pre># 方式一: 从 Releases 直接下载到平板 (最新版 Release 已附带该脚本)\n#   下载后放到 /sdcard/, 然后执行:\nsu -c \"sh /sdcard/y700_diag.sh\"\n\n# 方式二: 从仓库取脚本并推送到平板\nadb push tools/y700_diag.sh /data/local/tmp/\nsu -c \"sh /data/local/tmp/y700_diag.sh\"\n\n# 可选参数: 采样时长(秒), 默认 60\nsu -c \"sh /data/local/tmp/y700_diag.sh 120\"</pre>\n\n<p>脚本运行约 1 分钟后自动生成报告到 <b><code>/sdcard/Y700模块诊断_<时间>.txt</code></b>，包含：</p>\n\n<p>| 检查项 | 说明 |</p>\n<p>|---|---|</p>\n<p>| 环境信息 | 机型 / Android / 内核 / root / SELinux 上下文 / 屏幕状态 / 前台应用 / CPU TOP3 |</p>\n<p>| 模块安装 | 模块目录 / 版本 / 文件完整性 / <code>disable</code> 标志 / service.d 自启脚本 / <b>生效的 <code>ZONE_MODE</code>、<code>KILL_THERMAL</code></b> |</p>\n<p>| 服务进程 | 是否运行（直查 <code>/proc</code>，不依赖 <code>ps</code>）、是否多实例 |</p>\n<p>| <b>温区检查</b> | 设备<b>全部温区类型</b>列表 + 目标温区 <code>mode</code>/<code>temp</code> 与期望伪装值逐项对比（<b>按当前 <code>ZONE_MODE</code> 判读</b>，模式 2 下「未禁用」不算异常） |</p>\n<p>| 写入权限 | <code>emul_temp</code> / <code>mode</code> 是否可写（写异值回读，避免写同值造成的假阳性） |</p>\n<p>| 温控进程 | thermal-engine / thermal HAL 状态 + <code>/proc</code> 复核 + <b><code>runtime.log</code> 里的杀温控记录</b> |</p>\n<p>| 充电与节点 | 充电协议 / 输入电压电流 / CCL / 输入电流上限 / <b>充电限流冷却设备状态</b> / IIO 输入电流节点 |</p>\n<p>| <b>动态采样</b> | 每分钟 12 次采样，检测温度伪装是否<b>稳定维持</b>（抓「有时有效有时无效」） |</p>\n<p>| <b>充电限流分析</b> | 按充电协议（PD/PPS 与 SDP/DCP 区别对待）分析温度、CCL、输入利用率与能量守恒 |</p>\n<p>| 自动结论 | 直接列出发现的问题与建议 |</p>\n\n<p>> 脚本已修正四类<b>误报</b>：<code>customize.sh 缺失</code>（管理器安装后会删除，属正常）、</p>\n<p>> 「电池功率偏低」（SDP 数据口 0.5A 场景下正常）、「CCL 可写」假阳性（写入同值不算可写，现写入不同值实测）、</p>\n<p>> 「温区 <code>mode</code> 不可写」假阳性（模块运行中会每 5 秒把温区重新置回 <code>disabled</code>，回读不一致不等于不可写，现按写入是否被拒绝判定）。</p>\n\n<p>把生成的报告文件发出来即可定位问题（报告只含系统状态，不含隐私信息）。</p>\n\n<p>---</p>\n\n<h2>版本历史</h2>\n\n<h3>模块</h3>\n\n<li>**V7.1** — **配置热重载**：主循环每 5 秒重读 `config.prop`，改配置**不用重启**即可生效（`ZONE_MODE`/`ENABLE_THERMAL_BYPASS`/`KILL_THERMAL`/伪装温度/各间隔），</li>\n<p>  变更写入 <code>runtime.log</code>；关闭绕过时会<b>清除伪装温度 + 恢复温区 + 还原 CCL</b>（「关掉模块 = 回到原始状态」，便于 A/B）；</p>\n<p>  配置项增加<b>合法性校验</b>（写错的值回退默认值，不会把模块搞坏）；新增<b>深度定位脚本</b> <code>y700_full_diag.sh</code>（全节点 dump + 平台证据 + 自动 A/B）</p>\n<li>**V7.0** — 新增**兼容性开关** `ZONE_MODE`（`1`=禁用温区+伪装 / `2`=仅伪装保持 `mode=enabled`，会把此前禁用的温区写回 `enabled`）</li>\n<p>  与 <code>KILL_THERMAL</code>（周期击杀温控进程），解决<b>部分四代/五代机型充电被锁 10W</b>；</p>\n<p>  <b>修复「杀温控进程」长期静默失效</b>——原实现用 <code>ps -A -o PID,NAME</code> 匹配进程名，而模块运行上下文里</p>\n<p>  <code>ps</code> 列不出其他进程名（实测命中数恒为 0），V6.x 实际从未杀掉过任何进程；改用 <code>/proc/<pid>/cmdline</code> 扫描后实测可命中，</p>\n<p>  因该功能本版才真正生效，默认改为 <code>0</code> 避免升级后行为被悄悄改变；</p>\n<p>  温区禁用清单改为<b>开机校验后重建</b>（温区编号每次开机变化，旧实现残留上百条脏数据 + 每 5 秒对每温区 <code>grep</code> 一次）；</p>\n<p>  新增 <code>runtime.log</code> 运行日志；启动与充电日志打印生效模式；诊断脚本作为 Release 附件发布</p>\n<li>**V6.9** — 上述输入功率**校验收窄为仅 PPS/PD 生效**（SDP/DCP 下节点可靠，避免电池读数尖峰把有效样本误剔除）</li>\n<li>**V6.8** — 输入功率增加**合理性校验**：部分平台 PPS 下会返回极小垃圾值（如 17637µA → 0.1W）被当成有效样本；现按能量守恒剔除（充电时输入功率必然 ≥ 电池功率），无效时如实显示「不可读」</li>\n<li>**V6.7** — 杀温控进程改为**按进程名通用匹配**（兼容 `android.hardware.thermal-service@1.0` 等非 `.qti` 命名，提升异机型兼容性）；诊断脚本增强：**CCL 可写性测试** + **电池温度/输入功率/充电限流分析**</li>\n<li>**V6.6** — 修复开机多实例竞态（原锁文件方案在「创建后内容未写入」时被误判为残留锁，导致两个实例同时运行、日志互相覆盖）；诊断脚本新增「充电限流冷却设备」检查</li>\n<li>**V6.5** — 输入电流改用 PMIC IIO ADC 节点；PPS 下输入功率不可读时如实标注 + 记录 PPS 电压峰值；新增诊断脚本</li>\n<li>**V6.4** — 充电日志增加「输入功率」统计；修复充电协议在最终日志恒为「未识别」</li>\n<li>**V6.3** — 充电日志增加「充电协议」行（PD/PPS/DCP/SCP 等）</li>\n<li>**V6.2** — 修复单实例锁 pid 复用导致的偶发失效（有时有效有时无效）</li>\n<li>**V6.1** — 三代 CCL 写入修复（单位不同导致限流 + PPS 反复重协商）</li>\n<li>**V6.0** — 三代温区适配 + 机型识别 + 单实例锁原子创建</li>\n<li>**V5.9** — 温区发现按类型自适应扫描</li>\n<li>**V5.8** — 单实例锁（初版）</li>\n<li>**V5.7** — 拔线清除伪装 + 杀进程限频 + 写回验证</li>\n\n<h3>App</h3>\n\n<li>**v1.5** — 输入可读性校验同步收窄为**仅 PD/PPS 生效**（与模块逻辑一致）</li>\n<li>**v1.4** — 输入可读性判断加入**能量守恒校验**（输入功率远小于电池功率时判为不可读，避免显示 PPS 垃圾读数）</li>\n<li>**v1.3** — 同步输入电流 IIO 节点修复；不可读时明确标注；「充电类型」改名「充电阶段」</li>\n<li>**v1.2** — 修复模块状态误判为「未运行」（`ps` 不显示完整命令行，改用 `/proc` cmdline 校验）</li>\n<li>**v1.1** — 实时图表可视化 + 充电会话自动记录 + 历史列表/详情</li>\n<li>**v1.0** — 首个版本：libsu 直读 `/sys` 实时充电信息</li>\n\n<p>---</p>\n\n<h2>项目结构</h2>\n\n<pre>.\n├── module/                 # Magisk/KernelSU 模块源码\n│   ├── service.sh          # 核心逻辑 (温控绕过/伪装/充电日志)\n│   ├── customize.sh        # 安装脚本 (生成 service.d 开机脚本)\n│   ├── uninstall.sh        # 卸载时恢复温区\n│   ├── config.prop         # 用户配置\n│   └── module.prop         # 模块信息\n├── tools/\n│   ├── y700_diag.sh        # 一键诊断脚本 (10 节快照 + 动态采样, Release 附件)\n│   └── y700_full_diag.sh   # 深度定位脚本 (全节点 dump + 平台证据 + 自动 A/B, 无需重启)\n├── docs/\n│   ├── release-notes/      # 各版本 Release 说明存档 (与 GitHub Release 内容一致)\n│   └── issues/             # 社区问题回复存档 (与 GitHub Issue 内容一致)\n├── promo/                  # 宣传海报与生成脚本\n│   ├── poster_v6.4.png\n│   └── make_poster.ps1\n└── app/                    # 配套 Android App\n    ├── app/src/main/java/com/y700/charge/\n    │   ├── MainActivity.kt         # 导航\n    │   ├── data/ChargeReader.kt    # libsu 读取 /sys\n    │   ├── data/ChargeRepo.kt      # 轮询 + 会话记录\n    │   ├── data/Models.kt          # 数据模型 + JSON\n    │   ├── data/SessionStore.kt    # 会话持久化\n    │   └── ui/                     # Compose 界面与图表\n    └── README.md</pre>\n\n<h2>免责声明</h2>\n\n<p>温控绕过属硬件保护修改，高温/边充边玩有风险，自担风险。搬运请标明出处。</p>\n\n<p>作者：酷安@妲你小己吧</p>\n\n\n<p>请我喝点小甜水可以扫描下面赞赏码，不强求，大家随意</p>\n<p><img width=\"1206\" height=\"1185\" alt=\"IMG_3472(20251123-142501)\" src=\"https://github.com/user-attachments/assets/6eb53662-b068-4d7f-9376-9de919fc2610\" /></p>\n\n\n\n<p>小tips，有刷机救砖需要可以闲鱼搜索：专业刷机救砖  6级鱼小铺的就是我   提供专业价廉的服务</p>",
+  "homepageUrl": "https://github.com/aweiyry/y700_thermal_boost",
+  "sourceUrl": "https://github.com/aweiyry/y700_thermal_boost",
+  "url": "https://github.com/aweiyry/y700_thermal_boost",
+  "latestRelease": {
+    "name": "v6.9",
+    "version": "v6.9",
+    "time": "2026-09-21T16:21:51Z",
+    "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.9/y700_thermal_boost_v6.9.zip"
+  },
+  "releases": [
+    {
+      "name": "v6.9",
+      "tagName": "v6.9",
+      "publishedAt": "2026-09-21T16:21:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_charge_monitor_v1.5.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.9/y700_charge_monitor_v1.5.apk",
+          "size": 8001971,
+          "downloadCount": 0
+        },
+        {
+          "name": "y700_thermal_boost_v6.9.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.9/y700_thermal_boost_v6.9.zip",
+          "size": 8755,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v6.8",
+      "tagName": "v6.8",
+      "publishedAt": "2026-09-21T16:14:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_thermal_boost_v6.8.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.8/y700_thermal_boost_v6.8.zip",
+          "size": 8719,
+          "downloadCount": 0
+        },
+        {
+          "name": "y700_charge_monitor_v1.4.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.8/y700_charge_monitor_v1.4.apk",
+          "size": 8001827,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v6.7",
+      "tagName": "v6.7",
+      "publishedAt": "2026-09-18T10:04:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_charge_monitor_v1.3.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.7/y700_charge_monitor_v1.3.apk",
+          "size": 8001779,
+          "downloadCount": 17
+        },
+        {
+          "name": "y700_thermal_boost_v6.7.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.7/y700_thermal_boost_v6.7.zip",
+          "size": 8367,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "v6.6",
+      "tagName": "v6.6",
+      "publishedAt": "2026-09-17T17:07:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_thermal_boost_v6.6.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.6/y700_thermal_boost_v6.6.zip",
+          "size": 8129,
+          "downloadCount": 2
+        },
+        {
+          "name": "y700_charge_monitor_v1.3.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.6/y700_charge_monitor_v1.3.apk",
+          "size": 8001779,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v6.5",
+      "tagName": "v6.5",
+      "publishedAt": "2026-09-17T01:13:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_thermal_boost_v6.5.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.5/y700_thermal_boost_v6.5.zip",
+          "size": 7946,
+          "downloadCount": 13
+        },
+        {
+          "name": "y700_charge_monitor_v1.3.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.5/y700_charge_monitor_v1.3.apk",
+          "size": 8001779,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v6.4",
+      "tagName": "v6.4",
+      "publishedAt": "2026-09-16T09:47:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "y700_thermal_boost_v6.4.zip",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.4/y700_thermal_boost_v6.4.zip",
+          "size": 7344,
+          "downloadCount": 12
+        },
+        {
+          "name": "y700_charge_monitor_v1.2.apk",
+          "downloadUrl": "https://github.com/aweiyry/y700_thermal_boost/releases/download/v6.4/y700_charge_monitor_v1.2.apk",
+          "size": 8000559,
+          "downloadCount": 9
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,30 @@
+{
+  "readme": "# ZeroTier One for KernelSU Next (arm64)\n\nStatic ZeroTier One 1.14.2 daemon + WebUI. Install the zip in KernelSU Next, reboot,\nthen open the module's WebUI (Overview / Peers / Settings / Logs).\n\n- Identity, config and logs: `/data/adb/zerotier` (kept on uninstall)\n- CLI: `su -c \"sh /data/adb/modules/zerotier_ksu/scripts/zt.sh cli listnetworks\"`\n- Action button in the manager toggles ZeroTier on/off\n- Requires `CONFIG_TUN` in the kernel (`zcat /proc/config.gz | grep TUN`)\n- Android routing fix: `ip rule add pref 5000 lookup main` (toggle in Settings)\n- Built from upstream tag 1.14.2 with `ZT_SSO_SUPPORTED=0 ZT_STATIC=1` (no SSO/OIDC support).\n  ZeroTier is under the BSL 1.1 license, see ZEROTIER-LICENSE.txt.\n- Members tab (API access): paste a ZeroTier Central API token (my.zerotier.com -> Account) to list,\n  authorize/deauthorize, rename and delete network members, and to authorize this node in one tap.\n  Token is stored in `/data/adb/zerotier/api.token` (mode 600). Central blocks browser CORS, so requests\n  run in the shell via the bundled static curl (`bin/curl`: minimal 2 MB HTTPS-only build with mbedTLS + c-ares, plus `bin/cacert.pem`; DNS via `API_DNS`).\n  CLI: `zt.sh api token set|clear|status`, `zt.sh api GET /network/<id>/member`.\n  `API_BASE` can point to a Central-compatible self-hosted API.\n- Battery saver: with \"Pause in battery saver\" on (default), ZeroTier stops while Android battery saver is on and\n  resumes when it turns off. Starting it manually while saver is on overrides the pause until saver turns off.\n- Members tab: pending badge, \"Authorize all pending\", per-member IPs, bridge toggle, ping.\n- Notify on join requests (off by default): checks Central every ~10 min while ZeroTier is enabled.\n- Identity: `zt.sh backup` / `zt.sh restore` use `/sdcard/Download/zerotier-identity.tar` (unencrypted private key!).\n- Low-latency tuning (default on): writes a managed `local.conf` (no TCP relay fallback, UPnP/NAT-PMP port mapping;\n  your own local.conf is never overwritten), raises daemon priority, protects it from the low-memory killer, moves it to\n  the foreground cpuset and shrinks the zt tun queue. Optional \"Keep awake\" holds a wakelock + Wi-Fi low-latency mode.\n",
+  "readmeHTML": "<h1>ZeroTier One for KernelSU Next (arm64)</h1>\n\n<p>Static ZeroTier One 1.14.2 daemon + WebUI. Install the zip in KernelSU Next, reboot,</p>\n<p>then open the module's WebUI (Overview / Peers / Settings / Logs).</p>\n\n<li>Identity, config and logs: `/data/adb/zerotier` (kept on uninstall)</li>\n<li>CLI: `su -c \"sh /data/adb/modules/zerotier_ksu/scripts/zt.sh cli listnetworks\"`</li>\n<li>Action button in the manager toggles ZeroTier on/off</li>\n<li>Requires `CONFIG_TUN` in the kernel (`zcat /proc/config.gz | grep TUN`)</li>\n<li>Android routing fix: `ip rule add pref 5000 lookup main` (toggle in Settings)</li>\n<li>Built from upstream tag 1.14.2 with `ZT_SSO_SUPPORTED=0 ZT_STATIC=1` (no SSO/OIDC support).</li>\n<p>  ZeroTier is under the BSL 1.1 license, see ZEROTIER-LICENSE.txt.</p>\n<li>Members tab (API access): paste a ZeroTier Central API token (my.zerotier.com -> Account) to list,</li>\n<p>  authorize/deauthorize, rename and delete network members, and to authorize this node in one tap.</p>\n<p>  Token is stored in <code>/data/adb/zerotier/api.token</code> (mode 600). Central blocks browser CORS, so requests</p>\n<p>  run in the shell via the bundled static curl (<code>bin/curl</code>: minimal 2 MB HTTPS-only build with mbedTLS + c-ares, plus <code>bin/cacert.pem</code>; DNS via <code>API_DNS</code>).</p>\n<p>  CLI: <code>zt.sh api token set|clear|status</code>, <code>zt.sh api GET /network/<id>/member</code>.</p>\n<p>  <code>API_BASE</code> can point to a Central-compatible self-hosted API.</p>\n<li>Battery saver: with \"Pause in battery saver\" on (default), ZeroTier stops while Android battery saver is on and</li>\n<p>  resumes when it turns off. Starting it manually while saver is on overrides the pause until saver turns off.</p>\n<li>Members tab: pending badge, \"Authorize all pending\", per-member IPs, bridge toggle, ping.</li>\n<li>Notify on join requests (off by default): checks Central every ~10 min while ZeroTier is enabled.</li>\n<li>Identity: `zt.sh backup` / `zt.sh restore` use `/sdcard/Download/zerotier-identity.tar` (unencrypted private key!).</li>\n<li>Low-latency tuning (default on): writes a managed `local.conf` (no TCP relay fallback, UPnP/NAT-PMP port mapping;</li>\n<p>  your own local.conf is never overwritten), raises daemon priority, protects it from the low-memory killer, moves it to</p>\n<p>  the foreground cpuset and shrinks the zt tun queue. Optional \"Keep awake\" holds a wakelock + Wi-Fi low-latency mode.</p>",
+  "homepageUrl": "https://github.com/iqbaldalban-93/zerotier-ksu",
+  "sourceUrl": "https://github.com/iqbaldalban-93/zerotier-ksu",
+  "url": "https://github.com/iqbaldalban-93/zerotier-ksu",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-10-30T18:00:30Z",
+    "downloadUrl": "https://github.com/iqbaldalban-93/zerotier-ksu/releases/download/v1.0.0/zerotier-ksu.v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-10-30T18:00:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zerotier-ksu.v1.0.0.zip",
+          "downloadUrl": "https://github.com/iqbaldalban-93/zerotier-ksu/releases/download/v1.0.0/zerotier-ksu.v1.0.0.zip",
+          "size": 2943648,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

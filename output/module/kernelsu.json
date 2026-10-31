@@ -1,0 +1,436 @@
+{
+  "readme": "**English** | [Español](README_ES.md) | [简体中文](README_CN.md) | [繁體中文](README_TW.md) | [日本語](README_JP.md) | [한국어](README_KR.md) | [Polski](README_PL.md) | [Português (Brasil)](README_PT-BR.md) | [Türkçe](README_TR.md) | [Русский](README_RU.md) | [Tiếng Việt](README_VI.md) | [Indonesia](README_ID.md) | [עברית](README_IW.md) | [हिंदी](README_IN.md) | [Italiano](README_IT.md)\n\n# KernelSU\n\n<img src=\"https://kernelsu.org/logo.png\" style=\"width: 96px;\" alt=\"logo\">\n\nA kernel-based root solution for Android devices.\n\n[![Latest release](https://img.shields.io/github/v/release/tiann/KernelSU?label=Release&logo=github)](https://github.com/tiann/KernelSU/releases/latest)\n[![Weblate](https://img.shields.io/badge/Localization-Weblate-teal?logo=weblate)](https://hosted.weblate.org/engage/kernelsu)\n[![Channel](https://img.shields.io/badge/Follow-Telegram-blue.svg?logo=telegram)](https://t.me/KernelSU)\n[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)\n[![GitHub License](https://img.shields.io/github/license/tiann/KernelSU?logo=gnu)](/LICENSE)\n\n## Features\n\n1. Kernel-based `su` and root access management.\n2. Module system based on [metamodules](https://kernelsu.org/guide/metamodule.html): Pluggable infrastructure for systemless modifications.\n3. [App Profile](https://kernelsu.org/guide/app-profile.html): Lock up the root power in a cage.\n\n## Compatibility state\n\nKernelSU officially supports Android GKI 2.0 devices (kernel 5.10+). Older kernels (4.14+) are also supported, but the kernel will need to be built manually.\n\nWith this, WSA, ChromeOS, and container-based Android are all supported.\n\nCurrently, the `arm64-v8a` and `x86_64` architectures are supported.\n\n> [!CAUTION]\n> Recent kernel versions have implemented a breaking change causing KernelSU to fail and potentially trigger a kernel panic on `x86_64`! Check the website for more info!\n\n## Usage\n\n- [Installation](https://kernelsu.org/guide/installation.html)\n- [How to build](https://kernelsu.org/guide/how-to-build.html)\n- [Official website](https://kernelsu.org/)\n\n## Translation\n\nTo help translate KernelSU, we no longer accept translation contributions via Weblate. All translations are now handled using LLMs.\n\nIf you would like to add support for a new language, feel free to open a PR. Please note that modifications to existing English and Chinese translations are not accepted.\n\n## Discussion\n\n- Telegram: [@KernelSU](https://t.me/KernelSU)\n\n## Security\n\nFor information on reporting security vulnerabilities in KernelSU, see [SECURITY.md](/SECURITY.md).\n\n## License\n\n- Files under the `kernel` directory are [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).\n- All other parts except the `kernel` directory are [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).\n\n## Credits\n\n- [Kernel-Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/): The KernelSU idea.\n- [Magisk](https://github.com/topjohnwu/Magisk): The powerful root tool.\n- [genuine](https://github.com/brevent/genuine/): APK v2 signature validation.\n- [Diamorphine](https://github.com/m0nad/Diamorphine): Some rootkit skills.\n",
+  "readmeHTML": "<p><b>English</b> | <a href=\"README_ES.md\">Español</a> | <a href=\"README_CN.md\">简体中文</a> | <a href=\"README_TW.md\">繁體中文</a> | <a href=\"README_JP.md\">日本語</a> | <a href=\"README_KR.md\">한국어</a> | <a href=\"README_PL.md\">Polski</a> | <a href=\"README_PT-BR.md\">Português (Brasil)</a> | <a href=\"README_TR.md\">Türkçe</a> | <a href=\"README_RU.md\">Русский</a> | <a href=\"README_VI.md\">Tiếng Việt</a> | <a href=\"README_ID.md\">Indonesia</a> | <a href=\"README_IW.md\">עברית</a> | <a href=\"README_IN.md\">हिंदी</a> | <a href=\"README_IT.md\">Italiano</a></p>\n\n<h1>KernelSU</h1>\n\n<p><img src=\"https://kernelsu.org/logo.png\" style=\"width: 96px;\" alt=\"logo\"></p>\n\n<p>A kernel-based root solution for Android devices.</p>\n\n<p><a href=\"https://img.shields.io/github/v/release/tiann/KernelSU?label=Release&logo=github\">![Latest release</a>](https://github.com/tiann/KernelSU/releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/Localization-Weblate-teal?logo=weblate\">![Weblate</a>](https://hosted.weblate.org/engage/kernelsu)</p>\n<p><a href=\"https://img.shields.io/badge/Follow-Telegram-blue.svg?logo=telegram\">![Channel</a>](https://t.me/KernelSU)</p>\n<p><a href=\"https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu\">![License: GPL v2</a>](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)</p>\n<p><a href=\"https://img.shields.io/github/license/tiann/KernelSU?logo=gnu\">![GitHub License</a>](/LICENSE)</p>\n\n<h2>Features</h2>\n\n<li>Kernel-based `su` and root access management.</li>\n<li>Module system based on [metamodules](https://kernelsu.org/guide/metamodule.html): Pluggable infrastructure for systemless modifications.</li>\n<li>[App Profile](https://kernelsu.org/guide/app-profile.html): Lock up the root power in a cage.</li>\n\n<h2>Compatibility state</h2>\n\n<p>KernelSU officially supports Android GKI 2.0 devices (kernel 5.10+). Older kernels (4.14+) are also supported, but the kernel will need to be built manually.</p>\n\n<p>With this, WSA, ChromeOS, and container-based Android are all supported.</p>\n\n<p>Currently, the <code>arm64-v8a</code> and <code>x86_64</code> architectures are supported.</p>\n\n<p>> [!CAUTION]</p>\n<p>> Recent kernel versions have implemented a breaking change causing KernelSU to fail and potentially trigger a kernel panic on <code>x86_64</code>! Check the website for more info!</p>\n\n<h2>Usage</h2>\n\n<li>[Installation](https://kernelsu.org/guide/installation.html)</li>\n<li>[How to build](https://kernelsu.org/guide/how-to-build.html)</li>\n<li>[Official website](https://kernelsu.org/)</li>\n\n<h2>Translation</h2>\n\n<p>To help translate KernelSU, we no longer accept translation contributions via Weblate. All translations are now handled using LLMs.</p>\n\n<p>If you would like to add support for a new language, feel free to open a PR. Please note that modifications to existing English and Chinese translations are not accepted.</p>\n\n<h2>Discussion</h2>\n\n<li>Telegram: [@KernelSU](https://t.me/KernelSU)</li>\n\n<h2>Security</h2>\n\n<p>For information on reporting security vulnerabilities in KernelSU, see <a href=\"/SECURITY.md\">SECURITY.md</a>.</p>\n\n<h2>License</h2>\n\n<li>Files under the `kernel` directory are [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).</li>\n<li>All other parts except the `kernel` directory are [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).</li>\n\n<h2>Credits</h2>\n\n<li>[Kernel-Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/): The KernelSU idea.</li>\n<li>[Magisk](https://github.com/topjohnwu/Magisk): The powerful root tool.</li>\n<li>[genuine](https://github.com/brevent/genuine/): APK v2 signature validation.</li>\n<li>[Diamorphine](https://github.com/m0nad/Diamorphine): Some rootkit skills.</li>",
+  "homepageUrl": "https://kernelsu.org",
+  "sourceUrl": "https://github.com/tiann/KernelSU",
+  "url": "https://github.com/tiann/KernelSU",
+  "latestRelease": {
+    "name": "v0.4.0",
+    "version": "v0.4.0",
+    "time": "2023-03-01T10:21:17Z",
+    "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android12-5.10.136_2022-11.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2023-03-01T10:21:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AnyKernel3-android12-5.10.136_2022-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android12-5.10.136_2022-11.zip",
+          "size": 17861916,
+          "downloadCount": 315
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.110_2022-07.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android12-5.10.110_2022-07.zip",
+          "size": 17837056,
+          "downloadCount": 248
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "size": 17372388,
+          "downloadCount": 152
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.101_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android12-5.10.101_2022-05.zip",
+          "size": 17805752,
+          "downloadCount": 1910
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.74_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android13-5.15.74_2022-05.zip",
+          "size": 20329440,
+          "downloadCount": 543
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "size": 17104519,
+          "downloadCount": 346
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.41_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android13-5.15.41_2022-05.zip",
+          "size": 20325157,
+          "downloadCount": 627
+        },
+        {
+          "name": "AnyKernel3-android13-5.10.107_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android13-5.10.107_2022-05.zip",
+          "size": 20116519,
+          "downloadCount": 299
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "size": 17154332,
+          "downloadCount": 234
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.66_2021-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/AnyKernel3-android12-5.10.66_2021-11.zip",
+          "size": 17740509,
+          "downloadCount": 234
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "size": 17133280,
+          "downloadCount": 82
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.110_2022-07-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.110_2022-07-boot.img.gz",
+          "size": 17182557,
+          "downloadCount": 81
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "size": 17401563,
+          "downloadCount": 65
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.136_2022-11-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.136_2022-11-boot.img.gz",
+          "size": 17206957,
+          "downloadCount": 93
+        },
+        {
+          "name": "ksu-10672-Image-android12-5.10.66_2021-11-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.4.0/ksu-10672-Image-android12-5.10.66_2021-11-boot.img.gz",
+          "size": 17090142,
+          "downloadCount": 94
+        }
+      ]
+    },
+    {
+      "name": "v0.3.9",
+      "tagName": "v0.3.9",
+      "publishedAt": "2023-02-22T00:14:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AnyKernel3-android12-5.10.136_2022-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android12-5.10.136_2022-11.zip",
+          "size": 17862550,
+          "downloadCount": 129
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.101_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android12-5.10.101_2022-05.zip",
+          "size": 17805071,
+          "downloadCount": 823
+        },
+        {
+          "name": "KernelSU_v0.3.9-release.apk",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/KernelSU_v0.3.9-release.apk",
+          "size": 6167429,
+          "downloadCount": 2676
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.110_2022-07.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android12-5.10.110_2022-07.zip",
+          "size": 17834944,
+          "downloadCount": 121
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.81_2022-03.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android12-5.10.81_2022-03.zip",
+          "size": 17750034,
+          "downloadCount": 158
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.66_2021-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android12-5.10.66_2021-11.zip",
+          "size": 17741482,
+          "downloadCount": 139
+        },
+        {
+          "name": "AnyKernel3-android13-5.10.149_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android13-5.10.149_2022-05.zip",
+          "size": 20206429,
+          "downloadCount": 94
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.41_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android13-5.15.41_2022-05.zip",
+          "size": 20328062,
+          "downloadCount": 292
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.74_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android13-5.15.74_2022-05.zip",
+          "size": 20326801,
+          "downloadCount": 236
+        },
+        {
+          "name": "ksu-10647-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/ksu-10647-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "size": 17104133,
+          "downloadCount": 203
+        },
+        {
+          "name": "AnyKernel3-android13-5.10.107_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/AnyKernel3-android13-5.10.107_2022-05.zip",
+          "size": 20114550,
+          "downloadCount": 155
+        },
+        {
+          "name": "ksu-10647-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/ksu-10647-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "size": 17134205,
+          "downloadCount": 66
+        },
+        {
+          "name": "ksu-10647-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/ksu-10647-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "size": 17372624,
+          "downloadCount": 85
+        },
+        {
+          "name": "ksu-10647-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/ksu-10647-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "size": 17402077,
+          "downloadCount": 51
+        },
+        {
+          "name": "ksu-10647-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.9/ksu-10647-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "size": 17153290,
+          "downloadCount": 119
+        }
+      ]
+    },
+    {
+      "name": "v0.3.8",
+      "tagName": "v0.3.8",
+      "publishedAt": "2023-02-14T06:05:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AnyKernel3-android12-5.10.81_2022-03.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/AnyKernel3-android12-5.10.81_2022-03.zip",
+          "size": 17748674,
+          "downloadCount": 143
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.74_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/AnyKernel3-android13-5.15.74_2022-05.zip",
+          "size": 20329830,
+          "downloadCount": 163
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.66_2021-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/AnyKernel3-android12-5.10.66_2021-11.zip",
+          "size": 17740312,
+          "downloadCount": 111
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "size": 17152993,
+          "downloadCount": 97
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "size": 17401314,
+          "downloadCount": 49
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.66_2021-11-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.66_2021-11-boot-gz.img.gz",
+          "size": 17041466,
+          "downloadCount": 52
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.110_2022-07-boot-gz.img.gz",
+          "size": 17133438,
+          "downloadCount": 54
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.110_2022-07.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/AnyKernel3-android12-5.10.110_2022-07.zip",
+          "size": 17836663,
+          "downloadCount": 129
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.101_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/AnyKernel3-android12-5.10.101_2022-05.zip",
+          "size": 17804276,
+          "downloadCount": 674
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "size": 17372517,
+          "downloadCount": 67
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.81_2022-03-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.81_2022-03-boot-lz4.img.gz",
+          "size": 17314908,
+          "downloadCount": 47
+        },
+        {
+          "name": "ksu-10614-Image-android13-5.10.107_2022-05-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android13-5.10.107_2022-05-boot.img.gz",
+          "size": 18265053,
+          "downloadCount": 139
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.81_2022-03-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.81_2022-03-boot.img.gz",
+          "size": 17097111,
+          "downloadCount": 57
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.110_2022-07-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.110_2022-07-boot.img.gz",
+          "size": 17182220,
+          "downloadCount": 49
+        },
+        {
+          "name": "ksu-10614-Image-android12-5.10.81_2022-03-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.8/ksu-10614-Image-android12-5.10.81_2022-03-boot-gz.img.gz",
+          "size": 17048992,
+          "downloadCount": 42
+        }
+      ]
+    },
+    {
+      "name": "v0.3.7",
+      "tagName": "v0.3.7",
+      "publishedAt": "2023-02-08T15:13:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AnyKernel3-android12-5.10.110_2022-07.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android12-5.10.110_2022-07.zip",
+          "size": 17834959,
+          "downloadCount": 128
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.81_2022-03.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android12-5.10.81_2022-03.zip",
+          "size": 17749432,
+          "downloadCount": 139
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.101_2022-05-boot.img.gz",
+          "size": 17150511,
+          "downloadCount": 201
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.74_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android13-5.15.74_2022-05.zip",
+          "size": 20326011,
+          "downloadCount": 198
+        },
+        {
+          "name": "AnyKernel3-android12-5.10.136_2022-11.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android12-5.10.136_2022-11.zip",
+          "size": 17841292,
+          "downloadCount": 125
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.101_2022-05-boot-gz.img.gz",
+          "size": 17102252,
+          "downloadCount": 374
+        },
+        {
+          "name": "AnyKernel3-android13-5.10.149_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android13-5.10.149_2022-05.zip",
+          "size": 20204835,
+          "downloadCount": 108
+        },
+        {
+          "name": "AnyKernel3-android13-5.15.41_2022-05.zip",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/AnyKernel3-android13-5.15.41_2022-05.zip",
+          "size": 20326748,
+          "downloadCount": 198
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.66_2021-11-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.66_2021-11-boot-lz4.img.gz",
+          "size": 17301275,
+          "downloadCount": 53
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.101_2022-05-boot-lz4.img.gz",
+          "size": 17371690,
+          "downloadCount": 102
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.110_2022-07-boot-lz4.img.gz",
+          "size": 17401300,
+          "downloadCount": 41
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.81_2022-03-boot.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.81_2022-03-boot.img.gz",
+          "size": 17097007,
+          "downloadCount": 77
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.136_2022-11-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.136_2022-11-boot-lz4.img.gz",
+          "size": 17411138,
+          "downloadCount": 40
+        },
+        {
+          "name": "ksu-10581-Image-android12-5.10.81_2022-03-boot-lz4.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android12-5.10.81_2022-03-boot-lz4.img.gz",
+          "size": 17313857,
+          "downloadCount": 65
+        },
+        {
+          "name": "ksu-10581-Image-android13-5.10.107_2022-05-boot-gz.img.gz",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.7/ksu-10581-Image-android13-5.10.107_2022-05-boot-gz.img.gz",
+          "size": 18225002,
+          "downloadCount": 48
+        }
+      ]
+    },
+    {
+      "name": "v0.3.6",
+      "tagName": "v0.3.6",
+      "publishedAt": "2023-02-03T05:00:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU_v0.3.6-26-gb975950-release.apk",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.6/KernelSU_v0.3.6-26-gb975950-release.apk",
+          "size": 6066133,
+          "downloadCount": 3320
+        }
+      ]
+    },
+    {
+      "name": "v0.3.4",
+      "tagName": "v0.3.4",
+      "publishedAt": "2023-01-28T03:01:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "KernelSU_v0.3.4-4-g6e8771b-release.apk",
+          "downloadUrl": "https://github.com/tiann/KernelSU/releases/download/v0.3.4/KernelSU_v0.3.4-4-g6e8771b-release.apk",
+          "size": 3379853,
+          "downloadCount": 4763
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

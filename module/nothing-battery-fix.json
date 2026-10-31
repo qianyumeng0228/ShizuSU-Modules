@@ -1,0 +1,30 @@
+{
+  "readme": "# Nothing Battery Icon Fix\n\nA KernelSU/Magisk module that reverts the Nothing Phone battery percentage style to the \"Outside\" style\n\n## 🧠 How it Works\n\nThe new battery icon style is controlled by a single boolean value in the `BatteryMeterView` logic. We change the value of this boolean to `false` to revert the battery percentage to the old style\n\n## 🛠️ Build it yourself\n\n### Prerequisites\n\n- JDK 17\n- Python 3 (for zipping script)\n- Android SDK (set `ANDROID_HOME` or create `local.properties`)\n\n### Build\n\n1. Clone this repository.\n2. Run the build script:\n   - **Windows**: `build_module.bat`\n   - **Linux/Mac**: `./gradlew clean :overlay:assembleDebug` then run `python3 create_ksu_zip.py module output.zip` manually.\n\nThe output will create a flashable zip named `NothingBatteryFix.zip`.\n\n## 📦 Installation\n\n1. Flash `NothingBatteryFix.zip` in your root manager (KernelSU/Magisk).\n2. Reboot.\n",
+  "readmeHTML": "<h1>Nothing Battery Icon Fix</h1>\n\n<p>A KernelSU/Magisk module that reverts the Nothing Phone battery percentage style to the \"Outside\" style</p>\n\n<h2>🧠 How it Works</h2>\n\n<p>The new battery icon style is controlled by a single boolean value in the <code>BatteryMeterView</code> logic. We change the value of this boolean to <code>false</code> to revert the battery percentage to the old style</p>\n\n<h2>🛠️ Build it yourself</h2>\n\n<h3>Prerequisites</h3>\n\n<li>JDK 17</li>\n<li>Python 3 (for zipping script)</li>\n<li>Android SDK (set `ANDROID_HOME` or create `local.properties`)</li>\n\n<h3>Build</h3>\n\n<li>Clone this repository.</li>\n<li>Run the build script:</li>\n<p>   - <b>Windows</b>: <code>build_module.bat</code></p>\n<p>   - <b>Linux/Mac</b>: <code>./gradlew clean :overlay:assembleDebug</code> then run <code>python3 create_ksu_zip.py module output.zip</code> manually.</p>\n\n<p>The output will create a flashable zip named <code>NothingBatteryFix.zip</code>.</p>\n\n<h2>📦 Installation</h2>\n\n<li>Flash `NothingBatteryFix.zip` in your root manager (KernelSU/Magisk).</li>\n<li>Reboot.</li>",
+  "homepageUrl": "https://github.com/Farpathan/Nothing-Battery-Fix",
+  "sourceUrl": "https://github.com/Farpathan/Nothing-Battery-Fix",
+  "url": "https://github.com/Farpathan/Nothing-Battery-Fix",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-01-10T17:04:11Z",
+    "downloadUrl": "https://github.com/Farpathan/Nothing-Battery-Fix/releases/download/v1.0.0/NothingBatteryFix.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-01-10T17:04:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NothingBatteryFix.zip",
+          "downloadUrl": "https://github.com/Farpathan/Nothing-Battery-Fix/releases/download/v1.0.0/NothingBatteryFix.zip",
+          "size": 3250,
+          "downloadCount": 155
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

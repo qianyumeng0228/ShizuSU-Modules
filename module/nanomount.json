@@ -1,0 +1,100 @@
+{
+  "readme": "[English](README.md) | [Bahasa Indonesia](README.id.md)\n\n# NanoMount\n\n**A high-performance, ultra-lightweight OverlayFS mount engine for Android.**\n\n![License](https://img.shields.io/badge/License-MIT-blue.svg)\n![Android](https://img.shields.io/badge/Android-10.0%2B-green.svg)\n![Version](https://img.shields.io/badge/Version-2.0-orange.svg)\n![Root](https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red.svg)\n\n## Overview\n\nNanoMount is an ultra-lightweight root module that replaces heavy, traditional bind mounts with a unified, high-performance OverlayFS system. It loads active module files into a temporary RAM staging area (`tmpfs`) and mounts them cleanly over partitions like `/system`, `/vendor`, and `/product` in a single, seamless step.\n\n---\n\n## Why Use NanoMount?\n\n- **Stealth by Design**: Mounts files under hidden paths (like `/dev/my_preload`), bypassing root detection and security checks.\n- **Pure RAM Staging**: Operates entirely in memory (`tmpfs`). Zero disk overhead, no ext4 loop images, and no storage wear.\n- **Sourced Shell Safety**: Fully refactored to execute safely when sourced as `metamount.sh` in KernelSU and APatch.\n- **Optimized & Dynamic**: Features a manager-aware watchdog (8s on KSU/APatch, 35s on Magisk) and eliminates subshell pipelines for faster boot times.\n- **Persistent Diagnostics**: Saves a clean boot diagnostic summary at `/data/adb/nanomount/last_boot.log`.\n\n---\n\n## Requirements\n\n| Requirement | Details |\n|-------------|---------|\n| Android | 10.0+ (API 29+) |\n| Kernel | `CONFIG_OVERLAY_FS=y`, `tmpfs` as valid OverlayFS lower filesystem, & `tmpfs` `security.selinux` xattr support |\n| Root | Magisk, KernelSU, or APatch |\n\n---\n\n## Installation & File Structure\n\n1. Install the ZIP file via your root manager's **Modules** tab.\n2. **Reboot** your device to activate.\n3. Configure settings at: `/data/adb/nanomount/config.sh`\n\n### File Structure\n\n```text\nNanoMount/\n├── META-INF/\n│   └── com/\n│       └── google/\n│           └── android/\n│               ├── update-binary\n│               └── updater-script\n├── config.sh           # user-configurable settings\n├── customize.sh        # install-time compatibility & metamodule setup\n├── module.prop         # module metadata properties\n├── post-fs-data.sh     # core subdirectory mount engine (renamed to metamount.sh on KSU/APatch)\n├── service.sh          # status description updater & diagnostic logger\n├── boot-completed.sh  # boot completion watchdog reset (KSU/APatch)\n└── uninstall.sh        # cleanup script\n```\n\n---\n\n## Limitations & Advanced Configuration\n\n### Known Limitations\nNanoMount mounts modifications at the first-level subdirectory level (e.g., `/system/bin`, `/system/etc`). If another early-boot script or tool has already mounted a filesystem directly over one of these subdirectories before NanoMount runs, the duplicate mount will be skipped for safety. Any modifications inside that specific subdirectory will not be applied (logged to `/dev/kmsg`).\n\n### Conflict Resolution\nIf multiple modules modify the same file (e.g., `/system/etc/hosts`), the last processed file wins in the `tmpfs` staging area:\n*   **Auto Mode**: Processed **alphabetically** by module folder name. The last folder alphabetically wins.\n*   **Manual Mode**: Processed **top-to-bottom** as listed in `/data/adb/nanomount/modules.txt`. The bottom-most module wins.\n\n### Excluding Modules\nTo prevent NanoMount from processing a specific module (e.g., if it is incompatible or manages its own mounting):\n*   Create an empty file named `skip_nanomount` inside that module's folder:\n    `/data/adb/modules/<module-id>/skip_nanomount`\n*   NanoMount will ignore this module and let your root manager handle it normally.\n\n---\n\n## How It Works\n\n```mermaid\nflowchart TD\n    FlashZip([Start: Flash ZIP Module]) --> CheckOverlay{Check CONFIG_OVERLAY_FS?}\n    CheckOverlay -- No --> AbortOverlay[Abort: OverlayFS Required]\n    CheckOverlay -- Yes --> CheckTmpfsBackend{Check Overlay on tmpfs?}\n    \n    CheckTmpfsBackend -- No --> AbortTmpfsBackend[Abort: tmpfs Backend Unsupported]\n    CheckTmpfsBackend -- Yes --> CheckSELinux{Check tmpfs SELinux?}\n    \n    CheckSELinux -- No --> AbortSELinux[Abort: SELinux xattr Unsupported]\n    CheckSELinux -- Yes --> CheckTrusted{Check tmpfs Trusted xattr?}\n    \n    CheckTrusted -- Yes --> FullMode[Install: Full Feature Mode]\n    CheckTrusted -- No --> PureMode[Install: Pure tmpfs Mode]\n    \n    FullMode & PureMode --> ConfigSetup[Setup Config & Complete]\n    ConfigSetup --> BootStart[Device Reboots & Early Boot Post-FS]\n    \n    BootStart --> WatchdogStart[Start Dynamic Watchdog & Check Anti-Bootloop]\n    WatchdogStart --> StagingCreate[Create tmpfs Staging Area]\n    StagingCreate --> ProcessModules[Process Active Modules]\n    ProcessModules --> CopyFiles[Copy Files & Apply SELinux Contexts via Filesystem]\n    CopyFiles --> SkipMount[Touch skip_mount for Modules]\n    SkipMount --> MountOverlay[Mount Overlay at Subdirectory Levels]\n    MountOverlay --> CleanStaging[Lazy Umount Staging Area]\n    CleanStaging --> WatchdogStop[Stop Watchdog & Run service.sh]\n    \n    WatchdogStop --> UILoaded[Android UI Loaded]\n    UILoaded --> UpdateProp[Update module.prop Description]\n    UpdateProp --> WaitBoot[Wait for sys.boot_completed=0]\n    WaitBoot --> ResetAntiBoot[Reset Anti-Bootloop & Save Diagnostic Log]\n    ResetAntiBoot --> Finished([Finished: Running Smoothly])\n\n    %% Custom Styles and Colors (Ultra-Muted Slate Theme)\n    classDef startEnd fill:#1b2c24,stroke:#34d399,stroke-width:1.5px,color:#e6f4ea;\n    classDef fail fill:#2c1b1b,stroke:#f87171,stroke-width:1.5px,color:#fce8e6;\n    classDef decision fill:#2d2216,stroke:#fbbf24,stroke-width:1.5px,color:#fef3c7;\n    classDef process fill:#1e293b,stroke:#475569,stroke-width:1px,color:#f1f5f9;\n    \n    class FlashZip,Finished startEnd;\n    class AbortOverlay,AbortTmpfsBackend,AbortSELinux fail;\n    class CheckOverlay,CheckTmpfsBackend,CheckSELinux,CheckTrusted decision;\n    class FullMode,PureMode,ConfigSetup,BootStart,WatchdogStart,StagingCreate,ProcessModules,CopyFiles,SkipMount,MountOverlay,CleanStaging,WatchdogStop,UILoaded,UpdateProp,WaitBoot,ResetAntiBoot process;\n```\n\n---\n\n## Developer, Credits & License\n\n- **Developer**: [dyokism](https://github.com/dyokism)\n- **Special Thanks**: [bnsmb](https://github.com/bnsmb) for finding the kernel compatibility gap.\n- **License**: MIT\n",
+  "readmeHTML": "<p><a href=\"README.md\">English</a> | <a href=\"README.id.md\">Bahasa Indonesia</a></p>\n\n<h1>NanoMount</h1>\n\n<p><b>A high-performance, ultra-lightweight OverlayFS mount engine for Android.</b></p>\n\n<p>!<a href=\"https://img.shields.io/badge/License-MIT-blue.svg\">License</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Android-10.0%2B-green.svg\">Android</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Version-2.0-orange.svg\">Version</a></p>\n<p>!<a href=\"https://img.shields.io/badge/Root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red.svg\">Root</a></p>\n\n<h2>Overview</h2>\n\n<p>NanoMount is an ultra-lightweight root module that replaces heavy, traditional bind mounts with a unified, high-performance OverlayFS system. It loads active module files into a temporary RAM staging area (<code>tmpfs</code>) and mounts them cleanly over partitions like <code>/system</code>, <code>/vendor</code>, and <code>/product</code> in a single, seamless step.</p>\n\n<p>---</p>\n\n<h2>Why Use NanoMount?</h2>\n\n<li>**Stealth by Design**: Mounts files under hidden paths (like `/dev/my_preload`), bypassing root detection and security checks.</li>\n<li>**Pure RAM Staging**: Operates entirely in memory (`tmpfs`). Zero disk overhead, no ext4 loop images, and no storage wear.</li>\n<li>**Sourced Shell Safety**: Fully refactored to execute safely when sourced as `metamount.sh` in KernelSU and APatch.</li>\n<li>**Optimized & Dynamic**: Features a manager-aware watchdog (8s on KSU/APatch, 35s on Magisk) and eliminates subshell pipelines for faster boot times.</li>\n<li>**Persistent Diagnostics**: Saves a clean boot diagnostic summary at `/data/adb/nanomount/last_boot.log`.</li>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<p>| Requirement | Details |</p>\n<p>|-------------|---------|</p>\n<p>| Android | 10.0+ (API 29+) |</p>\n<p>| Kernel | <code>CONFIG_OVERLAY_FS=y</code>, <code>tmpfs</code> as valid OverlayFS lower filesystem, & <code>tmpfs</code> <code>security.selinux</code> xattr support |</p>\n<p>| Root | Magisk, KernelSU, or APatch |</p>\n\n<p>---</p>\n\n<h2>Installation & File Structure</h2>\n\n<li>Install the ZIP file via your root manager's **Modules** tab.</li>\n<li>**Reboot** your device to activate.</li>\n<li>Configure settings at: `/data/adb/nanomount/config.sh`</li>\n\n<h3>File Structure</h3>\n\n<pre>NanoMount/\n├── META-INF/\n│   └── com/\n│       └── google/\n│           └── android/\n│               ├── update-binary\n│               └── updater-script\n├── config.sh           # user-configurable settings\n├── customize.sh        # install-time compatibility &amp; metamodule setup\n├── module.prop         # module metadata properties\n├── post-fs-data.sh     # core subdirectory mount engine (renamed to metamount.sh on KSU/APatch)\n├── service.sh          # status description updater &amp; diagnostic logger\n├── boot-completed.sh  # boot completion watchdog reset (KSU/APatch)\n└── uninstall.sh        # cleanup script</pre>\n\n<p>---</p>\n\n<h2>Limitations & Advanced Configuration</h2>\n\n<h3>Known Limitations</h3>\n<p>NanoMount mounts modifications at the first-level subdirectory level (e.g., <code>/system/bin</code>, <code>/system/etc</code>). If another early-boot script or tool has already mounted a filesystem directly over one of these subdirectories before NanoMount runs, the duplicate mount will be skipped for safety. Any modifications inside that specific subdirectory will not be applied (logged to <code>/dev/kmsg</code>).</p>\n\n<h3>Conflict Resolution</h3>\n<p>If multiple modules modify the same file (e.g., <code>/system/etc/hosts</code>), the last processed file wins in the <code>tmpfs</code> staging area:</p>\n<li>  **Auto Mode**: Processed **alphabetically** by module folder name. The last folder alphabetically wins.</li>\n<li>  **Manual Mode**: Processed **top-to-bottom** as listed in `/data/adb/nanomount/modules.txt`. The bottom-most module wins.</li>\n\n<h3>Excluding Modules</h3>\n<p>To prevent NanoMount from processing a specific module (e.g., if it is incompatible or manages its own mounting):</p>\n<li>  Create an empty file named `skip_nanomount` inside that module's folder:</li>\n<p>    <code>/data/adb/modules/<module-id>/skip_nanomount</code></p>\n<li>  NanoMount will ignore this module and let your root manager handle it normally.</li>\n\n<p>---</p>\n\n<h2>How It Works</h2>\n\n<pre>flowchart TD\n    FlashZip([Start: Flash ZIP Module]) --&gt; CheckOverlay{Check CONFIG_OVERLAY_FS?}\n    CheckOverlay -- No --&gt; AbortOverlay[Abort: OverlayFS Required]\n    CheckOverlay -- Yes --&gt; CheckTmpfsBackend{Check Overlay on tmpfs?}\n\n    CheckTmpfsBackend -- No --&gt; AbortTmpfsBackend[Abort: tmpfs Backend Unsupported]\n    CheckTmpfsBackend -- Yes --&gt; CheckSELinux{Check tmpfs SELinux?}\n\n    CheckSELinux -- No --&gt; AbortSELinux[Abort: SELinux xattr Unsupported]\n    CheckSELinux -- Yes --&gt; CheckTrusted{Check tmpfs Trusted xattr?}\n\n    CheckTrusted -- Yes --&gt; FullMode[Install: Full Feature Mode]\n    CheckTrusted -- No --&gt; PureMode[Install: Pure tmpfs Mode]\n\n    FullMode &amp; PureMode --&gt; ConfigSetup[Setup Config &amp; Complete]\n    ConfigSetup --&gt; BootStart[Device Reboots &amp; Early Boot Post-FS]\n\n    BootStart --&gt; WatchdogStart[Start Dynamic Watchdog &amp; Check Anti-Bootloop]\n    WatchdogStart --&gt; StagingCreate[Create tmpfs Staging Area]\n    StagingCreate --&gt; ProcessModules[Process Active Modules]\n    ProcessModules --&gt; CopyFiles[Copy Files &amp; Apply SELinux Contexts via Filesystem]\n    CopyFiles --&gt; SkipMount[Touch skip_mount for Modules]\n    SkipMount --&gt; MountOverlay[Mount Overlay at Subdirectory Levels]\n    MountOverlay --&gt; CleanStaging[Lazy Umount Staging Area]\n    CleanStaging --&gt; WatchdogStop[Stop Watchdog &amp; Run service.sh]\n\n    WatchdogStop --&gt; UILoaded[Android UI Loaded]\n    UILoaded --&gt; UpdateProp[Update module.prop Description]\n    UpdateProp --&gt; WaitBoot[Wait for sys.boot_completed=0]\n    WaitBoot --&gt; ResetAntiBoot[Reset Anti-Bootloop &amp; Save Diagnostic Log]\n    ResetAntiBoot --&gt; Finished([Finished: Running Smoothly])\n\n    %% Custom Styles and Colors (Ultra-Muted Slate Theme)\n    classDef startEnd fill:#1b2c24,stroke:#34d399,stroke-width:1.5px,color:#e6f4ea;\n    classDef fail fill:#2c1b1b,stroke:#f87171,stroke-width:1.5px,color:#fce8e6;\n    classDef decision fill:#2d2216,stroke:#fbbf24,stroke-width:1.5px,color:#fef3c7;\n    classDef process fill:#1e293b,stroke:#475569,stroke-width:1px,color:#f1f5f9;\n\n    class FlashZip,Finished startEnd;\n    class AbortOverlay,AbortTmpfsBackend,AbortSELinux fail;\n    class CheckOverlay,CheckTmpfsBackend,CheckSELinux,CheckTrusted decision;\n    class FullMode,PureMode,ConfigSetup,BootStart,WatchdogStart,StagingCreate,ProcessModules,CopyFiles,SkipMount,MountOverlay,CleanStaging,WatchdogStop,UILoaded,UpdateProp,WaitBoot,ResetAntiBoot process;</pre>\n\n<p>---</p>\n\n<h2>Developer, Credits & License</h2>\n\n<li>**Developer**: [dyokism](https://github.com/dyokism)</li>\n<li>**Special Thanks**: [bnsmb](https://github.com/bnsmb) for finding the kernel compatibility gap.</li>\n<li>**License**: MIT</li>",
+  "homepageUrl": "https://github.com/dyokism/NanoMount",
+  "sourceUrl": "https://github.com/dyokism/NanoMount",
+  "url": "https://github.com/dyokism/NanoMount",
+  "latestRelease": {
+    "name": "2.0",
+    "version": "2.0",
+    "time": "2026-06-04T11:36:34Z",
+    "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/2.0/NanoMount.zip"
+  },
+  "releases": [
+    {
+      "name": "2.0",
+      "tagName": "2.0",
+      "publishedAt": "2026-06-04T11:36:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/2.0/NanoMount.zip",
+          "size": 9964,
+          "downloadCount": 863
+        }
+      ]
+    },
+    {
+      "name": "1.4",
+      "tagName": "1.4",
+      "publishedAt": "2026-06-02T02:16:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount-v1.4.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/1.4/NanoMount-v1.4.zip",
+          "size": 8562,
+          "downloadCount": 52
+        }
+      ]
+    },
+    {
+      "name": "1.3",
+      "tagName": "1.3",
+      "publishedAt": "2026-05-31T04:35:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount-v1.3.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/1.3/NanoMount-v1.3.zip",
+          "size": 8302,
+          "downloadCount": 30
+        }
+      ]
+    },
+    {
+      "name": "1.2",
+      "tagName": "1.2",
+      "publishedAt": "2026-05-28T13:17:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount-v1.2.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/1.2/NanoMount-v1.2.zip",
+          "size": 8475,
+          "downloadCount": 52
+        }
+      ]
+    },
+    {
+      "name": "1.1",
+      "tagName": "1.1",
+      "publishedAt": "2026-05-28T03:37:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount-v1.1.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/1.1/NanoMount-v1.1.zip",
+          "size": 7986,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "1.0",
+      "tagName": "1.0",
+      "publishedAt": "2026-05-24T13:47:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "NanoMount-v1.0.zip",
+          "downloadUrl": "https://github.com/dyokism/NanoMount/releases/download/1.0/NanoMount-v1.0.zip",
+          "size": 7440,
+          "downloadCount": 12
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

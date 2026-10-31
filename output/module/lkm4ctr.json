@@ -1,0 +1,326 @@
+{
+  "readme": "# lkm4ctr\n\n`lkm4ctr` automatically loads `lkm4ctr.ko` to enable Docker and containers on all currently released arm64 Android GKI KMIs; no custom kernel flash. The module is intended for rooted devices and must match the device KMI exactly.\n\nSee [copying.txt](copying.txt) for the project and vendored-source license terms.\n\n## Start here\n\n1. Check the device kernel: `uname -a`\n2. Either download the matching `lkm4ctr-4.0.5-<kmi>-arm64.ko` release asset or install `lkm4ctr-kernelsu-module.zip` in KernelSU; the KernelSU module selects the matching KMI automatically\n3. Install `fuse-overlayfs` and configure Docker to use it by default (see the user manual)\n4. For a standalone `.ko` install, load it as root: `sudo insmod /path/to/lkm4ctr-4.0.5-<matching-kmi>-arm64.ko` (KernelSU installs and loads the bundled module itself)\n5. Start Docker: `sudo dockerd --config-file=\"$PREFIX/etc/docker/daemon.json\" --bridge=none --experimental`\n6. Test a container: `sudo docker run --network=host --rm -it docker.io/library/alpine:latest /bin/sh`\n\n`NET_NS` is currently bookkeeping-only, so host networking is required for network access. Read the manual before loading a module on a real device.\n\nThe KernelSU ZIP includes every KMI build and `lkm4ctr_checker`, enables boot auto-load by default, and provides an action button plus a multilingual WebUI for module control and checker output. Published releases include an update feed so KernelSU Manager can offer in-app updates when `versionCode` increases.\n\n## Documentation\n\n- [English user manual](docs/en/USER_GUIDE.md) · [简体中文](docs/zh-hans/USER_GUIDE.md) · [繁體中文](docs/zh-hant/USER_GUIDE.md)\n- [English architecture and developer documentation](docs/en/architecture/GLUE.md)\n- [English checker documentation](docs/en/developer/CHECKER.md)\n- [English vendor-kernel documentation](docs/en/developer/VENDOR_KERNEL.md)\n- [简体中文文档索引](docs/zh-hans/README.md) · [繁體中文文件索引](docs/zh-hant/README.md)\n\n`AGENTS.md` is the repository's contributor/agent contract and intentionally remains at the repository root.\n",
+  "readmeHTML": "<h1>lkm4ctr</h1>\n\n<p><code>lkm4ctr</code> automatically loads <code>lkm4ctr.ko</code> to enable Docker and containers on all currently released arm64 Android GKI KMIs; no custom kernel flash. The module is intended for rooted devices and must match the device KMI exactly.</p>\n\n<p>See <a href=\"copying.txt\">copying.txt</a> for the project and vendored-source license terms.</p>\n\n<h2>Start here</h2>\n\n<li>Check the device kernel: `uname -a`</li>\n<li>Either download the matching `lkm4ctr-4.0.5-<kmi>-arm64.ko` release asset or install `lkm4ctr-kernelsu-module.zip` in KernelSU; the KernelSU module selects the matching KMI automatically</li>\n<li>Install `fuse-overlayfs` and configure Docker to use it by default (see the user manual)</li>\n<li>For a standalone `.ko` install, load it as root: `sudo insmod /path/to/lkm4ctr-4.0.5-<matching-kmi>-arm64.ko` (KernelSU installs and loads the bundled module itself)</li>\n<li>Start Docker: `sudo dockerd --config-file=\"$PREFIX/etc/docker/daemon.json\" --bridge=none --experimental`</li>\n<li>Test a container: `sudo docker run --network=host --rm -it docker.io/library/alpine:latest /bin/sh`</li>\n\n<p><code>NET_NS</code> is currently bookkeeping-only, so host networking is required for network access. Read the manual before loading a module on a real device.</p>\n\n<p>The KernelSU ZIP includes every KMI build and <code>lkm4ctr_checker</code>, enables boot auto-load by default, and provides an action button plus a multilingual WebUI for module control and checker output. Published releases include an update feed so KernelSU Manager can offer in-app updates when <code>versionCode</code> increases.</p>\n\n<h2>Documentation</h2>\n\n<li>[English user manual](docs/en/USER_GUIDE.md) · [简体中文](docs/zh-hans/USER_GUIDE.md) · [繁體中文](docs/zh-hant/USER_GUIDE.md)</li>\n<li>[English architecture and developer documentation](docs/en/architecture/GLUE.md)</li>\n<li>[English checker documentation](docs/en/developer/CHECKER.md)</li>\n<li>[English vendor-kernel documentation](docs/en/developer/VENDOR_KERNEL.md)</li>\n<li>[简体中文文档索引](docs/zh-hans/README.md) · [繁體中文文件索引](docs/zh-hant/README.md)</li>\n\n<p><code>AGENTS.md</code> is the repository's contributor/agent contract and intentionally remains at the repository root.</p>",
+  "homepageUrl": "https://github.com/cyanmint/lkm4ctr",
+  "sourceUrl": "https://github.com/cyanmint/lkm4ctr",
+  "url": "https://github.com/cyanmint/lkm4ctr",
+  "latestRelease": {
+    "name": "4.0.5",
+    "version": "4.0.5",
+    "time": "2026-10-17T16:50:14Z",
+    "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-kernelsu-module.zip"
+  },
+  "releases": [
+    {
+      "name": "4.0.5",
+      "tagName": "4.0.5",
+      "publishedAt": "2026-10-17T16:50:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "lkm4ctr-4.0.5-android14-6.1-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android14-6.1-arm64.ko",
+          "size": 11394032,
+          "downloadCount": 17
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android13-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android13-5.10-arm64.ko",
+          "size": 14378632,
+          "downloadCount": 3
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android13-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android13-5.15-arm64.ko",
+          "size": 15022256,
+          "downloadCount": 14
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android14-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android14-5.15-arm64.ko",
+          "size": 15340440,
+          "downloadCount": 2
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android12-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android12-5.10-arm64.ko",
+          "size": 14794048,
+          "downloadCount": 27
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android15-6.6-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android15-6.6-arm64.ko",
+          "size": 6528128,
+          "downloadCount": 28
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android16-6.12-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android16-6.12-arm64.ko",
+          "size": 8087384,
+          "downloadCount": 13
+        },
+        {
+          "name": "lkm4ctr-4.0.5-android17-6.18-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-4.0.5-android17-6.18-arm64.ko",
+          "size": 8627296,
+          "downloadCount": 1
+        },
+        {
+          "name": "lkm4ctr-kernelsu-module.zip",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr-kernelsu-module.zip",
+          "size": 27300879,
+          "downloadCount": 413
+        },
+        {
+          "name": "lkm4ctr_checker-4.0.5-arm64",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/lkm4ctr_checker-4.0.5-arm64",
+          "size": 851184,
+          "downloadCount": 34
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.5/update.json",
+          "size": 153,
+          "downloadCount": 2413
+        }
+      ]
+    },
+    {
+      "name": "4.0.4",
+      "tagName": "4.0.4",
+      "publishedAt": "2026-10-15T01:54:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "lkm4ctr-android14-6.1-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android14-6.1-arm64.ko",
+          "size": 10944408,
+          "downloadCount": 10
+        },
+        {
+          "name": "lkm4ctr-android14-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android14-5.15-arm64.ko",
+          "size": 14792536,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android12-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android12-5.10-arm64.ko",
+          "size": 14199128,
+          "downloadCount": 3
+        },
+        {
+          "name": "lkm4ctr-android13-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android13-5.15-arm64.ko",
+          "size": 14510800,
+          "downloadCount": 2
+        },
+        {
+          "name": "lkm4ctr-android13-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android13-5.10-arm64.ko",
+          "size": 13819544,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android15-6.6-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android15-6.6-arm64.ko",
+          "size": 6231800,
+          "downloadCount": 3
+        },
+        {
+          "name": "lkm4ctr-android16-6.12-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android16-6.12-arm64.ko",
+          "size": 7775456,
+          "downloadCount": 2
+        },
+        {
+          "name": "lkm4ctr-android17-6.18-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr-android17-6.18-arm64.ko",
+          "size": 8311088,
+          "downloadCount": 1
+        },
+        {
+          "name": "lkm4ctr_checker-arm64",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.4/lkm4ctr_checker-arm64",
+          "size": 850648,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "4.0.3",
+      "tagName": "4.0.3",
+      "publishedAt": "2026-09-20T13:20:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "lkm4ctr-android13-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android13-5.15-arm64.ko",
+          "size": 14207720,
+          "downloadCount": 13
+        },
+        {
+          "name": "lkm4ctr-android14-6.1-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android14-6.1-arm64.ko",
+          "size": 10880768,
+          "downloadCount": 59
+        },
+        {
+          "name": "lkm4ctr-android13-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android13-5.10-arm64.ko",
+          "size": 13598464,
+          "downloadCount": 3
+        },
+        {
+          "name": "lkm4ctr-android12-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android12-5.10-arm64.ko",
+          "size": 13933728,
+          "downloadCount": 15
+        },
+        {
+          "name": "lkm4ctr-android14-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android14-5.15-arm64.ko",
+          "size": 14500088,
+          "downloadCount": 6
+        },
+        {
+          "name": "lkm4ctr-android15-6.6-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android15-6.6-arm64.ko",
+          "size": 6164360,
+          "downloadCount": 12
+        },
+        {
+          "name": "lkm4ctr-android16-6.12-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr-android16-6.12-arm64.ko",
+          "size": 7713912,
+          "downloadCount": 8
+        },
+        {
+          "name": "lkm4ctr_checker-arm64",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.3/lkm4ctr_checker-arm64",
+          "size": 850584,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "4.0.2",
+      "tagName": "4.0.2",
+      "publishedAt": "2026-07-29T04:15:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "lkm4ctr-android12-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android12-5.10-arm64.ko",
+          "size": 13803224,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android14-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android14-5.15-arm64.ko",
+          "size": 14357560,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android13-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android13-5.15-arm64.ko",
+          "size": 14071600,
+          "downloadCount": 1
+        },
+        {
+          "name": "lkm4ctr-android14-6.1-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android14-6.1-arm64.ko",
+          "size": 10768608,
+          "downloadCount": 2
+        },
+        {
+          "name": "lkm4ctr-android13-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android13-5.10-arm64.ko",
+          "size": 13463536,
+          "downloadCount": 1
+        },
+        {
+          "name": "lkm4ctr-android16-6.12-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android16-6.12-arm64.ko",
+          "size": 7653600,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr_checker-arm64",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr_checker-arm64",
+          "size": 850584,
+          "downloadCount": 2
+        },
+        {
+          "name": "lkm4ctr-android15-6.6-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.2/lkm4ctr-android15-6.6-arm64.ko",
+          "size": 6104776,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "4.0.1",
+      "tagName": "4.0.1",
+      "publishedAt": "2026-07-27T01:45:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "lkm4ctr-android13-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android13-5.10-arm64.ko",
+          "size": 8842328,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android14-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android14-5.15-arm64.ko",
+          "size": 9526320,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android12-5.10-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android12-5.10-arm64.ko",
+          "size": 8874368,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android13-5.15-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android13-5.15-arm64.ko",
+          "size": 9248176,
+          "downloadCount": 1
+        },
+        {
+          "name": "lkm4ctr-android14-6.1-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android14-6.1-arm64.ko",
+          "size": 7427592,
+          "downloadCount": 4
+        },
+        {
+          "name": "lkm4ctr-android15-6.6-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android15-6.6-arm64.ko",
+          "size": 4174520,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr-android16-6.12-arm64.ko",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr-android16-6.12-arm64.ko",
+          "size": 4877440,
+          "downloadCount": 0
+        },
+        {
+          "name": "lkm4ctr_checker-arm64",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/lkm4ctr_checker-arm64",
+          "size": 850584,
+          "downloadCount": 1
+        },
+        {
+          "name": "redroid-test-disk-a.ext4.zst",
+          "downloadUrl": "https://github.com/cyanmint/lkm4ctr/releases/download/4.0.1/redroid-test-disk-a.ext4.zst",
+          "size": 802556081,
+          "downloadCount": 39
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

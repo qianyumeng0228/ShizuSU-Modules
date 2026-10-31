@@ -1,0 +1,30 @@
+{
+  "readme": "# OyoksAG\n\nSystemless [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome) untuk KernelSU/Magisk. Jalan otomatis saat boot, redirect semua traffic DNS port 53 ke AdGuardHome, dan bisa pakai filter list AdGuard mentah (`||domain.com^`) lewat Web UI.\n\n## Fitur\n- **Systemless** - Tidak mengganti file sistem, aman di KernelSU\n- **Auto-start** - Otomatis jalan saat boot via `service.sh`\n- **DNS Redirect** - Redirect port 53 (UDP/TCP) ke `127.0.0.1:5353` via iptables\n- **Web UI** - Akses di `http://127.0.0.1:3000` untuk setup & konfigurasi\n- **Custom Filter Lists** - Bisa pakai rule AdGuard, Adblock Plus, dll\n- **Query Log & Statistics** - Lihat trafik DNS yang diblokir/diizinkan\n- **Client Whitelisting** - Bisa whitelist perangkat tertentu\n\n## Instalasi\n1. Download `oyoksag.zip` dari [Releases](https://github.com/vhio/oyoksAG/releases)\n2. Install via **KernelSU Manager > Modules > Install from storage**\n3. Reboot perangkat\n4. Buka browser & akses `http://127.0.0.1:3000`\n5. Ikuti wizard setup awal AdGuardHome\n\n## Penggunaan\n- **Web UI**: `http://127.0.0.1:3000`\n- **DNS Port**: `5353` (redirect dari port 53)\n- **Log**: `/data/adb/modules/oyoksag/agh.log`\n- **Config**: `/data/adb/modules/oyoksag/config/AdGuardHome.yaml`\n\n## Catatan\n- **Setup awal**: Pertama kali buka Web UI wajib buat akun/admin & atur konfigurasi\n- **Private DNS**: Disarankan matikan *Private DNS* (Settings > Network & Internet > Private DNS) biar redirect iptables bisa jalan maksimal\n- **VPN**: Bisa bentrok dengan aplikasi VPN tertentu\n- **IPv6**: Script udah nyediain routing IPv6 via ip6tables\n- **Uninstall**: Saat di-uninstall, modul bakal otomatis hapus rules iptables\n\n## Kredit\n- [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)\n",
+  "readmeHTML": "<h1>OyoksAG</h1>\n\n<p>Systemless <a href=\"https://github.com/AdguardTeam/AdGuardHome\">AdGuardHome</a> untuk KernelSU/Magisk. Jalan otomatis saat boot, redirect semua traffic DNS port 53 ke AdGuardHome, dan bisa pakai filter list AdGuard mentah (<code>||domain.com^</code>) lewat Web UI.</p>\n\n<h2>Fitur</h2>\n<li>**Systemless** - Tidak mengganti file sistem, aman di KernelSU</li>\n<li>**Auto-start** - Otomatis jalan saat boot via `service.sh`</li>\n<li>**DNS Redirect** - Redirect port 53 (UDP/TCP) ke `127.0.0.1:5353` via iptables</li>\n<li>**Web UI** - Akses di `http://127.0.0.1:3000` untuk setup & konfigurasi</li>\n<li>**Custom Filter Lists** - Bisa pakai rule AdGuard, Adblock Plus, dll</li>\n<li>**Query Log & Statistics** - Lihat trafik DNS yang diblokir/diizinkan</li>\n<li>**Client Whitelisting** - Bisa whitelist perangkat tertentu</li>\n\n<h2>Instalasi</h2>\n<li>Download `oyoksag.zip` dari [Releases](https://github.com/vhio/oyoksAG/releases)</li>\n<li>Install via **KernelSU Manager > Modules > Install from storage**</li>\n<li>Reboot perangkat</li>\n<li>Buka browser & akses `http://127.0.0.1:3000`</li>\n<li>Ikuti wizard setup awal AdGuardHome</li>\n\n<h2>Penggunaan</h2>\n<li>**Web UI**: `http://127.0.0.1:3000`</li>\n<li>**DNS Port**: `5353` (redirect dari port 53)</li>\n<li>**Log**: `/data/adb/modules/oyoksag/agh.log`</li>\n<li>**Config**: `/data/adb/modules/oyoksag/config/AdGuardHome.yaml`</li>\n\n<h2>Catatan</h2>\n<li>**Setup awal**: Pertama kali buka Web UI wajib buat akun/admin & atur konfigurasi</li>\n<li>**Private DNS**: Disarankan matikan *Private DNS* (Settings > Network & Internet > Private DNS) biar redirect iptables bisa jalan maksimal</li>\n<li>**VPN**: Bisa bentrok dengan aplikasi VPN tertentu</li>\n<li>**IPv6**: Script udah nyediain routing IPv6 via ip6tables</li>\n<li>**Uninstall**: Saat di-uninstall, modul bakal otomatis hapus rules iptables</li>\n\n<h2>Kredit</h2>\n<li>[AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)</li>",
+  "homepageUrl": "https://github.com/vhio/oyoksAG",
+  "sourceUrl": "https://github.com/vhio/oyoksAG",
+  "url": "https://github.com/vhio/oyoksAG",
+  "latestRelease": {
+    "name": "v1.0",
+    "version": "v1.0",
+    "time": "2026-10-29T02:37:33Z",
+    "downloadUrl": "https://github.com/vhio/oyoksAG/releases/download/v1.0/oyoksag.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-10-29T02:37:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "oyoksag.zip",
+          "downloadUrl": "https://github.com/vhio/oyoksAG/releases/download/v1.0/oyoksag.zip",
+          "size": 11352162,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

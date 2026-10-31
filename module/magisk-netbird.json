@@ -1,0 +1,154 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"docs/netbird-logo.png\" alt=\"NetBird logo\" width=\"340\">\n</p>\n\n<h1 align=\"center\">Magisk NetBird</h1>\n\n<p align=\"center\">\n  <img alt=\"Release\" src=\"https://img.shields.io/github/v/release/ahsaboy/magisk-netbird?logo=git&logoColor=white\">\n  <img alt=\"Downloads\" src=\"https://img.shields.io/github/downloads/ahsaboy/magisk-netbird/total?logo=github&logoColor=white\">\n  <img alt=\"NetBird\" src=\"https://img.shields.io/github/v/release/netbirdio/netbird?label=NetBird\">\n  <img alt=\"Magisk\" src=\"https://img.shields.io/badge/Magisk-%E2%89%A520.4-green?logo=magisk&logoColor=white\">\n  <img alt=\"Arch\" src=\"https://img.shields.io/badge/arch-arm64%20%7C%20armv7%20%7C%20x86__64-lightgrey?logo=android&logoColor=3C4043\">\n</p>\n\n<p align=\"center\"><b><a href=\"README.md\">English</a> · <a href=\"README.zh-CN.md\">中文</a></b></p>\n\nMinimal Magisk module wrapper for the NetBird CLI daemon. Official NetBird\nbinaries (currently v0.81.4) are bundled for three architectures.\n\nDNS management is disabled by default when joining with `netbird.service up`.\n\n## Download\n\n| Zip | Devices |\n| --- | --- |\n| `magisk-netbird-<version>.zip` | arm64-v8a, armeabi-v7a, and x86_64 |\n\nLatest release: <https://github.com/ahsaboy/magisk-netbird/releases/latest>\n\nThe release ZIP contains all three NetBird binaries and installs on arm64-v8a,\n32-bit ARM, and x86_64. Magisk-compatible managers can check for updates from\nthe module's update information. The ACTION button needs Magisk v28+.\n\n## Usage\n\nConnect and check status:\n\n```sh\nsu -c 'netbird.service up --setup-key <KEY> --management-url <URL>'\nsu -c 'netbird.service status'\nsu -c 'netbird.service down'   # disconnect; daemon stays running\nsu -c 'netbird.service stop'   # stop the daemon\nsu -c 'netbird.service start'\nsu -c 'netbird.service peers'\nsu -c 'netbird.service log --once'\n```\n\nOn KernelSU without a mount metamodule installed, the module's `system/bin`\noverlay is not mounted and `netbird.service` may be missing from `PATH` after\na reboot. The module re-creates `/dev/netbird` and `/dev/netbird.service`\nsymlinks on every boot; use those as a drop-in replacement:\n\n```sh\nsu -c '/dev/netbird.service status'\n```\n\nTo keep the setup key out of shell history and `ps` output, prefer a file:\n\n```sh\nsu -c 'echo -n <KEY> > /data/adb/netbird/setup.key && chmod 600 /data/adb/netbird/setup.key'\nsu -c 'netbird.service up --setup-key-file /data/adb/netbird/setup.key --management-url <URL>'\n```\n\nInspect peers with `netbird.service peers` for connection type, latency, traffic,\nand last-handshake details.\n\nThe module ACTION button is a shortcut for manager users. KernelSU users can open\nthe WebUI for status, routes, health, profiles, and scheduled automation controls.\n`down` disconnects without stopping the daemon or watcher; use `stop` to stop\nthe daemon.\n\n<p align=\"center\">\n  <img src=\"docs/kernelsu-webui.jpg\" alt=\"Magisk NetBird KernelSU WebUI\" width=\"360\">\n</p>\n\n## Configuration\n\nDefaults are set in `netbird/settings.sh`; override any of them via environment\nvariables (environment outranks CLI flags in NetBird):\n\n| Variable | Default | Effect |\n| --- | --- | --- |\n| `NB_DISABLE_DNS` | `true` | Also enforced on `up` via `--disable-dns`. |\n| `NB_DISABLE_IPV6` | `false` | When `true`, `up` appends `--disable-ipv6`; this disables NetBird overlay IPv6 and is not a firewall compatibility workaround. |\n| `NB_DISABLE_FIREWALL` | `false` | When `true`, `up` appends `--disable-firewall` (client stops managing firewall rules). |\n| `NB_FORCE_USERSPACE_FIREWALL` | `auto` | Automatically forced when Android has no usable `ip6tables` nat table; set explicitly to override detection. |\n| `NB_WG_KERNEL_DISABLED` | `auto` | Automatically forced with the userspace-firewall fallback unless explicitly set. |\n| `NB_DISABLE_SSH_CONFIG` | `true` | Skips writing `/etc/ssh/ssh_config.d` (read-only on Android). |\n| `NB_SKIP_NFTABLES_CHECK` | `true` | Skips the nftables probe, which always fails on Android. |\n| `NB_SKIP_DNS_PROBE` | `true` | Skips the local-resolver startup probe. |\n| `NB_NETWORK_MONITOR` | `true` | Upstream defaults to `false` on Linux; enabled for faster reconnects after network switches. |\n| `NB_STATE_DIR` | `/data/adb/netbird` | Writable location for `state.json` / WireGuard keys (upstream default `/var/lib/netbird` does not exist on Android). |\n| `NB_LOG_LEVEL` | `info` | NetBird log level. |\n| `NB_LOG_MAX_SIZE_MB` | `5` | NetBird's own log-rotation cap for `client.log` in MiB (upstream default 15). |\n| `NB_WATCHDOG` | `on` | Watchdog: auto-restart the daemon when its status stops responding; `off` disables. |\n| `NB_WATCHDOG_FAILS` | `3` | Consecutive failed status probes before a restart (30s apart while connected, 300s while disconnected). |\n| `NB_WATCHDOG_MAX_RESTARTS` | `10` | Restart budget; reset after 5 healthy probes. |\n\nAll of the variables above (and any other variable the official client\nsupports) can be persisted in `/data/adb/netbird/.env` as `KEY=VALUE` lines\n(`#` starts a comment); a real environment variable still wins over the file.\nStart from the installed template:\n\n```sh\ncp /data/adb/netbird/netbird.env.example /data/adb/netbird/.env\n```\n\nDaemon-read variables (e.g. `NB_LOG_LEVEL`) apply after the next\n`netbird.service restart`; no reboot is needed. On Android builds without a usable IPv6\n`nat` table, the module automatically enables NetBird's userspace firewall and userspace\nWireGuard so native `ip6tables` initialization cannot block startup.\n\nFlags added by `up` persist in `config.json` and are applied on (re)connect,\nso after changing them run `netbird.service down` followed by\n`netbird.service up` (or `netbird.service restart`).\n\nThe watcher checks daemon process state every 30 seconds. It probes NetBird status\nevery 30 seconds while connected and every 300 seconds after an intentional disconnect;\nthe watchdog restarts an unresponsive daemon after the configured number of failed probes.\n`netbird.service down` only disconnects. `netbird.service stop` stops the daemon, while\n`start` or `up` starts it again. Uninstall removes the module's network rules.\n\n## Dynamic status\n\nWhile the daemon is running, `module.prop` is refreshed periodically. Because module descriptions are single-line metadata, status is shown as compact paired fields such as IP/peers, management/signal, relay/interface, memory, CA count, and refresh time. The peers field carries a direct/relay bracket (`[P3 R1]` = 3 direct, 1 relayed); `WD=n` shows accumulated watchdog restarts.\n\n## Custom CA trust\n\nFor self-hosted NetBird servers with a private CA, place PEM certificates in `/data/adb/netbird/certs/` as `.crt`, `.pem`, or `.cer` files. `/data/adb/netbird/ca.crt` is also loaded automatically. Restart NetBird after changing certificates:\n\n```sh\nsu -c 'netbird.service restart'\nsu -c '/data/adb/netbird/scripts/cert-trust.sh status'\n```\n\nThe module injects `/system/etc/resolv.conf` for the Linux binary runtime. Android's normal app DNS is not changed by this; `netbird.service up` still disables NetBird DNS management with `--disable-dns`.\n\nDirect NetBird commands should include the module daemon address:\n\n```sh\nsu -c 'netbird --daemon-addr unix:///data/adb/netbird/run/netbird.sock status'\n```\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"docs/netbird-logo.png\" alt=\"NetBird logo\" width=\"340\"></p>\n<p></p></p>\n\n<p><h1 align=\"center\">Magisk NetBird</h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <img alt=\"Release\" src=\"https://img.shields.io/github/v/release/ahsaboy/magisk-netbird?logo=git&logoColor=white\"></p>\n<p>  <img alt=\"Downloads\" src=\"https://img.shields.io/github/downloads/ahsaboy/magisk-netbird/total?logo=github&logoColor=white\"></p>\n<p>  <img alt=\"NetBird\" src=\"https://img.shields.io/github/v/release/netbirdio/netbird?label=NetBird\"></p>\n<p>  <img alt=\"Magisk\" src=\"https://img.shields.io/badge/Magisk-%E2%89%A520.4-green?logo=magisk&logoColor=white\"></p>\n<p>  <img alt=\"Arch\" src=\"https://img.shields.io/badge/arch-arm64%20%7C%20armv7%20%7C%20x86__64-lightgrey?logo=android&logoColor=3C4043\"></p>\n<p></p></p>\n\n<p><p align=\"center\"><b><a href=\"README.md\">English</a> · <a href=\"README.zh-CN.md\">中文</a></b></p></p>\n\n<p>Minimal Magisk module wrapper for the NetBird CLI daemon. Official NetBird</p>\n<p>binaries (currently v0.81.4) are bundled for three architectures.</p>\n\n<p>DNS management is disabled by default when joining with <code>netbird.service up</code>.</p>\n\n<h2>Download</h2>\n\n<p>| Zip | Devices |</p>\n<p>| --- | --- |</p>\n<p>| <code>magisk-netbird-<version>.zip</code> | arm64-v8a, armeabi-v7a, and x86_64 |</p>\n\n<p>Latest release: <https://github.com/ahsaboy/magisk-netbird/releases/latest></p>\n\n<p>The release ZIP contains all three NetBird binaries and installs on arm64-v8a,</p>\n<p>32-bit ARM, and x86_64. Magisk-compatible managers can check for updates from</p>\n<p>the module's update information. The ACTION button needs Magisk v28+.</p>\n\n<h2>Usage</h2>\n\n<p>Connect and check status:</p>\n\n<pre>su -c 'netbird.service up --setup-key &lt;KEY&gt; --management-url &lt;URL&gt;'\nsu -c 'netbird.service status'\nsu -c 'netbird.service down'   # disconnect; daemon stays running\nsu -c 'netbird.service stop'   # stop the daemon\nsu -c 'netbird.service start'\nsu -c 'netbird.service peers'\nsu -c 'netbird.service log --once'</pre>\n\n<p>On KernelSU without a mount metamodule installed, the module's <code>system/bin</code></p>\n<p>overlay is not mounted and <code>netbird.service</code> may be missing from <code>PATH</code> after</p>\n<p>a reboot. The module re-creates <code>/dev/netbird</code> and <code>/dev/netbird.service</code></p>\n<p>symlinks on every boot; use those as a drop-in replacement:</p>\n\n<pre>su -c '/dev/netbird.service status'</pre>\n\n<p>To keep the setup key out of shell history and <code>ps</code> output, prefer a file:</p>\n\n<pre>su -c 'echo -n &lt;KEY&gt; &gt; /data/adb/netbird/setup.key &amp;&amp; chmod 600 /data/adb/netbird/setup.key'\nsu -c 'netbird.service up --setup-key-file /data/adb/netbird/setup.key --management-url &lt;URL&gt;'</pre>\n\n<p>Inspect peers with <code>netbird.service peers</code> for connection type, latency, traffic,</p>\n<p>and last-handshake details.</p>\n\n<p>The module ACTION button is a shortcut for manager users. KernelSU users can open</p>\n<p>the WebUI for status, routes, health, profiles, and scheduled automation controls.</p>\n<p><code>down</code> disconnects without stopping the daemon or watcher; use <code>stop</code> to stop</p>\n<p>the daemon.</p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/kernelsu-webui.jpg\" alt=\"Magisk NetBird KernelSU WebUI\" width=\"360\"></p>\n<p></p></p>\n\n<h2>Configuration</h2>\n\n<p>Defaults are set in <code>netbird/settings.sh</code>; override any of them via environment</p>\n<p>variables (environment outranks CLI flags in NetBird):</p>\n\n<p>| Variable | Default | Effect |</p>\n<p>| --- | --- | --- |</p>\n<p>| <code>NB_DISABLE_DNS</code> | <code>true</code> | Also enforced on <code>up</code> via <code>--disable-dns</code>. |</p>\n<p>| <code>NB_DISABLE_IPV6</code> | <code>false</code> | When <code>true</code>, <code>up</code> appends <code>--disable-ipv6</code>; this disables NetBird overlay IPv6 and is not a firewall compatibility workaround. |</p>\n<p>| <code>NB_DISABLE_FIREWALL</code> | <code>false</code> | When <code>true</code>, <code>up</code> appends <code>--disable-firewall</code> (client stops managing firewall rules). |</p>\n<p>| <code>NB_FORCE_USERSPACE_FIREWALL</code> | <code>auto</code> | Automatically forced when Android has no usable <code>ip6tables</code> nat table; set explicitly to override detection. |</p>\n<p>| <code>NB_WG_KERNEL_DISABLED</code> | <code>auto</code> | Automatically forced with the userspace-firewall fallback unless explicitly set. |</p>\n<p>| <code>NB_DISABLE_SSH_CONFIG</code> | <code>true</code> | Skips writing <code>/etc/ssh/ssh_config.d</code> (read-only on Android). |</p>\n<p>| <code>NB_SKIP_NFTABLES_CHECK</code> | <code>true</code> | Skips the nftables probe, which always fails on Android. |</p>\n<p>| <code>NB_SKIP_DNS_PROBE</code> | <code>true</code> | Skips the local-resolver startup probe. |</p>\n<p>| <code>NB_NETWORK_MONITOR</code> | <code>true</code> | Upstream defaults to <code>false</code> on Linux; enabled for faster reconnects after network switches. |</p>\n<p>| <code>NB_STATE_DIR</code> | <code>/data/adb/netbird</code> | Writable location for <code>state.json</code> / WireGuard keys (upstream default <code>/var/lib/netbird</code> does not exist on Android). |</p>\n<p>| <code>NB_LOG_LEVEL</code> | <code>info</code> | NetBird log level. |</p>\n<p>| <code>NB_LOG_MAX_SIZE_MB</code> | <code>5</code> | NetBird's own log-rotation cap for <code>client.log</code> in MiB (upstream default 15). |</p>\n<p>| <code>NB_WATCHDOG</code> | <code>on</code> | Watchdog: auto-restart the daemon when its status stops responding; <code>off</code> disables. |</p>\n<p>| <code>NB_WATCHDOG_FAILS</code> | <code>3</code> | Consecutive failed status probes before a restart (30s apart while connected, 300s while disconnected). |</p>\n<p>| <code>NB_WATCHDOG_MAX_RESTARTS</code> | <code>10</code> | Restart budget; reset after 5 healthy probes. |</p>\n\n<p>All of the variables above (and any other variable the official client</p>\n<p>supports) can be persisted in <code>/data/adb/netbird/.env</code> as <code>KEY=VALUE</code> lines</p>\n<p>(<code>#</code> starts a comment); a real environment variable still wins over the file.</p>\n<p>Start from the installed template:</p>\n\n<pre>cp /data/adb/netbird/netbird.env.example /data/adb/netbird/.env</pre>\n\n<p>Daemon-read variables (e.g. <code>NB_LOG_LEVEL</code>) apply after the next</p>\n<p><code>netbird.service restart</code>; no reboot is needed. On Android builds without a usable IPv6</p>\n<p><code>nat</code> table, the module automatically enables NetBird's userspace firewall and userspace</p>\n<p>WireGuard so native <code>ip6tables</code> initialization cannot block startup.</p>\n\n<p>Flags added by <code>up</code> persist in <code>config.json</code> and are applied on (re)connect,</p>\n<p>so after changing them run <code>netbird.service down</code> followed by</p>\n<p><code>netbird.service up</code> (or <code>netbird.service restart</code>).</p>\n\n<p>The watcher checks daemon process state every 30 seconds. It probes NetBird status</p>\n<p>every 30 seconds while connected and every 300 seconds after an intentional disconnect;</p>\n<p>the watchdog restarts an unresponsive daemon after the configured number of failed probes.</p>\n<p><code>netbird.service down</code> only disconnects. <code>netbird.service stop</code> stops the daemon, while</p>\n<p><code>start</code> or <code>up</code> starts it again. Uninstall removes the module's network rules.</p>\n\n<h2>Dynamic status</h2>\n\n<p>While the daemon is running, <code>module.prop</code> is refreshed periodically. Because module descriptions are single-line metadata, status is shown as compact paired fields such as IP/peers, management/signal, relay/interface, memory, CA count, and refresh time. The peers field carries a direct/relay bracket (<code>[P3 R1]</code> = 3 direct, 1 relayed); <code>WD=n</code> shows accumulated watchdog restarts.</p>\n\n<h2>Custom CA trust</h2>\n\n<p>For self-hosted NetBird servers with a private CA, place PEM certificates in <code>/data/adb/netbird/certs/</code> as <code>.crt</code>, <code>.pem</code>, or <code>.cer</code> files. <code>/data/adb/netbird/ca.crt</code> is also loaded automatically. Restart NetBird after changing certificates:</p>\n\n<pre>su -c 'netbird.service restart'\nsu -c '/data/adb/netbird/scripts/cert-trust.sh status'</pre>\n\n<p>The module injects <code>/system/etc/resolv.conf</code> for the Linux binary runtime. Android's normal app DNS is not changed by this; <code>netbird.service up</code> still disables NetBird DNS management with <code>--disable-dns</code>.</p>\n\n<p>Direct NetBird commands should include the module daemon address:</p>\n\n<pre>su -c 'netbird --daemon-addr unix:///data/adb/netbird/run/netbird.sock status'</pre>",
+  "homepageUrl": "https://github.com/ahsaboy/magisk-netbird",
+  "sourceUrl": "https://github.com/ahsaboy/magisk-netbird",
+  "url": "https://github.com/ahsaboy/magisk-netbird",
+  "latestRelease": {
+    "name": "v1.2.0",
+    "version": "v1.2.0",
+    "time": "2026-09-22T09:11:46Z",
+    "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.2.0/magisk-netbird-arm64-v8a.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-09-22T09:11:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-netbird-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.2.0/magisk-netbird-arm64-v8a.zip",
+          "size": 13995790,
+          "downloadCount": 2
+        },
+        {
+          "name": "magisk-netbird-x86_64.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.2.0/magisk-netbird-x86_64.zip",
+          "size": 15425738,
+          "downloadCount": 0
+        },
+        {
+          "name": "magisk-netbird-armv7.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.2.0/magisk-netbird-armv7.zip",
+          "size": 14565030,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-06-19T17:34:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "checksums.sha256",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.1.0/checksums.sha256",
+          "size": 92,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-NetBird-v1.1.0.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.1.0/Magisk-NetBird-v1.1.0.zip",
+          "size": 13091932,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-06-19T17:53:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "checksums.sha256",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.3/checksums.sha256",
+          "size": 92,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-NetBird-v1.0.3.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.3/Magisk-NetBird-v1.0.3.zip",
+          "size": 13091235,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-06-19T17:28:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-NetBird-v1.0.2.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.2/Magisk-NetBird-v1.0.2.zip",
+          "size": 13091800,
+          "downloadCount": 0
+        },
+        {
+          "name": "checksums.sha256",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.2/checksums.sha256",
+          "size": 92,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-06-19T14:04:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-NetBird-v1.0.1.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.1/Magisk-NetBird-v1.0.1.zip",
+          "size": 13091555,
+          "downloadCount": 2
+        },
+        {
+          "name": "Magisk-NetBird-v1.0.1-lite.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.1/Magisk-NetBird-v1.0.1-lite.zip",
+          "size": 11790,
+          "downloadCount": 2
+        },
+        {
+          "name": "checksums.sha256",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.1/checksums.sha256",
+          "size": 189,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-06-19T13:21:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-NetBird-v1.0.0-lite.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.0/Magisk-NetBird-v1.0.0-lite.zip",
+          "size": 10507,
+          "downloadCount": 2
+        },
+        {
+          "name": "checksums.sha256",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.0/checksums.sha256",
+          "size": 189,
+          "downloadCount": 0
+        },
+        {
+          "name": "Magisk-NetBird-v1.0.0.zip",
+          "downloadUrl": "https://github.com/ahsaboy/magisk-netbird/releases/download/v1.0.0/Magisk-NetBird-v1.0.0.zip",
+          "size": 13090272,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

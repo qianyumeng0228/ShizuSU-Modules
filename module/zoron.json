@@ -1,0 +1,136 @@
+{
+  "readme": "# Zoron-X - Ultra Intelligent Power Conservation Engine\n\nZoron-X is a next-generation, open-source Magisk module and Android controller app engineered to maximize battery life, control thermal throttling, and ensure peak performance via deep kernel-level optimizations.\n\n## 📖 Official Documentation\n\nRead the full explanation of the Zoron-X philosophy, features, and core algorithms (like the Microburst Engine and Intent Prediction) on our Official GitHub Pages site:\n\n👉 **[ZORON-X Documentation](https://buildwithtausif.github.io/zoron/)**\n\n## ⚖️ Root vs. Non-Root Compatibility\n\nZORON-X supports both **Rooted** (Magisk/KernelSU) and **Non-Rooted** devices.\n\n> [!IMPORTANT]\n> **Recommended for Root Devices**: ZORON-X is designed primarily for rooted devices to achieve optimal results. Non-root fallback mode is recommended **only** when the device has a heavily worn-out battery that cannot be replaced.\n\nOn non-root devices the app will show an in-app advisory describing technical limitations and recommended usage. The advisory appears on first run and includes a \"Don't show this advisory again\" option and a \"Learn More\" button linking to the in-app documentation.\n\n### Technical Aspects: Why Root Needs ZORON-X (and Stock Doesn't)\n- **Root Devices (Custom ROMs/Kernels)**: Custom ROMs, kernels, and root modifications often bypass standard OEM power management. They can disable CPU core parking, run aggressive scaling governors, allow unmanaged background wakelocks, and prevent the SOC from entering deep suspend states. Thus, root devices need an explicit kernel-level saver like ZORON-X to force-regulate resource allocations.\n- **Non-Root Devices (Stock OEM Firmware)**: Stock OEM firmware already contains highly optimized, hardware-specific power managers tuned by manufacturers. They manage system resources, app standby buckets, and doze timers natively. Adding third-party battery managers is generally unnecessary.\n- **ZORON-X Fallback**: On non-root devices, ZORON-X runs a Java-based fallback engine utilizing user-granted system settings permissions to toggle sync, reduce screen timeouts/brightness, and disable power-hungry haptics dynamically. This is intended solely to squeeze extra life out of degraded, unreplaceable batteries.\n\n## 🚀 Features at a Glance\n- **Autopilot Mode**: AI-driven profile switching based on foreground app and battery level.\n- **Race-To-Idle**: Finishes tasks instantly and drops into deep sleep.\n- **Intent Prediction Engine**: Monitors raw hardware touch inputs to detect user activity.\n- **Delta-based Fastpath**: Prevents UI stutters by only executing necessary kernel changes.\n- **Interactive Dashboard**: Real-time battery graphs, process monitoring, and telemetry.\n- **Bootloop Security**: Kernel panic failsafe that rolls back profiles on crashes.\n\n## 💾 Installation\n1. Download the latest `zoron_vX.X.X.zip` from the [Releases](https://github.com/buildwithtausif/zoron/releases) page.\n2. Flash in Magisk or KernelSU.\n3. Reboot and open the **Zoron-X** app.\n\n## 📜 License\nMIT License\n",
+  "readmeHTML": "<h1>Zoron-X - Ultra Intelligent Power Conservation Engine</h1>\n\n<p>Zoron-X is a next-generation, open-source Magisk module and Android controller app engineered to maximize battery life, control thermal throttling, and ensure peak performance via deep kernel-level optimizations.</p>\n\n<h2>📖 Official Documentation</h2>\n\n<p>Read the full explanation of the Zoron-X philosophy, features, and core algorithms (like the Microburst Engine and Intent Prediction) on our Official GitHub Pages site:</p>\n\n<p>👉 <b><a href=\"https://buildwithtausif.github.io/zoron/\">ZORON-X Documentation</a></b></p>\n\n<h2>⚖️ Root vs. Non-Root Compatibility</h2>\n\n<p>ZORON-X supports both <b>Rooted</b> (Magisk/KernelSU) and <b>Non-Rooted</b> devices.</p>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>Recommended for Root Devices</b>: ZORON-X is designed primarily for rooted devices to achieve optimal results. Non-root fallback mode is recommended <b>only</b> when the device has a heavily worn-out battery that cannot be replaced.</p>\n\n<p>On non-root devices the app will show an in-app advisory describing technical limitations and recommended usage. The advisory appears on first run and includes a \"Don't show this advisory again\" option and a \"Learn More\" button linking to the in-app documentation.</p>\n\n<h3>Technical Aspects: Why Root Needs ZORON-X (and Stock Doesn't)</h3>\n<li>**Root Devices (Custom ROMs/Kernels)**: Custom ROMs, kernels, and root modifications often bypass standard OEM power management. They can disable CPU core parking, run aggressive scaling governors, allow unmanaged background wakelocks, and prevent the SOC from entering deep suspend states. Thus, root devices need an explicit kernel-level saver like ZORON-X to force-regulate resource allocations.</li>\n<li>**Non-Root Devices (Stock OEM Firmware)**: Stock OEM firmware already contains highly optimized, hardware-specific power managers tuned by manufacturers. They manage system resources, app standby buckets, and doze timers natively. Adding third-party battery managers is generally unnecessary.</li>\n<li>**ZORON-X Fallback**: On non-root devices, ZORON-X runs a Java-based fallback engine utilizing user-granted system settings permissions to toggle sync, reduce screen timeouts/brightness, and disable power-hungry haptics dynamically. This is intended solely to squeeze extra life out of degraded, unreplaceable batteries.</li>\n\n<h2>🚀 Features at a Glance</h2>\n<li>**Autopilot Mode**: AI-driven profile switching based on foreground app and battery level.</li>\n<li>**Race-To-Idle**: Finishes tasks instantly and drops into deep sleep.</li>\n<li>**Intent Prediction Engine**: Monitors raw hardware touch inputs to detect user activity.</li>\n<li>**Delta-based Fastpath**: Prevents UI stutters by only executing necessary kernel changes.</li>\n<li>**Interactive Dashboard**: Real-time battery graphs, process monitoring, and telemetry.</li>\n<li>**Bootloop Security**: Kernel panic failsafe that rolls back profiles on crashes.</li>\n\n<h2>💾 Installation</h2>\n<li>Download the latest `zoron_vX.X.X.zip` from the [Releases](https://github.com/buildwithtausif/zoron/releases) page.</li>\n<li>Flash in Magisk or KernelSU.</li>\n<li>Reboot and open the **Zoron-X** app.</li>\n\n<h2>📜 License</h2>\n<p>MIT License</p>",
+  "homepageUrl": "https://buildwithtausif.github.io/zoron/",
+  "sourceUrl": "https://github.com/buildwithtausif/zoron",
+  "url": "https://github.com/buildwithtausif/zoron",
+  "latestRelease": {
+    "name": "v2.9.4",
+    "version": "v2.9.4",
+    "time": "2026-05-21T14:11:36Z",
+    "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.4/zoron_optimizations_v2.9.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.9.4",
+      "tagName": "v2.9.4",
+      "publishedAt": "2026-05-21T14:11:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.9.4.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.4/zoron_optimizations_v2.9.4.zip",
+          "size": 4971386,
+          "downloadCount": 1
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.4/Zoron.apk",
+          "size": 5976832,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.9.3",
+      "tagName": "v2.9.3",
+      "publishedAt": "2026-05-21T13:59:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.9.3.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.3/zoron_optimizations_v2.9.3.zip",
+          "size": 4972898,
+          "downloadCount": 1
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.3/Zoron.apk",
+          "size": 5997778,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.9.2",
+      "tagName": "v2.9.2",
+      "publishedAt": "2026-05-21T13:54:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.9.2.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.2/zoron_optimizations_v2.9.2.zip",
+          "size": 4971785,
+          "downloadCount": 1
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.2/Zoron.apk",
+          "size": 5985268,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.9.0",
+      "tagName": "v2.9.0",
+      "publishedAt": "2026-05-21T13:43:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.9.0.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.0/zoron_optimizations_v2.9.0.zip",
+          "size": 4971740,
+          "downloadCount": 1
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.9.0/Zoron.apk",
+          "size": 5985232,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v2.8.0",
+      "tagName": "v2.8.0",
+      "publishedAt": "2026-05-21T13:33:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.8.0.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.8.0/zoron_optimizations_v2.8.0.zip",
+          "size": 4972014,
+          "downloadCount": 0
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.8.0/Zoron.apk",
+          "size": 5982868,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.7.0",
+      "tagName": "v2.7.0",
+      "publishedAt": "2026-05-21T13:18:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "zoron_optimizations_v2.7.0.zip",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.7.0/zoron_optimizations_v2.7.0.zip",
+          "size": 4967469,
+          "downloadCount": 1
+        },
+        {
+          "name": "Zoron.apk",
+          "downloadUrl": "https://github.com/buildwithtausif/zoron/releases/download/v2.7.0/Zoron.apk",
+          "size": 5981352,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

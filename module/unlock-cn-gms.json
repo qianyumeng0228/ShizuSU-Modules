@@ -1,0 +1,100 @@
+{
+  "readme": "# Unlock CN GMS\n\n> [!NOTE]\n> 此版本使用 Magisk v28102 新特性，抹除 permissions 文件,支持 APatch/KernelSU。\n> \n> 使用体验与原版无异。\n> \n> 不支持自动挂载的将尝试使用 [mountify standalone](https://github.com/backslashxx/mountify/blob/standalone-script/global_mount.sh) 挂载，如果都不支持则使用原版的处理方式\n\nThe GMS is restricted in China on some devices, because of configuration files that declare `cn.google.services` feature.\nBy this restriction, you can not enable `Google Location History` and the `Google Map Timeline` function can not use either.\n\nThis module removes the restriction by replacing these configuration files.\n\nSupported file locations:\n- `/system/etc/permissions/services.cn.google.xml`\n- `/system/etc/permissions/com.oppo.features.cn_google.xml`\n- `/vendor/etc/permissions/services.cn.google.xml`\n- `/product/etc/permissions/services.cn.google.xml`\n- `/product/etc/permissions/cn.google.services.xml`\n- `/product/etc/sysconfig/cn_feature.xml`\n- `/odm/etc/permissions/com.gnss.bds_preference.xml` (Xiaomi 8e5 等机型)\n- `/my_bigball/etc/permissions/oplus_google_cn_gms_features.xml`\n- `/my_product/etc/permissions/oplus_google_cn_gms_features.xml`\n- `/my_heytap/etc/permissions/my_heytap_cn_gms_features.xml`\n\n---\n部分国行手机，或者本地化后的 ROM 中有内置 GMS ，但是某些功能无法使用，比如无法开启 `Google Location History` 服务，无法使用 `Google Map Timeline`，设备无法在 Web 版 Google play 中显示等等。\n\n该模块通过查找并替换所有声明了 `cn.google.services` 的权限配置文件, 具体为删除如下配置行：\n\n ```xml\n <feature name=\"cn.google.services\" />\n <feature name=\"com.google.android.feature.services_updater\" />\n ``` \n 以此来实现去除国行 GMS 的限制。\n\n 注意：部分设备上可能同时存在多个配置文件（如小米 8e5 同时在 `/odm` 和 `/product` 分区下各有一个），本模块会自动处理所有匹配的文件。对于独立挂载的分区（如 `/odm`、`/my_bigball` 等），通过 bind mount 方式替换。\n\n **注意**：为了开启 `Google Location History` 服务，你可能还需要配合其他模块   \n 例如\n Magisk 模块: ~~[Riru - Location Report Enabler](https://github.com/RikkaApps/Riru-LocationReportEnabler)~~     \n 或者 Xposed 模块 [LocationReportEnabler](https://github.com/GhostFlying/LocationReportEnabler)\n",
+  "readmeHTML": "<h1>Unlock CN GMS</h1>\n\n<p>> [!NOTE]</p>\n<p>> 此版本使用 Magisk v28102 新特性，抹除 permissions 文件,支持 APatch/KernelSU。</p>\n<p>></p>\n<p>> 使用体验与原版无异。</p>\n<p>></p>\n<p>> 不支持自动挂载的将尝试使用 <a href=\"https://github.com/backslashxx/mountify/blob/standalone-script/global_mount.sh\">mountify standalone</a> 挂载，如果都不支持则使用原版的处理方式</p>\n\n<p>The GMS is restricted in China on some devices, because of configuration files that declare <code>cn.google.services</code> feature.</p>\n<p>By this restriction, you can not enable <code>Google Location History</code> and the <code>Google Map Timeline</code> function can not use either.</p>\n\n<p>This module removes the restriction by replacing these configuration files.</p>\n\n<p>Supported file locations:</p>\n<li>`/system/etc/permissions/services.cn.google.xml`</li>\n<li>`/system/etc/permissions/com.oppo.features.cn_google.xml`</li>\n<li>`/vendor/etc/permissions/services.cn.google.xml`</li>\n<li>`/product/etc/permissions/services.cn.google.xml`</li>\n<li>`/product/etc/permissions/cn.google.services.xml`</li>\n<li>`/product/etc/sysconfig/cn_feature.xml`</li>\n<li>`/odm/etc/permissions/com.gnss.bds_preference.xml` (Xiaomi 8e5 等机型)</li>\n<li>`/my_bigball/etc/permissions/oplus_google_cn_gms_features.xml`</li>\n<li>`/my_product/etc/permissions/oplus_google_cn_gms_features.xml`</li>\n<li>`/my_heytap/etc/permissions/my_heytap_cn_gms_features.xml`</li>\n\n<p>---</p>\n<p>部分国行手机，或者本地化后的 ROM 中有内置 GMS ，但是某些功能无法使用，比如无法开启 <code>Google Location History</code> 服务，无法使用 <code>Google Map Timeline</code>，设备无法在 Web 版 Google play 中显示等等。</p>\n\n<p>该模块通过查找并替换所有声明了 <code>cn.google.services</code> 的权限配置文件, 具体为删除如下配置行：</p>\n\n<p> ```xml</p>\n<p> <feature name=\"cn.google.services\" /></p>\n<p> <feature name=\"com.google.android.feature.services_updater\" /></p>\n<p> ```</p>\n<p> 以此来实现去除国行 GMS 的限制。</p>\n\n<p> 注意：部分设备上可能同时存在多个配置文件（如小米 8e5 同时在 <code>/odm</code> 和 <code>/product</code> 分区下各有一个），本模块会自动处理所有匹配的文件。对于独立挂载的分区（如 <code>/odm</code>、<code>/my_bigball</code> 等），通过 bind mount 方式替换。</p>\n\n<p> <b>注意</b>：为了开启 <code>Google Location History</code> 服务，你可能还需要配合其他模块</p>\n<p> 例如</p>\n<p> Magisk 模块: ~~<a href=\"https://github.com/RikkaApps/Riru-LocationReportEnabler\">Riru - Location Report Enabler</a>~~</p>\n<p> 或者 Xposed 模块 <a href=\"https://github.com/GhostFlying/LocationReportEnabler\">LocationReportEnabler</a></p>",
+  "homepageUrl": "https://github.com/KOWX712/unlock-cn-gms",
+  "sourceUrl": "https://github.com/KOWX712/unlock-cn-gms",
+  "url": "https://github.com/KOWX712/unlock-cn-gms",
+  "latestRelease": {
+    "name": "v4.5",
+    "version": "v4.5",
+    "time": "2025-10-24T17:05:42Z",
+    "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.5/unlock-cn-gms.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.5",
+      "tagName": "v4.5",
+      "publishedAt": "2025-10-24T17:05:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.5/unlock-cn-gms.zip",
+          "size": 5633,
+          "downloadCount": 251
+        }
+      ]
+    },
+    {
+      "name": "v4.4",
+      "tagName": "v4.4",
+      "publishedAt": "2025-10-20T07:58:14Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.4/unlock-cn-gms.zip",
+          "size": 5643,
+          "downloadCount": 45
+        }
+      ]
+    },
+    {
+      "name": "v4.3",
+      "tagName": "v4.3",
+      "publishedAt": "2025-06-19T19:39:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.3/unlock-cn-gms.zip",
+          "size": 4948,
+          "downloadCount": 72
+        }
+      ]
+    },
+    {
+      "name": "v4.2",
+      "tagName": "v4.2",
+      "publishedAt": "2025-04-23T18:56:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.2/unlock-cn-gms.zip",
+          "size": 4931,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "v4.1",
+      "tagName": "v4.1",
+      "publishedAt": "2025-03-06T09:40:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v4.1.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.1/unlock-cn-gms-v4.1.zip",
+          "size": 5031,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "v4.0",
+      "tagName": "v4.0",
+      "publishedAt": "2025-03-03T18:57:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v4.0.zip",
+          "downloadUrl": "https://github.com/KOWX712/unlock-cn-gms/releases/download/v4.0/unlock-cn-gms-v4.0.zip",
+          "size": 2208,
+          "downloadCount": 8
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

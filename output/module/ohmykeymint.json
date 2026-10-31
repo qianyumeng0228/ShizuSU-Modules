@@ -1,0 +1,106 @@
+{
+  "readme": "# Oh My Keymint（第三方版本）\n\n> 本仓库是基于 [qwq233/OhMyKeymint](https://github.com/qwq233/OhMyKeymint) 修改的第三方版本，**不是官方版本，也不代表上游维护者**。本版本的问题请反馈至[本仓库](https://github.com/ITxiao6666/OhMyKeymint/issues)。\n\n面向 Android 的自定义 Keystore / KeyMint 实现，提供应用配置、Keybox 管理及配套 WebUI。\n\n## 安装与使用\n\n需要 **Android 12 及以上**，以及 KernelSU 或 Magisk。\n\n1. 从本仓库的 [Releases](https://github.com/ITxiao6666/OhMyKeymint/releases) 下载并安装模块。\n2. 打开 WebUI，选择需要使用 OMK 的应用，按需导入 Keybox。\n3. 高级设置及生效条件请参阅[配置指南](docs/CONFIGURATION.md)。\n\nKernelSU 可直接从模块列表打开 WebUI；Magisk 需自行安装 KSUWebUIStandalone 或 WebUI X。\nZygisk 相关功能需另行安装并启用 Zygisk Next。\n\n## 主要功能\n\n- 应用包名、多用户及应用独立安全补丁配置。\n- RSA / EC Keybox 导入与证书链信息查看。\n- 安全补丁同步与恢复、Pixel PIF 配置 Soter HAL、本地软件 TA、远程中继及 Tencent Soter\n- 运行状态诊断、主题与语言设置。\n\nKeybox 至少需要一个完整的 RSA 或 EC 条目，私钥必须与证书链匹配。\n仅含 EC 条目时，RSA 密钥的认证证书也使用该 EC 私钥和证书链签名。\n详细配置位于 `/data/misc/keystore/omk/`，请勿公开密钥。\n\n## 注意事项\n\n- 软件实现不能替代真实 TEE 或生物认证，不保证通过检测或支付认证。\n- 使用前请备份重要数据，实验性功能请谨慎开启。\n- 卸载会删除 OMK 配置及密钥数据，可能需要相关应用重新登录或注册；禁用模块不会删除这些数据。\n\n## Restarting keymint and injector\n\n需要手动重启服务时，可执行对应命令：\n\n```sh\ntouch /data/adb/omk/restart.keymint\ntouch /data/adb/omk/restart.injector\ntouch /data/adb/omk/restart.all\n```\n\n哪些设置需要重启服务或设备，请参阅[生效说明](docs/CONFIGURATION.md#how-changes-are-loaded)。\n\n## 许可与致谢\n\n使用前须阅读并同时遵守 [General License Agreement v4 或后续版本](LICENSE.md) 和 [Oh My Keymint License](LICENSE-2)。\n本软件按原样提供，不作任何担保。独立标明的第三方部分仍遵循各自原有许可。\n\nCopyright (C) 2025, 2026 James Clef <qwq233@qwq2333.top>\n\n部分代码来自 [AOSP](https://source.android.com/)，采用 [Apache-2.0](template/AOSP.Apache-license-2.0.txt)。\n\nCopyright 2022, The Android Open Source Project\n\n其他第三方来源与许可见[第三方软件说明](docs/THIRD_PARTY.md)。\n",
+  "readmeHTML": "<h1>Oh My Keymint（第三方版本）</h1>\n\n<p>> 本仓库是基于 <a href=\"https://github.com/qwq233/OhMyKeymint\">qwq233/OhMyKeymint</a> 修改的第三方版本，<b>不是官方版本，也不代表上游维护者</b>。本版本的问题请反馈至<a href=\"https://github.com/ITxiao6666/OhMyKeymint/issues\">本仓库</a>。</p>\n\n<p>面向 Android 的自定义 Keystore / KeyMint 实现，提供应用配置、Keybox 管理及配套 WebUI。</p>\n\n<h2>安装与使用</h2>\n\n<p>需要 <b>Android 12 及以上</b>，以及 KernelSU 或 Magisk。</p>\n\n<li>从本仓库的 [Releases](https://github.com/ITxiao6666/OhMyKeymint/releases) 下载并安装模块。</li>\n<li>打开 WebUI，选择需要使用 OMK 的应用，按需导入 Keybox。</li>\n<li>高级设置及生效条件请参阅[配置指南](docs/CONFIGURATION.md)。</li>\n\n<p>KernelSU 可直接从模块列表打开 WebUI；Magisk 需自行安装 KSUWebUIStandalone 或 WebUI X。</p>\n<p>Zygisk 相关功能需另行安装并启用 Zygisk Next。</p>\n\n<h2>主要功能</h2>\n\n<li>应用包名、多用户及应用独立安全补丁配置。</li>\n<li>RSA / EC Keybox 导入与证书链信息查看。</li>\n<li>安全补丁同步与恢复、Pixel PIF 配置 Soter HAL、本地软件 TA、远程中继及 Tencent Soter</li>\n<li>运行状态诊断、主题与语言设置。</li>\n\n<p>Keybox 至少需要一个完整的 RSA 或 EC 条目，私钥必须与证书链匹配。</p>\n<p>仅含 EC 条目时，RSA 密钥的认证证书也使用该 EC 私钥和证书链签名。</p>\n<p>详细配置位于 <code>/data/misc/keystore/omk/</code>，请勿公开密钥。</p>\n\n<h2>注意事项</h2>\n\n<li>软件实现不能替代真实 TEE 或生物认证，不保证通过检测或支付认证。</li>\n<li>使用前请备份重要数据，实验性功能请谨慎开启。</li>\n<li>卸载会删除 OMK 配置及密钥数据，可能需要相关应用重新登录或注册；禁用模块不会删除这些数据。</li>\n\n<h2>Restarting keymint and injector</h2>\n\n<p>需要手动重启服务时，可执行对应命令：</p>\n\n<pre>touch /data/adb/omk/restart.keymint\ntouch /data/adb/omk/restart.injector\ntouch /data/adb/omk/restart.all</pre>\n\n<p>哪些设置需要重启服务或设备，请参阅<a href=\"docs/CONFIGURATION.md#how-changes-are-loaded\">生效说明</a>。</p>\n\n<h2>许可与致谢</h2>\n\n<p>使用前须阅读并同时遵守 <a href=\"LICENSE.md\">General License Agreement v4 或后续版本</a> 和 <a href=\"LICENSE-2\">Oh My Keymint License</a>。</p>\n<p>本软件按原样提供，不作任何担保。独立标明的第三方部分仍遵循各自原有许可。</p>\n\n<p>Copyright (C) 2025, 2026 James Clef <qwq233@qwq2333.top></p>\n\n<p>部分代码来自 <a href=\"https://source.android.com/\">AOSP</a>，采用 <a href=\"template/AOSP.Apache-license-2.0.txt\">Apache-2.0</a>。</p>\n\n<p>Copyright 2022, The Android Open Source Project</p>\n\n<p>其他第三方来源与许可见<a href=\"docs/THIRD_PARTY.md\">第三方软件说明</a>。</p>",
+  "homepageUrl": "https://github.com/ITxiao6666/OhMyKeymint",
+  "sourceUrl": "https://github.com/ITxiao6666/OhMyKeymint",
+  "url": "https://github.com/ITxiao6666/OhMyKeymint",
+  "latestRelease": {
+    "name": "v1.3.5-d10f68e",
+    "version": "v1.3.5-d10f68e",
+    "time": "2026-09-21T19:50:43Z",
+    "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-d10f68e/OhMyKeymint-1.3.5-185-d10f68e-release.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3.5-d10f68e",
+      "tagName": "v1.3.5-d10f68e",
+      "publishedAt": "2026-09-21T19:50:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-1.3.5-185-d10f68e-release.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-d10f68e/OhMyKeymint-1.3.5-185-d10f68e-release.zip",
+          "size": 6472889,
+          "downloadCount": 35
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5-d55f830",
+      "tagName": "v1.3.5-d55f830",
+      "publishedAt": "2026-09-16T15:12:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-1.3.5-180-d55f830-release.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-d55f830/OhMyKeymint-1.3.5-180-d55f830-release.zip",
+          "size": 6339611,
+          "downloadCount": 357
+        },
+        {
+          "name": "OhMyKeymint-1.3.5-180-d55f830-release.zip.sha256",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-d55f830/OhMyKeymint-1.3.5-180-d55f830-release.zip.sha256",
+          "size": 109,
+          "downloadCount": 54
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5-3a54f9a",
+      "tagName": "v1.3.5-3a54f9a",
+      "publishedAt": "2026-09-15T16:54:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-1.3.5-179-3a54f9a-release.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-3a54f9a/OhMyKeymint-1.3.5-179-3a54f9a-release.zip",
+          "size": 6337595,
+          "downloadCount": 39
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5-2df11d1",
+      "tagName": "v1.3.5-2df11d1",
+      "publishedAt": "2026-09-11T15:11:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-1.3.5-176-2df11d1-release.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5-2df11d1/OhMyKeymint-1.3.5-176-2df11d1-release.zip",
+          "size": 6335596,
+          "downloadCount": 120
+        }
+      ]
+    },
+    {
+      "name": "v1.3.5",
+      "tagName": "v1.3.5",
+      "publishedAt": "2026-09-11T09:29:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-1.3.5-175-d56dbdd-release.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.3.5/OhMyKeymint-1.3.5-175-d56dbdd-release.zip",
+          "size": 6333134,
+          "downloadCount": 32
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-08-21T10:29:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "OhMyKeymint-release-arm64-v8a-1.2.0-992199c.zip",
+          "downloadUrl": "https://github.com/ITxiao6666/OhMyKeymint/releases/download/v1.2.0/OhMyKeymint-release-arm64-v8a-1.2.0-992199c.zip",
+          "size": 4766501,
+          "downloadCount": 14
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

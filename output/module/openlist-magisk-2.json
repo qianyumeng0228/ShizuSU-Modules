@@ -1,0 +1,100 @@
+{
+  "readme": "# OpenList Magisk/KernelSU/APatch 模块\n\n[![Release](https://img.shields.io/github/v/release/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/releases)\n[![License](https://img.shields.io/github/license/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/blob/main/LICENSE)\n\nOpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器集成到 Android 系统中，通过 Magisk、KernelSU 或 APatch 以系统化方式运行，支持 ARM 和 ARM64 架构。\n\n## 功能亮点\n\n- **多框架支持**：同时兼容 Magisk、KernelSU 和 APatch\n- **灵活安装选项**：支持三种安装位置\n  - data/adb/openlist\n  - 模块目录/bin\n  - system/bin\n- **数据目录可选**：支持两种数据存储位置\n  - /data/adb/openlist/\n  - /storage/emulated/0/Android/openlist/\n- **密码定制**：提供初始密码设置选项\n- **动态服务管理**：通过 Magisk/KernelSU 的\"动作\"按钮一键控制服务\n- **智能网络适配**：自动识别 WiFi 和移动网络 IP\n- **日志支持**：详细的运行日志记录\n\n## 截图展示\n\n| 安装界面 | KernelSU WiFi 网络 | KernelSU 移动网络 |\n|---------|------------------|------------------|\n| ![安装界面](install-interface.jpg) | ![KernelSU WiFi 网络](kernelsu-wifi.jpg) | ![KernelSU 移动网络](kernelsu-mobile-network.jpg) |\n\n## 系统要求\n\n- Android 设备（支持 ARM 或 ARM64 架构）\n- Magisk v20.4 或更高版本，或 KernelSU\n- Root 权限\n\n## 框架兼容性\n\n本模块同时支持 **Magisk**、**KernelSU** 和 **APatch** 三大 Android Root 框架：\n\n### Magisk 支持\n- 支持 Magisk v20.4 及以上版本\n- 完全兼容 Magisk 模块系统\n- 支持 Magisk 动作按钮控制\n- 支持 Magisk 更新机制\n\n### KernelSU 支持  \n- 支持 KernelSU 最新版本\n- 完全兼容 KernelSU 模块系统\n- 支持 KernelSU 动作按钮控制\n- 支持 KernelSU 更新机制\n\n### APatch 支持\n- 支持 APatch 最新版本\n- 完全兼容 APatch 模块系统\n- 支持 APatch 动作按钮控制\n- 支持 APatch 更新机制\n\n### 通用特性\n- 自动检测运行环境（Magisk/KernelSU/APatch）\n- 统一的路径配置和处理\n- 兼容的卸载机制\n- 完整的日志记录系统\n\n## 安装步骤\n\n1. **下载模块**\n   - 从 [GitHub Releases](https://github.com/Alien-Et/OpenList-Magisk/releases) 下载最新版本\n\n2. **安装配置**\n   - 打开 Magisk 管理器、KernelSU 管理器 或 APatch 管理器\n   - 选择\"从本地安装\"\n   - 进入安装配置界面：\n     - 选择二进制文件安装位置\n     - 选择数据目录存储位置\n     - 选择是否修改默认密码为 admin\n\n3. **完成安装**\n   - 等待安装完成\n   - 重启设备\n\n## 使用说明\n\n### 服务管理\n- 系统启动后自动运行\n- 通过 Magisk/KernelSU/APatch \"动作\"按钮控制服务\n- 服务状态显示在 module.prop：\n  - 运行中：显示访问地址和数据目录\n  - 已停止：显示启动提示\n\n### 访问方式\n- Web 界面访问：`http://<设备IP>:5244`\n- 初始密码：查看数据目录下的 `初始密码.txt`\n\n### 数据存储\n- 默认数据目录：`/data/adb/openlist/`\n- 日志文件位置：与数据目录相同\n- 密码文件：`初始密码.txt`\n\n## 故障排除\n\n### 常见问题\n1. **无法访问服务**\n   - 检查网络连接\n   - 检查服务状态：`pgrep -f openlist`\n   - 查看日志文件\n   - 手动重启服务：`su -c /data/adb/modules/openlist/service.sh`\n\n2. **IP 地址获取失败**\n   - 确认 WiFi 或移动网络已连接\n   - 检查网络接口状态\n   - 查看模块日志\n\n3. **服务无法启动**\n   - 检查二进制文件权限\n   - 确认数据目录可写\n   - 查看详细日志\n\n### 手动操作\n- 停止服务：`su -c pkill -f openlist`\n- 启动服务：`su -c /data/adb/modules/openlist/service.sh`\n- 查看日志：`cat /data/adb/modules/openlist/service.log`\n\n## 更新说明\n- 支持通过 Magisk/KernelSU/APatch 更新检查\n- 更新不会清除现有数据\n- 可在安装时重新选择配置选项\n\n## 更新日志\n\n### v4.1.10 (2026-02-22)\n- **修复** versionCode 计算逻辑，支持三位版本号 (v4.1.10 → 4110)\n- **修复** 安装脚本占位符替换问题\n- **修复** sed 替换时变量被错误展开的问题\n- **优化** action.sh 启停服务的输出提示信息\n- **改进** 移除冗余的占位符验证逻辑\n\n## 数据迁移说明\n1. 在安装时选择新的数据目录\n2. 手动将现有数据迁移到新目录\n3. 更新 config.json 中的相关路径\n\n## 贡献\n- 欢迎提交 Issue 和 Pull Request\n- 问题反馈：[GitHub Issues](https://github.com/Alien-Et/OpenList-Magisk/issues)\n\n## 许可证\n本项目基于 [MIT 许可证](LICENSE) 发布。\n",
+  "readmeHTML": "<h1>OpenList Magisk/KernelSU/APatch 模块</h1>\n\n<p><a href=\"https://img.shields.io/github/v/release/Alien-Et/OpenList-Magisk\">![Release</a>](https://github.com/Alien-Et/OpenList-Magisk/releases)</p>\n<p><a href=\"https://img.shields.io/github/license/Alien-Et/OpenList-Magisk\">![License</a>](https://github.com/Alien-Et/OpenList-Magisk/blob/main/LICENSE)</p>\n\n<p>OpenList Magisk 模块将 <a href=\"https://github.com/OpenListTeam/OpenList\">OpenList</a> 文件服务器集成到 Android 系统中，通过 Magisk、KernelSU 或 APatch 以系统化方式运行，支持 ARM 和 ARM64 架构。</p>\n\n<h2>功能亮点</h2>\n\n<li>**多框架支持**：同时兼容 Magisk、KernelSU 和 APatch</li>\n<li>**灵活安装选项**：支持三种安装位置</li>\n<p>  - data/adb/openlist</p>\n<p>  - 模块目录/bin</p>\n<p>  - system/bin</p>\n<li>**数据目录可选**：支持两种数据存储位置</li>\n<p>  - /data/adb/openlist/</p>\n<p>  - /storage/emulated/0/Android/openlist/</p>\n<li>**密码定制**：提供初始密码设置选项</li>\n<li>**动态服务管理**：通过 Magisk/KernelSU 的\"动作\"按钮一键控制服务</li>\n<li>**智能网络适配**：自动识别 WiFi 和移动网络 IP</li>\n<li>**日志支持**：详细的运行日志记录</li>\n\n<h2>截图展示</h2>\n\n<p>| 安装界面 | KernelSU WiFi 网络 | KernelSU 移动网络 |</p>\n<p>|---------|------------------|------------------|</p>\n<p>| !<a href=\"install-interface.jpg\">安装界面</a> | !<a href=\"kernelsu-wifi.jpg\">KernelSU WiFi 网络</a> | !<a href=\"kernelsu-mobile-network.jpg\">KernelSU 移动网络</a> |</p>\n\n<h2>系统要求</h2>\n\n<li>Android 设备（支持 ARM 或 ARM64 架构）</li>\n<li>Magisk v20.4 或更高版本，或 KernelSU</li>\n<li>Root 权限</li>\n\n<h2>框架兼容性</h2>\n\n<p>本模块同时支持 <b>Magisk</b>、<b>KernelSU</b> 和 <b>APatch</b> 三大 Android Root 框架：</p>\n\n<h3>Magisk 支持</h3>\n<li>支持 Magisk v20.4 及以上版本</li>\n<li>完全兼容 Magisk 模块系统</li>\n<li>支持 Magisk 动作按钮控制</li>\n<li>支持 Magisk 更新机制</li>\n\n<h3>KernelSU 支持</h3>\n<li>支持 KernelSU 最新版本</li>\n<li>完全兼容 KernelSU 模块系统</li>\n<li>支持 KernelSU 动作按钮控制</li>\n<li>支持 KernelSU 更新机制</li>\n\n<h3>APatch 支持</h3>\n<li>支持 APatch 最新版本</li>\n<li>完全兼容 APatch 模块系统</li>\n<li>支持 APatch 动作按钮控制</li>\n<li>支持 APatch 更新机制</li>\n\n<h3>通用特性</h3>\n<li>自动检测运行环境（Magisk/KernelSU/APatch）</li>\n<li>统一的路径配置和处理</li>\n<li>兼容的卸载机制</li>\n<li>完整的日志记录系统</li>\n\n<h2>安装步骤</h2>\n\n<li>**下载模块**</li>\n<p>   - 从 <a href=\"https://github.com/Alien-Et/OpenList-Magisk/releases\">GitHub Releases</a> 下载最新版本</p>\n\n<li>**安装配置**</li>\n<p>   - 打开 Magisk 管理器、KernelSU 管理器 或 APatch 管理器</p>\n<p>   - 选择\"从本地安装\"</p>\n<p>   - 进入安装配置界面：</p>\n<p>     - 选择二进制文件安装位置</p>\n<p>     - 选择数据目录存储位置</p>\n<p>     - 选择是否修改默认密码为 admin</p>\n\n<li>**完成安装**</li>\n<p>   - 等待安装完成</p>\n<p>   - 重启设备</p>\n\n<h2>使用说明</h2>\n\n<h3>服务管理</h3>\n<li>系统启动后自动运行</li>\n<li>通过 Magisk/KernelSU/APatch \"动作\"按钮控制服务</li>\n<li>服务状态显示在 module.prop：</li>\n<p>  - 运行中：显示访问地址和数据目录</p>\n<p>  - 已停止：显示启动提示</p>\n\n<h3>访问方式</h3>\n<li>Web 界面访问：`http://<设备IP>:5244`</li>\n<li>初始密码：查看数据目录下的 `初始密码.txt`</li>\n\n<h3>数据存储</h3>\n<li>默认数据目录：`/data/adb/openlist/`</li>\n<li>日志文件位置：与数据目录相同</li>\n<li>密码文件：`初始密码.txt`</li>\n\n<h2>故障排除</h2>\n\n<h3>常见问题</h3>\n<li>**无法访问服务**</li>\n<p>   - 检查网络连接</p>\n<p>   - 检查服务状态：<code>pgrep -f openlist</code></p>\n<p>   - 查看日志文件</p>\n<p>   - 手动重启服务：<code>su -c /data/adb/modules/openlist/service.sh</code></p>\n\n<li>**IP 地址获取失败**</li>\n<p>   - 确认 WiFi 或移动网络已连接</p>\n<p>   - 检查网络接口状态</p>\n<p>   - 查看模块日志</p>\n\n<li>**服务无法启动**</li>\n<p>   - 检查二进制文件权限</p>\n<p>   - 确认数据目录可写</p>\n<p>   - 查看详细日志</p>\n\n<h3>手动操作</h3>\n<li>停止服务：`su -c pkill -f openlist`</li>\n<li>启动服务：`su -c /data/adb/modules/openlist/service.sh`</li>\n<li>查看日志：`cat /data/adb/modules/openlist/service.log`</li>\n\n<h2>更新说明</h2>\n<li>支持通过 Magisk/KernelSU/APatch 更新检查</li>\n<li>更新不会清除现有数据</li>\n<li>可在安装时重新选择配置选项</li>\n\n<h2>更新日志</h2>\n\n<h3>v4.1.10 (2026-02-22)</h3>\n<li>**修复** versionCode 计算逻辑，支持三位版本号 (v4.1.10 → 4110)</li>\n<li>**修复** 安装脚本占位符替换问题</li>\n<li>**修复** sed 替换时变量被错误展开的问题</li>\n<li>**优化** action.sh 启停服务的输出提示信息</li>\n<li>**改进** 移除冗余的占位符验证逻辑</li>\n\n<h2>数据迁移说明</h2>\n<li>在安装时选择新的数据目录</li>\n<li>手动将现有数据迁移到新目录</li>\n<li>更新 config.json 中的相关路径</li>\n\n<h2>贡献</h2>\n<li>欢迎提交 Issue 和 Pull Request</li>\n<li>问题反馈：[GitHub Issues](https://github.com/Alien-Et/OpenList-Magisk/issues)</li>\n\n<h2>许可证</h2>\n<p>本项目基于 <a href=\"LICENSE\">MIT 许可证</a> 发布。</p>",
+  "homepageUrl": "https://github.com/Alien-Et/OpenList-Magisk",
+  "sourceUrl": "https://github.com/Alien-Et/OpenList-Magisk",
+  "url": "https://github.com/Alien-Et/OpenList-Magisk",
+  "latestRelease": {
+    "name": "v4.2.5",
+    "version": "v4.2.5",
+    "time": "2026-08-08T12:39:53Z",
+    "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.5/openlist-magisk-v4.2.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.2.5",
+      "tagName": "v4.2.5",
+      "publishedAt": "2026-08-08T12:39:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.2.5.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.5/openlist-magisk-v4.2.5.zip",
+          "size": 96613868,
+          "downloadCount": 358
+        }
+      ]
+    },
+    {
+      "name": "v4.2.4",
+      "tagName": "v4.2.4",
+      "publishedAt": "2026-07-23T13:49:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.2.4.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.4/openlist-magisk-v4.2.4.zip",
+          "size": 92493743,
+          "downloadCount": 239
+        }
+      ]
+    },
+    {
+      "name": "v4.2.2",
+      "tagName": "v4.2.2",
+      "publishedAt": "2026-05-25T17:41:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.2.2.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.2/openlist-magisk-v4.2.2.zip",
+          "size": 89933971,
+          "downloadCount": 547
+        }
+      ]
+    },
+    {
+      "name": "v4.2.1",
+      "tagName": "v4.2.1",
+      "publishedAt": "2026-04-09T17:04:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.2.1.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.1/openlist-magisk-v4.2.1.zip",
+          "size": 109555768,
+          "downloadCount": 435
+        }
+      ]
+    },
+    {
+      "name": "v4.2.0",
+      "tagName": "v4.2.0",
+      "publishedAt": "2026-04-08T16:58:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.2.0.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.2.0/openlist-magisk-v4.2.0.zip",
+          "size": 109554796,
+          "downloadCount": 58
+        }
+      ]
+    },
+    {
+      "name": "v4.1.10",
+      "tagName": "v4.1.10",
+      "publishedAt": "2026-02-25T06:38:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "openlist-magisk-v4.1.10.zip",
+          "downloadUrl": "https://github.com/Alien-Et/OpenList-Magisk/releases/download/v4.1.10/openlist-magisk-v4.1.10.zip",
+          "size": 100801854,
+          "downloadCount": 174
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

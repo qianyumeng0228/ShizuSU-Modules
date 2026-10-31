@@ -1,0 +1,424 @@
+{
+  "readme": "# frida-magisk\n\nEnglish | [Simplified Chinese](README.zh-CN.md)\n\nStandalone Magisk / KernelSU module for packaging official Frida Android server binaries, official Frida Gadget binaries, and a bundled Zygisk injector into a flashable ZIP.\n\nThis README is written to be automation-friendly. An AI agent should be able to build the module, deploy it to a known Android device, and operate the module interface by following the command contracts below.\n\n## Quick Facts\n\n- Module ID: `frida_magisk`\n- Installed module path: `/data/adb/modules/frida_magisk`\n- Runtime Gadget staging path: `/data/local/tmp/frida_magisk`\n- Default server mode: `hybrid`\n- Default `frida-server` listen address: `127.0.0.1:27042`\n- Default Gadget listen address: `127.0.0.1:27043`\n- Supported ABIs: `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`\n- Main device interface: `sh /data/adb/modules/frida_magisk/action.sh ...`\n- WebUI entry: `module/webroot/index.html`, executed by KernelSU / SukiSU through `ksu.exec`\n\n## Repository Layout\n\n```text\nmodule/                         Magisk / KernelSU module template\nmodule/native/zygisk/           Zygisk injector source\nmodule/action.sh                Stable on-device command interface\nmodule/service.sh               late_start service entry\nmodule/customize.sh             install-time setup script\nmodule/webroot/                 KernelSU / SukiSU WebUI\nscripts/fetch-frida-assets.sh   Download official Frida Android assets\nscripts/build-zygisk-injector.sh Build injector for all supported ABIs\nscripts/build-module.sh         Package the flashable ZIP\nscripts/build-all.sh            Full build entry\n.github/workflows/build.yml     CI, scheduled latest checks, and releases\n```\n\n## Build\n\nFull local build:\n\n```bash\nscripts/build-all.sh\n```\n\nEquivalent explicit steps:\n\n```bash\nscripts/fetch-frida-assets.sh\nscripts/build-zygisk-injector.sh\nscripts/build-module.sh\n```\n\nBuild a specific Frida version:\n\n```bash\nFRIDA_VERSION=17.23.3 scripts/build-all.sh\n```\n\n`scripts/build-all.sh` builds the universal package and all per-ABI packages by default. To build only selected package targets:\n\n```bash\nMODULE_ABIS=\"arm64-v8a\" scripts/build-all.sh\nMODULE_ABIS=\"universal arm64-v8a\" scripts/build-all.sh\n```\n\n`scripts/fetch-frida-assets.sh` always verifies SHA-256. Known versions are pinned in the script; any other version is verified against the `digest` that the GitHub releases API publishes for each `frida/frida` asset. There is no unverified mode. Set `GH_TOKEN` to avoid API rate limits:\n\n```bash\nFRIDA_VERSION=17.23.3 scripts/build-all.sh\n```\n\nOutputs:\n\n```text\ndist/frida-magisk-<frida-version>-universal.zip\ndist/frida-magisk-<frida-version>-arm64-v8a.zip\ndist/frida-magisk-<frida-version>-armeabi-v7a.zip\ndist/frida-magisk-<frida-version>-x86.zip\ndist/frida-magisk-<frida-version>-x86_64.zip\ndist/*.sha256\n```\n\nDownload guidance:\n\n- Use `arm64-v8a` for most modern Android phones.\n- Use `universal` only when the target ABI is unknown or one package must support multiple devices.\n- Installing a package for the wrong ABI fails during module installation because `customize.sh` requires a matching `bin/<abi>/frida-server`.\n\n## GitHub Actions And Releases\n\nWorkflow: `.github/workflows/build.yml`\n\nSupported triggers:\n\n- `push` to `main` or `master`: builds and uploads workflow artifacts.\n- `push` tag `v*`: builds the version from the tag, then creates or updates the matching GitHub Release.\n- `pull_request`: build only, never publishes.\n- Every push and pull request also runs a `checks` job: shell syntax, `actionlint` on the workflows, and `scripts/test-config-upgrade.sh`.\n- `workflow_dispatch`: accepts `frida_version` and `publish_release` (publishing is only honoured on the default branch).\n- `schedule`: runs daily at `00:00 UTC`, checks the latest upstream Frida release, and creates a release only when this repository does not already have `v<latest-version>`; otherwise it still runs a build-only check so toolchain breakage is visible.\n\nManual build examples:\n\n```bash\ngh workflow run build.yml -f frida_version=17.23.3 -f publish_release=false\ngh workflow run build.yml -f frida_version=latest -f publish_release=true\n```\n\nRelease rule:\n\n- Scheduled latest build publishes `v<frida-version>` automatically if missing.\n- Tag build publishes the pushed tag.\n- Manual build publishes only when `publish_release=true`.\n\n\n### Module updates (updateJson)\n\n- The official module's `module.prop` sets `updateJson` to `update/official.json` on `main`, so Magisk / KernelSU can offer in-app updates. The update points at the `universal` ZIP.\n- After a successful release, the publish job (only on `xjoker/frida-magisk`, never on PRs, forks or other branches) updates `update/official.json` and `update/official-changelog.md` and pushes the change to the default branch. It never moves to a lower version.\n- The antidetect flavor removes `updateJson`, because a public URL would undo its renaming. `scripts/verify-antidetect-package.sh` checks that it is gone.\n- The URL always points at `xjoker/frida-magisk`, so an official package built from a fork still receives updates from the upstream releases.\n- Owned antidetect asset archives are verified against `antidetect/hashes.sha256` in this repository. See `antidetect/README.md`.\n- Schedule: the daily run publishes new Frida versions. The Monday run also does a build-only check when the latest release already exists.\n\n## Device Deployment\n\nAll ADB commands must include `-s <serial>`. Do not use implicit default devices.\n\nConfirm the device first:\n\n```bash\nadb devices\nadb -s <serial> shell getprop ro.product.model\nadb -s <serial> shell getprop ro.build.version.release\nadb -s <serial> shell su -c id\n```\n\nInstall with KernelSU / SukiSU:\n\n```bash\nadb -s <serial> push dist/frida-magisk-17.23.3-arm64-v8a.zip /data/local/tmp/frida-magisk.zip\nadb -s <serial> shell su -c '/data/adb/ksud module install /data/local/tmp/frida-magisk.zip'\nadb -s <serial> reboot\n```\n\nInstall with Magisk CLI when available:\n\n```bash\nadb -s <serial> push dist/frida-magisk-17.23.3-arm64-v8a.zip /data/local/tmp/frida-magisk.zip\nadb -s <serial> shell su -c 'magisk --install-module /data/local/tmp/frida-magisk.zip'\nadb -s <serial> reboot\n```\n\nAfter reboot:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh status'\nadb -s <serial> forward tcp:27042 tcp:27042\nfrida-ps -H 127.0.0.1:27042\n```\n\n## Module Configuration\n\nRuntime config file:\n\n```text\n/data/adb/modules/frida_magisk/config.env\n```\n\nDefault values:\n\n```sh\nFRIDA_MODE=hybrid\nFRIDA_LISTEN=127.0.0.1:27042\nWATCHDOG_INTERVAL=5\nGADGET_TARGET_PACKAGE=\nGADGET_LISTEN=127.0.0.1:27043\nGADGET_ON_LOAD=wait\nGADGET_RUNTIME=qjs\nGADGET_INCLUDE_CHILDREN=no\n```\n\nModes:\n\n- `server`: run only regular `frida-server`.\n- `hybrid`: run regular `frida-server` and allow Gadget injection for the configured target package.\n- `gadget`: disable regular `frida-server`; use Gadget only.\n\n## Stable On-Device Interface\n\nCommand prefix:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh <command> [args...]'\n```\n\nSupported commands:\n\n```text\nstatus\nweb-status\npackages [query] [limit]\nstart\nstop\nrestart\nset-listen <ipv4:port>\nset-mode <server|hybrid|gadget>\nset-gadget <package> <ipv4:port> <wait|resume> <qjs|v8> [yes|no]\nclear-gadget\nwatchdog-stop\n```\n\nAutomation-friendly status:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh web-status'\n```\n\n`web-status` prints `KEY=value` lines. Important keys:\n\n```text\nHEALTH=running|stopped\nPID=<pid|none>\nLISTEN=<ipv4:port>\nMODE=server|hybrid|gadget\nWATCHDOG=running|stopped\nVERSION=<frida-version>\nGADGET_TARGET_PACKAGE=<package|empty>\nGADGET_LISTEN=<ipv4:port>\nGADGET_ON_LOAD=wait|resume\nGADGET_RUNTIME=qjs|v8\nGADGET_INCLUDE_CHILDREN=yes|no\nGADGET_BACKEND=internal|missing\nGADGET_ABI=arm64-v8a|armeabi-v7a|x86|x86_64|unknown\n```\n\nList installed packages:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh packages xingin 50'\n```\n\nOutput format:\n\n```text\nPACKAGE=com.example.app\n```\n\nChange server listen address:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-listen 127.0.0.1:27042'\n```\n\nSwitch modes:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode server'\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode hybrid'\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode gadget'\n```\n\nConfigure Gadget for one app:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-gadget com.example.app 127.0.0.1:27043 resume qjs no'\nadb -s <serial> forward tcp:27043 tcp:27043\nadb -s <serial> shell am force-stop com.example.app\nadb -s <serial> shell monkey -p com.example.app 1\nfrida-ps -H 127.0.0.1:27043\n```\n\nClear Gadget target:\n\n```bash\nadb -s <serial> shell su -c 'sh /data/adb/modules/frida_magisk/action.sh clear-gadget'\n```\n\n## WebUI Interface\n\nThe WebUI is packaged under:\n\n```text\n/data/adb/modules/frida_magisk/webroot/\n```\n\nKernelSU / SukiSU launches `webroot/index.html`. The page calls the same on-device `action.sh` interface through `ksu.exec`. It does not depend on external web assets. The UI defaults to English and includes a language switcher for Simplified Chinese.\n\n## Safe Operating Procedure For AI Agents\n\n1. Identify exactly one target device with `adb devices`.\n2. Confirm model, Android version, and root shell with `adb -s <serial> ...`.\n3. Install the module ZIP.\n4. Reboot only after the user has allowed the reboot or when the task explicitly requires module activation.\n5. After reboot, call `web-status`.\n6. Use `set-gadget` only for a regular test application package, not a system process.\n7. After Gadget testing, call `clear-gadget` and restore `set-mode hybrid`.\n\n## Safety Notes\n\n- Zygisk injector changes require a device reboot.\n- Do not set `GADGET_TARGET_PACKAGE` to a launcher, input method, permission manager, WebView, root manager, payment component, account service, or other core system process.\n- `GADGET_ON_LOAD=wait` blocks the target process until a Frida client connects. For smoke tests, use `resume`.\n- `GADGET_INCLUDE_CHILDREN=no` is the default to avoid child processes competing for the same Gadget listen port.\n- Binding Frida to `0.0.0.0:<port>` exposes the debugging port to the network. Only do this in a trusted, isolated network.\n",
+  "readmeHTML": "<h1>frida-magisk</h1>\n\n<p>English | <a href=\"README.zh-CN.md\">Simplified Chinese</a></p>\n\n<p>Standalone Magisk / KernelSU module for packaging official Frida Android server binaries, official Frida Gadget binaries, and a bundled Zygisk injector into a flashable ZIP.</p>\n\n<p>This README is written to be automation-friendly. An AI agent should be able to build the module, deploy it to a known Android device, and operate the module interface by following the command contracts below.</p>\n\n<h2>Quick Facts</h2>\n\n<li>Module ID: `frida_magisk`</li>\n<li>Installed module path: `/data/adb/modules/frida_magisk`</li>\n<li>Runtime Gadget staging path: `/data/local/tmp/frida_magisk`</li>\n<li>Default server mode: `hybrid`</li>\n<li>Default `frida-server` listen address: `127.0.0.1:27042`</li>\n<li>Default Gadget listen address: `127.0.0.1:27043`</li>\n<li>Supported ABIs: `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`</li>\n<li>Main device interface: `sh /data/adb/modules/frida_magisk/action.sh ...`</li>\n<li>WebUI entry: `module/webroot/index.html`, executed by KernelSU / SukiSU through `ksu.exec`</li>\n\n<h2>Repository Layout</h2>\n\n<pre>module/                         Magisk / KernelSU module template\nmodule/native/zygisk/           Zygisk injector source\nmodule/action.sh                Stable on-device command interface\nmodule/service.sh               late_start service entry\nmodule/customize.sh             install-time setup script\nmodule/webroot/                 KernelSU / SukiSU WebUI\nscripts/fetch-frida-assets.sh   Download official Frida Android assets\nscripts/build-zygisk-injector.sh Build injector for all supported ABIs\nscripts/build-module.sh         Package the flashable ZIP\nscripts/build-all.sh            Full build entry\n.github/workflows/build.yml     CI, scheduled latest checks, and releases</pre>\n\n<h2>Build</h2>\n\n<p>Full local build:</p>\n\n<pre>scripts/build-all.sh</pre>\n\n<p>Equivalent explicit steps:</p>\n\n<pre>scripts/fetch-frida-assets.sh\nscripts/build-zygisk-injector.sh\nscripts/build-module.sh</pre>\n\n<p>Build a specific Frida version:</p>\n\n<pre>FRIDA_VERSION=17.23.3 scripts/build-all.sh</pre>\n\n<p><code>scripts/build-all.sh</code> builds the universal package and all per-ABI packages by default. To build only selected package targets:</p>\n\n<pre>MODULE_ABIS=\"arm64-v8a\" scripts/build-all.sh\nMODULE_ABIS=\"universal arm64-v8a\" scripts/build-all.sh</pre>\n\n<p><code>scripts/fetch-frida-assets.sh</code> always verifies SHA-256. Known versions are pinned in the script; any other version is verified against the <code>digest</code> that the GitHub releases API publishes for each <code>frida/frida</code> asset. There is no unverified mode. Set <code>GH_TOKEN</code> to avoid API rate limits:</p>\n\n<pre>FRIDA_VERSION=17.23.3 scripts/build-all.sh</pre>\n\n<p>Outputs:</p>\n\n<pre>dist/frida-magisk-&lt;frida-version&gt;-universal.zip\ndist/frida-magisk-&lt;frida-version&gt;-arm64-v8a.zip\ndist/frida-magisk-&lt;frida-version&gt;-armeabi-v7a.zip\ndist/frida-magisk-&lt;frida-version&gt;-x86.zip\ndist/frida-magisk-&lt;frida-version&gt;-x86_64.zip\ndist/*.sha256</pre>\n\n<p>Download guidance:</p>\n\n<li>Use `arm64-v8a` for most modern Android phones.</li>\n<li>Use `universal` only when the target ABI is unknown or one package must support multiple devices.</li>\n<li>Installing a package for the wrong ABI fails during module installation because `customize.sh` requires a matching `bin/<abi>/frida-server`.</li>\n\n<h2>GitHub Actions And Releases</h2>\n\n<p>Workflow: <code>.github/workflows/build.yml</code></p>\n\n<p>Supported triggers:</p>\n\n<li>`push` to `main` or `master`: builds and uploads workflow artifacts.</li>\n<li>`push` tag `v*`: builds the version from the tag, then creates or updates the matching GitHub Release.</li>\n<li>`pull_request`: build only, never publishes.</li>\n<li>Every push and pull request also runs a `checks` job: shell syntax, `actionlint` on the workflows, and `scripts/test-config-upgrade.sh`.</li>\n<li>`workflow_dispatch`: accepts `frida_version` and `publish_release` (publishing is only honoured on the default branch).</li>\n<li>`schedule`: runs daily at `00:00 UTC`, checks the latest upstream Frida release, and creates a release only when this repository does not already have `v<latest-version>`; otherwise it still runs a build-only check so toolchain breakage is visible.</li>\n\n<p>Manual build examples:</p>\n\n<pre>gh workflow run build.yml -f frida_version=17.23.3 -f publish_release=false\ngh workflow run build.yml -f frida_version=latest -f publish_release=true</pre>\n\n<p>Release rule:</p>\n\n<li>Scheduled latest build publishes `v<frida-version>` automatically if missing.</li>\n<li>Tag build publishes the pushed tag.</li>\n<li>Manual build publishes only when `publish_release=true`.</li>\n\n\n<h3>Module updates (updateJson)</h3>\n\n<li>The official module's `module.prop` sets `updateJson` to `update/official.json` on `main`, so Magisk / KernelSU can offer in-app updates. The update points at the `universal` ZIP.</li>\n<li>After a successful release, the publish job (only on `xjoker/frida-magisk`, never on PRs, forks or other branches) updates `update/official.json` and `update/official-changelog.md` and pushes the change to the default branch. It never moves to a lower version.</li>\n<li>The antidetect flavor removes `updateJson`, because a public URL would undo its renaming. `scripts/verify-antidetect-package.sh` checks that it is gone.</li>\n<li>The URL always points at `xjoker/frida-magisk`, so an official package built from a fork still receives updates from the upstream releases.</li>\n<li>Owned antidetect asset archives are verified against `antidetect/hashes.sha256` in this repository. See `antidetect/README.md`.</li>\n<li>Schedule: the daily run publishes new Frida versions. The Monday run also does a build-only check when the latest release already exists.</li>\n\n<h2>Device Deployment</h2>\n\n<p>All ADB commands must include <code>-s <serial></code>. Do not use implicit default devices.</p>\n\n<p>Confirm the device first:</p>\n\n<pre>adb devices\nadb -s &lt;serial&gt; shell getprop ro.product.model\nadb -s &lt;serial&gt; shell getprop ro.build.version.release\nadb -s &lt;serial&gt; shell su -c id</pre>\n\n<p>Install with KernelSU / SukiSU:</p>\n\n<pre>adb -s &lt;serial&gt; push dist/frida-magisk-17.23.3-arm64-v8a.zip /data/local/tmp/frida-magisk.zip\nadb -s &lt;serial&gt; shell su -c '/data/adb/ksud module install /data/local/tmp/frida-magisk.zip'\nadb -s &lt;serial&gt; reboot</pre>\n\n<p>Install with Magisk CLI when available:</p>\n\n<pre>adb -s &lt;serial&gt; push dist/frida-magisk-17.23.3-arm64-v8a.zip /data/local/tmp/frida-magisk.zip\nadb -s &lt;serial&gt; shell su -c 'magisk --install-module /data/local/tmp/frida-magisk.zip'\nadb -s &lt;serial&gt; reboot</pre>\n\n<p>After reboot:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh status'\nadb -s &lt;serial&gt; forward tcp:27042 tcp:27042\nfrida-ps -H 127.0.0.1:27042</pre>\n\n<h2>Module Configuration</h2>\n\n<p>Runtime config file:</p>\n\n<pre>/data/adb/modules/frida_magisk/config.env</pre>\n\n<p>Default values:</p>\n\n<pre>FRIDA_MODE=hybrid\nFRIDA_LISTEN=127.0.0.1:27042\nWATCHDOG_INTERVAL=5\nGADGET_TARGET_PACKAGE=\nGADGET_LISTEN=127.0.0.1:27043\nGADGET_ON_LOAD=wait\nGADGET_RUNTIME=qjs\nGADGET_INCLUDE_CHILDREN=no</pre>\n\n<p>Modes:</p>\n\n<li>`server`: run only regular `frida-server`.</li>\n<li>`hybrid`: run regular `frida-server` and allow Gadget injection for the configured target package.</li>\n<li>`gadget`: disable regular `frida-server`; use Gadget only.</li>\n\n<h2>Stable On-Device Interface</h2>\n\n<p>Command prefix:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh &lt;command&gt; [args...]'</pre>\n\n<p>Supported commands:</p>\n\n<pre>status\nweb-status\npackages [query] [limit]\nstart\nstop\nrestart\nset-listen &lt;ipv4:port&gt;\nset-mode &lt;server|hybrid|gadget&gt;\nset-gadget &lt;package&gt; &lt;ipv4:port&gt; &lt;wait|resume&gt; &lt;qjs|v8&gt; [yes|no]\nclear-gadget\nwatchdog-stop</pre>\n\n<p>Automation-friendly status:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh web-status'</pre>\n\n<p><code>web-status</code> prints <code>KEY=value</code> lines. Important keys:</p>\n\n<pre>HEALTH=running|stopped\nPID=&lt;pid|none&gt;\nLISTEN=&lt;ipv4:port&gt;\nMODE=server|hybrid|gadget\nWATCHDOG=running|stopped\nVERSION=&lt;frida-version&gt;\nGADGET_TARGET_PACKAGE=&lt;package|empty&gt;\nGADGET_LISTEN=&lt;ipv4:port&gt;\nGADGET_ON_LOAD=wait|resume\nGADGET_RUNTIME=qjs|v8\nGADGET_INCLUDE_CHILDREN=yes|no\nGADGET_BACKEND=internal|missing\nGADGET_ABI=arm64-v8a|armeabi-v7a|x86|x86_64|unknown</pre>\n\n<p>List installed packages:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh packages xingin 50'</pre>\n\n<p>Output format:</p>\n\n<pre>PACKAGE=com.example.app</pre>\n\n<p>Change server listen address:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-listen 127.0.0.1:27042'</pre>\n\n<p>Switch modes:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode server'\nadb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode hybrid'\nadb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-mode gadget'</pre>\n\n<p>Configure Gadget for one app:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh set-gadget com.example.app 127.0.0.1:27043 resume qjs no'\nadb -s &lt;serial&gt; forward tcp:27043 tcp:27043\nadb -s &lt;serial&gt; shell am force-stop com.example.app\nadb -s &lt;serial&gt; shell monkey -p com.example.app 1\nfrida-ps -H 127.0.0.1:27043</pre>\n\n<p>Clear Gadget target:</p>\n\n<pre>adb -s &lt;serial&gt; shell su -c 'sh /data/adb/modules/frida_magisk/action.sh clear-gadget'</pre>\n\n<h2>WebUI Interface</h2>\n\n<p>The WebUI is packaged under:</p>\n\n<pre>/data/adb/modules/frida_magisk/webroot/</pre>\n\n<p>KernelSU / SukiSU launches <code>webroot/index.html</code>. The page calls the same on-device <code>action.sh</code> interface through <code>ksu.exec</code>. It does not depend on external web assets. The UI defaults to English and includes a language switcher for Simplified Chinese.</p>\n\n<h2>Safe Operating Procedure For AI Agents</h2>\n\n<li>Identify exactly one target device with `adb devices`.</li>\n<li>Confirm model, Android version, and root shell with `adb -s <serial> ...`.</li>\n<li>Install the module ZIP.</li>\n<li>Reboot only after the user has allowed the reboot or when the task explicitly requires module activation.</li>\n<li>After reboot, call `web-status`.</li>\n<li>Use `set-gadget` only for a regular test application package, not a system process.</li>\n<li>After Gadget testing, call `clear-gadget` and restore `set-mode hybrid`.</li>\n\n<h2>Safety Notes</h2>\n\n<li>Zygisk injector changes require a device reboot.</li>\n<li>Do not set `GADGET_TARGET_PACKAGE` to a launcher, input method, permission manager, WebView, root manager, payment component, account service, or other core system process.</li>\n<li>`GADGET_ON_LOAD=wait` blocks the target process until a Frida client connects. For smoke tests, use `resume`.</li>\n<li>`GADGET_INCLUDE_CHILDREN=no` is the default to avoid child processes competing for the same Gadget listen port.</li>\n<li>Binding Frida to `0.0.0.0:<port>` exposes the debugging port to the network. Only do this in a trusted, isolated network.</li>",
+  "homepageUrl": "https://github.com/xjoker/frida-magisk",
+  "sourceUrl": "https://github.com/xjoker/frida-magisk",
+  "url": "https://github.com/xjoker/frida-magisk",
+  "latestRelease": {
+    "name": "v17.15.0",
+    "version": "v17.15.0",
+    "time": "2026-06-20T00:55:42Z",
+    "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-x86.zip"
+  },
+  "releases": [
+    {
+      "name": "v17.15.0",
+      "tagName": "v17.15.0",
+      "publishedAt": "2026-06-20T00:55:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-17.15.0-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-x86.zip",
+          "size": 33111847,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-arm64-v8a.zip",
+          "size": 33875349,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-x86_64.zip",
+          "size": 54437716,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-armeabi-v7a.zip",
+          "size": 19325540,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-universal.zip",
+          "size": 140688064,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-armeabi-v7a.zip.sha256",
+          "size": 103,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-universal.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-x86.zip.sha256",
+          "size": 95,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.15.0-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.15.0/frida-magisk-17.15.0-x86_64.zip.sha256",
+          "size": 98,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v17.14.1-antidetect",
+      "tagName": "v17.14.1-antidetect",
+      "publishedAt": "2026-06-18T02:06:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-antidetect-17.14.1-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-universal.zip",
+          "size": 140685423,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-armeabi-v7a.zip",
+          "size": 19328295,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-arm64-v8a.zip",
+          "size": 33873808,
+          "downloadCount": 4
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-x86.zip",
+          "size": 33116391,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-x86_64.zip",
+          "size": 54428960,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-arm64-v8a.zip.sha256",
+          "size": 112,
+          "downloadCount": 2
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-armeabi-v7a.zip.sha256",
+          "size": 114,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-universal.zip.sha256",
+          "size": 112,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-x86.zip.sha256",
+          "size": 106,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-antidetect-17.14.1-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1-antidetect/frida-magisk-antidetect-17.14.1-x86_64.zip.sha256",
+          "size": 109,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v17.14.1",
+      "tagName": "v17.14.1",
+      "publishedAt": "2026-06-18T01:00:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-17.14.1-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-arm64-v8a.zip",
+          "size": 33873978,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-x86.zip",
+          "size": 33116522,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-x86_64.zip",
+          "size": 54429112,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-armeabi-v7a.zip",
+          "size": 19328430,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-universal.zip",
+          "size": 140685655,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-armeabi-v7a.zip.sha256",
+          "size": 103,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-x86.zip.sha256",
+          "size": 95,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-x86_64.zip.sha256",
+          "size": 98,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.14.1-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.14.1/frida-magisk-17.14.1-universal.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v17.13.0",
+      "tagName": "v17.13.0",
+      "publishedAt": "2026-06-16T01:05:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-17.13.0-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-x86.zip",
+          "size": 33097759,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-armeabi-v7a.zip",
+          "size": 19320530,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-x86_64.zip",
+          "size": 54412042,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-arm64-v8a.zip",
+          "size": 33864996,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-universal.zip",
+          "size": 140636252,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-armeabi-v7a.zip.sha256",
+          "size": 103,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-x86.zip.sha256",
+          "size": 95,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-universal.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.13.0-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.13.0/frida-magisk-17.13.0-x86_64.zip.sha256",
+          "size": 98,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v17.12.0",
+      "tagName": "v17.12.0",
+      "publishedAt": "2026-06-12T01:00:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-17.12.0-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-universal.zip",
+          "size": 140626177,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-armeabi-v7a.zip",
+          "size": 19317667,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-x86_64.zip",
+          "size": 54408024,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-x86.zip",
+          "size": 33097175,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-arm64-v8a.zip",
+          "size": 33862386,
+          "downloadCount": 2
+        },
+        {
+          "name": "frida-magisk-17.12.0-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-armeabi-v7a.zip.sha256",
+          "size": 103,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-universal.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-x86_64.zip.sha256",
+          "size": 98,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.12.0-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.12.0/frida-magisk-17.12.0-x86.zip.sha256",
+          "size": 95,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v17.11.0",
+      "tagName": "v17.11.0",
+      "publishedAt": "2026-06-11T07:25:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "frida-magisk-17.11.0-x86.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-x86.zip",
+          "size": 33075125,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-universal.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-universal.zip",
+          "size": 140519110,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-armeabi-v7a.zip",
+          "size": 19302107,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-x86_64.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-x86_64.zip",
+          "size": 54365400,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-arm64-v8a.zip",
+          "size": 33835550,
+          "downloadCount": 2
+        },
+        {
+          "name": "frida-magisk-17.11.0-arm64-v8a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-arm64-v8a.zip.sha256",
+          "size": 101,
+          "downloadCount": 2
+        },
+        {
+          "name": "frida-magisk-17.11.0-armeabi-v7a.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-armeabi-v7a.zip.sha256",
+          "size": 103,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-universal.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-universal.zip.sha256",
+          "size": 101,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-x86.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-x86.zip.sha256",
+          "size": 95,
+          "downloadCount": 1
+        },
+        {
+          "name": "frida-magisk-17.11.0-x86_64.zip.sha256",
+          "downloadUrl": "https://github.com/xjoker/frida-magisk/releases/download/v17.11.0/frida-magisk-17.11.0-x86_64.zip.sha256",
+          "size": 98,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

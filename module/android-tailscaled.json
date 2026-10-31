@@ -1,0 +1,72 @@
+{
+  "readme": "# android-tailscaled\n\nA Magisk / KernelSU / APatch module that runs **upstream tailscaled** on rooted Android (arm64) in kernel TUN mode, with a WebUI.\n\n- **Up to date**: CI builds the latest [tailscale](https://github.com/tailscale/tailscale) release daily, applying a small patch set ([`patches/`](patches)).\n- **Plain CLI**: `tailscale` works as-is (`su -c 'tailscale status'`), no wrappers or extra flags.\n- **Coexists** with VPN apps and root TPROXY proxies (e.g. MaterialXray): Tailscale's packet marks and routing rules stay clear of Android's and theirs.\n- **WebUI** (KernelSU / APatch / MMRL): status, devices, exit node, preferences, daemon settings, logs.\n\n## Install\n\n1. Download the zip from [Releases](https://github.com/AetherMagee/android-tailscaled/releases/latest) and install it in your root manager. The daemon starts right away.\n2. Log in from the WebUI, or run `su -c 'tailscale up'` and open the printed link.\n\nUpdates arrive through the root manager's built-in module updater.\n\n## Usage\n\n| | |\n|---|---|\n| `tailscale ...` | the normal Tailscale CLI |\n| `tailscaled.service {start\\|stop\\|restart\\|status\\|log}` | manage the daemon |\n| `/data/adb/tailscale/tailscaled.conf` | daemon settings (port, TUN/userspace, rule priority, extra flags) |\n| `/data/adb/tailscale/` | node state, socket and logs; kept on uninstall |\n\nToggling the module in the root manager stops/starts the daemon immediately. A module that was disabled at boot needs a reboot (or the WebUI's Start button) after re-enabling.\n\n### Routing priority\n\nTailscale installs one policy rule, `not fwmark 0x40000000/0x60000000 lookup 52`, at `IP_RULE_PRIORITY`:\n\n- `9999` (default): after TPROXY proxies (MaterialXray's rule is at 9990, its probes at 9991-9998), before all of Android's own rules (10000+), so tailnet IPs win over VPN apps. Proxied apps reach the tailnet only if the proxy bypasses `100.64.0.0/10` (MaterialXray's \"Bypass LAN\"). With an exit node, the proxy's own upstream traffic goes through the exit node.\n- `5270`: upstream's default, Tailscale before everything. MaterialXray refuses to start TPROXY with a rule ahead of its own.\n\n## What the patches change\n\n| Patch | Why |\n|---|---|\n| detect Android (`/dev/__properties__`) | gate the rest on Android |\n| fwmark bits → 29-30 (`0x60000000`) | upstream's `0xff0000` overlaps netd's bits 16-20; MaterialXray uses 21-28 |\n| connmark rules appended, not inserted at 1 | MaterialXray requires its guard first in mangle OUTPUT |\n| single fall-through ip rule | Android keeps default routes in per-network tables, so upstream's `main` + `unreachable` rules cut tailscaled off |\n| `TS_IP_POLICY_PREF_BASE` | make the priority configurable |\n| socket/state in `/data/adb/tailscale` | `tailscale` CLI works without `--socket` |\n| no-op OS DNS configurator | Android has no `resolv.conf` |\n| netd's protected-from-VPN bit on tailscaled's sockets | VPN apps don't capture Tailscale's own traffic |\n| Tailscale SSH as `root` | no `/etc/passwd`/`getent` on Android; toybox `id` lacks `-z`; Android PATH. Sessions start in `/data/adb/tailscale/home` with `/system/bin/sh` |\n\nAlso omitted from the build: `portlist` (no reporting of listening services to the control plane) and server-only features (AWS, Kubernetes, systemd, …).\n\n## Limitations\n\n- arm64 only.\n- MagicDNS names don't resolve system-wide yet (Android resolves through netd). Tailnet IPs work; 100.100.100.100 answers direct queries.\n- Tailscale SSH supports only the `root` user (`ssh root@<device>`); allow it in your tailnet policy.\n- Advertising an exit node or subnet routes is untested.\n- Android's per-app background network restrictions apply to tailnet traffic, the same as for any VPN.\n\n## Building\n\n```sh\n./build.sh            # latest upstream release\n./build.sh v1.104.1   # specific tag\n```\n\nNeeds Go and git. Produces `dist/android-tailscaled-<tag>-r<REVISION>.zip`. Bump `REVISION` to release module-only changes.\n",
+  "readmeHTML": "<h1>android-tailscaled</h1>\n\n<p>A Magisk / KernelSU / APatch module that runs <b>upstream tailscaled</b> on rooted Android (arm64) in kernel TUN mode, with a WebUI.</p>\n\n<li>**Up to date**: CI builds the latest [tailscale](https://github.com/tailscale/tailscale) release daily, applying a small patch set ([`patches/`](patches)).</li>\n<li>**Plain CLI**: `tailscale` works as-is (`su -c 'tailscale status'`), no wrappers or extra flags.</li>\n<li>**Coexists** with VPN apps and root TPROXY proxies (e.g. MaterialXray): Tailscale's packet marks and routing rules stay clear of Android's and theirs.</li>\n<li>**WebUI** (KernelSU / APatch / MMRL): status, devices, exit node, preferences, daemon settings, logs.</li>\n\n<h2>Install</h2>\n\n<li>Download the zip from [Releases](https://github.com/AetherMagee/android-tailscaled/releases/latest) and install it in your root manager. The daemon starts right away.</li>\n<li>Log in from the WebUI, or run `su -c 'tailscale up'` and open the printed link.</li>\n\n<p>Updates arrive through the root manager's built-in module updater.</p>\n\n<h2>Usage</h2>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| <code>tailscale ...</code> | the normal Tailscale CLI |</p>\n<p>| <code>tailscaled.service {start\\|stop\\|restart\\|status\\|log}</code> | manage the daemon |</p>\n<p>| <code>/data/adb/tailscale/tailscaled.conf</code> | daemon settings (port, TUN/userspace, rule priority, extra flags) |</p>\n<p>| <code>/data/adb/tailscale/</code> | node state, socket and logs; kept on uninstall |</p>\n\n<p>Toggling the module in the root manager stops/starts the daemon immediately. A module that was disabled at boot needs a reboot (or the WebUI's Start button) after re-enabling.</p>\n\n<h3>Routing priority</h3>\n\n<p>Tailscale installs one policy rule, <code>not fwmark 0x40000000/0x60000000 lookup 52</code>, at <code>IP_RULE_PRIORITY</code>:</p>\n\n<li>`9999` (default): after TPROXY proxies (MaterialXray's rule is at 9990, its probes at 9991-9998), before all of Android's own rules (10000+), so tailnet IPs win over VPN apps. Proxied apps reach the tailnet only if the proxy bypasses `100.64.0.0/10` (MaterialXray's \"Bypass LAN\"). With an exit node, the proxy's own upstream traffic goes through the exit node.</li>\n<li>`5270`: upstream's default, Tailscale before everything. MaterialXray refuses to start TPROXY with a rule ahead of its own.</li>\n\n<h2>What the patches change</h2>\n\n<p>| Patch | Why |</p>\n<p>|---|---|</p>\n<p>| detect Android (<code>/dev/__properties__</code>) | gate the rest on Android |</p>\n<p>| fwmark bits → 29-30 (<code>0x60000000</code>) | upstream's <code>0xff0000</code> overlaps netd's bits 16-20; MaterialXray uses 21-28 |</p>\n<p>| connmark rules appended, not inserted at 1 | MaterialXray requires its guard first in mangle OUTPUT |</p>\n<p>| single fall-through ip rule | Android keeps default routes in per-network tables, so upstream's <code>main</code> + <code>unreachable</code> rules cut tailscaled off |</p>\n<p>| <code>TS_IP_POLICY_PREF_BASE</code> | make the priority configurable |</p>\n<p>| socket/state in <code>/data/adb/tailscale</code> | <code>tailscale</code> CLI works without <code>--socket</code> |</p>\n<p>| no-op OS DNS configurator | Android has no <code>resolv.conf</code> |</p>\n<p>| netd's protected-from-VPN bit on tailscaled's sockets | VPN apps don't capture Tailscale's own traffic |</p>\n<p>| Tailscale SSH as <code>root</code> | no <code>/etc/passwd</code>/<code>getent</code> on Android; toybox <code>id</code> lacks <code>-z</code>; Android PATH. Sessions start in <code>/data/adb/tailscale/home</code> with <code>/system/bin/sh</code> |</p>\n\n<p>Also omitted from the build: <code>portlist</code> (no reporting of listening services to the control plane) and server-only features (AWS, Kubernetes, systemd, …).</p>\n\n<h2>Limitations</h2>\n\n<li>arm64 only.</li>\n<li>MagicDNS names don't resolve system-wide yet (Android resolves through netd). Tailnet IPs work; 100.100.100.100 answers direct queries.</li>\n<li>Tailscale SSH supports only the `root` user (`ssh root@<device>`); allow it in your tailnet policy.</li>\n<li>Advertising an exit node or subnet routes is untested.</li>\n<li>Android's per-app background network restrictions apply to tailnet traffic, the same as for any VPN.</li>\n\n<h2>Building</h2>\n\n<pre>./build.sh            # latest upstream release\n./build.sh v1.104.1   # specific tag</pre>\n\n<p>Needs Go and git. Produces <code>dist/android-tailscaled-<tag>-r<REVISION>.zip</code>. Bump <code>REVISION</code> to release module-only changes.</p>",
+  "homepageUrl": "https://github.com/AetherMagee/android-tailscaled",
+  "sourceUrl": "https://github.com/AetherMagee/android-tailscaled",
+  "url": "https://github.com/AetherMagee/android-tailscaled",
+  "latestRelease": {
+    "name": "v1.104.4-r2",
+    "version": "v1.104.4-r2",
+    "time": "2026-10-29T13:48:50Z",
+    "downloadUrl": "https://github.com/AetherMagee/android-tailscaled/releases/download/v1.104.4-r2/android-tailscaled-v1.104.4-r2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.104.4-r2",
+      "tagName": "v1.104.4-r2",
+      "publishedAt": "2026-10-29T13:48:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-tailscaled-v1.104.4-r2.zip",
+          "downloadUrl": "https://github.com/AetherMagee/android-tailscaled/releases/download/v1.104.4-r2/android-tailscaled-v1.104.4-r2.zip",
+          "size": 10493784,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.104.2-r2",
+      "tagName": "v1.104.2-r2",
+      "publishedAt": "2026-10-21T11:14:47Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-tailscaled-v1.104.2-r2.zip",
+          "downloadUrl": "https://github.com/AetherMagee/android-tailscaled/releases/download/v1.104.2-r2/android-tailscaled-v1.104.2-r2.zip",
+          "size": 10399128,
+          "downloadCount": 12
+        }
+      ]
+    },
+    {
+      "name": "v1.104.1-r2",
+      "tagName": "v1.104.1-r2",
+      "publishedAt": "2026-10-09T17:47:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-tailscaled-v1.104.1-r2.zip",
+          "downloadUrl": "https://github.com/AetherMagee/android-tailscaled/releases/download/v1.104.1-r2/android-tailscaled-v1.104.1-r2.zip",
+          "size": 10400268,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.104.1-r1",
+      "tagName": "v1.104.1-r1",
+      "publishedAt": "2026-10-08T23:27:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "android-tailscaled-v1.104.1-r1.zip",
+          "downloadUrl": "https://github.com/AetherMagee/android-tailscaled/releases/download/v1.104.1-r1/android-tailscaled-v1.104.1-r1.zip",
+          "size": 10393848,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

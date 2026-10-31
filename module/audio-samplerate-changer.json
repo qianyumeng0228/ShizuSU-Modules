@@ -1,0 +1,100 @@
+{
+  "readme": "## A Magisk module changing audio samplerates at the system-wide mixer for the best Hi-Fi experience\n\nThis module has been developed for casual music lovers to be able to experience the essence of my root script [\"USB SampleRate Changer\"](https://github.com/yzyhk904/USB_SampleRate_Changer) by the automation of Magisk.\n\nIts features:\n<ol>\n    <li>Setting the samplerate of the USB HAL audio driver to be maximum automatically (up to 768 kHz & 32 bits; but 192 kHz & 32 bits for Tensor devices only)</li>\n    <li>Setting its USB data transfer period to be 2000 usec for reducing jitter, instead of usual 5000 usec</li>\n    <li>Setting the samplerate of the AOSP Bluetooth audio driver automatically depending upon a selected codec without double re-sampling unlike offload drivers</li>\n    <li>Setting the samplerate of internal speakers to be maximum; 384 kHz & 32 bits for Qcom devices, 48 kHz & 32 bits for others</li>\n    <li>Default re-sampling parameters are the same as <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\"</a> (can be overridden by other modules), i.e., very mastering level quality being much better than the over-sammpling quality of very expensive DAC's applied when \"The bit-perfect mode\"</li>\n    <li>Optimizing I/O kernel tunables for reducing jitter (most effective and almost safe as kernel tuning)</li>\n    <li>Designed for using <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings\">\"Audio Msic. Settings\"</a> or <a href=\"https://github.com/yzyhk904/hifi-maximizer-mod\">\"Hifi maximizer\"</a> together, but can be used by itself only</li>\n    <ol><li>Since the above two modules override re-sampling parameters, use <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\"</a> in addition if you use cheapie devices (Bluetooth LDAC earphones, cheap USB DAC's, and internal speakers, etc.)</li>\n    <li>Strongly recommending to install <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer\">\"Audio jitter silencer\"</a> together and uninstall (or disable) \"Digital Wellbeing\" app (for reducing very large jitters which this module cannot reduce by itself)!</li></ol>\n    <li>Disabling DRC (a kind of compression) if enabled, and the call screening framework under audio HAL's for reducing jitter</li>\n</ol>\n<br/>\n<br/>\n\nNotes:\n* This module can run only on devices using a 7.0 audio policy configuration prevailing since Android 14 or so including custom ROM's supporting relatively old ones (especially phh GSI's doing since Android 12), excluding recent AIDL only ones like Pixel 9 series.\n* This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 14~16, and Qualcomm SoC & MediaTek SoC & Tensors combinations). \n* Also don't forget disabling \"Absolute Volume\" of Bluetooth devices in developer settings and setting a volume at the Bluetooth devices side to be maximum for the best audio quality, though most people may think inversely.\n* Almost all equalizers and some apps (using a much worse internal re-sampler to output; e.g. old Am@zon music app, some VOIP apps, etc.) cannot work for greater than 192 kHz audio outputs (but of which quality is far better sometimes). And the latest Am@zon music app re-samples up to 192 kHz for such high frequency audio output, i.e. incurs much worse double re-sampling. If you prefer such ones, modify `SampleRatePrimary=\"384000\"` to `SampleRatePrimary=\"192000\"` or even `SampleRatePrimary=\"48000\"` (these samplerates affect only internal speakers and wired headsets), and also the third argument of `patchClearLock` command from \"max\" (means up to 768 kHz) to \"default\" (does up to 192 kHz) in \"customize.sh\" in a ZIP file of this module and install (or update) the modified one.\n* <a href=\"https://github.com/Magisk-Modules-Alt-Repo/drc-remover\">\"DRC remover\"</a> and <a href=\"https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker\">\"USB Samplerate Unlocker\"</a> are already  included; Don't try installing them together</li>\n\n\n## DISCLAIMER\n\n* I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.\n\n##\n",
+  "readmeHTML": "<h2>A Magisk module changing audio samplerates at the system-wide mixer for the best Hi-Fi experience</h2>\n\n<p>This module has been developed for casual music lovers to be able to experience the essence of my root script <a href=\"https://github.com/yzyhk904/USB_SampleRate_Changer\">\"USB SampleRate Changer\"</a> by the automation of Magisk.</p>\n\n<p>Its features:</p>\n<p><ol></p>\n<p>    <li>Setting the samplerate of the USB HAL audio driver to be maximum automatically (up to 768 kHz & 32 bits; but 192 kHz & 32 bits for Tensor devices only)</li></p>\n<p>    <li>Setting its USB data transfer period to be 2000 usec for reducing jitter, instead of usual 5000 usec</li></p>\n<p>    <li>Setting the samplerate of the AOSP Bluetooth audio driver automatically depending upon a selected codec without double re-sampling unlike offload drivers</li></p>\n<p>    <li>Setting the samplerate of internal speakers to be maximum; 384 kHz & 32 bits for Qcom devices, 48 kHz & 32 bits for others</li></p>\n<p>    <li>Default re-sampling parameters are the same as <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\"</a> (can be overridden by other modules), i.e., very mastering level quality being much better than the over-sammpling quality of very expensive DAC's applied when \"The bit-perfect mode\"</li></p>\n<p>    <li>Optimizing I/O kernel tunables for reducing jitter (most effective and almost safe as kernel tuning)</li></p>\n<p>    <li>Designed for using <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings\">\"Audio Msic. Settings\"</a> or <a href=\"https://github.com/yzyhk904/hifi-maximizer-mod\">\"Hifi maximizer\"</a> together, but can be used by itself only</li></p>\n<p>    <ol><li>Since the above two modules override re-sampling parameters, use <a href=\"https://github.com/Magisk-Modules-Alt-Repo/resampling-for-cheapies\">\"Resampling for cheapies\"</a> in addition if you use cheapie devices (Bluetooth LDAC earphones, cheap USB DAC's, and internal speakers, etc.)</li></p>\n<p>    <li>Strongly recommending to install <a href=\"https://github.com/Magisk-Modules-Alt-Repo/audio-jitter-silencer\">\"Audio jitter silencer\"</a> together and uninstall (or disable) \"Digital Wellbeing\" app (for reducing very large jitters which this module cannot reduce by itself)!</li></ol></p>\n<p>    <li>Disabling DRC (a kind of compression) if enabled, and the call screening framework under audio HAL's for reducing jitter</li></p>\n<p></ol></p>\n<p><br/></p>\n<p><br/></p>\n\n<p>Notes:</p>\n<li>This module can run only on devices using a 7.0 audio policy configuration prevailing since Android 14 or so including custom ROM's supporting relatively old ones (especially phh GSI's doing since Android 12), excluding recent AIDL only ones like Pixel 9 series.</li>\n<li>This module has been tested on LineageOS and crDroid ROM's, and phh GSI's (Android 14~16, and Qualcomm SoC & MediaTek SoC & Tensors combinations).</li>\n<li>Also don't forget disabling \"Absolute Volume\" of Bluetooth devices in developer settings and setting a volume at the Bluetooth devices side to be maximum for the best audio quality, though most people may think inversely.</li>\n<li>Almost all equalizers and some apps (using a much worse internal re-sampler to output; e.g. old Am@zon music app, some VOIP apps, etc.) cannot work for greater than 192 kHz audio outputs (but of which quality is far better sometimes). And the latest Am@zon music app re-samples up to 192 kHz for such high frequency audio output, i.e. incurs much worse double re-sampling. If you prefer such ones, modify `SampleRatePrimary=\"384000\"` to `SampleRatePrimary=\"192000\"` or even `SampleRatePrimary=\"48000\"` (these samplerates affect only internal speakers and wired headsets), and also the third argument of `patchClearLock` command from \"max\" (means up to 768 kHz) to \"default\" (does up to 192 kHz) in \"customize.sh\" in a ZIP file of this module and install (or update) the modified one.</li>\n<li><a href=\"https://github.com/Magisk-Modules-Alt-Repo/drc-remover\">\"DRC remover\"</a> and <a href=\"https://github.com/Magisk-Modules-Alt-Repo/usb-samplerate-unlocker\">\"USB Samplerate Unlocker\"</a> are already  included; Don't try installing them together</li></li>\n\n\n<h2>DISCLAIMER</h2>\n\n<li>I am not responsible for any damage that may occur to your device, so it is your own choice whether to attempt this module or not.</li>\n\n<p>##</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer",
+  "latestRelease": {
+    "name": "v1.1.6",
+    "version": "v1.1.6",
+    "time": "2025-06-07T14:52:12Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.6/magisk-module-audio-samplerate-changer-v1.1.6.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.6",
+      "tagName": "v1.1.6",
+      "publishedAt": "2025-06-07T14:52:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.6.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.6/magisk-module-audio-samplerate-changer-v1.1.6.zip",
+          "size": 41688,
+          "downloadCount": 386
+        }
+      ]
+    },
+    {
+      "name": "v1.1.5",
+      "tagName": "v1.1.5",
+      "publishedAt": "2025-04-30T13:29:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.5-2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.5/magisk-module-audio-samplerate-changer-v1.1.5-2.zip",
+          "size": 41688,
+          "downloadCount": 359
+        }
+      ]
+    },
+    {
+      "name": "v1.1.4",
+      "tagName": "v1.1.4",
+      "publishedAt": "2025-03-02T12:00:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.4-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.4/magisk-module-audio-samplerate-changer-v1.1.4-1.zip",
+          "size": 40007,
+          "downloadCount": 462
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2024-12-11T14:21:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.2-1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.2/magisk-module-audio-samplerate-changer-v1.1.2-1.zip",
+          "size": 39787,
+          "downloadCount": 972
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2024-11-30T10:25:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.1.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.1/magisk-module-audio-samplerate-changer-v1.1.1.zip",
+          "size": 39656,
+          "downloadCount": 328
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2024-11-23T07:46:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "magisk-module-audio-samplerate-changer-v1.1.0.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-samplerate-changer/releases/download/v1.1.0/magisk-module-audio-samplerate-changer-v1.1.0.zip",
+          "size": 39415,
+          "downloadCount": 293
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,58 @@
+{
+  "readme": "# Leica Camera Enabler (Safe)\n\nA Magisk/KernelSU module (+ bundled LSPOSED companion) that enables Leica features\nfor the Xiaomi 17 Ultra (nezha).\n\n## Features\n\n**Module (system props):**\n- Sets `ro.theme_customize=LCC`\n- Sets `ro.theme_leica=true`\n- Sets `camera.debug.safe.check.disable=true`\n\n**Bundled LSPOSED module** (`LeicaFramePatcher.apk`, installed automatically on flash — see [`lsposed-module/`](lsposed-module/)):\n- Removes the non-working Leica gallery frames from the picker (their working duplicates remain further down the list, so nothing is lost)\n- Hides the Leica camera-island \"Camera ring\" settings this variant has no hardware for — both in the camera and in system Settings (the Photography Kit \"Camera Grip\" is left working)\n- Renames the watermark device name to **\"XIAOMI 17 Ultra by Leica\"** in both the camera and the gallery editor\n\n> Requires ticking scope **Camera + Gallery editor + Settings** in the LSPOSED manager after install.\n\n## Project structure\n\n- [`module/`](module/) — Magisk/KernelSU module payload (props, `customize.sh`, Magisk installer). The release zip is built from here.\n- [`lsposed-module/`](lsposed-module/) — the LSPOSED/Xposed companion (Gradle project). CI builds its APK and bundles it into the zip.\n- [`.github/workflows/release.yml`](.github/workflows/release.yml) — builds the APK, assembles and verifies the flashable zip, and attaches it to tagged releases.\n\n## Credits & Attribution\n\n- **Discovery:** Special thanks to **Max Weinbach** for discovering these flags. \n  - [Original X Post by Max Weinbach](https://x.com/mweinbach/status/2038763588655993271)\n- **Author:** mexus\n\n## Requirements\n\n- Xiaomi 17 Ultra (nezha), rooted with Magisk or KernelSU / KSU-Next\n- A recent LSPOSED (Xposed **API 100+** — the companion is a modern libxposed module)\n\n## Installation\n\n1. Download the zip from the [Releases](https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases) page\n   (use the **Release asset**, not the Actions \"artifact\" — that one is double-zipped by GitHub and won't flash).\n2. Flash it in the **Magisk app** or **KernelSU / KSU-Next** manager. This applies the props\n   and auto-installs the bundled LSPOSED APK (flashing runs inside Android, where `pm` is available).\n3. Open **LSPOSED** → enable **Leica Frame Patcher** → set its scope to **Camera** + **Gallery editor** + **Settings**.\n4. Reboot.\n5. Clear Camera app data.\n\n> The LSPOSED enable + scope step (3) is manual — LSPOSED has no supported way to auto-enable a module.\n> If auto-install didn't run (e.g. recovery flash), install `/data/adb/modules/leica_camera_enabler/LeicaFramePatcher.apk` manually.\n\nThe LSPOSED module source and build details are in [`lsposed-module/`](lsposed-module/).\n",
+  "readmeHTML": "<h1>Leica Camera Enabler (Safe)</h1>\n\n<p>A Magisk/KernelSU module (+ bundled LSPOSED companion) that enables Leica features</p>\n<p>for the Xiaomi 17 Ultra (nezha).</p>\n\n<h2>Features</h2>\n\n<p><b>Module (system props):</b></p>\n<li>Sets `ro.theme_customize=LCC`</li>\n<li>Sets `ro.theme_leica=true`</li>\n<li>Sets `camera.debug.safe.check.disable=true`</li>\n\n<p><b>Bundled LSPOSED module</b> (<code>LeicaFramePatcher.apk</code>, installed automatically on flash — see <a href=\"lsposed-module/\"><code>lsposed-module/</code></a>):</p>\n<li>Removes the non-working Leica gallery frames from the picker (their working duplicates remain further down the list, so nothing is lost)</li>\n<li>Hides the Leica camera-island \"Camera ring\" settings this variant has no hardware for — both in the camera and in system Settings (the Photography Kit \"Camera Grip\" is left working)</li>\n<li>Renames the watermark device name to **\"XIAOMI 17 Ultra by Leica\"** in both the camera and the gallery editor</li>\n\n<p>> Requires ticking scope <b>Camera + Gallery editor + Settings</b> in the LSPOSED manager after install.</p>\n\n<h2>Project structure</h2>\n\n<li>[`module/`](module/) — Magisk/KernelSU module payload (props, `customize.sh`, Magisk installer). The release zip is built from here.</li>\n<li>[`lsposed-module/`](lsposed-module/) — the LSPOSED/Xposed companion (Gradle project). CI builds its APK and bundles it into the zip.</li>\n<li>[`.github/workflows/release.yml`](.github/workflows/release.yml) — builds the APK, assembles and verifies the flashable zip, and attaches it to tagged releases.</li>\n\n<h2>Credits & Attribution</h2>\n\n<li>**Discovery:** Special thanks to **Max Weinbach** for discovering these flags.</li>\n<p>  - <a href=\"https://x.com/mweinbach/status/2038763588655993271\">Original X Post by Max Weinbach</a></p>\n<li>**Author:** mexus</li>\n\n<h2>Requirements</h2>\n\n<li>Xiaomi 17 Ultra (nezha), rooted with Magisk or KernelSU / KSU-Next</li>\n<li>A recent LSPOSED (Xposed **API 100+** — the companion is a modern libxposed module)</li>\n\n<h2>Installation</h2>\n\n<li>Download the zip from the [Releases](https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases) page</li>\n<p>   (use the <b>Release asset</b>, not the Actions \"artifact\" — that one is double-zipped by GitHub and won't flash).</p>\n<li>Flash it in the **Magisk app** or **KernelSU / KSU-Next** manager. This applies the props</li>\n<p>   and auto-installs the bundled LSPOSED APK (flashing runs inside Android, where <code>pm</code> is available).</p>\n<li>Open **LSPOSED** → enable **Leica Frame Patcher** → set its scope to **Camera** + **Gallery editor** + **Settings**.</li>\n<li>Reboot.</li>\n<li>Clear Camera app data.</li>\n\n<p>> The LSPOSED enable + scope step (3) is manual — LSPOSED has no supported way to auto-enable a module.</p>\n<p>> If auto-install didn't run (e.g. recovery flash), install <code>/data/adb/modules/leica_camera_enabler/LeicaFramePatcher.apk</code> manually.</p>\n\n<p>The LSPOSED module source and build details are in <a href=\"lsposed-module/\"><code>lsposed-module/</code></a>.</p>",
+  "homepageUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler",
+  "sourceUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler",
+  "url": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler",
+  "latestRelease": {
+    "name": "v1.2",
+    "version": "v1.2",
+    "time": "2026-08-12T10:34:45Z",
+    "downloadUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases/download/v1.2/nezha_leica_camera_enabler_by_mexus.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-08-12T10:34:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nezha_leica_camera_enabler_by_mexus.zip",
+          "downloadUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases/download/v1.2/nezha_leica_camera_enabler_by_mexus.zip",
+          "size": 1426210,
+          "downloadCount": 2074
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-08-12T09:34:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nezha_leica_camera_enabler_by_mexus.zip",
+          "downloadUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases/download/v1.1/nezha_leica_camera_enabler_by_mexus.zip",
+          "size": 1425000,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-04-09T10:35:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "nezha_leica_camera_enabler_by_mexus.zip",
+          "downloadUrl": "https://github.com/mexusbg/Nezha-Leica-Camera-Enabler/releases/download/v1.0/nezha_leica_camera_enabler_by_mexus.zip",
+          "size": 1109,
+          "downloadCount": 1841
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

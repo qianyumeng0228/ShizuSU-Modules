@@ -1,0 +1,98 @@
+{
+  "readme": "![SmartAppClose Logo](./smarappcloselogos.png)\n\n## Smart App Close (Gaming Mode)\n\n## Apa Fungsi Modul Ini?\n\nSmart App Close adalah modul berbasis Magisk/KernelSU yang dirancang khusus untuk **memaksimalkan performa gaming** di perangkat Android dengan cara **menutup aplikasi-aplikasi latar belakang secara otomatis saat kamu membuka game**. Modul ini sangat berguna untuk pengguna dengan RAM terbatas yang ingin menghindari lag atau delay saat bermain game.\n\nModul ini bekerja secara otomatis tanpa perlu aplikasi tambahan atau task killer, cukup edit file konfigurasi whitelist dan gamelist sesuai kebutuhanmu.\n\n---\n\n## Bagaimana Cara Kerjanya?\n\n1. **Deteksi Game Aktif**  \n   Modul memonitor aplikasi foreground dan membandingkannya dengan daftar package di `gamelist.txt`.\n\n2. **Filter Aplikasi Penting**  \n   Aplikasi yang ada di `whitelist.txt` tidak akan di-close, sehingga app penting tetap aman.\n\n3. **Force-Close App Latar Belakang**  \n   Saat game dari gamelist aktif, modul akan menutup semua aplikasi lain yang tidak termasuk whitelist untuk membebaskan RAM dan resource.\n\n4. **Loop Aktif 24/7**  \n   Modul terus berjalan di background melalui script `service.sh`, dan akan auto-reload konfigurasi pada versi terbaru tanpa butuh reboot.\n\n---\n\n## Kelebihan:\n- Performa gaming meningkat signifikan\n- RAM jadi lebih lega tanpa bloatware\n- Ringan dan tidak memerlukan akses UI\n- Bisa digunakan di semua jenis ROM: AOSP, MIUI, HyperOS, dll\n\n---\n\n## Cara Penggunaan\n1. Flash modul via Magisk / KernelSU / KernelSU Next\n2. Reboot device\n3. Akses:\n   ```\n   /data/adb/modules/smartappclose/system/etc/smartappclose/\n   ```\n4. Edit file:\n   - `whitelist.txt`: aplikasi yang tidak ingin ditutup\n   - `gamelist.txt`: aplikasi game yang memicu clean\n5. Enjoying Gaming\n\n---\n\n## Info:\n- `whitelist.txt` = Daftar app yang **tidak ingin di-kill**\n- `gamelist.txt` = Daftar game yang **akan memicu pembersihan**\n\n---\n\n## ⚠️ Untuk Android 11 Users ⚠️\nJika mengalami error saat install, [klik di sini](./for_Android_11.md)\n\n---\n\n## Download\n\nKamu bisa mengunduh semua versi modul dari halaman rilis resmi berikut:  \n[**DOWNLOAD**](https://github.com/johnwick278/SmartAppClose/releases)\n\n---\n\n## Dibuat oleh\n[@unknuw](https://t.me/unknuw) x [ChatGPT](https://chat.openai.com/)\n",
+  "readmeHTML": "<p>!<a href=\"./smarappcloselogos.png\">SmartAppClose Logo</a></p>\n\n<h2>Smart App Close (Gaming Mode)</h2>\n\n<h2>Apa Fungsi Modul Ini?</h2>\n\n<p>Smart App Close adalah modul berbasis Magisk/KernelSU yang dirancang khusus untuk <b>memaksimalkan performa gaming</b> di perangkat Android dengan cara <b>menutup aplikasi-aplikasi latar belakang secara otomatis saat kamu membuka game</b>. Modul ini sangat berguna untuk pengguna dengan RAM terbatas yang ingin menghindari lag atau delay saat bermain game.</p>\n\n<p>Modul ini bekerja secara otomatis tanpa perlu aplikasi tambahan atau task killer, cukup edit file konfigurasi whitelist dan gamelist sesuai kebutuhanmu.</p>\n\n<p>---</p>\n\n<h2>Bagaimana Cara Kerjanya?</h2>\n\n<li>**Deteksi Game Aktif**</li>\n<p>   Modul memonitor aplikasi foreground dan membandingkannya dengan daftar package di <code>gamelist.txt</code>.</p>\n\n<li>**Filter Aplikasi Penting**</li>\n<p>   Aplikasi yang ada di <code>whitelist.txt</code> tidak akan di-close, sehingga app penting tetap aman.</p>\n\n<li>**Force-Close App Latar Belakang**</li>\n<p>   Saat game dari gamelist aktif, modul akan menutup semua aplikasi lain yang tidak termasuk whitelist untuk membebaskan RAM dan resource.</p>\n\n<li>**Loop Aktif 24/7**</li>\n<p>   Modul terus berjalan di background melalui script <code>service.sh</code>, dan akan auto-reload konfigurasi pada versi terbaru tanpa butuh reboot.</p>\n\n<p>---</p>\n\n<h2>Kelebihan:</h2>\n<li>Performa gaming meningkat signifikan</li>\n<li>RAM jadi lebih lega tanpa bloatware</li>\n<li>Ringan dan tidak memerlukan akses UI</li>\n<li>Bisa digunakan di semua jenis ROM: AOSP, MIUI, HyperOS, dll</li>\n\n<p>---</p>\n\n<h2>Cara Penggunaan</h2>\n<li>Flash modul via Magisk / KernelSU / KernelSU Next</li>\n<li>Reboot device</li>\n<li>Akses:</li>\n<p>   ```</p>\n<p>   /data/adb/modules/smartappclose/system/etc/smartappclose/</p>\n<p>   ```</p>\n<li>Edit file:</li>\n<p>   - <code>whitelist.txt</code>: aplikasi yang tidak ingin ditutup</p>\n<p>   - <code>gamelist.txt</code>: aplikasi game yang memicu clean</p>\n<li>Enjoying Gaming</li>\n\n<p>---</p>\n\n<h2>Info:</h2>\n<li>`whitelist.txt` = Daftar app yang **tidak ingin di-kill**</li>\n<li>`gamelist.txt` = Daftar game yang **akan memicu pembersihan**</li>\n\n<p>---</p>\n\n<h2>⚠️ Untuk Android 11 Users ⚠️</h2>\n<p>Jika mengalami error saat install, <a href=\"./for_Android_11.md\">klik di sini</a></p>\n\n<p>---</p>\n\n<h2>Download</h2>\n\n<p>Kamu bisa mengunduh semua versi modul dari halaman rilis resmi berikut:</p>\n<p><a href=\"https://github.com/johnwick278/SmartAppClose/releases\"><b>DOWNLOAD</b></a></p>\n\n<p>---</p>\n\n<h2>Dibuat oleh</h2>\n<p><a href=\"https://t.me/unknuw\">@unknuw</a> x <a href=\"https://chat.openai.com/\">ChatGPT</a></p>",
+  "homepageUrl": "https://github.com/UNKNUW/SmartAppClose",
+  "sourceUrl": "https://github.com/UNKNUW/SmartAppClose",
+  "url": "https://github.com/UNKNUW/SmartAppClose",
+  "latestRelease": {
+    "name": "V2.9(Fix)",
+    "version": "V2.9(Fix)",
+    "time": "2025-04-30T01:38:02Z",
+    "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.9%28Fix%29/SmartAppClose_GamingMode_v2.9_FIXED_FULLMATCH.zip"
+  },
+  "releases": [
+    {
+      "name": "V2.9(Fix)",
+      "tagName": "V2.9(Fix)",
+      "publishedAt": "2025-04-30T01:38:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmartAppClose_GamingMode_v2.9_FIXED_FULLMATCH.zip",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.9%28Fix%29/SmartAppClose_GamingMode_v2.9_FIXED_FULLMATCH.zip",
+          "size": 9933,
+          "downloadCount": 261
+        },
+        {
+          "name": "service.sh",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.9%28Fix%29/service.sh",
+          "size": 8404,
+          "downloadCount": 47
+        }
+      ]
+    },
+    {
+      "name": "V2.9",
+      "tagName": "V2.9",
+      "publishedAt": "2025-04-24T10:15:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmartAppClose_GamingMode_v2.9_AUTOCLEAR_TIMESTAMP_.FINAL.zip",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.9/SmartAppClose_GamingMode_v2.9_AUTOCLEAR_TIMESTAMP_.FINAL.zip",
+          "size": 2779,
+          "downloadCount": 27
+        },
+        {
+          "name": "service.sh",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.9/service.sh",
+          "size": 8403,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "V2.6",
+      "tagName": "V2.6",
+      "publishedAt": "2025-04-24T10:03:39Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmartAppClose_GamingMode_v2.6.zip",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.6/SmartAppClose_GamingMode_v2.6.zip",
+          "size": 2416,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "V2.0",
+      "tagName": "V2.0",
+      "publishedAt": "2025-04-24T09:50:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmartAppClose_GamingMode_v2.0.zip",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V2.0/SmartAppClose_GamingMode_v2.0.zip",
+          "size": 2690,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "V1.3",
+      "tagName": "V1.3",
+      "publishedAt": "2025-04-24T09:01:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SmartAppClose_GamingMode_v1.3.zip",
+          "downloadUrl": "https://github.com/UNKNUW/SmartAppClose/releases/download/V1.3/SmartAppClose_GamingMode_v1.3.zip",
+          "size": 2377,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

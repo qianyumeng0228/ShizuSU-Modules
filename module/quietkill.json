@@ -1,0 +1,58 @@
+{
+  "readme": "# QuiteKill Module\n\nQuiteKill is a KernelSU/Magisk module that force-stops background apps to free memory, save battery, and keep your device smooth. It can be triggered automatically when you lock your device using power button or controlled manually through a built-in WebUI.\n\n\n### Preview\n\n<p align=\"center\">\n  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss7.gif\" alt=\"Screenshot 1\" width=\"22%\">\n  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss8.gif\" alt=\"Screenshot 2\" width=\"22%\">\n  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss9.png\" alt=\"Screenshot 3\" width=\"22%\">\n  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss10.png\" alt=\"Screenshot 4\" width=\"22%\">\n</p>\n\n\n## Features\n\n- **Automatic App Killer**  \n  A short tap of the power button instantly stops all running user apps.  \n\n- **Ignore List**  \n  Add package names of apps you want to keep alive. These apps will never be killed.  \n\n- **System App Killer**  \n  Pre-installed Google services on non-vanilla ROMs such as Photos, Gmail, Gdrive etc. are system apps and not killed by default. Add them to the Force Kill list if you want them stopped.  \n\n- **WebUI Control Panel**  \n  A clean and responsive interface to:  \n  - Run the killer on demand  \n  - View, filter, copy, and export logs  \n  - Manage ignore and force-kill lists  \n  - Monitor killed vs. skipped apps in real time  \n  - Switch between light and dark themes  \n\n- **Stop Trigger Option**  \n  You can disable the power button trigger by clicking on the module's action button if you only want to run QuiteKill manually.\n\n\n## Stop Logic\n\n1. **User Apps** – All user-installed apps are killed by default  \n2. **System Apps** – Only killed if explicitly added to the Force Kill list  \n3. **Ignored Apps** – Always protected and never killed, regardless of trigger  \n\n## Configuration\n> PATH : /data/adb/modules/QuiteKill/config.txt\n```\n# Edit values as needed (0 = off, 1 = on)\n\n# Kill multiple apps at the same time (faster)\nPARALLEL=1\n\n# Maximum number of apps to kill at the same time in parallel mode\nMAX_JOBS=4\n\n# Kill only apps that are currently running (1 = only running, 0 = all apps)\nONLY_RUNNING=1\n\n# Skip critical system apps to avoid crashes (1 = skip, 0 = allow)\nSKIP_CRITICAL=1\n\n# Generate & save logs (1 = save, 0 = don't save)\nVERBOSE=1\n\n# Use wildcard patterns in ignore list (1 = enable, 0 = exact match only)\nWILDCARD_IGNORE=0\n```\n\n## Installation\n\n- Flash via Magisk, KernelSU, or Apatch  \n- Reboot your device  \n- Open the [WebUI](https://github.com/5ec1cff/KsuWebUIStandalone/releases) and configure the settings as per your needs\n\n\n## Disclaimer\n\nForce-stopping apps may affect notifications, background sync, and system stability.  \nUse the ignore list for critical apps and be careful with the system kill list.\n\n",
+  "readmeHTML": "<h1>QuiteKill Module</h1>\n\n<p>QuiteKill is a KernelSU/Magisk module that force-stops background apps to free memory, save battery, and keep your device smooth. It can be triggered automatically when you lock your device using power button or controlled manually through a built-in WebUI.</p>\n\n\n<h3>Preview</h3>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss7.gif\" alt=\"Screenshot 1\" width=\"22%\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss8.gif\" alt=\"Screenshot 2\" width=\"22%\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss9.png\" alt=\"Screenshot 3\" width=\"22%\"></p>\n<p>  <img src=\"https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/Assets/ss10.png\" alt=\"Screenshot 4\" width=\"22%\"></p>\n<p></p></p>\n\n\n<h2>Features</h2>\n\n<li>**Automatic App Killer**</li>\n<p>  A short tap of the power button instantly stops all running user apps.</p>\n\n<li>**Ignore List**</li>\n<p>  Add package names of apps you want to keep alive. These apps will never be killed.</p>\n\n<li>**System App Killer**</li>\n<p>  Pre-installed Google services on non-vanilla ROMs such as Photos, Gmail, Gdrive etc. are system apps and not killed by default. Add them to the Force Kill list if you want them stopped.</p>\n\n<li>**WebUI Control Panel**</li>\n<p>  A clean and responsive interface to:</p>\n<p>  - Run the killer on demand</p>\n<p>  - View, filter, copy, and export logs</p>\n<p>  - Manage ignore and force-kill lists</p>\n<p>  - Monitor killed vs. skipped apps in real time</p>\n<p>  - Switch between light and dark themes</p>\n\n<li>**Stop Trigger Option**</li>\n<p>  You can disable the power button trigger by clicking on the module's action button if you only want to run QuiteKill manually.</p>\n\n\n<h2>Stop Logic</h2>\n\n<li>**User Apps** – All user-installed apps are killed by default</li>\n<li>**System Apps** – Only killed if explicitly added to the Force Kill list</li>\n<li>**Ignored Apps** – Always protected and never killed, regardless of trigger</li>\n\n<h2>Configuration</h2>\n<p>> PATH : /data/adb/modules/QuiteKill/config.txt</p>\n<pre># Edit values as needed (0 = off, 1 = on)\n\n# Kill multiple apps at the same time (faster)\nPARALLEL=1\n\n# Maximum number of apps to kill at the same time in parallel mode\nMAX_JOBS=4\n\n# Kill only apps that are currently running (1 = only running, 0 = all apps)\nONLY_RUNNING=1\n\n# Skip critical system apps to avoid crashes (1 = skip, 0 = allow)\nSKIP_CRITICAL=1\n\n# Generate &amp; save logs (1 = save, 0 = don't save)\nVERBOSE=1\n\n# Use wildcard patterns in ignore list (1 = enable, 0 = exact match only)\nWILDCARD_IGNORE=0</pre>\n\n<h2>Installation</h2>\n\n<li>Flash via Magisk, KernelSU, or Apatch</li>\n<li>Reboot your device</li>\n<li>Open the [WebUI](https://github.com/5ec1cff/KsuWebUIStandalone/releases) and configure the settings as per your needs</li>\n\n\n<h2>Disclaimer</h2>\n\n<p>Force-stopping apps may affect notifications, background sync, and system stability.</p>\n<p>Use the ignore list for critical apps and be careful with the system kill list.</p>\n",
+  "homepageUrl": "https://t.me/MeowDump",
+  "sourceUrl": "https://github.com/MeowDump/QuietKill",
+  "url": "https://github.com/MeowDump/QuietKill",
+  "latestRelease": {
+    "name": "v5",
+    "version": "v5",
+    "time": "2025-11-25T14:10:21Z",
+    "downloadUrl": "https://github.com/MeowDump/QuietKill/releases/download/v5/v5-Quiet-Kill-25-11-2025.zip"
+  },
+  "releases": [
+    {
+      "name": "v5",
+      "tagName": "v5",
+      "publishedAt": "2025-11-25T14:10:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v5-Quiet-Kill-25-11-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/QuietKill/releases/download/v5/v5-Quiet-Kill-25-11-2025.zip",
+          "size": 41720,
+          "downloadCount": 4166
+        }
+      ]
+    },
+    {
+      "name": "v4",
+      "tagName": "v4",
+      "publishedAt": "2025-10-20T17:40:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v4-Quiet-Kill-20-10-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/QuietKill/releases/download/v4/v4-Quiet-Kill-20-10-2025.zip",
+          "size": 39772,
+          "downloadCount": 856
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2025-08-30T12:51:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "v3-Quiet-Kill-30-08-2025.zip",
+          "downloadUrl": "https://github.com/MeowDump/QuietKill/releases/download/v3/v3-Quiet-Kill-30-08-2025.zip",
+          "size": 40500,
+          "downloadCount": 424
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

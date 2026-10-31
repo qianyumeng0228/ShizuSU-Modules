@@ -1,0 +1,202 @@
+{
+  "readme": "# 🎧 WiFiAudio — 无线音频广播（KernelSU / Magisk 模块）\n\n把手机变成 **WiFi 音频发射器**：实时捕获设备播放的所有音频（媒体 / 游戏 / 通知 / 系统音效 / VoIP 通话），通过局域网 WiFi 广播出去，另一台设备（Android 手机/平板 或 PC）即可实时收听。\n\n**✅ 同时支持 KernelSU 与 Magisk**（同一份安装包，安装时自动适配平台）\n\n> **📌 关于 v4.20 源码**：本仓库源码由 v4.20 构建产物（模块 v3.9 刷机包 + 接收端/管理器 4.20 APK）**逆向恢复**而来，原始源码已丢失。完整的 4.18 → 4.20 变更说明见 [CHANGES_4.18_to_4.20.md](CHANGES_4.18_to_4.20.md)。\n> 注意：Compose UI（`MainActivity.kt`）反编译后为 Java 形态（`MainActivityKt.java`），逻辑完整但不是 Kotlin/Compose 源文件；4.20 起**编码链路下线，仅传输未压缩 PCM**。\n\n## ✨ 功能特性\n\n| 特性 | 说明 |\n|---|---|\n| 🎵 全量音频捕获 | 媒体、游戏、通知、闹钟、系统音效、**VoIP 通话**（微信语音等）全覆盖 |\n| 🗜️ **三种编码全可用** | **PCM** 无损直通 / **OPUS** 软解（libopus）/ **AAC** 软解（fdk-aac）——软解绕开 MediaCodec 兼容性问题 |\n| 🎮🎵 模式预设 | 游戏=低延迟（UDP+小缓冲），音乐=高音质稳定（TCP+大缓冲） |\n| ⚡ UDP / TCP 可选 | UDP 更低延迟；TCP 可靠稳定（发送端决定，接收端自动跟随） |\n| 🔬 **高采样率 PCM** | 支持 48k / 96k / 192kHz（自动跟随设备输出能力，Hi-Res 直通） |\n| 📡 多端同时接收 | 局域网广播，多个接收端可同时连接 |\n| 📱 管理器配置 | 发射端所有配置用 **WiFiAudio 管理器 App** 完成（root 直连，KernelSU/Magisk 通用） |\n| 🎛️ 预设系统 | 4 个系统预设 + 自定义预设（支持中文名） |\n| 📊 实时统计 | 协议/编码/采样/码率/缓冲/**实时延迟**/跳帧/下溢（接收端每秒刷新） |\n| 🔊 测试音 | 1kHz 正弦波验证扬声器链路 |\n| 🌙 夜间模式 | 深色/浅色一键切换 |\n| 🔋 默认省电 | 默认关闭，零进程零功耗 |\n\n## 📦 交付物（release/）\n\n```\nrelease/\n├── wifiaudio-ksu.zip          ← KernelSU/Magisk 模块（发送端）\n├── WifiAudioReceiver.apk      ← 接收端 App（另一台 Android 设备）\n├── WifiAudioManager.apk       ← 发射端管理 App（root 直连）\n└── WifiAudioTone.apk          ← 发声器（测试音）\n```\n\n## 🚀 快速上手\n\n1. 发送端手机刷 `wifiaudio-ksu.zip` → 重启\n2. 管理 App 开启「启用广播」\n3. 接收端装 `WifiAudioReceiver.apk` → 自动发现或填 IP → 连接 → 出声\n4. PC 播放：VLC 打开 `http://<发送端IP>:47801/stream`\n\n## 🔬 工作原理\n\n```\n┌─────────────── 发送端 (KSU/Magisk 模块, root) ───────────────┐\n│ app_process 以 root 启动 (SELinux 域自动适配)                 │\n│  AudioPolicy loopback (Android 13+ 官方API, root 反射)        │\n│   ├─ 匹配所有 usage + VoIP 通话捕获                           │\n│   └─ ROUTE_FLAG_LOOP_BACK[_RENDER] → 48k/96k/192k PCM         │\n│  Mixer（捕获线程同步分发 → 各 Sink）                          │\n│        ├─► TCP 流服务器 (47800, 裸 PCM)                       │\n│        ├─► UDP 流服务器 (48800, seq + PCM)                    │\n│        ├─► HTTP 流 (47801, WAV 头, VLC/浏览器)                │\n│        └─► 编码器: MediaCodec OPUS/AAC → 软解接收端            │\n└───────────────────────────────────────────────────────────────┘\n        │ WiFi 局域网\n        ▼\n┌─────────────── 接收端 ───────────────────────────┐\n│ Kotlin + Compose + miuix (MIUI 风格)             │\n│  TCP: PcmJitterBuffer 自适应缓冲（欠载驱动）      │\n│  UDP: seq 排序 + 毫秒级抖动队列                    │\n│  PCM: AudioTrack 直通 / AAudio exclusive          │\n│  OPUS/AAC: 硬解优先 → libopus/fdk-aac 软解兜底    │\n└──────────────────────────────────────────────────┘\n```\n\n## 🗂️ 目录结构\n\n```\n├── wifiaudio/           发送端模块 + 旧版命令行构建（Java）\n│   ├── module/          KernelSU/Magisk 模块本体\n│   ├── server/          捕获服务 Java 源码（app_process）\n│   └── receiver/        旧版接收端（纯 Java View）\n├── apps-android/        新版 App（Kotlin + Compose + miuix，Gradle 构建）\n│   ├── receiver/        接收端\n│   └── manager/         发射端管理器\n├── tone/                发声器 App\n├── audiotest/           解码链路测试 App\n├── release/             发行版安装包\n└── build_all.sh         一键构建（命令行链路）\n```\n\n## 🛠️ 从源码构建\n\n**命令行链路**（发送端模块 + 旧版）：\n```bash\nbash build_all.sh    # → wifiaudio/build/wifiaudio-ksu.zip 等\n```\n\n**Gradle 链路**（新版 Kotlin App，在 apps-android/ 下）：\n```bash\ncd apps-android\ngradle :receiver:assembleRelease :manager:assembleRelease\n```\n> 构建依赖：Android SDK（compileSdk 36+）、JDK 17、Gradle 8.13、AGP 8.13.2、Kotlin 2.3.20、Compose Multiplatform 1.10.3、[miuix 0.9.x](https://github.com/compose-miuix-ui/miuix)\n> JNI 软解库（libopus / fdk-aac / AAudio）已编译好放于各模块 `jniLibs/`，可用 NDK clang 重新编译\n\n## 📜 致谢\n\n- 音频捕获方案参考 [Genymobile/scrcpy](https://github.com/Genymobile/scrcpy)（Apache-2.0）\n- UI 基于 [compose-miuix-ui/miuix](https://github.com/compose-miuix-ui/miuix)（MIUI 风格 Compose 库）\n- OPUS 基于 [Xiph.Org libopus](https://opus-codec.org/)（BSD-3-Clause）\n- AAC 基于 Fraunhofer FDK AAC\n\n## 📋 版本历史\n\n| 版本 | 里程碑 |\n|---|---|\n| v4.20 | **编码链路下线，仅保留 PCM**（发送端删 OPUS/AAC 编码器、接收端删 5 个解码类、配置移除 codec/码率）；接收端新增诊断面板、延迟分解、连接预设、AAudio 容错回退、内置测试音；管理器新增服务日志、重启服务、发送队列/分发丢帧统计；发送端新增 `auto_off_min` 定时关闭；模块改为标准刷机包结构（v3.9）。源码由构建产物逆向恢复 |\n| v4.18 | 修复 HTTP 流缺响应头（PC/VLC 打不开 `/stream`）；Mixer 线程解耦（编码/UDP 不再阻塞捕获）；编码不匹配返回 409 |\n| v4.x | Kotlin + Compose + miuix 重构；自适应缓冲（欠载驱动）；AAudio exclusive；高采样率 PCM；URL/端口转发支持 |\n| v3.x | AAC 双模式、fdk-aac 软解、libopus 软解、配置迁移 |\n| v2.x | OPUS 软解成功、配置迁移 |\n| v1.0 | 首个可用版本（PCM + MediaCodec 编码） |\n",
+  "readmeHTML": "<h1>🎧 WiFiAudio — 无线音频广播（KernelSU / Magisk 模块）</h1>\n\n<p>把手机变成 <b>WiFi 音频发射器</b>：实时捕获设备播放的所有音频（媒体 / 游戏 / 通知 / 系统音效 / VoIP 通话），通过局域网 WiFi 广播出去，另一台设备（Android 手机/平板 或 PC）即可实时收听。</p>\n\n<p><b>✅ 同时支持 KernelSU 与 Magisk</b>（同一份安装包，安装时自动适配平台）</p>\n\n<p>> <b>📌 关于 v4.20 源码</b>：本仓库源码由 v4.20 构建产物（模块 v3.9 刷机包 + 接收端/管理器 4.20 APK）<b>逆向恢复</b>而来，原始源码已丢失。完整的 4.18 → 4.20 变更说明见 <a href=\"CHANGES_4.18_to_4.20.md\">CHANGES_4.18_to_4.20.md</a>。</p>\n<p>> 注意：Compose UI（<code>MainActivity.kt</code>）反编译后为 Java 形态（<code>MainActivityKt.java</code>），逻辑完整但不是 Kotlin/Compose 源文件；4.20 起<b>编码链路下线，仅传输未压缩 PCM</b>。</p>\n\n<h2>✨ 功能特性</h2>\n\n<p>| 特性 | 说明 |</p>\n<p>|---|---|</p>\n<p>| 🎵 全量音频捕获 | 媒体、游戏、通知、闹钟、系统音效、<b>VoIP 通话</b>（微信语音等）全覆盖 |</p>\n<p>| 🗜️ <b>三种编码全可用</b> | <b>PCM</b> 无损直通 / <b>OPUS</b> 软解（libopus）/ <b>AAC</b> 软解（fdk-aac）——软解绕开 MediaCodec 兼容性问题 |</p>\n<p>| 🎮🎵 模式预设 | 游戏=低延迟（UDP+小缓冲），音乐=高音质稳定（TCP+大缓冲） |</p>\n<p>| ⚡ UDP / TCP 可选 | UDP 更低延迟；TCP 可靠稳定（发送端决定，接收端自动跟随） |</p>\n<p>| 🔬 <b>高采样率 PCM</b> | 支持 48k / 96k / 192kHz（自动跟随设备输出能力，Hi-Res 直通） |</p>\n<p>| 📡 多端同时接收 | 局域网广播，多个接收端可同时连接 |</p>\n<p>| 📱 管理器配置 | 发射端所有配置用 <b>WiFiAudio 管理器 App</b> 完成（root 直连，KernelSU/Magisk 通用） |</p>\n<p>| 🎛️ 预设系统 | 4 个系统预设 + 自定义预设（支持中文名） |</p>\n<p>| 📊 实时统计 | 协议/编码/采样/码率/缓冲/<b>实时延迟</b>/跳帧/下溢（接收端每秒刷新） |</p>\n<p>| 🔊 测试音 | 1kHz 正弦波验证扬声器链路 |</p>\n<p>| 🌙 夜间模式 | 深色/浅色一键切换 |</p>\n<p>| 🔋 默认省电 | 默认关闭，零进程零功耗 |</p>\n\n<h2>📦 交付物（release/）</h2>\n\n<pre>release/\n├── wifiaudio-ksu.zip          ← KernelSU/Magisk 模块（发送端）\n├── WifiAudioReceiver.apk      ← 接收端 App（另一台 Android 设备）\n├── WifiAudioManager.apk       ← 发射端管理 App（root 直连）\n└── WifiAudioTone.apk          ← 发声器（测试音）</pre>\n\n<h2>🚀 快速上手</h2>\n\n<li>发送端手机刷 `wifiaudio-ksu.zip` → 重启</li>\n<li>管理 App 开启「启用广播」</li>\n<li>接收端装 `WifiAudioReceiver.apk` → 自动发现或填 IP → 连接 → 出声</li>\n<li>PC 播放：VLC 打开 `http://<发送端IP>:47801/stream`</li>\n\n<h2>🔬 工作原理</h2>\n\n<pre>┌─────────────── 发送端 (KSU/Magisk 模块, root) ───────────────┐\n│ app_process 以 root 启动 (SELinux 域自动适配)                 │\n│  AudioPolicy loopback (Android 13+ 官方API, root 反射)        │\n│   ├─ 匹配所有 usage + VoIP 通话捕获                           │\n│   └─ ROUTE_FLAG_LOOP_BACK[_RENDER] → 48k/96k/192k PCM         │\n│  Mixer（捕获线程同步分发 → 各 Sink）                          │\n│        ├─► TCP 流服务器 (47800, 裸 PCM)                       │\n│        ├─► UDP 流服务器 (48800, seq + PCM)                    │\n│        ├─► HTTP 流 (47801, WAV 头, VLC/浏览器)                │\n│        └─► 编码器: MediaCodec OPUS/AAC → 软解接收端            │\n└───────────────────────────────────────────────────────────────┘\n        │ WiFi 局域网\n        ▼\n┌─────────────── 接收端 ───────────────────────────┐\n│ Kotlin + Compose + miuix (MIUI 风格)             │\n│  TCP: PcmJitterBuffer 自适应缓冲（欠载驱动）      │\n│  UDP: seq 排序 + 毫秒级抖动队列                    │\n│  PCM: AudioTrack 直通 / AAudio exclusive          │\n│  OPUS/AAC: 硬解优先 → libopus/fdk-aac 软解兜底    │\n└──────────────────────────────────────────────────┘</pre>\n\n<h2>🗂️ 目录结构</h2>\n\n<pre>├── wifiaudio/           发送端模块 + 旧版命令行构建（Java）\n│   ├── module/          KernelSU/Magisk 模块本体\n│   ├── server/          捕获服务 Java 源码（app_process）\n│   └── receiver/        旧版接收端（纯 Java View）\n├── apps-android/        新版 App（Kotlin + Compose + miuix，Gradle 构建）\n│   ├── receiver/        接收端\n│   └── manager/         发射端管理器\n├── tone/                发声器 App\n├── audiotest/           解码链路测试 App\n├── release/             发行版安装包\n└── build_all.sh         一键构建（命令行链路）</pre>\n\n<h2>🛠️ 从源码构建</h2>\n\n<p><b>命令行链路</b>（发送端模块 + 旧版）：</p>\n<pre>bash build_all.sh    # → wifiaudio/build/wifiaudio-ksu.zip 等</pre>\n\n<p><b>Gradle 链路</b>（新版 Kotlin App，在 apps-android/ 下）：</p>\n<pre>cd apps-android\ngradle :receiver:assembleRelease :manager:assembleRelease</pre>\n<p>> 构建依赖：Android SDK（compileSdk 36+）、JDK 17、Gradle 8.13、AGP 8.13.2、Kotlin 2.3.20、Compose Multiplatform 1.10.3、<a href=\"https://github.com/compose-miuix-ui/miuix\">miuix 0.9.x</a></p>\n<p>> JNI 软解库（libopus / fdk-aac / AAudio）已编译好放于各模块 <code>jniLibs/</code>，可用 NDK clang 重新编译</p>\n\n<h2>📜 致谢</h2>\n\n<li>音频捕获方案参考 [Genymobile/scrcpy](https://github.com/Genymobile/scrcpy)（Apache-2.0）</li>\n<li>UI 基于 [compose-miuix-ui/miuix](https://github.com/compose-miuix-ui/miuix)（MIUI 风格 Compose 库）</li>\n<li>OPUS 基于 [Xiph.Org libopus](https://opus-codec.org/)（BSD-3-Clause）</li>\n<li>AAC 基于 Fraunhofer FDK AAC</li>\n\n<h2>📋 版本历史</h2>\n\n<p>| 版本 | 里程碑 |</p>\n<p>|---|---|</p>\n<p>| v4.20 | <b>编码链路下线，仅保留 PCM</b>（发送端删 OPUS/AAC 编码器、接收端删 5 个解码类、配置移除 codec/码率）；接收端新增诊断面板、延迟分解、连接预设、AAudio 容错回退、内置测试音；管理器新增服务日志、重启服务、发送队列/分发丢帧统计；发送端新增 <code>auto_off_min</code> 定时关闭；模块改为标准刷机包结构（v3.9）。源码由构建产物逆向恢复 |</p>\n<p>| v4.18 | 修复 HTTP 流缺响应头（PC/VLC 打不开 <code>/stream</code>）；Mixer 线程解耦（编码/UDP 不再阻塞捕获）；编码不匹配返回 409 |</p>\n<p>| v4.x | Kotlin + Compose + miuix 重构；自适应缓冲（欠载驱动）；AAudio exclusive；高采样率 PCM；URL/端口转发支持 |</p>\n<p>| v3.x | AAC 双模式、fdk-aac 软解、libopus 软解、配置迁移 |</p>\n<p>| v2.x | OPUS 软解成功、配置迁移 |</p>\n<p>| v1.0 | 首个可用版本（PCM + MediaCodec 编码） |</p>",
+  "homepageUrl": "https://github.com/SingGoPlay/wifiaudio",
+  "sourceUrl": "https://github.com/SingGoPlay/wifiaudio",
+  "url": "https://github.com/SingGoPlay/wifiaudio",
+  "latestRelease": {
+    "name": "v4.20",
+    "version": "v4.20",
+    "time": "2026-10-25T16:33:15Z",
+    "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.20/wifiaudio-ksu.zip"
+  },
+  "releases": [
+    {
+      "name": "v4.20",
+      "tagName": "v4.20",
+      "publishedAt": "2026-10-25T16:33:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.20/WifiAudioReceiver.apk",
+          "size": 8803466,
+          "downloadCount": 0
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.20/WifiAudioManager.apk",
+          "size": 8975816,
+          "downloadCount": 0
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.20/wifiaudio-ksu.zip",
+          "size": 207027,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.18",
+      "tagName": "v4.18",
+      "publishedAt": "2026-09-18T11:29:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.18/WifiAudioReceiver.apk",
+          "size": 11195876,
+          "downloadCount": 11
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.18/WifiAudioManager.apk",
+          "size": 8975816,
+          "downloadCount": 18
+        },
+        {
+          "name": "WifiAudioTone.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.18/WifiAudioTone.apk",
+          "size": 37460,
+          "downloadCount": 5
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.18/wifiaudio-ksu.zip",
+          "size": 202372,
+          "downloadCount": 18
+        }
+      ]
+    },
+    {
+      "name": "v4.16",
+      "tagName": "v4.16",
+      "publishedAt": "2026-09-01T12:06:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.16/WifiAudioReceiver.apk",
+          "size": 11195876,
+          "downloadCount": 10
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.16/WifiAudioManager.apk",
+          "size": 8975812,
+          "downloadCount": 12
+        },
+        {
+          "name": "WifiAudioTone.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.16/WifiAudioTone.apk",
+          "size": 37460,
+          "downloadCount": 4
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.16/wifiaudio-ksu.zip",
+          "size": 200464,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v4.15",
+      "tagName": "v4.15",
+      "publishedAt": "2026-08-23T13:01:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.15/WifiAudioReceiver.apk",
+          "size": 11195880,
+          "downloadCount": 9
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.15/WifiAudioManager.apk",
+          "size": 8975816,
+          "downloadCount": 9
+        },
+        {
+          "name": "WifiAudioTone.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.15/WifiAudioTone.apk",
+          "size": 37460,
+          "downloadCount": 5
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.15/wifiaudio-ksu.zip",
+          "size": 210529,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v4.14",
+      "tagName": "v4.14",
+      "publishedAt": "2026-08-23T12:51:57Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.14/WifiAudioReceiver.apk",
+          "size": 11195880,
+          "downloadCount": 0
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.14/WifiAudioManager.apk",
+          "size": 8975812,
+          "downloadCount": 1
+        },
+        {
+          "name": "WifiAudioTone.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.14/WifiAudioTone.apk",
+          "size": 37460,
+          "downloadCount": 0
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.14/wifiaudio-ksu.zip",
+          "size": 210529,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v4.13",
+      "tagName": "v4.13",
+      "publishedAt": "2026-08-23T12:43:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "WifiAudioReceiver.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.13/WifiAudioReceiver.apk",
+          "size": 11195880,
+          "downloadCount": 0
+        },
+        {
+          "name": "WifiAudioManager.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.13/WifiAudioManager.apk",
+          "size": 8975784,
+          "downloadCount": 0
+        },
+        {
+          "name": "WifiAudioTone.apk",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.13/WifiAudioTone.apk",
+          "size": 37460,
+          "downloadCount": 0
+        },
+        {
+          "name": "wifiaudio-ksu.zip",
+          "downloadUrl": "https://github.com/SingGoPlay/wifiaudio/releases/download/v4.13/wifiaudio-ksu.zip",
+          "size": 210529,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

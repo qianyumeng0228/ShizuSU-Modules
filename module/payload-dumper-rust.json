@@ -1,0 +1,448 @@
+{
+  "readme": "# payload-dumper-rust 🦀\n\nA fast and efficient Android OTA payload dumper.\n\n\n## What it does\n\nExtracts partition images (boot, system, vendor, etc.) from Android OTA `payload.bin` files.\n\n## This has these features\n\n- **Parallel extraction** - Uses all CPU cores for faster extraction\n- **Works with ZIP files** - Extract directly from ROM ZIPs without unzipping first\n- **URL support** - Extract from remote URLs, downloading only the needed data instead of the entire file\n- **Cross-platform** - Works on Linux, Windows, macOS, and Android (Termux)\n- **Incremental OTA** - Experimental Incremental OTA Support (ONLY ZUCCHINI OPS IS NOT SUPPORTED YET)\n\n## Installation\n\n### Quick Install\n\n**Linux / macOS / Termux:**\n```bash\nbash <(curl -sSL \"https://raw.githubusercontent.com/rhythmcache/payload-dumper-rust/main/scripts/install.sh\")\n```\n\n**Windows (PowerShell):**\n```powershell\npowershell -NoExit -ExecutionPolicy Bypass -Command \"Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/rhythmcache/payload-dumper-rust/main/scripts/install.ps1' | Invoke-Expression\"\n```\n\n### Pre-built Binaries\n\nDownload from [releases](https://github.com/rhythmcache/payload-dumper-rust/releases).\n\n### Build from Source\n\n```bash\ncargo install payload_dumper\n```\n\nOr:\n```bash\ngit clone https://github.com/rhythmcache/payload-dumper-rust\ncd payload-dumper-rust\ncargo build --release\n```\n\n## Usage\n\n### Basic Examples\n\n**Extract from payload.bin:**\n```bash\npayload_dumper payload.bin -o output\n```\n\n**Extract from ROM ZIP** (no unzipping required):\n```bash\npayload_dumper rom.zip -o output\n```\n\n**Extract from URL** (downloads only required data):\n```bash\npayload_dumper https://example.com/ota.zip -o output\n```\n\n**Extract specific partitions:**\n```bash\npayload_dumper payload.bin -i boot,vendor_boot -o output\n```\n\n**Extract Incremental OTA:**\n- To extract an incremental OTA, create a directory named `old` in the current working directory and copy all images from the previous build into it.\n- If the old images are located elsewhere, specify their location using the `--source-dir <PATH>` argument.\n\n**List partitions without extracting:**\n```bash\npayload_dumper payload.bin --list\n```\n\n### Advanced Options\n\n**URL extraction with prefetch** (better for slow connections):\n```bash\npayload_dumper https://example.com/ota.zip --prefetch -o output\n```\n\n**Custom thread count:**\n```bash\npayload_dumper payload.bin -t 8 -o output\n```\n\n**Export metadata as JSON:**\n```bash\npayload_dumper payload.bin --metadata -o output\n# Creates output/payload_metadata.json\n```\n\n**Full metadata with operation details:**\n```bash\npayload_dumper payload.bin --metadata=full -o output\n```\n\n**Skip verification** (faster but not recommended):\n```bash\npayload_dumper payload.bin --no-verify -o output\n```\n\n### All Options\n\n```\nUsage: payload_dumper [OPTIONS] <PAYLOAD_PATH>\n\nArguments:\n  <PAYLOAD_PATH>  Path to payload.bin, ROM ZIP, or URL\n\nOptions:\n  -o, --out <OUT>              Output directory [default: output]\n  -U, --user-agent <AGENT>     Custom User-Agent for HTTP requests\n  -C, --cookies <COOKIES>      Custom HTTP Cookie header value for remote requests\n      --dns <DNS>              Custom DNS servers (comma-separated IPs)\n  -i, --images <IMAGES>        Comma-separated partition names to extract\n  -t, --threads <THREADS>      Number of threads for parallel processing\n  -l, --list                   List available partitions\n  -m, --metadata[=<MODE>]      Save metadata as JSON (compact or full)\n  -P, --no-parallel            Disable parallel extraction\n  -n, --no-verify              Skip hash verification\n      --prefetch               Download all data first (for remote URLs)\n  -q, --quiet                  Suppress all non-essential output (errors will still be shown)\n  -h, --help                   Show help\n  -V, --version                Show version\n```\n\n## Why extract from URLs?\n\nInstead of downloading a 3GB OTA file to extract a 50MB boot image, this tool downloads only ~50-100MB of required data.\n\nUseful for:\n- Quick partition extraction without full downloads\n- CI/CD pipelines\n- Bandwidth-limited connections\n\n## Build\n\nTo build manually, you will need:\n- [Rust compiler and Cargo](https://rust-lang.org/tools/install/)\n- Basic command-line knowledge\n- A bit of patience\n\n### 1. Clone the repository\n```bash\ngit clone --depth 1 https://github.com/rhythmcache/payload-dumper-rust.git\ncd payload-dumper-rust\n```\n\n### 2. Default build (recommended for most users)\n```bash\ncargo build --release\n```\n\nThis builds the binary with:\n- Local `.bin` and `.zip` support\n- Remote HTTP/HTTPS support\n- Prefetch mode\n- Metadata support\n\n---\n\n## Feature-based builds\n\nPayload Dumper is modular. You can disable features you do not need to:\n- Reduce compile time\n- Reduce binary size\n- Avoid unnecessary dependencies\n\n### Local files only (fastest build, smallest binary)\nIf you only need local payload files and no network support:\n\n```bash\ncargo build --release --no-default-features\n```\n\nThis:\n- Disables all HTTP/network code\n- Removes `reqwest`, DNS, and TLS dependencies\n- Compiles much faster\n- Produces a significantly smaller binary\n\n---\n\n### Enable remote (HTTP/HTTPS) support\nTo work with remote URLs:\n\n```bash\ncargo build --release --features remote_zip\n```\n\n---\n\n### Static binaries and DNS notes\n\nWhen building a fully static binary (for example with `musl`), DNS resolution may fail\nbecause system libc DNS resolvers are unavailable.\n\n#### Use the built-in DNS resolver\n```bash\ncargo build --release --features hickory_dns\n```\n\nThis enables:\n- Built-in DNS resolution via `hickory-resolver`\n- No dependency on system libc DNS\n- Reliable behavior in fully static environments\n\nBy default, the resolver uses **Cloudflare DNS (1.1.1.1)**.\n#### Override DNS server at runtime\nThe DNS server is selected **at runtime**.\n\nYou can override it in two ways:\n\n**1. Using environment variable**\n```bash\nexport PAYLOAD_DUMPER_CUSTOM_DNS=8.8.8.8,4.4.4.4\n./payload_dumper <PAYLOAD>\n```\n\n**2. Using CLI flag (`--dns`)**\n```bash\n./payload_dumper --dns 8.8.8.8,4.4.4.4 <PAYLOAD>\n```\n\n> If both are provided, the `--dns` flag takes precedence.\n---\nIf you are unsure, use the default build. \n\n## Troubleshooting\n\n**\"Server doesn't support range requests\"**  \nDownload the file first, then extract locally.\n\n**Out of memory errors**  \nUse `--no-parallel` or reduce thread count with `-t`.\n\n**Slow extraction**  \nRemove `--no-parallel` if set. For remote extraction, try `--prefetch`.\n\n## Credits\n\nInspired by [vm03/payload_dumper](https://github.com/vm03/payload_dumper)\n\n## License\n\n[Apache-2.0](./LICENSE)\n",
+  "readmeHTML": "<h1>payload-dumper-rust 🦀</h1>\n\n<p>A fast and efficient Android OTA payload dumper.</p>\n\n\n<h2>What it does</h2>\n\n<p>Extracts partition images (boot, system, vendor, etc.) from Android OTA <code>payload.bin</code> files.</p>\n\n<h2>This has these features</h2>\n\n<li>**Parallel extraction** - Uses all CPU cores for faster extraction</li>\n<li>**Works with ZIP files** - Extract directly from ROM ZIPs without unzipping first</li>\n<li>**URL support** - Extract from remote URLs, downloading only the needed data instead of the entire file</li>\n<li>**Cross-platform** - Works on Linux, Windows, macOS, and Android (Termux)</li>\n<li>**Incremental OTA** - Experimental Incremental OTA Support (ONLY ZUCCHINI OPS IS NOT SUPPORTED YET)</li>\n\n<h2>Installation</h2>\n\n<h3>Quick Install</h3>\n\n<p><b>Linux / macOS / Termux:</b></p>\n<pre>bash &lt;(curl -sSL \"https://raw.githubusercontent.com/rhythmcache/payload-dumper-rust/main/scripts/install.sh\")</pre>\n\n<p><b>Windows (PowerShell):</b></p>\n<pre>powershell -NoExit -ExecutionPolicy Bypass -Command \"Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/rhythmcache/payload-dumper-rust/main/scripts/install.ps1' | Invoke-Expression\"</pre>\n\n<h3>Pre-built Binaries</h3>\n\n<p>Download from <a href=\"https://github.com/rhythmcache/payload-dumper-rust/releases\">releases</a>.</p>\n\n<h3>Build from Source</h3>\n\n<pre>cargo install payload_dumper</pre>\n\n<p>Or:</p>\n<pre>git clone https://github.com/rhythmcache/payload-dumper-rust\ncd payload-dumper-rust\ncargo build --release</pre>\n\n<h2>Usage</h2>\n\n<h3>Basic Examples</h3>\n\n<p><b>Extract from payload.bin:</b></p>\n<pre>payload_dumper payload.bin -o output</pre>\n\n<p><b>Extract from ROM ZIP</b> (no unzipping required):</p>\n<pre>payload_dumper rom.zip -o output</pre>\n\n<p><b>Extract from URL</b> (downloads only required data):</p>\n<pre>payload_dumper https://example.com/ota.zip -o output</pre>\n\n<p><b>Extract specific partitions:</b></p>\n<pre>payload_dumper payload.bin -i boot,vendor_boot -o output</pre>\n\n<p><b>Extract Incremental OTA:</b></p>\n<li>To extract an incremental OTA, create a directory named `old` in the current working directory and copy all images from the previous build into it.</li>\n<li>If the old images are located elsewhere, specify their location using the `--source-dir <PATH>` argument.</li>\n\n<p><b>List partitions without extracting:</b></p>\n<pre>payload_dumper payload.bin --list</pre>\n\n<h3>Advanced Options</h3>\n\n<p><b>URL extraction with prefetch</b> (better for slow connections):</p>\n<pre>payload_dumper https://example.com/ota.zip --prefetch -o output</pre>\n\n<p><b>Custom thread count:</b></p>\n<pre>payload_dumper payload.bin -t 8 -o output</pre>\n\n<p><b>Export metadata as JSON:</b></p>\n<pre>payload_dumper payload.bin --metadata -o output\n# Creates output/payload_metadata.json</pre>\n\n<p><b>Full metadata with operation details:</b></p>\n<pre>payload_dumper payload.bin --metadata=full -o output</pre>\n\n<p><b>Skip verification</b> (faster but not recommended):</p>\n<pre>payload_dumper payload.bin --no-verify -o output</pre>\n\n<h3>All Options</h3>\n\n<pre>Usage: payload_dumper [OPTIONS] &lt;PAYLOAD_PATH&gt;\n\nArguments:\n  &lt;PAYLOAD_PATH&gt;  Path to payload.bin, ROM ZIP, or URL\n\nOptions:\n  -o, --out &lt;OUT&gt;              Output directory [default: output]\n  -U, --user-agent &lt;AGENT&gt;     Custom User-Agent for HTTP requests\n  -C, --cookies &lt;COOKIES&gt;      Custom HTTP Cookie header value for remote requests\n      --dns &lt;DNS&gt;              Custom DNS servers (comma-separated IPs)\n  -i, --images &lt;IMAGES&gt;        Comma-separated partition names to extract\n  -t, --threads &lt;THREADS&gt;      Number of threads for parallel processing\n  -l, --list                   List available partitions\n  -m, --metadata[=&lt;MODE&gt;]      Save metadata as JSON (compact or full)\n  -P, --no-parallel            Disable parallel extraction\n  -n, --no-verify              Skip hash verification\n      --prefetch               Download all data first (for remote URLs)\n  -q, --quiet                  Suppress all non-essential output (errors will still be shown)\n  -h, --help                   Show help\n  -V, --version                Show version</pre>\n\n<h2>Why extract from URLs?</h2>\n\n<p>Instead of downloading a 3GB OTA file to extract a 50MB boot image, this tool downloads only ~50-100MB of required data.</p>\n\n<p>Useful for:</p>\n<li>Quick partition extraction without full downloads</li>\n<li>CI/CD pipelines</li>\n<li>Bandwidth-limited connections</li>\n\n<h2>Build</h2>\n\n<p>To build manually, you will need:</p>\n<li>[Rust compiler and Cargo](https://rust-lang.org/tools/install/)</li>\n<li>Basic command-line knowledge</li>\n<li>A bit of patience</li>\n\n<h3>1. Clone the repository</h3>\n<pre>git clone --depth 1 https://github.com/rhythmcache/payload-dumper-rust.git\ncd payload-dumper-rust</pre>\n\n<h3>2. Default build (recommended for most users)</h3>\n<pre>cargo build --release</pre>\n\n<p>This builds the binary with:</p>\n<li>Local `.bin` and `.zip` support</li>\n<li>Remote HTTP/HTTPS support</li>\n<li>Prefetch mode</li>\n<li>Metadata support</li>\n\n<p>---</p>\n\n<h2>Feature-based builds</h2>\n\n<p>Payload Dumper is modular. You can disable features you do not need to:</p>\n<li>Reduce compile time</li>\n<li>Reduce binary size</li>\n<li>Avoid unnecessary dependencies</li>\n\n<h3>Local files only (fastest build, smallest binary)</h3>\n<p>If you only need local payload files and no network support:</p>\n\n<pre>cargo build --release --no-default-features</pre>\n\n<p>This:</p>\n<li>Disables all HTTP/network code</li>\n<li>Removes `reqwest`, DNS, and TLS dependencies</li>\n<li>Compiles much faster</li>\n<li>Produces a significantly smaller binary</li>\n\n<p>---</p>\n\n<h3>Enable remote (HTTP/HTTPS) support</h3>\n<p>To work with remote URLs:</p>\n\n<pre>cargo build --release --features remote_zip</pre>\n\n<p>---</p>\n\n<h3>Static binaries and DNS notes</h3>\n\n<p>When building a fully static binary (for example with <code>musl</code>), DNS resolution may fail</p>\n<p>because system libc DNS resolvers are unavailable.</p>\n\n<p>#### Use the built-in DNS resolver</p>\n<pre>cargo build --release --features hickory_dns</pre>\n\n<p>This enables:</p>\n<li>Built-in DNS resolution via `hickory-resolver`</li>\n<li>No dependency on system libc DNS</li>\n<li>Reliable behavior in fully static environments</li>\n\n<p>By default, the resolver uses <b>Cloudflare DNS (1.1.1.1)</b>.</p>\n<p>#### Override DNS server at runtime</p>\n<p>The DNS server is selected <b>at runtime</b>.</p>\n\n<p>You can override it in two ways:</p>\n\n<p><b>1. Using environment variable</b></p>\n<pre>export PAYLOAD_DUMPER_CUSTOM_DNS=8.8.8.8,4.4.4.4\n./payload_dumper &lt;PAYLOAD&gt;</pre>\n\n<p><b>2. Using CLI flag (<code>--dns</code>)</b></p>\n<pre>./payload_dumper --dns 8.8.8.8,4.4.4.4 &lt;PAYLOAD&gt;</pre>\n\n<p>> If both are provided, the <code>--dns</code> flag takes precedence.</p>\n<p>---</p>\n<p>If you are unsure, use the default build.</p>\n\n<h2>Troubleshooting</h2>\n\n<p><b>\"Server doesn't support range requests\"</b></p>\n<p>Download the file first, then extract locally.</p>\n\n<p><b>Out of memory errors</b></p>\n<p>Use <code>--no-parallel</code> or reduce thread count with <code>-t</code>.</p>\n\n<p><b>Slow extraction</b></p>\n<p>Remove <code>--no-parallel</code> if set. For remote extraction, try <code>--prefetch</code>.</p>\n\n<h2>Credits</h2>\n\n<p>Inspired by <a href=\"https://github.com/vm03/payload_dumper\">vm03/payload_dumper</a></p>\n\n<h2>License</h2>\n\n<p><a href=\"./LICENSE\">Apache-2.0</a></p>",
+  "homepageUrl": "https://github.com/rhythmcache/payload-dumper-rust",
+  "sourceUrl": "https://github.com/rhythmcache/payload-dumper-rust",
+  "url": "https://github.com/rhythmcache/payload-dumper-rust",
+  "latestRelease": {
+    "name": "0.6.0",
+    "version": "0.6.0",
+    "time": "2025-06-13T17:15:05Z",
+    "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-aarch64-linux-musl.zip"
+  },
+  "releases": [
+    {
+      "name": "0.6.0",
+      "tagName": "0.6.0",
+      "publishedAt": "2025-06-13T17:15:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper-aarch64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-aarch64-linux-musl.zip",
+          "size": 1782648,
+          "downloadCount": 10
+        },
+        {
+          "name": "payload_dumper-aarch64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-aarch64-windows.zip",
+          "size": 1377930,
+          "downloadCount": 63
+        },
+        {
+          "name": "payload_dumper-android-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-android-arm64-v8a.zip",
+          "size": 1578765,
+          "downloadCount": 35
+        },
+        {
+          "name": "payload_dumper-android-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-android-armeabi-v7a.zip",
+          "size": 1153323,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-android-x86.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-android-x86.zip",
+          "size": 1531849,
+          "downloadCount": 6
+        },
+        {
+          "name": "payload_dumper-android-x86_64.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-android-x86_64.zip",
+          "size": 1666361,
+          "downloadCount": 11
+        },
+        {
+          "name": "payload_dumper-arm64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-arm64-darwin.zip",
+          "size": 1365629,
+          "downloadCount": 10
+        },
+        {
+          "name": "payload_dumper-armv7-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-armv7-linux-musl.zip",
+          "size": 1491288,
+          "downloadCount": 5
+        },
+        {
+          "name": "payload_dumper-i686-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-i686-linux-musl.zip",
+          "size": 1658850,
+          "downloadCount": 4
+        },
+        {
+          "name": "payload_dumper-i686-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-i686-windows.zip",
+          "size": 1346517,
+          "downloadCount": 10
+        },
+        {
+          "name": "payload_dumper-riscv64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-riscv64-linux-musl.zip",
+          "size": 1598556,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-universal-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-universal-darwin.zip",
+          "size": 2793452,
+          "downloadCount": 7
+        },
+        {
+          "name": "payload_dumper-x86_64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-x86_64-darwin.zip",
+          "size": 1427497,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-x86_64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-x86_64-linux-musl.zip",
+          "size": 1872472,
+          "downloadCount": 32
+        },
+        {
+          "name": "payload_dumper-x86_64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.6.0/payload_dumper-x86_64-windows.zip",
+          "size": 1480697,
+          "downloadCount": 86
+        }
+      ]
+    },
+    {
+      "name": "0.5.0",
+      "tagName": "0.5.0",
+      "publishedAt": "2025-06-12T04:18:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper-aarch64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-aarch64-linux-musl.zip",
+          "size": 1898403,
+          "downloadCount": 5
+        },
+        {
+          "name": "payload_dumper-armv7-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-armv7-linux-musl.zip",
+          "size": 1595208,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-i686-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-i686-linux-musl.zip",
+          "size": 1805328,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-riscv64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-riscv64-linux-musl.zip",
+          "size": 1702757,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-x86_64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-x86_64-linux-musl.zip",
+          "size": 2132602,
+          "downloadCount": 4
+        },
+        {
+          "name": "payload_dumper-aarch64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-aarch64-windows.zip",
+          "size": 1537068,
+          "downloadCount": 5
+        },
+        {
+          "name": "payload_dumper-i686-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-i686-windows.zip",
+          "size": 1481236,
+          "downloadCount": 5
+        },
+        {
+          "name": "payload_dumper-x86_64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-x86_64-windows.zip",
+          "size": 1734228,
+          "downloadCount": 7
+        },
+        {
+          "name": "payload_dumper-arm64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-arm64-darwin.zip",
+          "size": 1388594,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-universal-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-universal-darwin.zip",
+          "size": 2838010,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-x86_64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-x86_64-darwin.zip",
+          "size": 1448634,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-android-arm64-v8a.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-android-arm64-v8a.zip",
+          "size": 1684236,
+          "downloadCount": 7
+        },
+        {
+          "name": "payload_dumper-android-armeabi-v7a.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-android-armeabi-v7a.zip",
+          "size": 1251704,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-android-x86.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-android-x86.zip",
+          "size": 1638572,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-android-x86_64.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.5.0/payload_dumper-android-x86_64.zip",
+          "size": 1770722,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "0.4.0",
+      "tagName": "0.4.0",
+      "publishedAt": "2025-06-06T04:43:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper-aarch64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-aarch64-linux-musl.zip",
+          "size": 1985679,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-aarch64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-aarch64-windows.zip",
+          "size": 1627221,
+          "downloadCount": 6
+        },
+        {
+          "name": "payload_dumper-arm64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-arm64-darwin.zip",
+          "size": 1476015,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-armv7-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-armv7-linux-musl.zip",
+          "size": 1679300,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-i686-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-i686-linux-musl.zip",
+          "size": 1892261,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-i686-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-i686-windows.zip",
+          "size": 1567116,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-riscv64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-riscv64-linux-musl.zip",
+          "size": 1788984,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-universal-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-universal-darwin.zip",
+          "size": 3008690,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-x86_64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-x86_64-darwin.zip",
+          "size": 1534599,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-x86_64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-x86_64-linux-musl.zip",
+          "size": 2219283,
+          "downloadCount": 4
+        },
+        {
+          "name": "payload_dumper-x86_64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-x86_64-windows.zip",
+          "size": 1818811,
+          "downloadCount": 8
+        },
+        {
+          "name": "payload_dumper-android-magisk-module.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.4.0/payload_dumper-android-magisk-module.zip",
+          "size": 6216125,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "0.3.0",
+      "tagName": "0.3.0",
+      "publishedAt": "2025-04-02T12:36:50Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper-android-magisk-module.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-android-magisk-module.zip",
+          "size": 6231316,
+          "downloadCount": 97
+        },
+        {
+          "name": "payload_dumper-i686-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-i686-linux-musl.zip",
+          "size": 1658747,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-x86_64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-x86_64-linux-musl.zip",
+          "size": 1989968,
+          "downloadCount": 5
+        },
+        {
+          "name": "payload_dumper-aarch64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-aarch64-linux-musl.zip",
+          "size": 1750634,
+          "downloadCount": 11
+        },
+        {
+          "name": "payload_dumper-armv7-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-armv7-linux-musl.zip",
+          "size": 1466503,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-windows-x86_64.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-windows-x86_64.zip",
+          "size": 1728740,
+          "downloadCount": 73
+        },
+        {
+          "name": "payload_dumper-riscv64-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-riscv64-linux-musl.zip",
+          "size": 1517729,
+          "downloadCount": 3
+        },
+        {
+          "name": "payload_dumper-arm64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-arm64-darwin.zip",
+          "size": 1459626,
+          "downloadCount": 7
+        },
+        {
+          "name": "payload_dumper-universal-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-universal-darwin.zip",
+          "size": 2988174,
+          "downloadCount": 6
+        },
+        {
+          "name": "payload_dumper-x86_64-darwin.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-x86_64-darwin.zip",
+          "size": 1527434,
+          "downloadCount": 8
+        },
+        {
+          "name": "payload_dumper-i686-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-i686-windows.zip",
+          "size": 1560806,
+          "downloadCount": 23
+        },
+        {
+          "name": "payload_dumper-aarch64-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.3.0/payload_dumper-aarch64-windows.zip",
+          "size": 1620202,
+          "downloadCount": 16
+        }
+      ]
+    },
+    {
+      "name": "0.2.0",
+      "tagName": "0.2.0",
+      "publishedAt": "2025-03-06T15:38:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper_aarch64-unknown-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper_aarch64-unknown-linux-musl.zip",
+          "size": 1855331,
+          "downloadCount": 6
+        },
+        {
+          "name": "payload_dumper-armv7-unknown-linux-musleabihf.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper-armv7-unknown-linux-musleabihf.zip",
+          "size": 1413628,
+          "downloadCount": 7
+        },
+        {
+          "name": "payload_dumper-i686-unknown-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper-i686-unknown-linux-musl.zip",
+          "size": 1583543,
+          "downloadCount": 2
+        },
+        {
+          "name": "payload_dumper-x86_64-pc-windows.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper-x86_64-pc-windows.zip",
+          "size": 1850285,
+          "downloadCount": 31
+        },
+        {
+          "name": "payload_dumper-android-magisk-module.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper-android-magisk-module.zip",
+          "size": 6584424,
+          "downloadCount": 12
+        },
+        {
+          "name": "payload_dumper-x86_64-unknown-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.2.0/payload_dumper-x86_64-unknown-linux-musl.zip",
+          "size": 2169303,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "0.1.0",
+      "tagName": "0.1.0",
+      "publishedAt": "2025-03-03T19:13:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "payload_dumper_win-x64.exe.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.1.0/payload_dumper_win-x64.exe.zip",
+          "size": 1836121,
+          "downloadCount": 20
+        },
+        {
+          "name": "payload_dumper_x86_64-unknown-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.1.0/payload_dumper_x86_64-unknown-linux-musl.zip",
+          "size": 2183816,
+          "downloadCount": 4
+        },
+        {
+          "name": "payload_dumper_aarch64-unknown-linux-musl.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.1.0/payload_dumper_aarch64-unknown-linux-musl.zip",
+          "size": 1875885,
+          "downloadCount": 6
+        },
+        {
+          "name": "payload_dumper_armv7-unknown-linux-musleabihf.zip",
+          "downloadUrl": "https://github.com/rhythmcache/payload-dumper-rust/releases/download/0.1.0/payload_dumper_armv7-unknown-linux-musleabihf.zip",
+          "size": 1435463,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

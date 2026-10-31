@@ -1,0 +1,72 @@
+{
+  "readme": "# VBMeta Patch WebUI\n\n把原来的 `修复vbmeta工具箱.sh` 做成了一个 KernelSU WebUI 模块，核心变化是：\n\n- 不再扫描当前目录里的 `.img`\n- 直接从手机的 `by-name` 分区读取源分区来提取 VBMeta\n- 从下载目录扫描目标镜像，也支持手动输入目标镜像路径\n- 可以只导出修补后的镜像，也可以在备份后回写到指定分区\n\n## 当前能力\n\n- 自动检测常见 AVB 相关分区：`vbmeta*`、`boot*`、`init_boot*`、`vendor_boot*`、`recovery*`、`dtbo*`\n- 从源分区提取 AVB Header / Footer 中的 VBMeta\n- 按目标镜像大小重新组装并输出修补镜像\n- 可选自动备份回写分区后写入修补镜像\n- WebUI 中显示实时日志与输出文件路径\n\n## 目录结构\n\n- `scripts/backend.sh`: WebUI 调用入口\n- `scripts/vbpatch-lib.sh`: 核心修补逻辑\n- `webroot/`: KernelSU WebUI 页面\n- `build-module.sh`: 打包 zip\n\n## 打包\n\n```bash\nchmod +x build-module.sh\n./build-module.sh\n```\n\n生成文件在 `dist/` 目录下。\n\n## GitHub Actions Release\n\n- 推送标签 `v*`，例如 `v1.0.0`，会自动构建 zip 并创建 GitHub Release\n- 也可以在 GitHub Actions 页面手动运行 `Build And Release`，并填写标签名\n\n## 注意\n\n- `patch-file` 子命令主要是为了本地测试核心逻辑，WebUI 实际使用的是分区模式。\n- 直接回写分区前，建议先用“仅导出镜像”模式验证结果。\n",
+  "readmeHTML": "<h1>VBMeta Patch WebUI</h1>\n\n<p>把原来的 <code>修复vbmeta工具箱.sh</code> 做成了一个 KernelSU WebUI 模块，核心变化是：</p>\n\n<li>不再扫描当前目录里的 `.img`</li>\n<li>直接从手机的 `by-name` 分区读取源分区来提取 VBMeta</li>\n<li>从下载目录扫描目标镜像，也支持手动输入目标镜像路径</li>\n<li>可以只导出修补后的镜像，也可以在备份后回写到指定分区</li>\n\n<h2>当前能力</h2>\n\n<li>自动检测常见 AVB 相关分区：`vbmeta*`、`boot*`、`init_boot*`、`vendor_boot*`、`recovery*`、`dtbo*`</li>\n<li>从源分区提取 AVB Header / Footer 中的 VBMeta</li>\n<li>按目标镜像大小重新组装并输出修补镜像</li>\n<li>可选自动备份回写分区后写入修补镜像</li>\n<li>WebUI 中显示实时日志与输出文件路径</li>\n\n<h2>目录结构</h2>\n\n<li>`scripts/backend.sh`: WebUI 调用入口</li>\n<li>`scripts/vbpatch-lib.sh`: 核心修补逻辑</li>\n<li>`webroot/`: KernelSU WebUI 页面</li>\n<li>`build-module.sh`: 打包 zip</li>\n\n<h2>打包</h2>\n\n<pre>chmod +x build-module.sh\n./build-module.sh</pre>\n\n<p>生成文件在 <code>dist/</code> 目录下。</p>\n\n<h2>GitHub Actions Release</h2>\n\n<li>推送标签 `v*`，例如 `v1.0.0`，会自动构建 zip 并创建 GitHub Release</li>\n<li>也可以在 GitHub Actions 页面手动运行 `Build And Release`，并填写标签名</li>\n\n<h2>注意</h2>\n\n<li>`patch-file` 子命令主要是为了本地测试核心逻辑，WebUI 实际使用的是分区模式。</li>\n<li>直接回写分区前，建议先用“仅导出镜像”模式验证结果。</li>",
+  "homepageUrl": "https://github.com/hupochun/vbpatch",
+  "sourceUrl": "https://github.com/hupochun/vbpatch",
+  "url": "https://github.com/hupochun/vbpatch",
+  "latestRelease": {
+    "name": "v1.0.3",
+    "version": "v1.0.3",
+    "time": "2026-05-27T10:56:17Z",
+    "downloadUrl": "https://github.com/hupochun/vbpatch/releases/download/v1.0.3/vbpatch-ksu-webui-1.0.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-05-27T10:56:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vbpatch-ksu-webui-1.0.3.zip",
+          "downloadUrl": "https://github.com/hupochun/vbpatch/releases/download/v1.0.3/vbpatch-ksu-webui-1.0.3.zip",
+          "size": 15609,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-05-27T06:37:15Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vbpatch-ksu-webui-1.0.2.zip",
+          "downloadUrl": "https://github.com/hupochun/vbpatch/releases/download/v1.0.2/vbpatch-ksu-webui-1.0.2.zip",
+          "size": 14361,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-05-27T05:19:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vbpatch-ksu-webui-1.0.1.zip",
+          "downloadUrl": "https://github.com/hupochun/vbpatch/releases/download/v1.0.1/vbpatch-ksu-webui-1.0.1.zip",
+          "size": 14044,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-05-27T05:02:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vbpatch-ksu-webui-1.0.0.zip",
+          "downloadUrl": "https://github.com/hupochun/vbpatch/releases/download/v1.0.0/vbpatch-ksu-webui-1.0.0.zip",
+          "size": 14089,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

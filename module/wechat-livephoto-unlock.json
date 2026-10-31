@@ -1,0 +1,82 @@
+{
+  "readme": "# 📸 WeChat LivePhoto Unlock（微信实况照片解锁）\n\n> 让**非白名单机型 / 旧系统**的 Android 微信完整支持**实况照片（Live Photo / Live 动图）**——相册 LIVE 角标识别、聊天预览发送、视频提取播放，全链路打通。\n\n<p align=\"center\">\n  <b>LSPosed 版</b> · <b>Zygisk 版</b> 双方案任选\n</p>\n\n---\n\n## ✅ 版本兼容性（重要）\n\n| 状态 | 微信版本 | 说明 |\n|---|---|---|\n| ✅ **完整支持** | **8.0.69 ~ 8.0.79** | 相册 LIVE 角标、预览、发送全功能正常 |\n| ⚠️ **部分支持** | 8.0.63 ~ 8.0.68 | 模块注入兼容（不崩溃），但早期版本实况识别走**系统探测**而非桩类，相册可能不显示 LIVE 角标 |\n| ❌ **不支持** | < 8.0.63 | 微信尚未实装实况照片功能 |\n\n**最低完整支持版本：8.0.69**\n\n> 📌 已实测：8.0.69 / 8.0.70 / 8.0.71 / 8.0.72 / 8.0.74 / 8.0.76 / 8.0.77 / 8.0.78 / 8.0.79 相册 LIVE 角标与识别全部正常。\n\n---\n\n## ✨ 功能特性\n\n- ✅ **相册 LIVE 角标识别** — 兼容小米 / 魅族 / 抖音 / Google Motion Photo 等主流实况格式\n- ✅ **聊天选择实况并发送** — 直通秒发\n- ✅ **预览动态画面** — 含 100MB+ 超大实况图，流式提取不卡死\n- ✅ **接收查看实况** — 动图 + 声音完整播放\n- ✅ **朋友圈发表实况**\n- ✅ **增强检测** — 头部 XMP 标记（MotionPhoto / MicroVideo / GCamera）+ 尾部 ftyp 双通道\n- ✅ **多版本自适应** — DexProbe 按方法签名结构动态探测关键类，微信混淆升级不失效\n\n---\n\n## 📦 两个版本\n\n### 1️⃣ LSPosed 版（`LSPosed/`）\n\n基于 **libxposed API 102** 的成熟方案。\n\n**安装步骤**：\n1. 安装 `LSPosed-backup.apk`\n2. 打开 LSPosed 管理器 → 模块 → 启用 **LivePhotoUnlock**\n3. 作用域勾选 **微信（com.tencent.mm）**\n4. 强制停止微信并重新打开\n\n**文件**：\n- `LSPosed-backup.apk` — 模块 APK（v2.1 起移除重复的 `LivePhotoUnlock-enhanced-v2.apk`，与其字节完全相同）\n- `LivePhotoUnlockHook-enhanced.kt` / `DexProbe.kt` — 源码\n- `../../common/LivePhotoCodec.java` — 与 Zygisk 版共用的纯 JVM 共享核心（编解码/检测/配置键表）；LSPosed 构建时把 `common` 加入 sourceSets 即可\n\n### 3️⃣ 共享核心（`common/`，v2.1 新增）\n\n纯 JVM、无 Android 依赖：`me.livephoto.common.LivePhotoCodec`。\nLSPosed（Kotlin）与 Zygisk（Java）共用一套实现，修一处两边生效：\nMP4 box 解析（ftyp/mvhd/tkhd）、实况文件检测、内嵌视频定位与流式拷贝、\nexpt JSON 构造、Repairer 配置键表。\n\n### 2️⃣ Zygisk 版（`Zygisk/`）\n\n纯 Zygisk 方案，**无需 LSPosed**，通过 **Pine Hook 引擎**注入。\n\n**安装步骤**：\n1. KernelSU / Magisk → 安装模块 `LivePhotoUnlock-Zygisk-v2.1.1.zip`\n2. 重启手机\n3. 打开微信即可使用\n\n**文件**：\n- `LivePhotoUnlock-Zygisk-v2.1.1.zip` — 模块包\n- `source/` — 完整源码（含 `module.prop` / `post-fs-data.sh` / `customize.sh` 打包脚本）\n- `livephoto_module-v4.dex` — 旧版业务 dex（已废弃，v2.1.1 起由源码构建）\n\n---\n\n## 🛠 技术原理\n\n微信所有官方 APK 中的 `com.motion.core.LivePhotoCore` 都是**桩类**（initCore 返回 -1000、isLivePhoto 返回空表），厂商白名单只决定是否创建核心实例，不提供实现本身。本模块通过**模拟真核心**实现完整功能：\n\n| 桩方法 | 模块实现 |\n|---|---|\n| `initCore(Context)` | 返回 0（成功标志）|\n| `isSupport()` | 返回 true |\n| `isLivePhoto(List)` | MediaStore 解析 + 文件头部 XMP 标记 + 尾部 ftyp 特征扫描 |\n| `getVideoMetaData(id, path)` | 流式提取内嵌 MP4，返回完整 JSON |\n| `exportLivePhoto(json)` | 图 + 视频合成动态 JPEG 保存到相册 |\n\n**多版本自适应（DexProbe）**：按方法签名结构动态探测，不依赖固定混淆类名：\n\n| 版本范围 | 包装类 | remux worker |\n|---|---|---|\n| 8.0.63 | `lo.b` | `rb4.b0` |\n| 8.0.64 | `oo.b` | `oc4.b0` |\n| 8.0.65 | `po.b` | `nd4.b0` |\n| 8.0.66 | `xn.b` | `jf4.b0` |\n| 8.0.67/68/69 | `zn.b` | `ei4.b0` / `xi4.b0` |\n| 8.0.70 | `bp.b` | `wl4.b0` |\n| 8.0.71 | `ep.b` | `in4.b0` |\n| 8.0.72 | `gp.b` | `lo4.b0` |\n| 8.0.74/76 | `qp.b` | `wp4.b0` / `ar4.b0` |\n| 8.0.77 | `wp.b` | `yt4.b0` |\n| 8.0.78/79 | `wp.b` | `ox4.b0` / `ky4.b0` |\n\n---\n\n## ⚠️ 注意事项\n\n- ⚠️ **两版不能同时启用**（会冲突导致微信崩溃 SIGSEGV）\n- ⚠️ 使用 Xposed / Zygisk 注入**可能触发微信风控**，**强烈建议先小号测试**\n- ⚠️ **8.0.63~8.0.68** 早期版本实况识别走系统探测，模块兼容但不保证显示 LIVE 角标\n- 微信升级后混淆类名会变化，Zygisk 版已内置 DexProbe 动态探测应对\n\n---\n\n## 📥 下载\n\n前往 [**Releases**](https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases) 下载最新版本。\n\n---\n\n## 🆕 v2.1.1（2026-10-09，Zygisk 版）\n\n- dex 用 v2.1 源码重新构建（含共享核心 `LivePhotoCodec`，旧 ZIP 内 dex 还是 v2.0 前版本）\n- `DexProbe` 删除废弃代码；微信 APK 路径优先用 `Context.sourceDir` 获取，不再硬扫 `/data/app`\n- `post-fs-data.sh` / `customize.sh` 的 `chown` 改动态获取微信 UID（原来写死的 `u0_a281` 换机失效）\n- `module.prop` / 打包脚本提为正式源码文件；native `.so` 未改动，复用旧版\n\n## 🆕 v2.1 优化（2026-10-08）\n\n**性能（高优先级）**\n- 视频提取改为真·流式：尾部窗口逆向定位 ftyp 后分段拷贝，不再整文件 `readBytes`（100MB+ 实况不再大堆分配）；时长/宽高只读视频头尾有限区域解析\n- 导出合成去掉 `ib + vb` 第三份内存拷贝，改为 File 流式拼接；图像只做 JPEG 魔数校验（2 字节）不再读入内容\n- 缩略图只流式读取 `[0, 视频起始)` 的 JPEG 头部\n- Zygisk 版 ftyp 定位从\"头部 8MB 正向\"改为\"尾部窗口逆向\"，JPEG 部分超 8MB 的大底照片不再漏检；删除无调用的 `extractEmbeddedMp4`（曾最多分配 512MB）\n\n**启动与维护（中优先级）**\n- DexProbe 结果按微信 versionCode 缓存（SharedPreferences），命中后跳过全量 dex 扫描\n- MMKV 批量写完一次 `sync`（原逐 key sync）\n- 新增 `common/LivePhotoCodec.java` 纯 JVM 共享核心，LSPosed / Zygisk 共用编解码与配置逻辑，删掉约 300 行重复代码\n\n**仓库卫生**\n- 移除与 `LSPosed-backup.apk` 字节完全相同的重复 APK\n\n---\n\n## 📄 免责声明\n\n本项目仅用于**技术研究和学习**。使用本模块可能触发微信风控（账号异常、功能受限、封号等），开发者不承担任何责任。请勿用于任何商业用途。\n\n⭐ 如果这个项目对你有帮助，欢迎 Star！\n",
+  "readmeHTML": "<h1>📸 WeChat LivePhoto Unlock（微信实况照片解锁）</h1>\n\n<p>> 让<b>非白名单机型 / 旧系统</b>的 Android 微信完整支持<b>实况照片（Live Photo / Live 动图）</b>——相册 LIVE 角标识别、聊天预览发送、视频提取播放，全链路打通。</p>\n\n<p><p align=\"center\"></p>\n<p>  <b>LSPosed 版</b> · <b>Zygisk 版</b> 双方案任选</p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>✅ 版本兼容性（重要）</h2>\n\n<p>| 状态 | 微信版本 | 说明 |</p>\n<p>|---|---|---|</p>\n<p>| ✅ <b>完整支持</b> | <b>8.0.69 ~ 8.0.79</b> | 相册 LIVE 角标、预览、发送全功能正常 |</p>\n<p>| ⚠️ <b>部分支持</b> | 8.0.63 ~ 8.0.68 | 模块注入兼容（不崩溃），但早期版本实况识别走<b>系统探测</b>而非桩类，相册可能不显示 LIVE 角标 |</p>\n<p>| ❌ <b>不支持</b> | < 8.0.63 | 微信尚未实装实况照片功能 |</p>\n\n<p><b>最低完整支持版本：8.0.69</b></p>\n\n<p>> 📌 已实测：8.0.69 / 8.0.70 / 8.0.71 / 8.0.72 / 8.0.74 / 8.0.76 / 8.0.77 / 8.0.78 / 8.0.79 相册 LIVE 角标与识别全部正常。</p>\n\n<p>---</p>\n\n<h2>✨ 功能特性</h2>\n\n<li>✅ **相册 LIVE 角标识别** — 兼容小米 / 魅族 / 抖音 / Google Motion Photo 等主流实况格式</li>\n<li>✅ **聊天选择实况并发送** — 直通秒发</li>\n<li>✅ **预览动态画面** — 含 100MB+ 超大实况图，流式提取不卡死</li>\n<li>✅ **接收查看实况** — 动图 + 声音完整播放</li>\n<li>✅ **朋友圈发表实况**</li>\n<li>✅ **增强检测** — 头部 XMP 标记（MotionPhoto / MicroVideo / GCamera）+ 尾部 ftyp 双通道</li>\n<li>✅ **多版本自适应** — DexProbe 按方法签名结构动态探测关键类，微信混淆升级不失效</li>\n\n<p>---</p>\n\n<h2>📦 两个版本</h2>\n\n<h3>1️⃣ LSPosed 版（`LSPosed/`）</h3>\n\n<p>基于 <b>libxposed API 102</b> 的成熟方案。</p>\n\n<p><b>安装步骤</b>：</p>\n<li>安装 `LSPosed-backup.apk`</li>\n<li>打开 LSPosed 管理器 → 模块 → 启用 **LivePhotoUnlock**</li>\n<li>作用域勾选 **微信（com.tencent.mm）**</li>\n<li>强制停止微信并重新打开</li>\n\n<p><b>文件</b>：</p>\n<li>`LSPosed-backup.apk` — 模块 APK（v2.1 起移除重复的 `LivePhotoUnlock-enhanced-v2.apk`，与其字节完全相同）</li>\n<li>`LivePhotoUnlockHook-enhanced.kt` / `DexProbe.kt` — 源码</li>\n<li>`../../common/LivePhotoCodec.java` — 与 Zygisk 版共用的纯 JVM 共享核心（编解码/检测/配置键表）；LSPosed 构建时把 `common` 加入 sourceSets 即可</li>\n\n<h3>3️⃣ 共享核心（`common/`，v2.1 新增）</h3>\n\n<p>纯 JVM、无 Android 依赖：<code>me.livephoto.common.LivePhotoCodec</code>。</p>\n<p>LSPosed（Kotlin）与 Zygisk（Java）共用一套实现，修一处两边生效：</p>\n<p>MP4 box 解析（ftyp/mvhd/tkhd）、实况文件检测、内嵌视频定位与流式拷贝、</p>\n<p>expt JSON 构造、Repairer 配置键表。</p>\n\n<h3>2️⃣ Zygisk 版（`Zygisk/`）</h3>\n\n<p>纯 Zygisk 方案，<b>无需 LSPosed</b>，通过 <b>Pine Hook 引擎</b>注入。</p>\n\n<p><b>安装步骤</b>：</p>\n<li>KernelSU / Magisk → 安装模块 `LivePhotoUnlock-Zygisk-v2.1.1.zip`</li>\n<li>重启手机</li>\n<li>打开微信即可使用</li>\n\n<p><b>文件</b>：</p>\n<li>`LivePhotoUnlock-Zygisk-v2.1.1.zip` — 模块包</li>\n<li>`source/` — 完整源码（含 `module.prop` / `post-fs-data.sh` / `customize.sh` 打包脚本）</li>\n<li>`livephoto_module-v4.dex` — 旧版业务 dex（已废弃，v2.1.1 起由源码构建）</li>\n\n<p>---</p>\n\n<h2>🛠 技术原理</h2>\n\n<p>微信所有官方 APK 中的 <code>com.motion.core.LivePhotoCore</code> 都是<b>桩类</b>（initCore 返回 -1000、isLivePhoto 返回空表），厂商白名单只决定是否创建核心实例，不提供实现本身。本模块通过<b>模拟真核心</b>实现完整功能：</p>\n\n<p>| 桩方法 | 模块实现 |</p>\n<p>|---|---|</p>\n<p>| <code>initCore(Context)</code> | 返回 0（成功标志）|</p>\n<p>| <code>isSupport()</code> | 返回 true |</p>\n<p>| <code>isLivePhoto(List)</code> | MediaStore 解析 + 文件头部 XMP 标记 + 尾部 ftyp 特征扫描 |</p>\n<p>| <code>getVideoMetaData(id, path)</code> | 流式提取内嵌 MP4，返回完整 JSON |</p>\n<p>| <code>exportLivePhoto(json)</code> | 图 + 视频合成动态 JPEG 保存到相册 |</p>\n\n<p><b>多版本自适应（DexProbe）</b>：按方法签名结构动态探测，不依赖固定混淆类名：</p>\n\n<p>| 版本范围 | 包装类 | remux worker |</p>\n<p>|---|---|---|</p>\n<p>| 8.0.63 | <code>lo.b</code> | <code>rb4.b0</code> |</p>\n<p>| 8.0.64 | <code>oo.b</code> | <code>oc4.b0</code> |</p>\n<p>| 8.0.65 | <code>po.b</code> | <code>nd4.b0</code> |</p>\n<p>| 8.0.66 | <code>xn.b</code> | <code>jf4.b0</code> |</p>\n<p>| 8.0.67/68/69 | <code>zn.b</code> | <code>ei4.b0</code> / <code>xi4.b0</code> |</p>\n<p>| 8.0.70 | <code>bp.b</code> | <code>wl4.b0</code> |</p>\n<p>| 8.0.71 | <code>ep.b</code> | <code>in4.b0</code> |</p>\n<p>| 8.0.72 | <code>gp.b</code> | <code>lo4.b0</code> |</p>\n<p>| 8.0.74/76 | <code>qp.b</code> | <code>wp4.b0</code> / <code>ar4.b0</code> |</p>\n<p>| 8.0.77 | <code>wp.b</code> | <code>yt4.b0</code> |</p>\n<p>| 8.0.78/79 | <code>wp.b</code> | <code>ox4.b0</code> / <code>ky4.b0</code> |</p>\n\n<p>---</p>\n\n<h2>⚠️ 注意事项</h2>\n\n<li>⚠️ **两版不能同时启用**（会冲突导致微信崩溃 SIGSEGV）</li>\n<li>⚠️ 使用 Xposed / Zygisk 注入**可能触发微信风控**，**强烈建议先小号测试**</li>\n<li>⚠️ **8.0.63~8.0.68** 早期版本实况识别走系统探测，模块兼容但不保证显示 LIVE 角标</li>\n<li>微信升级后混淆类名会变化，Zygisk 版已内置 DexProbe 动态探测应对</li>\n\n<p>---</p>\n\n<h2>📥 下载</h2>\n\n<p>前往 <a href=\"https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases\"><b>Releases</b></a> 下载最新版本。</p>\n\n<p>---</p>\n\n<h2>🆕 v2.1.1（2026-10-09，Zygisk 版）</h2>\n\n<li>dex 用 v2.1 源码重新构建（含共享核心 `LivePhotoCodec`，旧 ZIP 内 dex 还是 v2.0 前版本）</li>\n<li>`DexProbe` 删除废弃代码；微信 APK 路径优先用 `Context.sourceDir` 获取，不再硬扫 `/data/app`</li>\n<li>`post-fs-data.sh` / `customize.sh` 的 `chown` 改动态获取微信 UID（原来写死的 `u0_a281` 换机失效）</li>\n<li>`module.prop` / 打包脚本提为正式源码文件；native `.so` 未改动，复用旧版</li>\n\n<h2>🆕 v2.1 优化（2026-10-08）</h2>\n\n<p><b>性能（高优先级）</b></p>\n<li>视频提取改为真·流式：尾部窗口逆向定位 ftyp 后分段拷贝，不再整文件 `readBytes`（100MB+ 实况不再大堆分配）；时长/宽高只读视频头尾有限区域解析</li>\n<li>导出合成去掉 `ib + vb` 第三份内存拷贝，改为 File 流式拼接；图像只做 JPEG 魔数校验（2 字节）不再读入内容</li>\n<li>缩略图只流式读取 `[0, 视频起始)` 的 JPEG 头部</li>\n<li>Zygisk 版 ftyp 定位从\"头部 8MB 正向\"改为\"尾部窗口逆向\"，JPEG 部分超 8MB 的大底照片不再漏检；删除无调用的 `extractEmbeddedMp4`（曾最多分配 512MB）</li>\n\n<p><b>启动与维护（中优先级）</b></p>\n<li>DexProbe 结果按微信 versionCode 缓存（SharedPreferences），命中后跳过全量 dex 扫描</li>\n<li>MMKV 批量写完一次 `sync`（原逐 key sync）</li>\n<li>新增 `common/LivePhotoCodec.java` 纯 JVM 共享核心，LSPosed / Zygisk 共用编解码与配置逻辑，删掉约 300 行重复代码</li>\n\n<p><b>仓库卫生</b></p>\n<li>移除与 `LSPosed-backup.apk` 字节完全相同的重复 APK</li>\n\n<p>---</p>\n\n<h2>📄 免责声明</h2>\n\n<p>本项目仅用于<b>技术研究和学习</b>。使用本模块可能触发微信风控（账号异常、功能受限、封号等），开发者不承担任何责任。请勿用于任何商业用途。</p>\n\n<p>⭐ 如果这个项目对你有帮助，欢迎 Star！</p>",
+  "homepageUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock",
+  "sourceUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock",
+  "url": "https://github.com/lyg1106-cell/wechat-livephoto-unlock",
+  "latestRelease": {
+    "name": "v2.1.1",
+    "version": "v2.1.1",
+    "time": "2026-10-09T06:32:54Z",
+    "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v2.1.1/LivePhotoUnlock-Zygisk-v2.1.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.1.1",
+      "tagName": "v2.1.1",
+      "publishedAt": "2026-10-09T06:32:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LivePhotoUnlock-Zygisk-v2.1.1.zip",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v2.1.1/LivePhotoUnlock-Zygisk-v2.1.1.zip",
+          "size": 590752,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v2.1.0",
+      "tagName": "v2.1.0",
+      "publishedAt": "2026-10-09T01:04:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "livephoto-unlock-v2.1.0.apk",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v2.1.0/livephoto-unlock-v2.1.0.apk",
+          "size": 733812,
+          "downloadCount": 29
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-10-07T06:14:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LSPosed-backup.apk",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v1.0.0/LSPosed-backup.apk",
+          "size": 656007,
+          "downloadCount": 0
+        },
+        {
+          "name": "LivePhotoUnlock-enhanced-v2.apk",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v1.0.0/LivePhotoUnlock-enhanced-v2.apk",
+          "size": 656007,
+          "downloadCount": 9
+        },
+        {
+          "name": "LivePhotoUnlock-Zygisk-v2.0.zip",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v1.0.0/LivePhotoUnlock-Zygisk-v2.0.zip",
+          "size": 581579,
+          "downloadCount": 6
+        },
+        {
+          "name": "livephoto_module-v4.dex",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v1.0.0/livephoto_module-v4.dex",
+          "size": 244304,
+          "downloadCount": 0
+        },
+        {
+          "name": "LivePhotoUnlock-Zygisk-v2.1.zip",
+          "downloadUrl": "https://github.com/lyg1106-cell/wechat-livephoto-unlock/releases/download/v1.0.0/LivePhotoUnlock-Zygisk-v2.1.zip",
+          "size": 582163,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

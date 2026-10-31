@@ -1,0 +1,100 @@
+{
+  "readme": "<div align=\"center\">\n<h1>A1 memory management</h1>\n<a href=\"http://cppmicroservices.org/\"><img alt=\"C Language\" src=\"https://img.shields.io/badge/-C-black?logo=c&style=flat-square&logoColor=ffffff\"></a>\n<a href=\"http://cppmicroservices.org/\"><img alt=\"C++ Language\" src=\"https://img.shields.io/badge/-C++-808080?logo=c%2B%2B&style=flat-square&logoColor=ffffff\"></a>\n<a href=\"https://www.python.org/\"><img alt=\"Bash Shell\" src=\"https://img.shields.io/badge/-Bash-ae9a5a?style=flat-square&logo=shell&logoColor=ffffff\"></a>\n<img alt=\"Android Support\" src=\"https://img.shields.io/badge/Android%208~14-Support-green\">\n<img alt=\"arm64-v8a Support\" src=\"https://img.shields.io/badge/arm64--v8a-Support-green\">\n<a href=\"https://t.me/HCha1234\"><img alt=\"Join Telegram Channel\" src=\"https://img.shields.io/badge/Join%20group-Telegram-brightgreen.svg?logo=telegram\"></a>\n<p><b><a href=\"README.md\">English</a> | <a href=\"README-zh.md\">简体中文</a> | <a href=\"README-ru.md\">Русский</a></b></p>\n<p>Third-party memory management running on Android can reduce the running memory used by applications.</p>\n</div>\n\n## ✨important function\n- Managing the survival and termination of background processes\n- Specifying the release of background application child processes\n- Preventing Low Memory Killer Daemon from killing background processes\n- Automatically releasing non-essential memory\n- Putting applications to sleep to reduce CPU and memory usage\n\n## 💡Description\n- This module only supports Android 8 to 14, and the platform is limited to arm64-v8a.\n- Magisk version should be 20.4+ and ksu is mostly compatible.\n- This module is unlikely to conflict with other modules.\n\n### Default List Path\n![列表图片](image/list.jpg)\n- List File: /sdcard/Android/HChai/HC_memory/名单列表.conf\n\n## 📱Terminal UI\nCustom toggle functionality, only supports simple feature toggling. For more detailed parameter configurations, please see 📝 Custom Configuration.\n![UI图片](image/ui_us.jpg)\nHow to access the Terminal UI interface?\n- You can use the `amui` command in Termux or execute /sdcard/Android/HChai/HC_memory/`terminal.sh` in the mt manager.\n\nHow to save and toggle features?\n- Use the arrow keys for navigation and press Enter to save.\n- If there's no keyboard, click on the bottom right corner \"lm\" to summon the keyboard.\n\nWhat does the feature do?\n- An explanation will be added to the Terminal UI later. Currently, only the Json configuration guide is available.\n\n## 📝Custom Configuration\nThe built-in configuration is suitable for most devices, but there are still some devices that may not work with the default configuration. Therefore, more adjustable parameters are provided. This requirement was already taken into consideration when designing the HAMv2 framework, and most parameters can be customized and adjusted. Moreover, this project can be embedded and run within other modules. The JSON configuration file is located at `/data/adb/modules/Hc_memory/config/memory.json`\n\n### Project Information\n```json\n\"project\": {\n    \"name\": \"官方配置 [23.06.25]\",\n    \"author\": \"火機@coolapk\"\n}\n```\n\n| Field  | Type   | Description                                  |\n| ------ | ------ | -------------------------------------------- |\n| name   | string | Name of the configuration file               |\n| author | string | Author information of the configuration file |\n\nThe `name` and `author` are reflected in the logs in the following format:\n```\n[2023-07-06 19:00:22] [info] config 官方配置 [23.06.25] | by: 火機@coolapk\n```\n\n- For more detailed instructions on the JSON configuration file, please refer to[here.](config/JSON-CONFIG.md)\n\n## 🔍Frequently Asked Questions\n\nCan it be used in conjunction with other memory optimization modules?\n- A1 memory management works completely differently from other memory optimization methods, so using it together with other modules will only yield a cumulative effect of 1+1=2.\n\nDoes it consume power?\n- Not at all. I spent a considerable amount of time optimizing the core code while developing the HAMv2 framework. It is implemented in low-level languages such as C/C++, resulting in minimal power consumption that can be completely ignored.\n\nDoes it conflict with other Magisk modules or Xposed modules?\n- It is highly unlikely to conflict with other modules. So far, no conflicts have been encountered with this module.\n\nDoes it cause power consumption during standby?\n- The HAMv2 framework does not cause power consumption during standby, as the A1 memory management enters a sleep state when the device is in standby mode.\n\nWhy is the background process still killed even after enabling the lmkd process kill prevention?\n- This is because it only prevents lmkd from killing background processes and does not include the background process killing programs from various phone manufacturers.\n\nHow to configure the smart list?\n- To configure the smart list, you need to add the rule \"KILL package_name:subprocess_name\" in the respective list. Before adding, make sure you understand the functionality and purpose of the subprocess to avoid any unexpected issues.\n\nWhy does the device enter fb mode after a certain period of time?\n- Most cases of this issue occur on Samsung devices when the hook to prevent lmkd process killing is enabled. This is likely the cause of the problem. Currently, there is no solution available, but you can try disabling the hook to prevent lmkd process killing to resolve it.\n\nWhy is the process playing audio being paused?\n- The occurrence of audio process being paused is rare. If it indeed happens, you can add the process to the whitelist or disable the app hibernation feature. This will ensure continuous operation of the audio process without being paused.\n\nNot compatible with this platform: xxxx error when installing the module.\n- Currently, the module only supports the arm-v8a platform and does not support other platforms temporarily.\n\n## 🚀download\n- [Go to Github to download](https://github.com/OneB1ank/A1Memory/releases)\n\n## 🌟Star History\n\n<a href=\"https://star-history.com/#OneB1ank/A1Memory&Timeline\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline&theme=dark\" />\n    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline\" />\n    <img alt=\"Star History Chart\" src=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline\" />\n  </picture>\n</a>\n\n## 🙏Acknowledgments\n\nThanks to the following users or projects for their source code contributions to this project:  \n- [@yc9559](https://github.com/yc9559)\n- [@HChenX](https://github.com/HChenX)\n\nThanks to the following users for their testing feedback and bug identification:\n- @火機(coolapk)\n\n## 🎉Support Donations\nIf you find this module useful, you can make a donation to support me.\n- [爱发电](https://afdian.net/a/HCha1)\n- [patreon](https://patreon.com/A1memory)\n- USDT(TRC20)\n  > Address: TSqTqn2NcyUAbEwsdGgsrYoU5pokno5PnQ\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n<p><h1>A1 memory management</h1></p>\n<p><a href=\"http://cppmicroservices.org/\"><img alt=\"C Language\" src=\"https://img.shields.io/badge/-C-black?logo=c&style=flat-square&logoColor=ffffff\"></a></p>\n<p><a href=\"http://cppmicroservices.org/\"><img alt=\"C++ Language\" src=\"https://img.shields.io/badge/-C++-808080?logo=c%2B%2B&style=flat-square&logoColor=ffffff\"></a></p>\n<p><a href=\"https://www.python.org/\"><img alt=\"Bash Shell\" src=\"https://img.shields.io/badge/-Bash-ae9a5a?style=flat-square&logo=shell&logoColor=ffffff\"></a></p>\n<p><img alt=\"Android Support\" src=\"https://img.shields.io/badge/Android%208~14-Support-green\"></p>\n<p><img alt=\"arm64-v8a Support\" src=\"https://img.shields.io/badge/arm64--v8a-Support-green\"></p>\n<p><a href=\"https://t.me/HCha1234\"><img alt=\"Join Telegram Channel\" src=\"https://img.shields.io/badge/Join%20group-Telegram-brightgreen.svg?logo=telegram\"></a></p>\n<p><p><b><a href=\"README.md\">English</a> | <a href=\"README-zh.md\">简体中文</a> | <a href=\"README-ru.md\">Русский</a></b></p></p>\n<p><p>Third-party memory management running on Android can reduce the running memory used by applications.</p></p>\n<p></div></p>\n\n<h2>✨important function</h2>\n<li>Managing the survival and termination of background processes</li>\n<li>Specifying the release of background application child processes</li>\n<li>Preventing Low Memory Killer Daemon from killing background processes</li>\n<li>Automatically releasing non-essential memory</li>\n<li>Putting applications to sleep to reduce CPU and memory usage</li>\n\n<h2>💡Description</h2>\n<li>This module only supports Android 8 to 14, and the platform is limited to arm64-v8a.</li>\n<li>Magisk version should be 20.4+ and ksu is mostly compatible.</li>\n<li>This module is unlikely to conflict with other modules.</li>\n\n<h3>Default List Path</h3>\n<p>!<a href=\"image/list.jpg\">列表图片</a></p>\n<li>List File: /sdcard/Android/HChai/HC_memory/名单列表.conf</li>\n\n<h2>📱Terminal UI</h2>\n<p>Custom toggle functionality, only supports simple feature toggling. For more detailed parameter configurations, please see 📝 Custom Configuration.</p>\n<p>!<a href=\"image/ui_us.jpg\">UI图片</a></p>\n<p>How to access the Terminal UI interface?</p>\n<li>You can use the `amui` command in Termux or execute /sdcard/Android/HChai/HC_memory/`terminal.sh` in the mt manager.</li>\n\n<p>How to save and toggle features?</p>\n<li>Use the arrow keys for navigation and press Enter to save.</li>\n<li>If there's no keyboard, click on the bottom right corner \"lm\" to summon the keyboard.</li>\n\n<p>What does the feature do?</p>\n<li>An explanation will be added to the Terminal UI later. Currently, only the Json configuration guide is available.</li>\n\n<h2>📝Custom Configuration</h2>\n<p>The built-in configuration is suitable for most devices, but there are still some devices that may not work with the default configuration. Therefore, more adjustable parameters are provided. This requirement was already taken into consideration when designing the HAMv2 framework, and most parameters can be customized and adjusted. Moreover, this project can be embedded and run within other modules. The JSON configuration file is located at <code>/data/adb/modules/Hc_memory/config/memory.json</code></p>\n\n<h3>Project Information</h3>\n<pre>\"project\": {\n    \"name\": \"官方配置 [23.06.25]\",\n    \"author\": \"火機@coolapk\"\n}</pre>\n\n<p>| Field  | Type   | Description                                  |</p>\n<p>| ------ | ------ | -------------------------------------------- |</p>\n<p>| name   | string | Name of the configuration file               |</p>\n<p>| author | string | Author information of the configuration file |</p>\n\n<p>The <code>name</code> and <code>author</code> are reflected in the logs in the following format:</p>\n<pre>[2023-07-06 19:00:22] [info] config 官方配置 [23.06.25] | by: 火機@coolapk</pre>\n\n<li>For more detailed instructions on the JSON configuration file, please refer to[here.](config/JSON-CONFIG.md)</li>\n\n<h2>🔍Frequently Asked Questions</h2>\n\n<p>Can it be used in conjunction with other memory optimization modules?</p>\n<li>A1 memory management works completely differently from other memory optimization methods, so using it together with other modules will only yield a cumulative effect of 1+1=2.</li>\n\n<p>Does it consume power?</p>\n<li>Not at all. I spent a considerable amount of time optimizing the core code while developing the HAMv2 framework. It is implemented in low-level languages such as C/C++, resulting in minimal power consumption that can be completely ignored.</li>\n\n<p>Does it conflict with other Magisk modules or Xposed modules?</p>\n<li>It is highly unlikely to conflict with other modules. So far, no conflicts have been encountered with this module.</li>\n\n<p>Does it cause power consumption during standby?</p>\n<li>The HAMv2 framework does not cause power consumption during standby, as the A1 memory management enters a sleep state when the device is in standby mode.</li>\n\n<p>Why is the background process still killed even after enabling the lmkd process kill prevention?</p>\n<li>This is because it only prevents lmkd from killing background processes and does not include the background process killing programs from various phone manufacturers.</li>\n\n<p>How to configure the smart list?</p>\n<li>To configure the smart list, you need to add the rule \"KILL package_name:subprocess_name\" in the respective list. Before adding, make sure you understand the functionality and purpose of the subprocess to avoid any unexpected issues.</li>\n\n<p>Why does the device enter fb mode after a certain period of time?</p>\n<li>Most cases of this issue occur on Samsung devices when the hook to prevent lmkd process killing is enabled. This is likely the cause of the problem. Currently, there is no solution available, but you can try disabling the hook to prevent lmkd process killing to resolve it.</li>\n\n<p>Why is the process playing audio being paused?</p>\n<li>The occurrence of audio process being paused is rare. If it indeed happens, you can add the process to the whitelist or disable the app hibernation feature. This will ensure continuous operation of the audio process without being paused.</li>\n\n<p>Not compatible with this platform: xxxx error when installing the module.</p>\n<li>Currently, the module only supports the arm-v8a platform and does not support other platforms temporarily.</li>\n\n<h2>🚀download</h2>\n<li>[Go to Github to download](https://github.com/OneB1ank/A1Memory/releases)</li>\n\n<h2>🌟Star History</h2>\n\n<p><a href=\"https://star-history.com/#OneB1ank/A1Memory&Timeline\"></p>\n<p>  <picture></p>\n<p>    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline&theme=dark\" /></p>\n<p>    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline\" /></p>\n<p>    <img alt=\"Star History Chart\" src=\"https://api.star-history.com/svg?repos=OneB1ank/A1Memory&type=Timeline\" /></p>\n<p>  </picture></p>\n<p></a></p>\n\n<h2>🙏Acknowledgments</h2>\n\n<p>Thanks to the following users or projects for their source code contributions to this project:</p>\n<li>[@yc9559](https://github.com/yc9559)</li>\n<li>[@HChenX](https://github.com/HChenX)</li>\n\n<p>Thanks to the following users for their testing feedback and bug identification:</p>\n<li>@火機(coolapk)</li>\n\n<h2>🎉Support Donations</h2>\n<p>If you find this module useful, you can make a donation to support me.</p>\n<li>[爱发电](https://afdian.net/a/HCha1)</li>\n<li>[patreon](https://patreon.com/A1memory)</li>\n<li>USDT(TRC20)</li>\n<p>  > Address: TSqTqn2NcyUAbEwsdGgsrYoU5pokno5PnQ</p>",
+  "homepageUrl": "https://github.com/OneB1ank/A1Memory",
+  "sourceUrl": "https://github.com/OneB1ank/A1Memory",
+  "url": "https://github.com/OneB1ank/A1Memory",
+  "latestRelease": {
+    "name": "Beta6",
+    "version": "Beta6",
+    "time": "2023-07-10T09:55:37Z",
+    "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta6/A1Memory-2023-07-11.zip"
+  },
+  "releases": [
+    {
+      "name": "Beta6",
+      "tagName": "Beta6",
+      "publishedAt": "2023-07-10T09:55:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-11.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta6/A1Memory-2023-07-11.zip",
+          "size": 785102,
+          "downloadCount": 1118
+        }
+      ]
+    },
+    {
+      "name": "Beta5",
+      "tagName": "Beta5",
+      "publishedAt": "2023-07-10T06:54:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-10.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta5/A1Memory-2023-07-10.zip",
+          "size": 1244201,
+          "downloadCount": 413
+        }
+      ]
+    },
+    {
+      "name": "Beta4",
+      "tagName": "Beta4",
+      "publishedAt": "2023-07-09T04:34:37Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-09.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta4/A1Memory-2023-07-09.zip",
+          "size": 788134,
+          "downloadCount": 1082
+        }
+      ]
+    },
+    {
+      "name": "Beta3",
+      "tagName": "Beta3",
+      "publishedAt": "2023-07-08T05:38:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-08.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta3/A1Memory-2023-07-08.zip",
+          "size": 788142,
+          "downloadCount": 713
+        }
+      ]
+    },
+    {
+      "name": "Beta2",
+      "tagName": "Beta2",
+      "publishedAt": "2023-07-07T04:09:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-07.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta2/A1Memory-2023-07-07.zip",
+          "size": 789948,
+          "downloadCount": 177
+        }
+      ]
+    },
+    {
+      "name": "Beta",
+      "tagName": "Beta",
+      "publishedAt": "2023-07-06T07:03:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "A1Memory-2023-07-06.zip",
+          "downloadUrl": "https://github.com/OneB1ank/A1Memory/releases/download/Beta/A1Memory-2023-07-06.zip",
+          "size": 787953,
+          "downloadCount": 212
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

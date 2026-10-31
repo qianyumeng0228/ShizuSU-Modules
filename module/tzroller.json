@@ -1,0 +1,30 @@
+{
+  "readme": "# tzroller\n\n**tzroller** is a Magisk module that automatically fetches the latest [IANA tzdata](https://www.iana.org/time-zones), compiles it, and installs it on your Android device.\n\n## Features\n\n- Automatically downloads the latest IANA timezone database\n- Compiles tzdata into Android-compatible format\n- Installs updated time zone definitions system-wide via Magisk\n- Keeps your Android device's time zone data in sync with upstream\n\n## Requirements\n\n- Rooted Android device with [Magisk](https://topjohnwu.github.io/Magisk/) installed\n- Internet connection  \n**Note for users in Iran 🇮🇷:** Accessing the IANA tzdata server requires a **VPN**.\n\n## Installation\n\n1. Go to the [Releases](https://github.com/Sina-Ghaderi/tzroller/releases) section of this repository.\n2. Download the latest `tzroller.zip` file.\n3. Open the Magisk app.\n4. Navigate to **Modules** > **Install from storage**.\n5. Select the downloaded ZIP file.\n6. Reboot your device.\n\n## How It Works\n\n1. On installation or update, the module downloads the latest tzdata from IANA.\n2. It compiles the tzdata using `zic` (zone information compiler).\n3. The compiled data is copied via Magisk overlay to one of the following system paths, depending on your Android version:\n   - `/system/usr/share/zoneinfo` (for older Android versions)\n   - `/system/apex/com.android.tzdata/etc/tz` (for Android 10 and above)\n4. Android will then use the updated timezone definitions without requiring a full system update.\n\n## Notes\n\n- This module replaces system timezone data only at runtime using Magisk overlay. It does **not** modify the actual system partition.\n- Supports both legacy and APEX-based tzdata locations.\n- Compatible with most Android ROMs and versions that follow the AOSP structure.\n- To update the data manually, simply re-install the module.\n\n## Disclaimer\n\nUse at your own risk. While the module is designed to be safe and non-destructive, modifying system behavior always carries some risk. Make sure to have a backup before making changes.\n\n## License\n\nMIT License\n\n---\n\nFeel free to contribute or open issues for bugs and suggestions.\n",
+  "readmeHTML": "<h1>tzroller</h1>\n\n<p><b>tzroller</b> is a Magisk module that automatically fetches the latest <a href=\"https://www.iana.org/time-zones\">IANA tzdata</a>, compiles it, and installs it on your Android device.</p>\n\n<h2>Features</h2>\n\n<li>Automatically downloads the latest IANA timezone database</li>\n<li>Compiles tzdata into Android-compatible format</li>\n<li>Installs updated time zone definitions system-wide via Magisk</li>\n<li>Keeps your Android device's time zone data in sync with upstream</li>\n\n<h2>Requirements</h2>\n\n<li>Rooted Android device with [Magisk](https://topjohnwu.github.io/Magisk/) installed</li>\n<li>Internet connection</li>\n<p><b>Note for users in Iran 🇮🇷:</b> Accessing the IANA tzdata server requires a <b>VPN</b>.</p>\n\n<h2>Installation</h2>\n\n<li>Go to the [Releases](https://github.com/Sina-Ghaderi/tzroller/releases) section of this repository.</li>\n<li>Download the latest `tzroller.zip` file.</li>\n<li>Open the Magisk app.</li>\n<li>Navigate to **Modules** > **Install from storage**.</li>\n<li>Select the downloaded ZIP file.</li>\n<li>Reboot your device.</li>\n\n<h2>How It Works</h2>\n\n<li>On installation or update, the module downloads the latest tzdata from IANA.</li>\n<li>It compiles the tzdata using `zic` (zone information compiler).</li>\n<li>The compiled data is copied via Magisk overlay to one of the following system paths, depending on your Android version:</li>\n<p>   - <code>/system/usr/share/zoneinfo</code> (for older Android versions)</p>\n<p>   - <code>/system/apex/com.android.tzdata/etc/tz</code> (for Android 10 and above)</p>\n<li>Android will then use the updated timezone definitions without requiring a full system update.</li>\n\n<h2>Notes</h2>\n\n<li>This module replaces system timezone data only at runtime using Magisk overlay. It does **not** modify the actual system partition.</li>\n<li>Supports both legacy and APEX-based tzdata locations.</li>\n<li>Compatible with most Android ROMs and versions that follow the AOSP structure.</li>\n<li>To update the data manually, simply re-install the module.</li>\n\n<h2>Disclaimer</h2>\n\n<p>Use at your own risk. While the module is designed to be safe and non-destructive, modifying system behavior always carries some risk. Make sure to have a backup before making changes.</p>\n\n<h2>License</h2>\n\n<p>MIT License</p>\n\n<p>---</p>\n\n<p>Feel free to contribute or open issues for bugs and suggestions.</p>",
+  "homepageUrl": "https://github.com/Sina-Ghaderi/tzroller",
+  "sourceUrl": "https://github.com/Sina-Ghaderi/tzroller",
+  "url": "https://github.com/Sina-Ghaderi/tzroller",
+  "latestRelease": {
+    "name": "v1.10",
+    "version": "v1.10",
+    "time": "2025-07-18T22:24:55Z",
+    "downloadUrl": "https://github.com/Sina-Ghaderi/tzroller/releases/download/v1.10/tzroller.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.10",
+      "tagName": "v1.10",
+      "publishedAt": "2025-07-18T22:24:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "tzroller.zip",
+          "downloadUrl": "https://github.com/Sina-Ghaderi/tzroller/releases/download/v1.10/tzroller.zip",
+          "size": 551096,
+          "downloadCount": 122
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

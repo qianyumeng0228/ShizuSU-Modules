@@ -1,0 +1,86 @@
+{
+  "readme": "<div align=\"center\">\n\n<img src=\"icon.png\" width=\"96\" alt=\"Pixel Tune icon\">\n\n# Pixel Tune\n\n**Reversible performance, thermal and battery tuning for the Google Pixel 8a**\n\n![Version](https://img.shields.io/github/v/release/MildaHribal/pixel_tune?style=flat-square)\n![Device](https://img.shields.io/badge/device-Pixel%208a%20(akita)-4285F4?style=flat-square&logo=google&logoColor=white)\n![KernelSU](https://img.shields.io/badge/root-KernelSU--Next-2E7D32?style=flat-square)\n![Shell](https://img.shields.io/badge/POSIX%20sh-4EAA25?style=flat-square&logo=gnubash&logoColor=white)\n![WebUI](https://img.shields.io/badge/WebUI-HTML%20%2F%20JS-E34F26?style=flat-square&logo=html5&logoColor=white)\n\n</div>\n\n> [!WARNING]\n> Built and measured **only for the Pixel 8a (Tensor G3)**. The sysfs paths, frequency tables and thermal values are SoC-specific. Do not install it on any other device.\n\n## About\n\nA KernelSU module that puts the Pixel 8a's hidden tuning levers (uclamp, the `sched_pixel` governor, the Mali GPU, the memory bus, MGLRU, charge cap) behind one CLI and a WebUI. It exists because the phone throttles hard: under sustained load the big cores drop to ~38-40 % of their maximum at only 58 °C, and take ~84 s to recover. The profiles therefore trim the thermal peak instead of chasing benchmark numbers.\n\n## Features\n\n- **Profiles, switched by hand**: `balanced` (default), `powersave`, `performance`, `game`, `night`, `pogo`. No background daemon decides for you.\n- **WebUI** in the KernelSU manager: live CPU/GPU/temperature/battery overview, profile tiles, charge-limit slider, per-app rules, tweaks, sleep settings.\n- **Tweak registry**: kernel/system knobs, each with a description, risk level and stock value.\n- **Per-app rules**: Android Game Mode, refresh rate and a profile overlay per package.\n- **Sleep helper** (`pxtune doze`): releases foreign wake locks so the phone can actually suspend.\n- **Charge cap**, display resolution/DPI presets with a 60 s auto-revert safeguard, optional metrics sampling.\n\n## Safety\n\n- Everything is **reversible**: stock values are snapshotted on first run and `pxtune revert` restores them.\n- Writes nothing to `/system` or `/vendor`, mounts no overlay, SELinux stays **Enforcing**.\n- **Bootloop protection**: the module disables itself after repeated failed boots.\n- Emergency off switch: create `/data/adb/pixel_tune/DISABLE`, or boot into KernelSU safe mode.\n\n## Requirements\n\n- Google Pixel 8a, Android 16 (tested on kernel `6.1.145-android14-11`)\n- Root with **KernelSU-Next** (the tested setup; the WebUI needs a manager with module WebUI support)\n\n## Installation\n\n1. Download `pixel_tune-vX.Y.Z.zip` from [**Releases**](https://github.com/MildaHribal/pixel_tune/releases/latest).\n2. KernelSU manager → **Modules** → **Install from storage** → pick the ZIP.\n3. Reboot. The profile is applied ~20 s after boot, once the system is up.\n4. Check that everything is in place:\n\n```sh\nsu -c 'pxtune selftest'\n```\n\nTo uninstall, remove it in the manager and reboot; `uninstall.sh` reverts the runtime values. Your profiles and the stock backup in `/data/adb/pixel_tune/` are kept.\n\n## Usage\n\nOpen the WebUI from the manager (**Modules → Pixel Tune → WebUI**), or use the CLI as root:\n\n```sh\npxtune status               # profile, temperatures, frequencies, battery\npxtune profile powersave    # switch profile\npxtune charge 80            # stop charging at 80 %\npxtune tweak list           # browse the tweak registry\npxtune app list             # per-app rules\npxtune doze on              # enable the sleep helper\npxtune revert               # restore everything to stock\npxtune log                  # last 50 log lines\n```\n\n## Project structure\n\n```\nbin/          pxtune CLI and its helpers (tweaks, per-app, metrics, doze)\nprofiles/     shipped profiles (KEY=VALUE, parsed, never sourced)\ntweaks/       the tweak registry\napps/         example per-app rules\nwebroot/      the WebUI\n*.sh          KernelSU lifecycle scripts (install, boot, uninstall)\n```\n\n## Documentation\n\nThe full guide covers how every profile value was derived, the complete CLI and profile-key reference, the four levels of emergency shutdown, troubleshooting and a full manual revert: **[docs/GUIDE.md](docs/GUIDE.md)**. The internal contract is in [SPEC.md](SPEC.md).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"icon.png\" width=\"96\" alt=\"Pixel Tune icon\"></p>\n\n<h1>Pixel Tune</h1>\n\n<p><b>Reversible performance, thermal and battery tuning for the Google Pixel 8a</b></p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/MildaHribal/pixel_tune?style=flat-square\">Version</a></p>\n<p>!<a href=\"https://img.shields.io/badge/device-Pixel%208a%20(akita\">Device</a>-4285F4?style=flat-square&logo=google&logoColor=white)</p>\n<p>!<a href=\"https://img.shields.io/badge/root-KernelSU--Next-2E7D32?style=flat-square\">KernelSU</a></p>\n<p>!<a href=\"https://img.shields.io/badge/POSIX%20sh-4EAA25?style=flat-square&logo=gnubash&logoColor=white\">Shell</a></p>\n<p>!<a href=\"https://img.shields.io/badge/WebUI-HTML%20%2F%20JS-E34F26?style=flat-square&logo=html5&logoColor=white\">WebUI</a></p>\n\n<p></div></p>\n\n<p>> [!WARNING]</p>\n<p>> Built and measured <b>only for the Pixel 8a (Tensor G3)</b>. The sysfs paths, frequency tables and thermal values are SoC-specific. Do not install it on any other device.</p>\n\n<h2>About</h2>\n\n<p>A KernelSU module that puts the Pixel 8a's hidden tuning levers (uclamp, the <code>sched_pixel</code> governor, the Mali GPU, the memory bus, MGLRU, charge cap) behind one CLI and a WebUI. It exists because the phone throttles hard: under sustained load the big cores drop to ~38-40 % of their maximum at only 58 °C, and take ~84 s to recover. The profiles therefore trim the thermal peak instead of chasing benchmark numbers.</p>\n\n<h2>Features</h2>\n\n<li>**Profiles, switched by hand**: `balanced` (default), `powersave`, `performance`, `game`, `night`, `pogo`. No background daemon decides for you.</li>\n<li>**WebUI** in the KernelSU manager: live CPU/GPU/temperature/battery overview, profile tiles, charge-limit slider, per-app rules, tweaks, sleep settings.</li>\n<li>**Tweak registry**: kernel/system knobs, each with a description, risk level and stock value.</li>\n<li>**Per-app rules**: Android Game Mode, refresh rate and a profile overlay per package.</li>\n<li>**Sleep helper** (`pxtune doze`): releases foreign wake locks so the phone can actually suspend.</li>\n<li>**Charge cap**, display resolution/DPI presets with a 60 s auto-revert safeguard, optional metrics sampling.</li>\n\n<h2>Safety</h2>\n\n<li>Everything is **reversible**: stock values are snapshotted on first run and `pxtune revert` restores them.</li>\n<li>Writes nothing to `/system` or `/vendor`, mounts no overlay, SELinux stays **Enforcing**.</li>\n<li>**Bootloop protection**: the module disables itself after repeated failed boots.</li>\n<li>Emergency off switch: create `/data/adb/pixel_tune/DISABLE`, or boot into KernelSU safe mode.</li>\n\n<h2>Requirements</h2>\n\n<li>Google Pixel 8a, Android 16 (tested on kernel `6.1.145-android14-11`)</li>\n<li>Root with **KernelSU-Next** (the tested setup; the WebUI needs a manager with module WebUI support)</li>\n\n<h2>Installation</h2>\n\n<li>Download `pixel_tune-vX.Y.Z.zip` from [**Releases**](https://github.com/MildaHribal/pixel_tune/releases/latest).</li>\n<li>KernelSU manager → **Modules** → **Install from storage** → pick the ZIP.</li>\n<li>Reboot. The profile is applied ~20 s after boot, once the system is up.</li>\n<li>Check that everything is in place:</li>\n\n<pre>su -c 'pxtune selftest'</pre>\n\n<p>To uninstall, remove it in the manager and reboot; <code>uninstall.sh</code> reverts the runtime values. Your profiles and the stock backup in <code>/data/adb/pixel_tune/</code> are kept.</p>\n\n<h2>Usage</h2>\n\n<p>Open the WebUI from the manager (<b>Modules → Pixel Tune → WebUI</b>), or use the CLI as root:</p>\n\n<pre>pxtune status               # profile, temperatures, frequencies, battery\npxtune profile powersave    # switch profile\npxtune charge 80            # stop charging at 80 %\npxtune tweak list           # browse the tweak registry\npxtune app list             # per-app rules\npxtune doze on              # enable the sleep helper\npxtune revert               # restore everything to stock\npxtune log                  # last 50 log lines</pre>\n\n<h2>Project structure</h2>\n\n<pre>bin/          pxtune CLI and its helpers (tweaks, per-app, metrics, doze)\nprofiles/     shipped profiles (KEY=VALUE, parsed, never sourced)\ntweaks/       the tweak registry\napps/         example per-app rules\nwebroot/      the WebUI\n*.sh          KernelSU lifecycle scripts (install, boot, uninstall)</pre>\n\n<h2>Documentation</h2>\n\n<p>The full guide covers how every profile value was derived, the complete CLI and profile-key reference, the four levels of emergency shutdown, troubleshooting and a full manual revert: <b><a href=\"docs/GUIDE.md\">docs/GUIDE.md</a></b>. The internal contract is in <a href=\"SPEC.md\">SPEC.md</a>.</p>",
+  "homepageUrl": "https://github.com/MildaHribal/pixel_tune",
+  "sourceUrl": "https://github.com/MildaHribal/pixel_tune",
+  "url": "https://github.com/MildaHribal/pixel_tune",
+  "latestRelease": {
+    "name": "v1.5.3",
+    "version": "v1.5.3",
+    "time": "2026-10-11T03:36:44Z",
+    "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.5.3/pixel_tune-v1.5.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.3",
+      "tagName": "v1.5.3",
+      "publishedAt": "2026-10-11T03:36:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel_tune-v1.5.3.zip",
+          "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.5.3/pixel_tune-v1.5.3.zip",
+          "size": 314789,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5.2",
+      "tagName": "v1.5.2",
+      "publishedAt": "2026-08-23T19:42:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel_tune-v1.5.2.zip",
+          "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.5.2/pixel_tune-v1.5.2.zip",
+          "size": 312430,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-08-23T18:59:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel_tune-v1.5.1.zip",
+          "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.5.1/pixel_tune-v1.5.1.zip",
+          "size": 312429,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-08-23T17:47:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel_tune-v1.5.0.zip",
+          "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.5.0/pixel_tune-v1.5.0.zip",
+          "size": 313899,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-08-14T00:54:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "pixel_tune-v1.4.0.zip",
+          "downloadUrl": "https://github.com/MildaHribal/pixel_tune/releases/download/v1.4.0/pixel_tune-v1.4.0.zip",
+          "size": 278906,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

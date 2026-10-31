@@ -1,0 +1,322 @@
+{
+  "readme": "<p align=\"center\">\n  <img src=\"assets/logo.png\" width=\"200\" alt=\"VPN Hide\" />\n</p>\n\n<h1 align=\"center\">VPN Hide</h1>\n\n<p align=\"center\">Скрывает активное VPN-соединение на Android от выбранных приложений.</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/okhsunrog/vpnhide/actions/workflows/ci.yml\"><img src=\"https://img.shields.io/github/actions/workflow/status/okhsunrog/vpnhide/ci.yml?label=CI\" alt=\"CI\"></a>\n  <a href=\"https://github.com/okhsunrog/vpnhide/releases/latest\"><img src=\"https://img.shields.io/github/v/release/okhsunrog/vpnhide\" alt=\"Release\"></a>\n  <a href=\"https://github.com/okhsunrog/vpnhide/releases\"><img src=\"https://img.shields.io/github/downloads/okhsunrog/vpnhide/total\" alt=\"Downloads\"></a>\n  <a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/license-MIT-blue\" alt=\"License\"></a>\n</p>\n\n<p align=\"center\"><strong><a href=\"README.en.md\">English version</a> · <a href=\"README.zh.md\">中文版</a></strong></p>\n\n## Чем vpnhide лучше аналогов?\n\nСуществующие модули, такие как [NoVPNDetect](https://bitbucket.org/yuri-project/novpndetect) и [NoVPNDetect Enhanced](https://github.com/BlueCat300/NoVPNDetectEnhanced), покрывают только **Java API** обнаружение и хукают **внутри процесса** целевого приложения через Xposed. У этого подхода две критические проблемы:\n\n1. **Обнаружение anti-tamper защитой** — любое приложение с проверкой инъекций в память обнаруживает хуки Xposed и отказывается работать. Автор NoVPNDetect Enhanced прямо пишет: *«Модуль не будет работать если у подключаемого приложения есть защита от LSPosed, проверка на инъекции в память. Например MirPay, Т-Банк.»*\n2. **Нет нативного покрытия** — приложения, использующие C/C++ код, кроссплатформенные фреймворки (Flutter, React Native) или прямые системные вызовы, могут обнаружить VPN через `ioctl`, `getifaddrs`, netlink-сокеты и `/proc/net/*`. Java-хуки эти векторы полностью пропускают.\n\nvpnhide решает обе проблемы многослойной архитектурой:\n\n**Уровень 1 — Java API (модуль lsposed):** хукает `system_server`, а не целевое приложение. `NetworkCapabilities`, `NetworkInfo` и `LinkProperties` фильтруются на уровне Binder *до того*, как данные попадут в процесс приложения. Приложение получает чистые данные через IPC — никаких инъекций в его процесс, нечего обнаруживать. Этот же модуль скрывает выбранные приложения от приложений-наблюдателей на уровне `PackageManager` (роль Apps).\n\n**Уровень 2 — нативный (kmod, встроенный в ядро, KPM или Zygisk):** покрывает нативные пути обнаружения. Активным должен быть ровно один Native-бэкенд:\n- **kmod** (рекомендуется для поддерживаемых GKI-ядер) — хуки `kprobe`/`kretprobe` на уровне ядра. Фильтрует `ioctl`, `getifaddrs`/netlink-дампы интерфейсов, адресов, маршрутов и policy rules, а также отклоняет `SO_BINDTODEVICE` / `SO_BINDTOIFINDEX` для скрытых интерфейсов до изменения состояния сокета. Нулевой след в процессе приложения: никаких инъекций библиотек, нечего обнаруживать.\n- **KPM** — KernelPatch Module с теми же 11 логическими kernel-хуками, но без привязки к GKI-варианту `.ko`. Полезен для старых/non-GKI ядер 4.9 / 4.14 / 4.19 / 5.4 и ситуаций, где `.ko` не может загрузиться. Требует KernelPatch runtime: APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest).\n- **Zygisk** — запасной вариант, если kernel-level backend поставить нельзя. Inline-хуки `libc.so`, включая best-effort фильтрацию `setsockopt`, работают внутри процесса приложения и обходятся прямыми системными вызовами, поэтому банковские и anti-fraud приложения могут их обнаруживать. Для таких приложений лучше оставлять Native выключенным и полагаться на Java-уровень.\n\n**Уровень 3 — модуль скрытия портов (portshide):** отдельный Magisk-модуль. Через iptables блокирует выбранным приложениям доступ к `127.0.0.1` / `::1`, чтобы они не могли обнаружить локально запущенный VPN / proxy-демон по открытому порту (роль Ports).\n\nПроцесс целевого приложения полностью нетронут при использовании LSPosed + kernel-level Native-бэкенда (kmod или KPM) — ни Xposed, ни inline-хуков, ни модифицированных регионов памяти. Благодаря этому vpnhide работает с банковскими и государственными приложениями, которые активно обнаруживают и блокируют модули на основе Xposed.\n\n## Что именно скрывает vpnhide\n\nvpnhide скрывает от выбранных приложений три вещи — всё настраивается пер-апп через четыре роли **J / N / A / P** (Java, Native, Apps, Ports):\n\n1. **Скрытие интерфейса** — главная задача. Убирает VPN-интерфейсы и маршруты из нативных API (`ioctl`, `getifaddrs`, netlink, `/proc/net/*`, `NetworkInterface`), не позволяет привязать сокет к скрытому интерфейсу и очищает Java API (`NetworkCapabilities`, `NetworkInfo`, `LinkProperties`). Его дают две роли сразу — **Java (J)** и **Native (N)**, они включаются независимо.\n2. **Скрытие портов** — блокирует доступ к localhost для выбранных приложений, чтобы они не могли обнаружить Clash, sing-box, V2Ray, Happ и подобные инструменты через проверку локальных портов (роль **Ports (P)**).\n3. **Скрытие приложений** — позволяет скрыть выбранные установленные приложения от выбранных приложений-наблюдателей. Полезно против проверок package visibility, например когда приложение пытается определить, установлен ли на устройстве VPN или proxy-клиент (роль **Apps (A)**).\n\n## Какие модули нужны?\n\nВсегда нужно **приложение VPN Hide** (`vpnhide.apk`) + LSPosed/Vector для Java-уровня + ровно один Native-бэкенд для нативного скрытия. Дополнительно приложение может использовать необязательный Ports-модуль для блокировки localhost-портов:\n\n- **`kmod`** (стабильный вариант по умолчанию) — полностью out-of-process, невидим для anti-tamper. Требуется поддерживаемое GKI-ядро: 5.10, 5.15, 6.1, 6.6 или 6.12.\n- **`KPM`** — kernel-level backend для 4.9 / 4.14 / 4.19 / 5.4 и других случаев, где `.ko` не подходит. Нужен APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest).\n- **`Zygisk`** — fallback, если kmod/KPM недоступны или вы не хотите ставить KernelPatch runtime.\n- **`portshide`** (необязательно) — установите, если хотите блокировать выбранным приложениям доступ к localhost-портам.\n\nНе ставьте несколько Native-бэкендов одновременно. Если они всё же установлены, приложение выбирает активный по приоритету: kmod, затем встроенный в ядро, затем KPM, затем Zygisk; лишние модули лучше удалить.\n\nСм. [Установка](#установка) для пошаговой инструкции.\n\n## Установка\n\nСкачайте последний релиз из [Releases](https://github.com/okhsunrog/vpnhide/releases).\n\nКоротко — приложение на вкладке **«Обзор»** проведёт вас по шагам и подскажет, какой модуль ставить. Полные инструкции — во встроенном руководстве (ссылки ниже открываются и на GitHub, и в самом приложении).\n\n1. **Приложение + LSPosed.** Установите `vpnhide.apk`, включите модуль **VPN Hide** в LSPosed, добавьте **«System Framework»** в его scope и перезагрузитесь. → [Первая установка](docs/help/ru/first-install.md)\n2. **Один Native-бэкенд.** «Обзор» определит ядро и назовёт файл — kmod, KPM или Zygisk. Установите его через root-менеджер и перезагрузитесь. Если вы собираете ядро сами, есть четвёртый вариант — [встроенный в ядро бэкенд](builtin/README.md) с модулем-компаньоном. → [Какой Native-бэкенд выбрать](docs/help/ru/choosing-native.md) · [kmod](docs/help/ru/kmod-install.md) · [KPM](docs/help/ru/kpm-install.md) · [Zygisk](docs/help/ru/zygisk-install.md)\n3. **Необязательно — Ports.** Для блокировки localhost-портов установите `vpnhide-ports.zip`. → [Скрыть localhost-порты](docs/help/ru/ports.md)\n4. **Настройте скрытие.** На вкладке **«Скрытие»** дайте роли **J / N / A / P** приложениям, от которых прячете VPN (банк, госуслуги), — не самому VPN-клиенту. → [Настроить скрытие](docs/help/ru/configure-hiding.md)\n5. **После Save остановите приложение-цель** (force-stop) и откройте его заново: хуки Zygisk ставятся при старте процесса, а остальные слои применяются сразу, но приложение могло закешировать старый ответ. Перезагрузка нужна только при установке или обновлении модулей. → [Когда применяются изменения](docs/help/ru/saving-applying.md)\n\nПолное офлайн-руководство встроено в приложение (**Настройки → Помощь и руководство**) и лежит в репозитории: [docs/help/ru](docs/help/ru/) — установка, настройка, диагностика, обновление и удаление, ограничения.\n\n<details>\n<summary><b>Настройка через командную строку (для продвинутых)</b></summary>\n\nПользовательская конфигурация хранится в `/data/system/vpnhide_config.json`. Отредактируйте JSON и запустите activator установленного модуля:\n\n```sh\nsu -c /data/adb/modules/vpnhide_kmod/activator\nsu -c /data/adb/modules/vpnhide_kpm/activator\nsu -c /data/adb/modules/vpnhide_zygisk/activator\nsu -c /data/adb/modules/vpnhide_ports/activator\n```\n\nЗапускайте только activator тех модулей, которые действительно установлены. LSPosed читает JSON напрямую из `system_server`, отдельный activator для него не нужен. Старые `targets.txt` в `/data/adb/vpnhide_*` — это конфиг версий до 1.0. Пользовательской настройкой они больше не являются: приложение один раз переносит их в JSON и удаляет.\n\n</details>\n\n<details>\n<summary><b>Ручной подбор GKI (если хотите выбрать файл kmod самостоятельно)</b></summary>\n\n1. На телефоне откройте **Настройки → О телефоне** и найдите строку **Версия ядра**. Она выглядит примерно так: `6.1.75-android14-11-g...`\n2. Вам нужны две части из этой строки: версия ядра (`6.1`) и поколение android (`android14`). Вместе они образуют ваше поколение GKI: `android14-6.1`\n3. Скачайте соответствующий файл из релиза: `vpnhide-kmod-android14-6.1.zip`\n\nТакже можно выполнить `adb shell uname -r` через ADB, чтобы увидеть строку версии ядра.\n\n> **Важно:** `android14` в строке ядра — это НЕ версия Android, а поколение ядра. Например, все Pixel с 6 по 9a используют ядро `android14-6.1` вне зависимости от того, стоит ли на них Android 14 или 15.\n\n</details>\n\n## Скриншоты\n\n| Обзор — VPN скрыт | Скрытие — единый список | Как это работает |\n|:-:|:-:|:-:|\n| <img src=\"assets/screenshots/dashboard-hidden.png\" width=\"250\"> | <img src=\"assets/screenshots/hiding-list.png\" width=\"250\"> | <img src=\"assets/screenshots/hiding-help.png\" width=\"250\"> |\n\n| Статистика | Разбор по хукам | Выбор хуков для приложения |\n|:-:|:-:|:-:|\n| <img src=\"assets/screenshots/statistics.png\" width=\"250\"> | <img src=\"assets/screenshots/statistics-breakdown.png\" width=\"250\"> | <img src=\"assets/screenshots/hook-picker.png\" width=\"250\"> |\n\n| Диагностика | Настройки | Сообщество |\n|:-:|:-:|:-:|\n| <img src=\"assets/screenshots/diagnostics-native.png\" width=\"250\"> | <img src=\"assets/screenshots/settings.png\" width=\"250\"> | <img src=\"assets/screenshots/community.png\" width=\"250\"> |\n\n## Проверка\n\nВ приложении есть встроенная система диагностики, которая автоматически обнаруживает большинство проблем с настройкой.\n\n**Обзор** (запускается при каждом открытии приложения):\n- Статус модулей и бэкендов (установлен, активен, версия, количество целей)\n- Валидация конфигурации LSPosed — читает базу данных LSPosed и проверяет, что VPN Hide включён, System Framework в scope, и нет лишних приложений в scope (частая ошибка при настройке)\n- Обнаружение несоответствия версий — сравнивает версии установленных модулей с версией приложения и подсказывает, что именно нужно обновить\n- Рекомендация Native-бэкенда — определяет ядро устройства и подбирает нужный файл kmod, KPM или Zygisk\n- Проверка скрытия в реальном времени (при активном VPN) — выполняет 13 нативных и 12 Java API проверок, чтобы убедиться, что VPN действительно скрыт\n\nВсе обнаруженные проблемы показываются в виде карточек с конкретными инструкциями по исправлению.\n\n**Статистика** — счётчики перехватов по каждому приложению: какие приложения и какими методами проверяют VPN.\n\n**Настройки → Диагностика** — детальная разбивка по каждой проверке с индивидуальными результатами PASS/FAIL по всем 25 проверкам. Полезна для отладки, когда «Обзор» показывает неполное скрытие.\n\n## Компоненты\n\n| Директория | Что | Как |\n|---|---|---|\n| **[builtin/](builtin/)** | Встроенный в ядро бэкенд (C) + модуль-компаньон | Тот же драйвер, что `.ko`, но вкомпилированный в ядро (`CONFIG_VPNHIDE=y`) — для ядер, где `.ko` не загрузить: интегрированные модули, нет kprobes, LTO. `scripts/integrate.py` вносит его в дерево ядра, компаньон несёт только активатор. |\n| **[kmod/](kmod/)** | Модуль ядра `.ko` + KPM backend (C) | Два kernel-level Native-бэкенда: стабильный GKI `.ko` на `kretprobe` и KPM на KernelPatch inline hooks. Оба дают нулевой след в процессе приложения; активным должен быть только один. ([подробнее](kmod/README.md), [KPM](kmod/kpm/README.md)) |\n| **[lsposed/](lsposed/)** | LSPosed-модуль + приложение (Kotlin + Rust) | Хуки `writeToParcel` в `system_server` для per-UID фильтрации Binder. APK предоставляет обзорную панель (статус модулей, проверка версий, валидация конфигурации LSPosed, рекомендации по установке), вкладку «Скрытие» для ролей Java / Native / Apps / Ports и диагностику. ([подробнее](lsposed/README.md)) |\n| **[portshide/](portshide/)** | Модуль скрытия портов (Shell + iptables) | Блокирует выбранным приложениям доступ к `127.0.0.1` / `::1`, скрывая локально запущенные VPN / proxy-демоны от проверок localhost-портов. ([подробнее](portshide/README.md)) |\n| **[zygisk/](zygisk/)** | Zygisk-модуль (Rust) | Inline-хуки `libc.so` в процессе приложения. Fallback, когда kernel-level backend недоступен. ([подробнее](zygisk/README.md)) |\n\n## Покрытие обнаружения\n\n| # | Вектор обнаружения | SELinux | kmod | KPM | Zygisk | LSPosed |\n|---|---|---|---|---|---|---|\n| 1 | `ioctl(SIOCGIFFLAGS)` на tun0 | | x | x | x | |\n| 2 | `ioctl(SIOCGIFNAME)` разрешение индекса в имя | | x | x | x | |\n| 3 | `ioctl(SIOCGIFMTU)` фингерпринтинг MTU | | x | x | x | |\n| 4 | `ioctl(SIOCGIFCONF)` перечисление интерфейсов | | x | x | x | |\n| 5 | Все остальные `SIOCGIF*` (INDEX, HWADDR, ADDR и т.д.) | | x | x | x | |\n| 6 | `getifaddrs()` (использует netlink внутри) | | x | x | x | |\n| 7 | netlink `RTM_GETLINK` дамп | | x | x | x | |\n| 8 | netlink `RTM_GETADDR` дамп (IPv4 + IPv6) | | x | x | x | |\n| 9 | netlink `RTM_GETROUTE` дамп | | x | x | x | |\n| 10 | netlink `RTM_GETRULE` (policy rules) | | x | x | | |\n| 11 | Публичный `/32` или `/128` host-route к VPN-серверу | | x | x | | |\n| 12 | `SO_BINDTODEVICE` / `SO_BINDTOIFINDEX` | | x | x | libc | |\n| 13 | `/proc/net/route` | блок. | x | x | x | |\n| 14 | `/proc/net/ipv6_route` | блок. | x | x | x | |\n| 15 | `/proc/net/if_inet6` | блок. | | | x | |\n| 16 | `/proc/net/tcp`, `tcp6` | блок. | | | x | |\n| 17 | `/proc/net/udp`, `udp6` | блок. | | | | |\n| 18 | `/proc/net/dev` | блок. | | | | |\n| 19 | `/proc/net/fib_trie` | блок. | | | | |\n| 20 | `/sys/class/net/tun0/` и `/proc/sys/net/*/{conf,neigh}/tun0` | блок. | опц. | | | |\n| 21 | `NetworkCapabilities` (hasTransport, NOT_VPN, transportInfo) | | | | | x |\n| 22 | `NetworkInfo` (getType, getTypeName) | | | | | x |\n| 23 | `ConnectivityManager.getActiveNetwork()` | | | | | x |\n| 24 | `ConnectivityManager.getAllNetworks()` + VPN-сканирование | | | | | x |\n| 25 | `LinkProperties` (interfaceName) | | | | | x |\n| 26 | `LinkProperties` (маршруты через VPN-интерфейсы) | | | | | x |\n| 27 | `NetworkInterface.getNetworkInterfaces()` | | x | x | x | |\n| 28 | `/proc/net/route` через Java `FileInputStream` | блок. | x | x | x | |\n\n**блок.** = на сток-enforcing сборках (Android 10+) SELinux обычно запрещает обычным приложениям доступ к этому файлу `/proc/net/*` / `/sys`. Но политика SELinux настроена **по-разному на разных устройствах и прошивках** (OEM- и кастомные ROM, `permissive`-сборки), поэтому защитой vpnhide следует считать только явно указанное в таблице покрытие.\n\n**libc** = best-effort покрытие Zygisk: прямой системный вызов обходит inline-хук.\n\n**опц.** = скрытие файловых путей в `.ko` по умолчанию выключено. Включите его\nв настройках и перезагрузите устройство; в выключенном состоянии глобальные\nVFS-хуки вообще не устанавливаются.\n\nВажно: `ioctl` и netlink-дампы доступны обычному приложению без помощи SELinux; на Linux 5.7+ это относится и к первой привязке сокета к интерфейсу. Именно через netlink детекторы вроде RKNHardering обходят блокировку `/proc/net/route` (см. [issue #86](https://github.com/okhsunrog/vpnhide/issues/86)). Kernel-level варианты (kmod/KPM) закрывают отмеченные в таблице нативные пути без следа в процессе. Zygisk закрывает только вызовы, проходящие через libc; прямой raw syscall обходит его хуки. На более старых ядрах привязку непривилегированного сокета отклоняет само ядро. Остальное либо часто блокируется SELinux на стоке (но это зависит от устройства), либо идёт через Java API и покрывается LSPosed.\n\nKPM реализует те же 11 логических kernel-хуков, что и `.ko`, но отдельные различия ABI и поведения на старых ядрах перечислены в полной карте векторов.\n\nПолная карта векторов — с разбивкой по слоям, нюансами SELinux и известными пробелами — в [docs/detection-vectors.md](docs/detection-vectors.md).\n\n## Сборка из исходников\n\n- **kmod**: `./kmod/build.py --kmi android14-6.1` (или `--all`) — авто-запускает DDK-контейнер через podman/docker. Подробнее: [kmod/BUILDING.md](kmod/BUILDING.md).\n- **KPM**: `python3 kmod/kpm/build.py` — собирает универсальный `vpnhide-kpm.zip` через KernelPatch submodule. Подробнее: [kmod/kpm/README.md](kmod/kpm/README.md).\n- **zygisk**: `cd zygisk && ./build.py` (Rust + NDK + cargo-ndk)\n- **lsposed**: `cd lsposed && ./gradlew assembleDebug` (JDK 17 + Rust + NDK + cargo-ndk). Обычный debug APK остаётся debuggable, но проходит R8/shrink, чтобы не раздувать Xposed-модуль при установке и agent smoke-тестах. Для старой unminified debug-сборки используйте `./gradlew assembleRawDebug`.\n\n### Заметки для контрибьюторов, застрявших на Windows\n\nЕсли вы используете Windows, при сборке некоторых подпроектов возникают определенные неудобства.\n\n**lsposed**: отлично собирается в Android Studio.\n\n**portshide**: `cd .\\portshide\\; python .\\build-zip.py` выполняется без проблем.\n\nДля kmod и zygisk вам (к сожалению) потребуется установить [Docker for Windows](https://docs.docker.com/desktop/setup/install/windows-install/).\n\n**kmod**: `python .\\kmod\\build.py --kmi android14-6.1` — скрипт сам подберёт docker и поднимет образ `ddk-min` (тот же, что в CI).\n\n**KPM**: собирайте из Linux или WSL. Скрипт ожидает POSIX-инструменты, `make`/`clang`, KernelPatch submodule и Android NDK; нативная сборка на Windows сейчас не документирована.\n\n**zygisk**:\n```powershell\ndocker run --rm -it -v \"${PWD}:/workspace\" -v \"vpnhide_cargo_cache:/usr/local/cargo/registry\" -w /workspace ghcr.io/okhsunrog/vpnhide/ci:latest bash -c 'cd zygisk && python3 ./build.py'\n```\nПричина, по которой `zygisk` нельзя собрать напрямую, заключается в том, что исходный код зависимости `zygisk-api` содержит файл с именем `aux.rs`. Cargo использует `libgit2` для работы с git, в котором есть защита, запрещающая создавать файлы, _содержащие_ зарезервированные слова Windows. Вы получите ошибку: `cannot checkout to invalid path 'src/aux.rs'; class=Checkout (20)`. [Сообщают](https://superuser.com/a/1929659), что после какого-то обновления стало возможным создавать файлы, содержащие зарезервированные слова, **с** расширением, но, похоже, в `libgit2` это поведение не было изменено.\n\n## Проверено на\n\n- [RKNHardering](https://github.com/xtclovver/RKNHardering/) — все векторы обнаружения чисты\n- [YourVPNDead](https://git.zapret.moe/zapretkvn/yourvpndead) ([зеркало на GitHub](https://github.com/zapret-discordyoutube/yourvpndead)) — все векторы обнаружения чисты\n\nОба реализуют официальную методику обнаружения VPN/прокси Минцифры РФ ([источник](https://t.me/ruitunion/893)).\n\n## Раздельное туннелирование (split tunneling)\n\nКорректно работает с конфигурациями VPN с раздельным туннелированием: затрагиваются только приложения из списка целей.\n\nНастоятельно рекомендуется использовать split tunneling в паре с VPN Hide. VPN Hide прячет VPN на устройстве, но не может изменить то, что видит сервер: если приложение идёт через туннель, сервис видит выходной IP VPN-сервера и может отказать по нему. Поэтому приложения, которым туннель не нужен (банки, госуслуги, платёжные сервисы), лучше исключить из туннеля в настройках VPN-клиента — тогда они видят настоящий IP и никаких следов VPN. Подробнее: [Напрямую или через туннель](docs/help/ru/split-tunneling.md).\n\nПриложения-детекторы, сравнивающие публичный IP устройства с внешними чекерами, лучше оставлять вне туннеля — их трафик должен выходить через оператора, а не через VPN.\n\n## Модель угроз\n\nПодробная [модель угроз](docs/threat-model.md): возможности атакующего приложения, доверенные компоненты, границы защиты и ограничения диагностики.\n\nvpnhide скрывает активный VPN от конкретных приложений. Он НЕ предназначен для:\n- Скрытия root или кастомной прошивки\n- Обхода Play Integrity\n- Обмана серверной детекции (утечки DNS, чёрные списки IP, фингерпринтинг латентности/TLS)\n\n## Известные ограничения\n\n- `kmod` требует поддерживаемое GKI-ядро с `CONFIG_KPROBES=y` (стандарт на устройствах Android 12+)\n- KPM требует KernelPatch runtime (APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest)); не ставьте KPM одновременно с `.ko`\n- `lsposed` требует LSPosed, LSPosed-Next или Vector\n- `zygisk` собирается под arm64-v8a и armeabi-v7a (внедрение в 32-битные процессы); kernel-бэкенды — только arm64\n- Прямые системные вызовы `svc #0` обходят хуки libc в Zygisk — для этого нужен kernel-level backend (kmod или KPM)\n- Серверная детекция неисправима на стороне клиента — используйте раздельное туннелирование\n\n## Поддержать проект\n\nvpnhide бесплатный, без рекламы и телеметрии. Платных функций не будет — донат ничего не открывает.\n\nТот же список есть в приложении: **Настройки → Поддержать проект**, там адреса копируются по тапу.\n\n**Boosty** — оплата картой, разово или подпиской: <https://boosty.to/okhsunrog/donate>\n\n| Монета | Сеть | Адрес |\n| --- | --- | --- |\n| USDT | Tron (TRC20) | `TMskx2wKmPg11VYvHoS93vUQGm7yhcetUU` |\n| BTC | Bitcoin | `bc1pmt9u6nux4x7n86zknwdgt9v02lah2tu6d983ak2prc5cwt8hsetq82ganh` |\n| GRAM | The Open Network | `UQADYTtMBQdZvmNNEX02R9sACpdnXKlPV8RbuFrxo7JFBRGS` |\n| LTC | Litecoin | `MBLKJfPNANH3U41UPJFtha7EPJGdbiW5dZ` |\n\n## Лицензия\n\nMIT. См. [LICENSE](LICENSE).\n\nМодуль ядра объявляет `MODULE_LICENSE(\"GPL\")`, как требуется ядром Linux для разрешения символов `EXPORT_SYMBOL_GPL` во время выполнения.\n\n## Star History\n\n<a href=\"https://www.star-history.com/?type=date&repos=okhsunrog%2Fvpnhide\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&theme=dark&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" />\n    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" />\n    <img alt=\"Star History Chart\" src=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" />\n  </picture>\n</a>\n",
+  "readmeHTML": "<p><p align=\"center\"></p>\n<p>  <img src=\"assets/logo.png\" width=\"200\" alt=\"VPN Hide\" /></p>\n<p></p></p>\n\n<p><h1 align=\"center\">VPN Hide</h1></p>\n\n<p><p align=\"center\">Скрывает активное VPN-соединение на Android от выбранных приложений.</p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/okhsunrog/vpnhide/actions/workflows/ci.yml\"><img src=\"https://img.shields.io/github/actions/workflow/status/okhsunrog/vpnhide/ci.yml?label=CI\" alt=\"CI\"></a></p>\n<p>  <a href=\"https://github.com/okhsunrog/vpnhide/releases/latest\"><img src=\"https://img.shields.io/github/v/release/okhsunrog/vpnhide\" alt=\"Release\"></a></p>\n<p>  <a href=\"https://github.com/okhsunrog/vpnhide/releases\"><img src=\"https://img.shields.io/github/downloads/okhsunrog/vpnhide/total\" alt=\"Downloads\"></a></p>\n<p>  <a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/license-MIT-blue\" alt=\"License\"></a></p>\n<p></p></p>\n\n<p><p align=\"center\"><strong><a href=\"README.en.md\">English version</a> · <a href=\"README.zh.md\">中文版</a></strong></p></p>\n\n<h2>Чем vpnhide лучше аналогов?</h2>\n\n<p>Существующие модули, такие как <a href=\"https://bitbucket.org/yuri-project/novpndetect\">NoVPNDetect</a> и <a href=\"https://github.com/BlueCat300/NoVPNDetectEnhanced\">NoVPNDetect Enhanced</a>, покрывают только <b>Java API</b> обнаружение и хукают <b>внутри процесса</b> целевого приложения через Xposed. У этого подхода две критические проблемы:</p>\n\n<li>**Обнаружение anti-tamper защитой** — любое приложение с проверкой инъекций в память обнаруживает хуки Xposed и отказывается работать. Автор NoVPNDetect Enhanced прямо пишет: *«Модуль не будет работать если у подключаемого приложения есть защита от LSPosed, проверка на инъекции в память. Например MirPay, Т-Банк.»*</li>\n<li>**Нет нативного покрытия** — приложения, использующие C/C++ код, кроссплатформенные фреймворки (Flutter, React Native) или прямые системные вызовы, могут обнаружить VPN через `ioctl`, `getifaddrs`, netlink-сокеты и `/proc/net/*`. Java-хуки эти векторы полностью пропускают.</li>\n\n<p>vpnhide решает обе проблемы многослойной архитектурой:</p>\n\n<p><b>Уровень 1 — Java API (модуль lsposed):</b> хукает <code>system_server</code>, а не целевое приложение. <code>NetworkCapabilities</code>, <code>NetworkInfo</code> и <code>LinkProperties</code> фильтруются на уровне Binder *до того*, как данные попадут в процесс приложения. Приложение получает чистые данные через IPC — никаких инъекций в его процесс, нечего обнаруживать. Этот же модуль скрывает выбранные приложения от приложений-наблюдателей на уровне <code>PackageManager</code> (роль Apps).</p>\n\n<p><b>Уровень 2 — нативный (kmod, встроенный в ядро, KPM или Zygisk):</b> покрывает нативные пути обнаружения. Активным должен быть ровно один Native-бэкенд:</p>\n<li>**kmod** (рекомендуется для поддерживаемых GKI-ядер) — хуки `kprobe`/`kretprobe` на уровне ядра. Фильтрует `ioctl`, `getifaddrs`/netlink-дампы интерфейсов, адресов, маршрутов и policy rules, а также отклоняет `SO_BINDTODEVICE` / `SO_BINDTOIFINDEX` для скрытых интерфейсов до изменения состояния сокета. Нулевой след в процессе приложения: никаких инъекций библиотек, нечего обнаруживать.</li>\n<li>**KPM** — KernelPatch Module с теми же 11 логическими kernel-хуками, но без привязки к GKI-варианту `.ko`. Полезен для старых/non-GKI ядер 4.9 / 4.14 / 4.19 / 5.4 и ситуаций, где `.ko` не может загрузиться. Требует KernelPatch runtime: APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest).</li>\n<li>**Zygisk** — запасной вариант, если kernel-level backend поставить нельзя. Inline-хуки `libc.so`, включая best-effort фильтрацию `setsockopt`, работают внутри процесса приложения и обходятся прямыми системными вызовами, поэтому банковские и anti-fraud приложения могут их обнаруживать. Для таких приложений лучше оставлять Native выключенным и полагаться на Java-уровень.</li>\n\n<p><b>Уровень 3 — модуль скрытия портов (portshide):</b> отдельный Magisk-модуль. Через iptables блокирует выбранным приложениям доступ к <code>127.0.0.1</code> / <code>::1</code>, чтобы они не могли обнаружить локально запущенный VPN / proxy-демон по открытому порту (роль Ports).</p>\n\n<p>Процесс целевого приложения полностью нетронут при использовании LSPosed + kernel-level Native-бэкенда (kmod или KPM) — ни Xposed, ни inline-хуков, ни модифицированных регионов памяти. Благодаря этому vpnhide работает с банковскими и государственными приложениями, которые активно обнаруживают и блокируют модули на основе Xposed.</p>\n\n<h2>Что именно скрывает vpnhide</h2>\n\n<p>vpnhide скрывает от выбранных приложений три вещи — всё настраивается пер-апп через четыре роли <b>J / N / A / P</b> (Java, Native, Apps, Ports):</p>\n\n<li>**Скрытие интерфейса** — главная задача. Убирает VPN-интерфейсы и маршруты из нативных API (`ioctl`, `getifaddrs`, netlink, `/proc/net/*`, `NetworkInterface`), не позволяет привязать сокет к скрытому интерфейсу и очищает Java API (`NetworkCapabilities`, `NetworkInfo`, `LinkProperties`). Его дают две роли сразу — **Java (J)** и **Native (N)**, они включаются независимо.</li>\n<li>**Скрытие портов** — блокирует доступ к localhost для выбранных приложений, чтобы они не могли обнаружить Clash, sing-box, V2Ray, Happ и подобные инструменты через проверку локальных портов (роль **Ports (P)**).</li>\n<li>**Скрытие приложений** — позволяет скрыть выбранные установленные приложения от выбранных приложений-наблюдателей. Полезно против проверок package visibility, например когда приложение пытается определить, установлен ли на устройстве VPN или proxy-клиент (роль **Apps (A)**).</li>\n\n<h2>Какие модули нужны?</h2>\n\n<p>Всегда нужно <b>приложение VPN Hide</b> (<code>vpnhide.apk</code>) + LSPosed/Vector для Java-уровня + ровно один Native-бэкенд для нативного скрытия. Дополнительно приложение может использовать необязательный Ports-модуль для блокировки localhost-портов:</p>\n\n<li>**`kmod`** (стабильный вариант по умолчанию) — полностью out-of-process, невидим для anti-tamper. Требуется поддерживаемое GKI-ядро: 5.10, 5.15, 6.1, 6.6 или 6.12.</li>\n<li>**`KPM`** — kernel-level backend для 4.9 / 4.14 / 4.19 / 5.4 и других случаев, где `.ko` не подходит. Нужен APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest).</li>\n<li>**`Zygisk`** — fallback, если kmod/KPM недоступны или вы не хотите ставить KernelPatch runtime.</li>\n<li>**`portshide`** (необязательно) — установите, если хотите блокировать выбранным приложениям доступ к localhost-портам.</li>\n\n<p>Не ставьте несколько Native-бэкендов одновременно. Если они всё же установлены, приложение выбирает активный по приоритету: kmod, затем встроенный в ядро, затем KPM, затем Zygisk; лишние модули лучше удалить.</p>\n\n<p>См. <a href=\"#установка\">Установка</a> для пошаговой инструкции.</p>\n\n<h2>Установка</h2>\n\n<p>Скачайте последний релиз из <a href=\"https://github.com/okhsunrog/vpnhide/releases\">Releases</a>.</p>\n\n<p>Коротко — приложение на вкладке <b>«Обзор»</b> проведёт вас по шагам и подскажет, какой модуль ставить. Полные инструкции — во встроенном руководстве (ссылки ниже открываются и на GitHub, и в самом приложении).</p>\n\n<li>**Приложение + LSPosed.** Установите `vpnhide.apk`, включите модуль **VPN Hide** в LSPosed, добавьте **«System Framework»** в его scope и перезагрузитесь. → [Первая установка](docs/help/ru/first-install.md)</li>\n<li>**Один Native-бэкенд.** «Обзор» определит ядро и назовёт файл — kmod, KPM или Zygisk. Установите его через root-менеджер и перезагрузитесь. Если вы собираете ядро сами, есть четвёртый вариант — [встроенный в ядро бэкенд](builtin/README.md) с модулем-компаньоном. → [Какой Native-бэкенд выбрать](docs/help/ru/choosing-native.md) · [kmod](docs/help/ru/kmod-install.md) · [KPM](docs/help/ru/kpm-install.md) · [Zygisk](docs/help/ru/zygisk-install.md)</li>\n<li>**Необязательно — Ports.** Для блокировки localhost-портов установите `vpnhide-ports.zip`. → [Скрыть localhost-порты](docs/help/ru/ports.md)</li>\n<li>**Настройте скрытие.** На вкладке **«Скрытие»** дайте роли **J / N / A / P** приложениям, от которых прячете VPN (банк, госуслуги), — не самому VPN-клиенту. → [Настроить скрытие](docs/help/ru/configure-hiding.md)</li>\n<li>**После Save остановите приложение-цель** (force-stop) и откройте его заново: хуки Zygisk ставятся при старте процесса, а остальные слои применяются сразу, но приложение могло закешировать старый ответ. Перезагрузка нужна только при установке или обновлении модулей. → [Когда применяются изменения](docs/help/ru/saving-applying.md)</li>\n\n<p>Полное офлайн-руководство встроено в приложение (<b>Настройки → Помощь и руководство</b>) и лежит в репозитории: <a href=\"docs/help/ru/\">docs/help/ru</a> — установка, настройка, диагностика, обновление и удаление, ограничения.</p>\n\n<p><details></p>\n<p><summary><b>Настройка через командную строку (для продвинутых)</b></summary></p>\n\n<p>Пользовательская конфигурация хранится в <code>/data/system/vpnhide_config.json</code>. Отредактируйте JSON и запустите activator установленного модуля:</p>\n\n<pre>su -c /data/adb/modules/vpnhide_kmod/activator\nsu -c /data/adb/modules/vpnhide_kpm/activator\nsu -c /data/adb/modules/vpnhide_zygisk/activator\nsu -c /data/adb/modules/vpnhide_ports/activator</pre>\n\n<p>Запускайте только activator тех модулей, которые действительно установлены. LSPosed читает JSON напрямую из <code>system_server</code>, отдельный activator для него не нужен. Старые <code>targets.txt</code> в <code>/data/adb/vpnhide_*</code> — это конфиг версий до 1.0. Пользовательской настройкой они больше не являются: приложение один раз переносит их в JSON и удаляет.</p>\n\n<p></details></p>\n\n<p><details></p>\n<p><summary><b>Ручной подбор GKI (если хотите выбрать файл kmod самостоятельно)</b></summary></p>\n\n<li>На телефоне откройте **Настройки → О телефоне** и найдите строку **Версия ядра**. Она выглядит примерно так: `6.1.75-android14-11-g...`</li>\n<li>Вам нужны две части из этой строки: версия ядра (`6.1`) и поколение android (`android14`). Вместе они образуют ваше поколение GKI: `android14-6.1`</li>\n<li>Скачайте соответствующий файл из релиза: `vpnhide-kmod-android14-6.1.zip`</li>\n\n<p>Также можно выполнить <code>adb shell uname -r</code> через ADB, чтобы увидеть строку версии ядра.</p>\n\n<p>> <b>Важно:</b> <code>android14</code> в строке ядра — это НЕ версия Android, а поколение ядра. Например, все Pixel с 6 по 9a используют ядро <code>android14-6.1</code> вне зависимости от того, стоит ли на них Android 14 или 15.</p>\n\n<p></details></p>\n\n<h2>Скриншоты</h2>\n\n<p>| Обзор — VPN скрыт | Скрытие — единый список | Как это работает |</p>\n<p>|:-:|:-:|:-:|</p>\n<p>| <img src=\"assets/screenshots/dashboard-hidden.png\" width=\"250\"> | <img src=\"assets/screenshots/hiding-list.png\" width=\"250\"> | <img src=\"assets/screenshots/hiding-help.png\" width=\"250\"> |</p>\n\n<p>| Статистика | Разбор по хукам | Выбор хуков для приложения |</p>\n<p>|:-:|:-:|:-:|</p>\n<p>| <img src=\"assets/screenshots/statistics.png\" width=\"250\"> | <img src=\"assets/screenshots/statistics-breakdown.png\" width=\"250\"> | <img src=\"assets/screenshots/hook-picker.png\" width=\"250\"> |</p>\n\n<p>| Диагностика | Настройки | Сообщество |</p>\n<p>|:-:|:-:|:-:|</p>\n<p>| <img src=\"assets/screenshots/diagnostics-native.png\" width=\"250\"> | <img src=\"assets/screenshots/settings.png\" width=\"250\"> | <img src=\"assets/screenshots/community.png\" width=\"250\"> |</p>\n\n<h2>Проверка</h2>\n\n<p>В приложении есть встроенная система диагностики, которая автоматически обнаруживает большинство проблем с настройкой.</p>\n\n<p><b>Обзор</b> (запускается при каждом открытии приложения):</p>\n<li>Статус модулей и бэкендов (установлен, активен, версия, количество целей)</li>\n<li>Валидация конфигурации LSPosed — читает базу данных LSPosed и проверяет, что VPN Hide включён, System Framework в scope, и нет лишних приложений в scope (частая ошибка при настройке)</li>\n<li>Обнаружение несоответствия версий — сравнивает версии установленных модулей с версией приложения и подсказывает, что именно нужно обновить</li>\n<li>Рекомендация Native-бэкенда — определяет ядро устройства и подбирает нужный файл kmod, KPM или Zygisk</li>\n<li>Проверка скрытия в реальном времени (при активном VPN) — выполняет 13 нативных и 12 Java API проверок, чтобы убедиться, что VPN действительно скрыт</li>\n\n<p>Все обнаруженные проблемы показываются в виде карточек с конкретными инструкциями по исправлению.</p>\n\n<p><b>Статистика</b> — счётчики перехватов по каждому приложению: какие приложения и какими методами проверяют VPN.</p>\n\n<p><b>Настройки → Диагностика</b> — детальная разбивка по каждой проверке с индивидуальными результатами PASS/FAIL по всем 25 проверкам. Полезна для отладки, когда «Обзор» показывает неполное скрытие.</p>\n\n<h2>Компоненты</h2>\n\n<p>| Директория | Что | Как |</p>\n<p>|---|---|---|</p>\n<p>| <b><a href=\"builtin/\">builtin/</a></b> | Встроенный в ядро бэкенд (C) + модуль-компаньон | Тот же драйвер, что <code>.ko</code>, но вкомпилированный в ядро (<code>CONFIG_VPNHIDE=y</code>) — для ядер, где <code>.ko</code> не загрузить: интегрированные модули, нет kprobes, LTO. <code>scripts/integrate.py</code> вносит его в дерево ядра, компаньон несёт только активатор. |</p>\n<p>| <b><a href=\"kmod/\">kmod/</a></b> | Модуль ядра <code>.ko</code> + KPM backend (C) | Два kernel-level Native-бэкенда: стабильный GKI <code>.ko</code> на <code>kretprobe</code> и KPM на KernelPatch inline hooks. Оба дают нулевой след в процессе приложения; активным должен быть только один. (<a href=\"kmod/README.md\">подробнее</a>, <a href=\"kmod/kpm/README.md\">KPM</a>) |</p>\n<p>| <b><a href=\"lsposed/\">lsposed/</a></b> | LSPosed-модуль + приложение (Kotlin + Rust) | Хуки <code>writeToParcel</code> в <code>system_server</code> для per-UID фильтрации Binder. APK предоставляет обзорную панель (статус модулей, проверка версий, валидация конфигурации LSPosed, рекомендации по установке), вкладку «Скрытие» для ролей Java / Native / Apps / Ports и диагностику. (<a href=\"lsposed/README.md\">подробнее</a>) |</p>\n<p>| <b><a href=\"portshide/\">portshide/</a></b> | Модуль скрытия портов (Shell + iptables) | Блокирует выбранным приложениям доступ к <code>127.0.0.1</code> / <code>::1</code>, скрывая локально запущенные VPN / proxy-демоны от проверок localhost-портов. (<a href=\"portshide/README.md\">подробнее</a>) |</p>\n<p>| <b><a href=\"zygisk/\">zygisk/</a></b> | Zygisk-модуль (Rust) | Inline-хуки <code>libc.so</code> в процессе приложения. Fallback, когда kernel-level backend недоступен. (<a href=\"zygisk/README.md\">подробнее</a>) |</p>\n\n<h2>Покрытие обнаружения</h2>\n\n<p>| # | Вектор обнаружения | SELinux | kmod | KPM | Zygisk | LSPosed |</p>\n<p>|---|---|---|---|---|---|---|</p>\n<p>| 1 | <code>ioctl(SIOCGIFFLAGS)</code> на tun0 | | x | x | x | |</p>\n<p>| 2 | <code>ioctl(SIOCGIFNAME)</code> разрешение индекса в имя | | x | x | x | |</p>\n<p>| 3 | <code>ioctl(SIOCGIFMTU)</code> фингерпринтинг MTU | | x | x | x | |</p>\n<p>| 4 | <code>ioctl(SIOCGIFCONF)</code> перечисление интерфейсов | | x | x | x | |</p>\n<p>| 5 | Все остальные <code>SIOCGIF*</code> (INDEX, HWADDR, ADDR и т.д.) | | x | x | x | |</p>\n<p>| 6 | <code>getifaddrs()</code> (использует netlink внутри) | | x | x | x | |</p>\n<p>| 7 | netlink <code>RTM_GETLINK</code> дамп | | x | x | x | |</p>\n<p>| 8 | netlink <code>RTM_GETADDR</code> дамп (IPv4 + IPv6) | | x | x | x | |</p>\n<p>| 9 | netlink <code>RTM_GETROUTE</code> дамп | | x | x | x | |</p>\n<p>| 10 | netlink <code>RTM_GETRULE</code> (policy rules) | | x | x | | |</p>\n<p>| 11 | Публичный <code>/32</code> или <code>/128</code> host-route к VPN-серверу | | x | x | | |</p>\n<p>| 12 | <code>SO_BINDTODEVICE</code> / <code>SO_BINDTOIFINDEX</code> | | x | x | libc | |</p>\n<p>| 13 | <code>/proc/net/route</code> | блок. | x | x | x | |</p>\n<p>| 14 | <code>/proc/net/ipv6_route</code> | блок. | x | x | x | |</p>\n<p>| 15 | <code>/proc/net/if_inet6</code> | блок. | | | x | |</p>\n<p>| 16 | <code>/proc/net/tcp</code>, <code>tcp6</code> | блок. | | | x | |</p>\n<p>| 17 | <code>/proc/net/udp</code>, <code>udp6</code> | блок. | | | | |</p>\n<p>| 18 | <code>/proc/net/dev</code> | блок. | | | | |</p>\n<p>| 19 | <code>/proc/net/fib_trie</code> | блок. | | | | |</p>\n<p>| 20 | <code>/sys/class/net/tun0/</code> и <code>/proc/sys/net/*/{conf,neigh}/tun0</code> | блок. | опц. | | | |</p>\n<p>| 21 | <code>NetworkCapabilities</code> (hasTransport, NOT_VPN, transportInfo) | | | | | x |</p>\n<p>| 22 | <code>NetworkInfo</code> (getType, getTypeName) | | | | | x |</p>\n<p>| 23 | <code>ConnectivityManager.getActiveNetwork()</code> | | | | | x |</p>\n<p>| 24 | <code>ConnectivityManager.getAllNetworks()</code> + VPN-сканирование | | | | | x |</p>\n<p>| 25 | <code>LinkProperties</code> (interfaceName) | | | | | x |</p>\n<p>| 26 | <code>LinkProperties</code> (маршруты через VPN-интерфейсы) | | | | | x |</p>\n<p>| 27 | <code>NetworkInterface.getNetworkInterfaces()</code> | | x | x | x | |</p>\n<p>| 28 | <code>/proc/net/route</code> через Java <code>FileInputStream</code> | блок. | x | x | x | |</p>\n\n<p><b>блок.</b> = на сток-enforcing сборках (Android 10+) SELinux обычно запрещает обычным приложениям доступ к этому файлу <code>/proc/net/*</code> / <code>/sys</code>. Но политика SELinux настроена <b>по-разному на разных устройствах и прошивках</b> (OEM- и кастомные ROM, <code>permissive</code>-сборки), поэтому защитой vpnhide следует считать только явно указанное в таблице покрытие.</p>\n\n<p><b>libc</b> = best-effort покрытие Zygisk: прямой системный вызов обходит inline-хук.</p>\n\n<p><b>опц.</b> = скрытие файловых путей в <code>.ko</code> по умолчанию выключено. Включите его</p>\n<p>в настройках и перезагрузите устройство; в выключенном состоянии глобальные</p>\n<p>VFS-хуки вообще не устанавливаются.</p>\n\n<p>Важно: <code>ioctl</code> и netlink-дампы доступны обычному приложению без помощи SELinux; на Linux 5.7+ это относится и к первой привязке сокета к интерфейсу. Именно через netlink детекторы вроде RKNHardering обходят блокировку <code>/proc/net/route</code> (см. <a href=\"https://github.com/okhsunrog/vpnhide/issues/86\">issue #86</a>). Kernel-level варианты (kmod/KPM) закрывают отмеченные в таблице нативные пути без следа в процессе. Zygisk закрывает только вызовы, проходящие через libc; прямой raw syscall обходит его хуки. На более старых ядрах привязку непривилегированного сокета отклоняет само ядро. Остальное либо часто блокируется SELinux на стоке (но это зависит от устройства), либо идёт через Java API и покрывается LSPosed.</p>\n\n<p>KPM реализует те же 11 логических kernel-хуков, что и <code>.ko</code>, но отдельные различия ABI и поведения на старых ядрах перечислены в полной карте векторов.</p>\n\n<p>Полная карта векторов — с разбивкой по слоям, нюансами SELinux и известными пробелами — в <a href=\"docs/detection-vectors.md\">docs/detection-vectors.md</a>.</p>\n\n<h2>Сборка из исходников</h2>\n\n<li>**kmod**: `./kmod/build.py --kmi android14-6.1` (или `--all`) — авто-запускает DDK-контейнер через podman/docker. Подробнее: [kmod/BUILDING.md](kmod/BUILDING.md).</li>\n<li>**KPM**: `python3 kmod/kpm/build.py` — собирает универсальный `vpnhide-kpm.zip` через KernelPatch submodule. Подробнее: [kmod/kpm/README.md](kmod/kpm/README.md).</li>\n<li>**zygisk**: `cd zygisk && ./build.py` (Rust + NDK + cargo-ndk)</li>\n<li>**lsposed**: `cd lsposed && ./gradlew assembleDebug` (JDK 17 + Rust + NDK + cargo-ndk). Обычный debug APK остаётся debuggable, но проходит R8/shrink, чтобы не раздувать Xposed-модуль при установке и agent smoke-тестах. Для старой unminified debug-сборки используйте `./gradlew assembleRawDebug`.</li>\n\n<h3>Заметки для контрибьюторов, застрявших на Windows</h3>\n\n<p>Если вы используете Windows, при сборке некоторых подпроектов возникают определенные неудобства.</p>\n\n<p><b>lsposed</b>: отлично собирается в Android Studio.</p>\n\n<p><b>portshide</b>: <code>cd .\\portshide\\; python .\\build-zip.py</code> выполняется без проблем.</p>\n\n<p>Для kmod и zygisk вам (к сожалению) потребуется установить <a href=\"https://docs.docker.com/desktop/setup/install/windows-install/\">Docker for Windows</a>.</p>\n\n<p><b>kmod</b>: <code>python .\\kmod\\build.py --kmi android14-6.1</code> — скрипт сам подберёт docker и поднимет образ <code>ddk-min</code> (тот же, что в CI).</p>\n\n<p><b>KPM</b>: собирайте из Linux или WSL. Скрипт ожидает POSIX-инструменты, <code>make</code>/<code>clang</code>, KernelPatch submodule и Android NDK; нативная сборка на Windows сейчас не документирована.</p>\n\n<p><b>zygisk</b>:</p>\n<pre>docker run --rm -it -v \"${PWD}:/workspace\" -v \"vpnhide_cargo_cache:/usr/local/cargo/registry\" -w /workspace ghcr.io/okhsunrog/vpnhide/ci:latest bash -c 'cd zygisk &amp;&amp; python3 ./build.py'</pre>\n<p>Причина, по которой <code>zygisk</code> нельзя собрать напрямую, заключается в том, что исходный код зависимости <code>zygisk-api</code> содержит файл с именем <code>aux.rs</code>. Cargo использует <code>libgit2</code> для работы с git, в котором есть защита, запрещающая создавать файлы, _содержащие_ зарезервированные слова Windows. Вы получите ошибку: <code>cannot checkout to invalid path 'src/aux.rs'; class=Checkout (20)</code>. <a href=\"https://superuser.com/a/1929659\">Сообщают</a>, что после какого-то обновления стало возможным создавать файлы, содержащие зарезервированные слова, <b>с</b> расширением, но, похоже, в <code>libgit2</code> это поведение не было изменено.</p>\n\n<h2>Проверено на</h2>\n\n<li>[RKNHardering](https://github.com/xtclovver/RKNHardering/) — все векторы обнаружения чисты</li>\n<li>[YourVPNDead](https://git.zapret.moe/zapretkvn/yourvpndead) ([зеркало на GitHub](https://github.com/zapret-discordyoutube/yourvpndead)) — все векторы обнаружения чисты</li>\n\n<p>Оба реализуют официальную методику обнаружения VPN/прокси Минцифры РФ (<a href=\"https://t.me/ruitunion/893\">источник</a>).</p>\n\n<h2>Раздельное туннелирование (split tunneling)</h2>\n\n<p>Корректно работает с конфигурациями VPN с раздельным туннелированием: затрагиваются только приложения из списка целей.</p>\n\n<p>Настоятельно рекомендуется использовать split tunneling в паре с VPN Hide. VPN Hide прячет VPN на устройстве, но не может изменить то, что видит сервер: если приложение идёт через туннель, сервис видит выходной IP VPN-сервера и может отказать по нему. Поэтому приложения, которым туннель не нужен (банки, госуслуги, платёжные сервисы), лучше исключить из туннеля в настройках VPN-клиента — тогда они видят настоящий IP и никаких следов VPN. Подробнее: <a href=\"docs/help/ru/split-tunneling.md\">Напрямую или через туннель</a>.</p>\n\n<p>Приложения-детекторы, сравнивающие публичный IP устройства с внешними чекерами, лучше оставлять вне туннеля — их трафик должен выходить через оператора, а не через VPN.</p>\n\n<h2>Модель угроз</h2>\n\n<p>Подробная <a href=\"docs/threat-model.md\">модель угроз</a>: возможности атакующего приложения, доверенные компоненты, границы защиты и ограничения диагностики.</p>\n\n<p>vpnhide скрывает активный VPN от конкретных приложений. Он НЕ предназначен для:</p>\n<li>Скрытия root или кастомной прошивки</li>\n<li>Обхода Play Integrity</li>\n<li>Обмана серверной детекции (утечки DNS, чёрные списки IP, фингерпринтинг латентности/TLS)</li>\n\n<h2>Известные ограничения</h2>\n\n<li>`kmod` требует поддерживаемое GKI-ядро с `CONFIG_KPROBES=y` (стандарт на устройствах Android 12+)</li>\n<li>KPM требует KernelPatch runtime (APatch или [KPatch-Next-Module](https://github.com/KernelSU-Next/KPatch-Next-Module/releases/latest)); не ставьте KPM одновременно с `.ko`</li>\n<li>`lsposed` требует LSPosed, LSPosed-Next или Vector</li>\n<li>`zygisk` собирается под arm64-v8a и armeabi-v7a (внедрение в 32-битные процессы); kernel-бэкенды — только arm64</li>\n<li>Прямые системные вызовы `svc #0` обходят хуки libc в Zygisk — для этого нужен kernel-level backend (kmod или KPM)</li>\n<li>Серверная детекция неисправима на стороне клиента — используйте раздельное туннелирование</li>\n\n<h2>Поддержать проект</h2>\n\n<p>vpnhide бесплатный, без рекламы и телеметрии. Платных функций не будет — донат ничего не открывает.</p>\n\n<p>Тот же список есть в приложении: <b>Настройки → Поддержать проект</b>, там адреса копируются по тапу.</p>\n\n<p><b>Boosty</b> — оплата картой, разово или подпиской: <https://boosty.to/okhsunrog/donate></p>\n\n<p>| Монета | Сеть | Адрес |</p>\n<p>| --- | --- | --- |</p>\n<p>| USDT | Tron (TRC20) | <code>TMskx2wKmPg11VYvHoS93vUQGm7yhcetUU</code> |</p>\n<p>| BTC | Bitcoin | <code>bc1pmt9u6nux4x7n86zknwdgt9v02lah2tu6d983ak2prc5cwt8hsetq82ganh</code> |</p>\n<p>| GRAM | The Open Network | <code>UQADYTtMBQdZvmNNEX02R9sACpdnXKlPV8RbuFrxo7JFBRGS</code> |</p>\n<p>| LTC | Litecoin | <code>MBLKJfPNANH3U41UPJFtha7EPJGdbiW5dZ</code> |</p>\n\n<h2>Лицензия</h2>\n\n<p>MIT. См. <a href=\"LICENSE\">LICENSE</a>.</p>\n\n<p>Модуль ядра объявляет <code>MODULE_LICENSE(\"GPL\")</code>, как требуется ядром Linux для разрешения символов <code>EXPORT_SYMBOL_GPL</code> во время выполнения.</p>\n\n<h2>Star History</h2>\n\n<p><a href=\"https://www.star-history.com/?type=date&repos=okhsunrog%2Fvpnhide\"></p>\n<p>  <picture></p>\n<p>    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&theme=dark&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" /></p>\n<p>    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" /></p>\n<p>    <img alt=\"Star History Chart\" src=\"https://api.star-history.com/chart?repos=okhsunrog/vpnhide&type=date&legend=top-left&sealed_token=L6VLoQFGmusCfaI01irFbE2MJWoOX9V4Z66YMzG6z0vD-xjku8IZX4jnDHFYeAjjEne48AgxfoSExLa90tYlqeYq7E32T0DGbdKrR8UTyp0zVCfDeKGdCIku_20sKVi9WBuO4aqa3nBKDnKepezie3AC67kmr-2mazo76SIUyXWpRp8Lb038KZtafha8\" /></p>\n<p>  </picture></p>\n<p></a></p>",
+  "homepageUrl": "https://github.com/okhsunrog/vpnhide",
+  "sourceUrl": "https://github.com/okhsunrog/vpnhide",
+  "url": "https://github.com/okhsunrog/vpnhide",
+  "latestRelease": {
+    "name": "v0.4.1",
+    "version": "v0.4.1",
+    "time": "2026-04-12T22:10:34Z",
+    "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android14-5.15.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.4.1",
+      "tagName": "v0.4.1",
+      "publishedAt": "2026-04-12T22:10:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-kmod-android14-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android14-5.15.zip",
+          "size": 17894,
+          "downloadCount": 9
+        },
+        {
+          "name": "vpnhide-zygisk.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-zygisk.zip",
+          "size": 207333,
+          "downloadCount": 20
+        },
+        {
+          "name": "vpnhide-kmod-android14-6.1.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android14-6.1.zip",
+          "size": 17375,
+          "downloadCount": 11
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android13-5.10.zip",
+          "size": 16009,
+          "downloadCount": 10
+        },
+        {
+          "name": "vpnhide-lsposed.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-lsposed.apk",
+          "size": 18228226,
+          "downloadCount": 38
+        },
+        {
+          "name": "vpnhide-kmod-android16-6.12.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android16-6.12.zip",
+          "size": 16718,
+          "downloadCount": 10
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android13-5.15.zip",
+          "size": 16393,
+          "downloadCount": 13
+        },
+        {
+          "name": "vpnhide-test.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-test.apk",
+          "size": 6753223,
+          "downloadCount": 29
+        },
+        {
+          "name": "vpnhide-kmod-android15-6.6.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android15-6.6.zip",
+          "size": 14856,
+          "downloadCount": 11
+        },
+        {
+          "name": "vpnhide-kmod-android12-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.1/vpnhide-kmod-android12-5.10.zip",
+          "size": 15908,
+          "downloadCount": 19
+        }
+      ]
+    },
+    {
+      "name": "v0.4.0",
+      "tagName": "v0.4.0",
+      "publishedAt": "2026-04-12T00:26:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-kmod-android16-6.12.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android16-6.12.zip",
+          "size": 16416,
+          "downloadCount": 29
+        },
+        {
+          "name": "vpnhide-zygisk.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-zygisk.zip",
+          "size": 207636,
+          "downloadCount": 57
+        },
+        {
+          "name": "vpnhide-kmod-android14-6.1.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android14-6.1.zip",
+          "size": 17105,
+          "downloadCount": 28
+        },
+        {
+          "name": "vpnhide-kmod-android15-6.6.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android15-6.6.zip",
+          "size": 14553,
+          "downloadCount": 32
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android13-5.15.zip",
+          "size": 16289,
+          "downloadCount": 17
+        },
+        {
+          "name": "vpnhide-lsposed.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-lsposed.apk",
+          "size": 24333002,
+          "downloadCount": 101
+        },
+        {
+          "name": "vpnhide-kmod-android14-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android14-5.15.zip",
+          "size": 17809,
+          "downloadCount": 16
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android13-5.10.zip",
+          "size": 15913,
+          "downloadCount": 15
+        },
+        {
+          "name": "vpnhide-test.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-test.apk",
+          "size": 9752990,
+          "downloadCount": 45
+        },
+        {
+          "name": "vpnhide-kmod-android12-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.4.0/vpnhide-kmod-android12-5.10.zip",
+          "size": 15814,
+          "downloadCount": 24
+        }
+      ]
+    },
+    {
+      "name": "v0.3.1",
+      "tagName": "v0.3.1",
+      "publishedAt": "2026-04-11T20:11:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-kmod-android16-6.12.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android16-6.12.zip",
+          "size": 16369,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android13-5.15.zip",
+          "size": 16241,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-zygisk.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-zygisk.zip",
+          "size": 205635,
+          "downloadCount": 12
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android13-5.10.zip",
+          "size": 15863,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-kmod-android14-6.1.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android14-6.1.zip",
+          "size": 17058,
+          "downloadCount": 9
+        },
+        {
+          "name": "vpnhide-kmod-android15-6.6.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android15-6.6.zip",
+          "size": 14503,
+          "downloadCount": 9
+        },
+        {
+          "name": "vpnhide-kmod-android14-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android14-5.15.zip",
+          "size": 17759,
+          "downloadCount": 9
+        },
+        {
+          "name": "vpnhide-test.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-test.apk",
+          "size": 9752978,
+          "downloadCount": 12
+        },
+        {
+          "name": "vpnhide-kmod-android12-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-kmod-android12-5.10.zip",
+          "size": 15766,
+          "downloadCount": 11
+        },
+        {
+          "name": "vpnhide-lsposed.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.1/vpnhide-lsposed.apk",
+          "size": 7320399,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v0.3.0",
+      "tagName": "v0.3.0",
+      "publishedAt": "2026-04-11T20:04:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-kmod-android16-6.12.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android16-6.12.zip",
+          "size": 16369,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-zygisk.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-zygisk.zip",
+          "size": 205635,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-kmod-android15-6.6.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android15-6.6.zip",
+          "size": 14503,
+          "downloadCount": 7
+        },
+        {
+          "name": "vpnhide-kmod-android14-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android14-5.15.zip",
+          "size": 17759,
+          "downloadCount": 7
+        },
+        {
+          "name": "app-debug.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/app-debug.apk",
+          "size": 9752978,
+          "downloadCount": 11
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.15.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android13-5.15.zip",
+          "size": 16241,
+          "downloadCount": 7
+        },
+        {
+          "name": "vpnhide-kmod-android14-6.1.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android14-6.1.zip",
+          "size": 17058,
+          "downloadCount": 8
+        },
+        {
+          "name": "vpnhide-kmod-android13-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android13-5.10.zip",
+          "size": 15863,
+          "downloadCount": 7
+        },
+        {
+          "name": "vpnhide-kmod-android12-5.10.zip",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.3.0/vpnhide-kmod-android12-5.10.zip",
+          "size": 15766,
+          "downloadCount": 8
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-04-10T10:29:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-v0.2.0.apk.sha256",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.2.0/vpnhide-v0.2.0.apk.sha256",
+          "size": 85,
+          "downloadCount": 3
+        },
+        {
+          "name": "vpnhide-v0.2.0.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.2.0/vpnhide-v0.2.0.apk",
+          "size": 7354611,
+          "downloadCount": 13
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-04-10T02:07:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "vpnhide-v0.1.0.apk.sha256",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.1.0/vpnhide-v0.1.0.apk.sha256",
+          "size": 85,
+          "downloadCount": 2
+        },
+        {
+          "name": "vpnhide-v0.1.0.apk",
+          "downloadUrl": "https://github.com/okhsunrog/vpnhide/releases/download/v0.1.0/vpnhide-v0.1.0.apk",
+          "size": 7344367,
+          "downloadCount": 20
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

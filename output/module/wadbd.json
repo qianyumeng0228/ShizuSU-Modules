@@ -1,0 +1,100 @@
+{
+  "readme": "# Wireless ADB Controller  \nA simple Magisk module to control wireless ADB daemon. It allows you to start wireless ADBD in current session, start automatically on boot, set custom ports, and manage ADB keys (backup/restore/import). It supports KernelSU WebUI as well.\n\n![GitHub all releases](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/wadbd/total?style=for-the-badge)\n\n![Last Updated](https://img.shields.io/badge/Updated-2024--12--27-blue)\n\n## How to Use  \n1. Install the module via **Magisk**, **KernelSU**, or **Apatch**.  \n2. Reboot your device.  \n3. Open **Termux** or a terminal emulator and run the following command as `su`.\n\n---\n## Commands  \n```\n\nwadbd on <port>              - Enable wireless ADB on the specified port.\n\nwadbd off                   - Disable wireless ADB.\n\nwadbd status                - Show the status of wireless ADB.\n\nwadbd enable-on-boot <port> - Enable wireless ADB on boot with the specified port.\n\nwadbd disable-on-boot       - Disable wireless ADB on boot.\n\nwadbd --import-key <path>   - Import an adbkey.pub file to authorize ADB without prompt.\n\nwadbd --backup <path>         - Backup authorized adb_keys\n\nwadbd --restore <path>        -restore backed up adb_keys\n\nwadbd --clear-keys            - Revokes all authorized Keys\n```\n- Note: If you don't specify a port, it will use the default port 5555.\n# WebUI\n\n- You Can Also Control This Module Using Kernel Su or Apatch WebUI\n\n<div style=\"display: flex; justify-content: center; align-items: center;\">\n  <img src=\"https://github.com/rhythmcache/wireless-adb-controller/raw/main/e1.png\" alt=\"WebUI Screenshot\" width=\"45%\">\n  <img src=\"https://github.com/rhythmcache/wireless-adb-controller/raw/main/e2.png\" alt=\"KernelSU Screenshot\" width=\"45%\">\n</div>\n\n\n# Terminal Commands\n\n### `wadbd on [port] `\n- Enables Wireless ADB on specified port and displays the necessary commands to connect to your phone wirelessly.\n- default port is 5555 if not specified while running the command\n\n### `wadbd status`  \n- Displays whether Wireless ADB is currently running or not.\n\n### `wadbd off`  \n- Disables Wireless ADB.\n\n### `wadbd enable-on-boot [port]`\n- enables wireless adbd automatically on boot on specified port\n(default 5555 if not specified)\n\n### `wadbd disable-on-boot`\n- Disables wirelss adbd on boot\n\n\n\n# Experimental 👩‍🔬\n⚠️ These Features/Commands are Experimental and are not guaranteed to work on all devices. Use them at your own risk. These features are not available in WebUI and will `never` be added.\n\n#### `wadbd --import-keys <path-to-adbkey.pub>`\n- For some reason , If your device is not prompting to authorize ADB, you can use this command to directly import keys.\n- The adbkey.pub file is typically located at:\n  - Windows: `C:\\Users\\<username>\\.android\\adbkey.pub`\n  - Linux: `/home/<username>/.android/adbkey.pub`\n  - Termux: `/data/data/com.termux/files/home/.android/adbkey.pub`\n\n#### `wadbd --backup <path>` / `wadbd --restore <path>`\n- Used to backup or restore authorized keys\n\n#### `wadbd --clear-keys`\n- Revokes all authorized keys\n---\n## License\n\n    This Script Is Free Software. You can redistribute it\n    and/or modify it under the terms of the GNU General Public\n    License as published by the Free SoftwareFoundation,either version 3 of the License , or (at your option) \n    any later version.\n\n    This script is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU General Public License for more details.\n\n    You should have received a copy of the GNU General Public License\n    along with this script.  If not, see <http://www.gnu.org/licenses/>.\n    \n[![Telegram](https://img.shields.io/badge/Telegram-blue?style=flat-square&logo=telegram)](https://t.me/tr1ple_fault)\n",
+  "readmeHTML": "<h1>Wireless ADB Controller</h1>\n<p>A simple Magisk module to control wireless ADB daemon. It allows you to start wireless ADBD in current session, start automatically on boot, set custom ports, and manage ADB keys (backup/restore/import). It supports KernelSU WebUI as well.</p>\n\n<p>!<a href=\"https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/wadbd/total?style=for-the-badge\">GitHub all releases</a></p>\n\n<p>!<a href=\"https://img.shields.io/badge/Updated-2024--12--27-blue\">Last Updated</a></p>\n\n<h2>How to Use</h2>\n<li>Install the module via **Magisk**, **KernelSU**, or **Apatch**.</li>\n<li>Reboot your device.</li>\n<li>Open **Termux** or a terminal emulator and run the following command as `su`.</li>\n\n<p>---</p>\n<h2>Commands</h2>\n<pre>\nwadbd on &lt;port&gt;              - Enable wireless ADB on the specified port.\n\nwadbd off                   - Disable wireless ADB.\n\nwadbd status                - Show the status of wireless ADB.\n\nwadbd enable-on-boot &lt;port&gt; - Enable wireless ADB on boot with the specified port.\n\nwadbd disable-on-boot       - Disable wireless ADB on boot.\n\nwadbd --import-key &lt;path&gt;   - Import an adbkey.pub file to authorize ADB without prompt.\n\nwadbd --backup &lt;path&gt;         - Backup authorized adb_keys\n\nwadbd --restore &lt;path&gt;        -restore backed up adb_keys\n\nwadbd --clear-keys            - Revokes all authorized Keys</pre>\n<li>Note: If you don't specify a port, it will use the default port 5555.</li>\n<h1>WebUI</h1>\n\n<li>You Can Also Control This Module Using Kernel Su or Apatch WebUI</li>\n\n<p><div style=\"display: flex; justify-content: center; align-items: center;\"></p>\n<p>  <img src=\"https://github.com/rhythmcache/wireless-adb-controller/raw/main/e1.png\" alt=\"WebUI Screenshot\" width=\"45%\"></p>\n<p>  <img src=\"https://github.com/rhythmcache/wireless-adb-controller/raw/main/e2.png\" alt=\"KernelSU Screenshot\" width=\"45%\"></p>\n<p></div></p>\n\n\n<h1>Terminal Commands</h1>\n\n<h3>`wadbd on [port] `</h3>\n<li>Enables Wireless ADB on specified port and displays the necessary commands to connect to your phone wirelessly.</li>\n<li>default port is 5555 if not specified while running the command</li>\n\n<h3>`wadbd status`</h3>\n<li>Displays whether Wireless ADB is currently running or not.</li>\n\n<h3>`wadbd off`</h3>\n<li>Disables Wireless ADB.</li>\n\n<h3>`wadbd enable-on-boot [port]`</h3>\n<li>enables wireless adbd automatically on boot on specified port</li>\n<p>(default 5555 if not specified)</p>\n\n<h3>`wadbd disable-on-boot`</h3>\n<li>Disables wirelss adbd on boot</li>\n\n\n\n<h1>Experimental 👩‍🔬</h1>\n<p>⚠️ These Features/Commands are Experimental and are not guaranteed to work on all devices. Use them at your own risk. These features are not available in WebUI and will <code>never</code> be added.</p>\n\n<p>#### <code>wadbd --import-keys <path-to-adbkey.pub></code></p>\n<li>For some reason , If your device is not prompting to authorize ADB, you can use this command to directly import keys.</li>\n<li>The adbkey.pub file is typically located at:</li>\n<p>  - Windows: <code>C:\\Users\\<username>\\.android\\adbkey.pub</code></p>\n<p>  - Linux: <code>/home/<username>/.android/adbkey.pub</code></p>\n<p>  - Termux: <code>/data/data/com.termux/files/home/.android/adbkey.pub</code></p>\n\n<p>#### <code>wadbd --backup <path></code> / <code>wadbd --restore <path></code></p>\n<li>Used to backup or restore authorized keys</li>\n\n<p>#### <code>wadbd --clear-keys</code></p>\n<li>Revokes all authorized keys</li>\n<p>---</p>\n<h2>License</h2>\n\n<p>    This Script Is Free Software. You can redistribute it</p>\n<p>    and/or modify it under the terms of the GNU General Public</p>\n<p>    License as published by the Free SoftwareFoundation,either version 3 of the License , or (at your option)</p>\n<p>    any later version.</p>\n\n<p>    This script is distributed in the hope that it will be useful,</p>\n<p>    but WITHOUT ANY WARRANTY; without even the implied warranty of</p>\n<p>    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</p>\n<p>    GNU General Public License for more details.</p>\n\n<p>    You should have received a copy of the GNU General Public License</p>\n<p>    along with this script.  If not, see <http://www.gnu.org/licenses/>.</p>\n\n<p><a href=\"https://img.shields.io/badge/Telegram-blue?style=flat-square&logo=telegram\">![Telegram</a>](https://t.me/tr1ple_fault)</p>",
+  "homepageUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd",
+  "sourceUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd",
+  "url": "https://github.com/Magisk-Modules-Alt-Repo/wadbd",
+  "latestRelease": {
+    "name": "V4.3",
+    "version": "V4.3",
+    "time": "2025-01-11T11:11:43Z",
+    "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V4.3/wadbd-main-v4.3.zip"
+  },
+  "releases": [
+    {
+      "name": "V4.3",
+      "tagName": "V4.3",
+      "publishedAt": "2025-01-11T11:11:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wadbd-main-v4.3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V4.3/wadbd-main-v4.3.zip",
+          "size": 41297,
+          "downloadCount": 67
+        }
+      ]
+    },
+    {
+      "name": "V4.2",
+      "tagName": "V4.2",
+      "publishedAt": "2024-12-27T12:41:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wadbd-main-v4.2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V4.2/wadbd-main-v4.2.zip",
+          "size": 40770,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "V4",
+      "tagName": "V4",
+      "publishedAt": "2024-12-25T13:19:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wadbd-main-v4.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V4/wadbd-main-v4.zip",
+          "size": 40246,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "V3",
+      "tagName": "V3",
+      "publishedAt": "2024-12-24T17:54:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wadbd-main-v3.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V3/wadbd-main-v3.zip",
+          "size": 37682,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "V2",
+      "tagName": "V2",
+      "publishedAt": "2024-12-16T16:38:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wireless-adb-controller-main-v2.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V2/wireless-adb-controller-main-v2.zip",
+          "size": 3679,
+          "downloadCount": 28
+        }
+      ]
+    },
+    {
+      "name": "V1",
+      "tagName": "V1",
+      "publishedAt": "2024-11-22T18:41:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wadbd.zip",
+          "downloadUrl": "https://github.com/Magisk-Modules-Alt-Repo/wadbd/releases/download/V1/wadbd.zip",
+          "size": 4168,
+          "downloadCount": 46
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

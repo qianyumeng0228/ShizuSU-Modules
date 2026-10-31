@@ -1,0 +1,100 @@
+{
+  "readme": "# Universal SafetyNet Fix\n\nMagisk module to work around Google's SafetyNet and Play Integrity attestation.\n\nThis module works around hardware attestation and updates to SafetyNet and Play Integrity CTS profile checks. You must already be able to pass basic CTS profile attestation, which requires a valid combination of device and model names, build fingerprints, and security patch levels.\n\nIf you still have trouble passing SafetyNet or Play Integrity with this module, spoof the profile of a certified device by copying `ro.product` properties. [MagiskHide Props Config](https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf) is an easy way to do so on Magisk v23 and older. This is a common issue on old devices, custom ROMs, and stock ROMs without GMS certification (e.g. Chinese ROMs).\n\nAndroid versions up to 13 are supported, including OEM skins such as Samsung One UI and MIUI.\n\n## Download\n\n**[Download latest version](https://github.com/kdrag0n/safetynet-fix/releases)**\n\nInstall the downloaded module in Magisk Manager, then **enable Zygisk in Magisk settings.**\n\nThere is also a [Riru version](https://github.com/kdrag0n/safetynet-fix/releases/tag/v2.1.3) for Magisk 23 and older, but it is no longer updated. Please update to a current version of Magisk and use the Zygisk version.\n\n## How does it work?\n\nSee [Details](docs/details.md) for details about how this module works.\n\n## ROM integration\n\nIdeally, this workaround should be incorporated in custom ROMs instead of injecting code with a Magisk module. See the [ProtonAOSP website](https://protonaosp.org/developers/details/safetynet) for more information.\n\n## Support\n\nIf you found this module helpful, please consider supporting development with a **[recurring donation](https://patreon.com/kdrag0n)** on Patreon for benefits such as exclusive behind-the-scenes development news, early access to updates, and priority support. Alternatively, you can also [buy me a coffee](https://paypal.me/kdrag0ndonate). All support is appreciated.\n",
+  "readmeHTML": "<h1>Universal SafetyNet Fix</h1>\n\n<p>Magisk module to work around Google's SafetyNet and Play Integrity attestation.</p>\n\n<p>This module works around hardware attestation and updates to SafetyNet and Play Integrity CTS profile checks. You must already be able to pass basic CTS profile attestation, which requires a valid combination of device and model names, build fingerprints, and security patch levels.</p>\n\n<p>If you still have trouble passing SafetyNet or Play Integrity with this module, spoof the profile of a certified device by copying <code>ro.product</code> properties. <a href=\"https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf\">MagiskHide Props Config</a> is an easy way to do so on Magisk v23 and older. This is a common issue on old devices, custom ROMs, and stock ROMs without GMS certification (e.g. Chinese ROMs).</p>\n\n<p>Android versions up to 13 are supported, including OEM skins such as Samsung One UI and MIUI.</p>\n\n<h2>Download</h2>\n\n<p><b><a href=\"https://github.com/kdrag0n/safetynet-fix/releases\">Download latest version</a></b></p>\n\n<p>Install the downloaded module in Magisk Manager, then <b>enable Zygisk in Magisk settings.</b></p>\n\n<p>There is also a <a href=\"https://github.com/kdrag0n/safetynet-fix/releases/tag/v2.1.3\">Riru version</a> for Magisk 23 and older, but it is no longer updated. Please update to a current version of Magisk and use the Zygisk version.</p>\n\n<h2>How does it work?</h2>\n\n<p>See <a href=\"docs/details.md\">Details</a> for details about how this module works.</p>\n\n<h2>ROM integration</h2>\n\n<p>Ideally, this workaround should be incorporated in custom ROMs instead of injecting code with a Magisk module. See the <a href=\"https://protonaosp.org/developers/details/safetynet\">ProtonAOSP website</a> for more information.</p>\n\n<h2>Support</h2>\n\n<p>If you found this module helpful, please consider supporting development with a <b><a href=\"https://patreon.com/kdrag0n\">recurring donation</a></b> on Patreon for benefits such as exclusive behind-the-scenes development news, early access to updates, and priority support. Alternatively, you can also <a href=\"https://paypal.me/kdrag0ndonate\">buy me a coffee</a>. All support is appreciated.</p>",
+  "homepageUrl": "https://github.com/kdrag0n/safetynet-fix",
+  "sourceUrl": "https://github.com/kdrag0n/safetynet-fix",
+  "url": "https://github.com/kdrag0n/safetynet-fix",
+  "latestRelease": {
+    "name": "v1.2.0",
+    "version": "v1.2.0",
+    "time": "2021-07-04T07:23:06Z",
+    "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.2.0/safetynet-fix-v1.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2021-07-04T07:23:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.2.0.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.2.0/safetynet-fix-v1.2.0.zip",
+          "size": 1449225,
+          "downloadCount": 59741
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2021-01-16T09:23:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.1.1.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.1.1/safetynet-fix-v1.1.1.zip",
+          "size": 722578,
+          "downloadCount": 123659
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2021-01-14T04:01:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.1.0.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.1.0/safetynet-fix-v1.1.0.zip",
+          "size": 722505,
+          "downloadCount": 17708
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2021-01-14T03:58:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.0.2.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.0.2/safetynet-fix-v1.0.2.zip",
+          "size": 197474,
+          "downloadCount": 3611
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2021-01-14T03:57:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.0.1.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.0.1/safetynet-fix-v1.0.1.zip",
+          "size": 197195,
+          "downloadCount": 1558
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2021-01-14T03:56:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "safetynet-fix-v1.0.0.zip",
+          "downloadUrl": "https://github.com/kdrag0n/safetynet-fix/releases/download/v1.0.0/safetynet-fix-v1.0.0.zip",
+          "size": 216568,
+          "downloadCount": 3075
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,58 @@
+{
+  "readme": "# MaskTheGApps\n**By [Used](https://github.com/usedoperative-sudo)** (me)\n\nA Magisk module that systemlessly injects **MindTheGApps** components into your Android device. Specifically designed for GSIs and \"Vanilla\" custom ROMs.\n\n\n\n## 🚀 Overview\n**MaskTheGApps** allows you to have a functional Google environment without modifying the `/system` partition. It uses the modern GApps structure, making it clean and efficient.\n\n### Key Features\n* **Systemless Implementation:** No direct system modification, keeping your partition read-only if needed.\n* **Modern Structure:** Compatible with **Android 11 and newer**.\n* **GSI Identity:** Includes a `system.prop` that identifies the device as **\"Google GMS on ARM64\"**. This helps with Play Integrity certification on Generic System Images.\n* **Full GMS Suite:** Includes Play Store, GMS Core, Services Framework, and essential sync adapters.\n\n## 📂 Module Structure\nThe module follows the standard Magisk layout:\n* `/system/product`: Google apps, permissions, and overlays.\n* `/system/system_ext`: Setup Wizard and Framework services.\n* `system.prop`: Fingerprint set to Google GMS GSI standards.\n* `addon.d`: Included for legacy/ROM script compatibility.\n\n## 🛠 Installation\n1. Download the `.zip` for your Android version from the [Releases](../../releases) section.\n2. Open the **Magisk App**.\n3. Go to **Modules** > **Install from storage**.\n4. Select `MaskTheGApps.zip`, wait for the process to finish, and reboot.\n\n### 📱 Which version should I download?\n\n**Important:** You must download the release that matches your Android version. Installing a mismatched version may cause system instability or bootloops.\n\n| Android Version | Release Tag | Codename |\n| --- | --- | --- |\n| **Android 11** | `RedVelvetCake` | Red Velvet Cake 🍰 |\n| **Android 12 / 12L** | `SnowCone` | Snow Cone 🍧 |\n| **Android 13** | `Tiramisu` | Tiramisu ☕ |\n| **Android 14** | `UpsideDownCake` | Upside Down Cake 🙃 |\n\n> [!TIP]\n> Always check your Android version in **Settings > About Phone** before downloading a zip from the [Releases](../../releases) section.\n\n## ⚠️ Important Notes\n* **Target OS:** Android 11, 12, 13, and 14+.\n* **Device ID:** Your device will be identified as a **\"Google GMS on ARM64\"** (GSI Model). It does not spoof a specific Pixel device.\n* **No Physical Testing:** Please note that I do not currently have a physical Android device for real-time testing. Use this module at your own risk.\n\n> [!WARNING]  \n> **DO NOT** perform a Factory Reset after installing this module. Since Magisk modules are stored in `/data`, wiping your data will delete the module and the Google services entirely.\n\n## Credits\n* [MindTheGApps Team](https://gitlab.com/MindTheGApps) for the core binaries.\n* [Used](https://github.com/usedoperative-sudo) (me) for the Magisk implementation.\n",
+  "readmeHTML": "<h1>MaskTheGApps</h1>\n<p><b>By <a href=\"https://github.com/usedoperative-sudo\">Used</a></b> (me)</p>\n\n<p>A Magisk module that systemlessly injects <b>MindTheGApps</b> components into your Android device. Specifically designed for GSIs and \"Vanilla\" custom ROMs.</p>\n\n\n\n<h2>🚀 Overview</h2>\n<p><b>MaskTheGApps</b> allows you to have a functional Google environment without modifying the <code>/system</code> partition. It uses the modern GApps structure, making it clean and efficient.</p>\n\n<h3>Key Features</h3>\n<li>**Systemless Implementation:** No direct system modification, keeping your partition read-only if needed.</li>\n<li>**Modern Structure:** Compatible with **Android 11 and newer**.</li>\n<li>**GSI Identity:** Includes a `system.prop` that identifies the device as **\"Google GMS on ARM64\"**. This helps with Play Integrity certification on Generic System Images.</li>\n<li>**Full GMS Suite:** Includes Play Store, GMS Core, Services Framework, and essential sync adapters.</li>\n\n<h2>📂 Module Structure</h2>\n<p>The module follows the standard Magisk layout:</p>\n<li>`/system/product`: Google apps, permissions, and overlays.</li>\n<li>`/system/system_ext`: Setup Wizard and Framework services.</li>\n<li>`system.prop`: Fingerprint set to Google GMS GSI standards.</li>\n<li>`addon.d`: Included for legacy/ROM script compatibility.</li>\n\n<h2>🛠 Installation</h2>\n<li>Download the `.zip` for your Android version from the [Releases](../../releases) section.</li>\n<li>Open the **Magisk App**.</li>\n<li>Go to **Modules** > **Install from storage**.</li>\n<li>Select `MaskTheGApps.zip`, wait for the process to finish, and reboot.</li>\n\n<h3>📱 Which version should I download?</h3>\n\n<p><b>Important:</b> You must download the release that matches your Android version. Installing a mismatched version may cause system instability or bootloops.</p>\n\n<p>| Android Version | Release Tag | Codename |</p>\n<p>| --- | --- | --- |</p>\n<p>| <b>Android 11</b> | <code>RedVelvetCake</code> | Red Velvet Cake 🍰 |</p>\n<p>| <b>Android 12 / 12L</b> | <code>SnowCone</code> | Snow Cone 🍧 |</p>\n<p>| <b>Android 13</b> | <code>Tiramisu</code> | Tiramisu ☕ |</p>\n<p>| <b>Android 14</b> | <code>UpsideDownCake</code> | Upside Down Cake 🙃 |</p>\n\n<p>> [!TIP]</p>\n<p>> Always check your Android version in <b>Settings > About Phone</b> before downloading a zip from the <a href=\"../../releases\">Releases</a> section.</p>\n\n<h2>⚠️ Important Notes</h2>\n<li>**Target OS:** Android 11, 12, 13, and 14+.</li>\n<li>**Device ID:** Your device will be identified as a **\"Google GMS on ARM64\"** (GSI Model). It does not spoof a specific Pixel device.</li>\n<li>**No Physical Testing:** Please note that I do not currently have a physical Android device for real-time testing. Use this module at your own risk.</li>\n\n<p>> [!WARNING]</p>\n<p>> <b>DO NOT</b> perform a Factory Reset after installing this module. Since Magisk modules are stored in <code>/data</code>, wiping your data will delete the module and the Google services entirely.</p>\n\n<h2>Credits</h2>\n<li>[MindTheGApps Team](https://gitlab.com/MindTheGApps) for the core binaries.</li>\n<li>[Used](https://github.com/usedoperative-sudo) (me) for the Magisk implementation.</li>",
+  "homepageUrl": "https://github.com/usedoperative-sudo/MaskTheGApps",
+  "sourceUrl": "https://github.com/usedoperative-sudo/MaskTheGApps",
+  "url": "https://github.com/usedoperative-sudo/MaskTheGApps",
+  "latestRelease": {
+    "name": "Tiramisu",
+    "version": "Tiramisu",
+    "time": "2026-02-27T01:06:40Z",
+    "downloadUrl": "https://github.com/usedoperative-sudo/MaskTheGApps/releases/download/Tiramisu/MaskTheGApps-Tiramisu-13.zip"
+  },
+  "releases": [
+    {
+      "name": "Tiramisu",
+      "tagName": "Tiramisu",
+      "publishedAt": "2026-02-27T01:06:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MaskTheGApps-Tiramisu-13.zip",
+          "downloadUrl": "https://github.com/usedoperative-sudo/MaskTheGApps/releases/download/Tiramisu/MaskTheGApps-Tiramisu-13.zip",
+          "size": 384380168,
+          "downloadCount": 299
+        }
+      ]
+    },
+    {
+      "name": "SnowCone",
+      "tagName": "SnowCone",
+      "publishedAt": "2026-02-25T01:24:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MaskTheGApps-SnowCone-12.zip",
+          "downloadUrl": "https://github.com/usedoperative-sudo/MaskTheGApps/releases/download/SnowCone/MaskTheGApps-SnowCone-12.zip",
+          "size": 240581510,
+          "downloadCount": 25
+        }
+      ]
+    },
+    {
+      "name": "RedVelvetCake",
+      "tagName": "RedVelvetCake",
+      "publishedAt": "2026-02-24T05:20:29Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MaskTheGApps-RedVelvetCake-11.zip",
+          "downloadUrl": "https://github.com/usedoperative-sudo/MaskTheGApps/releases/download/RedVelvetCake/MaskTheGApps-RedVelvetCake-11.zip",
+          "size": 193727575,
+          "downloadCount": 54
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

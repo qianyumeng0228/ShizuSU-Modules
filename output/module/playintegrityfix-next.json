@@ -1,0 +1,100 @@
+{
+  "readme": "# Play Integrity Fix-NEXT\nOriginally created by chiteroman, forked by me. This module is a set of experimental items to ensure valid attestation on rooted devices with the new PlayIntegrity API rules and DroidGuard restrictions. Avaliable on Android 10-16.\n\n[![GitHub release (latest by date)](https://img.shields.io/github/v/release/EricInacio01/PlayIntegrityFix-NEXT?label=Release&color=blue&style=flat)](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/latest)\n[![GitHub Release Date](https://img.shields.io/github/release-date/EricInacio01/PlayIntegrityFix-NEXT?label=Release%20Date&color=brightgreen&style=flat)](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases)\n[![GitHub Releases](https://img.shields.io/github/downloads/EricInacio01/PlayIntegrityFix-NEXT/latest/total?label=Downloads%20%28Latest%20Release%29&color=blue&style=flat)](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/latest)\n[![GitHub All Releases](https://img.shields.io/github/downloads/EricInacio01/PlayIntegrityFix-NEXT/total?label=Total%20Downloads%20%28All%20Releases%29&color=brightgreen&style=flat)](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases)\n\n## Required\nFirst, install one of these TrickyStore versions:\n- [TrickyStore](https://github.com/5ec1cff/TrickyStore/releases)\n- [TrickyStore-OSS](https://github.com/beakthoven/TrickyStoreOSS/releases)\n\nYou must have **one** of the following combinations installed (use latest versions):\n\n| Root Solution | Zygisk Implementation | Additional Notes |\n|---------------|----------------------|------------------|\n| [Magisk](https://github.com/topjohnwu/Magisk) | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) or [ReZygisk](https://github.com/PerformanC/ReZygisk) | ⚠️ Disable Zygisk in Magisk settings |\n| [KernelSU](https://github.com/tiann/KernelSU) | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) or [ReZygisk](https://github.com/PerformanC/ReZygisk) | Install as module |\n| [KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next) | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) or [ReZygisk](https://github.com/PerformanC/ReZygisk) | Install as module |\n| [APatch](https://github.com/bmax121/APatch) | [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) or [ReZygisk](https://github.com/PerformanC/ReZygisk) | Install as module |\n\n\n## 📝 NOTES\nPIF-Next is not a root hiding module. It only has integration with TrickyStore to ensure valid hardware attestation and predefined settings to guarantee stable and excellent usability for later configuration.\n\n## 🔍 CHECK INTEGRITY\n\nThere are two reliable methods for verifying Play Integrity verdicts:\n\n1. **Google Play Store**:\n   - Open the Play Store > Settings > Tap ‘Play Store version’ seven times.\n   - Go to ‘General’ > ‘Developer options’ > ‘Verify integrity’.\n   - Your attestation will appear immediately!\n\n2. **External app - SPIC**:\n   - Download [SPIC - Play Integrity Checker](https://play.google.com/store/apps/details?id=com.henrikherzig.playintegritychecker&pcampaignid=web_share).\n   - Open the app and click ‘Check’ to view the results.\n\n\nAfter requesting an attestation, you should receive something like this:\n```text\n- MEETS_BASIC_INTEGRITY     ✅\n- MEETS_DEVICE_INTEGRITY    ✅\n- MEETS_STRONG_INTEGRITY    ❌ (available with valid keybox)\n- MEETS_VIRTUAL_INTEGRITY   ❌ (only for emulators)\n```\n\n\n## 🐛 KNOWN ISSUES\n- Google Wallet: there is no magic formula that makes GWallet work on all devices. By default, PIF-Next comes with all options enabled and configured to ensure compatibility.\n- Conflicts: some Custom ROMs (e.g. CrDroid, InfinityX, Matrixx, etc.) already come with Keybox injection by default. Instead of using this module, you can just use TrickyStore + Keybox injection from your own ROM.\n\n## 🔄 TROUBLESHOOTING\nYou can follow [this tutorial](https://t.me/bunkerdoquim/26) (you will be redirected to Telegram) to fix all available issues.\n\n\n## ACKNOWLEDGMENTS\n- This project is forked from the official chiteroman's PIF repo.\n- [kdrag0n](https://github.com/kdrag0n/safetynet-fix) & [Displax](https://github.com/Displax/safetynet-fix) for the original idea.\n- [osm0sis](https://github.com/osm0sis/PlayIntegrityFork) for his autopif.sh, spoofBuild and some infrastructure integrations.\n- [5ec1cff](https://github.com/5ec1cff/TrickyStore) by inserting keybox.xml and also target.txt in TrickyStore\n- [KOWX712](https://github.com/KOWX712/PlayIntegrityFix) through its code base.\n",
+  "readmeHTML": "<h1>Play Integrity Fix-NEXT</h1>\n<p>Originally created by chiteroman, forked by me. This module is a set of experimental items to ensure valid attestation on rooted devices with the new PlayIntegrity API rules and DroidGuard restrictions. Avaliable on Android 10-16.</p>\n\n<p><a href=\"https://img.shields.io/github/v/release/EricInacio01/PlayIntegrityFix-NEXT?label=Release&color=blue&style=flat\">![GitHub release (latest by date)</a>](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/release-date/EricInacio01/PlayIntegrityFix-NEXT?label=Release%20Date&color=brightgreen&style=flat\">![GitHub Release Date</a>](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases)</p>\n<p><a href=\"https://img.shields.io/github/downloads/EricInacio01/PlayIntegrityFix-NEXT/latest/total?label=Downloads%20%28Latest%20Release%29&color=blue&style=flat\">![GitHub Releases</a>](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/downloads/EricInacio01/PlayIntegrityFix-NEXT/total?label=Total%20Downloads%20%28All%20Releases%29&color=brightgreen&style=flat\">![GitHub All Releases</a>](https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases)</p>\n\n<h2>Required</h2>\n<p>First, install one of these TrickyStore versions:</p>\n<li>[TrickyStore](https://github.com/5ec1cff/TrickyStore/releases)</li>\n<li>[TrickyStore-OSS](https://github.com/beakthoven/TrickyStoreOSS/releases)</li>\n\n<p>You must have <b>one</b> of the following combinations installed (use latest versions):</p>\n\n<p>| Root Solution | Zygisk Implementation | Additional Notes |</p>\n<p>|---------------|----------------------|------------------|</p>\n<p>| <a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a> | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> or <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> | ⚠️ Disable Zygisk in Magisk settings |</p>\n<p>| <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a> | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> or <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> | Install as module |</p>\n<p>| <a href=\"https://github.com/KernelSU-Next/KernelSU-Next\">KernelSU Next</a> | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> or <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> | Install as module |</p>\n<p>| <a href=\"https://github.com/bmax121/APatch\">APatch</a> | <a href=\"https://github.com/Dr-TSNG/ZygiskNext\">Zygisk Next</a> or <a href=\"https://github.com/PerformanC/ReZygisk\">ReZygisk</a> | Install as module |</p>\n\n\n<h2>📝 NOTES</h2>\n<p>PIF-Next is not a root hiding module. It only has integration with TrickyStore to ensure valid hardware attestation and predefined settings to guarantee stable and excellent usability for later configuration.</p>\n\n<h2>🔍 CHECK INTEGRITY</h2>\n\n<p>There are two reliable methods for verifying Play Integrity verdicts:</p>\n\n<li>**Google Play Store**:</li>\n<p>   - Open the Play Store > Settings > Tap ‘Play Store version’ seven times.</p>\n<p>   - Go to ‘General’ > ‘Developer options’ > ‘Verify integrity’.</p>\n<p>   - Your attestation will appear immediately!</p>\n\n<li>**External app - SPIC**:</li>\n<p>   - Download <a href=\"https://play.google.com/store/apps/details?id=com.henrikherzig.playintegritychecker&pcampaignid=web_share\">SPIC - Play Integrity Checker</a>.</p>\n<p>   - Open the app and click ‘Check’ to view the results.</p>\n\n\n<p>After requesting an attestation, you should receive something like this:</p>\n<pre>- MEETS_BASIC_INTEGRITY     ✅\n- MEETS_DEVICE_INTEGRITY    ✅\n- MEETS_STRONG_INTEGRITY    ❌ (available with valid keybox)\n- MEETS_VIRTUAL_INTEGRITY   ❌ (only for emulators)</pre>\n\n\n<h2>🐛 KNOWN ISSUES</h2>\n<li>Google Wallet: there is no magic formula that makes GWallet work on all devices. By default, PIF-Next comes with all options enabled and configured to ensure compatibility.</li>\n<li>Conflicts: some Custom ROMs (e.g. CrDroid, InfinityX, Matrixx, etc.) already come with Keybox injection by default. Instead of using this module, you can just use TrickyStore + Keybox injection from your own ROM.</li>\n\n<h2>🔄 TROUBLESHOOTING</h2>\n<p>You can follow <a href=\"https://t.me/bunkerdoquim/26\">this tutorial</a> (you will be redirected to Telegram) to fix all available issues.</p>\n\n\n<h2>ACKNOWLEDGMENTS</h2>\n<li>This project is forked from the official chiteroman's PIF repo.</li>\n<li>[kdrag0n](https://github.com/kdrag0n/safetynet-fix) & [Displax](https://github.com/Displax/safetynet-fix) for the original idea.</li>\n<li>[osm0sis](https://github.com/osm0sis/PlayIntegrityFork) for his autopif.sh, spoofBuild and some infrastructure integrations.</li>\n<li>[5ec1cff](https://github.com/5ec1cff/TrickyStore) by inserting keybox.xml and also target.txt in TrickyStore</li>\n<li>[KOWX712](https://github.com/KOWX712/PlayIntegrityFix) through its code base.</li>",
+  "homepageUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT",
+  "sourceUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT",
+  "url": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT",
+  "latestRelease": {
+    "name": "v3.0-release",
+    "version": "v3.0-release",
+    "time": "2025-08-09T06:35:53Z",
+    "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v3.0-release/PIF-Next_v3.0_release.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.0-release",
+      "tagName": "v3.0-release",
+      "publishedAt": "2025-08-09T06:35:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PIF-Next_v3.0_release.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v3.0-release/PIF-Next_v3.0_release.zip",
+          "size": 154626,
+          "downloadCount": 76321
+        }
+      ]
+    },
+    {
+      "name": "v2.1-fixes",
+      "tagName": "v2.1-fixes",
+      "publishedAt": "2025-07-01T04:33:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PIF-Next_v2.1_release.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v2.1-fixes/PIF-Next_v2.1_release.zip",
+          "size": 151969,
+          "downloadCount": 23096
+        }
+      ]
+    },
+    {
+      "name": "v2.0-release",
+      "tagName": "v2.0-release",
+      "publishedAt": "2025-06-27T18:08:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PIF-Next_v2.0_release.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v2.0-release/PIF-Next_v2.0_release.zip",
+          "size": 151963,
+          "downloadCount": 3972
+        }
+      ]
+    },
+    {
+      "name": "v1.7",
+      "tagName": "v1.7",
+      "publishedAt": "2025-06-15T02:10:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix-NEXT_v1.7.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v1.7/PlayIntegrityFix-NEXT_v1.7.zip",
+          "size": 149611,
+          "downloadCount": 2999
+        }
+      ]
+    },
+    {
+      "name": "v1.5_release",
+      "tagName": "v1.5_release",
+      "publishedAt": "2025-06-12T17:17:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix-NEXT_v1.5.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v1.5_release/PlayIntegrityFix-NEXT_v1.5.zip",
+          "size": 149480,
+          "downloadCount": 1234
+        }
+      ]
+    },
+    {
+      "name": "v1.0_release",
+      "tagName": "v1.0_release",
+      "publishedAt": "2025-06-11T19:04:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "PlayIntegrityFix-NEXT_v1.0.zip",
+          "downloadUrl": "https://github.com/EricInacio01/PlayIntegrityFix-NEXT/releases/download/v1.0_release/PlayIntegrityFix-NEXT_v1.0.zip",
+          "size": 145825,
+          "downloadCount": 1219
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

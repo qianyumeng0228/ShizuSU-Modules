@@ -1,0 +1,100 @@
+{
+  "readme": "# Always Trust User Certs\n\nThis module makes all installed user certificates part of the system certificate store, so that they will automatically be used when building the trust chain. This module makes it unnecessary to add the network_security_config property to an application's manifest.\n\nFeatures:\n\n* Support for multiple users\n* Support for Magisk/KernelSU/KernelSU Next\n* Support for devices with and without mainline/conscrypt updates\n\nDepending on your Android version and Google Play Security Update version, your certificates will be either stored in `/system/etc/security/cacerts` or in `/apex/com.android.conscrypt/cacerts/`. This module handles all scenarios and works on any device from Android 7 until Android 16.\n\nMore background information can be found [in this blogpost](https://blog.nviso.eu/2025/06/05/intercepting-traffic-on-android-with-mainline-and-conscrypt/).\n## Usage\n\n### Installing certificates\n\nInstall the certificate as a user certificate and restart the device.\n\n### Removing certificates\n\nRemove the certificate from the user store through the settings and restart the device.\n\n## Changelog\n\n### v1.3\n\n* Fixed bug on A14+\n\n### v1.2\n\n* Added automatic update support\n\n### v1.1\n\n* Fixed permission issue for non-conscrypt\n* Fixed removal of certs for non-conscrypt\n* Renamed repo\n\n### v1.0\n\n* Add support for mainline/conscrypt certificates\n* Add support for multiple users\n* Add support for KernelSU\n\n### v0.4.1\n\n* Supports Android 10\n* Updated Module to be compatible with latest Magisk module template (v20.4+)\n\n### v0.3\n\n* The module now removes all user-installed certificates from the system store before copying them over, so that user certificates that were removed will no longer be kept in the system store.\n\n### v0.2\n\n* Fixed directory creation bug\n* Updated Module to be compatible with latest Magisk module template (v15+)\n\n### v0.1\n\n* Initial release\n",
+  "readmeHTML": "<h1>Always Trust User Certs</h1>\n\n<p>This module makes all installed user certificates part of the system certificate store, so that they will automatically be used when building the trust chain. This module makes it unnecessary to add the network_security_config property to an application's manifest.</p>\n\n<p>Features:</p>\n\n<li>Support for multiple users</li>\n<li>Support for Magisk/KernelSU/KernelSU Next</li>\n<li>Support for devices with and without mainline/conscrypt updates</li>\n\n<p>Depending on your Android version and Google Play Security Update version, your certificates will be either stored in <code>/system/etc/security/cacerts</code> or in <code>/apex/com.android.conscrypt/cacerts/</code>. This module handles all scenarios and works on any device from Android 7 until Android 16.</p>\n\n<p>More background information can be found <a href=\"https://blog.nviso.eu/2025/06/05/intercepting-traffic-on-android-with-mainline-and-conscrypt/\">in this blogpost</a>.</p>\n<h2>Usage</h2>\n\n<h3>Installing certificates</h3>\n\n<p>Install the certificate as a user certificate and restart the device.</p>\n\n<h3>Removing certificates</h3>\n\n<p>Remove the certificate from the user store through the settings and restart the device.</p>\n\n<h2>Changelog</h2>\n\n<h3>v1.3</h3>\n\n<li>Fixed bug on A14+</li>\n\n<h3>v1.2</h3>\n\n<li>Added automatic update support</li>\n\n<h3>v1.1</h3>\n\n<li>Fixed permission issue for non-conscrypt</li>\n<li>Fixed removal of certs for non-conscrypt</li>\n<li>Renamed repo</li>\n\n<h3>v1.0</h3>\n\n<li>Add support for mainline/conscrypt certificates</li>\n<li>Add support for multiple users</li>\n<li>Add support for KernelSU</li>\n\n<h3>v0.4.1</h3>\n\n<li>Supports Android 10</li>\n<li>Updated Module to be compatible with latest Magisk module template (v20.4+)</li>\n\n<h3>v0.3</h3>\n\n<li>The module now removes all user-installed certificates from the system store before copying them over, so that user certificates that were removed will no longer be kept in the system store.</li>\n\n<h3>v0.2</h3>\n\n<li>Fixed directory creation bug</li>\n<li>Updated Module to be compatible with latest Magisk module template (v15+)</li>\n\n<h3>v0.1</h3>\n\n<li>Initial release</li>",
+  "homepageUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts",
+  "sourceUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts",
+  "url": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts",
+  "latestRelease": {
+    "name": "v1.0",
+    "version": "v1.0",
+    "time": "2025-05-07T05:50:35Z",
+    "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v1.0/AlwaysTrustUserCerts_v1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-05-07T05:50:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AlwaysTrustUserCerts_v1.0.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v1.0/AlwaysTrustUserCerts_v1.0.zip",
+          "size": 5865,
+          "downloadCount": 687
+        }
+      ]
+    },
+    {
+      "name": "v0.4.1",
+      "tagName": "v0.4.1",
+      "publishedAt": "2020-05-10T21:31:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AlwaysTrustUserCerts.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v0.4.1/AlwaysTrustUserCerts.zip",
+          "size": 3574,
+          "downloadCount": 76951
+        }
+      ]
+    },
+    {
+      "name": "v0.4",
+      "tagName": "v0.4",
+      "publishedAt": "2020-04-29T18:12:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MagiskTrustUserCerts.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v0.4/MagiskTrustUserCerts.zip",
+          "size": 6234,
+          "downloadCount": 694
+        }
+      ]
+    },
+    {
+      "name": "v0.3",
+      "tagName": "v0.3",
+      "publishedAt": "2018-12-24T08:07:09Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AlwaysTrustUserCerts.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v0.3/AlwaysTrustUserCerts.zip",
+          "size": 6176,
+          "downloadCount": 3650
+        }
+      ]
+    },
+    {
+      "name": "v0.2",
+      "tagName": "v0.2",
+      "publishedAt": "2018-05-30T08:23:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AlwaysTrustUserCerts_v0.2.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v0.2/AlwaysTrustUserCerts_v0.2.zip",
+          "size": 6170,
+          "downloadCount": 833
+        }
+      ]
+    },
+    {
+      "name": "v0.1",
+      "tagName": "v0.1",
+      "publishedAt": "2017-12-16T13:18:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AlwaysTrustUserCerts.zip",
+          "downloadUrl": "https://github.com/NVISOsecurity/AlwaysTrustUserCerts/releases/download/v0.1/AlwaysTrustUserCerts.zip",
+          "size": 6936,
+          "downloadCount": 542
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

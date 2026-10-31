@@ -1,0 +1,100 @@
+{
+  "readme": "English / [简体中文](webpage/locales/README_ZH-CN.md)\n\n# **Anti SafetyCore**\nA Magisk module to fight against the behavior of installing Android System SafetyCore and Android System Key Verifier by Google quietly.\n\n## Supported Root Solution\n[Magisk](https://github.com/topjohnwu/Magisk) / [KernelSU](https://github.com/tiann/KernelSU) / [APatch](https://github.com/bmax121/APatch)\n\n## Why this module exists?\n1. **I hate installing apps silently so much.** *——As installing apps silently in the background, uninstalling apps silently and updating apps automatically & silently are the most favorite dirty things Google loves to do, LOL.*\nTherefore, sorry for any inconvenience. Would you feel better if I apology?\n2. **In order to hide its dark intentions of further collecting users' data in the background quietly, Google deliberately named the apps in a way that resembles the names of system critical components.** *——Thank you, but not all the users are the fools*\n3. **The apps Google installed is useless for me** *——LOL, Google.*\n\n## How does this module work?\n**In a standard and well-behave ROM, APKs with the same package name but different signatures cannot be overwrite installed casually.**\nSo, to stop Google from installing quietly in the background, just installing a placeholder APK with a different signature will do the trick.\nEven with its special system level permissions, Google can't do upgrade or downgrade installations.\nThis effectively blocks Google from repeatedly installing stuff like SafetyCore and Key Verifier on the sly.\n\n## Configuration\nSince version 1.3.0, you can place **empty files (without extension)** with the following names in the configuration directory `/data/adb/anti_safetycore` to enable respective features (Reboot to take effect after creating file):\n1. **`keep_running`**: Enables background daemon mode. The module will periodically check the status of SafetyCore and KeyVerifier components. If Google Play Services restores them, or if the existing components mismatch the placeholder app, the module will automatically uninstall and reinstall the placeholder.\n2. **`systemize`**: Mount placeholder apps as system apps. In this mode, Google Play Services cannot forcibly uninstall or replace the placeholder, even with system-level permissions.\n      \n### **Compatibility Notice**   \nFor devices running KernelSU (KernelSU kernel version ≥ 22098) or APatch (APatch kernel version ≥ 11170), you must install the [Metamodule](https://kernelsu.org/guide/metamodule.html) to enable `systemize` feature. Without it, the placeholder will always be installed as a user app regardless of the configuration.\n   \n### **Default Behavior**   \nBy default, the module installs the placeholders as **user apps**, which is sufficient for most devices.   \nOnly enable additional configurations in the following scenarios:   \n- Placeholder is frequently restored to the official app by Google Play Services\n- Device runs for long periods without rebooting, with concerns about silent component restoration\n\n### Notes\n1. If you have installed and enabled modules like [Core Patch](https://github.com/LSPosed/CorePatch) or similar options, Google may successfully perform a background silent update of the placeholder app.\n> When these options are enabled, your ROM will ignore the different signatures and allow Google's actions.\n2. To reduce resource consumption and system intervention, this module only uninstalls the two apps and replaces them with placeholder apps at booting.\n> This means that if Google successfully replaces them with the original apps, you just need to click on the action/open button to uninstall them or restart your device to restore the placeholder apps.\n\n## Help and Support\n- If you encounter any problems, please [click here](https://github.com/Astoritin/AntiSafetyCore/issues) to submit feedback.\n- [Pull Request](https://github.com/Astoritin/AntiSafetyCore/pulls) is always welcome to improve this module.\n\n## Credits\n- [Magisk](https://github.com/topjohnwu/Magisk) - the foundation which makes everything possible\n- [Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) - the implementation of function extract and root solution check\n- [LSPosed](https://github.com/LSPosed/LSPosed) - the implementation of function extract and root solution check\n",
+  "readmeHTML": "<p>English / <a href=\"webpage/locales/README_ZH-CN.md\">简体中文</a></p>\n\n<h1>**Anti SafetyCore**</h1>\n<p>A Magisk module to fight against the behavior of installing Android System SafetyCore and Android System Key Verifier by Google quietly.</p>\n\n<h2>Supported Root Solution</h2>\n<p><a href=\"https://github.com/topjohnwu/Magisk\">Magisk</a> / <a href=\"https://github.com/tiann/KernelSU\">KernelSU</a> / <a href=\"https://github.com/bmax121/APatch\">APatch</a></p>\n\n<h2>Why this module exists?</h2>\n<li>**I hate installing apps silently so much.** *——As installing apps silently in the background, uninstalling apps silently and updating apps automatically & silently are the most favorite dirty things Google loves to do, LOL.*</li>\n<p>Therefore, sorry for any inconvenience. Would you feel better if I apology?</p>\n<li>**In order to hide its dark intentions of further collecting users' data in the background quietly, Google deliberately named the apps in a way that resembles the names of system critical components.** *——Thank you, but not all the users are the fools*</li>\n<li>**The apps Google installed is useless for me** *——LOL, Google.*</li>\n\n<h2>How does this module work?</h2>\n<p><b>In a standard and well-behave ROM, APKs with the same package name but different signatures cannot be overwrite installed casually.</b></p>\n<p>So, to stop Google from installing quietly in the background, just installing a placeholder APK with a different signature will do the trick.</p>\n<p>Even with its special system level permissions, Google can't do upgrade or downgrade installations.</p>\n<p>This effectively blocks Google from repeatedly installing stuff like SafetyCore and Key Verifier on the sly.</p>\n\n<h2>Configuration</h2>\n<p>Since version 1.3.0, you can place <b>empty files (without extension)</b> with the following names in the configuration directory <code>/data/adb/anti_safetycore</code> to enable respective features (Reboot to take effect after creating file):</p>\n<li>**`keep_running`**: Enables background daemon mode. The module will periodically check the status of SafetyCore and KeyVerifier components. If Google Play Services restores them, or if the existing components mismatch the placeholder app, the module will automatically uninstall and reinstall the placeholder.</li>\n<li>**`systemize`**: Mount placeholder apps as system apps. In this mode, Google Play Services cannot forcibly uninstall or replace the placeholder, even with system-level permissions.</li>\n\n<h3>**Compatibility Notice**</h3>\n<p>For devices running KernelSU (KernelSU kernel version ≥ 22098) or APatch (APatch kernel version ≥ 11170), you must install the <a href=\"https://kernelsu.org/guide/metamodule.html\">Metamodule</a> to enable <code>systemize</code> feature. Without it, the placeholder will always be installed as a user app regardless of the configuration.</p>\n\n<h3>**Default Behavior**</h3>\n<p>By default, the module installs the placeholders as <b>user apps</b>, which is sufficient for most devices.</p>\n<p>Only enable additional configurations in the following scenarios:</p>\n<li>Placeholder is frequently restored to the official app by Google Play Services</li>\n<li>Device runs for long periods without rebooting, with concerns about silent component restoration</li>\n\n<h3>Notes</h3>\n<li>If you have installed and enabled modules like [Core Patch](https://github.com/LSPosed/CorePatch) or similar options, Google may successfully perform a background silent update of the placeholder app.</li>\n<p>> When these options are enabled, your ROM will ignore the different signatures and allow Google's actions.</p>\n<li>To reduce resource consumption and system intervention, this module only uninstalls the two apps and replaces them with placeholder apps at booting.</li>\n<p>> This means that if Google successfully replaces them with the original apps, you just need to click on the action/open button to uninstall them or restart your device to restore the placeholder apps.</p>\n\n<h2>Help and Support</h2>\n<li>If you encounter any problems, please [click here](https://github.com/Astoritin/AntiSafetyCore/issues) to submit feedback.</li>\n<li>[Pull Request](https://github.com/Astoritin/AntiSafetyCore/pulls) is always welcome to improve this module.</li>\n\n<h2>Credits</h2>\n<li>[Magisk](https://github.com/topjohnwu/Magisk) - the foundation which makes everything possible</li>\n<li>[Zygisk Next](https://github.com/Dr-TSNG/ZygiskNext) - the implementation of function extract and root solution check</li>\n<li>[LSPosed](https://github.com/LSPosed/LSPosed) - the implementation of function extract and root solution check</li>",
+  "homepageUrl": "https://github.com/Astoritin/AntiSafetyCore",
+  "sourceUrl": "https://github.com/Astoritin/AntiSafetyCore",
+  "url": "https://github.com/Astoritin/AntiSafetyCore",
+  "latestRelease": {
+    "name": "v1.1.2",
+    "version": "v1.1.2",
+    "time": "2025-06-22T11:44:16Z",
+    "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.1.2/AntiSafetyCore-v1.1.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2025-06-22T11:44:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.1.2.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.1.2/AntiSafetyCore-v1.1.2.zip",
+          "size": 18808,
+          "downloadCount": 695
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2025-06-08T05:44:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.1.1.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.1.1/AntiSafetyCore-v1.1.1.zip",
+          "size": 19598,
+          "downloadCount": 505
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2025-05-25T03:40:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.1.0.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.1.0/AntiSafetyCore-v1.1.0.zip",
+          "size": 20621,
+          "downloadCount": 85
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2025-05-09T03:57:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.0.2.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.0.2/AntiSafetyCore-v1.0.2.zip",
+          "size": 164978,
+          "downloadCount": 123
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2025-05-08T09:54:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.0.1.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.0.1/AntiSafetyCore-v1.0.1.zip",
+          "size": 116296,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2025-05-08T04:53:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AntiSafetyCore-v1.0.0.zip",
+          "downloadUrl": "https://github.com/Astoritin/AntiSafetyCore/releases/download/v1.0.0/AntiSafetyCore-v1.0.0.zip",
+          "size": 131299,
+          "downloadCount": 6
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

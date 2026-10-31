@@ -1,0 +1,30 @@
+{
+  "readme": "# 背屏音乐歌词\n\n这是一个基于小米官方背屏音乐卡片的运行时模板，提供自适应标题/歌词排版、普通显示与 AOD 布局，以及 Magisk/KernelSU 模块安装方式。\n\n## 使用说明\n\n安装模块后，无需额外配置：\n\n1. 打开网易云音乐的“蓝牙音乐歌词”功能。\n2. 连接蓝牙设备。\n3. 播放音乐，背屏音乐卡片会自动显示歌词并按容器宽度调整字号和行数。\n\n除网易云音乐外，其他播放器也会使用自适应标题排版。标题达到两行或三行时，作者详情会自动隐藏；三行仍放不下时只在末尾省略。\n\n## 构建\n\n需要 Windows PowerShell 和 Python 3。先在仓库根目录执行：\n\n```powershell\npython -X utf8 Lyrics-Music/source/build_card.py\npython -X utf8 Lyrics-Music-Magisk/source/build_module.py\n```\n\n构建结果：\n\n- `Lyrics-Music.zip`：卡片 ZIP，根目录直接包含 `manifest.xml`。\n- `Lyrics-Music-Magisk-v1.0.0.zip`：Magisk/KernelSU 模块 ZIP，可直接刷入。\n\n模块会接管：\n\n`/data/system/theme_magic/users/0/subscreencenter/smart_assistant/music`\n\n不会修改小米背屏助手 APK 或系统分区。模块服务会在开机后检查运行时模板，如果背屏助手重新释放官方模板，会自动恢复自定义卡片。\n\n## 目录结构\n\n```text\nLyrics-Music/              卡片源码、资源和电脑预览器\nLyrics-Music-Magisk/       模块脚本和模块元数据\n```\n\n`payload/`、`rendered/`、ZIP 和 Python 缓存均为构建生成物，不提交到源码仓库。\n\n## 卸载\n\n在 Magisk 或 KernelSU 中卸载“背屏音乐歌词”模块即可。模块卸载脚本会解除临时锁并尝试恢复官方运行时模板。\n",
+  "readmeHTML": "<h1>背屏音乐歌词</h1>\n\n<p>这是一个基于小米官方背屏音乐卡片的运行时模板，提供自适应标题/歌词排版、普通显示与 AOD 布局，以及 Magisk/KernelSU 模块安装方式。</p>\n\n<h2>使用说明</h2>\n\n<p>安装模块后，无需额外配置：</p>\n\n<li>打开网易云音乐的“蓝牙音乐歌词”功能。</li>\n<li>连接蓝牙设备。</li>\n<li>播放音乐，背屏音乐卡片会自动显示歌词并按容器宽度调整字号和行数。</li>\n\n<p>除网易云音乐外，其他播放器也会使用自适应标题排版。标题达到两行或三行时，作者详情会自动隐藏；三行仍放不下时只在末尾省略。</p>\n\n<h2>构建</h2>\n\n<p>需要 Windows PowerShell 和 Python 3。先在仓库根目录执行：</p>\n\n<pre>python -X utf8 Lyrics-Music/source/build_card.py\npython -X utf8 Lyrics-Music-Magisk/source/build_module.py</pre>\n\n<p>构建结果：</p>\n\n<li>`Lyrics-Music.zip`：卡片 ZIP，根目录直接包含 `manifest.xml`。</li>\n<li>`Lyrics-Music-Magisk-v1.0.0.zip`：Magisk/KernelSU 模块 ZIP，可直接刷入。</li>\n\n<p>模块会接管：</p>\n\n<p><code>/data/system/theme_magic/users/0/subscreencenter/smart_assistant/music</code></p>\n\n<p>不会修改小米背屏助手 APK 或系统分区。模块服务会在开机后检查运行时模板，如果背屏助手重新释放官方模板，会自动恢复自定义卡片。</p>\n\n<h2>目录结构</h2>\n\n<pre>Lyrics-Music/              卡片源码、资源和电脑预览器\nLyrics-Music-Magisk/       模块脚本和模块元数据</pre>\n\n<p><code>payload/</code>、<code>rendered/</code>、ZIP 和 Python 缓存均为构建生成物，不提交到源码仓库。</p>\n\n<h2>卸载</h2>\n\n<p>在 Magisk 或 KernelSU 中卸载“背屏音乐歌词”模块即可。模块卸载脚本会解除临时锁并尝试恢复官方运行时模板。</p>",
+  "homepageUrl": "https://github.com/Orynnx/LyricOnRearScreen",
+  "sourceUrl": "https://github.com/Orynnx/LyricOnRearScreen",
+  "url": "https://github.com/Orynnx/LyricOnRearScreen",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-07-10T16:22:21Z",
+    "downloadUrl": "https://github.com/Orynnx/LyricOnRearScreen/releases/download/v1.0.0/Lyrics-Music-Magisk-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-07-10T16:22:21Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Lyrics-Music-Magisk-v1.0.0.zip",
+          "downloadUrl": "https://github.com/Orynnx/LyricOnRearScreen/releases/download/v1.0.0/Lyrics-Music-Magisk-v1.0.0.zip",
+          "size": 61758,
+          "downloadCount": 122
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

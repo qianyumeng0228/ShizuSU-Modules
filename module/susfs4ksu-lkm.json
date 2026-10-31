@@ -1,0 +1,100 @@
+{
+  "readme": "[English](README.en.md)\n\n[x64设备兼容](https://github.com/ymuuuu/susfs4ksu-lkm-x64)\n\n# susfs4ksu-lkm\n\nSUSFS 的**可加载内核模块（LKM）移植版**：让 susfs 可以在不用重编译内核的情况下运行 。\n\n## 加载\n\n`.ko` 要选与设备内核对应的那一份，例如 5.15 设备用 `susfs_guard_lkm-android13-5.15.ko`。\n\n**KernelSU 设备**：\n\n```sh\nksud insmod /data/adb/loader/susfs_guard_lkm.ko\n```\n\n**非 KernelSU 设备**：用 release 附带的加载器 `susfs_insmod`：\n\n```sh\nsusfs_insmod /data/adb/loader/susfs_guard_lkm.ko\n```\n\n卸载：\n\n```sh\nrmmod susfs_guard_lkm\n```\n\n## 作为 KernelSU 模块刷入\n\n想免去手动选 `.ko`，每个 release 还附带打包好的模块 `susfs_guard_lkm-module-<tag>-arm64.zip`：在 KernelSU 管理器里刷入、重启即可。模块会按设备内核（`/proc/sys/kernel/osrelease`）自动选择并加载对应的 `.ko`（带 `expose_proc=1`），只负责加载、不设任何 susfs 规则；若系统已存在 susfs 则跳过。仅 arm64、仅 KernelSU 系管理器。`expose_proc=1` 会建立 `/proc/susfs_*` 控制节点，sus 规则通过这些节点下发。要移除：在管理器里停用或删除本模块（重启后生效），或 `rmmod susfs_guard_lkm` 当场卸载。\n\n若想手动指定，修改模块下的 `kmi_override` 为指定的 KMI 即可。\n\n默认在模块的 `post-fs-data` 阶段加载。若需提前到公共 `post-fs-data.d` 阶段，以 root 执行：\n\n```sh\ntouch /data/adb/modules/susfs_guard_lkm/early_load\n```\n\n重启后生效。删除该文件并重启可恢复默认加载；升级会保留此设置。两个阶段共用加载器，已有 SUSFS 时跳过，并遵守安全模式和模块停用/删除标记。卸载只移除本模块拥有的公共脚本，不会当场卸载正在运行的 LKM。\n\n当 SUSFS 规则或原始 kstat 快照必须在模块 post-fs-data 脚本和挂载之前配置时，请启用提前加载。这样可以及时提供 SUSFS 接口，让这些操作在所需的启动阶段执行。如果管理器在公共脚本之前应用 SUSFS 设置，仍需更早的加载阶段。模块只负责加载 LKM，设置由管理器应用。\n\n## 接口文档\n\n全部 `/proc` 控制节点，见 **[PROC_INTERFACES.md](PROC_INTERFACES.md)**。\n\n## License\n\nGPL-2.0，见 [LICENSE](LICENSE)。移植来源：[susfs4ksu](https://gitlab.com/simonpunk/susfs4ksu)（功能逻辑与 hook 点）、\n[SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra)（`patch_memory` / `lsm_hook` / `symbol_resolver`）。\n\n## 免责声明\n\n仅用于技术研究与学习。在自担风险的前提下使用。\n",
+  "readmeHTML": "<p><a href=\"README.en.md\">English</a></p>\n\n<p><a href=\"https://github.com/ymuuuu/susfs4ksu-lkm-x64\">x64设备兼容</a></p>\n\n<h1>susfs4ksu-lkm</h1>\n\n<p>SUSFS 的<b>可加载内核模块（LKM）移植版</b>：让 susfs 可以在不用重编译内核的情况下运行 。</p>\n\n<h2>加载</h2>\n\n<p><code>.ko</code> 要选与设备内核对应的那一份，例如 5.15 设备用 <code>susfs_guard_lkm-android13-5.15.ko</code>。</p>\n\n<p><b>KernelSU 设备</b>：</p>\n\n<pre>ksud insmod /data/adb/loader/susfs_guard_lkm.ko</pre>\n\n<p><b>非 KernelSU 设备</b>：用 release 附带的加载器 <code>susfs_insmod</code>：</p>\n\n<pre>susfs_insmod /data/adb/loader/susfs_guard_lkm.ko</pre>\n\n<p>卸载：</p>\n\n<pre>rmmod susfs_guard_lkm</pre>\n\n<h2>作为 KernelSU 模块刷入</h2>\n\n<p>想免去手动选 <code>.ko</code>，每个 release 还附带打包好的模块 <code>susfs_guard_lkm-module-<tag>-arm64.zip</code>：在 KernelSU 管理器里刷入、重启即可。模块会按设备内核（<code>/proc/sys/kernel/osrelease</code>）自动选择并加载对应的 <code>.ko</code>（带 <code>expose_proc=1</code>），只负责加载、不设任何 susfs 规则；若系统已存在 susfs 则跳过。仅 arm64、仅 KernelSU 系管理器。<code>expose_proc=1</code> 会建立 <code>/proc/susfs_*</code> 控制节点，sus 规则通过这些节点下发。要移除：在管理器里停用或删除本模块（重启后生效），或 <code>rmmod susfs_guard_lkm</code> 当场卸载。</p>\n\n<p>若想手动指定，修改模块下的 <code>kmi_override</code> 为指定的 KMI 即可。</p>\n\n<p>默认在模块的 <code>post-fs-data</code> 阶段加载。若需提前到公共 <code>post-fs-data.d</code> 阶段，以 root 执行：</p>\n\n<pre>touch /data/adb/modules/susfs_guard_lkm/early_load</pre>\n\n<p>重启后生效。删除该文件并重启可恢复默认加载；升级会保留此设置。两个阶段共用加载器，已有 SUSFS 时跳过，并遵守安全模式和模块停用/删除标记。卸载只移除本模块拥有的公共脚本，不会当场卸载正在运行的 LKM。</p>\n\n<p>当 SUSFS 规则或原始 kstat 快照必须在模块 post-fs-data 脚本和挂载之前配置时，请启用提前加载。这样可以及时提供 SUSFS 接口，让这些操作在所需的启动阶段执行。如果管理器在公共脚本之前应用 SUSFS 设置，仍需更早的加载阶段。模块只负责加载 LKM，设置由管理器应用。</p>\n\n<h2>接口文档</h2>\n\n<p>全部 <code>/proc</code> 控制节点，见 <b><a href=\"PROC_INTERFACES.md\">PROC_INTERFACES.md</a></b>。</p>\n\n<h2>License</h2>\n\n<p>GPL-2.0，见 <a href=\"LICENSE\">LICENSE</a>。移植来源：<a href=\"https://gitlab.com/simonpunk/susfs4ksu\">susfs4ksu</a>（功能逻辑与 hook 点）、</p>\n<p><a href=\"https://github.com/SukiSU-Ultra/SukiSU-Ultra\">SukiSU-Ultra</a>（<code>patch_memory</code> / <code>lsm_hook</code> / <code>symbol_resolver</code>）。</p>\n\n<h2>免责声明</h2>\n\n<p>仅用于技术研究与学习。在自担风险的前提下使用。</p>",
+  "homepageUrl": "https://github.com/inforcqb/susfs4ksu-lkm",
+  "sourceUrl": "https://github.com/inforcqb/susfs4ksu-lkm",
+  "url": "https://github.com/inforcqb/susfs4ksu-lkm",
+  "latestRelease": {
+    "name": "v2.3.0-r6",
+    "version": "v2.3.0-r6",
+    "time": "2026-09-13T13:45:30Z",
+    "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r6/susfs_guard_lkm.ko"
+  },
+  "releases": [
+    {
+      "name": "v2.3.0-r6",
+      "tagName": "v2.3.0-r6",
+      "publishedAt": "2026-09-13T13:45:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r6/susfs_guard_lkm.ko",
+          "size": 3808192,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r5",
+      "tagName": "v2.3.0-r5",
+      "publishedAt": "2026-09-13T12:51:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r5/susfs_guard_lkm.ko",
+          "size": 3778832,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r4",
+      "tagName": "v2.3.0-r4",
+      "publishedAt": "2026-09-12T14:38:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r4/susfs_guard_lkm.ko",
+          "size": 3734640,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r3",
+      "tagName": "v2.3.0-r3",
+      "publishedAt": "2026-09-12T14:22:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r3/susfs_guard_lkm.ko",
+          "size": 3757144,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r2",
+      "tagName": "v2.3.0-r2",
+      "publishedAt": "2026-09-12T14:11:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0-r2/susfs_guard_lkm.ko",
+          "size": 3757776,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0",
+      "tagName": "v2.3.0",
+      "publishedAt": "2026-09-09T14:25:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs_guard_lkm.ko",
+          "downloadUrl": "https://github.com/inforcqb/susfs4ksu-lkm/releases/download/v2.3.0/susfs_guard_lkm.ko",
+          "size": 3757776,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

@@ -1,0 +1,130 @@
+{
+  "readme": "# Magisk-iOS-Emoji\nSystemlessly replaces the emoji font with iOS Emoji.\n\n[![Stars](https://img.shields.io/github/stars/Keinta15/Magisk-iOS-Emoji?label=Stars&color=blue)](https://github.com/Keinta15/Magisk-iOS-Emoji)\n[![Release](https://img.shields.io/github/v/release/Keinta15/Magisk-iOS-Emoji?label=Release&logo=github)](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/latest)\n[![Download](https://img.shields.io/github/downloads/Keinta15/Magisk-iOS-Emoji/total?label=Downloads&logo=github)](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/)\n\n> [!TIP]\n> Contributions are welcome! If you'd like to help improve this module, feel free to submit a pull request. Check out the [Contributing](#contributing) section for more details.\n\n\n## Installation\n1. Download the latest release from the [Releases page](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/latest).\n2. Open the Magisk app.\n3. Go to **Modules** → **Install from storage** and select the downloaded ZIP file.\n4. Reboot your device.\n5. Enjoy iOS emojis system-wide!\n\n## Compatibility\n- **Magisk Version**: Requires Magisk v24.0 or higher.\n- **Android Version**: Tested on Android 10 and above. May work on older versions, but not guaranteed.\n- **Devices**: Works on most devices. Check the [Tested On](#tested-on) section for more details.\n\n## Screenshot\n<img src=\"https://github.com/Keinta15/Magisk-iOS-Emoji/blob/main/iOS_Emoji_Screenshot.jpg\" alt=\"iOS Emojis on Android\" width=\"400\" />  \n*Example of iOS emojis displayed on an Android device.*\n\n## Changelog\n### v26.4\n- Added 26.4 Emojis ([Unicode 17.0](https://emojipedia.org/unicode-17.0)) Thanks to [mistu01/MEEMEmoji](https://github.com/mistu01/MEEMEmoji) for the source.\n\n### v18.4.1\n- Fixed Messenger occasionally reverting to default emojis\n- Fixed a bug in service.sh that failed to properly disable the GMS font provider for all Google apps, preventing some apps from using the iOS emoji font\n- Better detection for Android 13+ storage isolation (all 3 see [f26a371](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/f26a371d9bf7042e10e1c84da380eaa1952bee09) thanks to [archieamas11](https://github.com/archieamas11))\n\n### v18.4\n- Added 18.4 Emojis ([Unicode 16.0](https://emojipedia.org/unicode-16.0)). Thanks to [samuelngs/apple-emoji-linux](https://github.com/samuelngs/apple-emoji-linux) for the source.\n- Added action.sh for user convenience\n- Updated log function to display messages properly when running the action\n\n### v17.4.7\n- **Facebook Lite/Messenger Lite Support**  \n  Added emoji replacement compatibility for:\n  - Facebook Lite (`com.facebook.lite`)\n  - Messenger Lite (`com.facebook.mlite`)\n- **`display_name()` function**  \n Added function to display app names instead of package name `com.facebook.katana`\n\n- **Case-Insensitive Font Detection**  \n  Modified `replace_emoji_fonts()` in `service.sh` to use:  \n  `find -iname \"*emoji*.ttf\"` instead of case-sensitive matching\n- **Cache Clearing Lag**  \n  Rewrote `clear_cache()` to eliminate delays caused by recursive `find` in `/data`  \n  *New implementation uses direct path targeting for faster cleanup*\n\n### v17.4.6\n- Updated `META-INF` (see [3e9dd3b](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/3e9dd3ba0d13f43f70bf299d4c727ffe3152c6b6)).  \n- Restructured `customize.sh` code (see [16ef755](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/16ef7553211f7de5e5f1791f6609c92de4c6c7de)), making it easier to update.  \n- Added `service.sh` (see [e7ae407](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/e7ae4077bf17e2b9e2c28b6aac75db1f7be11003)), eliminating the need for troubleshooting steps. Instead, simply restart your device.  \n\n### v17.4.1\n- Added Magisk 27005+ Support (see [b8339eb](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/b8339eb2a38d0876d2c8d640329e517816ced6ce), thanks to [E85Addict](https://github.com/E85Addict)).\n- Added OverlayFS Support (see [b9e6e0f](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/b9e6e0f374759c70dccd78c8791e4bb9d37b75a9), thanks to [reddxae](https://github.com/reddxae)).\n- Moved away from `install.sh` as recommended in the [Magisk Docs](https://github.com/topjohnwu/Magisk/blob/master/docs/guides.md) and switched to `customize.sh` (see [bc52d16](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/bc52d16186e6d53398f7b7c552c4251fd5e15a4b)).\n\n### v17.4\n- Added 17.4 Emojis.\n- Added a process to clear Gboard cache.\n\n### v16.4\n- Added 16.4 Emojis.\n- Fixed a typo.\n\n<details>\n<summary>Click to view prior changelogs</summary>\n\n### v15.4.6\n- Added Android 12 Support.\n- Fixed a typo in the extraction process.\n- Added Android 13 Support.\n\n### v15.4.5\n- Removed the method to replace Google Keyboard emojis as it was conflicting with other apps' settings.\n\n### v15.4.4\n- Forgot to add the XML file to the module.\n- Fixed a typo.\n\n### v15.4.3\n- Merged the normal module and the Samsung module into one.\n- Fixed an incorrect directory path in the install file.\n- Added compatibility for other devices like LG and HTC.\n\n### v15.4.2\n- Added a method to potentially completely replace Google Keyboard Emojis.\n- Tested `updater.json` directly from the Magisk Manager.\n\n### v15.4.1\n- Added `updater.json` for the ability to update directly from the Magisk Manager.\n- Cleaned up the code slightly.\n\n### v15.4\n- Added 15.4 Emojis.\n\n### v14.6\n- Added 14.6 Emojis.\n- Added a method to replace Facebook and Facebook Messenger app emojis.\n\n### v14.2\n- Added 14.2 Emojis.\n- Fixed a naming error on Samsung devices.\n</details>\n\n## Changelog for Emojis\n- [26.4 New Emojis](https://blog.emojipedia.org/apple-ios-26-4-emoji-changelog/)\n- [18.4 New Emojis](https://blog.emojipedia.org/apple-ios-18-4-emoji-changelog/)\n- [17.4 New Emojis](https://blog.emojipedia.org/ios-17-4-emoji-changelog/)\n- [16.4 New Emojis](https://blog.emojipedia.org/ios-16-4-emoji-changelog/)\n- [15.4 New Emojis](https://blog.emojipedia.org/ios-15-4-emoji-changelog/)\n- [14.6 New Emojis](https://blog.emojipedia.org/ios-14-6-emoji-changelog/)\n- [14.2 New Emojis](https://blog.emojipedia.org/ios-14-2-emoji-changelog/)\n\n## FAQ\n### Q: Why aren't the emojis changing after installation?\nA: Ensure that the module is enabled in Magisk and reboot your device. If the issue persists, clear the cache of your keyboard app (e.g., Gboard).\n\n### Q: Does this work with third-party keyboards?\nA: Yes, the module replaces the system emoji font, so it should work with any keyboard that uses system emojis.\n\n### Q: Can I use this alongside other Magisk modules?\nA: Yes, but conflicts may arise if another module modifies the system font. Disable conflicting modules if issues occur.\n\n## Tested On\n- OnePlus 13 (Android 15, 16)\n- OnePlus 11 (Android 14, 15)\n- OnePlus 8T (Android 13)\n- OnePlus 6\n- Pixel 7 Pro (Android 15, 16)\n- [Reported working by users](https://github.com/Keinta15/Magisk-iOS-Emoji/issues?q=is%3Aissue+is%3Aclosed+label%3A%22reported+working%22)\n\n## Troubleshooting\nIf the emoji files are replaced, reboot your phone.\n\n## Contributing\nContributions are welcome! If you'd like to contribute, please:\n1. Fork the repository.\n2. Create a new branch for your changes.\n3. Submit a pull request with a detailed description of your changes.\n\nPlease ensure your code includes relevant documentation.\n\n## License\nThis project is licensed under the [MIT License](https://github.com/Keinta15/Magisk-iOS-Emoji/blob/main/LICENSE). Feel free to use, modify, and distribute it as per the license terms.\n",
+  "readmeHTML": "<h1>Magisk-iOS-Emoji</h1>\n<p>Systemlessly replaces the emoji font with iOS Emoji.</p>\n\n<p><a href=\"https://img.shields.io/github/stars/Keinta15/Magisk-iOS-Emoji?label=Stars&color=blue\">![Stars</a>](https://github.com/Keinta15/Magisk-iOS-Emoji)</p>\n<p><a href=\"https://img.shields.io/github/v/release/Keinta15/Magisk-iOS-Emoji?label=Release&logo=github\">![Release</a>](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/latest)</p>\n<p><a href=\"https://img.shields.io/github/downloads/Keinta15/Magisk-iOS-Emoji/total?label=Downloads&logo=github\">![Download</a>](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/)</p>\n\n<p>> [!TIP]</p>\n<p>> Contributions are welcome! If you'd like to help improve this module, feel free to submit a pull request. Check out the <a href=\"#contributing\">Contributing</a> section for more details.</p>\n\n\n<h2>Installation</h2>\n<li>Download the latest release from the [Releases page](https://github.com/Keinta15/Magisk-iOS-Emoji/releases/latest).</li>\n<li>Open the Magisk app.</li>\n<li>Go to **Modules** → **Install from storage** and select the downloaded ZIP file.</li>\n<li>Reboot your device.</li>\n<li>Enjoy iOS emojis system-wide!</li>\n\n<h2>Compatibility</h2>\n<li>**Magisk Version**: Requires Magisk v24.0 or higher.</li>\n<li>**Android Version**: Tested on Android 10 and above. May work on older versions, but not guaranteed.</li>\n<li>**Devices**: Works on most devices. Check the [Tested On](#tested-on) section for more details.</li>\n\n<h2>Screenshot</h2>\n<p><img src=\"https://github.com/Keinta15/Magisk-iOS-Emoji/blob/main/iOS_Emoji_Screenshot.jpg\" alt=\"iOS Emojis on Android\" width=\"400\" /></p>\n<p>*Example of iOS emojis displayed on an Android device.*</p>\n\n<h2>Changelog</h2>\n<h3>v26.4</h3>\n<li>Added 26.4 Emojis ([Unicode 17.0](https://emojipedia.org/unicode-17.0)) Thanks to [mistu01/MEEMEmoji](https://github.com/mistu01/MEEMEmoji) for the source.</li>\n\n<h3>v18.4.1</h3>\n<li>Fixed Messenger occasionally reverting to default emojis</li>\n<li>Fixed a bug in service.sh that failed to properly disable the GMS font provider for all Google apps, preventing some apps from using the iOS emoji font</li>\n<li>Better detection for Android 13+ storage isolation (all 3 see [f26a371](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/f26a371d9bf7042e10e1c84da380eaa1952bee09) thanks to [archieamas11](https://github.com/archieamas11))</li>\n\n<h3>v18.4</h3>\n<li>Added 18.4 Emojis ([Unicode 16.0](https://emojipedia.org/unicode-16.0)). Thanks to [samuelngs/apple-emoji-linux](https://github.com/samuelngs/apple-emoji-linux) for the source.</li>\n<li>Added action.sh for user convenience</li>\n<li>Updated log function to display messages properly when running the action</li>\n\n<h3>v17.4.7</h3>\n<li>**Facebook Lite/Messenger Lite Support**</li>\n<p>  Added emoji replacement compatibility for:</p>\n<p>  - Facebook Lite (<code>com.facebook.lite</code>)</p>\n<p>  - Messenger Lite (<code>com.facebook.mlite</code>)</p>\n<li>**`display_name()` function**</li>\n<p> Added function to display app names instead of package name <code>com.facebook.katana</code></p>\n\n<li>**Case-Insensitive Font Detection**</li>\n<p>  Modified <code>replace_emoji_fonts()</code> in <code>service.sh</code> to use:</p>\n<p>  <code>find -iname \"*emoji*.ttf\"</code> instead of case-sensitive matching</p>\n<li>**Cache Clearing Lag**</li>\n<p>  Rewrote <code>clear_cache()</code> to eliminate delays caused by recursive <code>find</code> in <code>/data</code></p>\n<p>  *New implementation uses direct path targeting for faster cleanup*</p>\n\n<h3>v17.4.6</h3>\n<li>Updated `META-INF` (see [3e9dd3b](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/3e9dd3ba0d13f43f70bf299d4c727ffe3152c6b6)).</li>\n<li>Restructured `customize.sh` code (see [16ef755](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/16ef7553211f7de5e5f1791f6609c92de4c6c7de)), making it easier to update.</li>\n<li>Added `service.sh` (see [e7ae407](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/e7ae4077bf17e2b9e2c28b6aac75db1f7be11003)), eliminating the need for troubleshooting steps. Instead, simply restart your device.</li>\n\n<h3>v17.4.1</h3>\n<li>Added Magisk 27005+ Support (see [b8339eb](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/b8339eb2a38d0876d2c8d640329e517816ced6ce), thanks to [E85Addict](https://github.com/E85Addict)).</li>\n<li>Added OverlayFS Support (see [b9e6e0f](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/b9e6e0f374759c70dccd78c8791e4bb9d37b75a9), thanks to [reddxae](https://github.com/reddxae)).</li>\n<li>Moved away from `install.sh` as recommended in the [Magisk Docs](https://github.com/topjohnwu/Magisk/blob/master/docs/guides.md) and switched to `customize.sh` (see [bc52d16](https://github.com/Keinta15/Magisk-iOS-Emoji/commit/bc52d16186e6d53398f7b7c552c4251fd5e15a4b)).</li>\n\n<h3>v17.4</h3>\n<li>Added 17.4 Emojis.</li>\n<li>Added a process to clear Gboard cache.</li>\n\n<h3>v16.4</h3>\n<li>Added 16.4 Emojis.</li>\n<li>Fixed a typo.</li>\n\n<p><details></p>\n<p><summary>Click to view prior changelogs</summary></p>\n\n<h3>v15.4.6</h3>\n<li>Added Android 12 Support.</li>\n<li>Fixed a typo in the extraction process.</li>\n<li>Added Android 13 Support.</li>\n\n<h3>v15.4.5</h3>\n<li>Removed the method to replace Google Keyboard emojis as it was conflicting with other apps' settings.</li>\n\n<h3>v15.4.4</h3>\n<li>Forgot to add the XML file to the module.</li>\n<li>Fixed a typo.</li>\n\n<h3>v15.4.3</h3>\n<li>Merged the normal module and the Samsung module into one.</li>\n<li>Fixed an incorrect directory path in the install file.</li>\n<li>Added compatibility for other devices like LG and HTC.</li>\n\n<h3>v15.4.2</h3>\n<li>Added a method to potentially completely replace Google Keyboard Emojis.</li>\n<li>Tested `updater.json` directly from the Magisk Manager.</li>\n\n<h3>v15.4.1</h3>\n<li>Added `updater.json` for the ability to update directly from the Magisk Manager.</li>\n<li>Cleaned up the code slightly.</li>\n\n<h3>v15.4</h3>\n<li>Added 15.4 Emojis.</li>\n\n<h3>v14.6</h3>\n<li>Added 14.6 Emojis.</li>\n<li>Added a method to replace Facebook and Facebook Messenger app emojis.</li>\n\n<h3>v14.2</h3>\n<li>Added 14.2 Emojis.</li>\n<li>Fixed a naming error on Samsung devices.</li>\n<p></details></p>\n\n<h2>Changelog for Emojis</h2>\n<li>[26.4 New Emojis](https://blog.emojipedia.org/apple-ios-26-4-emoji-changelog/)</li>\n<li>[18.4 New Emojis](https://blog.emojipedia.org/apple-ios-18-4-emoji-changelog/)</li>\n<li>[17.4 New Emojis](https://blog.emojipedia.org/ios-17-4-emoji-changelog/)</li>\n<li>[16.4 New Emojis](https://blog.emojipedia.org/ios-16-4-emoji-changelog/)</li>\n<li>[15.4 New Emojis](https://blog.emojipedia.org/ios-15-4-emoji-changelog/)</li>\n<li>[14.6 New Emojis](https://blog.emojipedia.org/ios-14-6-emoji-changelog/)</li>\n<li>[14.2 New Emojis](https://blog.emojipedia.org/ios-14-2-emoji-changelog/)</li>\n\n<h2>FAQ</h2>\n<h3>Q: Why aren't the emojis changing after installation?</h3>\n<p>A: Ensure that the module is enabled in Magisk and reboot your device. If the issue persists, clear the cache of your keyboard app (e.g., Gboard).</p>\n\n<h3>Q: Does this work with third-party keyboards?</h3>\n<p>A: Yes, the module replaces the system emoji font, so it should work with any keyboard that uses system emojis.</p>\n\n<h3>Q: Can I use this alongside other Magisk modules?</h3>\n<p>A: Yes, but conflicts may arise if another module modifies the system font. Disable conflicting modules if issues occur.</p>\n\n<h2>Tested On</h2>\n<li>OnePlus 13 (Android 15, 16)</li>\n<li>OnePlus 11 (Android 14, 15)</li>\n<li>OnePlus 8T (Android 13)</li>\n<li>OnePlus 6</li>\n<li>Pixel 7 Pro (Android 15, 16)</li>\n<li>[Reported working by users](https://github.com/Keinta15/Magisk-iOS-Emoji/issues?q=is%3Aissue+is%3Aclosed+label%3A%22reported+working%22)</li>\n\n<h2>Troubleshooting</h2>\n<p>If the emoji files are replaced, reboot your phone.</p>\n\n<h2>Contributing</h2>\n<p>Contributions are welcome! If you'd like to contribute, please:</p>\n<li>Fork the repository.</li>\n<li>Create a new branch for your changes.</li>\n<li>Submit a pull request with a detailed description of your changes.</li>\n\n<p>Please ensure your code includes relevant documentation.</p>\n\n<h2>License</h2>\n<p>This project is licensed under the <a href=\"https://github.com/Keinta15/Magisk-iOS-Emoji/blob/main/LICENSE\">MIT License</a>. Feel free to use, modify, and distribute it as per the license terms.</p>",
+  "homepageUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji",
+  "sourceUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji",
+  "url": "https://github.com/Keinta15/Magisk-iOS-Emoji",
+  "latestRelease": {
+    "name": "15.4",
+    "version": "15.4",
+    "time": "2022-05-27T02:29:46Z",
+    "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/15.4/Magisk_iOS_Emoji_15.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v15.4.3",
+      "tagName": "v15.4.3",
+      "publishedAt": "2022-06-02T03:16:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_15.4.3.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v15.4.3/Magisk_iOS_Emoji_15.4.3.zip",
+          "size": 26650096,
+          "downloadCount": 100
+        }
+      ]
+    },
+    {
+      "name": "v15.4.2",
+      "tagName": "v15.4.2",
+      "publishedAt": "2022-06-02T02:11:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_15.4.2.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v15.4.2/Magisk_iOS_Emoji_15.4.2.zip",
+          "size": 26673967,
+          "downloadCount": 50
+        },
+        {
+          "name": "Magisk_iOS_Emoji_15.4.2_Samsung.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v15.4.2/Magisk_iOS_Emoji_15.4.2_Samsung.zip",
+          "size": 53319857,
+          "downloadCount": 40
+        }
+      ]
+    },
+    {
+      "name": "v15.4.1",
+      "tagName": "v15.4.1",
+      "publishedAt": "2022-06-02T00:51:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_15.4.1.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v15.4.1/Magisk_iOS_Emoji_15.4.1.zip",
+          "size": 26650094,
+          "downloadCount": 31
+        },
+        {
+          "name": "Magisk_iOS_Emoji_15.4.1_Samsung.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v15.4.1/Magisk_iOS_Emoji_15.4.1_Samsung.zip",
+          "size": 53296005,
+          "downloadCount": 22
+        }
+      ]
+    },
+    {
+      "name": "15.4",
+      "tagName": "15.4",
+      "publishedAt": "2022-05-27T02:29:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_15.4.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/15.4/Magisk_iOS_Emoji_15.4.zip",
+          "size": 26651564,
+          "downloadCount": 6793
+        },
+        {
+          "name": "Magisk_iOS_Emoji_15.4_Samsung.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/15.4/Magisk_iOS_Emoji_15.4_Samsung.zip",
+          "size": 53297448,
+          "downloadCount": 2694
+        }
+      ]
+    },
+    {
+      "name": "14.6",
+      "tagName": "14.6",
+      "publishedAt": "2021-07-15T20:32:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_14.6.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/14.6/Magisk_iOS_Emoji_14.6.zip",
+          "size": 25900656,
+          "downloadCount": 5747
+        },
+        {
+          "name": "Magisk_iOS_Emoji_14.6_Samsung.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/14.6/Magisk_iOS_Emoji_14.6_Samsung.zip",
+          "size": 51786719,
+          "downloadCount": 1757
+        }
+      ]
+    },
+    {
+      "name": "v14.2",
+      "tagName": "v14.2",
+      "publishedAt": "2020-11-22T23:41:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk_iOS_Emoji_14.2_Samsung.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v14.2/Magisk_iOS_Emoji_14.2_Samsung.zip",
+          "size": 45345837,
+          "downloadCount": 1700
+        },
+        {
+          "name": "Magisk_iOS_Emoji_14.2.zip",
+          "downloadUrl": "https://github.com/Keinta15/Magisk-iOS-Emoji/releases/download/v14.2/Magisk_iOS_Emoji_14.2.zip",
+          "size": 22675666,
+          "downloadCount": 3540
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

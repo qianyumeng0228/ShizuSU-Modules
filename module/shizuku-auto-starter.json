@@ -1,0 +1,30 @@
+{
+  "readme": "## Language\n\n- English  \n- [العربية](README_AR.md)\n\n\n<h1 align=\"center\"><sub>Shizuku Auto Starter</sub></h1>\n\n<p align=\"center\">\n  <a href=\"https://github.com/merbah3266/shizuku-auto-starter/releases/tag/v1.0\">\n    <img src=\"https://img.shields.io/github/downloads/merbah3266/shizuku-auto-starter/v1.0/total?label=downloads&color=blue&style=flat\" alt=\"downloads\">\n  </a>\n</p>\n\n### What does this module do\n\nThis module automatically starts **Shizuku** at device boot.  \nNo need to open the app or run commands manually.\n\n### What is this project\n\nA simple **Shell-based module**. When installed, it auto-runs `service.sh` after every boot.  \nThe script looks for `libshizuku.so` (from the Shizuku app) and runs it.\n\n### How it works\n\n1. Waits for the system to fully boot.\n2. Waits 5 more seconds.\n3. Searches for `libshizuku.so` under `/data/app/`.\n4. If found:\n   - Makes it executable.\n   - Executes it.\n5. Logs everything into `shizuku_exec.log`.\n\n### Requirements\n\n- Android device with root access\n- Shizuku app installed\n\n### Tested On\n\n- Redmi Note 11 SE (Rooted using Magisk)\n\n### Important Notes\n\n- Only tested on **Magisk**\n- Not guaranteed to work on **KernelSU**, **APatch**, or other custom environments\n- Use outside Magisk at your own risk\n\n### Module Files\n\n| File                 | Description                      |\n|----------------------|----------------------------------|\n| `service.sh`         | Main script – auto-runs after boot |\n| `shizuku_exec.log`   | Log file – created automatically  |\n| `module.prop`        | Metadata file for Magisk module   |\n\n### Other Download Options\n\nYou can get our module directly from MMRL using the button below:\n\n<p align=\"center\">\n  <a href=\"https://mmrl.dev/repository/ssmithSSR/Shizuku-Auto-Starter\">\n    <img src=\"https://raw.githubusercontent.com/merbah3266/Shizuku-Auto-Starter/main/badge.svg\" alt=\"Get it on MMRL\">\n  </a>\n</p>\n\n> [!WARNING]\n> Use of this module is entirely **at your own risk**.  \n> The developer is not responsible for any damage to your device or data resulting from improper or unsupported use.\n",
+  "readmeHTML": "<h2>Language</h2>\n\n<li>English</li>\n<li>[العربية](README_AR.md)</li>\n\n\n<p><h1 align=\"center\"><sub>Shizuku Auto Starter</sub></h1></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/merbah3266/shizuku-auto-starter/releases/tag/v1.0\"></p>\n<p>    <img src=\"https://img.shields.io/github/downloads/merbah3266/shizuku-auto-starter/v1.0/total?label=downloads&color=blue&style=flat\" alt=\"downloads\"></p>\n<p>  </a></p>\n<p></p></p>\n\n<h3>What does this module do</h3>\n\n<p>This module automatically starts <b>Shizuku</b> at device boot.</p>\n<p>No need to open the app or run commands manually.</p>\n\n<h3>What is this project</h3>\n\n<p>A simple <b>Shell-based module</b>. When installed, it auto-runs <code>service.sh</code> after every boot.</p>\n<p>The script looks for <code>libshizuku.so</code> (from the Shizuku app) and runs it.</p>\n\n<h3>How it works</h3>\n\n<li>Waits for the system to fully boot.</li>\n<li>Waits 5 more seconds.</li>\n<li>Searches for `libshizuku.so` under `/data/app/`.</li>\n<li>If found:</li>\n<p>   - Makes it executable.</p>\n<p>   - Executes it.</p>\n<li>Logs everything into `shizuku_exec.log`.</li>\n\n<h3>Requirements</h3>\n\n<li>Android device with root access</li>\n<li>Shizuku app installed</li>\n\n<h3>Tested On</h3>\n\n<li>Redmi Note 11 SE (Rooted using Magisk)</li>\n\n<h3>Important Notes</h3>\n\n<li>Only tested on **Magisk**</li>\n<li>Not guaranteed to work on **KernelSU**, **APatch**, or other custom environments</li>\n<li>Use outside Magisk at your own risk</li>\n\n<h3>Module Files</h3>\n\n<p>| File                 | Description                      |</p>\n<p>|----------------------|----------------------------------|</p>\n<p>| <code>service.sh</code>         | Main script – auto-runs after boot |</p>\n<p>| <code>shizuku_exec.log</code>   | Log file – created automatically  |</p>\n<p>| <code>module.prop</code>        | Metadata file for Magisk module   |</p>\n\n<h3>Other Download Options</h3>\n\n<p>You can get our module directly from MMRL using the button below:</p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://mmrl.dev/repository/ssmithSSR/Shizuku-Auto-Starter\"></p>\n<p>    <img src=\"https://raw.githubusercontent.com/merbah3266/Shizuku-Auto-Starter/main/badge.svg\" alt=\"Get it on MMRL\"></p>\n<p>  </a></p>\n<p></p></p>\n\n<p>> [!WARNING]</p>\n<p>> Use of this module is entirely <b>at your own risk</b>.</p>\n<p>> The developer is not responsible for any damage to your device or data resulting from improper or unsupported use.</p>",
+  "homepageUrl": "https://merbah3266.github.io/shizuku-auto-starter/",
+  "sourceUrl": "https://github.com/merbah3266/shizuku-auto-starter",
+  "url": "https://github.com/merbah3266/shizuku-auto-starter",
+  "latestRelease": {
+    "name": "v1.0",
+    "version": "v1.0",
+    "time": "2025-07-04T08:35:46Z",
+    "downloadUrl": "https://github.com/merbah3266/shizuku-auto-starter/releases/download/v1.0/Shizuku_Auto_Starter_1.0_1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-07-04T08:35:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Shizuku_Auto_Starter_1.0_1.zip",
+          "downloadUrl": "https://github.com/merbah3266/shizuku-auto-starter/releases/download/v1.0/Shizuku_Auto_Starter_1.0_1.zip",
+          "size": 1324,
+          "downloadCount": 672
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

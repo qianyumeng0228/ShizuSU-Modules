@@ -1,0 +1,78 @@
+{
+  "readme": "# KSU Proxy\n\nKernelSU transparent proxy module with a TTLink-style package layout:\n\n- sing-box as the main transparent proxy and routing core.\n- x-tunnel as optional sidecar nodes exposed to sing-box through local SOCKS outbounds.\n- Package-name whitelist intent expanded to Android UID instances automatically.\n- TProxy-first architecture so non-whitelisted apps bypass the module.\n- Hot whitelist reconciliation without restarting sing-box.\n- Module WebUI for package whitelist selection.\n- Default configuration references for sing-box and x-tunnel.\n\nPackage-facing files live at the project root, runtime assets live in `KsuProxy/`, and development files live in `dev/`.\n\nConfiguration reference files:\n\n- `KsuProxy/config/README.md`\n- `KsuProxy/config/config.example.jsonc`\n- `KsuProxy/config/sing-box/README.md`\n- `KsuProxy/config/x-tunnel/README.md`\n\nRuntime configuration is initialized under `/data/adb/ksu-proxy/config` on first start.\n",
+  "readmeHTML": "<h1>KSU Proxy</h1>\n\n<p>KernelSU transparent proxy module with a TTLink-style package layout:</p>\n\n<li>sing-box as the main transparent proxy and routing core.</li>\n<li>x-tunnel as optional sidecar nodes exposed to sing-box through local SOCKS outbounds.</li>\n<li>Package-name whitelist intent expanded to Android UID instances automatically.</li>\n<li>TProxy-first architecture so non-whitelisted apps bypass the module.</li>\n<li>Hot whitelist reconciliation without restarting sing-box.</li>\n<li>Module WebUI for package whitelist selection.</li>\n<li>Default configuration references for sing-box and x-tunnel.</li>\n\n<p>Package-facing files live at the project root, runtime assets live in <code>KsuProxy/</code>, and development files live in <code>dev/</code>.</p>\n\n<p>Configuration reference files:</p>\n\n<li>`KsuProxy/config/README.md`</li>\n<li>`KsuProxy/config/config.example.jsonc`</li>\n<li>`KsuProxy/config/sing-box/README.md`</li>\n<li>`KsuProxy/config/x-tunnel/README.md`</li>\n\n<p>Runtime configuration is initialized under <code>/data/adb/ksu-proxy/config</code> on first start.</p>",
+  "homepageUrl": "https://github.com/raxonalevis-cloud/ksu-proxy",
+  "sourceUrl": "https://github.com/raxonalevis-cloud/ksu-proxy",
+  "url": "https://github.com/raxonalevis-cloud/ksu-proxy",
+  "latestRelease": {
+    "name": "v0.2.11",
+    "version": "v0.2.11",
+    "time": "2026-06-24T03:56:56Z",
+    "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.11/ksu-proxy-v0.2.11.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.2.11",
+      "tagName": "v0.2.11",
+      "publishedAt": "2026-06-24T03:56:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-proxy-v0.2.11.zip",
+          "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.11/ksu-proxy-v0.2.11.zip",
+          "size": 36787417,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v0.2.9-dev",
+      "tagName": "v0.2.9-dev",
+      "publishedAt": "2026-06-24T02:10:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-proxy-v0.2.9-dev.zip",
+          "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.9-dev/ksu-proxy-v0.2.9-dev.zip",
+          "size": 36785700,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.2.8-dev",
+      "tagName": "v0.2.8-dev",
+      "publishedAt": "2026-06-23T15:01:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-proxy-v0.2.8-dev.zip",
+          "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.8-dev/ksu-proxy-v0.2.8-dev.zip",
+          "size": 36783048,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.2.7-dev",
+      "tagName": "v0.2.7-dev",
+      "publishedAt": "2026-06-23T09:12:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ksu-proxy.zip",
+          "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.7-dev/ksu-proxy.zip",
+          "size": 25466245,
+          "downloadCount": 1
+        },
+        {
+          "name": "ksu-proxy-v0.2.7-dev.zip",
+          "downloadUrl": "https://github.com/raxonalevis-cloud/ksu-proxy/releases/download/v0.2.7-dev/ksu-proxy-v0.2.7-dev.zip",
+          "size": 36652895,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

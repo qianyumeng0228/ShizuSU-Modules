@@ -1,0 +1,58 @@
+{
+  "readme": "# Pixel 10 Pro Thermal Polling Fix (Android 16)\n\n> [!IMPORTANT]\n> **RETIRED — DO NOT INSTALL.** This module is redundant on any firmware released after the initial Android 16 QPR builds: stock corrected the 5-minute thermal polling delay in a straight firmware release, so this overlay no longer applies to current builds and may conflict with the fixed stock configs. No further updates are planned. Left up for historical reference only.\n\n## 📢 DISCLAIMER \nI am very much a hobby dev, and new to rooting android devices. I made this repository to document my findings as I am learning. Please only implement the module if you know what you are doing, and always keep backups in case of something not working as intended.\n \n Asurgical Magisk/KernelSU module to correct a 5-minute thermal polling delay found in the initial Android 16 QPR builds for the Pixel 10 Pro.\n\n## 🚨 The Issue\nIn the stock Android 16 firmware for the Pixel 10 Pro, the `PollingDelay` for critical thermal sensors is incorrectly set to **300,000ms** (5 minutes). \n\nThis creates a massive \"blind spot\" in the system's thermal management. During heavy workloads, the CPU can hit 90°C+ before the Thermal HAL even attempts to sample the temperature, leading to heat soak and potential long-term battery degradation.\n\n## ✅ The Fix\nThis module overlays the stock thermal configs with focused edits:\n1.  **Reduces Polling Delay:** Sets `PollingDelay` to **5,000ms** for the `VIRTUAL-SKIN*` sensors across `thermal_info_config.json`, `thermal_info_config_throttling.json`, and `thermal_info_config_charge.json`.\n2.  **Keeps OEM thresholds:** Restores the original `HotThreshold`, `CdevCeilingFrequency`, and `Profile` data so only the sampling cadence changes.\n3.  **Retains Hysteresis & Passive Delay:** Keeps the default `PassiveDelay` (7,000ms) and `HotHysteresis` values to avoid oscillating CPU-frequency decisions even as the sensor updates faster.\n\n---\n\n## 📋 Technical Evidence & Root Cause\n**Affected Component:** `/vendor/etc/thermal_info_config.json`  \n**Target Config:** `VIRTUAL-SKIN-CPU-LIGHT-ODPM`\n\nThe stock configuration effectively disables real-time thermal management for burst workloads. By the time the 300s timer expires, the device has already reached thermal saturation. This module restores the expected behavior for a flagship Tensor G5 device.\n\n## ✅ Additional Overlays\n* `/vendor/etc/thermal_info_config_throttling.json` and `thermal_info_config_charge.json` inherit the same 5s polling cadence so the HAL cannot revert to the 300s delay through the included files.\n\n### Verification\nRun the following command in Termux (with root) to verify the fix is active:\n```bash\ncat /vendor/etc/thermal_info_config.json | grep -A 15 \"VIRTUAL-SKIN-CPU-LIGHT-ODPM\"\n# Ensure \"PollingDelay\" is now 5000.\n```\nVerify the included files as well:\n```bash\ncat /vendor/etc/thermal_info_config_throttling.json | rg -n \"VIRTUAL-SKIN-CPU-LIGHT-ODPM\" -C2\ncat /vendor/etc/thermal_info_config_charge.json | rg -n \"PollingDelay\" -C1\n```\n\n🛠 Installation\n * Download the thermal_fix.zip from the Releases tab.\n * Install via Magisk Manager or KernelSU.\n * Reboot your device.\n\n ⚠️ Disclaimer\n This module modifies system thermal parameters. Use at your own risk. While it is designed to increase safety by enforcing earlier throttling, the author is not responsible for any damage to your device.\n",
+  "readmeHTML": "<h1>Pixel 10 Pro Thermal Polling Fix (Android 16)</h1>\n\n<p>> [!IMPORTANT]</p>\n<p>> <b>RETIRED — DO NOT INSTALL.</b> This module is redundant on any firmware released after the initial Android 16 QPR builds: stock corrected the 5-minute thermal polling delay in a straight firmware release, so this overlay no longer applies to current builds and may conflict with the fixed stock configs. No further updates are planned. Left up for historical reference only.</p>\n\n<h2>📢 DISCLAIMER</h2>\n<p>I am very much a hobby dev, and new to rooting android devices. I made this repository to document my findings as I am learning. Please only implement the module if you know what you are doing, and always keep backups in case of something not working as intended.</p>\n\n<p> Asurgical Magisk/KernelSU module to correct a 5-minute thermal polling delay found in the initial Android 16 QPR builds for the Pixel 10 Pro.</p>\n\n<h2>🚨 The Issue</h2>\n<p>In the stock Android 16 firmware for the Pixel 10 Pro, the <code>PollingDelay</code> for critical thermal sensors is incorrectly set to <b>300,000ms</b> (5 minutes).</p>\n\n<p>This creates a massive \"blind spot\" in the system's thermal management. During heavy workloads, the CPU can hit 90°C+ before the Thermal HAL even attempts to sample the temperature, leading to heat soak and potential long-term battery degradation.</p>\n\n<h2>✅ The Fix</h2>\n<p>This module overlays the stock thermal configs with focused edits:</p>\n<li> **Reduces Polling Delay:** Sets `PollingDelay` to **5,000ms** for the `VIRTUAL-SKIN*` sensors across `thermal_info_config.json`, `thermal_info_config_throttling.json`, and `thermal_info_config_charge.json`.</li>\n<li> **Keeps OEM thresholds:** Restores the original `HotThreshold`, `CdevCeilingFrequency`, and `Profile` data so only the sampling cadence changes.</li>\n<li> **Retains Hysteresis & Passive Delay:** Keeps the default `PassiveDelay` (7,000ms) and `HotHysteresis` values to avoid oscillating CPU-frequency decisions even as the sensor updates faster.</li>\n\n<p>---</p>\n\n<h2>📋 Technical Evidence & Root Cause</h2>\n<p><b>Affected Component:</b> <code>/vendor/etc/thermal_info_config.json</code></p>\n<p><b>Target Config:</b> <code>VIRTUAL-SKIN-CPU-LIGHT-ODPM</code></p>\n\n<p>The stock configuration effectively disables real-time thermal management for burst workloads. By the time the 300s timer expires, the device has already reached thermal saturation. This module restores the expected behavior for a flagship Tensor G5 device.</p>\n\n<h2>✅ Additional Overlays</h2>\n<li>`/vendor/etc/thermal_info_config_throttling.json` and `thermal_info_config_charge.json` inherit the same 5s polling cadence so the HAL cannot revert to the 300s delay through the included files.</li>\n\n<h3>Verification</h3>\n<p>Run the following command in Termux (with root) to verify the fix is active:</p>\n<pre>cat /vendor/etc/thermal_info_config.json | grep -A 15 \"VIRTUAL-SKIN-CPU-LIGHT-ODPM\"\n# Ensure \"PollingDelay\" is now 5000.</pre>\n<p>Verify the included files as well:</p>\n<pre>cat /vendor/etc/thermal_info_config_throttling.json | rg -n \"VIRTUAL-SKIN-CPU-LIGHT-ODPM\" -C2\ncat /vendor/etc/thermal_info_config_charge.json | rg -n \"PollingDelay\" -C1</pre>\n\n<p>🛠 Installation</p>\n<p> * Download the thermal_fix.zip from the Releases tab.</p>\n<p> * Install via Magisk Manager or KernelSU.</p>\n<p> * Reboot your device.</p>\n\n<p> ⚠️ Disclaimer</p>\n<p> This module modifies system thermal parameters. Use at your own risk. While it is designed to increase safety by enforcing earlier throttling, the author is not responsible for any damage to your device.</p>",
+  "homepageUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix",
+  "sourceUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix",
+  "url": "https://github.com/marx161-cmd/pixel-10-thermal-fix",
+  "latestRelease": {
+    "name": "v1.3",
+    "version": "v1.3",
+    "time": "2026-01-04T03:43:11Z",
+    "downloadUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix/releases/download/v1.3/thermal_fix_v1.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-01-04T03:43:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "thermal_fix_v1.3.zip",
+          "downloadUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix/releases/download/v1.3/thermal_fix_v1.3.zip",
+          "size": 21216,
+          "downloadCount": 123
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-01-01T19:21:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "thermal_fix_v1.2.zip",
+          "downloadUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix/releases/download/v1.2/thermal_fix_v1.2.zip",
+          "size": 16187,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2025-12-31T09:00:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "thermal_fix.zip",
+          "downloadUrl": "https://github.com/marx161-cmd/pixel-10-thermal-fix/releases/download/v1.0/thermal_fix.zip",
+          "size": 4014,
+          "downloadCount": 20
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

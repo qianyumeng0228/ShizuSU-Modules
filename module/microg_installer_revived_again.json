@@ -1,0 +1,100 @@
+{
+  "readme": "[![Telegram](https://img.shields.io/badge/Telegram-microGRevivedAgain-blue?logo=telegram)](https://t.me/microGRevivedAgain)\n[![Website](https://img.shields.io/badge/Website-spacealtctrl.net-blue?logo=firefoxbrowser&logoColor=white)](https://spacealtctrl.net)\n\n# microG Installer Revived… again\n\n---\n\nA Magisk / KernelSU module that converts your installed microG GmsCore from a user app into a system-level app to improve Play Integrity behavior and testing on custom or rooted devices.\n\nThis module improves how microG interacts with the Android system by converting the `GmsCore` and `Companion` apps into privileged system-level apps (`priv-app`).\n\n> If this module helps you, please consider sharing your Play Integrity results in the [Telegram Results Group](https://t.me/microGRevivedAgainResults).\n\n---\n\n### Features\n\n- **System-Level Promotion**: Promotes your installed microG and Companion apps to `/system/product/priv-app/` or `/system/priv-app/` for system-level permissions.\n- **In-App WebUI**: Manage everything from a clean interface embedded directly inside KernelSU. For Magisk users, the [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) module is recommended to view this interface.\n- **Promote / Demote**: Easily toggle the module active state and manage your microG system apps.\n- **Built-in microG Updater**: Features an \"Installer\" that fetches the latest official releases from the microG GitHub repository, allowing you to quickly download and update your APKs.\n- **Multi-Language Support**: The WebUI is localized for community-driven translations.\n\n---\n\n### Requirements\n1. **Signature Spoofing**: Your ROM must support signature spoofing natively, or you must install a spoofing module like [FakeGApps](https://github.com/whew-inc/FakeGApps/releases) via LSPosed.\n2. **Pre-installed microG**: If you are a Magisk user and are **not** using the WebUI X interface, you *must* explicitly install both the `GmsCore` and `Companion`/`Play Store` APKs manually on your device before flashing the module. `customize.sh` takes care of automatically detecting and promoting both apps during installation.\n\n---\n\n### Installation\n\n1. Install the microG `GmsCore` and `Companion`/`Play Store` APKs manually on your device.\n2. Flash the `microg_installer_revived_again` ZIP file via Magisk or KernelSU.\n3. Reboot your device.\n4. **KernelSU Users**: Open the KernelSU app, navigate to the Modules tab, and tap the module to open the WebUI. From here you can check status, manage updates, and access logs (if enabled).\n5. **Magisk Users**: I suggest using [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) to interact with the module's interface. Otherwise, rely on `customize.sh` which will automatically promote the APKs you installed prior to flashing.\n\n---\n\n### Support & Contributions\n\nIf you have/find a bug, please turn on \"Debug logging\" in the WebUI Settings, reproduce the issue, check the **Logs** tab, and copy the output into a new [GitHub Issue](https://github.com/spacealtctrl/microg_installer_revived_again/issues).\n\nIf you'd like to help translate the WebUI into your language, please fork the repository and see the `webui/src/locales/` directory!\n\n---\n\n### Credits\n- **[microG Project](https://microg.org)** for the core GmsCore implementation.\n- **[nift4](https://github.com/nift4/microg_installer_revived)** for the original module.\n- **Hieu Van** \n- **All Telegram community members for testing and feedback.\n",
+  "readmeHTML": "<p><a href=\"https://img.shields.io/badge/Telegram-microGRevivedAgain-blue?logo=telegram\">![Telegram</a>](https://t.me/microGRevivedAgain)</p>\n<p><a href=\"https://img.shields.io/badge/Website-spacealtctrl.net-blue?logo=firefoxbrowser&logoColor=white\">![Website</a>](https://spacealtctrl.net)</p>\n\n<h1>microG Installer Revived… again</h1>\n\n<p>---</p>\n\n<p>A Magisk / KernelSU module that converts your installed microG GmsCore from a user app into a system-level app to improve Play Integrity behavior and testing on custom or rooted devices.</p>\n\n<p>This module improves how microG interacts with the Android system by converting the <code>GmsCore</code> and <code>Companion</code> apps into privileged system-level apps (<code>priv-app</code>).</p>\n\n<p>> If this module helps you, please consider sharing your Play Integrity results in the <a href=\"https://t.me/microGRevivedAgainResults\">Telegram Results Group</a>.</p>\n\n<p>---</p>\n\n<h3>Features</h3>\n\n<li>**System-Level Promotion**: Promotes your installed microG and Companion apps to `/system/product/priv-app/` or `/system/priv-app/` for system-level permissions.</li>\n<li>**In-App WebUI**: Manage everything from a clean interface embedded directly inside KernelSU. For Magisk users, the [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) module is recommended to view this interface.</li>\n<li>**Promote / Demote**: Easily toggle the module active state and manage your microG system apps.</li>\n<li>**Built-in microG Updater**: Features an \"Installer\" that fetches the latest official releases from the microG GitHub repository, allowing you to quickly download and update your APKs.</li>\n<li>**Multi-Language Support**: The WebUI is localized for community-driven translations.</li>\n\n<p>---</p>\n\n<h3>Requirements</h3>\n<li>**Signature Spoofing**: Your ROM must support signature spoofing natively, or you must install a spoofing module like [FakeGApps](https://github.com/whew-inc/FakeGApps/releases) via LSPosed.</li>\n<li>**Pre-installed microG**: If you are a Magisk user and are **not** using the WebUI X interface, you *must* explicitly install both the `GmsCore` and `Companion`/`Play Store` APKs manually on your device before flashing the module. `customize.sh` takes care of automatically detecting and promoting both apps during installation.</li>\n\n<p>---</p>\n\n<h3>Installation</h3>\n\n<li>Install the microG `GmsCore` and `Companion`/`Play Store` APKs manually on your device.</li>\n<li>Flash the `microg_installer_revived_again` ZIP file via Magisk or KernelSU.</li>\n<li>Reboot your device.</li>\n<li>**KernelSU Users**: Open the KernelSU app, navigate to the Modules tab, and tap the module to open the WebUI. From here you can check status, manage updates, and access logs (if enabled).</li>\n<li>**Magisk Users**: I suggest using [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) to interact with the module's interface. Otherwise, rely on `customize.sh` which will automatically promote the APKs you installed prior to flashing.</li>\n\n<p>---</p>\n\n<h3>Support & Contributions</h3>\n\n<p>If you have/find a bug, please turn on \"Debug logging\" in the WebUI Settings, reproduce the issue, check the <b>Logs</b> tab, and copy the output into a new <a href=\"https://github.com/spacealtctrl/microg_installer_revived_again/issues\">GitHub Issue</a>.</p>\n\n<p>If you'd like to help translate the WebUI into your language, please fork the repository and see the <code>webui/src/locales/</code> directory!</p>\n\n<p>---</p>\n\n<h3>Credits</h3>\n<li>**[microG Project](https://microg.org)** for the core GmsCore implementation.</li>\n<li>**[nift4](https://github.com/nift4/microg_installer_revived)** for the original module.</li>\n<li>**Hieu Van**</li>\n<li>**All Telegram community members for testing and feedback.</li>",
+  "homepageUrl": "spacealtctrl.net",
+  "sourceUrl": "https://github.com/spacealtctrl/microg_installer_revived_again",
+  "url": "https://github.com/spacealtctrl/microg_installer_revived_again",
+  "latestRelease": {
+    "name": "1.0.1-0",
+    "version": "1.0.1-0",
+    "time": "2026-05-07T17:08:26Z",
+    "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/1.0.1-0/microg_installer_revived_again-1.0.1-0.zip"
+  },
+  "releases": [
+    {
+      "name": "1.0.1-0",
+      "tagName": "1.0.1-0",
+      "publishedAt": "2026-05-07T17:08:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-1.0.1-0.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/1.0.1-0/microg_installer_revived_again-1.0.1-0.zip",
+          "size": 330203,
+          "downloadCount": 1188
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0-0",
+      "tagName": "v1.0.0-0",
+      "publishedAt": "2026-03-05T10:06:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-v1.0.0-0.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/v1.0.0-0/microg_installer_revived_again-v1.0.0-0.zip",
+          "size": 325354,
+          "downloadCount": 720
+        }
+      ]
+    },
+    {
+      "name": "v0.5.4-0",
+      "tagName": "v0.5.4-0",
+      "publishedAt": "2026-02-09T12:43:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-v5.4.0.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/v0.5.4-0/microg_installer_revived_again-v5.4.0.zip",
+          "size": 193124,
+          "downloadCount": 454
+        }
+      ]
+    },
+    {
+      "name": "v0.5.3-0",
+      "tagName": "v0.5.3-0",
+      "publishedAt": "2026-01-16T15:03:59Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-v5.3.0.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/v0.5.3-0/microg_installer_revived_again-v5.3.0.zip",
+          "size": 193571,
+          "downloadCount": 285
+        }
+      ]
+    },
+    {
+      "name": "v0.5.2-0",
+      "tagName": "v0.5.2-0",
+      "publishedAt": "2025-12-12T11:03:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-v5.2.0.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/v0.5.2-0/microg_installer_revived_again-v5.2.0.zip",
+          "size": 193371,
+          "downloadCount": 158
+        }
+      ]
+    },
+    {
+      "name": "v0.5.1-3",
+      "tagName": "v0.5.1-3",
+      "publishedAt": "2025-11-18T06:58:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "microg_installer_revived_again-v5.1.3.zip",
+          "downloadUrl": "https://github.com/spacealtctrl/microg_installer_revived_again/releases/download/v0.5.1-3/microg_installer_revived_again-v5.1.3.zip",
+          "size": 193369,
+          "downloadCount": 135
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

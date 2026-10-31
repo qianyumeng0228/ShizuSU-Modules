@@ -1,0 +1,74 @@
+{
+  "readme": "# LineageOS KernelSU Next + SUSFS kernels\n\nKernels for LineageOS devices with [KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next) and [SUSFS](https://gitlab.com/simonpunk/susfs4ksu) built in. Everything builds on GitHub Actions from the official LineageOS kernel source. Each build is repacked into the official LineageOS nightly `boot.img` for that device.\n\nPatch flow follows [WildKernels/OnePlus_KernelSU_SUSFS](https://github.com/WildKernels/OnePlus_KernelSU_SUSFS), adapted to LineageOS kernel trees.\n\n## Supported devices\n\n- **OnePlus 11 (salami)**\n  - LineageOS: 24.0\n  - Kernel: [android_kernel_oneplus_sm8550](https://github.com/LineageOS/android_kernel_oneplus_sm8550), 5.15 GKI (android13-5.15)\n  - Flash: `boot`\n  - Status: builds in CI\n\nMore devices can be added if their LineageOS kernel is GKI 5.10, 5.15, 6.1 or 6.6. Open an issue with the device codename.\n\n## Downloads\n\nGrab the latest build from [Releases](../../releases/latest):\n\n- `boot.img`: stock LineageOS `boot.img` with the new kernel swapped in\n- `AK3_*.zip`: AnyKernel3 zip that flashes from recovery\n- `info.txt`: LineageOS build date, kernel release, KernelSU Next and SUSFS versions\n- `SHA256SUMS`: file checksums\n\nEach `boot.img` matches **one** LineageOS build. Check the date in `info.txt` against **Settings → About phone**.\n\n## Install\n\n1. Update LineageOS to the build listed in `info.txt`.\n2. Test without flashing:\n   ```\n   adb reboot bootloader\n   fastboot boot boot.img\n   ```\n3. If it boots, install the [KernelSU Next manager](https://github.com/KernelSU-Next/KernelSU-Next/releases). It should show the kernel as supported, with SUSFS listed. Then flash:\n   ```\n   fastboot flash boot boot.img\n   ```\n   You can flash the AK3 zip from recovery instead.\n4. Install a SUSFS userspace module if you want to configure hiding.\n\nTo roll back, flash the stock `boot.img` for your build from [download.lineageos.org](https://download.lineageos.org).\n\n### boot or init_boot?\n\nFlash **`boot`**. KernelSU Next with SUSFS is built into the kernel, and on these devices the kernel lives in `boot`. `init_boot` only holds the ramdisk. Guides that flash `init_boot` are for Magisk or KernelSU in loadable-module (LKM) mode. That method can't add SUSFS. Leave `init_boot` stock.\n\n## After a LineageOS update\n\nThe update overwrites `boot`, so you lose root. Wait for a new release that matches your build, or run the workflow yourself, then flash again.\n\n## What the build does\n\n- Pulls the latest LineageOS nightly `boot.img` from the official API and checks its sha256.\n- Clones the LineageOS kernel plus its `-modules` tree, and uses the clang version the kernel specifies.\n- Adds KernelSU Next and the SUSFS kernel patches, with WildKernels' fixups for KernelSU Next.\n- Sets the kernel version string to the same value as stock, so the stock vendor modules still load. The build fails if the two differ.\n- Uses ThinLTO instead of full LTO, which runs out of memory on hosted runners.\n- Repacks the stock `boot.img` with magiskboot, builds the AK3 zip, and publishes a release.\n\nPinned by default:\n- KernelSU Next `4cb8ee68` (33388)\n- susfs4ksu `2ad2973` (v2.3.0)\n\nNewer KernelSU Next moves SUSFS into a separately loaded module, which these in-kernel patches don't support. You can override both pins under **Actions → Run workflow**.\n\n## Build it yourself\n\nFork, then go to **Actions → Build salami KSUN + SUSFS kernel → Run workflow**. The output appears as a release in your fork.\n\n## Troubleshooting\n\nPlay Integrity failing? See [docs/play-integrity-debug.md](docs/play-integrity-debug.md).\n\n## Disclaimer\n\nUnofficial build, not affiliated with LineageOS or OnePlus. Unlocked bootloader required. Keep the stock `boot.img` so you can roll back.\n",
+  "readmeHTML": "<h1>LineageOS KernelSU Next + SUSFS kernels</h1>\n\n<p>Kernels for LineageOS devices with <a href=\"https://github.com/KernelSU-Next/KernelSU-Next\">KernelSU Next</a> and <a href=\"https://gitlab.com/simonpunk/susfs4ksu\">SUSFS</a> built in. Everything builds on GitHub Actions from the official LineageOS kernel source. Each build is repacked into the official LineageOS nightly <code>boot.img</code> for that device.</p>\n\n<p>Patch flow follows <a href=\"https://github.com/WildKernels/OnePlus_KernelSU_SUSFS\">WildKernels/OnePlus_KernelSU_SUSFS</a>, adapted to LineageOS kernel trees.</p>\n\n<h2>Supported devices</h2>\n\n<li>**OnePlus 11 (salami)**</li>\n<p>  - LineageOS: 24.0</p>\n<p>  - Kernel: <a href=\"https://github.com/LineageOS/android_kernel_oneplus_sm8550\">android_kernel_oneplus_sm8550</a>, 5.15 GKI (android13-5.15)</p>\n<p>  - Flash: <code>boot</code></p>\n<p>  - Status: builds in CI</p>\n\n<p>More devices can be added if their LineageOS kernel is GKI 5.10, 5.15, 6.1 or 6.6. Open an issue with the device codename.</p>\n\n<h2>Downloads</h2>\n\n<p>Grab the latest build from <a href=\"../../releases/latest\">Releases</a>:</p>\n\n<li>`boot.img`: stock LineageOS `boot.img` with the new kernel swapped in</li>\n<li>`AK3_*.zip`: AnyKernel3 zip that flashes from recovery</li>\n<li>`info.txt`: LineageOS build date, kernel release, KernelSU Next and SUSFS versions</li>\n<li>`SHA256SUMS`: file checksums</li>\n\n<p>Each <code>boot.img</code> matches <b>one</b> LineageOS build. Check the date in <code>info.txt</code> against <b>Settings → About phone</b>.</p>\n\n<h2>Install</h2>\n\n<li>Update LineageOS to the build listed in `info.txt`.</li>\n<li>Test without flashing:</li>\n<p>   ```</p>\n<p>   adb reboot bootloader</p>\n<p>   fastboot boot boot.img</p>\n<p>   ```</p>\n<li>If it boots, install the [KernelSU Next manager](https://github.com/KernelSU-Next/KernelSU-Next/releases). It should show the kernel as supported, with SUSFS listed. Then flash:</li>\n<p>   ```</p>\n<p>   fastboot flash boot boot.img</p>\n<p>   ```</p>\n<p>   You can flash the AK3 zip from recovery instead.</p>\n<li>Install a SUSFS userspace module if you want to configure hiding.</li>\n\n<p>To roll back, flash the stock <code>boot.img</code> for your build from <a href=\"https://download.lineageos.org\">download.lineageos.org</a>.</p>\n\n<h3>boot or init_boot?</h3>\n\n<p>Flash <b><code>boot</code></b>. KernelSU Next with SUSFS is built into the kernel, and on these devices the kernel lives in <code>boot</code>. <code>init_boot</code> only holds the ramdisk. Guides that flash <code>init_boot</code> are for Magisk or KernelSU in loadable-module (LKM) mode. That method can't add SUSFS. Leave <code>init_boot</code> stock.</p>\n\n<h2>After a LineageOS update</h2>\n\n<p>The update overwrites <code>boot</code>, so you lose root. Wait for a new release that matches your build, or run the workflow yourself, then flash again.</p>\n\n<h2>What the build does</h2>\n\n<li>Pulls the latest LineageOS nightly `boot.img` from the official API and checks its sha256.</li>\n<li>Clones the LineageOS kernel plus its `-modules` tree, and uses the clang version the kernel specifies.</li>\n<li>Adds KernelSU Next and the SUSFS kernel patches, with WildKernels' fixups for KernelSU Next.</li>\n<li>Sets the kernel version string to the same value as stock, so the stock vendor modules still load. The build fails if the two differ.</li>\n<li>Uses ThinLTO instead of full LTO, which runs out of memory on hosted runners.</li>\n<li>Repacks the stock `boot.img` with magiskboot, builds the AK3 zip, and publishes a release.</li>\n\n<p>Pinned by default:</p>\n<li>KernelSU Next `4cb8ee68` (33388)</li>\n<li>susfs4ksu `2ad2973` (v2.3.0)</li>\n\n<p>Newer KernelSU Next moves SUSFS into a separately loaded module, which these in-kernel patches don't support. You can override both pins under <b>Actions → Run workflow</b>.</p>\n\n<h2>Build it yourself</h2>\n\n<p>Fork, then go to <b>Actions → Build salami KSUN + SUSFS kernel → Run workflow</b>. The output appears as a release in your fork.</p>\n\n<h2>Troubleshooting</h2>\n\n<p>Play Integrity failing? See <a href=\"docs/play-integrity-debug.md\">docs/play-integrity-debug.md</a>.</p>\n\n<h2>Disclaimer</h2>\n\n<p>Unofficial build, not affiliated with LineageOS or OnePlus. Unlocked bootloader required. Keep the stock <code>boot.img</code> so you can roll back.</p>",
+  "homepageUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS",
+  "sourceUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS",
+  "url": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS",
+  "latestRelease": {
+    "name": "los24-2026-10-16-ksun33388-susfsv2.3.0-9",
+    "version": "los24-2026-10-16-ksun33388-susfsv2.3.0-9",
+    "time": "2026-10-21T08:17:54Z",
+    "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0-9/AK3_salami_LOS24_KSUN33388_SUSFSv2.3.0_2026-10-16.zip"
+  },
+  "releases": [
+    {
+      "name": "los24-2026-10-16-ksun33388-susfsv2.3.0-9",
+      "tagName": "los24-2026-10-16-ksun33388-susfsv2.3.0-9",
+      "publishedAt": "2026-10-21T08:17:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AK3_salami_LOS24_KSUN33388_SUSFSv2.3.0_2026-10-16.zip",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0-9/AK3_salami_LOS24_KSUN33388_SUSFSv2.3.0_2026-10-16.zip",
+          "size": 22507564,
+          "downloadCount": 0
+        },
+        {
+          "name": "info.txt",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0-9/info.txt",
+          "size": 193,
+          "downloadCount": 0
+        },
+        {
+          "name": "boot.img",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0-9/boot.img",
+          "size": 201326592,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "los24-2026-10-16-ksun33388-susfsv2.3.0",
+      "tagName": "los24-2026-10-16-ksun33388-susfsv2.3.0",
+      "publishedAt": "2026-10-21T07:56:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "AK3_salami_LOS24_KSUN33388_SUSFSv2.3.0_2026-10-16.zip",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0/AK3_salami_LOS24_KSUN33388_SUSFSv2.3.0_2026-10-16.zip",
+          "size": 22509360,
+          "downloadCount": 0
+        },
+        {
+          "name": "info.txt",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0/info.txt",
+          "size": 193,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0/SHA256SUMS",
+          "size": 195,
+          "downloadCount": 0
+        },
+        {
+          "name": "boot.img",
+          "downloadUrl": "https://github.com/fishing-agents/LineageOS_KSUN_SUSFS/releases/download/los24-2026-10-16-ksun33388-susfsv2.3.0/boot.img",
+          "size": 201326592,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

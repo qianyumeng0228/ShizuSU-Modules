@@ -1,0 +1,30 @@
+{
+  "readme": "# Magisk Tailscaled\r\n\r\nThis repository contains a Magisk and KernelSU module for running Tailscale on rooted Android devices.\r\n\r\n## Prerequisites\r\n- Magisk or KernelSU\r\n\r\n## Quick Start & Installation\r\n\r\n1. Download the latest zip file from the [Releases](https://github.com/mgksu/tailscaled/releases/latest) page.\r\n2. Install the downloaded zip file using Magisk & reboot your phone.\r\n3. Open the Terminal.\r\n4. Run `tailscale up --ssh --accept-dns=false` to initiate login.You can skip ssh if you don't need it.\r\n5. Run 'tailscale ip' to retrieve your Tailscale IP.\r\n\r\nAfter installation, the Tailscale daemon (`tailscaled`) will run automatically on boot.\r\n\r\n## Limitation\r\n\r\n- This module only support `arm64` architecture.\r\n\r\n## Tailscale SSH \r\n- For ssh home directory is created at `/data/ssh/root` with Bourne shell (sh) as default shell.\r\n- If you want to change to zsh or any other shell create a file `/data/ssh/root/.profile` with below content assuming you have installed zsh through termux.\r\n```\r\nexport PATH=\"/data/data/com.termux/files/usr/bin:$PATH\"\r\nexport SHELL=\"zsh\"\r\nexec zsh\r\n```\r\n\r\n## Available command\r\n\r\n- `tailscale`: This command  execute tailscale operation.\r\n- `tailscaled`: This command execute tailscaled daemon operation.\r\n- `tailscaled.service`: This command for manage tailscaled service, you can start,stop,restart daemon and view live logs the tailscaled operation.\r\n\r\n### Cannot access other tailnet devices\r\n\r\n1. Verify that `tailscaled.service` is running. If not, restart it with `tailscaled.service restart`.\r\n2. Check if your device is connected to tailscaled and try a ping connection with `tailscale ping <your_tailnet_ip>`.\r\n3. Verify the port you want to access is accessible. You can do this by accessing it with another tailscale device or using the Tailscale Android App.\r\n\r\n### Other Error & Bugs\r\n\r\nYou can explore to the issue tab, if there not exists, you can open issue, for help me resolve the problem, you can include fresh log.\r\n\r\n1. Restart tailscaled with `tailscaled.service restart`\r\n2. Reproduce what are you doing which has problem.\r\n3. Get log at `tailscaled.service log`\r\n\r\n## Notes\r\n\r\nThis module is confirmed to be supported for KernelSU\r\n\r\n## Credits\r\n\r\n- [ANASFANANI & AUTHORS](https://github.com/anasfanani/Magisk-Tailscaled). for the repo structure.\r\n",
+  "readmeHTML": "<h1>Magisk Tailscaled</h1>\n\n<p>This repository contains a Magisk and KernelSU module for running Tailscale on rooted Android devices.</p>\n\n<h2>Prerequisites</h2>\n<li>Magisk or KernelSU</li>\n\n<h2>Quick Start & Installation</h2>\n\n<li>Download the latest zip file from the [Releases](https://github.com/mgksu/tailscaled/releases/latest) page.</li>\n<li>Install the downloaded zip file using Magisk & reboot your phone.</li>\n<li>Open the Terminal.</li>\n<li>Run `tailscale up --ssh --accept-dns=false` to initiate login.You can skip ssh if you don't need it.</li>\n<li>Run 'tailscale ip' to retrieve your Tailscale IP.</li>\n\n<p>After installation, the Tailscale daemon (<code>tailscaled</code>) will run automatically on boot.</p>\n\n<h2>Limitation</h2>\n\n<li>This module only support `arm64` architecture.</li>\n\n<h2>Tailscale SSH</h2>\n<li>For ssh home directory is created at `/data/ssh/root` with Bourne shell (sh) as default shell.</li>\n<li>If you want to change to zsh or any other shell create a file `/data/ssh/root/.profile` with below content assuming you have installed zsh through termux.</li>\n<pre>export PATH=\"/data/data/com.termux/files/usr/bin:$PATH\"\nexport SHELL=\"zsh\"\nexec zsh</pre>\n\n<h2>Available command</h2>\n\n<li>`tailscale`: This command  execute tailscale operation.</li>\n<li>`tailscaled`: This command execute tailscaled daemon operation.</li>\n<li>`tailscaled.service`: This command for manage tailscaled service, you can start,stop,restart daemon and view live logs the tailscaled operation.</li>\n\n<h3>Cannot access other tailnet devices</h3>\n\n<li>Verify that `tailscaled.service` is running. If not, restart it with `tailscaled.service restart`.</li>\n<li>Check if your device is connected to tailscaled and try a ping connection with `tailscale ping <your_tailnet_ip>`.</li>\n<li>Verify the port you want to access is accessible. You can do this by accessing it with another tailscale device or using the Tailscale Android App.</li>\n\n<h3>Other Error & Bugs</h3>\n\n<p>You can explore to the issue tab, if there not exists, you can open issue, for help me resolve the problem, you can include fresh log.</p>\n\n<li>Restart tailscaled with `tailscaled.service restart`</li>\n<li>Reproduce what are you doing which has problem.</li>\n<li>Get log at `tailscaled.service log`</li>\n\n<h2>Notes</h2>\n\n<p>This module is confirmed to be supported for KernelSU</p>\n\n<h2>Credits</h2>\n\n<li>[ANASFANANI & AUTHORS](https://github.com/anasfanani/Magisk-Tailscaled). for the repo structure.</li>",
+  "homepageUrl": "https://github.com/mgksu/tailscaled",
+  "sourceUrl": "https://github.com/mgksu/tailscaled",
+  "url": "https://github.com/mgksu/tailscaled",
+  "latestRelease": {
+    "name": "v1.82.5",
+    "version": "v1.82.5",
+    "time": "2025-05-06T08:07:45Z",
+    "downloadUrl": "https://github.com/mgksu/tailscaled/releases/download/v1.82.5/Magisk-Tailscaled-v1.82.5.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.82.5",
+      "tagName": "v1.82.5",
+      "publishedAt": "2025-05-06T08:07:45Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-Tailscaled-v1.82.5.zip",
+          "downloadUrl": "https://github.com/mgksu/tailscaled/releases/download/v1.82.5/Magisk-Tailscaled-v1.82.5.zip",
+          "size": 6684664,
+          "downloadCount": 906
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

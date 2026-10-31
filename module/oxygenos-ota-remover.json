@@ -1,0 +1,30 @@
+{
+  "readme": "# OxygenOS 16 OTA Remover\n\nKernelSU / Magisk / APatch module that removes OTA update components from OxygenOS 16, preventing forced system updates.\n\nTested on **OnePlus 15** (Android 16, OxygenOS 16). Should work on other OxygenOS 16 devices.\n\n## What it does\n\nRemoves the following system apps via systemless overlay:\n\n| Package | Description |\n|---------|-------------|\n| `com.oplus.ota` | Main OTA updater |\n| `com.oplus.cota` | Component OTA (silent updates) |\n| `com.cota.notification` | COTA notification service |\n| `com.oplus.romupdate` | ROM update checker |\n| `SystemAppUpdateService` | System app update service |\n\nAdditionally, `service.sh` runs after every boot to:\n- Clear cached \"update available\" state (removes the new firmware red dot in Setting)\n- Disable OTA packages via `pm disable-user` as a fallback\n\n## Installation\n\n1. Download the latest `.zip` from [Releases](../../releases)\n2. Open **KernelSU Manager** / **Magisk Manager** / **APatch**\n3. Go to Modules → Install from storage\n4. Select the downloaded zip\n5. Reboot\n\n## Uninstallation\n\nRemove the module from your root manager and reboot. All OTA packages will be re-enabled automatically.\n\n## Compatibility\n\n| Root Method | Supported |\n|-------------|-----------|\n| KernelSU | Yes |\n| Magisk (v20.4+) | Yes |\n| APatch | Yes |\n\n## Verified Devices\n\n| Device | OS | Status |\n|--------|----|--------|\n| OnePlus 15 | OxygenOS 16 (Android 16) | Working |\n\n> If you tested on another device and it doesn't work, please, open an issue with your results.\n\n## Building from source\n\n```bash\ngit clone https://github.com/user/oxygenos-ota-remover.git\ncd oxygenos-ota-remover\n./build.sh\n```\n\nOutput: `build/oxygenos16-ota-remover-v<version>.zip`\n\n## License\n\n[CC BY-NC-SA 4.0](LICENSE) - Non-commercial use only.\n\nCopyright (c) 2026 crankshift\n",
+  "readmeHTML": "<h1>OxygenOS 16 OTA Remover</h1>\n\n<p>KernelSU / Magisk / APatch module that removes OTA update components from OxygenOS 16, preventing forced system updates.</p>\n\n<p>Tested on <b>OnePlus 15</b> (Android 16, OxygenOS 16). Should work on other OxygenOS 16 devices.</p>\n\n<h2>What it does</h2>\n\n<p>Removes the following system apps via systemless overlay:</p>\n\n<p>| Package | Description |</p>\n<p>|---------|-------------|</p>\n<p>| <code>com.oplus.ota</code> | Main OTA updater |</p>\n<p>| <code>com.oplus.cota</code> | Component OTA (silent updates) |</p>\n<p>| <code>com.cota.notification</code> | COTA notification service |</p>\n<p>| <code>com.oplus.romupdate</code> | ROM update checker |</p>\n<p>| <code>SystemAppUpdateService</code> | System app update service |</p>\n\n<p>Additionally, <code>service.sh</code> runs after every boot to:</p>\n<li>Clear cached \"update available\" state (removes the new firmware red dot in Setting)</li>\n<li>Disable OTA packages via `pm disable-user` as a fallback</li>\n\n<h2>Installation</h2>\n\n<li>Download the latest `.zip` from [Releases](../../releases)</li>\n<li>Open **KernelSU Manager** / **Magisk Manager** / **APatch**</li>\n<li>Go to Modules → Install from storage</li>\n<li>Select the downloaded zip</li>\n<li>Reboot</li>\n\n<h2>Uninstallation</h2>\n\n<p>Remove the module from your root manager and reboot. All OTA packages will be re-enabled automatically.</p>\n\n<h2>Compatibility</h2>\n\n<p>| Root Method | Supported |</p>\n<p>|-------------|-----------|</p>\n<p>| KernelSU | Yes |</p>\n<p>| Magisk (v20.4+) | Yes |</p>\n<p>| APatch | Yes |</p>\n\n<h2>Verified Devices</h2>\n\n<p>| Device | OS | Status |</p>\n<p>|--------|----|--------|</p>\n<p>| OnePlus 15 | OxygenOS 16 (Android 16) | Working |</p>\n\n<p>> If you tested on another device and it doesn't work, please, open an issue with your results.</p>\n\n<h2>Building from source</h2>\n\n<pre>git clone https://github.com/user/oxygenos-ota-remover.git\ncd oxygenos-ota-remover\n./build.sh</pre>\n\n<p>Output: <code>build/oxygenos16-ota-remover-v<version>.zip</code></p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">CC BY-NC-SA 4.0</a> - Non-commercial use only.</p>\n\n<p>Copyright (c) 2026 crankshift</p>",
+  "homepageUrl": "https://github.com/crankshift/oxygenos-ota-remover",
+  "sourceUrl": "https://github.com/crankshift/oxygenos-ota-remover",
+  "url": "https://github.com/crankshift/oxygenos-ota-remover",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-02-15T22:13:35Z",
+    "downloadUrl": "https://github.com/crankshift/oxygenos-ota-remover/releases/download/v1.0.0/oxygenos16-ota-remover-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-02-15T22:13:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "oxygenos16-ota-remover-v1.0.0.zip",
+          "downloadUrl": "https://github.com/crankshift/oxygenos-ota-remover/releases/download/v1.0.0/oxygenos16-ota-remover-v1.0.0.zip",
+          "size": 5380,
+          "downloadCount": 357
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（NOASSERTION），使用需自行评估风险"
+}

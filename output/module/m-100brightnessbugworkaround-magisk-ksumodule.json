@@ -1,0 +1,86 @@
+{
+  "readme": "# 100% Brightness Bug Workaround Magisk & KSU Module\n\nA Magisk / KernelSU module that automatically toggles the Always-On Display (AOD) and cycles the screen state upon boot to bypass the 100% brightness bug.\n\n> ### ⚠️ DISCLAIMER ⚠️\n> **I am not responsible** for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!\n\n## What Does It Do?\n\nSome devices experience a bug where the screen brightness gets stuck at 100% after booting if the Always-On Display (AOD) is enabled. Manually turning the screen off and on does not fix it unless AOD is disabled first. This module automates the workaround by temporarily disabling AOD, cycling the screen state, and re-enabling AOD shortly after the device finishes booting.\n\n## How It Works\n\nOnce the boot process completes, the module executes a script that performs the following sequence:\n1. Disables Always-On Display (`settings put secure doze_always_on 0`).\n2. Waits briefly (0.2 seconds), then turns the screen off (`input keyevent 26`).\n3. Waits briefly, then wakes the screen up (`input keyevent 224`).\n4. Re-enables Always-On Display (`settings put secure doze_always_on 1`).\n\n# Installation\n1. [Download the latest release](https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/latest/download/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip).\n2. Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.\n3. Reboot the device.\n4. The screen will briefly cycle off and on after boot, bypassing the brightness bug.\n5. You're all set!\n6. If you experience any issues, please let me know through the [Issues](https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/issues) panel.\n\n# Compatibility\n- Android 8.0+\n- KernelSU or KernelSU Next or Magisk\n",
+  "readmeHTML": "<h1>100% Brightness Bug Workaround Magisk & KSU Module</h1>\n\n<p>A Magisk / KernelSU module that automatically toggles the Always-On Display (AOD) and cycles the screen state upon boot to bypass the 100% brightness bug.</p>\n\n<p>> ### ⚠️ DISCLAIMER ⚠️</p>\n<p>> <b>I am not responsible</b> for *bricked devices*, *dead SD cards*, *thermonuclear war*, or *you getting fired because the alarm app failed*. Please do some research if you have any concerns about features included in this module before flashing it. YOU are choosing to make these modifications, and if you point the finger at me for messing up your device, I will laugh at you!</p>\n\n<h2>What Does It Do?</h2>\n\n<p>Some devices experience a bug where the screen brightness gets stuck at 100% after booting if the Always-On Display (AOD) is enabled. Manually turning the screen off and on does not fix it unless AOD is disabled first. This module automates the workaround by temporarily disabling AOD, cycling the screen state, and re-enabling AOD shortly after the device finishes booting.</p>\n\n<h2>How It Works</h2>\n\n<p>Once the boot process completes, the module executes a script that performs the following sequence:</p>\n<li>Disables Always-On Display (`settings put secure doze_always_on 0`).</li>\n<li>Waits briefly (0.2 seconds), then turns the screen off (`input keyevent 26`).</li>\n<li>Waits briefly, then wakes the screen up (`input keyevent 224`).</li>\n<li>Re-enables Always-On Display (`settings put secure doze_always_on 1`).</li>\n\n<h1>Installation</h1>\n<li>[Download the latest release](https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/latest/download/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip).</li>\n<li>Flash it via **Magisk**, **KernelSU**, or **KernelSU Next**.</li>\n<li>Reboot the device.</li>\n<li>The screen will briefly cycle off and on after boot, bypassing the brightness bug.</li>\n<li>You're all set!</li>\n<li>If you experience any issues, please let me know through the [Issues](https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/issues) panel.</li>\n\n<h1>Compatibility</h1>\n<li>Android 8.0+</li>\n<li>KernelSU or KernelSU Next or Magisk</li>",
+  "homepageUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule",
+  "sourceUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule",
+  "url": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule",
+  "latestRelease": {
+    "name": "v1.0.4",
+    "version": "v1.0.4",
+    "time": "2026-03-26T16:20:11Z",
+    "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.4/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-03-26T16:20:11Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.4/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "size": 7874,
+          "downloadCount": 15
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-03-25T13:19:34Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.3/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "size": 7703,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.2",
+      "tagName": "v1.0.2",
+      "publishedAt": "2026-03-25T12:50:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.2/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "size": 6931,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-03-25T12:22:48Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.1/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "size": 6086,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-03-25T11:57:52Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "downloadUrl": "https://github.com/bcrtvkcs/100BrightnessBugWorkaround-Magisk-KSUModule/releases/download/v1.0.0/100BrightnessBugWorkaround-Magisk-KSUModule-main.zip",
+          "size": 5772,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

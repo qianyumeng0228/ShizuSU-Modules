@@ -1,0 +1,100 @@
+{
+  "readme": "# Unlock CN GMS\nThe GMS is restricted in China on some devices, because of configuration files that declare `cn.google.services` feature.\nBy this restriction, you can not enable `Google Location History` and the `Google Map Timeline` function can not use either.\n\nThis module removes the restriction by replacing these configuration files.\n\nSupported file locations:\n- `/system/etc/permissions/services.cn.google.xml`\n- `/system/etc/permissions/com.oppo.features.cn_google.xml`\n- `/vendor/etc/permissions/services.cn.google.xml`\n- `/product/etc/permissions/services.cn.google.xml`\n- `/product/etc/permissions/cn.google.services.xml`\n- `/product/etc/sysconfig/cn_feature.xml`\n- `/odm/etc/permissions/com.gnss.bds_preference.xml` (Xiaomi 8e5 等机型)\n- `/my_bigball/etc/permissions/oplus_google_cn_gms_features.xml`\n- `/my_product/etc/permissions/oplus_google_cn_gms_features.xml`\n- `/my_heytap/etc/permissions/my_heytap_cn_gms_features.xml`\n\n---\n部分国行手机，或者本地化后的 ROM 中有内置 GMS ，但是某些功能无法使用，比如无法开启 `Google Location History` 服务，无法使用 `Google Map Timeline`，设备无法在 Web 版 Google play 中显示等等。\n\n该模块通过查找并替换所有声明了 `cn.google.services` 的权限配置文件, 具体为删除如下配置行：\n\n ```xml\n <feature name=\"cn.google.services\" />\n <feature name=\"com.google.android.feature.services_updater\" />\n ``` \n 以此来实现去除国行 GMS 的限制。\n\n 注意：部分设备上可能同时存在多个配置文件（如小米 8e5 同时在 `/odm` 和 `/product` 分区下各有一个），本模块会自动处理所有匹配的文件。对于独立挂载的分区（如 `/odm`、`/my_bigball` 等），通过 bind mount 方式替换。\n\n **注意**：为了开启 `Google Location History` 服务，你可能还需要配合其他模块   \n 例如\n Magisk 模块: ~~[Riru - Location Report Enabler](https://github.com/RikkaApps/Riru-LocationReportEnabler)~~     \n 或者 Xposed 模块 [LocationReportEnabler](https://github.com/GhostFlying/LocationReportEnabler)\n",
+  "readmeHTML": "<h1>Unlock CN GMS</h1>\n<p>The GMS is restricted in China on some devices, because of configuration files that declare <code>cn.google.services</code> feature.</p>\n<p>By this restriction, you can not enable <code>Google Location History</code> and the <code>Google Map Timeline</code> function can not use either.</p>\n\n<p>This module removes the restriction by replacing these configuration files.</p>\n\n<p>Supported file locations:</p>\n<li>`/system/etc/permissions/services.cn.google.xml`</li>\n<li>`/system/etc/permissions/com.oppo.features.cn_google.xml`</li>\n<li>`/vendor/etc/permissions/services.cn.google.xml`</li>\n<li>`/product/etc/permissions/services.cn.google.xml`</li>\n<li>`/product/etc/permissions/cn.google.services.xml`</li>\n<li>`/product/etc/sysconfig/cn_feature.xml`</li>\n<li>`/odm/etc/permissions/com.gnss.bds_preference.xml` (Xiaomi 8e5 等机型)</li>\n<li>`/my_bigball/etc/permissions/oplus_google_cn_gms_features.xml`</li>\n<li>`/my_product/etc/permissions/oplus_google_cn_gms_features.xml`</li>\n<li>`/my_heytap/etc/permissions/my_heytap_cn_gms_features.xml`</li>\n\n<p>---</p>\n<p>部分国行手机，或者本地化后的 ROM 中有内置 GMS ，但是某些功能无法使用，比如无法开启 <code>Google Location History</code> 服务，无法使用 <code>Google Map Timeline</code>，设备无法在 Web 版 Google play 中显示等等。</p>\n\n<p>该模块通过查找并替换所有声明了 <code>cn.google.services</code> 的权限配置文件, 具体为删除如下配置行：</p>\n\n<p> ```xml</p>\n<p> <feature name=\"cn.google.services\" /></p>\n<p> <feature name=\"com.google.android.feature.services_updater\" /></p>\n<p> ```</p>\n<p> 以此来实现去除国行 GMS 的限制。</p>\n\n<p> 注意：部分设备上可能同时存在多个配置文件（如小米 8e5 同时在 <code>/odm</code> 和 <code>/product</code> 分区下各有一个），本模块会自动处理所有匹配的文件。对于独立挂载的分区（如 <code>/odm</code>、<code>/my_bigball</code> 等），通过 bind mount 方式替换。</p>\n\n<p> <b>注意</b>：为了开启 <code>Google Location History</code> 服务，你可能还需要配合其他模块</p>\n<p> 例如</p>\n<p> Magisk 模块: ~~<a href=\"https://github.com/RikkaApps/Riru-LocationReportEnabler\">Riru - Location Report Enabler</a>~~</p>\n<p> 或者 Xposed 模块 <a href=\"https://github.com/GhostFlying/LocationReportEnabler\">LocationReportEnabler</a></p>",
+  "homepageUrl": "https://github.com/fei-ke/unlock-cn-gms",
+  "sourceUrl": "https://github.com/fei-ke/unlock-cn-gms",
+  "url": "https://github.com/fei-ke/unlock-cn-gms",
+  "latestRelease": {
+    "name": "v3.3",
+    "version": "v3.3",
+    "time": "2023-05-06T14:20:22Z",
+    "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v3.3/unlock-cn-gms-v3.3.zip"
+  },
+  "releases": [
+    {
+      "name": "v3.3",
+      "tagName": "v3.3",
+      "publishedAt": "2023-05-06T14:20:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v3.3.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v3.3/unlock-cn-gms-v3.3.zip",
+          "size": 2584,
+          "downloadCount": 563
+        }
+      ]
+    },
+    {
+      "name": "v3.2",
+      "tagName": "v3.2",
+      "publishedAt": "2023-02-09T06:03:41Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v3.2.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v3.2/unlock-cn-gms-v3.2.zip",
+          "size": 2714,
+          "downloadCount": 550
+        }
+      ]
+    },
+    {
+      "name": "v3.1",
+      "tagName": "v3.1",
+      "publishedAt": "2022-04-29T08:04:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v3.1.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v3.1/unlock-cn-gms-v3.1.zip",
+          "size": 3396,
+          "downloadCount": 1331
+        }
+      ]
+    },
+    {
+      "name": "v3",
+      "tagName": "v3",
+      "publishedAt": "2022-03-10T05:28:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v3.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v3/unlock-cn-gms-v3.zip",
+          "size": 3362,
+          "downloadCount": 144
+        }
+      ]
+    },
+    {
+      "name": "v2",
+      "tagName": "v2",
+      "publishedAt": "2019-09-14T18:37:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms-v2.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v2/unlock-cn-gms-v2.zip",
+          "size": 7958,
+          "downloadCount": 1240
+        }
+      ]
+    },
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2018-01-10T11:06:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "unlock-cn-gms.zip",
+          "downloadUrl": "https://github.com/fei-ke/unlock-cn-gms/releases/download/v1/unlock-cn-gms.zip",
+          "size": 7019,
+          "downloadCount": 853
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}

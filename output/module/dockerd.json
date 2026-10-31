@@ -1,0 +1,44 @@
+{
+  "readme": "# Magisk Docker\n\nThis repository contains a Magisk and KernelSU module for running Docker on rooted Android devices.\n\n## Prerequisites\n- Magisk or KernelSU installed\n- Docker Patched kernel [See More](https://gist.github.com/FreddieOliveira/efe850df7ff3951cb62d74bd770dce27)\n\n## Quick Start & Installation\n\n1. Download the latest zip file from the [Releases](https://github.com/mgksu/dockerd/releases/latest) page.\n2. Install the downloaded zip file using Magisk & reboot your phone.\n\n\nAfter installation, the Docker daemon (`dockerd`) will run automatically on boot.\n\n## Limitation\n\n- This module only support `arm64` architecture.\n\n## Available command\n\n- `docker`: This executes docker operation.\n- `dockerd.service`: Used for managing dockerd service, you can start,stop,restart daemon and view live logs the dockerd operation.\n\n```sh\nexport PATH=/data/adb/docker/bin:$PATH\nexport DOCKER_HOST=\"unix:///data/adb/docker/run/docker.sock\"\n```\nYou can add above lines to your shell profile (e.g., `~/.bashrc`, `~/.zshrc`) to set the environment variables automatically.\n\n### Cannot connect to docker daemon\n\n- Verify that `dockerd.service` is running. If not, restart it with `dockerd.service restart`.\n- You can also turn on or off dockerd service throuhgh magisk or kernelSU.\n\n### Other Error & Bugs\n\nYou can explore to the issue tab, if there not exists, you can open issue, for help me resolve the problem, you can include fresh log.\n\n1. Restart dockerd with `dockerd.service restart`\n2. Reproduce what are you doing which has problem.\n3. Get log at `dockerd.service log runs` and `dockerd.service log dockerd` \n",
+  "readmeHTML": "<h1>Magisk Docker</h1>\n\n<p>This repository contains a Magisk and KernelSU module for running Docker on rooted Android devices.</p>\n\n<h2>Prerequisites</h2>\n<li>Magisk or KernelSU installed</li>\n<li>Docker Patched kernel [See More](https://gist.github.com/FreddieOliveira/efe850df7ff3951cb62d74bd770dce27)</li>\n\n<h2>Quick Start & Installation</h2>\n\n<li>Download the latest zip file from the [Releases](https://github.com/mgksu/dockerd/releases/latest) page.</li>\n<li>Install the downloaded zip file using Magisk & reboot your phone.</li>\n\n\n<p>After installation, the Docker daemon (<code>dockerd</code>) will run automatically on boot.</p>\n\n<h2>Limitation</h2>\n\n<li>This module only support `arm64` architecture.</li>\n\n<h2>Available command</h2>\n\n<li>`docker`: This executes docker operation.</li>\n<li>`dockerd.service`: Used for managing dockerd service, you can start,stop,restart daemon and view live logs the dockerd operation.</li>\n\n<pre>export PATH=/data/adb/docker/bin:$PATH\nexport DOCKER_HOST=\"unix:///data/adb/docker/run/docker.sock\"</pre>\n<p>You can add above lines to your shell profile (e.g., <code>~/.bashrc</code>, <code>~/.zshrc</code>) to set the environment variables automatically.</p>\n\n<h3>Cannot connect to docker daemon</h3>\n\n<li>Verify that `dockerd.service` is running. If not, restart it with `dockerd.service restart`.</li>\n<li>You can also turn on or off dockerd service throuhgh magisk or kernelSU.</li>\n\n<h3>Other Error & Bugs</h3>\n\n<p>You can explore to the issue tab, if there not exists, you can open issue, for help me resolve the problem, you can include fresh log.</p>\n\n<li>Restart dockerd with `dockerd.service restart`</li>\n<li>Reproduce what are you doing which has problem.</li>\n<li>Get log at `dockerd.service log runs` and `dockerd.service log dockerd`</li>",
+  "homepageUrl": "https://github.com/mgksu/dockerd",
+  "sourceUrl": "https://github.com/mgksu/dockerd",
+  "url": "https://github.com/mgksu/dockerd",
+  "latestRelease": {
+    "name": "v28.2.1",
+    "version": "v28.2.1",
+    "time": "2025-05-29T09:04:18Z",
+    "downloadUrl": "https://github.com/mgksu/dockerd/releases/download/v28.2.1/Magisk-Dockerd-v28.2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v28.2.1",
+      "tagName": "v28.2.1",
+      "publishedAt": "2025-05-29T09:04:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-Dockerd-v28.2.1.zip",
+          "downloadUrl": "https://github.com/mgksu/dockerd/releases/download/v28.2.1/Magisk-Dockerd-v28.2.1.zip",
+          "size": 71573162,
+          "downloadCount": 1741
+        }
+      ]
+    },
+    {
+      "name": "v28.1.1",
+      "tagName": "v28.1.1",
+      "publishedAt": "2025-05-08T08:07:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Magisk-Dockerd-v28.1.1.zip",
+          "downloadUrl": "https://github.com/mgksu/dockerd/releases/download/v28.1.1/Magisk-Dockerd-v28.1.1.zip",
+          "size": 71712340,
+          "downloadCount": 79
+        }
+      ]
+    }
+  ],
+  "note": "管理员背书收录：上游许可证未声明或不明确（未声明），使用需自行评估风险"
+}
