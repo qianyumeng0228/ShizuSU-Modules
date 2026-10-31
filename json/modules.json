@@ -1,9 +1,17 @@
 {
+  "id": "shizusu-modules",
+  "name": "ShizuSU 模块仓库",
+  "description": "ShizuSU 自建模块收录中心：A 路线（ShizuSU 管理器原生源）+ B 路线（MMRL 兼容）双输出。",
   "modules": [
     {
       "id": "zygisksu",
+      "name": "Zygisk Next",
       "version": "v1.5.2",
       "versionCode": 0,
+      "author": "Nullptr",
+      "description": "独立 Zygisk 实现，为 KernelSU 提供 Zygisk API，可替代 Magisk 内置 Zygisk",
+      "stars": 994,
+      "timestamp": 1791901486.0,
       "latest": {
         "zipUrl": "https://github.com/LSPosed/ZygiskNext/releases/download/v1.5.2/Zygisk-Next-1.5.2-864-a4a72ce-release.zip",
         "changelog": ""
@@ -32,12 +40,18 @@
         "changelog": "",
         "note": "官方仓库已迁至 LSPosed 组织（原 Dr-TSNG/ZygiskNext）"
       },
-      "timestamp": 1791901486.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "playintegrityfix",
+      "name": "Play Integrity Fork",
       "version": "v18",
       "versionCode": 0,
+      "author": "osm0sis",
+      "description": "修复 Play Integrity / SafetyNet 检测结果，支持自定义字段与属性",
+      "stars": 4635,
+      "timestamp": 1788024836.0,
       "latest": {
         "zipUrl": "https://github.com/osm0sis/PlayIntegrityFork/releases/download/v18/PlayIntegrityFork-v18.zip",
         "changelog": ""
@@ -66,12 +80,18 @@
         "changelog": "",
         "note": "原 chiteroman/PlayIntegrityFork 随作者账号受限，改用活跃的 osm0sis fork"
       },
-      "timestamp": 1788024836.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "tricky_store",
+      "name": "TrickyStore",
       "version": "1.4.1",
       "versionCode": 0,
+      "author": "5ec1cff",
+      "description": "模拟硬件密钥库，通过 Play Integrity 与设备认证（Key Attestation）",
+      "stars": 6439,
+      "timestamp": 1762077397.0,
       "latest": {
         "zipUrl": "https://github.com/5ec1cff/TrickyStore/releases/download/1.4.1/Tricky-Store-v1.4.1-245-72b2e84-release.zip",
         "changelog": ""
@@ -99,12 +119,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1762077397.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "bindhosts",
+      "name": "bindhosts",
       "version": "v2.1.5",
       "versionCode": 0,
+      "author": "backslashxx",
+      "description": "无系统挂载的 hosts 广告屏蔽模块，支持 APatch / KernelSU / Magisk",
+      "stars": 1511,
+      "timestamp": 1787535828.0,
       "latest": {
         "zipUrl": "https://github.com/bindhosts/bindhosts/releases/download/v2.1.5/bindhosts.zip",
         "changelog": ""
@@ -133,12 +159,18 @@
         "changelog": "",
         "note": "已迁移至 bindhosts 组织（原 backslashxx/bindhosts）"
       },
-      "timestamp": 1787535828.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "device_faker",
+      "name": "Device Faker",
       "version": "v1.6.0",
       "versionCode": 0,
+      "author": "Seyud",
+      "description": "可自定义配置的 Zygisk 机型伪装模块",
+      "stars": 857,
+      "timestamp": 1790417950.0,
       "latest": {
         "zipUrl": "https://github.com/Seyud/device_faker/releases/download/v1.6.0/device_faker_v1.6.0.zip",
         "changelog": ""
@@ -166,12 +198,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790417950.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "meta-hybrid",
+      "name": "Hybrid Mount",
       "version": "v6.2.5",
       "versionCode": 0,
+      "author": "由崎黑板",
+      "description": "新一代挂载元模块，支持 OverlayFS、Magic Mount 与 HymoFS",
+      "stars": 1785,
+      "timestamp": 1792548612.0,
       "latest": {
         "zipUrl": "https://github.com/Hybrid-Mount/meta-hybrid_mount/releases/download/v6.2.5/Hybrid-Mount-6.2.5-2118.zip",
         "changelog": ""
@@ -201,12 +239,18 @@
         "note": "元模块由 MetaManager 统一管理，不直接安装为 Magisk/KernelSU 模块",
         "origin": "元模块（metamodule）"
       },
-      "timestamp": 1792548612.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "netproxy",
+      "name": "NetProxy",
       "version": "v8.6.2",
       "versionCode": 0,
+      "author": "Fanju",
+      "description": "基于 sing-box 内核的 Android 透明代理模块，支持一键启停",
+      "stars": 1314,
+      "timestamp": 1792989578.0,
       "latest": {
         "zipUrl": "https://github.com/Fanju6/NetProxy-Magisk/releases/download/v8.6.2/NetProxy_v8.6.2_1090.zip",
         "changelog": ""
@@ -234,12 +278,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792989578.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "MagicNet",
+      "name": "MagicNet",
       "version": "v1.8.1",
       "versionCode": 0,
+      "author": "LIghtJUNction",
+      "description": "让 Android 以 tun 模式使用 mihomo 内核",
+      "stars": 212,
+      "timestamp": 1793283701.0,
       "latest": {
         "zipUrl": "https://github.com/LIghtJUNction/MagicNet/releases/download/v1.8.1/MagicNet-component-bin-ecapture-361016d000bed2c0ddb41be2dbd0aa62725ef1ff78a15d3a18448874be21b03b.zip",
         "changelog": ""
@@ -267,12 +317,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793283701.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magic_mount_rs",
+      "name": "Magic Mount-rs",
       "version": "v4.1.12",
       "versionCode": 0,
+      "author": "生于生时 亡于亡刻",
+      "description": "基于 MKSU 的 Magic Mount 元模块实现（Rust 版）",
+      "stars": 590,
+      "timestamp": 1793396515.0,
       "latest": {
         "zipUrl": "https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/download/v4.1.12/magic_mount_rs-4.1.12-959-arm64.zip",
         "changelog": ""
@@ -302,12 +358,18 @@
         "note": "元模块由 MetaManager 统一管理，不直接安装为 Magisk/KernelSU 模块",
         "origin": "元模块（metamodule）"
       },
-      "timestamp": 1793396515.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "FreePPS",
+      "name": "FreePPS",
       "version": "v1.7.0",
       "versionCode": 0,
+      "author": "Seyud",
+      "description": "启用米系设备的公版 PPS 快充支持",
+      "stars": 306,
+      "timestamp": 1787309540.0,
       "latest": {
         "zipUrl": "https://github.com/Seyud/FreePPS/releases/download/v1.7.0/FreePPS_v1.7.0.zip",
         "changelog": ""
@@ -335,12 +397,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1787309540.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "Mediatek_Mali_GPU_Governor",
+      "name": "天玑GPU调速器",
       "version": "v2.12.5",
       "versionCode": 0,
+      "author": "Seyud",
+      "description": "联发科 Mali GPU 动态调速器，优化全场景功耗与性能平衡",
+      "stars": 82,
+      "timestamp": 1791777615.0,
       "latest": {
         "zipUrl": "https://github.com/Seyud/Mediatek_Mali_GPU_Governor/releases/download/v2.12.5/Mediatek_Mali_GPU_Governor_v2.12.5.zip",
         "changelog": ""
@@ -368,12 +436,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791777615.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "deviceidchanger",
+      "name": "DeviceID/SSAID Changer",
       "version": "v1.2.1",
       "versionCode": 0,
+      "author": "sidex15",
+      "description": "WebUI 模块，修改已 Root 安卓设备的 SSAID / 设备 ID",
+      "stars": 286,
+      "timestamp": 1764517502.0,
       "latest": {
         "zipUrl": "https://github.com/sidex15/deviceidchanger/releases/download/v1.2.1/DeviceID-Changer.zip",
         "changelog": ""
@@ -401,12 +475,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1764517502.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "HyperUnlocked",
+      "name": "HyperUnlocked",
       "version": "v2.3.2",
       "versionCode": 0,
+      "author": "ukriu",
+      "description": "解锁小米设备高端功能的模块，支持 Magisk / KernelSU / APatch",
+      "stars": 260,
+      "timestamp": 1792004362.0,
       "latest": {
         "zipUrl": "https://github.com/ukriu/HyperUnlocked/releases/download/v2.3.2/HyperUnlocked.zip",
         "changelog": ""
@@ -434,12 +514,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792004362.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "AZenith",
+      "name": "AZenith",
       "version": "AZenith-5.3",
       "versionCode": 0,
+      "author": "Liliya",
+      "description": "通用性能调优模块",
+      "stars": 138,
+      "timestamp": 1792766759.0,
       "latest": {
         "zipUrl": "https://github.com/Liliya2727/AZenith/releases/download/AZenith-5.3/AZenith-5.3-2049-56aa3446-Stellars-Beta.zip",
         "changelog": ""
@@ -467,12 +553,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792766759.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygisk_lsposed",
+      "name": "LSPosed",
       "version": "v2.2",
       "versionCode": 0,
+      "author": "LSPosed Developers",
+      "description": "增强版 Xposed 框架，支持 Android 9~17，需启用 Zygisk",
+      "stars": 12976,
+      "timestamp": 1785836309.0,
       "latest": {
         "zipUrl": "https://github.com/JingMatrix/Vector/releases/download/v2.2/Vector-v2.2-3080-Debug.zip",
         "changelog": ""
@@ -501,12 +593,18 @@
         "changelog": "",
         "note": "KernelSU/APatch 分支（活跃维护），对应手机模块 zygisk_lsposed"
       },
-      "timestamp": 1785836309.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hma_oss_zygisk",
+      "name": "HMA-OSS",
       "version": "oss-173",
       "versionCode": 0,
+      "author": "frknkrc44",
+      "description": "隐藏应用列表、设置、包安装器等信息的 Zygisk 模块（开源版）",
+      "stars": 3822,
+      "timestamp": 1790729004.0,
       "latest": {
         "zipUrl": "https://github.com/frknkrc44/HMA-OSS/releases/download/oss-173/HMA-OSS-ZYGISK-oss-173-debug.zip",
         "changelog": ""
@@ -535,12 +633,18 @@
         "changelog": "",
         "note": "对应手机模块 hma_oss_zygisk"
       },
-      "timestamp": 1790729004.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygisk-assistant",
+      "name": "Zygisk-Assistant",
       "version": "v2.1.4",
       "versionCode": 0,
+      "author": "snake-4",
+      "description": "为 KernelSU / Magisk / APatch 隐藏 root 的 Zygisk 模块，用法类似 Shamiko",
+      "stars": 2662,
+      "timestamp": 1740269915.0,
       "latest": {
         "zipUrl": "https://github.com/snake-4/Zygisk-Assistant/releases/download/v2.1.4/Zygisk-Assistant-v2.1.4-1013f8a-debug.zip",
         "changelog": ""
@@ -568,12 +672,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1740269915.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ksuwebui",
+      "name": "KsuWebUI",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "5ec1cff",
+      "description": "独立的 WebUI 面板应用（供无内置 WebUI 的 KernelSU 系使用）",
+      "stars": 800,
+      "timestamp": 1729871829.0,
       "latest": {
         "zipUrl": "https://github.com/5ec1cff/KsuWebUIStandalone/releases/download/v1.0/KsuWebUI-1.0-34-release.apk",
         "changelog": ""
@@ -601,12 +711,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1729871829.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "busybox-ndk",
+      "name": "Busybox for Android NDK",
       "version": "13614",
       "versionCode": 0,
+      "author": "Magisk-Modules-Repo",
+      "description": "为 Android 提供 Busybox 命令集（NDK 编译版）",
+      "stars": 1176,
+      "timestamp": 1786195101.0,
       "latest": {
         "zipUrl": "https://github.com/Magisk-Modules-Repo/busybox-ndk/releases/download/13614/UPDATE-Busybox.Installer.v1.36.1-ALL-signed.zip",
         "changelog": ""
@@ -634,12 +750,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1786195101.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "Automatic_brick_rescue",
+      "name": "自动神仙救砖",
       "version": "v221204",
       "versionCode": 35,
+      "author": "奋斗的小青年",
+      "description": "自动救砖：系统连续重启3次或卡开机界面2分钟时自动禁用所有模块，支持白名单",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Automatic_brick_rescue.zip",
         "changelog": ""
@@ -669,12 +791,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "Eclipse",
+      "name": "定制温控",
       "version": "v5.7",
       "versionCode": 260717,
+      "author": "苏疫杆菌",
+      "description": "小米机型定制温控（多档位 thermal 配置）",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Eclipse.zip",
         "changelog": ""
@@ -704,12 +832,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "Violet",
+      "name": "紫罗兰附加模块",
       "version": "v1.4",
       "versionCode": 20260620,
+      "author": "泡菜",
+      "description": "紫罗兰工具箱核心自动化功能插件（配合 LSPosed）",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/Violet.zip",
         "changelog": ""
@@ -739,12 +873,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "WorkSettingPro",
+      "name": "爱玩机工具箱拓展",
       "version": "19.02",
       "versionCode": 1901,
+      "author": "小白杨",
+      "description": "爱玩机工具箱应用核心功能拓展（OTA 后免解锁 system 修改）",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/WorkSettingPro.zip",
         "changelog": ""
@@ -774,12 +914,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "YHGames",
+      "name": "月虹游戏助手",
       "version": "v1.4.2",
       "versionCode": 142,
+      "author": "月虹",
+      "description": "基于 Zygisk 的游戏增强：机型伪装、CPU 属性伪装、环境清理、安卓 ID 管理",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/YHGames.zip",
         "changelog": ""
@@ -809,12 +955,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "YH_YC",
+      "name": "月虹一键隐藏",
       "version": "v5.5.0",
       "versionCode": 550,
+      "author": "酷安@月虹yh",
+      "description": "一键隐藏模块（支持 Kernel / APatch / Magisk 全分支）",
+      "stars": 0,
+      "timestamp": 1791331200.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/YH_YC.zip",
         "changelog": ""
@@ -844,12 +996,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1791331200.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "RescueX",
+      "name": "RescueX",
       "version": "v3.5.11",
       "versionCode": 0,
+      "author": "jiayuxuan123",
+      "description": "自动救砖守护：连续重启/开机超时自动禁用问题模块，支持白名单、模块快照回滚、一次性安全模式与 WebUI",
+      "stars": 49,
+      "timestamp": 1787558851.0,
       "latest": {
         "zipUrl": "https://github.com/jiayuxuan123/RescueX/releases/download/v3.5.11/RescueX-v3.5.11.zip",
         "changelog": ""
@@ -878,12 +1036,18 @@
         "changelog": "",
         "note": "开源 MIT，兼容 Magisk / KernelSU / APatch"
       },
-      "timestamp": 1787558851.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "asl",
+      "name": "asl",
       "version": "v1.1",
       "versionCode": 0,
+      "author": "Moe Hakozaki (Aka. 沨鸾)",
+      "description": "Android Subsystem for GNU/Linux (magisk/ksu/Apatch module)",
+      "stars": 121,
+      "timestamp": 1757263813.0,
       "latest": {
         "zipUrl": "https://github.com/RuriOSS/asl/releases/download/v1.0/asl-alpine-edge.zip",
         "changelog": ""
@@ -912,19 +1076,25 @@
         "changelog": "",
         "note": "原作者仓库暂不可定位，需手动补充"
       },
-      "timestamp": 1757263813.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "shizu-test-20261007",
+      "name": "ShizuSUTestModule",
       "version": "v1.0.0",
       "versionCode": 1,
+      "author": "qianyumeng0228",
+      "description": "ShizuSU module store e2e integration test",
+      "stars": 0,
+      "timestamp": 1793421603.314281,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/shizu-test-20261007.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793414605.234307,
+          "timestamp": 1793421603.314281,
           "version": "v1.0.0",
           "versionCode": 1,
           "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/shizu-test-20261007.zip",
@@ -947,12 +1117,18 @@
         "note": "非公开仓库，由维护者手动收录并签名发布，校验签名后安装",
         "origin": "私有发布（ShizuSU 官方维护）"
       },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "custompinyindictionary",
+      "name": "CustomPinyinDictionary",
       "version": "assets",
       "versionCode": 0,
+      "author": "wuhgit",
+      "description": "自建拼音输入法词库，百万常用词汇量，适配 Fcitx5 (Linux / Android) 及 Gboard (Android + Magisk or KernelSU) 。",
+      "stars": 2858,
+      "timestamp": 1649670095.0,
       "latest": {
         "zipUrl": "https://github.com/wuhgit/CustomPinyinDictionary/releases/download/assets/CustomPinyinDictionary_Fcitx_Magisk_20260101.zip",
         "changelog": ""
@@ -980,12 +1156,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1649670095.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "integrity_box",
+      "name": "Integrity-Box",
       "version": "v46",
       "versionCode": 0,
+      "author": "MeowDump",
+      "description": "A toolkit for managing Play Integrity & System Environment",
+      "stars": 2804,
+      "timestamp": 1793293093.0,
       "latest": {
         "zipUrl": "https://github.com/MeowDump/Integrity-Box/releases/download/v46/v46-Integrity-Box-29-10-2026.zip",
         "changelog": ""
@@ -1013,12 +1195,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793293093.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "box4magisk",
+      "name": "box4magisk",
       "version": "v5.1",
       "versionCode": 0,
+      "author": "CHIZI-0618",
+      "description": "Use sing-box, clash, v2ray, xray tunnel proxy on Android devices.",
+      "stars": 1922,
+      "timestamp": 1726465322.0,
       "latest": {
         "zipUrl": "https://github.com/CHIZI-0618/box4magisk/releases/download/v5.1/box4_v5.1.zip",
         "changelog": ""
@@ -1046,12 +1234,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1726465322.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magisk_ad_blocking_module",
+      "name": "Magisk-Ad-Blocking-Module",
       "version": "v3.82",
       "versionCode": 0,
+      "author": "pantsufan",
+      "description": "Magisk module to block ads on android",
+      "stars": 575,
+      "timestamp": 1792069778.0,
       "latest": {
         "zipUrl": "https://github.com/pantsufan/Magisk-Ad-Blocking-Module/releases/download/v3.82/BlockAds-v3.82.zip",
         "changelog": ""
@@ -1079,12 +1273,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792069778.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "youtube_revanced_extended",
+      "name": "YouTube-ReVanced-Extended",
       "version": "483",
       "versionCode": 0,
+      "author": "MANCrimSon",
+      "description": "Auto-built YouTube & YT Music (RVX/Morphe + VoT) with in-app updates. NonRoot APKs (Obtainium) and Root modules (Magisk/KernelSU/APatch).",
+      "stars": 570,
+      "timestamp": 1793384349.0,
       "latest": {
         "zipUrl": "https://github.com/MANCrimSon/YouTube-ReVanced-Extended/releases/download/483/youtube-morphe-module-v21.30.216-all.zip",
         "changelog": ""
@@ -1112,12 +1312,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793384349.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "encore",
+      "name": "encore",
       "version": "5.2.2",
       "versionCode": 0,
+      "author": "Rem01Gaming",
+      "description": "Special performance module for your device",
+      "stars": 519,
+      "timestamp": 1791241496.0,
       "latest": {
         "zipUrl": "https://github.com/Rem01Gaming/encore/releases/download/5.2.2/encore-5.2.2-1571-47cdb70-main.zip",
         "changelog": ""
@@ -1145,12 +1351,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791241496.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "adguardcert",
+      "name": "adguardcert",
       "version": "v2.1",
       "versionCode": 0,
+      "author": "AdguardTeam",
+      "description": "Magisk module that allows using AdGuard's HTTPS filtering for all apps",
+      "stars": 426,
+      "timestamp": 1705998505.0,
       "latest": {
         "zipUrl": "https://github.com/AdguardTeam/adguardcert/releases/download/v2.1/adguardcert-v2.1.zip",
         "changelog": ""
@@ -1178,12 +1390,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1705998505.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "copg",
+      "name": "COPG",
       "version": "v7.6.1",
       "versionCode": 0,
+      "author": "AlirezaParsi",
+      "description": "Advanced per-app device / CPU / GPU spoofer for rooted Android — device profiles, per-app CPU models, prop & Android-ID spoofing, all driven by a full on-device WebUI. Zygisk module for KernelSU / Mag",
+      "stars": 421,
+      "timestamp": 1792905113.0,
       "latest": {
         "zipUrl": "https://github.com/AlirezaParsi/COPG/releases/download/v7.6.1/COPG-v7.6.1.zip",
         "changelog": ""
@@ -1211,22 +1429,28 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792905113.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "rvb",
-      "version": "260421",
+      "name": "rvb",
+      "version": "260422",
       "versionCode": 0,
+      "author": "nullcpy",
+      "description": "Automatically builds APKs and Magisk/KernelSU Modules with ReVanced, Revanced Extended, MorpheApp, RVX Morphed and Revanced Advanced patches whenever new patches are released. Updating 24/7...",
+      "stars": 391,
+      "timestamp": 1793420453.0,
       "latest": {
-        "zipUrl": "https://github.com/nullcpy/rvb/releases/download/260421/google-maps-bearinmindcat-module-v26.36.04.973607363-arm-v7a.zip",
+        "zipUrl": "https://github.com/nullcpy/rvb/releases/download/260422/google-keyboard-jasonwu1994-module-v18.5.4.993608717-release-arm64-v8a-arm64-v8a.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793404290.0,
-          "version": "260421",
+          "timestamp": 1793420453.0,
+          "version": "260422",
           "versionCode": 0,
-          "zipUrl": "https://github.com/nullcpy/rvb/releases/download/260421/google-maps-bearinmindcat-module-v26.36.04.973607363-arm-v7a.zip",
+          "zipUrl": "https://github.com/nullcpy/rvb/releases/download/260422/google-keyboard-jasonwu1994-module-v18.5.4.993608717-release-arm64-v8a-arm64-v8a.zip",
           "changelog": "",
           "size": 0
         }
@@ -1244,12 +1468,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793404290.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zdt_d",
+      "name": "ZDT-D",
       "version": "V4.3.0",
       "versionCode": 0,
+      "author": "GAME-OVER-op",
+      "description": "ZDT-D, Bypassing Internet blocks.",
+      "stars": 289,
+      "timestamp": 1791796378.0,
       "latest": {
         "zipUrl": "https://github.com/GAME-OVER-op/ZDT-D/releases/download/Technical_Assets/amneziawg.zip",
         "changelog": ""
@@ -1277,12 +1507,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791796378.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "sam",
+      "name": "SAM",
       "version": "20260907",
       "versionCode": 0,
+      "author": "5MayRain",
+      "description": "SmartDNS、AdGuardHome 和 mihomo 三种结合的模块，适用于Magisk 和 KernelSU ",
+      "stars": 154,
+      "timestamp": 1788781680.0,
       "latest": {
         "zipUrl": "https://github.com/5MayRain/SAM/releases/download/20260907/SAM_20260907_release.zip",
         "changelog": ""
@@ -1310,12 +1546,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1788781680.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "fluttertap",
+      "name": "FlutterTap",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "script-or-script",
+      "description": "Zygisk module that intercepts Flutter app traffic — redirects to a proxy and bypasses BoringSSL TLS pinning. Persistent, no Frida session. Installable via MMRL.",
+      "stars": 129,
+      "timestamp": 1785305171.0,
       "latest": {
         "zipUrl": "https://github.com/script-or-script/FlutterTap/releases/download/v1.0.0/FlutterTap-v1.0.0.zip",
         "changelog": ""
@@ -1343,12 +1585,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1785305171.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "stellar_tweaks",
+      "name": "Stellar-Tweaks",
       "version": "22.0",
       "versionCode": 0,
+      "author": "kanaodnd",
+      "description": "Intelligent Android performance daemon written in Rust. Fast-paced hybrid scheduler and real-time telemetry for Root and Non-Root environments.",
+      "stars": 103,
+      "timestamp": 1789833530.0,
       "latest": {
         "zipUrl": "https://github.com/kanaodnd/Stellar-Tweaks/releases/download/22.0/Stellar-v22.0-release5.3-VoyagingAstralist-25926.zip",
         "changelog": ""
@@ -1376,12 +1624,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789833530.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "perfmtk",
+      "name": "PerfMTK",
       "version": "v17.1",
       "versionCode": 0,
+      "author": "JUANIMAN",
+      "description": "A Magisk module for MediaTek devices with Mali GPUs.",
+      "stars": 101,
+      "timestamp": 1791677394.0,
       "latest": {
         "zipUrl": "https://github.com/JUANIMAN/PerfMTK/releases/download/v17.1/PerfMTKv17.1.zip",
         "changelog": ""
@@ -1409,12 +1663,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791677394.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "pixelxpert_next",
+      "name": "PixelXpert-Next",
       "version": "v6.1.2",
       "versionCode": 0,
+      "author": "anirudhgupta109",
+      "description": "mixed Xposed+Magisk module for customization of Google Pixel rom of Android 12+",
+      "stars": 116,
+      "timestamp": 1793105280.0,
       "latest": {
         "zipUrl": "https://github.com/anirudhgupta109/PixelXpert-Next/releases/download/v6.1.2/PixelXpert-Next.zip",
         "changelog": ""
@@ -1442,12 +1702,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793105280.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "anxcamerat",
+      "name": "ANXCameraT",
       "version": "v3.0",
       "versionCode": 0,
+      "author": "h1toru",
+      "description": "ANXCamera Magisk module for Android 12+",
+      "stars": 86,
+      "timestamp": 1704013261.0,
       "latest": {
         "zipUrl": "https://github.com/h1toru/ANXCameraT/releases/download/v3.0/ANXCameraT-v3.0.zip",
         "changelog": ""
@@ -1475,12 +1741,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1704013261.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "py2droid",
+      "name": "py2droid",
       "version": "v0.3.7",
       "versionCode": 0,
+      "author": "Mrakorez",
+      "description": "Magisk/KernelSU/APatch module to install Python 3 on Android.",
+      "stars": 77,
+      "timestamp": 1791052491.0,
       "latest": {
         "zipUrl": "https://github.com/Mrakorez/py2droid/releases/download/v0.3.7/py2droid-v0.3.7.zip",
         "changelog": ""
@@ -1508,12 +1780,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791052491.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "greenify4magisk_ksu_reborn",
+      "name": "Greenify4Magisk-KSU-Reborn",
       "version": "v5.1.1.3",
       "versionCode": 0,
+      "author": "Drsexo",
+      "description": "Integrate Greenify as a privileged system app to enable boost mode™, with automatic bulk app list generation and multi-user support. Works seamlessly with Magisk, KernelSU, and APatch.",
+      "stars": 64,
+      "timestamp": 1771252622.0,
       "latest": {
         "zipUrl": "https://github.com/Drsexo/Greenify4Magisk-KSU-Reborn/releases/download/v5.1.1.3/Greenify4Magisk-KSU-Reborn-v5.1.1.3.zip",
         "changelog": ""
@@ -1541,12 +1819,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1771252622.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zerotierforksu",
+      "name": "ZeroTierForKSU",
       "version": "10517",
       "versionCode": 0,
+      "author": "powerAn2020",
+      "description": "给KernelSU、Apatch用的zerotier，提供UI界面，集成zerotier网络管理功能。magisk需要搭配ksu独立面板使用",
+      "stars": 67,
+      "timestamp": 1780079048.0,
       "latest": {
         "zipUrl": "https://github.com/powerAn2020/ZeroTierForKSU/releases/download/10517/ZeroTierForKSU-arm-10517.zip",
         "changelog": ""
@@ -1574,12 +1858,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1780079048.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "targetedhide",
+      "name": "TargetedHide",
       "version": "v3",
       "versionCode": 0,
+      "author": "VisionR1",
+      "description": "Ηide files, folders, and packages from specific target apps.",
+      "stars": 51,
+      "timestamp": 1791736606.0,
       "latest": {
         "zipUrl": "https://github.com/VisionR1/TargetedHide/releases/download/v3/TargetedHide-v3.zip",
         "changelog": ""
@@ -1607,22 +1897,28 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791736606.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygisknextnext",
-      "version": "v2.7.1",
+      "name": "ZygiskNextNext",
+      "version": "v2.8.0",
       "versionCode": 0,
+      "author": "VeryBaaad",
+      "description": "A from-scratch, standalone implementation of the Zygisk Next module",
+      "stars": 94,
+      "timestamp": 1793417881.0,
       "latest": {
-        "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.7.1/ZNNext-v2.7.1-256-950ea9f-release.zip",
+        "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.8.0/ZNNext-v2.8.0-258-301e92b-release.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793371344.0,
-          "version": "v2.7.1",
+          "timestamp": 1793417881.0,
+          "version": "v2.8.0",
           "versionCode": 0,
-          "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.7.1/ZNNext-v2.7.1-256-950ea9f-release.zip",
+          "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.8.0/ZNNext-v2.8.0-258-301e92b-release.zip",
           "changelog": "",
           "size": 0
         }
@@ -1640,12 +1936,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793371344.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "wpd",
+      "name": "wpd",
       "version": "v7.0.0",
       "versionCode": 0,
+      "author": "Googlers-Repo",
+      "description": "WiFi Password Viewer for MMRL. This module is part for experimental tests of WebUI X.",
+      "stars": 41,
+      "timestamp": 1791647077.0,
       "latest": {
         "zipUrl": "https://github.com/Googlers-Repo/wpd/releases/download/v7.0.0/mmrl_wpd-7.0.0.zip",
         "changelog": ""
@@ -1673,12 +1975,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791647077.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "crond4android",
+      "name": "crond4android",
       "version": "v1.1.0",
       "versionCode": 0,
+      "author": "powerAn2020",
+      "description": "支持 KernelSU、APatch、Magisk下运行的Crond。带UI界面/The Crond program that supports running on KernelSU, APatch and Magisk.",
+      "stars": 41,
+      "timestamp": 1786097048.0,
       "latest": {
         "zipUrl": "https://github.com/powerAn2020/crond4android/releases/download/v1.1.0/crond4android-v1.1.0.zip",
         "changelog": ""
@@ -1706,12 +2014,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1786097048.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "youtube_revanced",
+      "name": "YouTube-Revanced",
       "version": "v21.13.164-R1",
       "versionCode": 0,
+      "author": "Zy0x",
+      "description": "YouTube Revanced patching with Revancify Tools (Root & Non-Root)",
+      "stars": 44,
+      "timestamp": 1792876168.0,
       "latest": {
         "zipUrl": "https://github.com/Zy0x/YouTube-Revanced/releases/download/v21.13.164-R1/YouTube.RVX.v21.13.164-R1.zip",
         "changelog": ""
@@ -1739,12 +2053,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792876168.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "resusfs",
+      "name": "ReSuSFS",
       "version": "v26.10.23",
       "versionCode": 0,
+      "author": "ahmed-alnassif",
+      "description": "ReSuSFS - The easiest way to use SuSFS on KernelSU. Strong hiding by default with built-in spoofing and hiding scripts, config files and toggle switches for everyday use, a built-in script manager for",
+      "stars": 104,
+      "timestamp": 1792750946.0,
       "latest": {
         "zipUrl": "https://github.com/ahmed-alnassif/ReSuSFS/releases/download/v26.10.23/ReSuSFS.zip",
         "changelog": ""
@@ -1772,12 +2092,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792750946.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "komodo_build_prop",
+      "name": "Komodo-Build-Prop",
       "version": "v26.1030",
       "versionCode": 0,
+      "author": "Elcapitanoe",
+      "description": "Magisk and KernelSU module that spoofs your Android device as Google Pixel 9 Pro XL.",
+      "stars": 35,
+      "timestamp": 1793329709.0,
       "latest": {
         "zipUrl": "https://github.com/Elcapitanoe/Komodo-Build-Prop/releases/download/v26.1030/Komodo_beta_DP11.261016.003.zip",
         "changelog": ""
@@ -1805,12 +2131,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793329709.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "patched_magiskssh",
+      "name": "Patched-MagiskSSH",
       "version": "v0.27",
       "versionCode": 0,
+      "author": "powerAn2020",
+      "description": "修补过的MagiskSSH，添加了ui，启用了日志功能。适用于KernelSU,Apatch,Magisk",
+      "stars": 39,
+      "timestamp": 1785468395.0,
       "latest": {
         "zipUrl": "https://github.com/powerAn2020/PatchedMagiskSSH/releases/download/v0.27/Patched-MagiskSSH.zip",
         "changelog": ""
@@ -1838,12 +2170,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1785468395.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "pingpimp",
+      "name": "PingPimp",
       "version": "v11.0",
       "versionCode": 0,
+      "author": "fuckyoustan",
+      "description": "Stop blaming lag. It's time to take absolute control of your connection",
+      "stars": 31,
+      "timestamp": 1791469393.0,
       "latest": {
         "zipUrl": "https://github.com/fuckyoustan/PingPimp/releases/download/v2.1/PingPimp_v2.1.zip",
         "changelog": ""
@@ -1871,12 +2209,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791469393.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "best_root_apps_for_android",
+      "name": "best-root-apps-for-android",
       "version": "ohmykeymint-1.2.5-17b0eb6",
       "versionCode": 0,
+      "author": "krishna3163",
+      "description": "Curated directory of Android root apps, Magisk, KernelSU, LSPosed modules, system tools, privacy utilities, and no-root Shizuku apps.",
+      "stars": 49,
+      "timestamp": 1793397583.0,
       "latest": {
         "zipUrl": "https://github.com/krishna3163/best-root-apps-for-android/releases/download/ohmykeymint-1.2.5-17b0eb6/OhMyKeymint-release-arm64-v8a-1.2.5-17b0eb6.zip",
         "changelog": ""
@@ -1904,12 +2248,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793397583.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "auriya",
+      "name": "auriya",
       "version": "v2.1.0",
       "versionCode": 0,
+      "author": "pavelc4",
+      "description": "Yet another universal Magisk/KSU module. This repository experimental project.",
+      "stars": 29,
+      "timestamp": 1788518347.0,
       "latest": {
         "zipUrl": "https://github.com/pavelc4/auriya/releases/download/v2.1.0/auriya-2.1.0-1-715ff3b-release.zip",
         "changelog": ""
@@ -1937,12 +2287,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1788518347.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "reconbridge",
+      "name": "reconbridge",
       "version": "v1.4.0",
       "versionCode": 0,
+      "author": "lm060719",
+      "description": "通用逆向分析 KernelSU 模块：手机侧只做原子能力，智能全在 PC 侧（Claude Code + MCP）。仅限授权安全研究与教育用途。",
+      "stars": 32,
+      "timestamp": 1790911857.0,
       "latest": {
         "zipUrl": "https://github.com/lm060719/reconbridge/releases/download/v1.4.0/reconbridge-mcp-win64.zip",
         "changelog": ""
@@ -1970,12 +2326,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790911857.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "evilfont",
+      "name": "EvilFont",
       "version": "v2.1",
       "versionCode": 0,
+      "author": "dedeadend",
+      "description": "A systemless module to change default Arabic/Persian font + Apple emojis.",
+      "stars": 29,
+      "timestamp": 1786449831.0,
       "latest": {
         "zipUrl": "https://github.com/dedeadend/EvilFont/releases/download/v2.1/EvilFont-v2.1.zip",
         "changelog": ""
@@ -2003,45 +2365,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1786449831.0
-    },
-    {
-      "id": "sound_unleashed",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "sound_unleashed",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Sound-Unleashed",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "gameenhancer",
+      "name": "GameEnhancer",
       "version": "V3.0",
       "versionCode": 0,
+      "author": "RAAJK20Pro",
+      "description": "Real Performance Starts Here.",
+      "stars": 26,
+      "timestamp": 1778040730.0,
       "latest": {
         "zipUrl": "https://github.com/RAAJK20Pro/GameEnhancer/releases/download/V3.0/GameEnhancerV3.0.zip",
         "changelog": ""
@@ -2069,12 +2404,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1778040730.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "sound_and_emoji_ios",
+      "name": "Sound_And_Emoji_IOS",
       "version": "V2.0.12",
       "versionCode": 0,
+      "author": "antoniomalheirs",
+      "description": "A KernelSU / KernelSU Next and Magisk-compatible module that replaces default Android system sounds and emojis with custom or iOS-style assets. Designed for full compatibility across rooted devices wi",
+      "stars": 26,
+      "timestamp": 1793329599.0,
       "latest": {
         "zipUrl": "https://github.com/antoniomalheirs/Sound_And_Emoji_IOS/releases/download/V2.0.12/Sound_And_Emoji_IOS-V2.0.12.zip",
         "changelog": ""
@@ -2102,45 +2443,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793329599.0
-    },
-    {
-      "id": "clear_optimization",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "clear_optimization",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Clear-Optimization",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "certbridge",
+      "name": "CertBridge",
       "version": "v5.1.2",
       "versionCode": 0,
+      "author": "Eikeitsu",
+      "description": "将 Reqable / ProxyPin / 自定义 CA 安装到 Android 系统信任库的 Magisk 模块，支持 KernelSU WebUI。Android 14+ 自动 APEX Conscrypt 注入。",
+      "stars": 44,
+      "timestamp": 1791735507.0,
       "latest": {
         "zipUrl": "https://github.com/Eikeitsu/CertBridge/releases/download/v5.1.2/CertBridge_v5.1.2_arm32.zip",
         "changelog": ""
@@ -2168,78 +2482,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791735507.0
-    },
-    {
-      "id": "sqlite3_for_android",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "sqlite3_for_android",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/SQLite3-for-Android",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
-    },
-    {
-      "id": "adaway_helper",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "adaway_helper",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/AdAway-Helper",
-        "license": "Apache-2.0",
-        "category": "AdBlock",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "lynx",
+      "name": "Lynx",
       "version": "Velocity2.9",
       "versionCode": 0,
+      "author": "Zy0x",
+      "description": "Experience the perfect balance of gaming optimization and battery efficiency with Lynx, a Magisk module tailored for root users. Gamers can enjoy lag-free gameplay while maximizing battery life, ensur",
+      "stars": 18,
+      "timestamp": 1719852457.0,
       "latest": {
         "zipUrl": "https://github.com/Zy0x/Lynx/releases/download/Velocity2.9/Lynx.-.Velocity.v2.9.zip",
         "changelog": ""
@@ -2267,78 +2521,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1719852457.0
-    },
-    {
-      "id": "aapt_for_plugin",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "aapt_for_plugin",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Aapt-for-Plugin",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
-    },
-    {
-      "id": "kill_needless_thermal_limits",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "kill_needless_thermal_limits",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Kill-Needless-Thermal-Limits",
-        "license": "Apache-2.0",
-        "category": "Performance",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "bootanimation_module",
+      "name": "bootanimation-module",
       "version": "v1.3-stable",
       "versionCode": 0,
+      "author": "readonlynux",
+      "description": "This module allows you to modify bootanimation without requiring meta-overlayfs or Magisk Magic Mount",
+      "stars": 14,
+      "timestamp": 1792252722.0,
       "latest": {
         "zipUrl": "https://github.com/readonlynux/bootanimation-module/releases/download/v1.3-stable/bootanimation-module-v1.3-stable.zip",
         "changelog": ""
@@ -2366,12 +2560,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792252722.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygisk_il2cppdumper",
+      "name": "Zygisk-Il2CppDumper",
       "version": "v1.6.1",
       "versionCode": 0,
+      "author": "codehasan",
+      "description": "🎮 Dump il2cpp game data at runtime with Zygisk",
+      "stars": 15,
+      "timestamp": 1789788375.0,
       "latest": {
         "zipUrl": "https://github.com/codehasan/Zygisk-Il2CppDumper/releases/download/v1.6.1/Zygisk_-_Il2CppDumper-v1.6.1-6-debug.zip",
         "changelog": ""
@@ -2399,78 +2599,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789788375.0
-    },
-    {
-      "id": "android_performance_optimizer",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "android_performance_optimizer",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Android-Performance-Optimizer",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
-    },
-    {
-      "id": "libsqlite_for_sdmaid",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "libsqlite_for_sdmaid",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Libsqlite-for-SDmaid",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "mtk_bwmod",
+      "name": "mtk-bwmod",
       "version": "v2.3",
       "versionCode": 0,
+      "author": "Elvandito",
+      "description": "Universal Magisk module for network optimization on **all MediaTek devices** — Helio G/P/X, Dimensity, MT6xxx, MT8xxx.",
+      "stars": 11,
+      "timestamp": 1790331164.0,
       "latest": {
         "zipUrl": "https://github.com/Elvandito/mtk-bwmod/releases/download/v2.3/mtk-bwmod-v2.3.zip",
         "changelog": ""
@@ -2498,12 +2638,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790331164.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "kasumi_proxy",
+      "name": "Kasumi-Proxy",
       "version": "v0.4.8",
       "versionCode": 0,
+      "author": "loss-and-quick",
+      "description": "System-level transparent proxy for rooted Android (Magisk/KernelSU/APatch module) and Linux/Windows desktop (Tauri 2) — Xray-core and sing-box driven by one shared Rust backend and a React UI.",
+      "stars": 14,
+      "timestamp": 1791801252.0,
       "latest": {
         "zipUrl": "https://github.com/loss-and-quick/Kasumi-Proxy/releases/download/v0.4.8/kasumi-proxy-linux-portable-v0.4.8.zip",
         "changelog": ""
@@ -2531,12 +2677,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791801252.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "nomount_suite",
+      "name": "NoMount-Suite",
       "version": "v1.3.205",
       "versionCode": 0,
+      "author": "Bouteillepleine",
+      "description": "NoMount Suite, mountless module loading for Android on the Prism VFS engine",
+      "stars": 19,
+      "timestamp": 1793222219.0,
       "latest": {
         "zipUrl": "https://github.com/Bouteillepleine/NoMount-Suite/releases/download/v1.3.205/00_NoMount-Module-v1.3.205.zip",
         "changelog": ""
@@ -2564,12 +2716,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793222219.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "svchub",
+      "name": "SvcHub",
       "version": "v1.4.2",
       "versionCode": 0,
+      "author": "LimpidMo",
+      "description": "一个开机启动和保活 Termux 服务和二进制服务的 KernelSU / Magisk /APatch 模块，并提供 WebUI 聚合管理",
+      "stars": 23,
+      "timestamp": 1792768036.0,
       "latest": {
         "zipUrl": "https://github.com/LimpidMo/SvcHub/releases/download/v1.4.2/SvcHub-12-1.4.2.zip",
         "changelog": ""
@@ -2597,12 +2755,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792768036.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "android17_lhdc_a2dp_universal",
+      "name": "android17-lhdc-a2dp-universal",
       "version": "v2.1.4",
       "versionCode": 0,
+      "author": "Makuro-Arisaka",
+      "description": "A Magisk module that makes Android 17's native LHDC actually produce sound.",
+      "stars": 9,
+      "timestamp": 1791900787.0,
       "latest": {
         "zipUrl": "https://github.com/Makuro-Arisaka/android17-lhdc-a2dp-universal/releases/download/v2.1.4/android17-lhdc-a2dp-universal.zip",
         "changelog": ""
@@ -2630,12 +2794,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791900787.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygisk_updguard",
+      "name": "zygisk-updguard",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "ZQZCC",
+      "description": "阻止所选应用的商店更新",
+      "stars": 8,
+      "timestamp": 1790034045.0,
       "latest": {
         "zipUrl": "https://github.com/ZQZCC/zygisk-updguard/releases/download/v1.0.0/UpdGuard-v1.0.0.zip",
         "changelog": ""
@@ -2663,12 +2833,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790034045.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ksu_webui_module_template",
+      "name": "ksu-webui-module-template",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "barsikus007",
+      "description": "This is a template for creating KernelSU/Apatch/Magisk modules with WebUI. It includes a basic structure and a build script",
+      "stars": 7,
+      "timestamp": 1766072855.0,
       "latest": {
         "zipUrl": "https://github.com/barsikus007/ksu-webui-module-template/releases/download/v1.0.0/ksu-webui-module-template_v1.0.0.zip",
         "changelog": ""
@@ -2696,12 +2872,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1766072855.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "droidbridge",
+      "name": "DroidBridge",
       "version": "apk-v0.5.8",
       "versionCode": 0,
+      "author": "zephyr7030",
+      "description": "On-device MCP server for Android — let ChatGPT and local AI agents operate your phone. App edition (Accessibility/Shizuku) or root edition (Magisk/KernelSU/APatch). No PC, no ADB.",
+      "stars": 14,
+      "timestamp": 1792511616.0,
       "latest": {
         "zipUrl": "https://github.com/zephyr7030/DroidBridge/releases/download/magisk-v0.5.8/droidbridge-magisk-0.5.8.zip",
         "changelog": ""
@@ -2729,45 +2911,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792511616.0
-    },
-    {
-      "id": "limit_avoidance_handler",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "limit_avoidance_handler",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Limit-Avoidance-Handler",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "qsc_stopcharging",
+      "name": "QSC-StopCharging",
       "version": "v17",
       "versionCode": 0,
+      "author": "L0NE-6",
+      "description": "🔋 QSC 定量停充 · Magisk/KernelSU/APatch 充电阈值控制模块 · 到达指定电量或温度自动停止充电、自动恢复充电 · 安卓 5-17 适配版 + 安卓 1-5 遗留 root 实验版 · 纯本地脚本，无联网",
+      "stars": 17,
+      "timestamp": 1792976616.0,
       "latest": {
         "zipUrl": "https://github.com/L0NE-6/QSC-StopCharging/releases/download/v17/QSC-StopCharging_A5-17_v17_20261004.zip",
         "changelog": ""
@@ -2795,12 +2950,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792976616.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "xiaomiautomation",
+      "name": "XiaomiAutomation",
       "version": "v0.13.4",
       "versionCode": 0,
+      "author": "Petittux1",
+      "description": "澎湃自动化—XiaomiAutomation：Xiaomi 17 Pro / HyperOS 4 root 自动化模块 —— 多 Profile 定时、任意 App 录制回放、内置工行每日浇水，纯 root 直控。WebUI 支持 KernelSU / APatch；Magisk 请配 KsuWebUI 或 MMRL。 | Root automation for Xiaomi 17 Pro / H",
+      "stars": 6,
+      "timestamp": 1791786488.0,
       "latest": {
         "zipUrl": "https://github.com/Petittux1/XiaomiAutomation/releases/download/v0.13.4/XiaomiAutomation-v0.13.4.zip",
         "changelog": ""
@@ -2828,45 +2989,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791786488.0
-    },
-    {
-      "id": "driver_ginkgo",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "driver_ginkgo",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Driver-Ginkgo",
-        "license": "Apache-2.0",
-        "category": "Performance",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magisk_devicespoofer",
+      "name": "Magisk-DeviceSpoofer",
       "version": "v22",
       "versionCode": 0,
+      "author": "L0NE-6",
+      "description": "📱 全机型机型伪装 Magisk 模块合集 · 3554 机型 / 26 品牌 · Android 1-17 适配 · 每日自动同步上游机型数据 · 纯本地脚本，无联网",
+      "stars": 14,
+      "timestamp": 1793314680.0,
       "latest": {
         "zipUrl": "https://github.com/L0NE-6/Magisk-DeviceSpoofer/releases/download/v22/Magisk-DeviceSpoofer_360_26_v22.zip",
         "changelog": ""
@@ -2894,12 +3028,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793314680.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "thermal_breaker_miyabi_core",
+      "name": "thermal-breaker-miyabi-core",
       "version": "v4.0.0",
       "versionCode": 0,
+      "author": "Rama-X2",
+      "description": "Advanced Magisk thermal optimizer focused on reducing aggressive throttling while preserving hardware protection.",
+      "stars": 6,
+      "timestamp": 1791394751.0,
       "latest": {
         "zipUrl": "https://github.com/Rama-X2/thermal-breaker-miyabi-core/releases/download/v4.0.0/Thermal-Breaker-Miyabi-Core-v4.0.0.zip",
         "changelog": ""
@@ -2927,12 +3067,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791394751.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "xtherm",
+      "name": "XTherm",
       "version": "v1.2.1",
       "versionCode": 0,
+      "author": "clsxkyyra404",
+      "description": "\"Advanced Disable Thermal for Root (Magisk/KernelSU). Bypass thermal throttling to maximize gaming performance.\"",
+      "stars": 5,
+      "timestamp": 1782011618.0,
       "latest": {
         "zipUrl": "https://github.com/clsxkyyra404/XTherm/releases/download/v1.2.1/XTherm_v1.2.1.zip",
         "changelog": ""
@@ -2960,45 +3106,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1782011618.0
-    },
-    {
-      "id": "dns_accelerator",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "dns_accelerator",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/DNS-Accelerator",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ksu_volume_steps",
+      "name": "ksu-volume-steps",
       "version": "v1.1",
       "versionCode": 0,
+      "author": "alextecplayz",
+      "description": "A KernelSU-compatible volume steps changer for the system build.prop",
+      "stars": 4,
+      "timestamp": 1731366093.0,
       "latest": {
         "zipUrl": "https://github.com/alextecplayz/ksu-volume-steps/releases/download/v1.1/ksu-volume-steps.zip",
         "changelog": ""
@@ -3026,78 +3145,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1731366093.0
-    },
-    {
-      "id": "advanced_hosts_manager",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "advanced_hosts_manager",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Advanced-Hosts-Manager",
-        "license": "Apache-2.0",
-        "category": "AdBlock",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
-    },
-    {
-      "id": "gps_optimization",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "gps_optimization",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/GPS-Optimization",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "faa_ydl",
+      "name": "Faa-YDL",
       "version": "v1.2.3",
       "versionCode": 0,
+      "author": "FaaRamadhann",
+      "description": "Download MP3 & MP4 dari YouTube + scan QR. Web UI Termux, APK standalone, modul Magisk/KernelSU/APatch + CLI fdl. Hasil ke /sdcard/Download/FaaDL.",
+      "stars": 5,
+      "timestamp": 1792764751.0,
       "latest": {
         "zipUrl": "https://github.com/FaaRamadhann/Faa-YDL/releases/download/v1.2.3/faa-ytdownloader-termux-v1.0.1.zip",
         "changelog": ""
@@ -3125,12 +3184,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792764751.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "adb_notify",
+      "name": "adb-notify",
       "version": "v1.0.1",
       "versionCode": 0,
+      "author": "darren-you",
+      "description": "Magisk 模块，用于切换 Android USB 调试与 USB 充电/连接通知",
+      "stars": 3,
+      "timestamp": 1778482613.0,
       "latest": {
         "zipUrl": "https://github.com/darren-you/adb-notify/releases/download/v1.0.1/usb_adb_notify_toggle-v1.0.1.zip",
         "changelog": ""
@@ -3158,12 +3223,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1778482613.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hyperos_boot_animation_module",
+      "name": "HyperOS-Boot-Animation-Module",
       "version": "V2.4.0",
       "versionCode": 0,
+      "author": "disbishxb",
+      "description": "免改分区替换开机动画 | Replace boot animation without repartition",
+      "stars": 3,
+      "timestamp": 1790537157.0,
       "latest": {
         "zipUrl": "https://github.com/disbishxb/HyperOS-Boot-Animation-Module/releases/download/V2.4.0/HyperOS-Boot-Animation-Module-oneplus.zip",
         "changelog": ""
@@ -3191,78 +3262,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790537157.0
-    },
-    {
-      "id": "crocus_vernus",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "crocus_vernus",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Crocus-Vernus",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
-    },
-    {
-      "id": "faa_app_freeze",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "faa_app_freeze",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/FaaRamadhann/Faa-App-Freeze",
-        "license": "MIT",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "yuki_bootanim",
+      "name": "Yuki-Bootanim",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "OhMyDitzzy",
+      "description": "Allows you to use custom boot animation through on Direct-Write or Overlay",
+      "stars": 2,
+      "timestamp": 1788855581.0,
       "latest": {
         "zipUrl": "https://github.com/OhMyDitzzy/Yuki-Bootanim/releases/download/v1.0.0/Yuki-Bootanim-v1.0.0.zip",
         "changelog": ""
@@ -3290,12 +3301,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1788855581.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "nextsusfs",
+      "name": "NextSUSFS",
       "version": "v0.0.14",
       "versionCode": 0,
+      "author": "ifoknr",
+      "description": "Kernel-level root hiding with SuSFS for the NEXT stack (NextWheel + NextZygisk). KernelSU module with a full WebUI, for any CPU.",
+      "stars": 6,
+      "timestamp": 1793341281.0,
       "latest": {
         "zipUrl": "https://github.com/ifoknr/NextSUSFS/releases/download/v0.0.14/NextSUSFS-v0.0.14.zip",
         "changelog": ""
@@ -3323,12 +3340,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793341281.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "katifetch_for_android_shell_magisk_module",
+      "name": "katifetch-for-android-shell-Magisk-Module",
       "version": "Katifetch-for-android-shell-module-1.2",
       "versionCode": 0,
+      "author": "ximimoments",
+      "description": "A lightweight system fetch tool for Android (Magisk & KSU & Root)",
+      "stars": 2,
+      "timestamp": 1774983481.0,
       "latest": {
         "zipUrl": "https://github.com/ximimoments/katifetch-for-android-shell-Magisk-Module/releases/download/Katifetch-for-android-shell-module-1.2/katifetch-magisk.zip",
         "changelog": ""
@@ -3356,12 +3379,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1774983481.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "bs_thermal",
+      "name": "BS-THERMAL",
       "version": "v1.5.9",
       "versionCode": 0,
+      "author": "BS1388",
+      "description": "Disables Thermal Zone and Disable [PPM/GPU limits]",
+      "stars": 1,
+      "timestamp": 1789818084.0,
       "latest": {
         "zipUrl": "https://github.com/BS1388/BS-THERMAL/releases/download/v1.5.9/BS_THERMAL_V1.5.9.zip",
         "changelog": ""
@@ -3389,12 +3418,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789818084.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "sl8541e_heshuicheng_device_optimization_module",
+      "name": "SL8541E-Heshuicheng-Device-Optimization-Module",
       "version": "v2.1.3",
       "versionCode": 0,
+      "author": "Baimacao",
+      "description": "SL8541E Heshuicheng Device Optimization Module For Unisoc SL8541E / SC9832E + Heshuicheng (HSC) smartwatches, Android 8.1.",
+      "stars": 1,
+      "timestamp": 1793239783.0,
       "latest": {
         "zipUrl": "https://github.com/Baimacao/SL8541E-Heshuicheng-Device-Optimization-Module/releases/download/v2.1.3/SL8541E_Config_Fix_v2.1.3_HSC.zip",
         "changelog": ""
@@ -3422,45 +3457,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793239783.0
-    },
-    {
-      "id": "dex2oat_optimizer",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "dex2oat_optimizer",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/DEMONNICA/Dex2OAT-Optimizer",
-        "license": "Apache-2.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "miatoll_stereo_mod",
+      "name": "miatoll-stereo-mod",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "EtoKomu",
+      "description": "Dual Speaker (Stereo Audio) Magisk/KernelSU module for Redmi Note 9 Pro / 9S (miatoll) on AOSP",
+      "stars": 1,
+      "timestamp": 1791378406.0,
       "latest": {
         "zipUrl": "https://github.com/EtoKomu/miatoll-stereo-mod/releases/download/v1.0/Miatoll_Stereo_Mod.zip",
         "changelog": ""
@@ -3488,12 +3496,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791378406.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "rosemary_susfs_kernel",
+      "name": "rosemary-susfs-kernel",
       "version": "recovery-pbrp-4.14",
       "versionCode": 0,
+      "author": "OctopusAssem",
+      "description": "Custom KernelSU (ReSukiSU) + SUSFS kernel for Redmi Note 10S (rosemary) - MIUI 14 / Android 13. Flashable kernel, root-hiding patches, spoofed hidden manager, complete KIT.",
+      "stars": 2,
+      "timestamp": 1791393941.0,
       "latest": {
         "zipUrl": "https://github.com/OctopusAssem/rosemary-susfs-kernel/releases/download/recovery-pbrp-4.14/PBRP-rosemary-4.0-20240324-UNOFFICIAL.zip",
         "changelog": ""
@@ -3521,12 +3535,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791393941.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "system_cert_installer",
+      "name": "System-Cert-Installer",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "RattlesHyper",
+      "description": "Install Multiple CA Certificate to System CA Store. APEX Bypass for Android 14+. Installing to User not required.",
+      "stars": 1,
+      "timestamp": 1780241086.0,
       "latest": {
         "zipUrl": "https://github.com/RattlesHyper/System-Cert-Installer/releases/download/v1.0/System-Cert-Installer-v1.0.zip",
         "changelog": ""
@@ -3554,12 +3574,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1780241086.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hyperos_flclash_vpn_fix",
+      "name": "hyperos-flclash-vpn-fix",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "fouc3-mirror",
+      "description": "KernelSU/Magisk module: fix FlClash VPN on HyperOS/MIUI. MIUI sets the FOREGROUND_SERVICE_SPECIAL_USE appop to \"ignore\"; Android 14+ validates FGS types via appop rather than permission, so VpnService",
+      "stars": 2,
+      "timestamp": 1790875951.0,
       "latest": {
         "zipUrl": "https://github.com/fouc3-mirror/hyperos-flclash-vpn-fix/releases/download/v1.0.0/hyperos-flclash-vpn-fix-v1.0.0.zip",
         "changelog": ""
@@ -3587,12 +3613,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790875951.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "android_persian_font_switcher",
+      "name": "android-persian-font-switcher",
       "version": "v0.3.0",
       "versionCode": 0,
+      "author": "ggYasin",
+      "description": "Open-source KernelSU font switcher with WebUI for changing Android Persian/Arabic fallback fonts while preserving the selected Latin font.",
+      "stars": 3,
+      "timestamp": 1791449730.0,
       "latest": {
         "zipUrl": "https://github.com/ggYasin/android-persian-font-switcher/releases/download/v0.3.0/Persian-Font-Switcher-v0.3.0.zip",
         "changelog": ""
@@ -3620,45 +3652,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791449730.0
-    },
-    {
-      "id": "ivanna_omega_supreme",
-      "version": "v2.5.202",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "https://github.com/GORE-TNS/IVANNA-OMEGA-SUPREME/releases/download/v2.5.202/ivanna_omega_supreme_v2.5.202.zip",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793400431.0,
-          "version": "v2.5.202",
-          "versionCode": 0,
-          "zipUrl": "https://github.com/GORE-TNS/IVANNA-OMEGA-SUPREME/releases/download/v2.5.202/ivanna_omega_supreme_v2.5.202.zip",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "ivanna_omega_supreme",
-        "enable": true,
-        "verified": true,
-        "update_to": "update.json",
-        "source": "https://github.com/luisurielpimentelperez814-design/IVANNA-OMEGA-SUPREME",
-        "license": "unknown",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793400431.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "boot_studio_module",
+      "name": "boot_studio_module",
       "version": "v1.4",
       "versionCode": 0,
+      "author": "lumii55",
+      "description": "Boot animation studio module repo",
+      "stars": 1,
+      "timestamp": 1790651820.0,
       "latest": {
         "zipUrl": "https://github.com/lumii55/boot_studio_module/releases/download/v1.4/BootStudioModule-v1.4.zip",
         "changelog": ""
@@ -3686,12 +3691,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790651820.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "mffmv14",
+      "name": "MFFMv14",
       "version": "runtime-v2026.10.28",
       "versionCode": 0,
+      "author": "mistu01",
+      "description": "Advanced android font module tool.",
+      "stars": 1,
+      "timestamp": 1793174221.0,
       "latest": {
         "zipUrl": "https://github.com/mistu01/MFFMv14/releases/download/runtime-v2026.10.28/mffm-runtime-2026.10.28.zip",
         "changelog": ""
@@ -3719,12 +3730,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793174221.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "rclonemagiskmanage",
+      "name": "RcloneMagiskManage",
       "version": "v1.2.0",
       "versionCode": 0,
+      "author": "powerAn2020",
+      "description": "Rclone Root Manager 是一个专为 Root（Magisk / KernelSU / APatch）打造的一体化云存储管理系统，通过原生 Android 界面与高性能 Rust 安全网关，实现对 Rclone 多网盘挂载（FUSE3）、文件传输、加解密及定时任务的零系统分区侵入式可视化管控。",
+      "stars": 1,
+      "timestamp": 1789438016.0,
       "latest": {
         "zipUrl": "https://github.com/powerAn2020/RcloneMagiskManage/releases/download/v1.2.0/rclone-manager-arm64.zip",
         "changelog": ""
@@ -3752,12 +3769,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789438016.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "return_roboto",
+      "name": "return-roboto",
       "version": "v17.0",
       "versionCode": 0,
+      "author": "reddxae",
+      "description": "Bring back the Android default font.",
+      "stars": 1,
+      "timestamp": 1791122289.0,
       "latest": {
         "zipUrl": "https://github.com/reddxae/return-roboto/releases/download/v17.0/return-roboto-v17.0-pixel.zip",
         "changelog": ""
@@ -3785,12 +3808,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791122289.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "iosx69",
+      "name": "iOSx69",
       "version": "v0.2",
       "versionCode": 0,
+      "author": "sabbirafat96",
+      "description": "🍎 iOS Emojis & Kohinoor Bangla Font system-wide! 🚀 Auto-update enabled, zero bloat, and no background daemon. Seamlessly transforms your rooted Android. Magisk / KernelSU / APatch ready. 🇧🇩",
+      "stars": 1,
+      "timestamp": 1792161600.0,
       "latest": {
         "zipUrl": "https://github.com/sabbirafat96/iOSx69/releases/download/v0.2/iOSx69.zip",
         "changelog": ""
@@ -3818,12 +3847,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792161600.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "td2tdr",
+      "name": "td2tdr",
       "version": "v0.0.636",
       "versionCode": 0,
+      "author": "sansej8989",
+      "description": "Модуль Magisk/KernelSU для Top Drives: автосинхронізація Garage.dat у Download/td2tdr_sync. WebUI-панель зі статистикою гаража.",
+      "stars": 1,
+      "timestamp": 1790863882.0,
       "latest": {
         "zipUrl": "https://github.com/sansej8989/td2tdr/releases/download/v0.0.636/td2tdr_v0.0.636.zip",
         "changelog": ""
@@ -3851,12 +3886,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790863882.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "droidspaces_lan_ip",
+      "name": "droidspaces-lan-ip",
       "version": "v1.0.2",
       "versionCode": 0,
+      "author": "yashoswalyo",
+      "description": "Assign Droidspaces NAT container its own IPv4 address on the phone's Wi-Fi LAN.",
+      "stars": 1,
+      "timestamp": 1791033887.0,
       "latest": {
         "zipUrl": "https://github.com/yashoswalyo/droidspaces-lan-ip/releases/download/v1.0.2/droidspaces-lan-ip-1.0.2.zip",
         "changelog": ""
@@ -3884,12 +3925,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791033887.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magisk_sysutils",
+      "name": "magisk-sysutils",
       "version": "1.0.0",
       "versionCode": 0,
+      "author": "AlexDev404",
+      "description": "Turn your rooted device into a much more capable Unix-like environment without needing a chroot",
+      "stars": 0,
+      "timestamp": 1788603673.0,
       "latest": {
         "zipUrl": "https://github.com/AlexDev404/magisk-sysutils/releases/download/1.0.0/magisk-sysutils.zip",
         "changelog": ""
@@ -3917,12 +3964,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1788603673.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ringmapper",
+      "name": "Ringmapper",
       "version": "v1.0.3",
       "versionCode": 0,
+      "author": "Deulfi",
+      "description": "Remap swipe events to something actual useful on cheap AliExpress Bluetooth multipurpose rings.",
+      "stars": 0,
+      "timestamp": 1790541376.0,
       "latest": {
         "zipUrl": "https://github.com/Deulfi/Ringmapper/releases/download/v1.0.3/Ringmapper-v1.0.3.zip",
         "changelog": ""
@@ -3950,12 +4003,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790541376.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "trustmedarling",
+      "name": "TrustMeDarling",
       "version": "v2.1",
       "versionCode": 0,
+      "author": "TheKimi7",
+      "description": "Makes user-installed CA certificates part of the system trust store, and reports which apps will not see them.",
+      "stars": 0,
+      "timestamp": 1791394496.0,
       "latest": {
         "zipUrl": "https://github.com/TheKimi7/TrustMeDarling/releases/download/v2.1/TrustMeDarling-v2.1.zip",
         "changelog": ""
@@ -3983,12 +4042,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791394496.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "unlock_core_for_dex2oat",
+      "name": "unlock_core_for_dex2oat",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "fnyoat",
+      "description": "MIUI/HyperOS dex2oat 全核+全线程解锁模块",
+      "stars": 0,
+      "timestamp": 1789729868.0,
       "latest": {
         "zipUrl": "https://github.com/fnyoat/unlock_core_for_dex2oat/releases/download/v1.0/unlock_core_for_dex2oat-v1.0.zip",
         "changelog": ""
@@ -4016,12 +4081,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789729868.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "emoji_flag_restore",
+      "name": "Emoji-Flag-Restore",
       "version": "1.0.0",
       "versionCode": 0,
+      "author": "hayatehinata",
+      "description": "Restores flag emoji that a ROM renders as missing or transparent, including the Taiwan flag (TW, U+1F1F9 U+1F1FC).",
+      "stars": 0,
+      "timestamp": 1791645528.0,
       "latest": {
         "zipUrl": "https://github.com/hayatehinata/Emoji-Flag-Restore/releases/download/1.0.0/Emoji-Flag-Restore-v1.0.0.zip",
         "changelog": ""
@@ -4049,12 +4120,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791645528.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "codex_android",
+      "name": "codex-android",
       "version": "v1.6.2",
       "versionCode": 0,
+      "author": "masitankitavim-ux",
+      "description": "Run OpenAI Codex CLI on Android as a Magisk/KernelSU module, with a built-in local gateway (Responses -> chat/completions) and a web console. Fill in your own API endpoint and model after install.",
+      "stars": 0,
+      "timestamp": 1791733468.0,
       "latest": {
         "zipUrl": "https://github.com/masitankitavim-ux/codex-android/releases/download/v1.6.2/codex_android-v1.6.2.zip",
         "changelog": ""
@@ -4082,12 +4159,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791733468.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "shark8_damon_reclaim_off",
+      "name": "shark8-damon-reclaim-off",
       "version": "v1.2",
       "versionCode": 0,
+      "author": "nalbe",
+      "description": "KernelSU module for Blackview Shark 8: disables the damon_reclaim kernel thread that was page-ing anonymous app memory into zram with no memory pressure",
+      "stars": 0,
+      "timestamp": 1791227516.0,
       "latest": {
         "zipUrl": "https://github.com/nalbe/shark8-damon-reclaim-off/releases/download/v1.2/shark8-damon-reclaim-off-1.2.zip",
         "changelog": ""
@@ -4115,12 +4198,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791227516.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "watchdog",
+      "name": "watchdog",
       "version": "v1.3.0",
       "versionCode": 0,
+      "author": "radito",
+      "description": "A KernelSU module that reboots your phone after a set duration of screen-off inactivity.",
+      "stars": 0,
+      "timestamp": 1791433675.0,
       "latest": {
         "zipUrl": "https://github.com/radito/watchdog/releases/download/v1.3.0/watchdog-1.3.0.zip",
         "changelog": ""
@@ -4148,12 +4237,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791433675.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "cts_on_lineage",
+      "name": "cts-on-lineage",
       "version": "v0.0.1",
       "versionCode": 0,
+      "author": "reddxae",
+      "description": "Enable Circle to Search support on LineageOS without GApps.",
+      "stars": 0,
+      "timestamp": 1791410410.0,
       "latest": {
         "zipUrl": "https://github.com/reddxae/cts-on-lineage/releases/download/v0.0.1/cts-on-lineage-v0.0.1.zip",
         "changelog": ""
@@ -4181,12 +4276,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791410410.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zapret_ksu",
+      "name": "zapret-ksu",
       "version": "v1.3.1",
       "versionCode": 0,
+      "author": "soufied",
+      "description": "KernelSU / KernelSU-Next module that runs zapret (nfqws and nfqws2) for DPI bypass on Android, with a WebUI, Blockcheck and automatic Wi-Fi/mobile profiles.",
+      "stars": 2,
+      "timestamp": 1793102489.0,
       "latest": {
         "zipUrl": "https://github.com/soufied/zapret-ksu/releases/download/v1.3.1/zapret-ksu-module.zip",
         "changelog": ""
@@ -4214,12 +4315,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793102489.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "tricky_addon_update_target_list",
+      "name": "Tricky-Addon-Update-Target-List",
       "version": "v4.4",
       "versionCode": 0,
+      "author": "KOWX712",
+      "description": "A KSU WebUI to configure Tricky Store target.txt",
+      "stars": 3511,
+      "timestamp": 1782029961.0,
       "latest": {
         "zipUrl": "https://github.com/KOWX712/Tricky-Addon-Update-Target-List/releases/download/v4.4/TrickyAddonModule-v4.4.zip",
         "changelog": ""
@@ -4247,12 +4354,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1782029961.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "revanced_morphe_builder",
+      "name": "revanced-morphe-builder",
       "version": "167",
       "versionCode": 0,
+      "author": "peternmuller",
+      "description": "An APK and Magisk/KernelSU module builder for RV/RVX/Morphe apps. Updated hourly.",
+      "stars": 291,
+      "timestamp": 1793361958.0,
       "latest": {
         "zipUrl": "https://github.com/peternmuller/revanced-morphe-builder/releases/download/167/youtube-morphe-module-v21.30.216-all.zip",
         "changelog": ""
@@ -4280,12 +4393,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793361958.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zaprett",
+      "name": "zaprett",
       "version": "7.1.0",
       "versionCode": 0,
+      "author": "egor-white",
+      "description": "zaprett для Android – мощное средство для обхода замедлений и блокировок",
+      "stars": 211,
+      "timestamp": 1775987090.0,
       "latest": {
         "zipUrl": "https://github.com/egor-white/zaprett/releases/download/7.1.0/zaprett-hosts.zip",
         "changelog": ""
@@ -4313,12 +4432,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1775987090.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "project_raco",
+      "name": "Project-Raco",
       "version": "7.0",
       "versionCode": 0,
+      "author": "LoggingNewMemory",
+      "description": "Performance Module | I chase the light until it breaks the night",
+      "stars": 57,
+      "timestamp": 1788479882.0,
       "latest": {
         "zipUrl": "https://github.com/LoggingNewMemory/Project-Raco/releases/download/7.0/ProjectRaco-7.0-LAB.zip",
         "changelog": ""
@@ -4346,12 +4471,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1788479882.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "revanced_magisk_module",
+      "name": "revanced-magisk-module",
       "version": "49",
       "versionCode": 0,
+      "author": "hxreborn",
+      "description": "ReVanced builder.",
+      "stars": 11,
+      "timestamp": 1791736495.0,
       "latest": {
         "zipUrl": "https://github.com/hxreborn/revanced-magisk-module/releases/download/49/youtube-revanced-zygisk-module-v21.16.256-arm64-v8a.zip",
         "changelog": ""
@@ -4379,12 +4510,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791736495.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "better_creators_app_v1_0_0",
+      "name": "Better-Creators-App-v1.0.0",
       "version": "first-version",
       "versionCode": 0,
+      "author": "KittenLink",
+      "description": "",
+      "stars": 2,
+      "timestamp": 1791712391.0,
       "latest": {
         "zipUrl": "https://github.com/KittenLink/Better-Creators-App-v1.0.0/releases/download/first-version/Better.Creators.App-v1.0.0.zip",
         "changelog": ""
@@ -4412,12 +4549,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791712391.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "fox_hide",
+      "name": "fox-hide",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "FengYeTrade",
+      "description": "FoxHide Root Conceal · 深度隐藏 Root 环境模块（Bootloader 状态伪装/系统属性/痕迹清理），兼容 Magisk/KernelSU/APatch",
+      "stars": 1,
+      "timestamp": 1791714509.0,
       "latest": {
         "zipUrl": "https://github.com/FengYeTrade/fox-hide/releases/download/v1.0.0/foxhide-v1.0.zip",
         "changelog": ""
@@ -4445,12 +4588,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791714509.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magisk_pluskey",
+      "name": "magisk-pluskey",
       "version": "v0.2",
       "versionCode": 0,
+      "author": "naplon74",
+      "description": "Magisk module for OnePlus \"Plus key\"",
+      "stars": 0,
+      "timestamp": 1792666895.0,
       "latest": {
         "zipUrl": "https://github.com/naplon74/magisk-pluskey/releases/download/v0.2/pluskey-v0.2.zip",
         "changelog": ""
@@ -4478,12 +4627,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792666895.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "agentbox",
+      "name": "agentbox",
       "version": "v0.2.1",
       "versionCode": 0,
+      "author": "rjial",
+      "description": "Claude Code and Hermes Agent, running right on your Android phone.",
+      "stars": 2,
+      "timestamp": 1792014700.0,
       "latest": {
         "zipUrl": "https://github.com/rjial/agentbox/releases/download/v0.2.1/agentbox-v0.2.1-debug.zip",
         "changelog": ""
@@ -4511,12 +4666,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792014700.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "revanced_extended",
+      "name": "revanced-extended",
       "version": "162",
       "versionCode": 0,
+      "author": "NoName-exe",
+      "description": "ReVanced eXtended (now Morphe) YT and YT-M for both root and non-root users.",
+      "stars": 4244,
+      "timestamp": 1793406394.0,
       "latest": {
         "zipUrl": "https://github.com/NoName-exe/revanced-extended/releases/download/162/youtube-morphe-module-v21.30.216-all.zip",
         "changelog": ""
@@ -4544,12 +4705,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793406394.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "box_for_magisk",
+      "name": "box_for_magisk",
       "version": "v1.10.2",
       "versionCode": 0,
+      "author": "taamarin",
+      "description": "Transparent Proxy for Android(root) ",
+      "stars": 2530,
+      "timestamp": 1757076322.0,
       "latest": {
         "zipUrl": "https://github.com/taamarin/box_for_magisk/releases/download/v1.10.2/box_for_root-v1.10.2.zip",
         "changelog": ""
@@ -4577,12 +4744,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1757076322.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "bye_blur",
+      "name": "Bye-Blur",
       "version": "v8",
       "versionCode": 0,
+      "author": "LeanxModulostk",
+      "description": "Disable the blur effect, this improves performance by discarding this complex visual effect.",
+      "stars": 16,
+      "timestamp": 1792918658.0,
       "latest": {
         "zipUrl": "https://github.com/LeanxModulostk/Bye-Blur/releases/download/v8/Bye.Blur-v8.zip",
         "changelog": ""
@@ -4610,12 +4783,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792918658.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "scr01_sms_receive",
+      "name": "SCR01-SMS-Receive",
       "version": "v0.1.2",
       "versionCode": 0,
+      "author": "27Aaron",
+      "description": "A minimal KernelSU module that brings SMS send and receive back to the SCR01.",
+      "stars": 2,
+      "timestamp": 1791899273.0,
       "latest": {
         "zipUrl": "https://github.com/27Aaron/SCR01-SMS-Receive/releases/download/v0.1.2/SCR01-SMS-Receive-v0.1.2.zip",
         "changelog": ""
@@ -4643,12 +4822,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791899273.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "rackphone",
+      "name": "rackphone",
       "version": "0.2.0",
       "versionCode": 0,
+      "author": "NKTKLN",
+      "description": "Retired Android phones as monitored server units: LineageOS + Magisk plugins for Prometheus telemetry, battery-wear protection, and an incoming SMS/call relay, driven from a Python CLI over adb.",
+      "stars": 1,
+      "timestamp": 1790469518.0,
       "latest": {
         "zipUrl": "https://github.com/NKTKLN/rackphone/releases/download/0.2.0/rackphone-battery-v0.2.0.zip",
         "changelog": ""
@@ -4676,12 +4861,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790469518.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hilightlink",
+      "name": "HilightLink",
       "version": "2026.10.12",
       "versionCode": 0,
+      "author": "atrejokm301",
+      "description": "Link app notifications to the Hilight LEDs on the Pixel 11 Pro. Root module and app, with per-app patterns, call light, charging light and a music visualizer.",
+      "stars": 1,
+      "timestamp": 1791860915.0,
       "latest": {
         "zipUrl": "https://github.com/atrejokm301/HilightLink/releases/download/2026.10.12/HilightLink-module.zip",
         "changelog": ""
@@ -4709,12 +4900,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791860915.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "samsung_direct_power",
+      "name": "samsung-direct-power",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "qsardor",
+      "description": "Hardware-level 0W Direct Power delivery and AMOLED WebUI Governor for Samsung devices.",
+      "stars": 0,
+      "timestamp": 1791130718.0,
       "latest": {
         "zipUrl": "https://github.com/qsardor/samsung-direct-power/releases/download/v1.0/Samsung_Direct_Power.zip",
         "changelog": ""
@@ -4742,12 +4939,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791130718.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hyperos_launcher",
+      "name": "HyperOS-Launcher",
       "version": "V7.5",
       "versionCode": 0,
+      "author": "Mods-Center",
+      "description": "Enhanced HyperOS Launcher with improved blur effects, widget support, stacked recent, dock background, and customization options for a refined user experience. Optimized for smoother performance and a",
+      "stars": 439,
+      "timestamp": 1791944151.0,
       "latest": {
         "zipUrl": "https://github.com/Mods-Center/HyperOS-Launcher/releases/download/V7.5/HyperOS_LauncherV7.5F%40kashis_cringey_stuffs.zip",
         "changelog": ""
@@ -4775,12 +4978,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791944151.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "max_manger",
+      "name": "Max-Manger",
       "version": "v4.0",
       "versionCode": 0,
+      "author": "nader295",
+      "description": "Advanced performance & power control for rooted Android — monitor and tune CPU, GPU, RAM, ZRAM, thermals, and more with Max AI and Max Atlas.",
+      "stars": 56,
+      "timestamp": 1793237224.0,
       "latest": {
         "zipUrl": "https://github.com/nader295/MaxManager/releases/download/v4.0/MaxManager-V4.zip",
         "changelog": ""
@@ -4808,12 +5017,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793237224.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "susfs4lkm",
+      "name": "SUSFS4LKM",
       "version": "v0.1.1",
       "versionCode": 0,
+      "author": "Xiaogugtfgdfhgrh",
+      "description": "为KSU LKM适配SUSFS，让LKM也能使用无敌环境",
+      "stars": 15,
+      "timestamp": 1791958347.0,
       "latest": {
         "zipUrl": "https://github.com/Xiaogugtfgdfhgrh/SUSFS4LKM/releases/download/v0.1.1/SUSFS4LKM-arm64.zip",
         "changelog": ""
@@ -4841,12 +5056,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791958347.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "revancedmusic",
+      "name": "RevancedMusic",
       "version": "v9.15.51",
       "versionCode": 0,
+      "author": "rapid4ik",
+      "description": "YouTube-Music Revanced patching with Revancify Tools (Root & Non-Root)",
+      "stars": 1,
+      "timestamp": 1791970782.0,
       "latest": {
         "zipUrl": "https://github.com/rapid4ik/RevancedMusic/releases/download/v9.15.51/YouTubeMusic.RVX.v9.15.51.zip",
         "changelog": ""
@@ -4874,12 +5095,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1791970782.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "thermocharge",
+      "name": "ThermoCharge",
       "version": "v0.5.0",
       "versionCode": 0,
+      "author": "kino516",
+      "description": "按电池温度闭环控制充电速度、并可设定充电上限的 KernelSU / APatch 模块 · Rust 单二进制 + WebUI · 四模式独立配置 · 充电历史曲线 · 设备自适应，不预置任何机型数据",
+      "stars": 2,
+      "timestamp": 1792502296.0,
       "latest": {
         "zipUrl": "https://github.com/kino516/ThermoCharge/releases/download/v0.5.0/thermo_charge.zip",
         "changelog": ""
@@ -4907,12 +5134,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792502296.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "blockads",
+      "name": "BlockAds",
       "version": "v2.73",
       "versionCode": 0,
+      "author": "pantsufan",
+      "description": "Magisk module to block ads on android ",
+      "stars": 217,
+      "timestamp": 1792069742.0,
       "latest": {
         "zipUrl": "https://github.com/pantsufan/BlockAds/releases/download/v2.73/BlockAds-v2.73.zip",
         "changelog": ""
@@ -4940,12 +5173,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792069742.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "noogle_magisk",
+      "name": "noogle-magisk",
       "version": "v2026.10.26",
       "versionCode": 0,
+      "author": "SelfRef",
+      "description": "Magisk modules replacing Google Play Services with microG and unbundling Google apps on stock Android 11-17",
+      "stars": 142,
+      "timestamp": 1792984757.0,
       "latest": {
         "zipUrl": "https://github.com/SelfRef/noogle-magisk/releases/download/v2026.10.26/noogle-microg-catfish-v2026.10.26.zip",
         "changelog": ""
@@ -4973,12 +5212,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792984757.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "altdb",
+      "name": "altdb",
       "version": "0.3.0",
       "versionCode": 0,
+      "author": "Dr-TSNG",
+      "description": "A KernelSU module that provides alternative adb server over local network",
+      "stars": 91,
+      "timestamp": 1792302382.0,
       "latest": {
         "zipUrl": "https://github.com/Dr-TSNG/altdb/releases/download/0.3.0/altdb-v0.3.0-arm64.zip",
         "changelog": ""
@@ -5006,12 +5251,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792302382.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "faa_gamecore",
+      "name": "Faa-GameCore",
       "version": "v1.3.6",
       "versionCode": 0,
+      "author": "FaaRamadhann",
+      "description": "Universal Magisk game booster: blacklist/whitelist, game detection, profiles, freeze-unfreeze, Night Blue Sky WebUI",
+      "stars": 2,
+      "timestamp": 1792299661.0,
       "latest": {
         "zipUrl": "https://github.com/FaaRamadhann/Faa-GameCore/releases/download/v1.3.6/faagamecore-v1.3.6.zip",
         "changelog": ""
@@ -5039,12 +5290,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792299661.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "susfs4ksu_module",
+      "name": "susfs4ksu-module",
       "version": "v1.5.2+_R28",
       "versionCode": 0,
+      "author": "sidex15",
+      "description": "An addon root hiding service for KernelSU",
+      "stars": 2707,
+      "timestamp": 1785057061.0,
       "latest": {
         "zipUrl": "https://github.com/sidex15/susfs4ksu-module/releases/download/v1.5.2%2B_R28/ksu_module_susfs_1.5.2%2B.zip",
         "changelog": ""
@@ -5072,12 +5329,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1785057061.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "globalxiaoai",
+      "name": "GlobalXiaoAI",
       "version": "V1",
       "versionCode": 0,
+      "author": "leandropng",
+      "description": "This magisk module enables the china-rom XiaoAI for every other global ROM.",
+      "stars": 0,
+      "timestamp": 1792168701.0,
       "latest": {
         "zipUrl": "https://github.com/leandropng/GlobalXiaoAI/releases/download/V1/GlobalXiaoAI.zip",
         "changelog": ""
@@ -5105,12 +5368,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792168701.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "dsh_container",
+      "name": "dsh_container",
       "version": "v0.10.2",
       "versionCode": 0,
+      "author": "wccch-wzz",
+      "description": "不依赖 Termux 的 KernelSU 容器模块：内置 PRoot + Ubuntu + Node + DeepSeek Harness，WebUI 一键安装/开关/终端",
+      "stars": 0,
+      "timestamp": 1792237024.0,
       "latest": {
         "zipUrl": "https://github.com/wccch-wzz/dsh_container/releases/download/v0.10.2/dsh_container-0.10.2-lite.zip",
         "changelog": ""
@@ -5138,12 +5407,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792237024.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "maxmanager",
+      "name": "MaxManager",
       "version": "v4.0",
       "versionCode": 0,
+      "author": "nader295",
+      "description": "Advanced performance & power control for rooted Android — monitor and tune CPU, GPU, RAM, ZRAM, thermals, and more with Max AI and Max Atlas.",
+      "stars": 56,
+      "timestamp": 1793237224.0,
       "latest": {
         "zipUrl": "https://github.com/nader295/MaxManager/releases/download/v4.0/MaxManager-V4.zip",
         "changelog": ""
@@ -5171,12 +5446,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793237224.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "nzapret",
+      "name": "nzapret",
       "version": "v4.0.0",
       "versionCode": 0,
+      "author": "nikitos4683",
+      "description": "Android DPI-bypass module for Magisk and KernelSU powered by nfqws2, nztg, iptables, CLI and WebUI.",
+      "stars": 20,
+      "timestamp": 1792317124.0,
       "latest": {
         "zipUrl": "https://github.com/nikitos4683/nzapret/releases/download/v4.0.0/nzapret-v4.0.0.zip",
         "changelog": ""
@@ -5204,12 +5485,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792317124.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "google_sans_flex_magisk",
+      "name": "google-sans-flex-magisk",
       "version": "v1.4.1-auto",
       "versionCode": 0,
+      "author": "ethanm6",
+      "description": "Magisk module: systemlessly replaces the Android system font with Google Sans Flex (renamed to fix Gecko/Firefox rendering)",
+      "stars": 1,
+      "timestamp": 1792709835.0,
       "latest": {
         "zipUrl": "https://github.com/ethanm6/google-sans-flex-magisk/releases/download/v1.4.1-auto/Google_Sans_Flex_v1.4.1-auto.zip",
         "changelog": ""
@@ -5237,12 +5524,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792709835.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "keybox_rotator",
+      "name": "keybox-rotator",
       "version": "v1.0.1",
       "versionCode": 0,
+      "author": "larsmartens",
+      "description": "Fail-closed Android attestation keybox rotation with live Google root and CRL validation",
+      "stars": 2,
+      "timestamp": 1784974688.0,
       "latest": {
         "zipUrl": "https://github.com/larsmartens/keybox-rotator/releases/download/v1.0.1/keybox-rotator-v1.0.1.zip",
         "changelog": ""
@@ -5270,12 +5563,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1784974688.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "noto_emoji_magisk",
+      "name": "noto-emoji-magisk",
       "version": "v2.057-20260911",
       "versionCode": 0,
+      "author": "ethanm6",
+      "description": "Magisk module that auto-updates Android's stock Noto Color Emoji font to Google's latest build — no manual rebuilds, no Unicode lag.",
+      "stars": 0,
+      "timestamp": 1790920958.0,
       "latest": {
         "zipUrl": "https://github.com/ethanm6/noto-emoji-magisk/releases/download/v2.057-20260911/NotoColorEmoji_v2.057-20260911.zip",
         "changelog": ""
@@ -5303,12 +5602,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1790920958.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "simple_flag_secure",
+      "name": "Simple-Flag-Secure",
       "version": "v10.1",
       "versionCode": 0,
+      "author": "ShivamXD6",
+      "description": "👀 Lightweight root module that disables FLAG_SECURE, enabling screenshots & screen recording in restricted apps. Hides screenshot detection. Includes a toggleable privacy mode to block screenshots sys",
+      "stars": 164,
+      "timestamp": 1792410680.0,
       "latest": {
         "zipUrl": "https://github.com/ShivamXD6/Simple-Flag-Secure/releases/download/v10.1/Simple_Flag_Secure_v10.1.zip",
         "changelog": ""
@@ -5336,12 +5641,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792410680.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "play_detach",
+      "name": "play-detach",
       "version": "v1.0.2",
       "versionCode": 0,
+      "author": "nikakvo",
+      "description": "Zygisk module that stops the Play Store from updating the apps you choose. WebUI with app icons, no reboot needed.",
+      "stars": 2,
+      "timestamp": 1792355795.0,
       "latest": {
         "zipUrl": "https://github.com/nikakvo/play-detach/releases/download/v1.0.2/play-detach-v1.0.2.zip",
         "changelog": ""
@@ -5369,22 +5680,28 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792355795.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "znnext",
-      "version": "v2.7.1",
+      "name": "ZNNext",
+      "version": "v2.8.0",
       "versionCode": 0,
+      "author": "VeryBaaad",
+      "description": "A from-scratch, standalone implementation of the Zygisk Next module",
+      "stars": 94,
+      "timestamp": 1793417881.0,
       "latest": {
-        "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.7.1/ZNNext-v2.7.1-256-950ea9f-release.zip",
+        "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.8.0/ZNNext-v2.8.0-258-301e92b-release.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793371344.0,
-          "version": "v2.7.1",
+          "timestamp": 1793417881.0,
+          "version": "v2.8.0",
           "versionCode": 0,
-          "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.7.1/ZNNext-v2.7.1-256-950ea9f-release.zip",
+          "zipUrl": "https://github.com/VeryBaaad/ZNNext/releases/download/v2.8.0/ZNNext-v2.8.0-258-301e92b-release.zip",
           "changelog": "",
           "size": 0
         }
@@ -5402,12 +5719,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793371344.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "freshemoji",
+      "name": "FreshEmoji",
       "version": "v18.0.0",
       "versionCode": 0,
+      "author": "yuk7",
+      "description": "Install Newer Noto Emoji Font to Your Android",
+      "stars": 19,
+      "timestamp": 1792436114.0,
       "latest": {
         "zipUrl": "https://github.com/yuk7/FreshEmoji/releases/download/v18.0.0/FreshEmoji.zip",
         "changelog": ""
@@ -5435,12 +5758,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792436114.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "vowifiportedrom",
+      "name": "VoWiFiPortedRom",
       "version": "v1.0.1",
       "versionCode": 0,
+      "author": "Suiying6023",
+      "description": "面向 K50U 移植版 HyperOS 的 VoWiFi 注册与短信维护模块，附移植参考和 VOXI 保号说明。",
+      "stars": 2,
+      "timestamp": 1789286576.0,
       "latest": {
         "zipUrl": "https://github.com/Suiying6023/VoWiFiPortedRom/releases/download/v1.0.1/vowifi-stack-v7.zip",
         "changelog": ""
@@ -5468,12 +5797,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789286576.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "trim_music_fluid_cloud",
+      "name": "trim-music-fluid-cloud",
       "version": "v1.1",
       "versionCode": 0,
+      "author": "furry-Huxiaomo",
+      "description": "让飞牛音乐（com.trim.music）在 ColorOS 上获得完整的媒体流体云支持 —— 状态栏胶囊、锁屏媒体卡、AOD 卡片。",
+      "stars": 1,
+      "timestamp": 1792420045.0,
       "latest": {
         "zipUrl": "https://github.com/furry-Huxiaomo/trim-music-fluid-cloud/releases/download/v1.1/trim_music_fluid_cloud-v1.1.zip",
         "changelog": ""
@@ -5501,12 +5836,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792420045.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "launcher3_layout_customization",
+      "name": "launcher3-layout-customization",
       "version": "1",
       "versionCode": 0,
+      "author": "reddxae",
+      "description": "Change home screen grid using partner resources",
+      "stars": 0,
+      "timestamp": 1792456549.0,
       "latest": {
         "zipUrl": "https://github.com/reddxae/launcher3-layout-customization/releases/download/1/launcher3-layout-customization-4x6.zip",
         "changelog": ""
@@ -5534,12 +5875,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792456549.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "pico4_ultra_algo_test",
+      "name": "pico4-ultra-algo-test",
       "version": "v0.2",
       "versionCode": 0,
+      "author": "hhhbwc",
+      "description": "PICO 4 (standard): experimental Ultra BODYPOSE 1.0.0.54 body-tracking algorithm swap - Magisk module with runtime toggle, boot self-heal, fully reversible.",
+      "stars": 2,
+      "timestamp": 1789551911.0,
       "latest": {
         "zipUrl": "https://github.com/hhhbwc/pico4-ultra-algo-test/releases/download/v0.2/PICO4_UltraAlgo_Test_v0.2.zip",
         "changelog": ""
@@ -5567,12 +5914,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789551911.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ntsync_ayaneo_pocket_fit_g3gen3",
+      "name": "ntsync-ayaneo-pocket-fit-g3gen3",
       "version": "rootscript-v1.1",
       "versionCode": 0,
+      "author": "The412Banner",
+      "description": "ntsync kernel driver (Linux 6.17 backport) as a Magisk module for the AYANEO (KONKR) Pocket FIT, Snapdragon G3 Gen 3, stock Android 14",
+      "stars": 0,
+      "timestamp": 1792538758.0,
       "latest": {
         "zipUrl": "https://github.com/The412Banner/ntsync-ayaneo-pocket-fit-g3gen3/releases/download/rootscript-v1.1/ntsync-pocket-fit-g3gen3-rootscript-v1.1.zip",
         "changelog": ""
@@ -5600,45 +5953,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792538758.0
-    },
-    {
-      "id": "gnss_assist_fix",
-      "version": "",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1793414605.234307,
-          "version": "",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "gnss_assist_fix",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/whooslizi/gnss-assist-fix",
-        "license": "GPL-3.0",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1793414605.234307
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "mesa_turnip_builder",
+      "name": "Mesa-Turnip-Builder",
       "version": "19_sep_2026",
       "versionCode": 0,
+      "author": "v3kt0r-87",
+      "description": "Script to build Freedreno Turnip Vulkan Driver as a Module for Magisk or EMULATORS",
+      "stars": 221,
+      "timestamp": 1789761883.0,
       "latest": {
         "zipUrl": "https://github.com/v3kt0r-87/Mesa-Turnip-Builder/releases/download/19_sep_2026/Turnip-26.2.3-EMULATOR.zip",
         "changelog": ""
@@ -5666,45 +5992,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1789761883.0
-    },
-    {
-      "id": "ultra_extreme_unlocker",
-      "version": "0.0.2",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1768636007.0,
-          "version": "0.0.2",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "ultra_extreme_unlocker",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/shakilxt/ULTRA-EXTREME-UNLOCKER",
-        "license": "unknown",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1768636007.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "artex_magisk",
+      "name": "ARTEX-Magisk",
       "version": "v0.3.15-source",
       "versionCode": 0,
+      "author": "hmruu",
+      "description": "一个在手机运行ARTEX的方案",
+      "stars": 3,
+      "timestamp": 1792600159.0,
       "latest": {
         "zipUrl": "https://github.com/hmruu/ARTEX-Magisk/releases/download/v0.3.15-source/artex-0.3.15-source-linux-arm64.zip",
         "changelog": ""
@@ -5732,12 +6031,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792600159.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "lkm_susfs_manager",
+      "name": "lkm-susfs-manager",
       "version": "v1.1.9",
       "versionCode": 0,
+      "author": "DawnyFY",
+      "description": "KernelSU 系列 SUSFS LKM 自动匹配 / 加载与规则管理模块（中文 WebUI）",
+      "stars": 3,
+      "timestamp": 1792976547.0,
       "latest": {
         "zipUrl": "https://github.com/DawnyFY/lkm-susfs-manager/releases/download/v1.1.9/susfs_allinone-1.1.9.zip",
         "changelog": ""
@@ -5765,12 +6070,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792976547.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "realme_narzo_30a_rmx3171_keepqassa_unofficial",
+      "name": "Realme-Narzo-30A-RMX3171-keepQASSA-Unofficial",
       "version": "v2.5.s-RMX3171",
       "versionCode": 0,
+      "author": "omi4real",
+      "description": "Unofficial Android 10 (#keepQASSA) Custom ROM (Port) for the Realme Narzo 30A (RMX3171). #keepQalive",
+      "stars": 0,
+      "timestamp": 1793024153.0,
       "latest": {
         "zipUrl": "https://github.com/omi4real/Realme-Narzo-30A-RMX3171-keepQASSA-Unofficial/releases/download/v2.5.s-RMX3171/LiteGapps-arm64-10.0-RMX3171-Patched.zip",
         "changelog": ""
@@ -5798,22 +6109,28 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793024153.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "extradim_magisk",
-      "version": "v3.2",
+      "name": "ExtraDim-Magisk",
+      "version": "v3.3",
       "versionCode": 0,
+      "author": "shivrajtode",
+      "description": "Real Extra Dim for ROMs that lack it (Android 8 to 17+): colour-matrix dimming + Quick Settings tile, no overlay. Magisk module.",
+      "stars": 1,
+      "timestamp": 1793414877.0,
       "latest": {
-        "zipUrl": "https://github.com/shivrajtode/ExtraDim-Magisk/releases/download/v3.2/ExtraDim-v3.2.zip",
+        "zipUrl": "https://github.com/shivrajtode/ExtraDim-Magisk/releases/download/v3.3/ExtraDim-v3.3.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793270736.0,
-          "version": "v3.2",
+          "timestamp": 1793414877.0,
+          "version": "v3.3",
           "versionCode": 0,
-          "zipUrl": "https://github.com/shivrajtode/ExtraDim-Magisk/releases/download/v3.2/ExtraDim-v3.2.zip",
+          "zipUrl": "https://github.com/shivrajtode/ExtraDim-Magisk/releases/download/v3.3/ExtraDim-v3.3.zip",
           "changelog": "",
           "size": 0
         }
@@ -5831,12 +6148,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793270736.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "patchedmagiskssh",
+      "name": "PatchedMagiskSSH",
       "version": "v0.27",
       "versionCode": 0,
+      "author": "powerAn2020",
+      "description": "修补过的MagiskSSH，添加了ui，启用了日志功能。适用于KernelSU,Apatch,Magisk",
+      "stars": 39,
+      "timestamp": 1785468395.0,
       "latest": {
         "zipUrl": "https://github.com/powerAn2020/PatchedMagiskSSH/releases/download/v0.27/Patched-MagiskSSH.zip",
         "changelog": ""
@@ -5864,12 +6187,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1785468395.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "mithermalscheduler",
+      "name": "MiThermalScheduler",
       "version": "v2.4.0",
       "versionCode": 0,
+      "author": "MiChongs",
+      "description": "小米 / Redmi 设备 KernelSU 温控调度模块：多方案、按应用自动切换、过热保护、Material 3 WebUI",
+      "stars": 8,
+      "timestamp": 1792839363.0,
       "latest": {
         "zipUrl": "https://github.com/MiChongs/MiThermalScheduler/releases/download/v2.4.0/MiThermalScheduler-v2.4.0.zip",
         "changelog": ""
@@ -5897,12 +6226,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792839363.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "dirbridge",
+      "name": "DirBridge",
       "version": "v0.1.3",
       "versionCode": 0,
+      "author": "Liebig773",
+      "description": "KernelSU 多应用下载目录只读映射模块：不复制视频，支持中文 WebUI、多目录和开机自动应用。作者 liebig。",
+      "stars": 1,
+      "timestamp": 1792719066.0,
       "latest": {
         "zipUrl": "https://github.com/Liebig773/DirBridge/releases/download/v0.1.3/DirBridge-v0.1.3-source.zip",
         "changelog": ""
@@ -5930,12 +6265,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792719066.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "apple_electrocution_bootanimation",
+      "name": "Apple-electrocution-bootanimation",
       "version": "1.0",
       "versionCode": 0,
+      "author": "axy0n-qli",
+      "description": "Apple electrocution bootanimation for google pixel",
+      "stars": 2,
+      "timestamp": 1792853681.0,
       "latest": {
         "zipUrl": "https://github.com/axy0n-qli/Apple-electrocution-bootanimation/releases/download/1.0/apple-electrocution-bootanimation.zip",
         "changelog": ""
@@ -5963,12 +6304,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792853681.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "moto_g15_raw",
+      "name": "moto-g15-raw",
       "version": "v4",
       "versionCode": 0,
+      "author": "RchrdAriza",
+      "description": "Enable RAW16 capture on the Moto G15 (lamu) MediaTek camera HAL, so GCam ports work. KernelSU/Magisk module + patcher + RE tooling.",
+      "stars": 0,
+      "timestamp": 1792697233.0,
       "latest": {
         "zipUrl": "https://github.com/RchrdAriza/moto-g15-raw/releases/download/v4/moto_g15_raw_v4.zip",
         "changelog": ""
@@ -5996,12 +6343,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792697233.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "mondrian_game_boost",
+      "name": "Mondrian-Game-Boost",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "nanairo8890",
+      "description": "Game boost root module for the POCO F5 Pro / Redmi K60 (mondrian) on Project Infinity-X 4.1 and MistOS 5.1 Beta (KernelSU/BakaSU + NoMount)",
+      "stars": 0,
+      "timestamp": 1792685389.0,
       "latest": {
         "zipUrl": "https://github.com/nanairo8890/Mondrian-Game-Boost/releases/download/v1.0/Mondrian-Game-Boost-v1.0.zip",
         "changelog": ""
@@ -6029,12 +6382,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792685389.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "bitperfect_dac",
+      "name": "BitPerfect-DAC",
       "version": "v0.9.1",
       "versionCode": 0,
+      "author": "varunpilankar",
+      "description": "A Magisk module exploring bit-perfect USB DAC playback on Android by preventing unnecessary audio resampling for Apple Music, Spotify, and other supported audio apps.",
+      "stars": 0,
+      "timestamp": 1792660393.0,
       "latest": {
         "zipUrl": "https://github.com/varunpilankar/BitPerfect-DAC/releases/download/v0.9.1/BitPerfect-DAC-v0.9.1.zip",
         "changelog": ""
@@ -6062,12 +6421,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792660393.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "neozygisk",
+      "name": "NeoZygisk",
       "version": "v2.4",
       "versionCode": 0,
+      "author": "JingMatrix",
+      "description": "Zygote injection with ptrace",
+      "stars": 2530,
+      "timestamp": 1786215827.0,
       "latest": {
         "zipUrl": "https://github.com/JingMatrix/NeoZygisk/releases/download/v2.4/NeoZygisk-v2.4-289-debug.zip",
         "changelog": ""
@@ -6095,12 +6460,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1786215827.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "package_installer",
+      "name": "Package-Installer",
       "version": "V3",
       "versionCode": 0,
+      "author": "Mods-Center",
+      "description": "Modern package installer featuring enhanced UI, rich app info, Monet theme support, and update capabilities. Supports AOSP, HyperOS ColorOS, and more—without requiring Unknown Sources permission or MI",
+      "stars": 204,
+      "timestamp": 1792812802.0,
       "latest": {
         "zipUrl": "https://github.com/Mods-Center/Package-Installer/releases/download/V3/New_UI_Package_InstallerV3%40kashis_cringey_stuffs.zip",
         "changelog": ""
@@ -6128,12 +6499,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792812802.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "magisk_sakurafrpc",
+      "name": "Magisk-Sakurafrpc",
       "version": "v0.1.0",
       "versionCode": 0,
+      "author": "christarcher",
+      "description": "一个专用于SakuraFrp内网穿透的magisk模块,可以用来暴露手机上运行的服务,如adb,http服务等.",
+      "stars": 23,
+      "timestamp": 1711108692.0,
       "latest": {
         "zipUrl": "https://github.com/christarcher/Magisk-Sakurafrpc/releases/download/v0.1.0/v0.1.0.zip",
         "changelog": ""
@@ -6161,12 +6538,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1711108692.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "vpn_tethering_ultra",
+      "name": "vpn-tethering-ultra",
       "version": "v3.20.2",
       "versionCode": 0,
+      "author": "JagKubarev",
+      "description": "Модуль KernelSU/Magisk/APatch: раздача Wi-Fi и USB через VPN или напрямую — kill-switch, DoH через dnsproxy, обход DPI (zapret)",
+      "stars": 2,
+      "timestamp": 1793270450.0,
       "latest": {
         "zipUrl": "https://github.com/JagKubarev/vpn-tethering-ultra/releases/download/v3.20.2/VPN_Tethering_Ultra_v3.20.2.zip",
         "changelog": ""
@@ -6194,12 +6577,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793270450.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "revanced_extended_mnml",
+      "name": "revanced-extended-mnml",
       "version": "162",
       "versionCode": 0,
+      "author": "NoName-exe",
+      "description": "Minimal ReVanced eXtended YT and YT-M and more for both root and non-root users.",
+      "stars": 52,
+      "timestamp": 1792727520.0,
       "latest": {
         "zipUrl": "https://github.com/NoName-exe/revanced-extended-mnml/releases/download/162/youtube-morphe-mnml-module-v21.20.405-all.zip",
         "changelog": ""
@@ -6227,12 +6616,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792727520.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "redmagic_rgb_cycle",
+      "name": "redmagic-rgb-cycle",
       "version": "v3.5",
       "versionCode": 0,
+      "author": "KahramanEdit",
+      "description": "\"KernelSU-based RGB control center for RedMagic 11 Pro. Synchronizes logo, trigger and fan LEDs via AW22XXX LED driver; real-time management with WebUI.\"",
+      "stars": 4,
+      "timestamp": 1792499348.0,
       "latest": {
         "zipUrl": "https://github.com/KahramanEdit/redmagic-rgb-cycle/releases/download/v3.5/redmagic_rgb_cycle_v3_5_17.zip",
         "changelog": ""
@@ -6260,12 +6655,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792499348.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "oneplus13_spk_eq",
+      "name": "oneplus13-spk-eq",
       "version": "v1.2",
       "versionCode": 0,
+      "author": "lizi600jin",
+      "description": "一加13 双扬声器全局调音｜KernelSU 模块｜从功放寄存器实测出发设计的 10 段频域 EQ｜改配置即时生效",
+      "stars": 1,
+      "timestamp": 1792920940.0,
       "latest": {
         "zipUrl": "https://github.com/lizi600jin/oneplus13-audio-effect/releases/download/v1.2/spk-eq-v1.2.zip",
         "changelog": ""
@@ -6293,12 +6694,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792920940.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "glyphkeeper",
+      "name": "GlyphKeeper",
       "version": "v1.5.1",
       "versionCode": 0,
+      "author": "vaccreate",
+      "description": "Root module (KernelSU/Magisk) to control Nothing Phone (2a) Glyphs via sysfs and WebUI",
+      "stars": 1,
+      "timestamp": 1792920482.0,
       "latest": {
         "zipUrl": "https://github.com/vaccreate/GlyphKeeper/releases/download/v1.5.1/GlyphKeeper-v1.5.1.zip",
         "changelog": ""
@@ -6326,12 +6733,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792920482.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "android_call_recorder",
+      "name": "Android-Call-Recorder",
       "version": "1.5",
       "versionCode": 0,
+      "author": "Benojir",
+      "description": "Automatic call recorder app for Android (Rooted Device).",
+      "stars": 54,
+      "timestamp": 1724441728.0,
       "latest": {
         "zipUrl": "https://github.com/Benojir/Android-Call-Recorder/releases/download/1.5/Call-Recorder_v1.5-Magisk.zip",
         "changelog": ""
@@ -6359,12 +6772,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1724441728.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "unityfix",
+      "name": "UnityFix",
       "version": "v9",
       "versionCode": 0,
+      "author": "LeanxModulostk",
+      "description": "Unity app incorrectly sets cpu affinity to max capacity cores. Setup the library name and mask to always report the same max cpu freq to the tasks.",
+      "stars": 38,
+      "timestamp": 1792971800.0,
       "latest": {
         "zipUrl": "https://github.com/LeanxModulostk/UnityFix/releases/download/v9/UnityFix.v9.zip",
         "changelog": ""
@@ -6392,12 +6811,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792971800.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "oneplus13_audio_effect",
+      "name": "oneplus13-audio-effect",
       "version": "v1.2",
       "versionCode": 0,
+      "author": "lizi600jin",
+      "description": "一加13音效｜一加13 扬声器音效模块｜KernelSU/Magisk 全局 EQ，只对内置扬声器生效，插蓝牙/USB 耳机自动旁路｜从功放寄存器实测（衰减量 64/48、f0 714~758Hz）反推曲线｜改配置 1 秒生效",
+      "stars": 1,
+      "timestamp": 1792920940.0,
       "latest": {
         "zipUrl": "https://github.com/lizi600jin/oneplus13-audio-effect/releases/download/v1.2/spk-eq-v1.2.zip",
         "changelog": ""
@@ -6425,12 +6850,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792920940.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "adguard_ca_nomount",
+      "name": "Adguard-CA-NoMount",
       "version": "v0.1.2",
       "versionCode": 0,
+      "author": "craftingmod",
+      "description": "NoMount implementation of adguard CA",
+      "stars": 0,
+      "timestamp": 1792914004.0,
       "latest": {
         "zipUrl": "https://github.com/craftingmod/Adguard-CA-NoMount/releases/download/v0.1.2/adguard-ca-nomount-0.1.2.zip",
         "changelog": ""
@@ -6458,12 +6889,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792914004.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ios_26_control_centre_module",
+      "name": "iOS-26-Control-Centre-Module",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "dextrecs-mc",
+      "description": "Systemless iOS 26-style Control Centre module for the HyperOS 3 SystemUI Plugin. Wraps the original APK so it can be flashed instead of sideloaded. ⚠️ May bootloop — read the README.",
+      "stars": 0,
+      "timestamp": 1792931063.0,
       "latest": {
         "zipUrl": "https://github.com/dextrecs-mc/iOS-26-Control-Centre-Module/releases/download/v1.0/v1.0-iOS-26-CC-Module.zip",
         "changelog": ""
@@ -6491,12 +6928,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792931063.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "k90promax_cpuctl",
+      "name": "K90ProMax-cpuctl",
       "version": "v1.8.3",
       "versionCode": 0,
+      "author": "j4525wnm56-commits",
+      "description": "Redmi K90 Pro Max (myron / SM8850) 的 CPU+GPU 频率档位管理模块，带本地网页界面 / CPU & GPU frequency profile manager for Redmi K90 Pro Max with built-in WebUI",
+      "stars": 0,
+      "timestamp": 1793393244.0,
       "latest": {
         "zipUrl": "https://github.com/j4525wnm56-commits/K90ProMax-cpuctl/releases/download/v1.8.3/K90ProMax-cpuctl-v1.8.3.zip",
         "changelog": ""
@@ -6524,12 +6967,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793393244.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "y700_cpuctl",
+      "name": "y700-cpuctl",
       "version": "v1.2.1",
       "versionCode": 0,
+      "author": "j4525wnm56-commits",
+      "description": "联想拯救者 Y700 一代 (TB-9707F / sheng) 的 CPU 频率分档控制模块，带本地网页界面 / CPU frequency profile manager for Lenovo Legion Y700 Gen 1 with built-in WebUI",
+      "stars": 0,
+      "timestamp": 1792983927.0,
       "latest": {
         "zipUrl": "https://github.com/j4525wnm56-commits/y700-cpuctl/releases/download/v1.2.1/y700-cpuctl-v1.2.1.zip",
         "changelog": ""
@@ -6557,12 +7006,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1792983927.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "audio_misc_settings",
+      "name": "audio-misc-settings",
       "version": "v1.3.12",
       "versionCode": 0,
+      "author": "Magisk-Modules-Alt-Repo",
+      "description": "A Magisk module for setting miscellaneous audio configuration values (media audio volume steps (100 steps), raising the resampling quality, disabling the effects framework, etc.) ",
+      "stars": 347,
+      "timestamp": 1793025937.0,
       "latest": {
         "zipUrl": "https://github.com/Magisk-Modules-Alt-Repo/audio-misc-settings/releases/download/v1.3.12/magisk-module-audio-misc-v1.3.12.zip",
         "changelog": ""
@@ -6590,12 +7045,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793025937.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "stevenblock",
+      "name": "StevenBlock",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "mikropsoft",
+      "description": "🚫 Advanced Ad-Blocking Module for Android | Compatible with Magisk, KernelSU, and APatch 🔒",
+      "stars": 306,
+      "timestamp": 1793021931.0,
       "latest": {
         "zipUrl": "https://github.com/mikropsoft/StevenBlock/releases/download/v1.0/StevenBlock.zip",
         "changelog": ""
@@ -6623,12 +7084,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793021931.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "stevenblock_2",
+      "name": "StevenBlock",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "Magisk-Modules-Alt-Repo",
+      "description": "🚫 Advanced Ad-Blocking Module for Android | Compatible with Magisk, KernelSU, and APatch 🔒",
+      "stars": 82,
+      "timestamp": 1793021932.0,
       "latest": {
         "zipUrl": "https://github.com/Magisk-Modules-Alt-Repo/StevenBlock/releases/download/v1.0/StevenBlock.zip",
         "changelog": ""
@@ -6656,12 +7123,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793021932.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "strace",
+      "name": "strace",
       "version": "v2",
       "versionCode": 0,
+      "author": "evdenis",
+      "description": "Magisk Module with strace",
+      "stars": 45,
+      "timestamp": 1774353046.0,
       "latest": {
         "zipUrl": "https://github.com/evdenis/strace/releases/download/v2/strace-v2.zip",
         "changelog": ""
@@ -6689,45 +7162,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1774353046.0
-    },
-    {
-      "id": "vanadiumwebviewmanager",
-      "version": "v2",
-      "versionCode": 0,
-      "latest": {
-        "zipUrl": "",
-        "changelog": ""
-      },
-      "versions": [
-        {
-          "timestamp": 1792768362.0,
-          "version": "v2",
-          "versionCode": 0,
-          "zipUrl": "",
-          "changelog": "",
-          "size": 0
-        }
-      ],
-      "track": {
-        "id": "vanadiumwebviewmanager",
-        "enable": true,
-        "verified": false,
-        "update_to": "update.json",
-        "source": "https://github.com/LeanxModulostk/VanadiumWebviewManager",
-        "license": "unknown",
-        "category": "Utility",
-        "arch": [
-          "arm64-v8a"
-        ],
-        "changelog": ""
-      },
-      "timestamp": 1792768362.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "disable_default_game_frame_rate",
+      "name": "disable-default-game-frame-rate",
       "version": "v1.0",
       "versionCode": 0,
+      "author": "JustMLC4real",
+      "description": "A minimal Magisk module that reapplies the Android default game frame rate override after reboot.",
+      "stars": 0,
+      "timestamp": 1793004242.0,
       "latest": {
         "zipUrl": "https://github.com/JustMLC4real/disable-default-game-frame-rate/releases/download/v1.0/Disable-Default-Game-Frame-Rate-v1.0.zip",
         "changelog": ""
@@ -6755,12 +7201,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793004242.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "901si_gsi_fixes",
+      "name": "901si-gsi-fixes",
       "version": "v1.2",
       "versionCode": 0,
+      "author": "PDWYX",
+      "description": "Magisk fixes for running Android 9 GSI on SoftBank 901si (msm8909 / Adreno 304)",
+      "stars": 0,
+      "timestamp": 1793028468.0,
       "latest": {
         "zipUrl": "https://github.com/PDWYX/901si-gsi-fixes/releases/download/v1.2/901si-gsi-fixes-v1.0.zip",
         "changelog": ""
@@ -6788,12 +7240,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793028468.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "zygote64_32_ksu",
+      "name": "zygote64_32_ksu",
       "version": "v1.1",
       "versionCode": 0,
+      "author": "budja8",
+      "description": "Re-enables the 32-bit secondary zygote and armeabi-v7a ABIs on 64-bit-only ROMs that still ship 32-bit userspace. Requires ReSukiSU/BakaSU initrc support.",
+      "stars": 0,
+      "timestamp": 1793045151.0,
       "latest": {
         "zipUrl": "https://github.com/budja8/zygote64_32_ksu/releases/download/v1.1/zygote64_32_ksu-v1.1.zip",
         "changelog": ""
@@ -6821,12 +7279,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793045151.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "realme_narzo_30a_magisk_addons",
+      "name": "Realme-Narzo-30A-Magisk-Addons",
       "version": "v2.0",
       "versionCode": 0,
+      "author": "omi4real",
+      "description": "Hardware-calibrated root modules and audio enhancements for the Realme Narzo 30A (RMX3171).",
+      "stars": 0,
+      "timestamp": 1793008750.0,
       "latest": {
         "zipUrl": "https://github.com/omi4real/Realme-Narzo-30A-Magisk-Addons/releases/download/v2.0/N30A_AudioBoost_Magisk.zip",
         "changelog": ""
@@ -6854,12 +7318,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793008750.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "groupguard_android",
+      "name": "groupguard-android",
       "version": "v1.1.1",
       "versionCode": 0,
+      "author": "zhangdunlong",
+      "description": "GroupGuard Telegram 群管机器人的 Android 常驻方案：Magisk 模块实现开机自启与看门狗保活",
+      "stars": 0,
+      "timestamp": 1793017477.0,
       "latest": {
         "zipUrl": "https://github.com/zhangdunlong/groupguard-android/releases/download/v1.1.1/groupguard-magisk-v1.1.1.zip",
         "changelog": ""
@@ -6887,12 +7357,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793017477.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "astra_maxrefresh_pro",
+      "name": "Astra_MaxRefresh_Pro",
       "version": "6.1",
       "versionCode": 0,
+      "author": "MuYuanXing",
+      "description": "星驰引擎_极速高刷Pro，欧加真满血高刷模块，适配超频DTBO，全局锁定刷新率，自定义应用刷新率档位。",
+      "stars": 22,
+      "timestamp": 1793182685.0,
       "latest": {
         "zipUrl": "https://github.com/MuYuanXing/Astra_MaxRefresh_Pro/releases/download/6.1/Astra_MaxRefresh_Pro_6.1.zip",
         "changelog": ""
@@ -6920,12 +7396,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793182685.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "xiaomiplaystorefix",
+      "name": "XiaomiPlayStoreFix",
       "version": "v1.3",
       "versionCode": 0,
+      "author": "leapdragon",
+      "description": "Fix Google Play Store crashes, stuck downloads and high CPU on Xiaomi/Redmi/POCO (HyperOS/MIUI) caused by the ROM's buggy built-in Cronet. Magisk/Zygisk module, no Xposed needed.",
+      "stars": 2,
+      "timestamp": 1793088861.0,
       "latest": {
         "zipUrl": "https://github.com/leapdragon/XiaomiPlayStoreFix/releases/download/v1.3/XiaomiPlayStoreFix-1.3.zip",
         "changelog": ""
@@ -6953,12 +7435,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793088861.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "acc_automatic_cache_cleaner",
+      "name": "ACC-Automatic-Cache-Cleaner",
       "version": "v1.1.3",
       "versionCode": 0,
+      "author": "raafi-abir",
+      "description": "A lightweight Magisk & KernelSU module that automatically cleans Android app caches, leftover folders, temporary files, and system junk. Features scheduled daily cleanup, manual cleaning, app exclusio",
+      "stars": 1,
+      "timestamp": 1793389212.0,
       "latest": {
         "zipUrl": "https://github.com/raafi-abir/ACC-Automatic-Cache-Cleaner/releases/download/v1.1.3/ACC-Automatic-Cache-Cleaner-v1.1.3.zip",
         "changelog": ""
@@ -6986,12 +7474,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793389212.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "call_of_duty_mobile_120fps_magisk",
+      "name": "call-of-duty-mobile-120fps-magisk",
       "version": "v5.1",
       "versionCode": 0,
+      "author": "AJfiles",
+      "description": "Call Of Duty Mobile Global (Root) 120FPS Module Magisk (Test S23 Ultra)",
+      "stars": 0,
+      "timestamp": 1793168833.0,
       "latest": {
         "zipUrl": "https://github.com/AJfiles/COD-Mobile-120fps-magisk/releases/download/v5.1/codm_s23_120_v5.1.zip",
         "changelog": ""
@@ -7019,12 +7513,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793168833.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "9routerandroid",
+      "name": "9RouterAndroid",
       "version": "v1.0.6",
       "versionCode": 0,
+      "author": "OmmniDevv",
+      "description": "9Router LLM gateway for rooted Android via Magisk/KernelSU. Standalone runtime with bundled glibc and Node.js 22 LTS, by OmmniDevv.",
+      "stars": 0,
+      "timestamp": 1793162106.0,
       "latest": {
         "zipUrl": "https://github.com/OmmniDevv/9RouterAndroid/releases/download/v1.0.6/9RouterAndroid-v1.0.6.zip",
         "changelog": ""
@@ -7052,12 +7552,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793162106.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hermesandroid",
+      "name": "HermesAndroid",
       "version": "v1.0.3",
       "versionCode": 0,
+      "author": "OmmniDevv",
+      "description": "Hermes Agent on rooted Android via Magisk/KernelSU. Fixed mirror of the original by TDat (Python 3.14 fix for the fastapi install failure). Original: https://github.com/dat-hoangnguyentuandat/HermesAn",
+      "stars": 0,
+      "timestamp": 1793162995.0,
       "latest": {
         "zipUrl": "https://github.com/OmmniDevv/HermesAndroid/releases/download/v1.0.3/HermesAndroid-v1.0.3.zip",
         "changelog": ""
@@ -7085,12 +7591,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793162995.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "resusfs_2",
+      "name": "ReSuSFS",
       "version": "v26.10.23-patch1",
       "versionCode": 0,
+      "author": "OmmniDevv",
+      "description": "ReSuSFS v26.10.23 with KMI detection patch for custom kernels (original by ahmed-alnassif, patch by OmmniDevv)",
+      "stars": 0,
+      "timestamp": 1793168027.0,
       "latest": {
         "zipUrl": "https://github.com/OmmniDevv/ReSuSFS/releases/download/v26.10.23-patch1/ReSuSFS-v26.10.23-patched-kmi.zip",
         "changelog": ""
@@ -7118,12 +7630,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793168027.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "wavebuds",
+      "name": "wavebuds",
       "version": "v1.3",
       "versionCode": 0,
+      "author": "3xa228148",
+      "description": "Open-source Android app for JBL Wave Buds earbuds: ambient sound, equalizer, touch controls, battery, auto-reconnect. Lightweight alternative to the JBL Headphones app.",
+      "stars": 0,
+      "timestamp": 1793257930.0,
       "latest": {
         "zipUrl": "https://github.com/3xa228148/wavebuds/releases/download/v1.3/WaveBuds-magisk.zip",
         "changelog": ""
@@ -7151,12 +7669,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793257930.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "cod_mobile_120fps_magisk",
+      "name": "COD-Mobile-120fps-magisk",
       "version": "v5.1",
       "versionCode": 0,
+      "author": "AJfiles",
+      "description": "Call Of Duty Mobile Global (Root) 120FPS Module Magisk (Test S23 Ultra)",
+      "stars": 0,
+      "timestamp": 1793168833.0,
       "latest": {
         "zipUrl": "https://github.com/AJfiles/COD-Mobile-120fps-magisk/releases/download/v5.1/codm_s23_120_v5.1.zip",
         "changelog": ""
@@ -7184,12 +7708,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793168833.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "ginkgo_camera_mic_fix",
+      "name": "ginkgo-camera-mic-fix",
       "version": "v1.0.0",
       "versionCode": 0,
+      "author": "whoisstof",
+      "description": "Magisk module for Redmi Note 8 (ginkgo) on LineageOS 24: disables the faulty S5KGM1 rear main camera, makes the OV8856 ultrawide the default rear camera, and disables Fluence so the microphone works. ",
+      "stars": 0,
+      "timestamp": 1793243772.0,
       "latest": {
         "zipUrl": "https://github.com/whoisstof/ginkgo-camera-mic-fix/releases/download/v1.0.0/camera-fix-ginkgo.zip",
         "changelog": ""
@@ -7217,12 +7747,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793243772.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "fastcharge_next",
+      "name": "Fastcharge-next",
       "version": "v2.0.2",
       "versionCode": 0,
+      "author": "Dev97633",
+      "description": "⚡ Magisk Module to boost charging speed with smart tweaks.",
+      "stars": 51,
+      "timestamp": 1775992646.0,
       "latest": {
         "zipUrl": "https://github.com/Dev97633/Fastcharge-next/releases/download/v2.0.2/fastcharge-next-v2.0.2.zip",
         "changelog": ""
@@ -7250,12 +7786,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1775992646.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "susfs4ksu_lkm_hide_mounts_by_mask",
+      "name": "susfs4ksu-lkm-hide-mounts-by-mask",
       "version": "v0.1",
       "versionCode": 0,
+      "author": "evgenyvolferts",
+      "description": "KernelSU Next companion module for SUSFS4KSU-for-LKM. Automatically hides mountinfo entries using configurable masks, with a Material You WebUI.",
+      "stars": 2,
+      "timestamp": 1793302128.0,
       "latest": {
         "zipUrl": "https://github.com/evgenyvolferts/susfs4ksu-lkm-hide-mounts-by-mask/releases/download/v0.1/susfs4ksu-lkm-hide-mounts-by-mask-v0.1.zip",
         "changelog": ""
@@ -7283,12 +7825,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793302128.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "qqbot_bridge",
+      "name": "qqbot-bridge",
       "version": "v2.1.0",
       "versionCode": 0,
+      "author": "wzww886",
+      "description": "Run a QQ AI bot on an old rooted Android phone — no VPS required. Magisk/KernelSU, OpenAI-compatible LLMs, persistent persona memory, stickers & watchdog recovery.",
+      "stars": 1,
+      "timestamp": 1793288679.0,
       "latest": {
         "zipUrl": "https://github.com/wzww886/qqbot-bridge/releases/download/v2.1.0/qqbot_bridge-v2.1.0.zip",
         "changelog": ""
@@ -7316,22 +7864,28 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793288679.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "workbuddy2api_panel_magisk",
-      "version": "v26.10.31_1",
+      "name": "workbuddy2api-panel-magisk",
+      "version": "v26.10.31_2",
       "versionCode": 0,
+      "author": "huxc573",
+      "description": "把 WorkBuddy2API Panel 做成 Android arm64 的 Magisk/APatch/KernelSU 模块：开机自启、崩溃拉起、自动跟随上游更新",
+      "stars": 0,
+      "timestamp": 1793420879.0,
       "latest": {
-        "zipUrl": "https://github.com/huxc573/workbuddy2api-panel-magisk/releases/download/v26.10.31_1/WorkBuddy2API-Magisk-v26.10.31_1.zip",
+        "zipUrl": "https://github.com/huxc573/workbuddy2api-panel-magisk/releases/download/v26.10.31_2/WorkBuddy2API-Magisk-v26.10.31_2.zip",
         "changelog": ""
       },
       "versions": [
         {
-          "timestamp": 1793414220.0,
-          "version": "v26.10.31_1",
+          "timestamp": 1793420879.0,
+          "version": "v26.10.31_2",
           "versionCode": 0,
-          "zipUrl": "https://github.com/huxc573/workbuddy2api-panel-magisk/releases/download/v26.10.31_1/WorkBuddy2API-Magisk-v26.10.31_1.zip",
+          "zipUrl": "https://github.com/huxc573/workbuddy2api-panel-magisk/releases/download/v26.10.31_2/WorkBuddy2API-Magisk-v26.10.31_2.zip",
           "changelog": "",
           "size": 0
         }
@@ -7349,12 +7903,18 @@
         ],
         "changelog": ""
       },
-      "timestamp": 1793414220.0
+      "readme": "",
+      "icon": ""
     },
     {
       "id": "hma-uidfake",
+      "name": "HMA UID Fake",
       "version": "0.4.0+1c71b6c",
       "versionCode": 4000,
+      "author": "Kodatemitsuru",
+      "description": "为被标记为高风险的应用伪造 UID，使其无法被 UID 扫描器探测到（内核 LKM 模块，仅供高级用户）",
+      "stars": 0,
+      "timestamp": 1793389301.0,
       "latest": {
         "zipUrl": "https://github.com/qianyumeng0228/ShizuSU-Modules/raw/main/private/hma-uidfake-0.4.0-1c71b6c.zip",
         "changelog": ""
@@ -7384,10 +7944,12 @@
         "note": "上游 KodateMitsuru/hma-uidfake 已不可访问（404），由管理员背书收录 zip 本体；包内 lkmloader.LICENSE 为 MIT",
         "origin": "manual"
       },
-      "timestamp": 1793389301.0
+      "readme": "",
+      "icon": ""
     }
   ],
   "metadata": {
-    "timestamp": 1793414605.234307
+    "version": 1,
+    "timestamp": 1793421603.314281
   }
 }
