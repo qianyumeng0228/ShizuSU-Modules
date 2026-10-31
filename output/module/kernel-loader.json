@@ -1,0 +1,100 @@
+{
+  "readme": "<div align=\"center\">\n\n<img src=\"app/src/main/res/mipmap-xxxhdpi/ic_launcher.png\" width=\"72\" alt=\"Kernel Loader\" onerror=\"this.style.display='none'\"/>\n\n# Kernel Loader\n\n### Automated Kernel Module Loader and Diagnostic Suite for Android\n**Detects running kernel · Downloads matching module · In-app verification**\n\n[![Release](https://img.shields.io/github/v/release/bmjubairdadu/kernel-loader?style=flat-square)](../../releases/latest)\n[![Platform](https://img.shields.io/badge/platform-Android%209%2B%20arm64-green?style=flat-square)](#requirements)\n[![Root](https://img.shields.io/badge/root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red?style=flat-square)](#requirements)\n[![License: GPL-3.0](https://img.shields.io/badge/license-GPL%20v3-blue?style=flat-square)](LICENSE)\n\n</div>\n\n---\n\n**Kernel Loader** is a root-powered Android application designed to resolve, download, insert, and verify kernel modules (`.ko`) across Linux kernels 4.9 through 6.12. It matches the exact running kernel against a live OTA driver catalog, verifies real-time physical memory read/write access via an integrated verification binary (`Driver.sh`), and packages complete hardware diagnostic dumps for custom driver compilation.\n\n---\n\n## Key Features\n\n- **Unified Load Pipeline**: Automatically matches the exact kernel version, downloads the compatible driver from the live OTA repository, and loads it into kernel space.\n- **In-App R/W Verification**: Direct execution of the `Driver.sh` memory engine within the terminal screen to verify physical memory read and write operations.\n- **Detailed Error Reporting**: When a module load fails, the loader extracts and displays the root cause directly from kernel ring buffers (`dmesg`), avoiding generic verification errors.\n- **Diagnostic Report Pack**: Generates a self-contained ZIP archive containing:\n  - Exact `boot.img` partition dump (detected via active A/B slot and block device mapping).\n  - Full kernel symbol table (`/proc/kallsyms`).\n  - Sample OEM vendor module (`.ko`) with extracted compiler vermagic and configuration.\n  - Decompressed kernel configuration (`/proc/config.gz` or `/proc/config`).\n  - Kernel ring buffer logs (`dmesg`) and live application logs.\n- **One-Tap Sharing**: Direct integration with WhatsApp and Telegram with full FileProvider permission handling and clip-data propagation.\n- **Security and Hardening**:\n  - Full-mode R8 code shrinking and class obfuscation.\n  - Runtime anti-tamper shield detecting Frida, debuggers, ptrace, and Xposed hooks.\n  - Network security configuration enforcing direct connections (`NO_PROXY`).\n\n---\n\n## Screenshots\n\n| Home | Live Terminal |\n|---|---|\n| ![Home](docs/screenshots/main.png) | ![Console](docs/screenshots/console.png) |\n\n---\n\n## Requirements\n\n| Component | Requirement |\n|---|---|\n| Root Provider | Magisk, KernelSU, or APatch (Superuser access required) |\n| Architecture | ARM64 (aarch64) |\n| Android Version | Android 9.0 (API level 28) or higher |\n| Connectivity | Internet connection for OTA driver catalog and updates |\n\n---\n\n## Execution Workflow\n\n```text\nTap LOAD\n   │\n   ├─► Pre-flight validation (Root check, Kernel release, Architecture)\n   │\n   ├─► OTA catalog resolution (Exact kernel match from repository)\n   │\n   ├─► Download and integrity verification\n   │\n   ├─► Staged insmod execution via root shell\n   │\n   └─► Device node verification and live dmesg validation\n```\n\n---\n\n## Diagnostic Report Structure\n\nWhen building custom drivers for unsupported kernels, the generated ZIP archive includes:\n\n```text\nreport_<device>_<kernel>.zip\n├─ boot.img                  Raw boot partition dump (kernel + ramdisk + dtb)\n├─ boot_info.txt             Block device path, header version, and sizes\n├─ kallsyms.txt              Kernel symbol addresses (/proc/kallsyms)\n├─ sample_vendor_module.ko   Real OEM module from /vendor/lib/modules\n├─ vendor_modinfo.txt        Compiler version, vermagic, and module info\n├─ config.txt                Kernel configuration options (IKCONFIG)\n├─ dmesg.txt                 Kernel ring buffer tail and insmod error details\n├─ applog.txt                Application execution console log\n├─ proc_cmdline.txt          Kernel boot arguments\n├─ proc_version.txt          Kernel compiler and toolchain identification\n├─ proc_cpuinfo.txt          CPU hardware specifications\n├─ device_props.txt          Android system properties dump\n└─ manifest.txt              Summary manifest of all collected artifacts\n```\n\n---\n\n## Building from Source\n\n```bash\ngit clone https://github.com/bmjubairdadu/kernel-loader.git\ncd kernel-loader\n./gradlew assembleRelease\n```\n\nThe release APK will be generated at:\n`app/build/outputs/apk/release/Kernel-Loader-v2.2.apk`\n\n- Language: Kotlin\n- UI Framework: Jetpack Compose\n- Root Management: libsu\n- Target SDK: 34 (Android 14)\n- Minimum SDK: 28 (Android 9)\n\n---\n\n## Security Model\n\n| Security Layer | Implementation |\n|---|---|\n| Code Obfuscation | R8 full-mode enabled with aggressive name mangling |\n| Debugger Protection | Checks `TracerPid` in `/proc/self/status` and `android.os.Debug` |\n| Instrumentation Guard | Inspects loaded memory maps for Frida (`frida-agent.so`, `/data/local/tmp/re.frida.server`) |\n| Network Integrity | Cleartext traffic disabled; network requests bypass proxy configurations |\n| Storage Isolation | Diagnostic staging files isolated in application cache with restricted permissions |\n\n---\n\n## Disclaimer\n\nLoading custom kernel modules requires root access and carries inherent risks including device reboots or bootloops if an incompatible module is loaded. While Kernel Loader conducts pre-load validations, users are advised to maintain backups of their boot images.\n\n---\n\n## License\n\nAuthor: [JUBAIR HOSEN](https://github.com/bmjubairdadu)  \nLicensed under the [GNU General Public License v3.0](LICENSE).\n",
+  "readmeHTML": "<p><div align=\"center\"></p>\n\n<p><img src=\"app/src/main/res/mipmap-xxxhdpi/ic_launcher.png\" width=\"72\" alt=\"Kernel Loader\" onerror=\"this.style.display='none'\"/></p>\n\n<h1>Kernel Loader</h1>\n\n<h3>Automated Kernel Module Loader and Diagnostic Suite for Android</h3>\n<p><b>Detects running kernel · Downloads matching module · In-app verification</b></p>\n\n<p><a href=\"https://img.shields.io/github/v/release/bmjubairdadu/kernel-loader?style=flat-square\">![Release</a>](../../releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/platform-Android%209%2B%20arm64-green?style=flat-square\">![Platform</a>](#requirements)</p>\n<p><a href=\"https://img.shields.io/badge/root-Magisk%20%7C%20KernelSU%20%7C%20APatch-red?style=flat-square\">![Root</a>](#requirements)</p>\n<p><a href=\"https://img.shields.io/badge/license-GPL%20v3-blue?style=flat-square\">![License: GPL-3.0</a>](LICENSE)</p>\n\n<p></div></p>\n\n<p>---</p>\n\n<p><b>Kernel Loader</b> is a root-powered Android application designed to resolve, download, insert, and verify kernel modules (<code>.ko</code>) across Linux kernels 4.9 through 6.12. It matches the exact running kernel against a live OTA driver catalog, verifies real-time physical memory read/write access via an integrated verification binary (<code>Driver.sh</code>), and packages complete hardware diagnostic dumps for custom driver compilation.</p>\n\n<p>---</p>\n\n<h2>Key Features</h2>\n\n<li>**Unified Load Pipeline**: Automatically matches the exact kernel version, downloads the compatible driver from the live OTA repository, and loads it into kernel space.</li>\n<li>**In-App R/W Verification**: Direct execution of the `Driver.sh` memory engine within the terminal screen to verify physical memory read and write operations.</li>\n<li>**Detailed Error Reporting**: When a module load fails, the loader extracts and displays the root cause directly from kernel ring buffers (`dmesg`), avoiding generic verification errors.</li>\n<li>**Diagnostic Report Pack**: Generates a self-contained ZIP archive containing:</li>\n<p>  - Exact <code>boot.img</code> partition dump (detected via active A/B slot and block device mapping).</p>\n<p>  - Full kernel symbol table (<code>/proc/kallsyms</code>).</p>\n<p>  - Sample OEM vendor module (<code>.ko</code>) with extracted compiler vermagic and configuration.</p>\n<p>  - Decompressed kernel configuration (<code>/proc/config.gz</code> or <code>/proc/config</code>).</p>\n<p>  - Kernel ring buffer logs (<code>dmesg</code>) and live application logs.</p>\n<li>**One-Tap Sharing**: Direct integration with WhatsApp and Telegram with full FileProvider permission handling and clip-data propagation.</li>\n<li>**Security and Hardening**:</li>\n<p>  - Full-mode R8 code shrinking and class obfuscation.</p>\n<p>  - Runtime anti-tamper shield detecting Frida, debuggers, ptrace, and Xposed hooks.</p>\n<p>  - Network security configuration enforcing direct connections (<code>NO_PROXY</code>).</p>\n\n<p>---</p>\n\n<h2>Screenshots</h2>\n\n<p>| Home | Live Terminal |</p>\n<p>|---|---|</p>\n<p>| !<a href=\"docs/screenshots/main.png\">Home</a> | !<a href=\"docs/screenshots/console.png\">Console</a> |</p>\n\n<p>---</p>\n\n<h2>Requirements</h2>\n\n<p>| Component | Requirement |</p>\n<p>|---|---|</p>\n<p>| Root Provider | Magisk, KernelSU, or APatch (Superuser access required) |</p>\n<p>| Architecture | ARM64 (aarch64) |</p>\n<p>| Android Version | Android 9.0 (API level 28) or higher |</p>\n<p>| Connectivity | Internet connection for OTA driver catalog and updates |</p>\n\n<p>---</p>\n\n<h2>Execution Workflow</h2>\n\n<pre>Tap LOAD\n   │\n   ├─► Pre-flight validation (Root check, Kernel release, Architecture)\n   │\n   ├─► OTA catalog resolution (Exact kernel match from repository)\n   │\n   ├─► Download and integrity verification\n   │\n   ├─► Staged insmod execution via root shell\n   │\n   └─► Device node verification and live dmesg validation</pre>\n\n<p>---</p>\n\n<h2>Diagnostic Report Structure</h2>\n\n<p>When building custom drivers for unsupported kernels, the generated ZIP archive includes:</p>\n\n<pre>report_&lt;device&gt;_&lt;kernel&gt;.zip\n├─ boot.img                  Raw boot partition dump (kernel + ramdisk + dtb)\n├─ boot_info.txt             Block device path, header version, and sizes\n├─ kallsyms.txt              Kernel symbol addresses (/proc/kallsyms)\n├─ sample_vendor_module.ko   Real OEM module from /vendor/lib/modules\n├─ vendor_modinfo.txt        Compiler version, vermagic, and module info\n├─ config.txt                Kernel configuration options (IKCONFIG)\n├─ dmesg.txt                 Kernel ring buffer tail and insmod error details\n├─ applog.txt                Application execution console log\n├─ proc_cmdline.txt          Kernel boot arguments\n├─ proc_version.txt          Kernel compiler and toolchain identification\n├─ proc_cpuinfo.txt          CPU hardware specifications\n├─ device_props.txt          Android system properties dump\n└─ manifest.txt              Summary manifest of all collected artifacts</pre>\n\n<p>---</p>\n\n<h2>Building from Source</h2>\n\n<pre>git clone https://github.com/bmjubairdadu/kernel-loader.git\ncd kernel-loader\n./gradlew assembleRelease</pre>\n\n<p>The release APK will be generated at:</p>\n<p><code>app/build/outputs/apk/release/Kernel-Loader-v2.2.apk</code></p>\n\n<li>Language: Kotlin</li>\n<li>UI Framework: Jetpack Compose</li>\n<li>Root Management: libsu</li>\n<li>Target SDK: 34 (Android 14)</li>\n<li>Minimum SDK: 28 (Android 9)</li>\n\n<p>---</p>\n\n<h2>Security Model</h2>\n\n<p>| Security Layer | Implementation |</p>\n<p>|---|---|</p>\n<p>| Code Obfuscation | R8 full-mode enabled with aggressive name mangling |</p>\n<p>| Debugger Protection | Checks <code>TracerPid</code> in <code>/proc/self/status</code> and <code>android.os.Debug</code> |</p>\n<p>| Instrumentation Guard | Inspects loaded memory maps for Frida (<code>frida-agent.so</code>, <code>/data/local/tmp/re.frida.server</code>) |</p>\n<p>| Network Integrity | Cleartext traffic disabled; network requests bypass proxy configurations |</p>\n<p>| Storage Isolation | Diagnostic staging files isolated in application cache with restricted permissions |</p>\n\n<p>---</p>\n\n<h2>Disclaimer</h2>\n\n<p>Loading custom kernel modules requires root access and carries inherent risks including device reboots or bootloops if an incompatible module is loaded. While Kernel Loader conducts pre-load validations, users are advised to maintain backups of their boot images.</p>\n\n<p>---</p>\n\n<h2>License</h2>\n\n<p>Author: <a href=\"https://github.com/bmjubairdadu\">JUBAIR HOSEN</a></p>\n<p>Licensed under the <a href=\"LICENSE\">GNU General Public License v3.0</a>.</p>",
+  "homepageUrl": "https://github.com/bmjubairdadu/kernel-loader",
+  "sourceUrl": "https://github.com/bmjubairdadu/kernel-loader",
+  "url": "https://github.com/bmjubairdadu/kernel-loader",
+  "latestRelease": {
+    "name": "v1.5",
+    "version": "v1.5",
+    "time": "2026-10-25T17:29:55Z",
+    "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.5/Kernel-Loader-v1.5.apk"
+  },
+  "releases": [
+    {
+      "name": "v1.5",
+      "tagName": "v1.5",
+      "publishedAt": "2026-10-25T17:29:55Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.5.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.5/Kernel-Loader-v1.5.apk",
+          "size": 4057273,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v1.4",
+      "tagName": "v1.4",
+      "publishedAt": "2026-10-25T15:08:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.4.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.4/Kernel-Loader-v1.4.apk",
+          "size": 4057273,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "v1.3",
+      "tagName": "v1.3",
+      "publishedAt": "2026-10-25T14:23:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.3.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.3/Kernel-Loader-v1.3.apk",
+          "size": 4057273,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2026-10-25T13:39:05Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.2.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.2/Kernel-Loader-v1.2.apk",
+          "size": 3448298,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-10-25T10:49:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.1.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.1/Kernel-Loader-v1.1.apk",
+          "size": 3448298,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.0",
+      "tagName": "v1.0",
+      "publishedAt": "2026-10-25T05:49:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kernel-Loader-v1.0.apk",
+          "downloadUrl": "https://github.com/bmjubairdadu/kernel-loader/releases/download/v1.0/Kernel-Loader-v1.0.apk",
+          "size": 3303200,
+          "downloadCount": 14
+        }
+      ]
+    }
+  ],
+  "origin": "github"
+}

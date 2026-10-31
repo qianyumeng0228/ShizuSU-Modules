@@ -1,0 +1,100 @@
+{
+  "readme": "# SUSFS LKM Loader\n\nIndependent **KernelSU-compatible module ZIP**, packaging the\n[inforcqb/susfs4ksu-lkm](https://github.com/inforcqb/susfs4ksu-lkm) release\n`v2.3.0-r18.1` (`9eee87c6a18ee5c769e9f1d59f496b0eb711b7c8`).\nNot an upstream release, not a Magisk-supported module, and not a boot image.\n\n## Scope\n\n- One arm64 ZIP packages all eight KMIs provided by the pinned upstream release:\n  **android12-5.10, android13-5.10, android13-5.15, android14-5.15,\n  android14-6.1, android15-6.6, android16-6.12, android17-6.18** (not Android OS versions).\n- Install and every boot select the matching binary from the real\n  `/proc/sys/kernel/osrelease`. No nearest-version fallback is used.\n- This is **not universal kernel compatibility**: non-GKI/unrecognized releases and\n  non-arm64 devices are unsupported. Vendor ABI differences can still prevent loading\n  within a listed KMI.\n- KernelSU installs it under `/data/adb/modules/susfs_lkm_loader/` after staging updates.\n- Loads the pinned `.ko` at the standard module `post-fs-data` stage using the upstream loader.\n- Detects an existing SUSFS interface before loading; refuses stacking, ambiguous probes and\n  unsupported kernel families. Family checks do not guarantee compatibility with every vendor kernel.\n- Does not load anything during install, unload active modules, change rule configurations,\n  install common boot scripts, inject init RC, modify sepolicy or flash partitions.\n- Rules remain managed by FolkSU or another explicitly chosen configuration tool.\n- `expose_proc=1` is explicit to make capability-gated LKM extensions available.\n- Loading is privileged kernel code execution. The upstream loader performs symbol relocation and\n  may adjust vermagic after the kernel rejects it; this is **not proof of ABI compatibility**.\n  Use only on backed-up, supported devices with a recovery path.\n\n## Install / disable / uninstall\n\nInstall the ZIP in a KernelSU-compatible manager; **reboot manually** to activate it.\nInstallation uses the standard manager installer, not recovery flashing or Magisk.\nDisable or uninstall in the module list, then reboot. No live `rmmod` is attempted.\nDeleting an on-disk `.ko` does not unload the running module.\nNever load this alongside built-in SUSFS or another SUSFS loader.\nCheck `/data/adb/modules/susfs_lkm_loader/load.log` and the manager's actual ABI capability probe,\nnot `lsmod` (SUSFS can hide its module).\n\n**FolkSU dynamic kstat limitation:** its current pre-mount snapshot runs *before* standard module\n`post-fs-data.sh`. Loading here is therefore too late for that initial snapshot. A later apply must\nremain pending reboot, not fabricate pre-mount metadata. This wrapper does not solve early-loader\nintegration, and does not automatically call `ksud susfs apply`. Other supported live rules can be\napplied explicitly after detection. Test safe-mode/module-disable behavior on your manager before\nrelying on unattended boot loading. Standard manager safe mode should skip module scripts.\n\n## Build\n\nRequires Python 3, network access and Android NDK on Linux. Set `ANDROID_NDK_HOME`, or\n`ANDROID_HOME` (defaults to `~/Android/Sdk`). Run:\n\n```sh\npython3 tools/build.py\n```\n\nOutput: `dist/susfs-lkm-module-v2.3.0-r18.1-arm64-multi-kmi.zip`.\nUpstream binaries are pinned and checked against SHA-256 from the GitHub release assets.\nThe corresponding pinned complete upstream source archive, wrapper probe source, license and\nprovenance are included in each ZIP. No upstream kernel functionality is reimplemented here.\nPackage building does not install or load the module.\n\nHost checks (mock loaders only, no privileged kernel operations):\n\n```sh\npython3 -m unittest discover -s tests -v\nsh -n module/kmi.sh module/customize.sh module/post-fs-data.sh\n```\n\nOnly android15-6.6 has prior on-device manual loading evidence. Multi-KMI boot\nselection is host-tested; actual loading/booting on the other seven KMIs remains\nunverified. Updating this ZIP does not unload the active implementation: reboot\nmanually to activate the update, with backups and a module-disable recovery path.\n\n## License and attribution\n\nGPL-2.0-only; see `LICENSE`. Upstream LKM and loader by inforcqb; upstream credits include\nsusfs4ksu, SukiSU-Ultra and their respective contributors. Wrapper scripts, probe and packaging\nby matsuzaka-yuki. Upstream source archive preserves original notices and license files.\n",
+  "readmeHTML": "<h1>SUSFS LKM Loader</h1>\n\n<p>Independent <b>KernelSU-compatible module ZIP</b>, packaging the</p>\n<p><a href=\"https://github.com/inforcqb/susfs4ksu-lkm\">inforcqb/susfs4ksu-lkm</a> release</p>\n<p><code>v2.3.0-r18.1</code> (<code>9eee87c6a18ee5c769e9f1d59f496b0eb711b7c8</code>).</p>\n<p>Not an upstream release, not a Magisk-supported module, and not a boot image.</p>\n\n<h2>Scope</h2>\n\n<li>One arm64 ZIP packages all eight KMIs provided by the pinned upstream release:</li>\n<p>  **android12-5.10, android13-5.10, android13-5.15, android14-5.15,</p>\n<p>  android14-6.1, android15-6.6, android16-6.12, android17-6.18** (not Android OS versions).</p>\n<li>Install and every boot select the matching binary from the real</li>\n<p>  <code>/proc/sys/kernel/osrelease</code>. No nearest-version fallback is used.</p>\n<li>This is **not universal kernel compatibility**: non-GKI/unrecognized releases and</li>\n<p>  non-arm64 devices are unsupported. Vendor ABI differences can still prevent loading</p>\n<p>  within a listed KMI.</p>\n<li>KernelSU installs it under `/data/adb/modules/susfs_lkm_loader/` after staging updates.</li>\n<li>Loads the pinned `.ko` at the standard module `post-fs-data` stage using the upstream loader.</li>\n<li>Detects an existing SUSFS interface before loading; refuses stacking, ambiguous probes and</li>\n<p>  unsupported kernel families. Family checks do not guarantee compatibility with every vendor kernel.</p>\n<li>Does not load anything during install, unload active modules, change rule configurations,</li>\n<p>  install common boot scripts, inject init RC, modify sepolicy or flash partitions.</p>\n<li>Rules remain managed by FolkSU or another explicitly chosen configuration tool.</li>\n<li>`expose_proc=1` is explicit to make capability-gated LKM extensions available.</li>\n<li>Loading is privileged kernel code execution. The upstream loader performs symbol relocation and</li>\n<p>  may adjust vermagic after the kernel rejects it; this is <b>not proof of ABI compatibility</b>.</p>\n<p>  Use only on backed-up, supported devices with a recovery path.</p>\n\n<h2>Install / disable / uninstall</h2>\n\n<p>Install the ZIP in a KernelSU-compatible manager; <b>reboot manually</b> to activate it.</p>\n<p>Installation uses the standard manager installer, not recovery flashing or Magisk.</p>\n<p>Disable or uninstall in the module list, then reboot. No live <code>rmmod</code> is attempted.</p>\n<p>Deleting an on-disk <code>.ko</code> does not unload the running module.</p>\n<p>Never load this alongside built-in SUSFS or another SUSFS loader.</p>\n<p>Check <code>/data/adb/modules/susfs_lkm_loader/load.log</code> and the manager's actual ABI capability probe,</p>\n<p>not <code>lsmod</code> (SUSFS can hide its module).</p>\n\n<p><b>FolkSU dynamic kstat limitation:</b> its current pre-mount snapshot runs *before* standard module</p>\n<p><code>post-fs-data.sh</code>. Loading here is therefore too late for that initial snapshot. A later apply must</p>\n<p>remain pending reboot, not fabricate pre-mount metadata. This wrapper does not solve early-loader</p>\n<p>integration, and does not automatically call <code>ksud susfs apply</code>. Other supported live rules can be</p>\n<p>applied explicitly after detection. Test safe-mode/module-disable behavior on your manager before</p>\n<p>relying on unattended boot loading. Standard manager safe mode should skip module scripts.</p>\n\n<h2>Build</h2>\n\n<p>Requires Python 3, network access and Android NDK on Linux. Set <code>ANDROID_NDK_HOME</code>, or</p>\n<p><code>ANDROID_HOME</code> (defaults to <code>~/Android/Sdk</code>). Run:</p>\n\n<pre>python3 tools/build.py</pre>\n\n<p>Output: <code>dist/susfs-lkm-module-v2.3.0-r18.1-arm64-multi-kmi.zip</code>.</p>\n<p>Upstream binaries are pinned and checked against SHA-256 from the GitHub release assets.</p>\n<p>The corresponding pinned complete upstream source archive, wrapper probe source, license and</p>\n<p>provenance are included in each ZIP. No upstream kernel functionality is reimplemented here.</p>\n<p>Package building does not install or load the module.</p>\n\n<p>Host checks (mock loaders only, no privileged kernel operations):</p>\n\n<pre>python3 -m unittest discover -s tests -v\nsh -n module/kmi.sh module/customize.sh module/post-fs-data.sh</pre>\n\n<p>Only android15-6.6 has prior on-device manual loading evidence. Multi-KMI boot</p>\n<p>selection is host-tested; actual loading/booting on the other seven KMIs remains</p>\n<p>unverified. Updating this ZIP does not unload the active implementation: reboot</p>\n<p>manually to activate the update, with backups and a module-disable recovery path.</p>\n\n<h2>License and attribution</h2>\n\n<p>GPL-2.0-only; see <code>LICENSE</code>. Upstream LKM and loader by inforcqb; upstream credits include</p>\n<p>susfs4ksu, SukiSU-Ultra and their respective contributors. Wrapper scripts, probe and packaging</p>\n<p>by matsuzaka-yuki. Upstream source archive preserves original notices and license files.</p>",
+  "homepageUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module",
+  "sourceUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module",
+  "url": "https://github.com/matsuzaka-yuki/susfs-lkm-module",
+  "latestRelease": {
+    "name": "v2.3.0-r18.4",
+    "version": "v2.3.0-r18.4",
+    "time": "2026-10-20T11:00:12Z",
+    "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.4/susfs-lkm-module-v2.3.0-r18.4-arm64-multi-kmi.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.3.0-r18.4",
+      "tagName": "v2.3.0-r18.4",
+      "publishedAt": "2026-10-20T11:00:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-v2.3.0-r18.4-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.4/susfs-lkm-module-v2.3.0-r18.4-arm64-multi-kmi.zip",
+          "size": 10525132,
+          "downloadCount": 467
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r18.3",
+      "tagName": "v2.3.0-r18.3",
+      "publishedAt": "2026-10-15T16:25:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-v2.3.0-r18.3-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.3/susfs-lkm-module-v2.3.0-r18.3-arm64-multi-kmi.zip",
+          "size": 10359617,
+          "downloadCount": 463
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r18.2",
+      "tagName": "v2.3.0-r18.2",
+      "publishedAt": "2026-10-15T10:57:19Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-v2.3.0-r18.2-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.2/susfs-lkm-module-v2.3.0-r18.2-arm64-multi-kmi.zip",
+          "size": 9942838,
+          "downloadCount": 37
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r18.1-fix-6442ebe",
+      "tagName": "v2.3.0-r18.1-fix-6442ebe",
+      "publishedAt": "2026-10-13T15:12:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-v2.3.0-r18.1-fix-6442ebe-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.1-fix-6442ebe/susfs-lkm-module-v2.3.0-r18.1-fix-6442ebe-arm64-multi-kmi.zip",
+          "size": 9216904,
+          "downloadCount": 296
+        }
+      ]
+    },
+    {
+      "name": "v2.3.0-r18.1",
+      "tagName": "v2.3.0-r18.1",
+      "publishedAt": "2026-10-13T12:39:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-v2.3.0-r18.1-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v2.3.0-r18.1/susfs-lkm-module-v2.3.0-r18.1-arm64-multi-kmi.zip",
+          "size": 9194880,
+          "downloadCount": 64
+        }
+      ]
+    },
+    {
+      "name": "v0.2.0",
+      "tagName": "v0.2.0",
+      "publishedAt": "2026-10-10T16:15:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-lkm-module-0.2.0-arm64-multi-kmi.zip",
+          "downloadUrl": "https://github.com/matsuzaka-yuki/susfs-lkm-module/releases/download/v0.2.0/susfs-lkm-module-0.2.0-arm64-multi-kmi.zip",
+          "size": 5967929,
+          "downloadCount": 783
+        }
+      ]
+    }
+  ],
+  "origin": "github"
+}

@@ -1,0 +1,209 @@
+{
+  "readme": "# Kam - CLI toolkit for KernelSU, APatch, Magisk, and AnyKernel3 modules\n\n[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)\n\nEnglish | [中文](README.zh-CN.md)\n\nKam is a CLI toolkit for scaffolding, building, packaging, installing, and\npublishing Android root module projects. It supports KernelSU, APatch, Magisk,\nand AnyKernel3 workflows, with templates for both full source repositories and\nmetadata-only module registry repositories.\n\nKam is under active development. Use the latest release or build from source\nwhen testing new template, workflow, and device-development features.\n\n## Supported Targets\n\n- KernelSU modules, including KernelSU Modules Repo full-source and\n  reference-only layouts.\n- APatch modules with compatible install and runtime scripts.\n- Magisk modules using the standard root-level `module.prop` layout.\n- AnyKernel3 kernel ZIP projects through `ak3_template` / `-t ak3`.\n\nThe standard `kam_template` / `-t kam` template creates a Magisk-style module\nZIP that can work across Magisk-compatible managers, including KernelSU and\nAPatch, when the module scripts themselves are manager-compatible.\n\n## Features\n\n- Fast project initialization from built-in, local, archive, and cached\n  templates.\n- Release-oriented module ZIP builds.\n- Development sessions with adb sync, hot update, logs, forwarding, and MCP.\n- Metadata sync from `kam.toml` to `module.prop`, `update.json`, `module.json`,\n  `repo.json`, `track.json`, and `config.json`.\n- Template import, export, cache, pull, and update flows.\n- GitHub Actions workflow installation for build/release or release mirroring.\n- Project-local and global configuration via `kam config`.\n\n## Installation\n\nRecommended installer for Linux, macOS, Termux, and Windows Git Bash/MSYS:\n\n```bash\ngit clone https://github.com/MemDeco-WG/Kam.git\ncd Kam\n./install.sh\n```\n\nManual Cargo install:\n\n```bash\ncargo install kam\n```\n\nBuild from source without installing:\n\n```bash\ngit clone https://github.com/MemDeco-WG/Kam.git\ncd Kam\ncargo build --release\n```\n\nPlatform notes:\n\n- macOS requires `curl` and a C compiler. If Xcode Command Line Tools are\n  missing, the installer starts `xcode-select --install`.\n- Termux installs required packages with `pkg install -y curl git clang make\n  pkg-config openssl perl`.\n- Windows should use Git Bash or MSYS2. If native compilation fails, install\n  the MSYS2 mingw-w64 toolchain or Visual Studio Build Tools.\n\n## Quick Start\n\nCreate a standard KernelSU/APatch/Magisk-compatible module:\n\n```bash\nkam init my_module -t kam\ncd my_module\nkam build\n```\n\nCreate an AnyKernel3 kernel module:\n\n```bash\nkam init my_kernel_module -t ak3\n```\n\nCreate a KernelSU Modules Repo full-source repository:\n\n```bash\nkam init my_module \\\n  --repo-mode full \\\n  --source-url https://github.com/you/my_module \\\n  -t kam_template\n```\n\nCreate a KernelSU Modules Repo reference-only repository:\n\n```bash\nkam init my_module \\\n  --repo-mode reference \\\n  --source-url https://github.com/you/my_module-source \\\n  --project-name \"My Module\" \\\n  --description \"Short module summary\"\n```\n\nFor KernelSU Modules Repo compatibility, the repository name must match\n`module.prop` `id`, releases must be immutable non-draft GitHub Releases, and\nrelease ZIP assets must contain a root-level `module.prop` with `id`, `version`,\nand `versionCode`.\n\n## Templates\n\nBuilt-in template aliases:\n\n| Alias | Full template | Use case |\n| --- | --- | --- |\n| `-t kam` | `kam_template` | Standard user-space module |\n| `-t meta` | `meta_template` | Metadata/metamodule workflows |\n| `-t ak3` | `ak3_template` | AnyKernel3 kernel ZIP projects |\n| `--tmpl` | `tmpl_template` | Template authoring project |\n\nExamples:\n\n```bash\nkam tmpl list\nkam tmpl pull\nkam init my_module -t kam\nkam init my_module -t ./tmpl/my_template\nkam init my_module -t ./templates/my_template.tar.gz\nkam init my_module -t kam --var repository=https://github.com/you/my_module\n```\n\nTemplate resolution order is direct local path, built-in template asset,\nproject-local `tmpl/` or `templates/`, then global template cache. If a simple\nname does not end with `_template`, Kam also tries `<name>_template`.\n\nSee:\n\n- [Template documentation index](docs/templates.md)\n- [Template development specification](docs/template-development.md)\n- [Kam TOML specification](docs/kam-toml.md)\n\n## Common Commands\n\n```bash\nkam init my_module -t kam\nkam add script service\nkam add hook pre-build sync-version --order 20\nkam add kamfw watchdog --phase service\nkam add webui\nkam check\nkam build\nkam install dist/my_module.zip\nkam dev --watch --hot --mcp --logs\nkam diff --device auto\nkam sync\nkam workflow install https://github.com/you/my_module\nkam repo status # inspect the local module package index/cache\n```\n\nPacman-style registry shortcuts:\n\n```bash\nkam -Sy           # refresh the local module package index\nkam -Ss magic     # search the local synced module index\nkam -Si module_id # show local package metadata\nkam -Sl           # list packages in the local synced index\nkam -Sp module_id # print the selected release ZIP URL without downloading\nkam -Sw module_id # download the selected release ZIP into Kam's package cache\nkam -S module_id  # download a module by id from local package metadata\nkam -Syu module_id # refresh index, then download\nkam -Sc           # clean the local module package index cache\nkam -U module.zip # install a local module package\nkam -R module_id  # mark an installed module for removal\n```\n\nInstalled module query shortcuts:\n\n```bash\nkam -Q                 # list installed modules on the connected device\nkam -Qs magic          # search installed module metadata\nkam -Qi module_id      # show installed module.prop metadata\nkam -Qu                # show installed modules with cached updates\nkam -Qm                # show installed modules outside the cached index\nkam -Qn                # show installed modules present in the cached index\nkam -Qk module_id      # check installed module integrity\nkam -Qo /data/adb/modules/MagicNet/cli # show which module owns a path\nkam -Ql module_id      # list files inside an installed module\nkam -Qp module.zip     # show module.prop metadata from a local package\nkam -Qpl module.zip    # list files inside a local package\nkam -Q --device serial # query a specific adb device\n```\n\nFull command documentation lives in [docs/commands.md](docs/commands.md).\n\n`kam diff` compares the installed device module with the current source tree\nand filters out binary payloads before running diff.\n\n## Module Configuration\n\nEdit `kam.toml`:\n\n```toml\n[prop]\nid = \"my_module\"\nname = \"My Module\"\nversion = \"1.0.0\"\nversionCode = 1\nauthor = \"YourName\"\ndescription = \"An Android root module\"\nupdateJson = \"https://example.com/update.json\"\n\n[mmrl.repo]\nrepository = \"https://github.com/you/my_module\"\nchangelog = \"https://github.com/you/my_module/blob/main/CHANGELOG.md\"\n```\n\nOr use `kam config` / `kam toml`:\n\n```bash\nkam config set prop.author \"YourName\"\nkam config --global set prop.author \"YourName\"\nkam toml get mmrl.repo.repository\nkam toml set prop.version=1.2.3\n```\n\n## Development Sessions\n\n`kam build` is for release packaging. `kam dev` is for fast real-device\niteration:\n\n```bash\nkam dev\nkam dev --watch\nkam dev --sync-only\nkam dev --install\nkam dev --logs\nkam dev --mcp\nkam dev doctor\n```\n\n`kam dev --mcp` uses the Kam Dev Runtime Contract v1:\n\n- Module root: `/data/adb/modules/<module_id>`\n- Standard CLI: `/data/adb/modules/<module_id>/cli`\n- Commands: `cli mcp enable`, `cli mcp disable`, `cli mcp status`,\n  `cli mcp status --json`\n- Transport: Streamable HTTP\n- Default endpoint: `http://127.0.0.1:8765/mcp`\n\nSee [docs/commands.md](docs/commands.md) for command options and\n[docs/advanced-usage.md](docs/advanced-usage.md) for hook/runtime details.\n\n## Agent Skills\n\nKam includes repo-local agent skills for module and template work.\n\nInstall the template development skill in another agent workspace:\n\n```bash\nnpx skills add https://github.com/MemDeco-WG/Kam --path .agents/skills/kam-template-development\n```\n\nIf your skills installer expects a skill name:\n\n```bash\nnpx skills add https://github.com/MemDeco-WG/Kam --skill kam-template-development\n```\n\n## Project Structure\n\n```text\nmy_module/\n├── kam.toml\n├── src/\n│   └── my_module/\n│       ├── module.prop\n│       ├── customize.sh\n│       ├── service.sh\n│       └── system/\n├── hooks/\n│   ├── pre-build/\n│   └── post-build/\n├── webui/\n├── dist/\n├── update.json\n└── README.md\n```\n\n## More Documentation\n\n- [Commands reference](docs/commands.md)\n- [Advanced usage](docs/advanced-usage.md)\n- [Kam TOML specification](docs/kam-toml.md)\n- [Template development specification](docs/template-development.md)\n- [Template documentation index](docs/templates.md)\n- [setup-kam workflow skill](.agents/skills/setup-kam-workflow/SKILL.md)\n- [Kam module development skill](.agents/skills/magisk-module-development/SKILL.md)\n- [kamfw framework skill](.agents/skills/kamfw-framework-usage/SKILL.md)\n\n## Contributing\n\nIssues and pull requests are welcome.\n\n1. Fork this repository.\n2. Create a feature branch.\n3. Run formatting, checks, tests, and clippy.\n4. Commit scoped changes.\n5. Open a pull request.\n\n## License\n\nThis project is licensed under the MIT License. See [LICENSE](LICENSE).\n\n## Acknowledgments\n\n- [Magisk](https://github.com/topjohnwu/Magisk)\n- [KernelSU](https://github.com/tiann/KernelSU)\n- [APatch](https://github.com/bmax121/APatch)\n- [MMRL](https://github.com/MMRLApp/MMRL)\n\n## Contact\n\n- GitHub Issues: <https://github.com/MemDeco-WG/Kam/issues>\n- Author: LightJunction\n",
+  "readmeHTML": "<h1>Kam - CLI toolkit for KernelSU, APatch, Magisk, and AnyKernel3 modules</h1>\n\n<p><a href=\"https://img.shields.io/badge/License-MIT-yellow.svg\">![License: MIT</a>](https://opensource.org/licenses/MIT)</p>\n\n<p>English | <a href=\"README.zh-CN.md\">中文</a></p>\n\n<p>Kam is a CLI toolkit for scaffolding, building, packaging, installing, and</p>\n<p>publishing Android root module projects. It supports KernelSU, APatch, Magisk,</p>\n<p>and AnyKernel3 workflows, with templates for both full source repositories and</p>\n<p>metadata-only module registry repositories.</p>\n\n<p>Kam is under active development. Use the latest release or build from source</p>\n<p>when testing new template, workflow, and device-development features.</p>\n\n<h2>Supported Targets</h2>\n\n<li>KernelSU modules, including KernelSU Modules Repo full-source and</li>\n<p>  reference-only layouts.</p>\n<li>APatch modules with compatible install and runtime scripts.</li>\n<li>Magisk modules using the standard root-level `module.prop` layout.</li>\n<li>AnyKernel3 kernel ZIP projects through `ak3_template` / `-t ak3`.</li>\n\n<p>The standard <code>kam_template</code> / <code>-t kam</code> template creates a Magisk-style module</p>\n<p>ZIP that can work across Magisk-compatible managers, including KernelSU and</p>\n<p>APatch, when the module scripts themselves are manager-compatible.</p>\n\n<h2>Features</h2>\n\n<li>Fast project initialization from built-in, local, archive, and cached</li>\n<p>  templates.</p>\n<li>Release-oriented module ZIP builds.</li>\n<li>Development sessions with adb sync, hot update, logs, forwarding, and MCP.</li>\n<li>Metadata sync from `kam.toml` to `module.prop`, `update.json`, `module.json`,</li>\n<p>  <code>repo.json</code>, <code>track.json</code>, and <code>config.json</code>.</p>\n<li>Template import, export, cache, pull, and update flows.</li>\n<li>GitHub Actions workflow installation for build/release or release mirroring.</li>\n<li>Project-local and global configuration via `kam config`.</li>\n\n<h2>Installation</h2>\n\n<p>Recommended installer for Linux, macOS, Termux, and Windows Git Bash/MSYS:</p>\n\n<pre>git clone https://github.com/MemDeco-WG/Kam.git\ncd Kam\n./install.sh</pre>\n\n<p>Manual Cargo install:</p>\n\n<pre>cargo install kam</pre>\n\n<p>Build from source without installing:</p>\n\n<pre>git clone https://github.com/MemDeco-WG/Kam.git\ncd Kam\ncargo build --release</pre>\n\n<p>Platform notes:</p>\n\n<li>macOS requires `curl` and a C compiler. If Xcode Command Line Tools are</li>\n<p>  missing, the installer starts <code>xcode-select --install</code>.</p>\n<li>Termux installs required packages with `pkg install -y curl git clang make</li>\n<p>  pkg-config openssl perl`.</p>\n<li>Windows should use Git Bash or MSYS2. If native compilation fails, install</li>\n<p>  the MSYS2 mingw-w64 toolchain or Visual Studio Build Tools.</p>\n\n<h2>Quick Start</h2>\n\n<p>Create a standard KernelSU/APatch/Magisk-compatible module:</p>\n\n<pre>kam init my_module -t kam\ncd my_module\nkam build</pre>\n\n<p>Create an AnyKernel3 kernel module:</p>\n\n<pre>kam init my_kernel_module -t ak3</pre>\n\n<p>Create a KernelSU Modules Repo full-source repository:</p>\n\n<pre>kam init my_module \\\n  --repo-mode full \\\n  --source-url https://github.com/you/my_module \\\n  -t kam_template</pre>\n\n<p>Create a KernelSU Modules Repo reference-only repository:</p>\n\n<pre>kam init my_module \\\n  --repo-mode reference \\\n  --source-url https://github.com/you/my_module-source \\\n  --project-name \"My Module\" \\\n  --description \"Short module summary\"</pre>\n\n<p>For KernelSU Modules Repo compatibility, the repository name must match</p>\n<p><code>module.prop</code> <code>id</code>, releases must be immutable non-draft GitHub Releases, and</p>\n<p>release ZIP assets must contain a root-level <code>module.prop</code> with <code>id</code>, <code>version</code>,</p>\n<p>and <code>versionCode</code>.</p>\n\n<h2>Templates</h2>\n\n<p>Built-in template aliases:</p>\n\n<p>| Alias | Full template | Use case |</p>\n<p>| --- | --- | --- |</p>\n<p>| <code>-t kam</code> | <code>kam_template</code> | Standard user-space module |</p>\n<p>| <code>-t meta</code> | <code>meta_template</code> | Metadata/metamodule workflows |</p>\n<p>| <code>-t ak3</code> | <code>ak3_template</code> | AnyKernel3 kernel ZIP projects |</p>\n<p>| <code>--tmpl</code> | <code>tmpl_template</code> | Template authoring project |</p>\n\n<p>Examples:</p>\n\n<pre>kam tmpl list\nkam tmpl pull\nkam init my_module -t kam\nkam init my_module -t ./tmpl/my_template\nkam init my_module -t ./templates/my_template.tar.gz\nkam init my_module -t kam --var repository=https://github.com/you/my_module</pre>\n\n<p>Template resolution order is direct local path, built-in template asset,</p>\n<p>project-local <code>tmpl/</code> or <code>templates/</code>, then global template cache. If a simple</p>\n<p>name does not end with <code>_template</code>, Kam also tries <code><name>_template</code>.</p>\n\n<p>See:</p>\n\n<li>[Template documentation index](docs/templates.md)</li>\n<li>[Template development specification](docs/template-development.md)</li>\n<li>[Kam TOML specification](docs/kam-toml.md)</li>\n\n<h2>Common Commands</h2>\n\n<pre>kam init my_module -t kam\nkam add script service\nkam add hook pre-build sync-version --order 20\nkam add kamfw watchdog --phase service\nkam add webui\nkam check\nkam build\nkam install dist/my_module.zip\nkam dev --watch --hot --mcp --logs\nkam diff --device auto\nkam sync\nkam workflow install https://github.com/you/my_module\nkam repo status # inspect the local module package index/cache</pre>\n\n<p>Pacman-style registry shortcuts:</p>\n\n<pre>kam -Sy           # refresh the local module package index\nkam -Ss magic     # search the local synced module index\nkam -Si module_id # show local package metadata\nkam -Sl           # list packages in the local synced index\nkam -Sp module_id # print the selected release ZIP URL without downloading\nkam -Sw module_id # download the selected release ZIP into Kam's package cache\nkam -S module_id  # download a module by id from local package metadata\nkam -Syu module_id # refresh index, then download\nkam -Sc           # clean the local module package index cache\nkam -U module.zip # install a local module package\nkam -R module_id  # mark an installed module for removal</pre>\n\n<p>Installed module query shortcuts:</p>\n\n<pre>kam -Q                 # list installed modules on the connected device\nkam -Qs magic          # search installed module metadata\nkam -Qi module_id      # show installed module.prop metadata\nkam -Qu                # show installed modules with cached updates\nkam -Qm                # show installed modules outside the cached index\nkam -Qn                # show installed modules present in the cached index\nkam -Qk module_id      # check installed module integrity\nkam -Qo /data/adb/modules/MagicNet/cli # show which module owns a path\nkam -Ql module_id      # list files inside an installed module\nkam -Qp module.zip     # show module.prop metadata from a local package\nkam -Qpl module.zip    # list files inside a local package\nkam -Q --device serial # query a specific adb device</pre>\n\n<p>Full command documentation lives in <a href=\"docs/commands.md\">docs/commands.md</a>.</p>\n\n<p><code>kam diff</code> compares the installed device module with the current source tree</p>\n<p>and filters out binary payloads before running diff.</p>\n\n<h2>Module Configuration</h2>\n\n<p>Edit <code>kam.toml</code>:</p>\n\n<pre>[prop]\nid = \"my_module\"\nname = \"My Module\"\nversion = \"1.0.0\"\nversionCode = 1\nauthor = \"YourName\"\ndescription = \"An Android root module\"\nupdateJson = \"https://example.com/update.json\"\n\n[mmrl.repo]\nrepository = \"https://github.com/you/my_module\"\nchangelog = \"https://github.com/you/my_module/blob/main/CHANGELOG.md\"</pre>\n\n<p>Or use <code>kam config</code> / <code>kam toml</code>:</p>\n\n<pre>kam config set prop.author \"YourName\"\nkam config --global set prop.author \"YourName\"\nkam toml get mmrl.repo.repository\nkam toml set prop.version=1.2.3</pre>\n\n<h2>Development Sessions</h2>\n\n<p><code>kam build</code> is for release packaging. <code>kam dev</code> is for fast real-device</p>\n<p>iteration:</p>\n\n<pre>kam dev\nkam dev --watch\nkam dev --sync-only\nkam dev --install\nkam dev --logs\nkam dev --mcp\nkam dev doctor</pre>\n\n<p><code>kam dev --mcp</code> uses the Kam Dev Runtime Contract v1:</p>\n\n<li>Module root: `/data/adb/modules/<module_id>`</li>\n<li>Standard CLI: `/data/adb/modules/<module_id>/cli`</li>\n<li>Commands: `cli mcp enable`, `cli mcp disable`, `cli mcp status`,</li>\n<p>  <code>cli mcp status --json</code></p>\n<li>Transport: Streamable HTTP</li>\n<li>Default endpoint: `http://127.0.0.1:8765/mcp`</li>\n\n<p>See <a href=\"docs/commands.md\">docs/commands.md</a> for command options and</p>\n<p><a href=\"docs/advanced-usage.md\">docs/advanced-usage.md</a> for hook/runtime details.</p>\n\n<h2>Agent Skills</h2>\n\n<p>Kam includes repo-local agent skills for module and template work.</p>\n\n<p>Install the template development skill in another agent workspace:</p>\n\n<pre>npx skills add https://github.com/MemDeco-WG/Kam --path .agents/skills/kam-template-development</pre>\n\n<p>If your skills installer expects a skill name:</p>\n\n<pre>npx skills add https://github.com/MemDeco-WG/Kam --skill kam-template-development</pre>\n\n<h2>Project Structure</h2>\n\n<pre>my_module/\n├── kam.toml\n├── src/\n│   └── my_module/\n│       ├── module.prop\n│       ├── customize.sh\n│       ├── service.sh\n│       └── system/\n├── hooks/\n│   ├── pre-build/\n│   └── post-build/\n├── webui/\n├── dist/\n├── update.json\n└── README.md</pre>\n\n<h2>More Documentation</h2>\n\n<li>[Commands reference](docs/commands.md)</li>\n<li>[Advanced usage](docs/advanced-usage.md)</li>\n<li>[Kam TOML specification](docs/kam-toml.md)</li>\n<li>[Template development specification](docs/template-development.md)</li>\n<li>[Template documentation index](docs/templates.md)</li>\n<li>[setup-kam workflow skill](.agents/skills/setup-kam-workflow/SKILL.md)</li>\n<li>[Kam module development skill](.agents/skills/magisk-module-development/SKILL.md)</li>\n<li>[kamfw framework skill](.agents/skills/kamfw-framework-usage/SKILL.md)</li>\n\n<h2>Contributing</h2>\n\n<p>Issues and pull requests are welcome.</p>\n\n<li>Fork this repository.</li>\n<li>Create a feature branch.</li>\n<li>Run formatting, checks, tests, and clippy.</li>\n<li>Commit scoped changes.</li>\n<li>Open a pull request.</li>\n\n<h2>License</h2>\n\n<p>This project is licensed under the MIT License. See <a href=\"LICENSE\">LICENSE</a>.</p>\n\n<h2>Acknowledgments</h2>\n\n<li>[Magisk](https://github.com/topjohnwu/Magisk)</li>\n<li>[KernelSU](https://github.com/tiann/KernelSU)</li>\n<li>[APatch](https://github.com/bmax121/APatch)</li>\n<li>[MMRL](https://github.com/MMRLApp/MMRL)</li>\n\n<h2>Contact</h2>\n\n<li>GitHub Issues: <https://github.com/MemDeco-WG/Kam/issues></li>\n<li>Author: LightJunction</li>",
+  "homepageUrl": "https://github.com/MemDeco-WG/Kam",
+  "sourceUrl": "https://github.com/MemDeco-WG/Kam",
+  "url": "https://github.com/MemDeco-WG/Kam",
+  "latestRelease": {
+    "name": "v0.5.24",
+    "version": "v0.5.24",
+    "time": "2025-12-27T14:22:49Z",
+    "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.24/templates.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.5.24",
+      "tagName": "v0.5.24",
+      "publishedAt": "2025-12-27T14:22:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.24/templates.zip.sig",
+          "size": 136,
+          "downloadCount": 1
+        },
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.24/templates.zip",
+          "size": 3405584,
+          "downloadCount": 7
+        },
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.24/Kam.zip",
+          "size": 601,
+          "downloadCount": 10
+        },
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.24/Kam.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.5.23",
+      "tagName": "v0.5.23",
+      "publishedAt": "2025-12-27T12:50:25Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.23/templates.zip",
+          "size": 3405197,
+          "downloadCount": 7
+        },
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.23/Kam.zip",
+          "size": 601,
+          "downloadCount": 8
+        },
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.23/Kam.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.23/templates.zip.sig",
+          "size": 136,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.5.22",
+      "tagName": "v0.5.22",
+      "publishedAt": "2025-12-27T11:49:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.22/templates.zip",
+          "size": 3405546,
+          "downloadCount": 8
+        },
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.22/Kam.zip",
+          "size": 601,
+          "downloadCount": 7
+        },
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.22/Kam.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.22/templates.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.5.21",
+      "tagName": "v0.5.21",
+      "publishedAt": "2025-12-27T11:32:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.21/Kam.zip",
+          "size": 601,
+          "downloadCount": 3
+        },
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.21/templates.zip",
+          "size": 3404562,
+          "downloadCount": 3
+        },
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.21/templates.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.21/Kam.zip.sig",
+          "size": 136,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v0.5.20",
+      "tagName": "v0.5.20",
+      "publishedAt": "2025-12-27T06:48:17Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.20/Kam.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.20/templates.zip",
+          "size": 3406944,
+          "downloadCount": 9
+        },
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.20/templates.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.20/Kam.zip",
+          "size": 413,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v0.5.19",
+      "tagName": "v0.5.19",
+      "publishedAt": "2025-12-26T16:41:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Kam.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.19/Kam.zip",
+          "size": 601,
+          "downloadCount": 3
+        },
+        {
+          "name": "templates.zip",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.19/templates.zip",
+          "size": 3405290,
+          "downloadCount": 4
+        },
+        {
+          "name": "Kam.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.19/Kam.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        },
+        {
+          "name": "templates.zip.sig",
+          "downloadUrl": "https://github.com/MemDeco-WG/Kam/releases/download/v0.5.19/templates.zip.sig",
+          "size": 140,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ],
+  "origin": "github",
+  "note": "上游许可证未声明或不明确，由管理员背书收录；本模块为 LKM/KPM 管理模块，使用需自行评估风险。原始 license: NOASSERTION"
+}
