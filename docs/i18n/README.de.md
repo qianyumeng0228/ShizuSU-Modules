@@ -83,9 +83,9 @@ Die Daten werden von `build.py` (Route A) + `tools/build_mmrl.py` (Route B) + `t
 
 ## Gesammelte Inhalte
 
-- **861 Module** im Route-A-Index; **794** direkt über MMRL/BakaSU installierbar
+- **871 Module** im Route-A-Index; **804** direkt über MMRL/BakaSU installierbar
 - **19 Kategorien**: Root-Verstecken / Play Integrity, Meta-Module (Mount-Engines), Zygisk-Implementierungen, Performance-Tuning, Netzwerk-Proxy, Werbeblocker, Audio, Schriftarten/Display, Backup & Rettung, Xposed/LSPosed, WebUI u. a.
-- **322 administrator-geprüft** (`adminApproved`): Upstream-Lizenz nicht erklärt oder unklar — nach Administrator-Prüfung aufgenommen, jeder Eintrag trägt eine `note`; Risiken beim Gebrauch selbst bewerten
+- **324 administrator-geprüft** (`adminApproved`): Upstream-Lizenz nicht erklärt oder unklar — nach Administrator-Prüfung aufgenommen, jeder Eintrag trägt eine `note`; Risiken beim Gebrauch selbst bewerten
 - Datenquelle: Globale KernelSU-Modul-Zusammenfassung (1.532 Einträge, dedupliziert)
 
 ## Aufnahmekriterien
