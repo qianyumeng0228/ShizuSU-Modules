@@ -1,0 +1,99 @@
+{
+  "readme": "# SideKey — 一加 / ColorOS 侧键增强模块\n\n![Version](https://img.shields.io/badge/version-v2.0.0-2b7cf6) ![Platform](https://img.shields.io/badge/platform-ColorOS%20%2F%20OPPO%20%2F%20realme-16a34a) ![Manager](https://img.shields.io/badge/KernelSU%20%2F%20Magisk%20%2F%20APatch-%E5%85%BC%E5%AE%B9-f59e0b) ![License](https://img.shields.io/badge/license-MIT-8b5cf6)\n\n纯 C++ 实现的 KernelSU / Magisk / APatch 模块：把电源键、音量键、三段式静音开关变成\n可编程快捷键，支持多击、长按、组合键，内置 37 个常用动作，全部配置在 WebUI 里点几下就能完成。\n\n- 作者：spoilsme\n- 平台：arm64，一加 / OPPO / realme（ColorOS 15 / 16 实测），其他机型理论可用（自动识别按键）\n- 本仓库只提供**安装包与说明**，下载请到 [Releases](https://github.com/spoilsme/SideKey/releases)\n\n## 界面预览\n\n| 按键 · 手势绑定 | 脚本 · 我的脚本 / 多动作 | 脚本 · 37 个内置动作 |\n| --- | --- | --- |\n| <img src=\"docs/ui-keys.jpg\" width=\"270\"> | <img src=\"docs/ui-scripts.jpg\" width=\"270\"> | <img src=\"docs/ui-scripts-builtin.jpg\" width=\"270\"> |\n\n| 设置 · 手势时序 / 密码 | 日志 · 开关与自动清理 | 关于 · 版本与链接 |\n| --- | --- | --- |\n| <img src=\"docs/ui-settings.jpg\" width=\"270\"> | <img src=\"docs/ui-log.jpg\" width=\"270\"> | <img src=\"docs/ui-about.jpg\" width=\"270\"> |\n\n## 项目特色\n\n- **零门槛配置**：打开 WebUI 自动识别这台机器的实体按键和三段式开关，点「＋手势」挑一个动作、点「保存并重启」，2 秒生效，全程不用碰命令行\n- **场景引擎（v2.0.0）**：同一个手势在不同场合做不同的事——微信里开付款码、相册里开编辑、静音时切响铃、息屏手电筒；10 种条件（应用 / 时段 / 响铃 / 横竖屏 / 流量 / 飞行模式…）可组合，冲突自动按「优先标记 > 应用 > 时段 > …」裁决，WebUI 里直接看胜负预览\n- **纯 C++ 守护进程**：没有 Java / Xposed / LSPosed 依赖，开机即用，不注入任何应用，兼容所有 root 管理器\n- **真·多击拦截**：通过 uinput 独占按键设备，双击音量键只跑你的脚本，不会顺带加减音量（自动检测支持情况）\n- **组合键自动识别**：只列出这台机器真实存在的按键，耳机线控、相机键这些不存在的键不会出现\n- **电源键友好**：默认叠加模式，息屏 / 亮屏 / 关机菜单全部保留，双击脚本只是额外多跑一次；「电源键 + 音量减」截图组合键可保持可用\n- **锁屏自动化**：锁屏直接拉起微信付款码并自动解锁到密码键盘，全程约 3 秒；密码加密存储、仅存本机\n- **手电筒满功率**：开关走 OPlus 官方服务（控制中心始终正常），点亮后自动拉满亮度，实测开灯约 1.7 秒\n- **脚本热更新**：自己的脚本放手机目录里，改完即时生效不用重启；WebUI 里还能一键试运行\n- **隐私干净**：不收集、不上传任何数据；唯一的联网操作是拉取一个几百字节的版本号 JSON（24 小时才拉一次，不携带任何设备信息），卸载即全部清除\n\n## 下载\n\n| 版本 | 说明 |\n| --- | --- |\n| **v2.0.0**（最新） | **场景引擎**：同一手势按场合（前台应用 / 时段 / 响铃 / 横竖屏 / 息屏…）做不同的事，每手势 3 个场景槽 + 优先级；组合键支持长短按；修复音量键对调失灵；新增管理器内自动更新 |\n| v1.7.1 | 手电筒改用官方服务开关，控制中心不再失灵；修复手电筒一键复位 |\n| v1.7.0 及更早 | 历史版本都在 [Releases](https://github.com/spoilsme/SideKey/releases) 页面 |\n\n到 [Releases](https://github.com/spoilsme/SideKey/releases) 下载 `sidekey-vX.Y.Z.zip`，直接刷入即可。\n\n## 安装\n\n1. 把 `sidekey-v2.0.0.zip` 刷进 KernelSU（或 Magisk / APatch），**重启**。\n   - 兼容 KernelSU / KSU Next、Magisk 稳定版 / Beta / Canary、Magisk Delta / Alpha、\n     APatch、狐狸面具（Fox Magisk Module Manager）等所有主流 root 管理器。\n   - v1.7.0 起包内补齐了标准 `META-INF/com/google/android/update-binary`（Magisk\n     官方安装脚本）：之前缺失它会导致 Magisk 系安装器报「Unzip error」刷入失败\n     （KernelSU 不依赖它所以之前能装）。\n2. 打开模块的 WebUI，按键页会自动识别本机的按键和三段式开关。\n3. 点任意手势行挑一个动作，底部「保存并重启」生效（守护进程重启约 2 秒）。\n\n升级 = 管理器里刷入新 zip 再重启，配置和脚本都会保留。\n\n### 模块内更新（v2.0.0 起）\n\n包内的 `module.prop` 带了 `updateJson` 字段，所以 **root 管理器的模块列表会自己检查新版**：\n有新版本时「侧键增强」那一行会直接出现「更新」按钮，点一下就能下载新 zip，\n不用自己去 Releases 找。KernelSU / KSU Next、Magisk、APatch、MMRL 都支持这套机制。\n\n- 检查用的是仓库根目录的 [`update.json`](update.json)，由发布脚本在每次发版后刷新；\n- 走 jsDelivr 的 **fastly 节点**（`fastly.jsdelivr.net`）：实测国内直连可用，`cdn.jsdelivr.net` 和 `raw.githubusercontent.com` 都会被重置；\n- WebUI 的「简介」页也有一份：进页面自动查（24 小时内只查一次），`有新版本` 会显示成彩色徽标，点它下载；\n- 管理器拉不到更新时不影响模块本身，手动刷 zip 一样升级；\n- ⚠️ **从 v1.7.x 及更早版本升上来的第一次仍需手动刷**：老版本的 `module.prop` 里没有 `updateJson`，\n  管理器无从检查；装过一次 v2.0.0 之后，以后每次新版都会自动提示。\n\n## 内置动作库\n\nWebUI「脚本」页可查看全部内置脚本（只读）和试运行；自己写的脚本放\n`/storage/emulated/0/Android/sidekey/scripts/`，改完即时生效不用重启。\n\n**ColorOS 快捷**：\n\n| 脚本 | 功能 | 说明 |\n| --- | --- | --- |\n| `sys_home.sh` / `sys_back.sh` | 主屏 / 返回 | |\n| `sys_recents.sh` | 最近任务 | |\n| `sys_screen_off.sh` / `sys_screen_on.sh` | 息屏 / 亮屏 | |\n| `sys_power_menu.sh` | 电源菜单 | |\n| `sys_notification.sh` | 下拉通知栏 | |\n| `sys_qs.sh` | 展开快捷设置 | |\n| `sys_split.sh` | 分屏 | |\n| `sys_screenshot.sh` | 截图 | |\n| `sys_assistant.sh` / `sys_camera.sh` | 语音助手 / 相机 | |\n| `cos_ocr.sh` | 文字识别 | |\n| `cos_screenshot_area.sh` | 区域截图 | |\n| `cos_torch.sh` | 手电筒（最大亮度） | **v1.7.1**：开关完全沿用 OPlus 官方服务（判断 `flashlight_enabled` → ACTION_OPEN/CLOSE + 同步两个 settings 值，**全程不碰 `switch_*` 电源闸**），点亮后再把 `led:torch_*` 拉到 `max_brightness` 得到满功率。实测：开灯约 1.7 秒、关灯约 0.5 秒，**控制中心手电筒开关始终正常**。若哪天失灵，WebUI「设置」页点【修复手电筒】（或 `TORCH_REPAIR=1 cos_torch.sh`）约 10 秒恢复，不用重启手机。日志 `torch.log` |\n| `cos_torch_sys.sh` | 手电筒（系统亮度·原版） | 走 OPlus 官方手势服务，与相机 HAL 完全兼容 |\n| `cos_bypass.sh` | 游戏免打扰 | |\n| `cos_nfc.sh` | NFC 开关 | |\n| `cos_ringer.sh` | 铃声 响铃→震动→静音 | 读当前模式 → 切下一个 → 回读确认，带切换提示；日志 `ringer.log` |\n\n**媒体**：`media_play.sh`（播放 / 暂停）、`media_next.sh` / `media_prev.sh`（切曲）、\n`slider_volume_up.sh` / `slider_volume_down.sh`（音量加减）。\n\n**微信 / 支付宝**：\n\n| 脚本 | 功能 | 说明 |\n| --- | --- | --- |\n| `wx_scan.sh` | 微信扫一扫 | |\n| `wx_pay.sh` | 微信付款码（亮屏版） | 直接拉起付款码界面 |\n| `wx_pay_lock.sh` | 付款码（锁屏自动解锁） | 亮屏 → 菜单键抬起锁屏 → 底部上滑出密码键盘（ColorOS 实测配方）；conf 写 `chain=1` 可自动输密码（v1.6.9 全程约 3 秒） |\n| `wx_password.sh` | 自动输入密码 | 自动定位键盘逐位点按；v1.6.9 起键盘坐标缓存（首次校准后免抓屏）、密码加密存储。`WX_KEYPAD_REFRESH=1` 强制重新校准 |\n| `ali_scan.sh` / `ali_pay.sh` | 支付宝扫一扫 / 付款码 | |\n| `ali_trip.sh` | 支付宝出行码 | |\n\n**已移除**：`slider_torch.sh`、`tool_flashlight_toggle.sh`、`wx_trip.sh`\n（微信已拦截外部跳小程序的 scheme）。\n\n## 锁屏密码自动输入（WebUI 配置）\n\n「设置」页 →「锁屏密码自动输入」卡：填密码数字、可选打开「解锁后自动输」，\n点保存立即生效。\n\n**隐私与安全（v1.6.9 起）：**\n\n- 密码**加密存储**：conf 里只有密文 `enc=`，采用一次一密（每次保存重新生成随机密钥）；\n- 密钥单独放在 `/data/adb/sidekey/.pkey`（权限 600，普通应用无法读取）；\n- 密码**仅保存在本机**，模块**不联网、不上传、不收集**任何密码信息，卸载模块即全部清除。\n\n## 故障排查\n\n- 守护进程没起来：看 WebUI「日志」页 → daemon.out 和 sidekeyd.log\n- 手电筒点不亮（控制中心）：WebUI「设置」页点【修复手电筒】（= `TORCH_REPAIR=1 cos_torch.sh`），约 10 秒恢复，**不用重启手机**\n- 铃声切换不对：看 `ringer.log`，把日志发到 Issues\n- 多击拦截不生效：设置页「按键扫描」确认设备和 uinput 状态\n- 刷入失败：确认 root 管理器版本，附上安装日志提到 Issues\n\n## 目录说明（安装后）\n\n```\n/data/adb/modules/sidekey/            模块本体（勿手改）\n/data/adb/sidekey/                    运行数据：日志、密钥\n/storage/emulated/0/Android/sidekey/  用户脚本（改完即时生效）\n```\n\n## 反馈\n\n问题与建议请开 [Issues](https://github.com/spoilsme/SideKey/issues)，附机型、系统版本、复现步骤和相关日志。\n\n## 许可\n\n本项目以 [MIT License](LICENSE) 开源。使用本模块产生的任何后果由使用者自行承担。\n",
+  "readmeHTML": "<h1>SideKey — 一加 / ColorOS 侧键增强模块</h1>\n\n<p>!<a href=\"https://img.shields.io/badge/version-v2.0.0-2b7cf6\">Version</a> !<a href=\"https://img.shields.io/badge/platform-ColorOS%20%2F%20OPPO%20%2F%20realme-16a34a\">Platform</a> !<a href=\"https://img.shields.io/badge/KernelSU%20%2F%20Magisk%20%2F%20APatch-%E5%85%BC%E5%AE%B9-f59e0b\">Manager</a> !<a href=\"https://img.shields.io/badge/license-MIT-8b5cf6\">License</a></p>\n\n<p>纯 C++ 实现的 KernelSU / Magisk / APatch 模块：把电源键、音量键、三段式静音开关变成</p>\n<p>可编程快捷键，支持多击、长按、组合键，内置 37 个常用动作，全部配置在 WebUI 里点几下就能完成。</p>\n\n<li>作者：spoilsme</li>\n<li>平台：arm64，一加 / OPPO / realme（ColorOS 15 / 16 实测），其他机型理论可用（自动识别按键）</li>\n<li>本仓库只提供**安装包与说明**，下载请到 [Releases](https://github.com/spoilsme/SideKey/releases)</li>\n\n<h2>界面预览</h2>\n\n<p>| 按键 · 手势绑定 | 脚本 · 我的脚本 / 多动作 | 脚本 · 37 个内置动作 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <img src=\"docs/ui-keys.jpg\" width=\"270\"> | <img src=\"docs/ui-scripts.jpg\" width=\"270\"> | <img src=\"docs/ui-scripts-builtin.jpg\" width=\"270\"> |</p>\n\n<p>| 设置 · 手势时序 / 密码 | 日志 · 开关与自动清理 | 关于 · 版本与链接 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <img src=\"docs/ui-settings.jpg\" width=\"270\"> | <img src=\"docs/ui-log.jpg\" width=\"270\"> | <img src=\"docs/ui-about.jpg\" width=\"270\"> |</p>\n\n<h2>项目特色</h2>\n\n<li>**零门槛配置**：打开 WebUI 自动识别这台机器的实体按键和三段式开关，点「＋手势」挑一个动作、点「保存并重启」，2 秒生效，全程不用碰命令行</li>\n<li>**场景引擎（v2.0.0）**：同一个手势在不同场合做不同的事——微信里开付款码、相册里开编辑、静音时切响铃、息屏手电筒；10 种条件（应用 / 时段 / 响铃 / 横竖屏 / 流量 / 飞行模式…）可组合，冲突自动按「优先标记 > 应用 > 时段 > …」裁决，WebUI 里直接看胜负预览</li>\n<li>**纯 C++ 守护进程**：没有 Java / Xposed / LSPosed 依赖，开机即用，不注入任何应用，兼容所有 root 管理器</li>\n<li>**真·多击拦截**：通过 uinput 独占按键设备，双击音量键只跑你的脚本，不会顺带加减音量（自动检测支持情况）</li>\n<li>**组合键自动识别**：只列出这台机器真实存在的按键，耳机线控、相机键这些不存在的键不会出现</li>\n<li>**电源键友好**：默认叠加模式，息屏 / 亮屏 / 关机菜单全部保留，双击脚本只是额外多跑一次；「电源键 + 音量减」截图组合键可保持可用</li>\n<li>**锁屏自动化**：锁屏直接拉起微信付款码并自动解锁到密码键盘，全程约 3 秒；密码加密存储、仅存本机</li>\n<li>**手电筒满功率**：开关走 OPlus 官方服务（控制中心始终正常），点亮后自动拉满亮度，实测开灯约 1.7 秒</li>\n<li>**脚本热更新**：自己的脚本放手机目录里，改完即时生效不用重启；WebUI 里还能一键试运行</li>\n<li>**隐私干净**：不收集、不上传任何数据；唯一的联网操作是拉取一个几百字节的版本号 JSON（24 小时才拉一次，不携带任何设备信息），卸载即全部清除</li>\n\n<h2>下载</h2>\n\n<p>| 版本 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| <b>v2.0.0</b>（最新） | <b>场景引擎</b>：同一手势按场合（前台应用 / 时段 / 响铃 / 横竖屏 / 息屏…）做不同的事，每手势 3 个场景槽 + 优先级；组合键支持长短按；修复音量键对调失灵；新增管理器内自动更新 |</p>\n<p>| v1.7.1 | 手电筒改用官方服务开关，控制中心不再失灵；修复手电筒一键复位 |</p>\n<p>| v1.7.0 及更早 | 历史版本都在 <a href=\"https://github.com/spoilsme/SideKey/releases\">Releases</a> 页面 |</p>\n\n<p>到 <a href=\"https://github.com/spoilsme/SideKey/releases\">Releases</a> 下载 <code>sidekey-vX.Y.Z.zip</code>，直接刷入即可。</p>\n\n<h2>安装</h2>\n\n<li>把 `sidekey-v2.0.0.zip` 刷进 KernelSU（或 Magisk / APatch），**重启**。</li>\n<p>   - 兼容 KernelSU / KSU Next、Magisk 稳定版 / Beta / Canary、Magisk Delta / Alpha、</p>\n<p>     APatch、狐狸面具（Fox Magisk Module Manager）等所有主流 root 管理器。</p>\n<p>   - v1.7.0 起包内补齐了标准 <code>META-INF/com/google/android/update-binary</code>（Magisk</p>\n<p>     官方安装脚本）：之前缺失它会导致 Magisk 系安装器报「Unzip error」刷入失败</p>\n<p>     （KernelSU 不依赖它所以之前能装）。</p>\n<li>打开模块的 WebUI，按键页会自动识别本机的按键和三段式开关。</li>\n<li>点任意手势行挑一个动作，底部「保存并重启」生效（守护进程重启约 2 秒）。</li>\n\n<p>升级 = 管理器里刷入新 zip 再重启，配置和脚本都会保留。</p>\n\n<h3>模块内更新（v2.0.0 起）</h3>\n\n<p>包内的 <code>module.prop</code> 带了 <code>updateJson</code> 字段，所以 <b>root 管理器的模块列表会自己检查新版</b>：</p>\n<p>有新版本时「侧键增强」那一行会直接出现「更新」按钮，点一下就能下载新 zip，</p>\n<p>不用自己去 Releases 找。KernelSU / KSU Next、Magisk、APatch、MMRL 都支持这套机制。</p>\n\n<li>检查用的是仓库根目录的 [`update.json`](update.json)，由发布脚本在每次发版后刷新；</li>\n<li>走 jsDelivr 的 **fastly 节点**（`fastly.jsdelivr.net`）：实测国内直连可用，`cdn.jsdelivr.net` 和 `raw.githubusercontent.com` 都会被重置；</li>\n<li>WebUI 的「简介」页也有一份：进页面自动查（24 小时内只查一次），`有新版本` 会显示成彩色徽标，点它下载；</li>\n<li>管理器拉不到更新时不影响模块本身，手动刷 zip 一样升级；</li>\n<li>⚠️ **从 v1.7.x 及更早版本升上来的第一次仍需手动刷**：老版本的 `module.prop` 里没有 `updateJson`，</li>\n<p>  管理器无从检查；装过一次 v2.0.0 之后，以后每次新版都会自动提示。</p>\n\n<h2>内置动作库</h2>\n\n<p>WebUI「脚本」页可查看全部内置脚本（只读）和试运行；自己写的脚本放</p>\n<p><code>/storage/emulated/0/Android/sidekey/scripts/</code>，改完即时生效不用重启。</p>\n\n<p><b>ColorOS 快捷</b>：</p>\n\n<p>| 脚本 | 功能 | 说明 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <code>sys_home.sh</code> / <code>sys_back.sh</code> | 主屏 / 返回 | |</p>\n<p>| <code>sys_recents.sh</code> | 最近任务 | |</p>\n<p>| <code>sys_screen_off.sh</code> / <code>sys_screen_on.sh</code> | 息屏 / 亮屏 | |</p>\n<p>| <code>sys_power_menu.sh</code> | 电源菜单 | |</p>\n<p>| <code>sys_notification.sh</code> | 下拉通知栏 | |</p>\n<p>| <code>sys_qs.sh</code> | 展开快捷设置 | |</p>\n<p>| <code>sys_split.sh</code> | 分屏 | |</p>\n<p>| <code>sys_screenshot.sh</code> | 截图 | |</p>\n<p>| <code>sys_assistant.sh</code> / <code>sys_camera.sh</code> | 语音助手 / 相机 | |</p>\n<p>| <code>cos_ocr.sh</code> | 文字识别 | |</p>\n<p>| <code>cos_screenshot_area.sh</code> | 区域截图 | |</p>\n<p>| <code>cos_torch.sh</code> | 手电筒（最大亮度） | <b>v1.7.1</b>：开关完全沿用 OPlus 官方服务（判断 <code>flashlight_enabled</code> → ACTION_OPEN/CLOSE + 同步两个 settings 值，**全程不碰 <code>switch_*</code> 电源闸**），点亮后再把 <code>led:torch_*</code> 拉到 <code>max_brightness</code> 得到满功率。实测：开灯约 1.7 秒、关灯约 0.5 秒，<b>控制中心手电筒开关始终正常</b>。若哪天失灵，WebUI「设置」页点【修复手电筒】（或 <code>TORCH_REPAIR=1 cos_torch.sh</code>）约 10 秒恢复，不用重启手机。日志 <code>torch.log</code> |</p>\n<p>| <code>cos_torch_sys.sh</code> | 手电筒（系统亮度·原版） | 走 OPlus 官方手势服务，与相机 HAL 完全兼容 |</p>\n<p>| <code>cos_bypass.sh</code> | 游戏免打扰 | |</p>\n<p>| <code>cos_nfc.sh</code> | NFC 开关 | |</p>\n<p>| <code>cos_ringer.sh</code> | 铃声 响铃→震动→静音 | 读当前模式 → 切下一个 → 回读确认，带切换提示；日志 <code>ringer.log</code> |</p>\n\n<p><b>媒体</b>：<code>media_play.sh</code>（播放 / 暂停）、<code>media_next.sh</code> / <code>media_prev.sh</code>（切曲）、</p>\n<p><code>slider_volume_up.sh</code> / <code>slider_volume_down.sh</code>（音量加减）。</p>\n\n<p><b>微信 / 支付宝</b>：</p>\n\n<p>| 脚本 | 功能 | 说明 |</p>\n<p>| --- | --- | --- |</p>\n<p>| <code>wx_scan.sh</code> | 微信扫一扫 | |</p>\n<p>| <code>wx_pay.sh</code> | 微信付款码（亮屏版） | 直接拉起付款码界面 |</p>\n<p>| <code>wx_pay_lock.sh</code> | 付款码（锁屏自动解锁） | 亮屏 → 菜单键抬起锁屏 → 底部上滑出密码键盘（ColorOS 实测配方）；conf 写 <code>chain=1</code> 可自动输密码（v1.6.9 全程约 3 秒） |</p>\n<p>| <code>wx_password.sh</code> | 自动输入密码 | 自动定位键盘逐位点按；v1.6.9 起键盘坐标缓存（首次校准后免抓屏）、密码加密存储。<code>WX_KEYPAD_REFRESH=1</code> 强制重新校准 |</p>\n<p>| <code>ali_scan.sh</code> / <code>ali_pay.sh</code> | 支付宝扫一扫 / 付款码 | |</p>\n<p>| <code>ali_trip.sh</code> | 支付宝出行码 | |</p>\n\n<p><b>已移除</b>：<code>slider_torch.sh</code>、<code>tool_flashlight_toggle.sh</code>、<code>wx_trip.sh</code></p>\n<p>（微信已拦截外部跳小程序的 scheme）。</p>\n\n<h2>锁屏密码自动输入（WebUI 配置）</h2>\n\n<p>「设置」页 →「锁屏密码自动输入」卡：填密码数字、可选打开「解锁后自动输」，</p>\n<p>点保存立即生效。</p>\n\n<p><b>隐私与安全（v1.6.9 起）：</b></p>\n\n<li>密码**加密存储**：conf 里只有密文 `enc=`，采用一次一密（每次保存重新生成随机密钥）；</li>\n<li>密钥单独放在 `/data/adb/sidekey/.pkey`（权限 600，普通应用无法读取）；</li>\n<li>密码**仅保存在本机**，模块**不联网、不上传、不收集**任何密码信息，卸载模块即全部清除。</li>\n\n<h2>故障排查</h2>\n\n<li>守护进程没起来：看 WebUI「日志」页 → daemon.out 和 sidekeyd.log</li>\n<li>手电筒点不亮（控制中心）：WebUI「设置」页点【修复手电筒】（= `TORCH_REPAIR=1 cos_torch.sh`），约 10 秒恢复，**不用重启手机**</li>\n<li>铃声切换不对：看 `ringer.log`，把日志发到 Issues</li>\n<li>多击拦截不生效：设置页「按键扫描」确认设备和 uinput 状态</li>\n<li>刷入失败：确认 root 管理器版本，附上安装日志提到 Issues</li>\n\n<h2>目录说明（安装后）</h2>\n\n<pre>/data/adb/modules/sidekey/            模块本体（勿手改）\n/data/adb/sidekey/                    运行数据：日志、密钥\n/storage/emulated/0/Android/sidekey/  用户脚本（改完即时生效）</pre>\n\n<h2>反馈</h2>\n\n<p>问题与建议请开 <a href=\"https://github.com/spoilsme/SideKey/issues\">Issues</a>，附机型、系统版本、复现步骤和相关日志。</p>\n\n<h2>许可</h2>\n\n<p>本项目以 <a href=\"LICENSE\">MIT License</a> 开源。使用本模块产生的任何后果由使用者自行承担。</p>",
+  "homepageUrl": "https://github.com/spoilsme/SideKey",
+  "sourceUrl": "https://github.com/spoilsme/SideKey",
+  "url": "https://github.com/spoilsme/SideKey",
+  "latestRelease": {
+    "name": "v1.5.0",
+    "version": "v1.5.0",
+    "time": "2026-10-30T12:20:44Z",
+    "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.5.0/sidekey-v1.5.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-10-30T12:20:44Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.5.0.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.5.0/sidekey-v1.5.0.zip",
+          "size": 246457,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.4.1",
+      "tagName": "v1.4.1",
+      "publishedAt": "2026-10-30T12:20:40Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.4.1.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.4.1/sidekey-v1.4.1.zip",
+          "size": 236449,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.3.0",
+      "tagName": "v1.3.0",
+      "publishedAt": "2026-10-30T12:20:36Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.3.0.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.3.0/sidekey-v1.3.0.zip",
+          "size": 209546,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.2.1",
+      "tagName": "v1.2.1",
+      "publishedAt": "2026-10-30T12:20:31Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.2.1.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.2.1/sidekey-v1.2.1.zip",
+          "size": 196303,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-10-30T12:20:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.2.0.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.2.0/sidekey-v1.2.0.zip",
+          "size": 195492,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-10-30T12:20:23Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "sidekey-v1.1.0.zip",
+          "downloadUrl": "https://github.com/spoilsme/SideKey/releases/download/v1.1.0/sidekey-v1.1.0.zip",
+          "size": 185573,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

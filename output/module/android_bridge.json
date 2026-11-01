@@ -1,0 +1,55 @@
+{
+  "readme": "[![Latest release](https://img.shields.io/github/v/release/ravindu644/android-bridge?label=Release&style=for-the-badge)](https://github.com/ravindu644/android-bridge/releases/latest)\n[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](./LICENSE)\n\n# android-bridge\n\nandroid-bridge lets a [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS)\ncontainer reach the phone it runs on. Root inside the container gets a shell on Android,\nthe same one `adb shell` gives you, with no cable and no ADB.\n\nOn a homelab phone nobody touches, that is how a container reboots the phone, runs `pm`,\n`cmd` or `dumpsys`, or manages Droidspaces itself. `reboot` inside a container only\nreboots the container.\n\n## What you get\n\n- **adb shell, from inside the container.** `android-bridge` opens an interactive shell\n  on the phone, `android-bridge reboot` runs one command. Pipes, terminals and exit codes\n  pass through.\n- **Root when you allow it.** The shell is never root. Run `su` in it, and your root\n  manager decides, the same as over ADB.\n- **Only root gets in.** A normal user in the container is refused, and so is root inside\n  a user namespace, such as rootless podman.\n- **Ready at boot.** The module starts the bridge before Droidspaces boots any container,\n  so a container that starts at boot can use it straight away.\n- **One small binary.** The same static binary is the bridge on the phone and the client\n  in the container, for arm64, arm, x86_64, x86 and riscv64.\n\n## Requirements\n\n- A rooted phone with KernelSU, Magisk or APatch.\n- [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS) and a container that should\n  reach the phone.\n- For `su` inside the bridge shell, a root manager that grants su to Shell.\n\n## Get started\n\n1. Flash `android-bridge-module-v*.zip` from the\n   [latest release](https://github.com/ravindu644/android-bridge/releases/latest) in your\n   root manager and reboot.\n2. In Droidspaces, give the container a read-only bind mount from `/dev/android-bridge` to\n   `/run/android-bridge`, then restart it. The\n   [installation guide](docs/installation.md#give-a-container-the-bridge) shows where that\n   is in the app.\n3. Copy the client into the container, see\n   [copy the client](docs/installation.md#copy-the-client-into-the-container).\n4. Inside the container, as root:\n\n   ```\n   android-bridge                         # a shell on the phone, like adb shell\n   android-bridge reboot                  # reboot the phone\n   android-bridge dumpsys battery\n   ```\n\nEverything else the client does is in [usage](docs/usage.md).\n\n## Security\n\n> [!WARNING]\n>\n> android-bridge gives root in a container a shell on the phone.\n>\n> Every container you give the bind mount to can open one, so do not give it to a\n> container that runs code you do not trust as root.\n>\n> If your root manager grants su to Shell, the bridge shell is one `su` away from root\n> on the phone.\n\n## Documentation\n\n| Page | What it covers |\n|------|----------------|\n| [Installation](docs/installation.md) | The module, the bind mount in Droidspaces, the client, building from source. |\n| [Usage](docs/usage.md) | Every option, quoting, exit codes and the log. |\n| [How it works](docs/how-it-works.md) | Who can connect, the shell you get, and what was tested. |\n| [Troubleshooting](docs/troubleshooting.md) | Each error message, what it means and the fix. |\n\n## License\n\n[GNU General Public License v3.0](./LICENSE). Copyright (C) 2026\n[ravindu644](https://github.com/ravindu644).\n",
+  "readmeHTML": "<p><a href=\"https://img.shields.io/github/v/release/ravindu644/android-bridge?label=Release&style=for-the-badge\">![Latest release</a>](https://github.com/ravindu644/android-bridge/releases/latest)</p>\n<p><a href=\"https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge\">![License: GPL v3</a>](./LICENSE)</p>\n\n<h1>android-bridge</h1>\n\n<p>android-bridge lets a <a href=\"https://github.com/ravindu644/Droidspaces-OSS\">Droidspaces</a></p>\n<p>container reach the phone it runs on. Root inside the container gets a shell on Android,</p>\n<p>the same one <code>adb shell</code> gives you, with no cable and no ADB.</p>\n\n<p>On a homelab phone nobody touches, that is how a container reboots the phone, runs <code>pm</code>,</p>\n<p><code>cmd</code> or <code>dumpsys</code>, or manages Droidspaces itself. <code>reboot</code> inside a container only</p>\n<p>reboots the container.</p>\n\n<h2>What you get</h2>\n\n<li>**adb shell, from inside the container.** `android-bridge` opens an interactive shell</li>\n<p>  on the phone, <code>android-bridge reboot</code> runs one command. Pipes, terminals and exit codes</p>\n<p>  pass through.</p>\n<li>**Root when you allow it.** The shell is never root. Run `su` in it, and your root</li>\n<p>  manager decides, the same as over ADB.</p>\n<li>**Only root gets in.** A normal user in the container is refused, and so is root inside</li>\n<p>  a user namespace, such as rootless podman.</p>\n<li>**Ready at boot.** The module starts the bridge before Droidspaces boots any container,</li>\n<p>  so a container that starts at boot can use it straight away.</p>\n<li>**One small binary.** The same static binary is the bridge on the phone and the client</li>\n<p>  in the container, for arm64, arm, x86_64, x86 and riscv64.</p>\n\n<h2>Requirements</h2>\n\n<li>A rooted phone with KernelSU, Magisk or APatch.</li>\n<li>[Droidspaces](https://github.com/ravindu644/Droidspaces-OSS) and a container that should</li>\n<p>  reach the phone.</p>\n<li>For `su` inside the bridge shell, a root manager that grants su to Shell.</li>\n\n<h2>Get started</h2>\n\n<li>Flash `android-bridge-module-v*.zip` from the</li>\n<p>   <a href=\"https://github.com/ravindu644/android-bridge/releases/latest\">latest release</a> in your</p>\n<p>   root manager and reboot.</p>\n<li>In Droidspaces, give the container a read-only bind mount from `/dev/android-bridge` to</li>\n<p>   <code>/run/android-bridge</code>, then restart it. The</p>\n<p>   <a href=\"docs/installation.md#give-a-container-the-bridge\">installation guide</a> shows where that</p>\n<p>   is in the app.</p>\n<li>Copy the client into the container, see</li>\n<p>   <a href=\"docs/installation.md#copy-the-client-into-the-container\">copy the client</a>.</p>\n<li>Inside the container, as root:</li>\n\n<p>   ```</p>\n<p>   android-bridge                         # a shell on the phone, like adb shell</p>\n<p>   android-bridge reboot                  # reboot the phone</p>\n<p>   android-bridge dumpsys battery</p>\n<p>   ```</p>\n\n<p>Everything else the client does is in <a href=\"docs/usage.md\">usage</a>.</p>\n\n<h2>Security</h2>\n\n<p>> [!WARNING]</p>\n<p>></p>\n<p>> android-bridge gives root in a container a shell on the phone.</p>\n<p>></p>\n<p>> Every container you give the bind mount to can open one, so do not give it to a</p>\n<p>> container that runs code you do not trust as root.</p>\n<p>></p>\n<p>> If your root manager grants su to Shell, the bridge shell is one <code>su</code> away from root</p>\n<p>> on the phone.</p>\n\n<h2>Documentation</h2>\n\n<p>| Page | What it covers |</p>\n<p>|------|----------------|</p>\n<p>| <a href=\"docs/installation.md\">Installation</a> | The module, the bind mount in Droidspaces, the client, building from source. |</p>\n<p>| <a href=\"docs/usage.md\">Usage</a> | Every option, quoting, exit codes and the log. |</p>\n<p>| <a href=\"docs/how-it-works.md\">How it works</a> | Who can connect, the shell you get, and what was tested. |</p>\n<p>| <a href=\"docs/troubleshooting.md\">Troubleshooting</a> | Each error message, what it means and the fix. |</p>\n\n<h2>License</h2>\n\n<p><a href=\"./LICENSE\">GNU General Public License v3.0</a>. Copyright (C) 2026</p>\n<p><a href=\"https://github.com/ravindu644\">ravindu644</a>.</p>",
+  "homepageUrl": "https://github.com/ravindu644/android-bridge",
+  "sourceUrl": "https://github.com/ravindu644/android-bridge",
+  "url": "https://github.com/ravindu644/android-bridge",
+  "latestRelease": {
+    "name": "v1.0.1",
+    "version": "v1.0.1",
+    "time": "2026-10-31T12:43:24Z",
+    "downloadUrl": "https://github.com/ravindu644/android-bridge/releases/download/v1.0.1/android-bridge-module-v1.0.1-9475664.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.1",
+      "tagName": "v1.0.1",
+      "publishedAt": "2026-10-31T12:43:24Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/ravindu644/android-bridge/releases/download/v1.0.1/SHA256SUMS",
+          "size": 107,
+          "downloadCount": 1
+        },
+        {
+          "name": "android-bridge-module-v1.0.1-9475664.zip",
+          "downloadUrl": "https://github.com/ravindu644/android-bridge/releases/download/v1.0.1/android-bridge-module-v1.0.1-9475664.zip",
+          "size": 237381,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-10-31T11:34:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/ravindu644/android-bridge/releases/download/v1.0.0/SHA256SUMS",
+          "size": 107,
+          "downloadCount": 1
+        },
+        {
+          "name": "android-bridge-module-v1.0.0-99d4ffd.zip",
+          "downloadUrl": "https://github.com/ravindu644/android-bridge/releases/download/v1.0.0/android-bridge-module-v1.0.0-99d4ffd.zip",
+          "size": 237152,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}
