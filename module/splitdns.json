@@ -1,0 +1,29 @@
+{
+  "readme": "# Split DNS\n\nРазные DNS-серверы для разных доменов: например, YouTube и Google через Quad9, нейросети через GeoHide, всё остальное через обычный DNS.\n\n- **Windows** — правила [NRPT](https://learn.microsoft.com/windows-server/networking/dns/deploy/nrpt): [Открыть сайт](https://fordownloads.github.io/SplitDNS)\n- **Android (KernelSU/Magisk)** — модуль с локальным [dnsproxy](https://github.com/AdguardTeam/dnsproxy) и WebUI\n\n## Зачем это нужно?\n\n- \"Умные\" DNS сервисы нестабильные и часто отваливаются, поэтому лучше применять их к тем сайтам, которые они \"обходят\", чтобы не ложить всю сеть\n- DNS могут подменять домены, которые вы хотите открывать напрямую\n- Один DNS подменяет больше доменов, чем другой, но при этом менее стабилен\n- DoH/DoT для всего на Android\n- Работает на всех сетях универсально\n\n## Как использовать?\n\nДля Windows:\n\n1. [Откройте сайт](https://fordownloads.github.io/SplitDNS)\n2. Добавьте DNS, например GeoHide\n3. Задайте ему домены, например \"Список GeoHide\"\n4. По желанию задайте Глобальный DNS, куда будут идти все остальные запросы, например Quad9 (провайдеры на данный момент подделывают запросы к Google и Cloudflare)\n5. Скачайте .bat и запустите\n6. Примените или отключите правила в .bat файле\n\n## Android\n\n1. Установите [splitdns.zip](https://github.com/fordownloads/SplitDNS/releases) в KernelSU или Magisk с поддержкой KSUWebUI. Перезагрузитесь.\n2. Добавьте DNS (например, GeoHide)\n3. Задайте ему домены (например, \"Список GeoHide\")\n4. По желанию задайте Глобальный DNS, куда будут идти все остальные запросы (например, Quad9, т.к. провайдеры на данный момент подделывают запросы к Google и Cloudflare)\n5. Режим \"Заменять системный DNS\":\n   - **вкл** — весь DNS телефона перенаправляется на dnsproxy через iptables\n   - **выкл** — перехватываются только запросы к `192.0.2.53`: укажите этот адрес как DNS в трехбуквенном клиенте\n6. Включите \"Изменить DNS\", перезагрузка не требуется\n\nКонфигурация находится в `/data/adb/splitdns/domains.txt`, лог — `/data/adb/splitdns/splitdns.log`.\nОтключите Private DNS: он идёт мимо модуля.\n\nКоманды: `sh /data/adb/modules/splitdns/splitdns.sh start|stop|restart|enable|disable|redirect-on|redirect-off|status`.\n",
+  "readmeHTML": "<h1>Split DNS</h1>\n\n<p>Разные DNS-серверы для разных доменов: например, YouTube и Google через Quad9, нейросети через GeoHide, всё остальное через обычный DNS.</p>\n\n<li>**Windows** — правила [NRPT](https://learn.microsoft.com/windows-server/networking/dns/deploy/nrpt): [Открыть сайт](https://fordownloads.github.io/SplitDNS)</li>\n<li>**Android (KernelSU/Magisk)** — модуль с локальным [dnsproxy](https://github.com/AdguardTeam/dnsproxy) и WebUI</li>\n\n<h2>Зачем это нужно?</h2>\n\n<li>\"Умные\" DNS сервисы нестабильные и часто отваливаются, поэтому лучше применять их к тем сайтам, которые они \"обходят\", чтобы не ложить всю сеть</li>\n<li>DNS могут подменять домены, которые вы хотите открывать напрямую</li>\n<li>Один DNS подменяет больше доменов, чем другой, но при этом менее стабилен</li>\n<li>DoH/DoT для всего на Android</li>\n<li>Работает на всех сетях универсально</li>\n\n<h2>Как использовать?</h2>\n\n<p>Для Windows:</p>\n\n<li>[Откройте сайт](https://fordownloads.github.io/SplitDNS)</li>\n<li>Добавьте DNS, например GeoHide</li>\n<li>Задайте ему домены, например \"Список GeoHide\"</li>\n<li>По желанию задайте Глобальный DNS, куда будут идти все остальные запросы, например Quad9 (провайдеры на данный момент подделывают запросы к Google и Cloudflare)</li>\n<li>Скачайте .bat и запустите</li>\n<li>Примените или отключите правила в .bat файле</li>\n\n<h2>Android</h2>\n\n<li>Установите [splitdns.zip](https://github.com/fordownloads/SplitDNS/releases) в KernelSU или Magisk с поддержкой KSUWebUI. Перезагрузитесь.</li>\n<li>Добавьте DNS (например, GeoHide)</li>\n<li>Задайте ему домены (например, \"Список GeoHide\")</li>\n<li>По желанию задайте Глобальный DNS, куда будут идти все остальные запросы (например, Quad9, т.к. провайдеры на данный момент подделывают запросы к Google и Cloudflare)</li>\n<li>Режим \"Заменять системный DNS\":</li>\n<p>   - <b>вкл</b> — весь DNS телефона перенаправляется на dnsproxy через iptables</p>\n<p>   - <b>выкл</b> — перехватываются только запросы к <code>192.0.2.53</code>: укажите этот адрес как DNS в трехбуквенном клиенте</p>\n<li>Включите \"Изменить DNS\", перезагрузка не требуется</li>\n\n<p>Конфигурация находится в <code>/data/adb/splitdns/domains.txt</code>, лог — <code>/data/adb/splitdns/splitdns.log</code>.</p>\n<p>Отключите Private DNS: он идёт мимо модуля.</p>\n\n<p>Команды: <code>sh /data/adb/modules/splitdns/splitdns.sh start|stop|restart|enable|disable|redirect-on|redirect-off|status</code>.</p>",
+  "homepageUrl": "https://github.com/fordownloads/SplitDNS",
+  "sourceUrl": "https://github.com/fordownloads/SplitDNS",
+  "url": "https://github.com/fordownloads/SplitDNS",
+  "latestRelease": {
+    "name": "v1",
+    "version": "v1",
+    "time": "2026-11-03T05:12:16Z",
+    "downloadUrl": "https://github.com/fordownloads/SplitDNS/releases/download/v1/splitdns.zip"
+  },
+  "releases": [
+    {
+      "name": "v1",
+      "tagName": "v1",
+      "publishedAt": "2026-11-03T05:12:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "splitdns.zip",
+          "downloadUrl": "https://github.com/fordownloads/SplitDNS/releases/download/v1/splitdns.zip",
+          "size": 8858567,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}

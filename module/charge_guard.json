@@ -1,0 +1,35 @@
+{
+  "readme": "# Charge Guard\n\nA Magisk module for phones that stay plugged in.\nIt stops charging at **70%** and resumes at **65%**.\n\nFor Redmi Note 7/7S running crDroid 13 / Android 17.\nTested with Magisk 31100.\nOnly the tested kernel build is accepted; other builds are blocked.\n\n## Install\n\n1. Enable Android's charging limit and set it to 70%.\n2. Download `charge-guard-1.0.6.zip` from [Releases](https://github.com/pixincreate/charge-guard/releases/latest), under **Assets**.\n3. Select the ZIP in **Magisk → Modules → Install from storage**.\n4. Reboot and tap **Action** to check that it works.\n\nDo not install GitHub's **Source code** ZIP.\n\n## Status\n\n**Action** shows whether the module is running, battery readings, and any fault.\nIt does not change settings.\nClose and reopen it for a fresh check.\n\nThe module card can show old status.\nRestart Magisk to refresh it; switching tabs does not work.\n\n## Important\n\n- The battery stays connected. Some battery drain remains; our test reports about 39 mA while holding.\n- At 40°C or after a failed check, the module tries to restore Android's charging control and stops until reboot. Check Action if it reports `Fault`; failed recovery can leave charging stopped.\n- Do not use another charging module or change Android's charging settings while this module runs.\n- If the module is disabled or missing after an unexpected reboot, Android's charging control can stay off. Turn it back on in battery settings.\n- Do not delete `/data/adb/lavender-battery-guard`. It stores recovery data.\n\nUninstall through Magisk, then reboot.\nThis is a prototype: resuming at 65% and long-term operation remain unverified on the phone.\nIt cannot prevent all battery aging.\nKeep the phone cool and stop using it if the battery swells.\n\n## Build and test\n\nUse Python 3, `uv`, ShellCheck, and a POSIX host with `timeout` installed.\n\n```sh\nuv run --no-project python -m unittest discover -s tests\nshellcheck ./*.sh tests/*.sh\nfor script in ./*.sh tests/*.sh; do sh -n \"$script\" || exit; done\nuv run --no-project python build.py\n```\n\nThe ZIP is saved in `dist/`.\n\n## License\n\nCopyright (C) 2026 PiX (`pixincreate`).\n[GPL-3.0-only](LICENSE).\n",
+  "readmeHTML": "<h1>Charge Guard</h1>\n\n<p>A Magisk module for phones that stay plugged in.</p>\n<p>It stops charging at <b>70%</b> and resumes at <b>65%</b>.</p>\n\n<p>For Redmi Note 7/7S running crDroid 13 / Android 17.</p>\n<p>Tested with Magisk 31100.</p>\n<p>Only the tested kernel build is accepted; other builds are blocked.</p>\n\n<h2>Install</h2>\n\n<li>Enable Android's charging limit and set it to 70%.</li>\n<li>Download `charge-guard-1.0.6.zip` from [Releases](https://github.com/pixincreate/charge-guard/releases/latest), under **Assets**.</li>\n<li>Select the ZIP in **Magisk → Modules → Install from storage**.</li>\n<li>Reboot and tap **Action** to check that it works.</li>\n\n<p>Do not install GitHub's <b>Source code</b> ZIP.</p>\n\n<h2>Status</h2>\n\n<p><b>Action</b> shows whether the module is running, battery readings, and any fault.</p>\n<p>It does not change settings.</p>\n<p>Close and reopen it for a fresh check.</p>\n\n<p>The module card can show old status.</p>\n<p>Restart Magisk to refresh it; switching tabs does not work.</p>\n\n<h2>Important</h2>\n\n<li>The battery stays connected. Some battery drain remains; our test reports about 39 mA while holding.</li>\n<li>At 40°C or after a failed check, the module tries to restore Android's charging control and stops until reboot. Check Action if it reports `Fault`; failed recovery can leave charging stopped.</li>\n<li>Do not use another charging module or change Android's charging settings while this module runs.</li>\n<li>If the module is disabled or missing after an unexpected reboot, Android's charging control can stay off. Turn it back on in battery settings.</li>\n<li>Do not delete `/data/adb/lavender-battery-guard`. It stores recovery data.</li>\n\n<p>Uninstall through Magisk, then reboot.</p>\n<p>This is a prototype: resuming at 65% and long-term operation remain unverified on the phone.</p>\n<p>It cannot prevent all battery aging.</p>\n<p>Keep the phone cool and stop using it if the battery swells.</p>\n\n<h2>Build and test</h2>\n\n<p>Use Python 3, <code>uv</code>, ShellCheck, and a POSIX host with <code>timeout</code> installed.</p>\n\n<pre>uv run --no-project python -m unittest discover -s tests\nshellcheck ./*.sh tests/*.sh\nfor script in ./*.sh tests/*.sh; do sh -n \"$script\" || exit; done\nuv run --no-project python build.py</pre>\n\n<p>The ZIP is saved in <code>dist/</code>.</p>\n\n<h2>License</h2>\n\n<p>Copyright (C) 2026 PiX (<code>pixincreate</code>).</p>\n<p><a href=\"LICENSE\">GPL-3.0-only</a>.</p>",
+  "homepageUrl": "https://github.com/pixincreate/charge-guard",
+  "sourceUrl": "https://github.com/pixincreate/charge-guard",
+  "url": "https://github.com/pixincreate/charge-guard",
+  "latestRelease": {
+    "name": "v1.0.6",
+    "version": "v1.0.6",
+    "time": "2026-11-02T10:43:26Z",
+    "downloadUrl": "https://github.com/pixincreate/charge-guard/releases/download/v1.0.6/charge-guard-1.0.6.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.6",
+      "tagName": "v1.0.6",
+      "publishedAt": "2026-11-02T10:43:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "charge-guard-1.0.6.zip",
+          "downloadUrl": "https://github.com/pixincreate/charge-guard/releases/download/v1.0.6/charge-guard-1.0.6.zip",
+          "size": 25989,
+          "downloadCount": 0
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/pixincreate/charge-guard/releases/download/v1.0.6/SHA256SUMS",
+          "size": 89,
+          "downloadCount": 0
+        }
+      ]
+    }
+  ]
+}
