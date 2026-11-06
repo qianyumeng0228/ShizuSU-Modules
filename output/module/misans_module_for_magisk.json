@@ -1,0 +1,99 @@
+{
+  "readme": "# MiSans Module for Magisk\n本项目旨在使不被支持的 AOSP 发行版使用MiSans，已在 A10、A11、A12 测试可正常启动。~~已知问题：MIUI 刷入后无法在设置中调整字体粗细。~~(主分支为通用版本，MIUI 专用版本已修正此问题)\n\n> **重要提醒：**\n>\n> 刷机、刷入 Magisk 模块可能会导致系统无法正常启动，请在操作前审慎考虑，并建议备份重要数据。因操作不当导致的系统故障（包括卡开机动画、功能异常等）或效果异常与模块作者无关。\n\n## 常用字重映射\n - 100 - 淡体 Thin (Hairline)\n - 200 - 特细 ExtraLight (UltraLight)\n - 300 - 细体 Light\n - 350 - 次细 DemiLight\n - 400 - 标准 Normal (Regular)\n - 500 - 适中 Medium\n - 600 - 次粗 SemiBold (DemiBold)\n - 700 - 粗体 Bold\n - 800 - 特粗 ExtraBold (UltraBold)\n - 900 - 浓体 Black (Heavy)\n - 950 - 特浓 ExtraBlack (UltraBlack)\n\n## 字重测试\n[点击此处进入字重测试](https://font.yukonga.top/) （酷安 [@YuKongA / 原名「余空_YuK」](https://www.coolapk.com/u/680367) 制作提供）\n\n## 注意事项\n1. `/system/fonts` 目录内的 **EmptyFont** 为空字体文件，主要提供度量和字重信息，**请勿轻易删除。**\n2. `/system/product` 文件夹内的内容用以覆盖类原生 Android 系统内置的 Google Sans 字体，实现所替换字体在类原生 ROM 上的全局覆盖。若想保留原生 ROM 内置的 Google Sans 字体，请将模块内的 `/system/product` 文件夹删除。\n3. `/system/etc/fonts.xml` 为字体配置文件，已经过调整以调用空字体及自定义字体。**理论上**可兼容 A12 和 A11，**但不保证所有 ROM 均能正常使用**，具体请参阅下面的 **「兼容性调整」** 。A7以上版本无需修改 `/system/etc/fonts.xml` 内容，由于 A5-A6 的字体配置文件包括 `fonts.xml` 和 `fallback_fonts.xml` ，所以二者需要同时修改[具体参照这里](https://www.daogebangong.com/zh/articles/detail/Tutorial%20deeply%20interprets%20the%20Android%20font%20mechanism%20and%20handles%20font%20replacement%20and%20thickness%20classification%20for%20Android%20phones.html)。\n4. **本模块最低支持 Magisk 20.4。**\n\n## 兼容性调整 <sub>仅供参考</sub>\n由于不同OEM对字体的实现方式不同，所以需要对模块内的配置文件进行调整：\n- **OPPO/一加 ColorOS：** 将 `/system/etc/fonts.xml` 复制到 `/system/system_ext/etc/` 目录并重命名为 `fonts_base.xml`。\n- **一加 HydrogenOS 11 及以上版本：** 将 `/system/etc/fonts.xml` 复制到相同文件夹，并重命名为 `fonts_base.xml。`\n- **魅族 Flyme：** 将 `/system/etc/fonts.xml` 复制 3 份到相同文件夹，并重命名为以下 3 个文件： `fonts_flyme.xml`、`fonts_inter.xml` 和 `fonts_slate.xml`。\n",
+  "readmeHTML": "<h1>MiSans Module for Magisk</h1>\n<p>本项目旨在使不被支持的 AOSP 发行版使用MiSans，已在 A10、A11、A12 测试可正常启动。~~已知问题：MIUI 刷入后无法在设置中调整字体粗细。~~(主分支为通用版本，MIUI 专用版本已修正此问题)</p>\n\n<p>> <b>重要提醒：</b></p>\n<p>></p>\n<p>> 刷机、刷入 Magisk 模块可能会导致系统无法正常启动，请在操作前审慎考虑，并建议备份重要数据。因操作不当导致的系统故障（包括卡开机动画、功能异常等）或效果异常与模块作者无关。</p>\n\n<h2>常用字重映射</h2>\n<p> - 100 - 淡体 Thin (Hairline)</p>\n<p> - 200 - 特细 ExtraLight (UltraLight)</p>\n<p> - 300 - 细体 Light</p>\n<p> - 350 - 次细 DemiLight</p>\n<p> - 400 - 标准 Normal (Regular)</p>\n<p> - 500 - 适中 Medium</p>\n<p> - 600 - 次粗 SemiBold (DemiBold)</p>\n<p> - 700 - 粗体 Bold</p>\n<p> - 800 - 特粗 ExtraBold (UltraBold)</p>\n<p> - 900 - 浓体 Black (Heavy)</p>\n<p> - 950 - 特浓 ExtraBlack (UltraBlack)</p>\n\n<h2>字重测试</h2>\n<p><a href=\"https://font.yukonga.top/\">点击此处进入字重测试</a> （酷安 <a href=\"https://www.coolapk.com/u/680367\">@YuKongA / 原名「余空_YuK」</a> 制作提供）</p>\n\n<h2>注意事项</h2>\n<li>`/system/fonts` 目录内的 **EmptyFont** 为空字体文件，主要提供度量和字重信息，**请勿轻易删除。**</li>\n<li>`/system/product` 文件夹内的内容用以覆盖类原生 Android 系统内置的 Google Sans 字体，实现所替换字体在类原生 ROM 上的全局覆盖。若想保留原生 ROM 内置的 Google Sans 字体，请将模块内的 `/system/product` 文件夹删除。</li>\n<li>`/system/etc/fonts.xml` 为字体配置文件，已经过调整以调用空字体及自定义字体。**理论上**可兼容 A12 和 A11，**但不保证所有 ROM 均能正常使用**，具体请参阅下面的 **「兼容性调整」** 。A7以上版本无需修改 `/system/etc/fonts.xml` 内容，由于 A5-A6 的字体配置文件包括 `fonts.xml` 和 `fallback_fonts.xml` ，所以二者需要同时修改[具体参照这里](https://www.daogebangong.com/zh/articles/detail/Tutorial%20deeply%20interprets%20the%20Android%20font%20mechanism%20and%20handles%20font%20replacement%20and%20thickness%20classification%20for%20Android%20phones.html)。</li>\n<li>**本模块最低支持 Magisk 20.4。**</li>\n\n<h2>兼容性调整 <sub>仅供参考</sub></h2>\n<p>由于不同OEM对字体的实现方式不同，所以需要对模块内的配置文件进行调整：</p>\n<li>**OPPO/一加 ColorOS：** 将 `/system/etc/fonts.xml` 复制到 `/system/system_ext/etc/` 目录并重命名为 `fonts_base.xml`。</li>\n<li>**一加 HydrogenOS 11 及以上版本：** 将 `/system/etc/fonts.xml` 复制到相同文件夹，并重命名为 `fonts_base.xml。`</li>\n<li>**魅族 Flyme：** 将 `/system/etc/fonts.xml` 复制 3 份到相同文件夹，并重命名为以下 3 个文件： `fonts_flyme.xml`、`fonts_inter.xml` 和 `fonts_slate.xml`。</li>",
+  "homepageUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk",
+  "sourceUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk",
+  "url": "https://github.com/nangongjing1/MiSans-Module-for-Magisk",
+  "latestRelease": {
+    "name": "v1.2",
+    "version": "v1.2",
+    "time": "2025-06-18T06:10:18Z",
+    "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/v1.2/MiSans-Module-for-Magisk_v1.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.2-for-MIUI",
+      "tagName": "v1.2.2-for-MIUI",
+      "publishedAt": "2025-06-18T05:57:33Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-MIUI_V1.2.2.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/v1.2.2-for-MIUI/MiSans-Module-for-MIUI_V1.2.2.zip",
+          "size": 23962686,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v1.2",
+      "tagName": "v1.2",
+      "publishedAt": "2025-06-18T06:10:18Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-Magisk_v1.2.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/v1.2/MiSans-Module-for-Magisk_v1.2.zip",
+          "size": 58027009,
+          "downloadCount": 93
+        }
+      ]
+    },
+    {
+      "name": "V1.2.1-for-MlUl",
+      "tagName": "V1.2.1-for-MlUl",
+      "publishedAt": "2024-11-08T12:32:43Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-MIUI_V1.2.1.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/V1.2.1-for-MlUl/MiSans-Module-for-MIUI_V1.2.1.zip",
+          "size": 14143466,
+          "downloadCount": 11
+        }
+      ]
+    },
+    {
+      "name": "V1.1.1-for-MIUI",
+      "tagName": "V1.1.1-for-MIUI",
+      "publishedAt": "2024-10-18T05:20:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-MIUI_V1.1.1.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/V1.1.1-for-MIUI/MiSans-Module-for-MIUI_V1.1.1.zip",
+          "size": 14143285,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "V1.1",
+      "tagName": "V1.1",
+      "publishedAt": "2024-10-17T13:11:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-Magisk_v1.1.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/V1.1/MiSans-Module-for-Magisk_v1.1.zip",
+          "size": 48207802,
+          "downloadCount": 71
+        }
+      ]
+    },
+    {
+      "name": "V1.0",
+      "tagName": "V1.0",
+      "publishedAt": "2024-10-17T12:18:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "MiSans-Module-for-Magisk_v1.0.zip",
+          "downloadUrl": "https://github.com/nangongjing1/MiSans-Module-for-Magisk/releases/download/V1.0/MiSans-Module-for-Magisk_v1.0.zip",
+          "size": 47514517,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

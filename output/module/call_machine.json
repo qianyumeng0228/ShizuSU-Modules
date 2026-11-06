@@ -1,0 +1,57 @@
+{
+  "readme": "\n![Call Machine Logo](app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp)\n\n### Call Machine\n\n---\n\n#### Features\n- Answers calls automatically with custom greeting audio.\n- Offers to limit single message duration to prevent one caller from hoggin the phone line.\n- Country code whitelisting - to prevent calls from other countries being automatically answered and costing you money\n- Saving recorded messages on **SD card or Internal storage** and even in app's private directory in **`/data` partition**\n- Can upload messages to a self-hosted [WetRadio](https://github.com/pisoj/WetRadio) instance.\n\nIf you desire the app to include **contact name** in **file names** of recorded messages, please\n**manually** grant contacts permission **in settings**.\n\n> **Warning:**\n>\n> This has **only been tested** on Xiaomi Redmi Note 8T running LineageOS 23.2 (Android 16)\n>\n> It **may or may not** work on other devices/ROMs.\n\n![Screenshoot](Screenshot_1.png)\n\n#### The application has <u>zero dependencies</u>\n\n[![Empty dependencies block](https://github.com/pisoj/og-nettools/assets/87895700/fecbf3ca-4746-4d6b-8b36-5ddcc987be4f)](https://github.com/pisoj/call-machine/blob/main/app/build.gradle.kts#L44)\n\n### Supported audio codecs\n| Codec          | Containers     | File extension    |\n|----------------|----------------|-------------------|\n| Opus           | ogg, mp4, webm | .ogg, .m4a, .wemb |\n| AAC-LC         | mp4, adts      | .m4a, .aac        |\n| HE-AAC v2      | mp4, adts      | .m4a, .aac        |\n| AMR Wideband   | amr, 3gpp      | .amr, .3gpp       |\n| AMR Narrowband | amr, 3gpp      | .amr, .3gpp       |\n\n---\n\n### Compile from source\n\nThe app itself **can be** compiled using **Android Studio** just like any other\nandroid application. It can also be compiled with `Gradle` from **command line**:\n```shell\n./gradlew :app:build\n```\n\nWhen you're done compiling move the apk from `app/build/outputs/apk/debug/` to `MagiskModule/system/priv-app/CallMachine/`\nand **rename** it to `CallMachine.apk`.\n\nNow go to `MagiskModule/` and ZIP `META-INF`, `system` and `module.prop` together.\nMake sure **not to create** a parent directory inside the ZIP archive. These three\nitems should be in the **root** of the ZIP file, otherwise Magisk is going to\n**reject** the module.\n\n> Note: **Binary files** inside `MagiskModule/system/bin` were obtained from [here](https://github.com/hasanbulat/tinyalsa-ndk/tree/fbd19bcda2cf4bc8d2b01e469440252f1a543e24/libs/armeabi).\n",
+  "readmeHTML": "\n<p>!<a href=\"app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp\">Call Machine Logo</a></p>\n\n<h3>Call Machine</h3>\n\n<p>---</p>\n\n<p>#### Features</p>\n<li>Answers calls automatically with custom greeting audio.</li>\n<li>Offers to limit single message duration to prevent one caller from hoggin the phone line.</li>\n<li>Country code whitelisting - to prevent calls from other countries being automatically answered and costing you money</li>\n<li>Saving recorded messages on **SD card or Internal storage** and even in app's private directory in **`/data` partition**</li>\n<li>Can upload messages to a self-hosted [WetRadio](https://github.com/pisoj/WetRadio) instance.</li>\n\n<p>If you desire the app to include <b>contact name</b> in <b>file names</b> of recorded messages, please</p>\n<p><b>manually</b> grant contacts permission <b>in settings</b>.</p>\n\n<p>> <b>Warning:</b></p>\n<p>></p>\n<p>> This has <b>only been tested</b> on Xiaomi Redmi Note 8T running LineageOS 23.2 (Android 16)</p>\n<p>></p>\n<p>> It <b>may or may not</b> work on other devices/ROMs.</p>\n\n<p>!<a href=\"Screenshot_1.png\">Screenshoot</a></p>\n\n<p>#### The application has <u>zero dependencies</u></p>\n\n<p><a href=\"https://github.com/pisoj/og-nettools/assets/87895700/fecbf3ca-4746-4d6b-8b36-5ddcc987be4f\">![Empty dependencies block</a>](https://github.com/pisoj/call-machine/blob/main/app/build.gradle.kts#L44)</p>\n\n<h3>Supported audio codecs</h3>\n<p>| Codec          | Containers     | File extension    |</p>\n<p>|----------------|----------------|-------------------|</p>\n<p>| Opus           | ogg, mp4, webm | .ogg, .m4a, .wemb |</p>\n<p>| AAC-LC         | mp4, adts      | .m4a, .aac        |</p>\n<p>| HE-AAC v2      | mp4, adts      | .m4a, .aac        |</p>\n<p>| AMR Wideband   | amr, 3gpp      | .amr, .3gpp       |</p>\n<p>| AMR Narrowband | amr, 3gpp      | .amr, .3gpp       |</p>\n\n<p>---</p>\n\n<h3>Compile from source</h3>\n\n<p>The app itself <b>can be</b> compiled using <b>Android Studio</b> just like any other</p>\n<p>android application. It can also be compiled with <code>Gradle</code> from <b>command line</b>:</p>\n<pre>./gradlew :app:build</pre>\n\n<p>When you're done compiling move the apk from <code>app/build/outputs/apk/debug/</code> to <code>MagiskModule/system/priv-app/CallMachine/</code></p>\n<p>and <b>rename</b> it to <code>CallMachine.apk</code>.</p>\n\n<p>Now go to <code>MagiskModule/</code> and ZIP <code>META-INF</code>, <code>system</code> and <code>module.prop</code> together.</p>\n<p>Make sure <b>not to create</b> a parent directory inside the ZIP archive. These three</p>\n<p>items should be in the <b>root</b> of the ZIP file, otherwise Magisk is going to</p>\n<p><b>reject</b> the module.</p>\n\n<p>> Note: <b>Binary files</b> inside <code>MagiskModule/system/bin</code> were obtained from <a href=\"https://github.com/hasanbulat/tinyalsa-ndk/tree/fbd19bcda2cf4bc8d2b01e469440252f1a543e24/libs/armeabi\">here</a>.</p>",
+  "homepageUrl": "https://github.com/pisoj/call-machine",
+  "sourceUrl": "https://github.com/pisoj/call-machine",
+  "url": "https://github.com/pisoj/call-machine",
+  "latestRelease": {
+    "name": "v.0.1.1",
+    "version": "v.0.1.1",
+    "time": "2026-11-06T02:10:06Z",
+    "downloadUrl": "https://github.com/pisoj/call-machine/releases/download/v.0.1.1/CallMachine_v0.1.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v.0.1.1",
+      "tagName": "v.0.1.1",
+      "publishedAt": "2026-11-06T02:10:06Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CallMachine_v0.1.1.zip",
+          "downloadUrl": "https://github.com/pisoj/call-machine/releases/download/v.0.1.1/CallMachine_v0.1.1.zip",
+          "size": 115993,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-07-17T11:34:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CallMachine_v0.1.0.zip",
+          "downloadUrl": "https://github.com/pisoj/call-machine/releases/download/v0.1.0/CallMachine_v0.1.0.zip",
+          "size": 115404,
+          "downloadCount": 46
+        }
+      ]
+    },
+    {
+      "name": "v0.0.29",
+      "tagName": "v0.0.29",
+      "publishedAt": "2026-03-08T21:57:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "CallMachine_v0.0.29.zip",
+          "downloadUrl": "https://github.com/pisoj/call-machine/releases/download/v0.0.29/CallMachine_v0.0.29.zip",
+          "size": 114859,
+          "downloadCount": 25
+        }
+      ]
+    }
+  ]
+}
