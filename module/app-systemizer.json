@@ -1,16 +1,104 @@
 {
-  "readme": "# App Systemizer（KernelSU）\n\nApp Systemizer 是一个 KernelSU 模块，通过 metamodule 的挂载机制把用户应用映射为系统应用。模块只写入 `/data/adb` 下的暂存目录和配置，不 remount 或修改真实的 `/system`、`super` 及动态逻辑分区。\n\n## 工作方式\n\nWebUI 读取用户应用，用户选择应用和目标目录后保存。模块复制 base APK 与 split APK 到模块数据目录，由 Magic Mount-rs 或其他兼容 metamodule 在重启后挂载到 `/system/app/<包名>/` 或 `/system/priv-app/<包名>/`。转换不会删除原用户应用或应用数据，也不会自动授予平台签名权限。\n\n配置和诊断文件位于 `/data/adb/app-systemizer/`。取消选择并保存即可在下次重启时撤销对应挂载。`service.sh` 会在启动时检查并恢复缺失的暂存 APK。\n\n## WebUI\n\n- 顶栏标题为“系统应用转换”，默认使用 Material 3，日志默认关闭。\n- 设置页的“UI 风格”可在 Material 3 与 Miuix 之间切换，选择会持久保存。两套风格都跟随系统亮暗模式，并读取 KernelSU/Android 的动态取色：Material 3 套用完整调色板，Miuix 只借用强调色，保留 HyperOS 的中性表面、圆角和字体层级。\n- Material 3 使用分区卡片、药丸形分段控件和带指示器的底栏；Miuix 使用通栏分组卡片、行内分隔线、行尾圆形勾选和纯色底栏。\n- 应用页支持搜索、批量选择、`/system/app` 与 `/system/priv-app` 目录选择、保存和重启。下拉刷新应用与挂载状态，并保留未保存编辑。\n- 日志页只有在“显示日志”开启后才记录内存日志；下拉只重新显示已收集日志，“刷新状态”按钮才查询挂载状态。\n- 设置页保留下拉回弹动效，不显示刷新文字或执行刷新操作。三页手势均带阻尼、平滑回弹和减少动态效果支持。\n- 主题选择、目录选择和页面交互支持触摸、键盘方向键及 Escape；应用行暴露 `checkbox` 语义，选中状态与锁定状态对读屏可见。\n\n## 构建\n\n需要 Node.js。安装依赖并打包：\n\n    npm ci\n    npm run package\n\n## 版本号\n\n`module.prop` 里的 `version` 使用[语义化版本](https://semver.org/lang/zh-CN/) `MAJOR.MINOR.PATCH`，例如 `1.3.2`，只需要在 `package.json` 里维护。\n\n`versionCode` 由版本号换算，不含日期：`MAJOR × 1 000 000 + MINOR × 1 000 + PATCH`，所以 `1.3.2` 对应 `1003002`。每个分段占三位，`MINOR` 与 `PATCH` 需小于 1000；版本号升一级，`versionCode` 必然跟着变大，安装器的升级判断与版本号完全一致。\n\n发版只改 `package.json` 的版本号再执行 `npm run package`，`module.prop`、`webroot/module-info.json` 和 `dist/` 里的 ZIP 文件名会一起更新。\n\n## PS\n仅在本人两部 Android 17的 HyperOS 4设备上测试，推荐使用 ReSukiSU。\n",
-  "readmeHTML": "<h1>App Systemizer（KernelSU）</h1>\n\n<p>App Systemizer 是一个 KernelSU 模块，通过 metamodule 的挂载机制把用户应用映射为系统应用。模块只写入 <code>/data/adb</code> 下的暂存目录和配置，不 remount 或修改真实的 <code>/system</code>、<code>super</code> 及动态逻辑分区。</p>\n\n<h2>工作方式</h2>\n\n<p>WebUI 读取用户应用，用户选择应用和目标目录后保存。模块复制 base APK 与 split APK 到模块数据目录，由 Magic Mount-rs 或其他兼容 metamodule 在重启后挂载到 <code>/system/app/<包名>/</code> 或 <code>/system/priv-app/<包名>/</code>。转换不会删除原用户应用或应用数据，也不会自动授予平台签名权限。</p>\n\n<p>配置和诊断文件位于 <code>/data/adb/app-systemizer/</code>。取消选择并保存即可在下次重启时撤销对应挂载。<code>service.sh</code> 会在启动时检查并恢复缺失的暂存 APK。</p>\n\n<h2>WebUI</h2>\n\n<li>顶栏标题为“系统应用转换”，默认使用 Material 3，日志默认关闭。</li>\n<li>设置页的“UI 风格”可在 Material 3 与 Miuix 之间切换，选择会持久保存。两套风格都跟随系统亮暗模式，并读取 KernelSU/Android 的动态取色：Material 3 套用完整调色板，Miuix 只借用强调色，保留 HyperOS 的中性表面、圆角和字体层级。</li>\n<li>Material 3 使用分区卡片、药丸形分段控件和带指示器的底栏；Miuix 使用通栏分组卡片、行内分隔线、行尾圆形勾选和纯色底栏。</li>\n<li>应用页支持搜索、批量选择、`/system/app` 与 `/system/priv-app` 目录选择、保存和重启。下拉刷新应用与挂载状态，并保留未保存编辑。</li>\n<li>日志页只有在“显示日志”开启后才记录内存日志；下拉只重新显示已收集日志，“刷新状态”按钮才查询挂载状态。</li>\n<li>设置页保留下拉回弹动效，不显示刷新文字或执行刷新操作。三页手势均带阻尼、平滑回弹和减少动态效果支持。</li>\n<li>主题选择、目录选择和页面交互支持触摸、键盘方向键及 Escape；应用行暴露 `checkbox` 语义，选中状态与锁定状态对读屏可见。</li>\n\n<h2>构建</h2>\n\n<p>需要 Node.js。安装依赖并打包：</p>\n\n<p>    npm ci</p>\n<p>    npm run package</p>\n\n<h2>版本号</h2>\n\n<p><code>module.prop</code> 里的 <code>version</code> 使用<a href=\"https://semver.org/lang/zh-CN/\">语义化版本</a> <code>MAJOR.MINOR.PATCH</code>，例如 <code>1.3.2</code>，只需要在 <code>package.json</code> 里维护。</p>\n\n<p><code>versionCode</code> 由版本号换算，不含日期：<code>MAJOR × 1 000 000 + MINOR × 1 000 + PATCH</code>，所以 <code>1.3.2</code> 对应 <code>1003002</code>。每个分段占三位，<code>MINOR</code> 与 <code>PATCH</code> 需小于 1000；版本号升一级，<code>versionCode</code> 必然跟着变大，安装器的升级判断与版本号完全一致。</p>\n\n<p>发版只改 <code>package.json</code> 的版本号再执行 <code>npm run package</code>，<code>module.prop</code>、<code>webroot/module-info.json</code> 和 <code>dist/</code> 里的 ZIP 文件名会一起更新。</p>\n\n<h2>PS</h2>\n<p>仅在本人两部 Android 17的 HyperOS 4设备上测试，推荐使用 ReSukiSU。</p>",
+  "readme": "# App Systemizer（KernelSU）\n\n把普通用户应用变成系统应用：勾选、保存、重启，之后它就以 `/system/app/<包名>/` 或 `/system/priv-app/<包名>/` 的身份运行。\n\n模块只往 `/data/adb` 写暂存文件和配置，不 remount、不改真实分区、不删应用数据，也不会授予平台签名权限。取消勾选并保存，下次重启就撤销。\n\n## 功能\n\n- **应用页**：搜索、批量选择，安装位置用下拉框切换目标目录，保存后重启生效；下拉刷新应用列表与挂载状态。\n- **日志页**：滚动记录命令输出，可按 OK / 信息 / 警告 / 错误筛选；默认关闭，在设置里开启后才出现。\n- **设置页**：自定义主题色、日志开关、检查更新、模块信息。\n- **Material 3 界面**：跟随系统深浅色，并读取 KernelSU / Android 的动态取色；没有动态取色时回落到 M3 基线色板。\n- **主题模式**：跟随系统 / 亮色 / 暗色，和主题色放在同一张「外观」卡片里；手动模式不读取系统取色，用基线调色板。\n- **主题色**：设置 → 外观 → 主题色，输入六位色号或选预设，整套界面按这颗种子色重新派生。\n- **检查更新**：`module.prop` 里带 `updateJson`，每次发版会把 `update.json` 作为 Release 附件上传；KernelSU 管理器据此在模块卡片右下角（卸载按钮左边）显示更新按钮，点一下直接升级。\n\n## 工作方式\n\n保存时，WebUI 把所选应用的 base APK 与 split APK 复制到模块数据目录，并把选择写进 `config/selections.tsv`；重启后由 Magic Mount-rs（或其他兼容 metamodule）把这些目录绑定到系统分区。`service.sh` 会在开机时检查并恢复缺失的暂存 APK。\n\n所有配置和诊断文件都在 `/data/adb/app-systemizer/`。\n\n## 安装\n\n1. 安装并启用 Magic Mount-rs（或其他兼容 metamodule）。\n2. 在 KernelSU / SukiSU Ultra / Magisk 里刷入 `App-Systemizer-KSU-vX.Y.Z.zip`，重启。\n3. 从模块详情页打开 WebUI。\n\n没有挂载元模块时 WebUI 会直接提示，转换不会生效。\n\n## 使用\n\n应用页顶部的「安装位置」下拉框决定**之后新勾选**的应用放进哪个目录，已有选择保留各自的目标；右下角的保存按钮只在有未保存修改时出现。日志默认不记录，需要先在设置里打开「显示日志」。\n\n## 兼容性\n\n只在作者的两台 Android 17 / HyperOS 4 设备上测试过，推荐使用 ReSukiSU 和 SukiSU。其他 KernelSU 分支或 Android 版本未验证。\n\n## 开发\n\n    npm ci\n    npm run build     # 打包 bundle，并把版本写进 module.prop 与 module-info.json\n    npm run package   # 生成 dist/App-Systemizer-KSU-v<version>.zip\n\n版本号只在 `package.json` 维护（SemVer）；`versionCode` 由 `MAJOR×1000000 + MINOR×1000 + PATCH` 换算，安装器靠它判断升级。\n\n发版是 tag 驱动的：改 `package.json` 的版本 → 在 `CHANGELOG.md` 写一节 `## <version>` → 提交 → 打 tag `v<version>` 并推送。`.github/workflows/release.yml` 会校验 tag 与版本一致，构建 zip，用 CHANGELOG 对应小节当正文创建 Release，同时生成 `update.json`（version / versionCode / zipUrl / changelog）一并上传，供管理器检查更新。\n\n## 目录\n\n    module/            模块本体：module.prop、service.sh、controller 脚本、webroot\n    module/webroot/    WebUI：index.html、app.css、app.js、theme.js、update.js\n    tools/             build.mjs（打包 bundle）、package.mjs（生成 zip）\n    .github/workflows/ tag 触发的发版流程\n",
+  "readmeHTML": "<h1>App Systemizer（KernelSU）</h1>\n\n<p>把普通用户应用变成系统应用：勾选、保存、重启，之后它就以 <code>/system/app/<包名>/</code> 或 <code>/system/priv-app/<包名>/</code> 的身份运行。</p>\n\n<p>模块只往 <code>/data/adb</code> 写暂存文件和配置，不 remount、不改真实分区、不删应用数据，也不会授予平台签名权限。取消勾选并保存，下次重启就撤销。</p>\n\n<h2>功能</h2>\n\n<li>**应用页**：搜索、批量选择，安装位置用下拉框切换目标目录，保存后重启生效；下拉刷新应用列表与挂载状态。</li>\n<li>**日志页**：滚动记录命令输出，可按 OK / 信息 / 警告 / 错误筛选；默认关闭，在设置里开启后才出现。</li>\n<li>**设置页**：自定义主题色、日志开关、检查更新、模块信息。</li>\n<li>**Material 3 界面**：跟随系统深浅色，并读取 KernelSU / Android 的动态取色；没有动态取色时回落到 M3 基线色板。</li>\n<li>**主题模式**：跟随系统 / 亮色 / 暗色，和主题色放在同一张「外观」卡片里；手动模式不读取系统取色，用基线调色板。</li>\n<li>**主题色**：设置 → 外观 → 主题色，输入六位色号或选预设，整套界面按这颗种子色重新派生。</li>\n<li>**检查更新**：`module.prop` 里带 `updateJson`，每次发版会把 `update.json` 作为 Release 附件上传；KernelSU 管理器据此在模块卡片右下角（卸载按钮左边）显示更新按钮，点一下直接升级。</li>\n\n<h2>工作方式</h2>\n\n<p>保存时，WebUI 把所选应用的 base APK 与 split APK 复制到模块数据目录，并把选择写进 <code>config/selections.tsv</code>；重启后由 Magic Mount-rs（或其他兼容 metamodule）把这些目录绑定到系统分区。<code>service.sh</code> 会在开机时检查并恢复缺失的暂存 APK。</p>\n\n<p>所有配置和诊断文件都在 <code>/data/adb/app-systemizer/</code>。</p>\n\n<h2>安装</h2>\n\n<li>安装并启用 Magic Mount-rs（或其他兼容 metamodule）。</li>\n<li>在 KernelSU / SukiSU Ultra / Magisk 里刷入 `App-Systemizer-KSU-vX.Y.Z.zip`，重启。</li>\n<li>从模块详情页打开 WebUI。</li>\n\n<p>没有挂载元模块时 WebUI 会直接提示，转换不会生效。</p>\n\n<h2>使用</h2>\n\n<p>应用页顶部的「安装位置」下拉框决定<b>之后新勾选</b>的应用放进哪个目录，已有选择保留各自的目标；右下角的保存按钮只在有未保存修改时出现。日志默认不记录，需要先在设置里打开「显示日志」。</p>\n\n<h2>兼容性</h2>\n\n<p>只在作者的两台 Android 17 / HyperOS 4 设备上测试过，推荐使用 ReSukiSU 和 SukiSU。其他 KernelSU 分支或 Android 版本未验证。</p>\n\n<h2>开发</h2>\n\n<p>    npm ci</p>\n<p>    npm run build     # 打包 bundle，并把版本写进 module.prop 与 module-info.json</p>\n<p>    npm run package   # 生成 dist/App-Systemizer-KSU-v<version>.zip</p>\n\n<p>版本号只在 <code>package.json</code> 维护（SemVer）；<code>versionCode</code> 由 <code>MAJOR×1000000 + MINOR×1000 + PATCH</code> 换算，安装器靠它判断升级。</p>\n\n<p>发版是 tag 驱动的：改 <code>package.json</code> 的版本 → 在 <code>CHANGELOG.md</code> 写一节 <code>## <version></code> → 提交 → 打 tag <code>v<version></code> 并推送。<code>.github/workflows/release.yml</code> 会校验 tag 与版本一致，构建 zip，用 CHANGELOG 对应小节当正文创建 Release，同时生成 <code>update.json</code>（version / versionCode / zipUrl / changelog）一并上传，供管理器检查更新。</p>\n\n<h2>目录</h2>\n\n<p>    module/            模块本体：module.prop、service.sh、controller 脚本、webroot</p>\n<p>    module/webroot/    WebUI：index.html、app.css、app.js、theme.js、update.js</p>\n<p>    tools/             build.mjs（打包 bundle）、package.mjs（生成 zip）</p>\n<p>    .github/workflows/ tag 触发的发版流程</p>",
   "homepageUrl": "https://github.com/CNReporter/app-systemizer",
   "sourceUrl": "https://github.com/CNReporter/app-systemizer",
   "url": "https://github.com/CNReporter/app-systemizer",
   "latestRelease": {
-    "name": "v1.3.3",
-    "version": "v1.3.3",
-    "time": "2026-10-26T04:41:16Z",
-    "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.3.3/App-Systemizer-KSU-v1.3.3.zip"
+    "name": "v1.6.1",
+    "version": "v1.6.1",
+    "time": "2026-11-06T19:01:49Z",
+    "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.6.1/App-Systemizer-KSU-v1.6.1.zip"
   },
   "releases": [
+    {
+      "name": "v1.6.1",
+      "tagName": "v1.6.1",
+      "publishedAt": "2026-11-06T19:01:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "App-Systemizer-KSU-v1.6.1.zip",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.6.1/App-Systemizer-KSU-v1.6.1.zip",
+          "size": 50438,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.6.1/update.json",
+          "size": 249,
+          "downloadCount": 5
+        }
+      ]
+    },
+    {
+      "name": "v1.6.0",
+      "tagName": "v1.6.0",
+      "publishedAt": "2026-11-06T18:50:20Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.6.0/update.json",
+          "size": 249,
+          "downloadCount": 4
+        },
+        {
+          "name": "App-Systemizer-KSU-v1.6.0.zip",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.6.0/App-Systemizer-KSU-v1.6.0.zip",
+          "size": 50608,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.5.1",
+      "tagName": "v1.5.1",
+      "publishedAt": "2026-11-06T18:39:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "App-Systemizer-KSU-v1.5.1.zip",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.5.1/App-Systemizer-KSU-v1.5.1.zip",
+          "size": 48377,
+          "downloadCount": 2
+        },
+        {
+          "name": "update.json",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.5.1/update.json",
+          "size": 249,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.5.0",
+      "tagName": "v1.5.0",
+      "publishedAt": "2026-11-06T18:30:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "App-Systemizer-KSU-v1.5.0.zip",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.5.0/App-Systemizer-KSU-v1.5.0.zip",
+          "size": 52742,
+          "downloadCount": 3
+        }
+      ]
+    },
+    {
+      "name": "v1.4.0",
+      "tagName": "v1.4.0",
+      "publishedAt": "2026-11-06T18:23:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "App-Systemizer-KSU-v1.4.0.zip",
+          "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.4.0/App-Systemizer-KSU-v1.4.0.zip",
+          "size": 48300,
+          "downloadCount": 1
+        }
+      ]
+    },
     {
       "name": "v1.3.3",
       "tagName": "v1.3.3",
@@ -21,7 +109,7 @@
           "name": "App-Systemizer-KSU-v1.3.3.zip",
           "downloadUrl": "https://github.com/CNReporter/app-systemizer/releases/download/v1.3.3/App-Systemizer-KSU-v1.3.3.zip",
           "size": 48498,
-          "downloadCount": 29
+          "downloadCount": 31
         }
       ]
     }
