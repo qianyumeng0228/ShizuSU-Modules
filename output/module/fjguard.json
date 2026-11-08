@@ -1,0 +1,43 @@
+{
+  "readme": "# FJGuard\n\n防格机的模块。\n\n有人想把你手机清空的时候，不管是手动还是脚本，它先拦一下。拦不住的，把文件补回来。\n\n## 干什么\n\n| 做 | 具体 |\n|---|---|\n| 拦 | `dd of=/dev/block`、`mkfs`、`rm -rf /data`、删锁屏库、恢复出厂广播、`pm clear` 系统包 |\n| 补 | 删掉 `/data/system` 下的关键文件，一秒左右写回去，权限和 SELinux 标签一起还原 |\n| 查 | 每 90 秒过一遍，被清空或写坏的也能发现 |\n| 救 | 开机时系统还没起来，先把锁屏库、包管理库补上，免得卡在开机或者解不开锁 |\n| 扛 | 守护进程被杀会自己回来；自己的脚本加 `chattr +i`，root 也删不掉 |\n\n## 装\n\nMagisk、KernelSU、APatch 都行，刷 zip 就可以：\n\n    su -c 'magisk --install-module /sdcard/Download/FJGuard-v1.0.4.zip'\n\n不重启也生效，重启后开机自愈那层才接上。\n\n## 用\n\n    sh /data/adb/modules/fjguard/bin/ctl.sh status      # 看状态\n    sh /data/adb/modules/fjguard/bin/ctl.sh selftest    # 自检，正常是 8 通过\n    sh /data/adb/modules/fjguard/bin/ctl.sh blocked     # 今天拦了什么\n    sh /data/adb/modules/fjguard/bin/ctl.sh allow       # 放行 60 秒\n    sh /data/adb/modules/fjguard/bin/ctl.sh off         # 关掉\n\n刷机、跑清理脚本之前先 `allow`，不然它会把你的命令当成攻击掐掉。\n\n## 几个坑\n\n- 它只看命令行。`sh -c \"一整段脚本\"` 这种写法，整段都在命令行里，里面带删数据的命令就会被判成攻击。\n- 半秒扫一次。跑得飞快、马上就退的命令可能漏掉，剩下的靠回滚兜着。\n- 回滚用的是建基线那一刻的内容。改过锁屏密码之后跑一次 `ctl.sh baseline`。\n- 自带程序直接往块设备写、或者专门研究过这个模块的人，挡不住。它是减速带，不是保险箱。\n\n## 配置\n\n改 `/data/adb/fjguard/guard.conf`，然后重启守护。\n\n扫描间隔、要不要管 `/sdcard`、要不要发通知，都在里面。\n\n## 兼容性\n\nMagisk 上实测过（alpha 30600，Android 13，Realme RMX3031）。\n\nKernelSU 和 APatch 是按标准模块格式写的，没实机刷过。装上要是有问题，提 issue 的时候带上机型和 `ctl.sh status` 的输出。\n\n更细的表在 [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)。\n\n## 自己构建\n\n    bash build.sh\n\n产物在 `dist/`。\n\n## 许可\n\nMIT\n\n---\n\nNot a Chinese reader? It's an anti-wipe module for rooted Android: kills destructive commands, restores deleted `/data/system` files within a second, repairs them before boot. Magisk / KernelSU / APatch, MIT.\n",
+  "readmeHTML": "<h1>FJGuard</h1>\n\n<p>防格机的模块。</p>\n\n<p>有人想把你手机清空的时候，不管是手动还是脚本，它先拦一下。拦不住的，把文件补回来。</p>\n\n<h2>干什么</h2>\n\n<p>| 做 | 具体 |</p>\n<p>|---|---|</p>\n<p>| 拦 | <code>dd of=/dev/block</code>、<code>mkfs</code>、<code>rm -rf /data</code>、删锁屏库、恢复出厂广播、<code>pm clear</code> 系统包 |</p>\n<p>| 补 | 删掉 <code>/data/system</code> 下的关键文件，一秒左右写回去，权限和 SELinux 标签一起还原 |</p>\n<p>| 查 | 每 90 秒过一遍，被清空或写坏的也能发现 |</p>\n<p>| 救 | 开机时系统还没起来，先把锁屏库、包管理库补上，免得卡在开机或者解不开锁 |</p>\n<p>| 扛 | 守护进程被杀会自己回来；自己的脚本加 <code>chattr +i</code>，root 也删不掉 |</p>\n\n<h2>装</h2>\n\n<p>Magisk、KernelSU、APatch 都行，刷 zip 就可以：</p>\n\n<p>    su -c 'magisk --install-module /sdcard/Download/FJGuard-v1.0.4.zip'</p>\n\n<p>不重启也生效，重启后开机自愈那层才接上。</p>\n\n<h2>用</h2>\n\n<p>    sh /data/adb/modules/fjguard/bin/ctl.sh status      # 看状态</p>\n<p>    sh /data/adb/modules/fjguard/bin/ctl.sh selftest    # 自检，正常是 8 通过</p>\n<p>    sh /data/adb/modules/fjguard/bin/ctl.sh blocked     # 今天拦了什么</p>\n<p>    sh /data/adb/modules/fjguard/bin/ctl.sh allow       # 放行 60 秒</p>\n<p>    sh /data/adb/modules/fjguard/bin/ctl.sh off         # 关掉</p>\n\n<p>刷机、跑清理脚本之前先 <code>allow</code>，不然它会把你的命令当成攻击掐掉。</p>\n\n<h2>几个坑</h2>\n\n<li>它只看命令行。`sh -c \"一整段脚本\"` 这种写法，整段都在命令行里，里面带删数据的命令就会被判成攻击。</li>\n<li>半秒扫一次。跑得飞快、马上就退的命令可能漏掉，剩下的靠回滚兜着。</li>\n<li>回滚用的是建基线那一刻的内容。改过锁屏密码之后跑一次 `ctl.sh baseline`。</li>\n<li>自带程序直接往块设备写、或者专门研究过这个模块的人，挡不住。它是减速带，不是保险箱。</li>\n\n<h2>配置</h2>\n\n<p>改 <code>/data/adb/fjguard/guard.conf</code>，然后重启守护。</p>\n\n<p>扫描间隔、要不要管 <code>/sdcard</code>、要不要发通知，都在里面。</p>\n\n<h2>兼容性</h2>\n\n<p>Magisk 上实测过（alpha 30600，Android 13，Realme RMX3031）。</p>\n\n<p>KernelSU 和 APatch 是按标准模块格式写的，没实机刷过。装上要是有问题，提 issue 的时候带上机型和 <code>ctl.sh status</code> 的输出。</p>\n\n<p>更细的表在 <a href=\"docs/COMPATIBILITY.md\">docs/COMPATIBILITY.md</a>。</p>\n\n<h2>自己构建</h2>\n\n<p>    bash build.sh</p>\n\n<p>产物在 <code>dist/</code>。</p>\n\n<h2>许可</h2>\n\n<p>MIT</p>\n\n<p>---</p>\n\n<p>Not a Chinese reader? It's an anti-wipe module for rooted Android: kills destructive commands, restores deleted <code>/data/system</code> files within a second, repairs them before boot. Magisk / KernelSU / APatch, MIT.</p>",
+  "homepageUrl": "https://github.com/mhjssg54188/FJGuard/releases",
+  "sourceUrl": "https://github.com/mhjssg54188/FJGuard",
+  "url": "https://github.com/mhjssg54188/FJGuard",
+  "latestRelease": {
+    "name": "v1.0.4",
+    "version": "v1.0.4",
+    "time": "2026-11-07T19:26:16Z",
+    "downloadUrl": "https://github.com/mhjssg54188/FJGuard/releases/download/v1.0.4/FJGuard-v1.0.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.4",
+      "tagName": "v1.0.4",
+      "publishedAt": "2026-11-07T19:26:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FJGuard-v1.0.4.zip",
+          "downloadUrl": "https://github.com/mhjssg54188/FJGuard/releases/download/v1.0.4/FJGuard-v1.0.4.zip",
+          "size": 31194,
+          "downloadCount": 6
+        }
+      ]
+    },
+    {
+      "name": "v1.0.3",
+      "tagName": "v1.0.3",
+      "publishedAt": "2026-11-07T19:01:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "FJGuard-v1.0.3.zip",
+          "downloadUrl": "https://github.com/mhjssg54188/FJGuard/releases/download/v1.0.3/FJGuard-v1.0.3.zip",
+          "size": 30854,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}
