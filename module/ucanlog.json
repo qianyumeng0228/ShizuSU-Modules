@@ -1,0 +1,35 @@
+{
+  "readme": "# UcanLog\n\nA small diagnostics collector for rooted Android devices. One command creates a report you can attach to a bug report.\n\nMade by [UcanPrjk01](https://github.com/UcanPrjk01).\n\n## What it collects\n\n| File | Content |\n|---|---|\n| `device.txt` | manufacturer, model, Android version, security patch, build fingerprint, kernel, SELinux mode |\n| `root.txt` | which root solution can be detected (Magisk version if available, KernelSU or APatch data directory) |\n| `modules.txt` | installed modules with version and state (enabled, disabled, pending removal) |\n| `logcat.txt` | `logcat -b all -d -v threadtime` |\n| `dmesg.txt` | kernel log (root needed) |\n\nReports are saved to `/sdcard/UcanLog/ucanlog-YYYYMMDD-HHMMSS.tar.gz`.\n\n## Install\n\n1. Download the ZIP from [Releases](../../releases).\n2. Open your root manager (Magisk, KernelSU or APatch), go to Modules, install the ZIP from storage.\n3. Reboot.\n\n## Use\n\nTerminal (Termux or adb shell):\n\n```\nsu -c ucanlog\nsu -c \"ucanlog --no-logcat\"\n```\n\nOr press **Action** on the module in your root manager, if it shows that button.\n\nOptions: `--no-logcat`, `--no-dmesg`, `-v` / `--version`, `-h` / `--help`.\n\n## Privacy\n\nLogs can contain account names, app names and device identifiers. Read the files and remove anything private before you share them. Nothing is uploaded anywhere; the report stays on your device.\n\n## Compatibility\n\nNot listed yet. The module has not been tested on specific devices. Test results will be added to `site-info.json` once confirmed.\n\n## Build and release\n\nThe workflow in `.github/workflows/release.yml` builds `ucanlog-<tag>.zip` and a `.sha256` file and publishes them as a GitHub Release. The tag must match `version=` in `module.prop`.\n\n## License\n\nMIT, see `LICENSE`.\n",
+  "readmeHTML": "<h1>UcanLog</h1>\n\n<p>A small diagnostics collector for rooted Android devices. One command creates a report you can attach to a bug report.</p>\n\n<p>Made by <a href=\"https://github.com/UcanPrjk01\">UcanPrjk01</a>.</p>\n\n<h2>What it collects</h2>\n\n<p>| File | Content |</p>\n<p>|---|---|</p>\n<p>| <code>device.txt</code> | manufacturer, model, Android version, security patch, build fingerprint, kernel, SELinux mode |</p>\n<p>| <code>root.txt</code> | which root solution can be detected (Magisk version if available, KernelSU or APatch data directory) |</p>\n<p>| <code>modules.txt</code> | installed modules with version and state (enabled, disabled, pending removal) |</p>\n<p>| <code>logcat.txt</code> | <code>logcat -b all -d -v threadtime</code> |</p>\n<p>| <code>dmesg.txt</code> | kernel log (root needed) |</p>\n\n<p>Reports are saved to <code>/sdcard/UcanLog/ucanlog-YYYYMMDD-HHMMSS.tar.gz</code>.</p>\n\n<h2>Install</h2>\n\n<li>Download the ZIP from [Releases](../../releases).</li>\n<li>Open your root manager (Magisk, KernelSU or APatch), go to Modules, install the ZIP from storage.</li>\n<li>Reboot.</li>\n\n<h2>Use</h2>\n\n<p>Terminal (Termux or adb shell):</p>\n\n<pre>su -c ucanlog\nsu -c \"ucanlog --no-logcat\"</pre>\n\n<p>Or press <b>Action</b> on the module in your root manager, if it shows that button.</p>\n\n<p>Options: <code>--no-logcat</code>, <code>--no-dmesg</code>, <code>-v</code> / <code>--version</code>, <code>-h</code> / <code>--help</code>.</p>\n\n<h2>Privacy</h2>\n\n<p>Logs can contain account names, app names and device identifiers. Read the files and remove anything private before you share them. Nothing is uploaded anywhere; the report stays on your device.</p>\n\n<h2>Compatibility</h2>\n\n<p>Not listed yet. The module has not been tested on specific devices. Test results will be added to <code>site-info.json</code> once confirmed.</p>\n\n<h2>Build and release</h2>\n\n<p>The workflow in <code>.github/workflows/release.yml</code> builds <code>ucanlog-<tag>.zip</code> and a <code>.sha256</code> file and publishes them as a GitHub Release. The tag must match <code>version=</code> in <code>module.prop</code>.</p>\n\n<h2>License</h2>\n\n<p>MIT, see <code>LICENSE</code>.</p>",
+  "homepageUrl": "https://github.com/UcanPrjk01/ucanlog",
+  "sourceUrl": "https://github.com/UcanPrjk01/ucanlog",
+  "url": "https://github.com/UcanPrjk01/ucanlog",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-11-08T09:47:54Z",
+    "downloadUrl": "https://github.com/UcanPrjk01/ucanlog/releases/download/v1.0.0/ucanlog-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-11-08T09:47:54Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ucanlog-v1.0.0.zip.sha256",
+          "downloadUrl": "https://github.com/UcanPrjk01/ucanlog/releases/download/v1.0.0/ucanlog-v1.0.0.zip.sha256",
+          "size": 85,
+          "downloadCount": 2
+        },
+        {
+          "name": "ucanlog-v1.0.0.zip",
+          "downloadUrl": "https://github.com/UcanPrjk01/ucanlog/releases/download/v1.0.0/ucanlog-v1.0.0.zip",
+          "size": 3665,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}
