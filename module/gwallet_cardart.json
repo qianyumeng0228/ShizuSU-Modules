@@ -1,0 +1,69 @@
+{
+  "readme": "# gwallet-cardart\n\n**不用 Hook 就能替換 Google 錢包（Google Wallet）卡面**的 KernelSU / Magisk 模組，附 WebUI 可以直接在手機上選圖、套用和還原。\n\n> Replace Google Wallet card art on a rooted Android phone **without hooking** Wallet or Google Play services. It only rewrites Wallet's local image cache. A WebUI lets you pick images, toggle and restore per card. [English summary below](#english).\n\n- ✅ 不注入 Wallet 或 GMS，不需要 LSPosed / Zygisk\n- ✅ 嗶卡畫面也會顯示新卡面（實測支付卡）\n- ✅ 被重新下載時自動換回自訂圖\n- ✅ WebUI：列出卡片、從手機選圖、拖曳裁切、一鍵還原\n- ✅ 只改變**顯示**，不碰卡片資料和付款流程\n\n## 原理\n\nGoogle 錢包用 [Glide](https://github.com/bumptech/glide) 載入卡面，下載的圖片存在：\n\n```\n/data/data/com.google.android.apps.walletnfcrel/cache/image_manager_disk_cache/<key>.0\n```\n\n其中 **`<key>` = sha256(卡面網址)**，沒有額外的簽章或驗證。只要卡面網址不變，Wallet 就一直讀本機快取，不會重新下載。\n\n這個模組會：\n\n1. 從 Wallet 的卡片紀錄（`files/common/*/*/*.pb`）和 GMS 的 `pay` 資料庫找出卡面網址，算出對應的快取檔名。\n2. 第一次套用時備份原圖，再用自訂圖**原地覆寫**快取檔。這樣檔案的擁有者、權限和 SELinux 標籤都不會變。\n3. 背景用 `inotifyd` 監看快取資料夾。Glide 寫入新檔（先寫 `.tmp` 再改名）時，馬上換回自訂圖。\n4. 同一張原圖如果有多份快取（不同網址），會一起替換。\n5. **卡面下載失敗的卡也能換**：有時卡面網址會被 Google 的圖片代理拒絕（實測遇過 `lh3.googleusercontent.com/wca/...` 回傳 403），這時 Wallet 會改顯示內建的預設圖，快取裡也不會有任何檔案。因為 Glide 會先查磁碟快取才上網，模組會直接建立這個網址對應的快取檔，並在 Glide 的 `journal` 加一筆 `CLEAN` 紀錄（建立前會先停止 Wallet），Glide 就會使用這個檔案，不再去下載。還原時則刪除檔案，並加一筆 `REMOVE` 紀錄。\n\n## 需求\n\n- 已 root 的 Android，使用 KernelSU（或分支）或 Magisk。WebUI 需要支援模組 WebUI 的管理器，例如 KernelSU / SukiSU / KernelSU Next，或在 Magisk 上用 [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) 這類工具。\n- Google 錢包能正常使用（要感應付款，Play Integrity 得自己處理）。\n\n## 安裝\n\n1. 從 [Releases](../../releases) 下載 `gwallet-cardart-v*.zip`，或自行執行 `./build.sh` 打包（App：`app/build.sh`，不需要 Gradle）。\n2. 在 KernelSU / Magisk 管理器安裝後重新開機。\n3. 先打開一次 Google 錢包並瀏覽你的卡片，讓卡面先下載到快取。\n\n## 使用\n\n開啟模組的 **WebUI**：\n\n- 列表會顯示快取中長寬比像卡片的圖片。能辨識來源的會標上類型（iPASS、支付卡等），名稱可以自己改。\n- **選擇圖片**：可以用系統檔案選擇器，或輸入 `/sdcard/...` 路徑。選好後能拖曳、縮放，預設沿用原卡的圓角和透明區。輸出尺寸是原圖的 2 倍。\n- **開關**：套用或還原原始卡面。自訂圖會保留，可以隨時再開。\n- **刪除自訂**：還原原圖並刪掉自訂圖。\n- **重啟 Wallet**：清掉 Wallet 記憶體裡的快取，重新打開就會看到新卡面。\n\n模組列表的 **Action** 按鈕會立刻套用一次並關閉 Wallet。\n\n狀態存在 `/data/adb/wallet_cardart/`（模組更新時保留），紀錄檔在 `log.txt`。**解除安裝模組時會自動還原所有原始卡面。**\n\n## 臨時 root 使用者：單次版 App\n\n如果你用的是**不解鎖 Bootloader 的臨時 root**（例如利用核心漏洞取得 root，重開機後就消失），可以改用 `gwallet-cardart-app-*.apk`：\n\n- 不需要安裝模組，也沒有背景監看。在有 root 的時候**寫入一次**就好。\n- 介面和 WebUI 相同，另外多一個「全部重新套用」按鈕。\n- 取得 root 後，先在 root 管理器裡允許「Wallet 卡面」使用 su，再打開 App 選圖並套用。\n\n**為什麼寫一次就夠？** Glide 的快取 key 只有網址的 sha256，沒有時間戳或簽章，所以重開機後快取檔還在，Wallet 也會繼續讀它（已實測）。即使之後完全沒有 root，自訂卡面也會一直保留，直到發生下列情況：\n\n| 情況 | 是否變回原圖 |\n|---|---|\n| 重開機、Wallet 更新 | 否 |\n| 手動清除 Wallet 快取或資料、系統在儲存空間不足時清理快取 | 是 |\n| 發卡機構更換卡面網址、移除後重新加入卡片 | 是 |\n\n變回原圖後，再取得一次 root，打開 App 按「全部重新套用」即可。\n\n## 限制與已知事項\n\n- **改不了卡片名稱**：支付卡名稱雖然以明文存在 GMS 的 `pay` / `android_pay` 資料庫，但 GMS 一啟動就會從伺服器同步並覆寫。票證（Valuable）的內容則有加密。目前只能換圖。\n- 卡面要在快取裡才能替換，所以要先在 Wallet 裡看過那張卡。例外是 Wallet 卡片紀錄裡有記載網址的卡（例如 iPASS），即使從沒成功下載過，也能直接建立快取。\n- 發卡機構換了卡面網址後，快取檔名會跟著改變。模組會盡量從卡片紀錄找回對應關係，但不保證每種卡都辨識得到。辨識不到時，可以勾選「顯示所有快取圖片」手動挑選。\n- 只在一台小米手機（Android 16、KernelSU）上測試過，卡片類型包括 iPASS 一卡通和支付卡。其他機型和卡片類型歡迎回報。\n- 只支援主要使用者（user 0）。\n\n## 免責聲明\n\n本專案與 Google 無任何關聯。Google 錢包官方不支援已 root 的裝置。本模組只修改本機圖片快取的顯示內容，不改動卡片、付款資料或任何伺服器資料。使用風險請自行承擔。\n\n---\n\n## English\n\n**gwallet-cardart** is a KernelSU/Magisk module that swaps Google Wallet card art without hooking any app.\n\n**How it works:** Google Wallet loads card art with Glide. The disk cache file name is `sha256(card art URL)`, and Wallet never re-downloads while the cache entry exists. The module:\n1. Finds card art URLs in Wallet's card records and GMS's `pay` database.\n2. Backs up the original image, then overwrites the cache file in place, which keeps the owner, mode and SELinux label.\n   If the art never downloaded (e.g. the image proxy returns 403), it creates the cache entry itself: the file plus a `CLEAN` journal line. Glide checks the disk cache before the network, so it uses that entry.\n3. Uses `inotifyd` to re-apply the custom image whenever Glide rewrites the entry.\n\nThe custom art also shows on the tap-to-pay screen.\n\n**Usage:** Install the zip, reboot, open Wallet once so the art gets cached, then use the module's WebUI to pick an image for each card, toggle it, or restore the original. Uninstalling restores all originals.\n\n**Temporary root?** Use the one-shot app (`gwallet-cardart-app-*.apk`). Grant it su while you have root, then apply once. The cache survives reboots, so the art stays even after root is gone, until the cache is cleared or the card art URL changes.\n\n**Limitations:** Card names can't be changed this way. GMS re-syncs them from the server right away, and pass contents are encrypted. Tested on one Xiaomi device running KernelSU.\n\nNot affiliated with Google. Use at your own risk.\n\n## License\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<h1>gwallet-cardart</h1>\n\n<p><b>不用 Hook 就能替換 Google 錢包（Google Wallet）卡面</b>的 KernelSU / Magisk 模組，附 WebUI 可以直接在手機上選圖、套用和還原。</p>\n\n<p>> Replace Google Wallet card art on a rooted Android phone <b>without hooking</b> Wallet or Google Play services. It only rewrites Wallet's local image cache. A WebUI lets you pick images, toggle and restore per card. <a href=\"#english\">English summary below</a>.</p>\n\n<li>✅ 不注入 Wallet 或 GMS，不需要 LSPosed / Zygisk</li>\n<li>✅ 嗶卡畫面也會顯示新卡面（實測支付卡）</li>\n<li>✅ 被重新下載時自動換回自訂圖</li>\n<li>✅ WebUI：列出卡片、從手機選圖、拖曳裁切、一鍵還原</li>\n<li>✅ 只改變**顯示**，不碰卡片資料和付款流程</li>\n\n<h2>原理</h2>\n\n<p>Google 錢包用 <a href=\"https://github.com/bumptech/glide\">Glide</a> 載入卡面，下載的圖片存在：</p>\n\n<pre>/data/data/com.google.android.apps.walletnfcrel/cache/image_manager_disk_cache/&lt;key&gt;.0</pre>\n\n<p>其中 <b><code><key></code> = sha256(卡面網址)</b>，沒有額外的簽章或驗證。只要卡面網址不變，Wallet 就一直讀本機快取，不會重新下載。</p>\n\n<p>這個模組會：</p>\n\n<li>從 Wallet 的卡片紀錄（`files/common/*/*/*.pb`）和 GMS 的 `pay` 資料庫找出卡面網址，算出對應的快取檔名。</li>\n<li>第一次套用時備份原圖，再用自訂圖**原地覆寫**快取檔。這樣檔案的擁有者、權限和 SELinux 標籤都不會變。</li>\n<li>背景用 `inotifyd` 監看快取資料夾。Glide 寫入新檔（先寫 `.tmp` 再改名）時，馬上換回自訂圖。</li>\n<li>同一張原圖如果有多份快取（不同網址），會一起替換。</li>\n<li>**卡面下載失敗的卡也能換**：有時卡面網址會被 Google 的圖片代理拒絕（實測遇過 `lh3.googleusercontent.com/wca/...` 回傳 403），這時 Wallet 會改顯示內建的預設圖，快取裡也不會有任何檔案。因為 Glide 會先查磁碟快取才上網，模組會直接建立這個網址對應的快取檔，並在 Glide 的 `journal` 加一筆 `CLEAN` 紀錄（建立前會先停止 Wallet），Glide 就會使用這個檔案，不再去下載。還原時則刪除檔案，並加一筆 `REMOVE` 紀錄。</li>\n\n<h2>需求</h2>\n\n<li>已 root 的 Android，使用 KernelSU（或分支）或 Magisk。WebUI 需要支援模組 WebUI 的管理器，例如 KernelSU / SukiSU / KernelSU Next，或在 Magisk 上用 [WebUI X](https://github.com/MMRLApp/WebUI-X-Portable) 這類工具。</li>\n<li>Google 錢包能正常使用（要感應付款，Play Integrity 得自己處理）。</li>\n\n<h2>安裝</h2>\n\n<li>從 [Releases](../../releases) 下載 `gwallet-cardart-v*.zip`，或自行執行 `./build.sh` 打包（App：`app/build.sh`，不需要 Gradle）。</li>\n<li>在 KernelSU / Magisk 管理器安裝後重新開機。</li>\n<li>先打開一次 Google 錢包並瀏覽你的卡片，讓卡面先下載到快取。</li>\n\n<h2>使用</h2>\n\n<p>開啟模組的 <b>WebUI</b>：</p>\n\n<li>列表會顯示快取中長寬比像卡片的圖片。能辨識來源的會標上類型（iPASS、支付卡等），名稱可以自己改。</li>\n<li>**選擇圖片**：可以用系統檔案選擇器，或輸入 `/sdcard/...` 路徑。選好後能拖曳、縮放，預設沿用原卡的圓角和透明區。輸出尺寸是原圖的 2 倍。</li>\n<li>**開關**：套用或還原原始卡面。自訂圖會保留，可以隨時再開。</li>\n<li>**刪除自訂**：還原原圖並刪掉自訂圖。</li>\n<li>**重啟 Wallet**：清掉 Wallet 記憶體裡的快取，重新打開就會看到新卡面。</li>\n\n<p>模組列表的 <b>Action</b> 按鈕會立刻套用一次並關閉 Wallet。</p>\n\n<p>狀態存在 <code>/data/adb/wallet_cardart/</code>（模組更新時保留），紀錄檔在 <code>log.txt</code>。<b>解除安裝模組時會自動還原所有原始卡面。</b></p>\n\n<h2>臨時 root 使用者：單次版 App</h2>\n\n<p>如果你用的是<b>不解鎖 Bootloader 的臨時 root</b>（例如利用核心漏洞取得 root，重開機後就消失），可以改用 <code>gwallet-cardart-app-*.apk</code>：</p>\n\n<li>不需要安裝模組，也沒有背景監看。在有 root 的時候**寫入一次**就好。</li>\n<li>介面和 WebUI 相同，另外多一個「全部重新套用」按鈕。</li>\n<li>取得 root 後，先在 root 管理器裡允許「Wallet 卡面」使用 su，再打開 App 選圖並套用。</li>\n\n<p><b>為什麼寫一次就夠？</b> Glide 的快取 key 只有網址的 sha256，沒有時間戳或簽章，所以重開機後快取檔還在，Wallet 也會繼續讀它（已實測）。即使之後完全沒有 root，自訂卡面也會一直保留，直到發生下列情況：</p>\n\n<p>| 情況 | 是否變回原圖 |</p>\n<p>|---|---|</p>\n<p>| 重開機、Wallet 更新 | 否 |</p>\n<p>| 手動清除 Wallet 快取或資料、系統在儲存空間不足時清理快取 | 是 |</p>\n<p>| 發卡機構更換卡面網址、移除後重新加入卡片 | 是 |</p>\n\n<p>變回原圖後，再取得一次 root，打開 App 按「全部重新套用」即可。</p>\n\n<h2>限制與已知事項</h2>\n\n<li>**改不了卡片名稱**：支付卡名稱雖然以明文存在 GMS 的 `pay` / `android_pay` 資料庫，但 GMS 一啟動就會從伺服器同步並覆寫。票證（Valuable）的內容則有加密。目前只能換圖。</li>\n<li>卡面要在快取裡才能替換，所以要先在 Wallet 裡看過那張卡。例外是 Wallet 卡片紀錄裡有記載網址的卡（例如 iPASS），即使從沒成功下載過，也能直接建立快取。</li>\n<li>發卡機構換了卡面網址後，快取檔名會跟著改變。模組會盡量從卡片紀錄找回對應關係，但不保證每種卡都辨識得到。辨識不到時，可以勾選「顯示所有快取圖片」手動挑選。</li>\n<li>只在一台小米手機（Android 16、KernelSU）上測試過，卡片類型包括 iPASS 一卡通和支付卡。其他機型和卡片類型歡迎回報。</li>\n<li>只支援主要使用者（user 0）。</li>\n\n<h2>免責聲明</h2>\n\n<p>本專案與 Google 無任何關聯。Google 錢包官方不支援已 root 的裝置。本模組只修改本機圖片快取的顯示內容，不改動卡片、付款資料或任何伺服器資料。使用風險請自行承擔。</p>\n\n<p>---</p>\n\n<h2>English</h2>\n\n<p><b>gwallet-cardart</b> is a KernelSU/Magisk module that swaps Google Wallet card art without hooking any app.</p>\n\n<p><b>How it works:</b> Google Wallet loads card art with Glide. The disk cache file name is <code>sha256(card art URL)</code>, and Wallet never re-downloads while the cache entry exists. The module:</p>\n<li>Finds card art URLs in Wallet's card records and GMS's `pay` database.</li>\n<li>Backs up the original image, then overwrites the cache file in place, which keeps the owner, mode and SELinux label.</li>\n<p>   If the art never downloaded (e.g. the image proxy returns 403), it creates the cache entry itself: the file plus a <code>CLEAN</code> journal line. Glide checks the disk cache before the network, so it uses that entry.</p>\n<li>Uses `inotifyd` to re-apply the custom image whenever Glide rewrites the entry.</li>\n\n<p>The custom art also shows on the tap-to-pay screen.</p>\n\n<p><b>Usage:</b> Install the zip, reboot, open Wallet once so the art gets cached, then use the module's WebUI to pick an image for each card, toggle it, or restore the original. Uninstalling restores all originals.</p>\n\n<p><b>Temporary root?</b> Use the one-shot app (<code>gwallet-cardart-app-*.apk</code>). Grant it su while you have root, then apply once. The cache survives reboots, so the art stays even after root is gone, until the cache is cleared or the card art URL changes.</p>\n\n<p><b>Limitations:</b> Card names can't be changed this way. GMS re-syncs them from the server right away, and pass contents are encrypted. Tested on one Xiaomi device running KernelSU.</p>\n\n<p>Not affiliated with Google. Use at your own risk.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/andyching168/gwallet-cardart",
+  "sourceUrl": "https://github.com/andyching168/gwallet-cardart",
+  "url": "https://github.com/andyching168/gwallet-cardart",
+  "latestRelease": {
+    "name": "v2.2",
+    "version": "v2.2",
+    "time": "2026-11-10T07:52:49Z",
+    "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.2/gwallet-cardart-v2.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.2",
+      "tagName": "v2.2",
+      "publishedAt": "2026-11-10T07:52:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gwallet-cardart-app-v1.1.apk",
+          "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.2/gwallet-cardart-app-v1.1.apk",
+          "size": 33617,
+          "downloadCount": 1
+        },
+        {
+          "name": "gwallet-cardart-v2.2.zip",
+          "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.2/gwallet-cardart-v2.2.zip",
+          "size": 12419,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1",
+      "tagName": "v2.1",
+      "publishedAt": "2026-11-10T07:42:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gwallet-cardart-app-v1.0.apk",
+          "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.1/gwallet-cardart-app-v1.0.apk",
+          "size": 33617,
+          "downloadCount": 2
+        },
+        {
+          "name": "gwallet-cardart-v2.1.zip",
+          "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.1/gwallet-cardart-v2.1.zip",
+          "size": 11808,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.0",
+      "tagName": "v2.0",
+      "publishedAt": "2026-11-10T07:14:49Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "gwallet-cardart-v2.0.zip",
+          "downloadUrl": "https://github.com/andyching168/gwallet-cardart/releases/download/v2.0/gwallet-cardart-v2.0.zip",
+          "size": 11252,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
