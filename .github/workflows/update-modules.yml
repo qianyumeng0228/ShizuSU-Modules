@@ -62,7 +62,21 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: 每日模块仓库自动更新 $(date -u +%Y-%m-%d)"
-            # 远端可能已有 discover 自动审核的新提交，rebase 到最新后重推（产物下一轮会被新 config 覆盖）
-            git pull --rebase
-            git push
+            # 远端可能已有 discover 收录提交或同日另一次构建的产物提交。
+            # 产物是每次全量重建的生成物，冲突时必须以本次构建为准，故用 merge -X ours；
+            # 远端新增的 config/candidates 等非冲突文件会被正常合并进来。
+            ok=0
+            for i in 1 2 3; do
+              git fetch origin main
+              if git merge -X ours --no-edit origin/main && git push; then
+                ok=1
+                break
+              fi
+              git merge --abort 2>/dev/null || true
+              sleep 5
+            done
+            if [ "$ok" != "1" ]; then
+              echo "::error::产物推送失败（三次重试均未成功）"
+              exit 1
+            fi
           fi
