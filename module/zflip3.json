@@ -1,0 +1,55 @@
+{
+  "readme": "<h1 align=\"center\">zflip3</h1>\n\n<p align=\"center\">Magisk modules for running a GSI on the Galaxy Z Flip3 (SM-F711B) without losing the cover screen.</p>\n\n<p align=\"center\">\n  <a href=\"#modules\"><b>Modules</b></a> &nbsp;&nbsp;|&nbsp;&nbsp;\n  <a href=\"#building\"><b>Building</b></a> &nbsp;&nbsp;|&nbsp;&nbsp;\n  <a href=\"#license\"><b>License</b></a>\n</p>\n\n<br>\n\nA GSI doesn't know about the cover screen, so when you fold the phone Android moves onto the 512x260 panel as if it were a tiny phone. `flip3_cover` keeps Android on the main screen and runs its own launcher on the cover, written from scratch to look and work like the One UI 7 one. `flip3_smsready` fixes incoming texts on Samsung's RIL.\n\n## Modules\n\n| Folder | Magisk id | What it does | State |\n|---|---|---|---|\n| [cover](cover) | `flip3_cover` | Cover screen: clock, widgets, notifications, music, quick panel | Working |\n| [sms](sms) | `flip3_smsready` | Fixes incoming SMS never reaching Android | Working |\n| [ims](ims) | `flip3_ims` | Port of Samsung's IMS service for VoLTE | Unfinished, don't use it for real calls |\n\nDownload the zips from [Releases](https://github.com/meetox80/zflip3/releases), install them in the Magisk app and reboot.\n\nTested on:\n\n- SM-F711B, vendor from the F711BXXSJJZH3 stock firmware (One UI 7)\n- Infinity-X 3.12 GSI, Android 16, `treble_arm64-ab-VANILLA`\n- Magisk\n\n## Building\n\nYou need Linux on x86_64 with curl, unzip, python3, [zig](https://ziglang.org), e2fsprogs (for `debugfs`), lz4 and android-tools (for `simg2img` and `lpunpack`). The JDK and the Android build tools are downloaded into `tools/` by the setup script.\n\n```sh\nscripts/setup-toolchain.sh\nscripts/extract-stock.sh path/to/AP_F711B....tar.md5\nscripts/build-cover.sh\nscripts/build-sms.sh\nscripts/build-ims.sh\n```\n\nThe zips end up in `dist/`.\n\n`extract-stock.sh` takes the AP file, a `super.img` or a `system.img` and copies the fonts, images and binaries the modules need into `stock/`. I used F711BXXSJJZH3. The scripts stop with an error if something they need isn't where they expect it. The SMS module doesn't need the firmware at all.\n\nThe first build creates a signing key in `signing/`. Keep it: the cover module reinstalls its app on boot, and that fails if the new APK is signed with a different key.\n\n## License\n\nCopyright &copy; 2026 kotwicha. Licensed under the [GNU General Public License v3.0](LICENSE).\n\nThe fonts, images and binaries the build takes from Samsung's firmware belong to their owners and aren't covered by this license. Samsung, Galaxy and One UI are trademarks of Samsung Electronics. This project isn't affiliated with Samsung.\n\n<br>\n\n<p align=\"center\"><sub>made by <a href=\"https://github.com/meetox80\">kotwicha</a></sub></p>\n",
+  "readmeHTML": "<p><h1 align=\"center\">zflip3</h1></p>\n\n<p><p align=\"center\">Magisk modules for running a GSI on the Galaxy Z Flip3 (SM-F711B) without losing the cover screen.</p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"#modules\"><b>Modules</b></a> &nbsp;&nbsp;|&nbsp;&nbsp;</p>\n<p>  <a href=\"#building\"><b>Building</b></a> &nbsp;&nbsp;|&nbsp;&nbsp;</p>\n<p>  <a href=\"#license\"><b>License</b></a></p>\n<p></p></p>\n\n<p><br></p>\n\n<p>A GSI doesn't know about the cover screen, so when you fold the phone Android moves onto the 512x260 panel as if it were a tiny phone. <code>flip3_cover</code> keeps Android on the main screen and runs its own launcher on the cover, written from scratch to look and work like the One UI 7 one. <code>flip3_smsready</code> fixes incoming texts on Samsung's RIL.</p>\n\n<h2>Modules</h2>\n\n<p>| Folder | Magisk id | What it does | State |</p>\n<p>|---|---|---|---|</p>\n<p>| <a href=\"cover\">cover</a> | <code>flip3_cover</code> | Cover screen: clock, widgets, notifications, music, quick panel | Working |</p>\n<p>| <a href=\"sms\">sms</a> | <code>flip3_smsready</code> | Fixes incoming SMS never reaching Android | Working |</p>\n<p>| <a href=\"ims\">ims</a> | <code>flip3_ims</code> | Port of Samsung's IMS service for VoLTE | Unfinished, don't use it for real calls |</p>\n\n<p>Download the zips from <a href=\"https://github.com/meetox80/zflip3/releases\">Releases</a>, install them in the Magisk app and reboot.</p>\n\n<p>Tested on:</p>\n\n<li>SM-F711B, vendor from the F711BXXSJJZH3 stock firmware (One UI 7)</li>\n<li>Infinity-X 3.12 GSI, Android 16, `treble_arm64-ab-VANILLA`</li>\n<li>Magisk</li>\n\n<h2>Building</h2>\n\n<p>You need Linux on x86_64 with curl, unzip, python3, <a href=\"https://ziglang.org\">zig</a>, e2fsprogs (for <code>debugfs</code>), lz4 and android-tools (for <code>simg2img</code> and <code>lpunpack</code>). The JDK and the Android build tools are downloaded into <code>tools/</code> by the setup script.</p>\n\n<pre>scripts/setup-toolchain.sh\nscripts/extract-stock.sh path/to/AP_F711B....tar.md5\nscripts/build-cover.sh\nscripts/build-sms.sh\nscripts/build-ims.sh</pre>\n\n<p>The zips end up in <code>dist/</code>.</p>\n\n<p><code>extract-stock.sh</code> takes the AP file, a <code>super.img</code> or a <code>system.img</code> and copies the fonts, images and binaries the modules need into <code>stock/</code>. I used F711BXXSJJZH3. The scripts stop with an error if something they need isn't where they expect it. The SMS module doesn't need the firmware at all.</p>\n\n<p>The first build creates a signing key in <code>signing/</code>. Keep it: the cover module reinstalls its app on boot, and that fails if the new APK is signed with a different key.</p>\n\n<h2>License</h2>\n\n<p>Copyright &copy; 2026 kotwicha. Licensed under the <a href=\"LICENSE\">GNU General Public License v3.0</a>.</p>\n\n<p>The fonts, images and binaries the build takes from Samsung's firmware belong to their owners and aren't covered by this license. Samsung, Galaxy and One UI are trademarks of Samsung Electronics. This project isn't affiliated with Samsung.</p>\n\n<p><br></p>\n\n<p><p align=\"center\"><sub>made by <a href=\"https://github.com/meetox80\">kotwicha</a></sub></p></p>",
+  "homepageUrl": "https://github.com/meetox80/zflip3",
+  "sourceUrl": "https://github.com/meetox80/zflip3",
+  "url": "https://github.com/meetox80/zflip3",
+  "latestRelease": {
+    "name": "cover-v0.3.0",
+    "version": "cover-v0.3.0",
+    "time": "2026-11-11T12:34:38Z",
+    "downloadUrl": "https://github.com/meetox80/zflip3/releases/download/cover-v0.3.0/cover-v0.3.0.zip"
+  },
+  "releases": [
+    {
+      "name": "smsready-v1.0",
+      "tagName": "smsready-v1.0",
+      "publishedAt": "2026-11-11T12:33:56Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/meetox80/zflip3/releases/download/smsready-v1.0/SHA256SUMS.txt",
+          "size": 84,
+          "downloadCount": 1
+        },
+        {
+          "name": "smsready-v1.0.zip",
+          "downloadUrl": "https://github.com/meetox80/zflip3/releases/download/smsready-v1.0/smsready-v1.0.zip",
+          "size": 3854,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "cover-v0.3.0",
+      "tagName": "cover-v0.3.0",
+      "publishedAt": "2026-11-11T12:34:38Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "cover-v0.3.0.zip",
+          "downloadUrl": "https://github.com/meetox80/zflip3/releases/download/cover-v0.3.0/cover-v0.3.0.zip",
+          "size": 592789,
+          "downloadCount": 1
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "downloadUrl": "https://github.com/meetox80/zflip3/releases/download/cover-v0.3.0/SHA256SUMS.txt",
+          "size": 83,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
