@@ -1,0 +1,85 @@
+{
+  "readme": "# dsh-go Root UI\n\n> 给 proot 运行环境递 root 的 KernelSU / SukiSU / Magisk 模块，自带 WebUI 控制台。\n\n![version](https://img.shields.io/badge/version-1.1.0-blue.svg)\n[![stars](https://img.shields.io/github/stars/Shawlei/dsh-go-root-ui?style=flat)](https://github.com/Shawlei/dsh-go-root-ui/stargazers)\n[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)\n[![platform](https://img.shields.io/badge/Android-KernelSU%20%7C%20SukiSU%20%7C%20Magisk-3ddc84.svg)](#兼容性)\n\n手机上跑 proot 类 Linux 环境（dsh-go、Termux proot-distro 等）时，容器里的 `uid=0` 是 proot 的\n`-0` 参数伪造出来的，真实的 root 能力它拿不到。本模块在**手机侧**开一个只监听回环地址的 root\n守护，把执行结果递进容器，并提供模块自带的 WebUI 用来操作。\n\n```\n容器 (uid 10306)  ──HTTP/token──▶  127.0.0.1:7000 (root, u:r:ksu:s0)  ──▶  真正执行\n        ▲                                                                     │\n        └────────────────────  stdout / stderr  ──────────────────────────────┘\n```\n\n## 特性\n\n- **一行命令拿 root**：装好后容器里直接 `r id` → `uid=0(root)`\n- **模块自带 WebUI**：管理器里点开就能执行命令、看状态、查日志、换 token\n- **零配置**：自动发现 proot 的 rootfs 目录与 App uid，不写死包名\n- **开机自启**：`service.sh` 拉起守护，断网/关屏都不影响\n- **失败可自愈**：管理器没注入 JS 桥时，页面自动跳到守护自己的 HTTP 页面\n- **小体积、纯 shell**：守护用 toybox `nc -L` + 手写 HTTP/1.1，没有额外二进制、没有 Node/Python 依赖\n- **能修属主**：`rfix` 一条命令把 root 写出来的文件交还给 App，避免引擎读不了自己的文件\n\n## 为什么容器里不能直接用 su\n\nKernelSU / SukiSU 的 `su` 不是磁盘上的文件，而是内核在 `execve` 上的钩子：\n\n```\nstat /system/bin/su   →  size=5326360  mode=755\ndd   /system/bin/su   →  0 bytes copied      ← 一个字节都读不出来\n/system/bin/su -c id  →  uid=0                ← execve 时才被拦截\n```\n\n而 proot 必须先 `open()` 读到 ELF 才决定怎么 `exec`，第一步就是 `ENOENT`，钩子根本没机会触发。\n所以 `su` 永远进不了容器，只能让外面的进程执行。详见 [docs/why-proot-cannot-su.md](docs/why-proot-cannot-su.md)。\n\n## 安装\n\n1. 管理器（KernelSU / SukiSU / Magisk）里刷入 `dshgo_rootui-<version>.zip`\n2. 重启手机（或手动跑一次 `su -c 'sh /data/adb/modules/dshgo_rootui/bin/rootd.sh'`）\n3. 管理器 → 模块 → **dsh-go Root UI** → **WebUI**\n\n装好之后容器里会自动出现：\n\n```bash\nr id              # uid=0(root) gid=0(root) context=u:r:ksu:s0\n```\n\n> 如果 WebUI 显示「通道未通」，说明管理器没注入 `ksu` 桥且守护没起来。\n> 页面会给出一键入口；实在不行重启一次手机。\n\n## 用法\n\n### WebUI\n\n| 区域 | 作用 |\n|---|---|\n| 状态 | 运行身份、设备、SELinux 域、容器客户端是否安装 |\n| 命令 | 输入框 + 常用命令胶囊，`Ctrl/⌘ + Enter` 执行，输出可复制 |\n| 更新客户端 | 重新把 `r` / `rfix` 写进 rootfs（换 token 后必须点） |\n| 日志 | 守护最近 80 行 |\n| 换 token | 重置 token 并自动同步容器客户端 |\n\n### 容器里\n\n```bash\nr id                          # 单条命令\nr ls /data/adb/modules\nr - <<'X'                      # 多行脚本\ngetprop ro.product.model\nls /data/adb/modules/*/module.prop\nX\nrfix /root/.dsh               # 把 root 写的文件属主交还 App\n```\n\n**路径注意**：`r` 里的路径是**手机侧**路径（`/data/adb`、`/sdcard`、`/system`），\n不是容器路径。容器 `/` 对应手机侧 `<app>/files/runtime/rootfs`，要让 root 写进容器可见的位置，\n就写到这个前缀下，再 `rfix`。\n\n## HTTP API\n\n守护默认 `127.0.0.1:7000`（可用 `DSHGO_PORT` 改），除 `/api/ping` 外都需要 token。\n\n| 方法 | 路径 | 说明 |\n|---|---|---|\n| GET | `/api/ping` | 存活探测，返回 `pong` |\n| GET | `/api/status` | `key=value` 多行：uid / model / android / context / rootfs / client / port |\n| GET | `/api/log?lines=80` | 守护日志尾部（上限 500 行） |\n| POST | `/api/exec` | 请求体即命令，返回 stdout+stderr，退出码在 `X-Exit-Code` |\n| POST | `/api/rfix` | 请求体是容器内路径（空格分隔），交还属主 |\n| POST | `/api/resync` | **无需 token**，把当前 token 重新写进目标 App 的 rootfs 客户端（自愈用） |\n\n```bash\nTOK=$(cat /data/adb/dshgo_rootui/token)\ncurl -s \"http://127.0.0.1:7000/api/status?token=$TOK\"\ncurl -s -X POST --data-binary 'id' \"http://127.0.0.1:7000/api/exec?token=$TOK\"\n```\n\n## 安全模型\n\n- 守护只 bind `127.0.0.1`，不接受外部连接。\n- token 32 位十六进制，存于 `/data/adb/dshgo_rootui/token`（`0600 root`），普通 App 读不到。\n- WebUI 页面由管理器从 `/data/adb/modules/...` 加载，同样仅 root 可读。\n- 守护**不会**把 token 暴露在页面上：`GET /` 只返回静态 HTML，读 token 需要文件权限或已认证请求。\n- **能读到 token 的进程等价于 root**：手机上任何能读该文件或能访问回环 + 拿到 token 的东西都能执行命令。\n  不要装来路不明的 App，不要把 token 贴到聊天/截图里。\n- 通过 `r` 写的文件属主是 `0:0`；写进 `/root`、rootfs 的 `0600` 文件会让 App 之后读不了，记得 `rfix`。\n\n## 兼容性\n\n| 环境 | 状态 |\n|---|---|\n| SukiSU Ultra（KernelSU 分支） | 已实测（Android 17 / arm64） |\n| KernelSU / KernelSU Next | 理论兼容（同一套模块与 WebUI 规范） |\n| Magisk | 模块可装；Magisk 管理器没有 WebUI，页面需用浏览器打开 `http://127.0.0.1:7000/` |\n| APatch | 同 Magisk |\n\nWebUI 里依次探测 `ksu` / `$ksu` / `kernelsu` / `$kernelsu` / `ksuAPI` 五种桥名，\n都找不到时回退到 HTTP。不同实现的原生桥回调签名不一样，前端已统一归一化：\n\n| 签名 | 来源 |\n|---|---|\n| `(stdout, stderr)` | KernelSU 官方 npm 包 |\n| `(errno, stdout, stderr)` | SukiSU 实测 |\n| `(errno, stdout)` | 部分分支 |\n\n返回 Promise 或直接返回对象也能识别。\n\n## 目录结构\n\n```\nmodule.prop                      模块信息\ncustomize.sh                     安装期：落盘 / 生成 token / 注入 / 权限\npost-fs-data.sh                  开机早期：确保 token 存在\nservice.sh                       开机后：拉起守护\nuninstall.sh                     卸载：停守护、清数据\nbin/common.sh                    路径发现、token、日志（被其他脚本引用）\nbin/rootd.sh                     启动 127.0.0.1 守护 + 自装客户端\nbin/handler.sh                   每连接一个实例的 HTTP/1.1 实现\nbin/install-client.sh            把 r / rfix 写进 rootfs\nbin/rotate.sh                    换 token 并同步客户端\nbin/client.sh                    容器里的 r 客户端\nbin/client-rfix.sh               容器里的 rfix 客户端\nwebroot/index.html               页面骨架\nwebroot/app.js                   前端逻辑（双通道）\nwebroot/style.css                样式\nMETA-INF/…/update-binary         安装器（Magisk/KSU 通用）\nbuild.sh                         打包：./build.sh → dist/<id>-<ver>.zip\n```\n\n## 开发\n\n```bash\n./build.sh                    # 打包到 dist/\n```\n\n发布流程：\n\n```bash\n./build.sh                       # 本地打包\ngit tag v1.1.0 && git push origin v1.1.0\n```\n\n推 `v*` tag 后，GitHub Actions 会自动 `./build.sh` 打包并把 zip 挂到 Release 上；\n也可以在 Actions 页手动 Run workflow，只产出 artifact。\n\n## English\n\nA KernelSU/SukiSU/Magisk module that gives **proot-based Linux environments** (dsh-go, etc.)\naccess to real root, plus a module WebUI.\n\nThe container's `uid=0` is proot's fake root; KernelSU's `su` is a kernel `execve` hook with no\nreadable file, so `open()` fails before `exec()` ever happens. This module runs a loopback-only\nroot daemon on the phone side and hands results back into the container.\n\nAfter install: `r id` → `uid=0(root)`. WebUI: module card → WebUI. API on `127.0.0.1:7000`, token at\n`/data/adb/dshgo_rootui/token`.\n\n## 链接\n\n- 仓库：<https://github.com/Shawlei/dsh-go-root-ui>\n- 问题反馈：<https://github.com/Shawlei/dsh-go-root-ui/issues>\n\n## License\n\n[MIT](LICENSE)\n",
+  "readmeHTML": "<h1>dsh-go Root UI</h1>\n\n<p>> 给 proot 运行环境递 root 的 KernelSU / SukiSU / Magisk 模块，自带 WebUI 控制台。</p>\n\n<p>!<a href=\"https://img.shields.io/badge/version-1.1.0-blue.svg\">version</a></p>\n<p><a href=\"https://img.shields.io/github/stars/Shawlei/dsh-go-root-ui?style=flat\">![stars</a>](https://github.com/Shawlei/dsh-go-root-ui/stargazers)</p>\n<p><a href=\"https://img.shields.io/badge/license-MIT-blue.svg\">![license</a>](LICENSE)</p>\n<p><a href=\"https://img.shields.io/badge/Android-KernelSU%20%7C%20SukiSU%20%7C%20Magisk-3ddc84.svg\">![platform</a>](#兼容性)</p>\n\n<p>手机上跑 proot 类 Linux 环境（dsh-go、Termux proot-distro 等）时，容器里的 <code>uid=0</code> 是 proot 的</p>\n<p><code>-0</code> 参数伪造出来的，真实的 root 能力它拿不到。本模块在<b>手机侧</b>开一个只监听回环地址的 root</p>\n<p>守护，把执行结果递进容器，并提供模块自带的 WebUI 用来操作。</p>\n\n<pre>容器 (uid 10306)  ──HTTP/token──▶  127.0.0.1:7000 (root, u:r:ksu:s0)  ──▶  真正执行\n        ▲                                                                     │\n        └────────────────────  stdout / stderr  ──────────────────────────────┘</pre>\n\n<h2>特性</h2>\n\n<li>**一行命令拿 root**：装好后容器里直接 `r id` → `uid=0(root)`</li>\n<li>**模块自带 WebUI**：管理器里点开就能执行命令、看状态、查日志、换 token</li>\n<li>**零配置**：自动发现 proot 的 rootfs 目录与 App uid，不写死包名</li>\n<li>**开机自启**：`service.sh` 拉起守护，断网/关屏都不影响</li>\n<li>**失败可自愈**：管理器没注入 JS 桥时，页面自动跳到守护自己的 HTTP 页面</li>\n<li>**小体积、纯 shell**：守护用 toybox `nc -L` + 手写 HTTP/1.1，没有额外二进制、没有 Node/Python 依赖</li>\n<li>**能修属主**：`rfix` 一条命令把 root 写出来的文件交还给 App，避免引擎读不了自己的文件</li>\n\n<h2>为什么容器里不能直接用 su</h2>\n\n<p>KernelSU / SukiSU 的 <code>su</code> 不是磁盘上的文件，而是内核在 <code>execve</code> 上的钩子：</p>\n\n<pre>stat /system/bin/su   →  size=5326360  mode=755\ndd   /system/bin/su   →  0 bytes copied      ← 一个字节都读不出来\n/system/bin/su -c id  →  uid=0                ← execve 时才被拦截</pre>\n\n<p>而 proot 必须先 <code>open()</code> 读到 ELF 才决定怎么 <code>exec</code>，第一步就是 <code>ENOENT</code>，钩子根本没机会触发。</p>\n<p>所以 <code>su</code> 永远进不了容器，只能让外面的进程执行。详见 <a href=\"docs/why-proot-cannot-su.md\">docs/why-proot-cannot-su.md</a>。</p>\n\n<h2>安装</h2>\n\n<li>管理器（KernelSU / SukiSU / Magisk）里刷入 `dshgo_rootui-<version>.zip`</li>\n<li>重启手机（或手动跑一次 `su -c 'sh /data/adb/modules/dshgo_rootui/bin/rootd.sh'`）</li>\n<li>管理器 → 模块 → **dsh-go Root UI** → **WebUI**</li>\n\n<p>装好之后容器里会自动出现：</p>\n\n<pre>r id              # uid=0(root) gid=0(root) context=u:r:ksu:s0</pre>\n\n<p>> 如果 WebUI 显示「通道未通」，说明管理器没注入 <code>ksu</code> 桥且守护没起来。</p>\n<p>> 页面会给出一键入口；实在不行重启一次手机。</p>\n\n<h2>用法</h2>\n\n<h3>WebUI</h3>\n\n<p>| 区域 | 作用 |</p>\n<p>|---|---|</p>\n<p>| 状态 | 运行身份、设备、SELinux 域、容器客户端是否安装 |</p>\n<p>| 命令 | 输入框 + 常用命令胶囊，<code>Ctrl/⌘ + Enter</code> 执行，输出可复制 |</p>\n<p>| 更新客户端 | 重新把 <code>r</code> / <code>rfix</code> 写进 rootfs（换 token 后必须点） |</p>\n<p>| 日志 | 守护最近 80 行 |</p>\n<p>| 换 token | 重置 token 并自动同步容器客户端 |</p>\n\n<h3>容器里</h3>\n\n<pre>r id                          # 单条命令\nr ls /data/adb/modules\nr - &lt;&lt;'X'                      # 多行脚本\ngetprop ro.product.model\nls /data/adb/modules/*/module.prop\nX\nrfix /root/.dsh               # 把 root 写的文件属主交还 App</pre>\n\n<p><b>路径注意</b>：<code>r</code> 里的路径是<b>手机侧</b>路径（<code>/data/adb</code>、<code>/sdcard</code>、<code>/system</code>），</p>\n<p>不是容器路径。容器 <code>/</code> 对应手机侧 <code><app>/files/runtime/rootfs</code>，要让 root 写进容器可见的位置，</p>\n<p>就写到这个前缀下，再 <code>rfix</code>。</p>\n\n<h2>HTTP API</h2>\n\n<p>守护默认 <code>127.0.0.1:7000</code>（可用 <code>DSHGO_PORT</code> 改），除 <code>/api/ping</code> 外都需要 token。</p>\n\n<p>| 方法 | 路径 | 说明 |</p>\n<p>|---|---|---|</p>\n<p>| GET | <code>/api/ping</code> | 存活探测，返回 <code>pong</code> |</p>\n<p>| GET | <code>/api/status</code> | <code>key=value</code> 多行：uid / model / android / context / rootfs / client / port |</p>\n<p>| GET | <code>/api/log?lines=80</code> | 守护日志尾部（上限 500 行） |</p>\n<p>| POST | <code>/api/exec</code> | 请求体即命令，返回 stdout+stderr，退出码在 <code>X-Exit-Code</code> |</p>\n<p>| POST | <code>/api/rfix</code> | 请求体是容器内路径（空格分隔），交还属主 |</p>\n<p>| POST | <code>/api/resync</code> | <b>无需 token</b>，把当前 token 重新写进目标 App 的 rootfs 客户端（自愈用） |</p>\n\n<pre>TOK=$(cat /data/adb/dshgo_rootui/token)\ncurl -s \"http://127.0.0.1:7000/api/status?token=$TOK\"\ncurl -s -X POST --data-binary 'id' \"http://127.0.0.1:7000/api/exec?token=$TOK\"</pre>\n\n<h2>安全模型</h2>\n\n<li>守护只 bind `127.0.0.1`，不接受外部连接。</li>\n<li>token 32 位十六进制，存于 `/data/adb/dshgo_rootui/token`（`0600 root`），普通 App 读不到。</li>\n<li>WebUI 页面由管理器从 `/data/adb/modules/...` 加载，同样仅 root 可读。</li>\n<li>守护**不会**把 token 暴露在页面上：`GET /` 只返回静态 HTML，读 token 需要文件权限或已认证请求。</li>\n<li>**能读到 token 的进程等价于 root**：手机上任何能读该文件或能访问回环 + 拿到 token 的东西都能执行命令。</li>\n<p>  不要装来路不明的 App，不要把 token 贴到聊天/截图里。</p>\n<li>通过 `r` 写的文件属主是 `0:0`；写进 `/root`、rootfs 的 `0600` 文件会让 App 之后读不了，记得 `rfix`。</li>\n\n<h2>兼容性</h2>\n\n<p>| 环境 | 状态 |</p>\n<p>|---|---|</p>\n<p>| SukiSU Ultra（KernelSU 分支） | 已实测（Android 17 / arm64） |</p>\n<p>| KernelSU / KernelSU Next | 理论兼容（同一套模块与 WebUI 规范） |</p>\n<p>| Magisk | 模块可装；Magisk 管理器没有 WebUI，页面需用浏览器打开 <code>http://127.0.0.1:7000/</code> |</p>\n<p>| APatch | 同 Magisk |</p>\n\n<p>WebUI 里依次探测 <code>ksu</code> / <code>$ksu</code> / <code>kernelsu</code> / <code>$kernelsu</code> / <code>ksuAPI</code> 五种桥名，</p>\n<p>都找不到时回退到 HTTP。不同实现的原生桥回调签名不一样，前端已统一归一化：</p>\n\n<p>| 签名 | 来源 |</p>\n<p>|---|---|</p>\n<p>| <code>(stdout, stderr)</code> | KernelSU 官方 npm 包 |</p>\n<p>| <code>(errno, stdout, stderr)</code> | SukiSU 实测 |</p>\n<p>| <code>(errno, stdout)</code> | 部分分支 |</p>\n\n<p>返回 Promise 或直接返回对象也能识别。</p>\n\n<h2>目录结构</h2>\n\n<pre>module.prop                      模块信息\ncustomize.sh                     安装期：落盘 / 生成 token / 注入 / 权限\npost-fs-data.sh                  开机早期：确保 token 存在\nservice.sh                       开机后：拉起守护\nuninstall.sh                     卸载：停守护、清数据\nbin/common.sh                    路径发现、token、日志（被其他脚本引用）\nbin/rootd.sh                     启动 127.0.0.1 守护 + 自装客户端\nbin/handler.sh                   每连接一个实例的 HTTP/1.1 实现\nbin/install-client.sh            把 r / rfix 写进 rootfs\nbin/rotate.sh                    换 token 并同步客户端\nbin/client.sh                    容器里的 r 客户端\nbin/client-rfix.sh               容器里的 rfix 客户端\nwebroot/index.html               页面骨架\nwebroot/app.js                   前端逻辑（双通道）\nwebroot/style.css                样式\nMETA-INF/…/update-binary         安装器（Magisk/KSU 通用）\nbuild.sh                         打包：./build.sh → dist/&lt;id&gt;-&lt;ver&gt;.zip</pre>\n\n<h2>开发</h2>\n\n<pre>./build.sh                    # 打包到 dist/</pre>\n\n<p>发布流程：</p>\n\n<pre>./build.sh                       # 本地打包\ngit tag v1.1.0 &amp;&amp; git push origin v1.1.0</pre>\n\n<p>推 <code>v*</code> tag 后，GitHub Actions 会自动 <code>./build.sh</code> 打包并把 zip 挂到 Release 上；</p>\n<p>也可以在 Actions 页手动 Run workflow，只产出 artifact。</p>\n\n<h2>English</h2>\n\n<p>A KernelSU/SukiSU/Magisk module that gives <b>proot-based Linux environments</b> (dsh-go, etc.)</p>\n<p>access to real root, plus a module WebUI.</p>\n\n<p>The container's <code>uid=0</code> is proot's fake root; KernelSU's <code>su</code> is a kernel <code>execve</code> hook with no</p>\n<p>readable file, so <code>open()</code> fails before <code>exec()</code> ever happens. This module runs a loopback-only</p>\n<p>root daemon on the phone side and hands results back into the container.</p>\n\n<p>After install: <code>r id</code> → <code>uid=0(root)</code>. WebUI: module card → WebUI. API on <code>127.0.0.1:7000</code>, token at</p>\n<p><code>/data/adb/dshgo_rootui/token</code>.</p>\n\n<h2>链接</h2>\n\n<li>仓库：<https://github.com/Shawlei/dsh-go-root-ui></li>\n<li>问题反馈：<https://github.com/Shawlei/dsh-go-root-ui/issues></li>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">MIT</a></p>",
+  "homepageUrl": "https://github.com/Shawlei/dsh-go-root-ui",
+  "sourceUrl": "https://github.com/Shawlei/dsh-go-root-ui",
+  "url": "https://github.com/Shawlei/dsh-go-root-ui",
+  "latestRelease": {
+    "name": "v1.1.4",
+    "version": "v1.1.4",
+    "time": "2026-11-13T00:44:16Z",
+    "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.4/dshgo_rootui-1.1.4.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1.4",
+      "tagName": "v1.1.4",
+      "publishedAt": "2026-11-13T00:44:16Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dshgo_rootui-1.1.4.zip",
+          "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.4/dshgo_rootui-1.1.4.zip",
+          "size": 22722,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.1.3",
+      "tagName": "v1.1.3",
+      "publishedAt": "2026-11-12T21:29:51Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dshgo_rootui-1.1.3.zip",
+          "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.3/dshgo_rootui-1.1.3.zip",
+          "size": 22316,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.2",
+      "tagName": "v1.1.2",
+      "publishedAt": "2026-11-12T21:22:35Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dshgo_rootui-1.1.2.zip",
+          "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.2/dshgo_rootui-1.1.2.zip",
+          "size": 21894,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.1.1",
+      "tagName": "v1.1.1",
+      "publishedAt": "2026-11-12T21:14:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dshgo_rootui-1.1.1.zip",
+          "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.1/dshgo_rootui-1.1.1.zip",
+          "size": 21117,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-11-12T21:04:28Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "dshgo_rootui-1.1.0.zip",
+          "downloadUrl": "https://github.com/Shawlei/dsh-go-root-ui/releases/download/v1.1.0/dshgo_rootui-1.1.0.zip",
+          "size": 21031,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}

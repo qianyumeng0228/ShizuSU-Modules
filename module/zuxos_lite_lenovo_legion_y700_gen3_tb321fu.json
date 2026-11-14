@@ -1,0 +1,35 @@
+{
+  "readme": "# ZUXOS Lite: faster stock ZUXOS 1.5 (Android 16) for the Legion Y700 Gen 3\n\nStock Chinese ZUXOS **1.5.10.184** with root and a small Magisk module that removes junk\nwhile **keeping** Lenovo's gaming features, PC/desktop mode and stylus support.\n\n## What the module does (`module/`)\n- **Debloat (systemless):** weather, Smart Connect, Vantage, Phone Clone, Lenovo notes/calendar/\n  recorder/calculator, the Chinese AI assistant + AI Lens, network manager, partner auto-installer,\n  printing, screensavers and live wallpapers (`removed.txt`). Undo by removing the module.\n- **Speed tweaks** (`system.prop`, `service.sh`): animation, ART/dexopt and scheduler settings;\n  re-applies 165 Hz after boot (ZUXOS resets it to 120 Hz).\n- **Modes:** `zuxmode performance|balanced|battery` from a terminal, or tap **Action** on the module\n  in Magisk to cycle.\n\n## Install (wipes the tablet; bootloader must be unlocked: see the [unlock guide](https://github.com/ttabouch12/Armada-OS-Lenovo-Legion-Y700-Gen3-TB321FU#readme))\n1. Firmware: CN full OTA `TB321FU_CN_OPEN_USER_Q00002.0_W_ZUI_17.5.10.184_ST_260208` from Lenovo's CDN\n   (`https://ota-cdn.lenovo.com/firmware/202629135222236-2821.zip`). Extract `payload.bin` with\n   [payload-dumper-go](https://github.com/ssut/payload-dumper-go) into `images/`.\n2. Root: patch `images/init_boot.img` with [Magisk](https://github.com/topjohnwu/Magisk) → `init_boot_magisk.img`.\n3. Dynamic partitions: make `super_empty.img` with `lpmake` (super 13958643712, group\n   `qti_dynamic_partitions_a/b` 13954449408, virtual A/B, 3 metadata slots).\n4. Tablet in fastboot, run `FLASH_ZUXOS_LITE.bat` (firmware on both slots → wipe-super → fastbootd for\n   the logical partitions → wipe data).\n5. After setup: install Magisk, flash the module zip (zip the contents of `module/`), reboot.\n6. Optional: Google Play — install `Phonesky.apk` from [MindTheGapps](https://github.com/MindTheGapps) as an\n   update with `adb install`; launcher — [Lawnchair](https://github.com/LawnchairLauncher/lawnchair)\n   (desktop/PC mode keeps working; set Lawnchair as home in Settings).\n",
+  "readmeHTML": "<h1>ZUXOS Lite: faster stock ZUXOS 1.5 (Android 16) for the Legion Y700 Gen 3</h1>\n\n<p>Stock Chinese ZUXOS <b>1.5.10.184</b> with root and a small Magisk module that removes junk</p>\n<p>while <b>keeping</b> Lenovo's gaming features, PC/desktop mode and stylus support.</p>\n\n<h2>What the module does (`module/`)</h2>\n<li>**Debloat (systemless):** weather, Smart Connect, Vantage, Phone Clone, Lenovo notes/calendar/</li>\n<p>  recorder/calculator, the Chinese AI assistant + AI Lens, network manager, partner auto-installer,</p>\n<p>  printing, screensavers and live wallpapers (<code>removed.txt</code>). Undo by removing the module.</p>\n<li>**Speed tweaks** (`system.prop`, `service.sh`): animation, ART/dexopt and scheduler settings;</li>\n<p>  re-applies 165 Hz after boot (ZUXOS resets it to 120 Hz).</p>\n<li>**Modes:** `zuxmode performance|balanced|battery` from a terminal, or tap **Action** on the module</li>\n<p>  in Magisk to cycle.</p>\n\n<h2>Install (wipes the tablet; bootloader must be unlocked: see the [unlock guide](https://github.com/ttabouch12/Armada-OS-Lenovo-Legion-Y700-Gen3-TB321FU#readme))</h2>\n<li>Firmware: CN full OTA `TB321FU_CN_OPEN_USER_Q00002.0_W_ZUI_17.5.10.184_ST_260208` from Lenovo's CDN</li>\n<p>   (<code>https://ota-cdn.lenovo.com/firmware/202629135222236-2821.zip</code>). Extract <code>payload.bin</code> with</p>\n<p>   <a href=\"https://github.com/ssut/payload-dumper-go\">payload-dumper-go</a> into <code>images/</code>.</p>\n<li>Root: patch `images/init_boot.img` with [Magisk](https://github.com/topjohnwu/Magisk) → `init_boot_magisk.img`.</li>\n<li>Dynamic partitions: make `super_empty.img` with `lpmake` (super 13958643712, group</li>\n<p>   <code>qti_dynamic_partitions_a/b</code> 13954449408, virtual A/B, 3 metadata slots).</p>\n<li>Tablet in fastboot, run `FLASH_ZUXOS_LITE.bat` (firmware on both slots → wipe-super → fastbootd for</li>\n<p>   the logical partitions → wipe data).</p>\n<li>After setup: install Magisk, flash the module zip (zip the contents of `module/`), reboot.</li>\n<li>Optional: Google Play — install `Phonesky.apk` from [MindTheGapps](https://github.com/MindTheGapps) as an</li>\n<p>   update with <code>adb install</code>; launcher — <a href=\"https://github.com/LawnchairLauncher/lawnchair\">Lawnchair</a></p>\n<p>   (desktop/PC mode keeps working; set Lawnchair as home in Settings).</p>",
+  "homepageUrl": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU",
+  "sourceUrl": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU",
+  "url": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU",
+  "latestRelease": {
+    "name": "v1.1",
+    "version": "v1.1",
+    "time": "2026-11-13T19:03:04Z",
+    "downloadUrl": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU/releases/download/v1.1/ZUXOS-Lite-module-v1.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.1",
+      "tagName": "v1.1",
+      "publishedAt": "2026-11-13T19:03:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ZUXOS-Lite-module-v1.1.zip",
+          "downloadUrl": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU/releases/download/v1.1/ZUXOS-Lite-module-v1.1.zip",
+          "size": 4092,
+          "downloadCount": 1
+        },
+        {
+          "name": "ZUXOS-Lite-installer-kit-v1.1.zip",
+          "downloadUrl": "https://github.com/ttabouch12/ZUXOS-Lite-Lenovo-Legion-Y700-Gen3-TB321FU/releases/download/v1.1/ZUXOS-Lite-installer-kit-v1.1.zip",
+          "size": 3025,
+          "downloadCount": 2
+        }
+      ]
+    }
+  ]
+}
