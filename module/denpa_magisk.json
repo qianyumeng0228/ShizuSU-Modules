@@ -1,0 +1,93 @@
+{
+  "readme": "# denpa-magisk\n\nRun [denpa](https://github.com/danything/denpa) (server + tuner agent) as root on Android via Magisk, KernelSU, or APatch. Because it runs as root, the agent uses sysfs/usbfs directly (`USB_BROKER` unset) — no Android app or USB permission dialog is needed.\n\n## Install & Usage\n\n1. Flash the zip from [Releases](https://github.com/tgw314/denpa-magisk/releases) in your root manager and reboot.\n2. Open the denpa Web UI at `http://<device>:3000`.\n\n> [!WARNING]\n> Do **not** install the official denpa APK alongside this module; they will conflict over the tuner and ports.\n\n- **Control:** Use the manager WebUI (status, logs, start/stop) on KernelSU and APatch. On Magisk, use a root shell:\n  ```sh\n  sh /data/adb/modules/denpa/ctl.sh start|stop|restart|status\n  ```\n- **Data directory:** `/data/adb/denpa` (config, DB, recordings)\n- **Updates:** Automatic via `updateJson` in `module.prop`. A GitHub Actions job checks for a new upstream release every 6 hours and publishes the module zip here.\n\n## How It Works\n\n- **Payload:** Extracted unmodified from the official Android APK at build time (verified against the upstream release's `.sha256`). No denpa binaries are committed to this repo.\n- **Networking:** The tuner agent listens on port 25252 (TLS). The bundled server connects to it via `127.0.0.1` with a pairing token.\n- **Hardware encoding:** Supported MediaCodec encoders are detected at startup via a small `app_process` DEX helper (`helper/`) and passed as `MEDIACODEC_ENCODERS`.\n\n## License & Source Code\n\n- **denpa (server):** AGPL-3.0-or-later\n- **tuner agent:** MPL-2.0\n- **This module (scripts, WebUI, helper):** AGPL-3.0-or-later (see [LICENSE](LICENSE))\n\n`helper/DenpaEncoders.java` is a Java port of upstream's `Encoders.kt`, which is why this repository's own code is also licensed under AGPL-3.0-or-later. Because each module zip redistributes the compiled upstream binaries extracted from the APK:\n\n- Every GitHub Release attaches the corresponding upstream source tarball (`denpa-<version>-source.tar.gz`).\n- Every module zip includes the upstream license texts under `licenses/`.\n\n> [!NOTE]\n> This module is meant for running denpa on your own device and home network. denpa is AGPL-licensed: if you modify denpa and let other people use your modified version over a network, AGPL §13 requires you, as the operator, to offer them its Corresponding Source. The unmodified upstream source is at [danything/denpa](https://github.com/danything/denpa) (same version tag); this module's own source is this repository.\n",
+  "readmeHTML": "<h1>denpa-magisk</h1>\n\n<p>Run <a href=\"https://github.com/danything/denpa\">denpa</a> (server + tuner agent) as root on Android via Magisk, KernelSU, or APatch. Because it runs as root, the agent uses sysfs/usbfs directly (<code>USB_BROKER</code> unset) — no Android app or USB permission dialog is needed.</p>\n\n<h2>Install & Usage</h2>\n\n<li>Flash the zip from [Releases](https://github.com/tgw314/denpa-magisk/releases) in your root manager and reboot.</li>\n<li>Open the denpa Web UI at `http://<device>:3000`.</li>\n\n<p>> [!WARNING]</p>\n<p>> Do <b>not</b> install the official denpa APK alongside this module; they will conflict over the tuner and ports.</p>\n\n<li>**Control:** Use the manager WebUI (status, logs, start/stop) on KernelSU and APatch. On Magisk, use a root shell:</li>\n<p>  ```sh</p>\n<p>  sh /data/adb/modules/denpa/ctl.sh start|stop|restart|status</p>\n<p>  ```</p>\n<li>**Data directory:** `/data/adb/denpa` (config, DB, recordings)</li>\n<li>**Updates:** Automatic via `updateJson` in `module.prop`. A GitHub Actions job checks for a new upstream release every 6 hours and publishes the module zip here.</li>\n\n<h2>How It Works</h2>\n\n<li>**Payload:** Extracted unmodified from the official Android APK at build time (verified against the upstream release's `.sha256`). No denpa binaries are committed to this repo.</li>\n<li>**Networking:** The tuner agent listens on port 25252 (TLS). The bundled server connects to it via `127.0.0.1` with a pairing token.</li>\n<li>**Hardware encoding:** Supported MediaCodec encoders are detected at startup via a small `app_process` DEX helper (`helper/`) and passed as `MEDIACODEC_ENCODERS`.</li>\n\n<h2>License & Source Code</h2>\n\n<li>**denpa (server):** AGPL-3.0-or-later</li>\n<li>**tuner agent:** MPL-2.0</li>\n<li>**This module (scripts, WebUI, helper):** AGPL-3.0-or-later (see [LICENSE](LICENSE))</li>\n\n<p><code>helper/DenpaEncoders.java</code> is a Java port of upstream's <code>Encoders.kt</code>, which is why this repository's own code is also licensed under AGPL-3.0-or-later. Because each module zip redistributes the compiled upstream binaries extracted from the APK:</p>\n\n<li>Every GitHub Release attaches the corresponding upstream source tarball (`denpa-<version>-source.tar.gz`).</li>\n<li>Every module zip includes the upstream license texts under `licenses/`.</li>\n\n<p>> [!NOTE]</p>\n<p>> This module is meant for running denpa on your own device and home network. denpa is AGPL-licensed: if you modify denpa and let other people use your modified version over a network, AGPL §13 requires you, as the operator, to offer them its Corresponding Source. The unmodified upstream source is at <a href=\"https://github.com/danything/denpa\">danything/denpa</a> (same version tag); this module's own source is this repository.</p>",
+  "homepageUrl": "https://github.com/tgw314/denpa-magisk",
+  "sourceUrl": "https://github.com/tgw314/denpa-magisk",
+  "url": "https://github.com/tgw314/denpa-magisk",
+  "latestRelease": {
+    "name": "v2.50.0",
+    "version": "v2.50.0",
+    "time": "2026-11-16T06:49:07Z",
+    "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.50.0/denpa-v2.50.0-r2.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.50.0",
+      "tagName": "v2.50.0",
+      "publishedAt": "2026-11-16T06:49:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "denpa-v2.50.0-r2.zip",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.50.0/denpa-v2.50.0-r2.zip",
+          "size": 72963693,
+          "downloadCount": 1
+        },
+        {
+          "name": "component-sources.tar",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.50.0/component-sources.tar",
+          "size": 41584640,
+          "downloadCount": 1
+        },
+        {
+          "name": "denpa-2.50.0-source.tar.gz",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.50.0/denpa-2.50.0-source.tar.gz",
+          "size": 8556972,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.49.0",
+      "tagName": "v2.49.0",
+      "publishedAt": "2026-11-15T22:59:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "component-sources.tar",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.49.0/component-sources.tar",
+          "size": 41584640,
+          "downloadCount": 1
+        },
+        {
+          "name": "denpa-v2.49.0-r2.zip",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.49.0/denpa-v2.49.0-r2.zip",
+          "size": 72962071,
+          "downloadCount": 1
+        },
+        {
+          "name": "denpa-2.49.0-source.tar.gz",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.49.0/denpa-2.49.0-source.tar.gz",
+          "size": 8236966,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.48.0",
+      "tagName": "v2.48.0",
+      "publishedAt": "2026-11-15T13:11:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "denpa-2.48.0-source.tar.gz",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.48.0/denpa-2.48.0-source.tar.gz",
+          "size": 8435389,
+          "downloadCount": 1
+        },
+        {
+          "name": "denpa-v2.48.0-r2.zip",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.48.0/denpa-v2.48.0-r2.zip",
+          "size": 72940686,
+          "downloadCount": 3
+        },
+        {
+          "name": "component-sources.tar",
+          "downloadUrl": "https://github.com/tgw314/denpa-magisk/releases/download/v2.48.0/component-sources.tar",
+          "size": 41584640,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
