@@ -1,0 +1,35 @@
+{
+  "readme": "# SUSFS Config\n\n**[Download susfs-config-a67lg2.zip](https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/download/v0.1/susfs-config-a67lg2.zip)**\n\n\nApply susfs at boot to line up the bootloader lock-state and hide the root infrastructure.\n\nA KernelSU Next module for the **Foxxd A67L Gen 2**.\n\nThe phone's `getprop` lock-state is already factory-green, but detectors read the\nreal values from `/proc/bootconfig` and the kernel command line. This module uses\n[susfs](https://gitlab.com/simonpunk/susfs4ksu) to make those agree with the\nspoofed props and to tuck KernelSU's infrastructure out of sight.\n\n## What it does\n\nAt boot (via `post-fs-data`):\n\n- **Lock-state.** Rewrites `/proc/bootconfig` so `androidboot.verifiedbootstate`,\n  `androidboot.flash.locked` and `androidboot.vbmeta.device_state` report\n  `green` / `1` / `locked` — matching the already-spoofed getprop values, so the\n  two can't be played off against each other.\n- **Hide `/data/adb`.** Registers the KernelSU infrastructure directory as a\n  susfs `sus_path`, so denylisted apps (the ones that run in the un-mounted\n  namespace) don't see it.\n- **Quiet avc logs.** Turns on susfs avc-log spoofing so su-domain denials don't\n  leak the ksu domain to `/proc/<pid>` scrapers.\n\nIt leaves KernelSU Next's own `bin/susfs` alone and installs its matching\n`ksu_susfs` tool alongside it.\n\n## Requirements\n\n- Foxxd A67L Gen 2\n- Rooted with KernelSU Next, on a kernel with **susfs v2.3.0** built in — the\n  [A67L G2 Kernel](https://github.com/CyberspaceVii/kernel-a67lg2). The bundled\n  `ksu_susfs` must match the kernel's susfs version; a mismatch just no-ops.\n\nThe installer stops without changing anything if the device or KSU check fails.\n\n## Install\n\n1. Download [`susfs-config-a67lg2.zip`](https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/latest/download/susfs-config-a67lg2.zip) (latest release).\n2. KernelSU Next → Modules → Install from storage → select the zip.\n3. Reboot.\n\n## Uninstall\n\nDisable or remove the module and reboot. The kernel-side susfs is left untouched;\nthe module only removes the `ksu_susfs` copy it placed, and the runtime spoofs\nclear on the next boot since nothing re-applies them.\n\n## Credits\n\nsusfs by [simonpunk / susfs4ksu](https://gitlab.com/simonpunk/susfs4ksu). This\nmodule only drives the stock `ksu_susfs` userspace tool; its own scripts are WTFPL.\n\n## License\n\n[WTFPL](LICENSE).\n\n---\n\nCyberspaceVII · https://www.cyberspace7.org\n",
+  "readmeHTML": "<h1>SUSFS Config</h1>\n\n<p><b><a href=\"https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/download/v0.1/susfs-config-a67lg2.zip\">Download susfs-config-a67lg2.zip</a></b></p>\n\n\n<p>Apply susfs at boot to line up the bootloader lock-state and hide the root infrastructure.</p>\n\n<p>A KernelSU Next module for the <b>Foxxd A67L Gen 2</b>.</p>\n\n<p>The phone's <code>getprop</code> lock-state is already factory-green, but detectors read the</p>\n<p>real values from <code>/proc/bootconfig</code> and the kernel command line. This module uses</p>\n<p><a href=\"https://gitlab.com/simonpunk/susfs4ksu\">susfs</a> to make those agree with the</p>\n<p>spoofed props and to tuck KernelSU's infrastructure out of sight.</p>\n\n<h2>What it does</h2>\n\n<p>At boot (via <code>post-fs-data</code>):</p>\n\n<li>**Lock-state.** Rewrites `/proc/bootconfig` so `androidboot.verifiedbootstate`,</li>\n<p>  <code>androidboot.flash.locked</code> and <code>androidboot.vbmeta.device_state</code> report</p>\n<p>  <code>green</code> / <code>1</code> / <code>locked</code> — matching the already-spoofed getprop values, so the</p>\n<p>  two can't be played off against each other.</p>\n<li>**Hide `/data/adb`.** Registers the KernelSU infrastructure directory as a</li>\n<p>  susfs <code>sus_path</code>, so denylisted apps (the ones that run in the un-mounted</p>\n<p>  namespace) don't see it.</p>\n<li>**Quiet avc logs.** Turns on susfs avc-log spoofing so su-domain denials don't</li>\n<p>  leak the ksu domain to <code>/proc/<pid></code> scrapers.</p>\n\n<p>It leaves KernelSU Next's own <code>bin/susfs</code> alone and installs its matching</p>\n<p><code>ksu_susfs</code> tool alongside it.</p>\n\n<h2>Requirements</h2>\n\n<li>Foxxd A67L Gen 2</li>\n<li>Rooted with KernelSU Next, on a kernel with **susfs v2.3.0** built in — the</li>\n<p>  <a href=\"https://github.com/CyberspaceVii/kernel-a67lg2\">A67L G2 Kernel</a>. The bundled</p>\n<p>  <code>ksu_susfs</code> must match the kernel's susfs version; a mismatch just no-ops.</p>\n\n<p>The installer stops without changing anything if the device or KSU check fails.</p>\n\n<h2>Install</h2>\n\n<li>Download [`susfs-config-a67lg2.zip`](https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/latest/download/susfs-config-a67lg2.zip) (latest release).</li>\n<li>KernelSU Next → Modules → Install from storage → select the zip.</li>\n<li>Reboot.</li>\n\n<h2>Uninstall</h2>\n\n<p>Disable or remove the module and reboot. The kernel-side susfs is left untouched;</p>\n<p>the module only removes the <code>ksu_susfs</code> copy it placed, and the runtime spoofs</p>\n<p>clear on the next boot since nothing re-applies them.</p>\n\n<h2>Credits</h2>\n\n<p>susfs by <a href=\"https://gitlab.com/simonpunk/susfs4ksu\">simonpunk / susfs4ksu</a>. This</p>\n<p>module only drives the stock <code>ksu_susfs</code> userspace tool; its own scripts are WTFPL.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">WTFPL</a>.</p>\n\n<p>---</p>\n\n<p>CyberspaceVII · https://www.cyberspace7.org</p>",
+  "homepageUrl": "https://github.com/CyberspaceVii/susfs-config-a67lg2",
+  "sourceUrl": "https://github.com/CyberspaceVii/susfs-config-a67lg2",
+  "url": "https://github.com/CyberspaceVii/susfs-config-a67lg2",
+  "latestRelease": {
+    "name": "v0.1",
+    "version": "v0.1",
+    "time": "2026-11-15T20:03:42Z",
+    "downloadUrl": "https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/download/v0.1/susfs-config-a67lg2.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1",
+      "tagName": "v0.1",
+      "publishedAt": "2026-11-15T20:03:42Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "susfs-config-a67lg2.zip",
+          "downloadUrl": "https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/download/v0.1/susfs-config-a67lg2.zip",
+          "size": 12796,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/CyberspaceVii/susfs-config-a67lg2/releases/download/v0.1/SHA256SUMS",
+          "size": 90,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "readme": "# Enable Tether\n\n**[Download enable-tether-a67lg2.zip](https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/download/v0.1/enable-tether-a67lg2.zip)**\n\nShare the phone's regular mobile data connection over its hotspot.\n\nA KernelSU Next module for the **Foxxd A67L Gen 2**. It skips Android's carrier\nprovisioning check and adjusts APNs reserved for tethering, allowing the hotspot\nto use the regular data APN. Carrier network restrictions can still apply.\n\n## Requirements\n\n- Foxxd A67L Gen 2\n- Rooted with KernelSU Next\n\nThe installer checks both before changing APN settings.\n\n## Install\n\n1. Download [`enable-tether-a67lg2.zip`](https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/latest/download/enable-tether-a67lg2.zip) (latest release).\n2. KernelSU Next → Modules → Install from storage → select the zip.\n3. Reboot, then turn on the hotspot in Settings.\n\n## What changes\n\n- Sets `net.tethering.noprovisioning=true` before Android starts.\n- Disables APNs whose only type is `dun` (tethering).\n- Removes `dun` from APNs that also serve other purposes, leaving those other\n  types enabled. Regular data APNs with `default` or `*` are left alone.\n\nOriginal values are saved before each edit in\n`/data/adb/cyberspacevii/enable-tether-a67lg2/apn.bak`. The module checks the APN\ntable again after boot, so it can reapply changes after an APN reset or SIM swap.\n\n## Uninstall\n\nRemove the module in KernelSU Next and reboot. It restores saved APN values\nwhen the row ID, carrier code and APN name still match. If restoration fails,\nthe backup is kept at the path above.\n\nDisabling the module stops it from setting the provisioning property after the\nnext reboot, but leaves its APN edits in place. Remove it to restore those edits.\n\n## License\n\n[WTFPL](LICENSE).\n\n---\n\nCyberspaceVII · https://www.cyberspace7.org\n",
+  "readmeHTML": "<h1>Enable Tether</h1>\n\n<p><b><a href=\"https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/download/v0.1/enable-tether-a67lg2.zip\">Download enable-tether-a67lg2.zip</a></b></p>\n\n<p>Share the phone's regular mobile data connection over its hotspot.</p>\n\n<p>A KernelSU Next module for the <b>Foxxd A67L Gen 2</b>. It skips Android's carrier</p>\n<p>provisioning check and adjusts APNs reserved for tethering, allowing the hotspot</p>\n<p>to use the regular data APN. Carrier network restrictions can still apply.</p>\n\n<h2>Requirements</h2>\n\n<li>Foxxd A67L Gen 2</li>\n<li>Rooted with KernelSU Next</li>\n\n<p>The installer checks both before changing APN settings.</p>\n\n<h2>Install</h2>\n\n<li>Download [`enable-tether-a67lg2.zip`](https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/latest/download/enable-tether-a67lg2.zip) (latest release).</li>\n<li>KernelSU Next → Modules → Install from storage → select the zip.</li>\n<li>Reboot, then turn on the hotspot in Settings.</li>\n\n<h2>What changes</h2>\n\n<li>Sets `net.tethering.noprovisioning=true` before Android starts.</li>\n<li>Disables APNs whose only type is `dun` (tethering).</li>\n<li>Removes `dun` from APNs that also serve other purposes, leaving those other</li>\n<p>  types enabled. Regular data APNs with <code>default</code> or <code>*</code> are left alone.</p>\n\n<p>Original values are saved before each edit in</p>\n<p><code>/data/adb/cyberspacevii/enable-tether-a67lg2/apn.bak</code>. The module checks the APN</p>\n<p>table again after boot, so it can reapply changes after an APN reset or SIM swap.</p>\n\n<h2>Uninstall</h2>\n\n<p>Remove the module in KernelSU Next and reboot. It restores saved APN values</p>\n<p>when the row ID, carrier code and APN name still match. If restoration fails,</p>\n<p>the backup is kept at the path above.</p>\n\n<p>Disabling the module stops it from setting the provisioning property after the</p>\n<p>next reboot, but leaves its APN edits in place. Remove it to restore those edits.</p>\n\n<h2>License</h2>\n\n<p><a href=\"LICENSE\">WTFPL</a>.</p>\n\n<p>---</p>\n\n<p>CyberspaceVII · https://www.cyberspace7.org</p>",
+  "homepageUrl": "https://github.com/CyberspaceVii/enable-tether-a67lg2",
+  "sourceUrl": "https://github.com/CyberspaceVii/enable-tether-a67lg2",
+  "url": "https://github.com/CyberspaceVii/enable-tether-a67lg2",
+  "latestRelease": {
+    "name": "v0.1",
+    "version": "v0.1",
+    "time": "2026-11-17T03:03:27Z",
+    "downloadUrl": "https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/download/v0.1/enable-tether-a67lg2.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1",
+      "tagName": "v0.1",
+      "publishedAt": "2026-11-17T03:03:27Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "enable-tether-a67lg2.zip",
+          "downloadUrl": "https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/download/v0.1/enable-tether-a67lg2.zip",
+          "size": 217315,
+          "downloadCount": 3
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/CyberspaceVii/enable-tether-a67lg2/releases/download/v0.1/SHA256SUMS",
+          "size": 91,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
