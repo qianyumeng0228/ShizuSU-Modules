@@ -1,0 +1,85 @@
+{
+  "readme": "# 🌸 Charger Protector Miyabi Core\n\nUniversal Battery Charge Protection Engine for Android (Magisk / KernelSU Module), designed to prevent battery degradation through intelligent charge capping, offering low overhead, accurate hardware verification, and zero system lag.\n\n## Key Features\n\n- **Lightweight Daemon**: Written in pure POSIX-compliant shell script with tiny memory footprint, boot-completion sync (`sys.boot_completed`), and single-instance PID locking.\n- **Anti-Loop & Anti-Freeze Protection (v2.5.0+)**: Strictly filters external charger ports (`usb`, `ac`, `wireless`, `mtk_charger_type`) while ignoring internal BMS/main/fuel-gauge nodes, AND continuously synchronizes live battery level during `dumpsys` icon hiding so the status bar percentage never freezes while plugged in or after unplugging.\n- **Smart Hardware Verification & Auto-Failover (v2.5.0+)**: Verifies real kernel `/sys/class/power_supply/battery/status` after cutting charging and automatically fails over across Qualcomm, MediaTek (Helio / Dimensity), and HyperOS/MIUI thermal overrides (`mi_thermald`) until a working hardware node is confirmed.\n- **Strict Hysteresis & Replug Blocking**: Tracks charge pause state persistently so charging stays blocked even if the cable is unplugged and plugged back in—resuming only when capacity drops to or below the resume threshold.\n- **Instant Configuration Application**: Uses Unix signals (`SIGUSR1`) to immediately interrupt daemon sleep cycles and apply new thresholds in milliseconds when updated via terminal or app.\n- **Smart Sleep Engine**: Uses dynamic polling frequencies (`15s` when plugged in, `45s` when unplugged) to conserve device resources.\n- **Interactive CLI Dashboard**: Terminal dashboard with live battery diagnostics (temperature, voltage, current), manual overrides, logs, and node toggle testing.\n- **RFC 8259 JSON API Support**: Valid JSON status output (even on multi-word MediaTek nodes and unavailable sensors) for companion/monitoring applications.\n\n---\n\n## Installation\n\n1. Download or package the module `.zip` archive (contains `config/`, `system/`, `customize.sh`, `module.prop`, `post-fs-data.sh`, `service.sh`, `uninstall.sh` — do not include repository files like `.git`, `README.md`, `changelog.txt`, or `update.json`).\n2. Transfer the `.zip` archive to your Android device.\n3. Flash the package via **Magisk App** or **KernelSU**.\n4. Reboot your device to start the daemon service.\n\n---\n\n## CLI Usage\n\nGain root shell access and run `miyabi-charger` with the following parameters:\n\n```bash\n# Open the interactive visual dashboard\nsu -c miyabi-charger\n\n# Get current status in raw JSON format (ideal for companion apps)\nsu -c miyabi-charger status-json\n\n# Set charging stop threshold (e.g. 90%)\nsu -c miyabi-charger set-stop 90\n\n# Set charging resume threshold (e.g. 70%)\nsu -c miyabi-charger set-resume 70\n\n# Enable automatic charge protection engine\nsu -c miyabi-charger enable\n\n# Disable automatic charge protection engine\nsu -c miyabi-charger disable\n\n# Manually force charge (ignores limit temporarily; alias: force-resume)\nsu -c miyabi-charger force-charge\n\n# Manually force stop charging (keeps charging suspended)\nsu -c miyabi-charger force-stop\n\n# Revert manual override back to automatic protection mode\nsu -c miyabi-charger auto\n```\n\n---\n\n## Custom Charging Node\n\nBy default, the engine automatically detects and verifies the most compatible charge control node on your device (supporting Qualcomm `qcom-battery`/`battery`, MediaTek `mtk-master-charger`/`mtk_battery_cmd`, Xiaomi `night_charging`, `constant_charge_current_max` fallback, etc.). If you want to manually select or test a specific node:\n\n1. Open the interactive dashboard: `su -c miyabi-charger`.\n2. Select Option `[5] Diagnose / Select Charge Node`.\n3. Choose one of the detected compatible nodes from the list, run `[T]` to test if Status changes out of `Charging` and current drops, or select option `[C] Custom Node Path Input` to enter an absolute path.\n   - *Example Qualcomm path*: `/sys/class/power_supply/battery/input_suspend` or `/sys/class/qcom-battery/input_suspend`\n   - *Example MediaTek path*: `/sys/class/power_supply/mtk-master-charger/charging_enabled` or `/proc/mtk_battery_cmd/current_cmd`\n\nAlternatively, you can configure it manually by adding `NODE_PATH=\"/your/custom/node/path\"` to `/data/adb/miyabi-core/charger/config.conf`.\n\n---\n\n## JSON API Output Sample\n\nCalling `su -c miyabi-charger status-json` returns a lightweight JSON payload:\n\n```json\n{\n  \"battery_level\": 85,\n  \"battery_status\": \"Discharging\",\n  \"temperature_c\": 34.2,\n  \"voltage_v\": 4.150,\n  \"current_ma\": -240,\n  \"cycle_count\": 120,\n  \"node_path\": \"/sys/class/power_supply/battery/input_suspend\",\n  \"node_value\": 1,\n  \"charging_state\": \"Disabled\",\n  \"protection_enabled\": 1,\n  \"stop_level\": 90,\n  \"resume_level\": 70,\n  \"manual_control\": 0,\n  \"manual_state\": 1,\n  \"daemon_running\": 1,\n  \"plugged_in\": 1,\n  \"hide_icon\": 1\n}\n```\n\n---\n\n## File Structure\n\n- [`system/bin/miyabi-charger`](system/bin/miyabi-charger) : Main CLI and background daemon executable.\n- [`config/default.conf`](config/default.conf) : Default configuration template.\n- [`customize.sh`](customize.sh) : Magisk/KernelSU installer script.\n- [`service.sh`](service.sh) : Starts the background daemon during late_start service boot.\n- [`post-fs-data.sh`](post-fs-data.sh) : Initializes directories, cleans stale runtime flags, and creates default configuration under `/data/adb/miyabi-core/charger/`.\n- [`uninstall.sh`](uninstall.sh) : Restores BatteryService state and removes module data directory on uninstall.\n",
+  "readmeHTML": "<h1>🌸 Charger Protector Miyabi Core</h1>\n\n<p>Universal Battery Charge Protection Engine for Android (Magisk / KernelSU Module), designed to prevent battery degradation through intelligent charge capping, offering low overhead, accurate hardware verification, and zero system lag.</p>\n\n<h2>Key Features</h2>\n\n<li>**Lightweight Daemon**: Written in pure POSIX-compliant shell script with tiny memory footprint, boot-completion sync (`sys.boot_completed`), and single-instance PID locking.</li>\n<li>**Anti-Loop & Anti-Freeze Protection (v2.5.0+)**: Strictly filters external charger ports (`usb`, `ac`, `wireless`, `mtk_charger_type`) while ignoring internal BMS/main/fuel-gauge nodes, AND continuously synchronizes live battery level during `dumpsys` icon hiding so the status bar percentage never freezes while plugged in or after unplugging.</li>\n<li>**Smart Hardware Verification & Auto-Failover (v2.5.0+)**: Verifies real kernel `/sys/class/power_supply/battery/status` after cutting charging and automatically fails over across Qualcomm, MediaTek (Helio / Dimensity), and HyperOS/MIUI thermal overrides (`mi_thermald`) until a working hardware node is confirmed.</li>\n<li>**Strict Hysteresis & Replug Blocking**: Tracks charge pause state persistently so charging stays blocked even if the cable is unplugged and plugged back in—resuming only when capacity drops to or below the resume threshold.</li>\n<li>**Instant Configuration Application**: Uses Unix signals (`SIGUSR1`) to immediately interrupt daemon sleep cycles and apply new thresholds in milliseconds when updated via terminal or app.</li>\n<li>**Smart Sleep Engine**: Uses dynamic polling frequencies (`15s` when plugged in, `45s` when unplugged) to conserve device resources.</li>\n<li>**Interactive CLI Dashboard**: Terminal dashboard with live battery diagnostics (temperature, voltage, current), manual overrides, logs, and node toggle testing.</li>\n<li>**RFC 8259 JSON API Support**: Valid JSON status output (even on multi-word MediaTek nodes and unavailable sensors) for companion/monitoring applications.</li>\n\n<p>---</p>\n\n<h2>Installation</h2>\n\n<li>Download or package the module `.zip` archive (contains `config/`, `system/`, `customize.sh`, `module.prop`, `post-fs-data.sh`, `service.sh`, `uninstall.sh` — do not include repository files like `.git`, `README.md`, `changelog.txt`, or `update.json`).</li>\n<li>Transfer the `.zip` archive to your Android device.</li>\n<li>Flash the package via **Magisk App** or **KernelSU**.</li>\n<li>Reboot your device to start the daemon service.</li>\n\n<p>---</p>\n\n<h2>CLI Usage</h2>\n\n<p>Gain root shell access and run <code>miyabi-charger</code> with the following parameters:</p>\n\n<pre># Open the interactive visual dashboard\nsu -c miyabi-charger\n\n# Get current status in raw JSON format (ideal for companion apps)\nsu -c miyabi-charger status-json\n\n# Set charging stop threshold (e.g. 90%)\nsu -c miyabi-charger set-stop 90\n\n# Set charging resume threshold (e.g. 70%)\nsu -c miyabi-charger set-resume 70\n\n# Enable automatic charge protection engine\nsu -c miyabi-charger enable\n\n# Disable automatic charge protection engine\nsu -c miyabi-charger disable\n\n# Manually force charge (ignores limit temporarily; alias: force-resume)\nsu -c miyabi-charger force-charge\n\n# Manually force stop charging (keeps charging suspended)\nsu -c miyabi-charger force-stop\n\n# Revert manual override back to automatic protection mode\nsu -c miyabi-charger auto</pre>\n\n<p>---</p>\n\n<h2>Custom Charging Node</h2>\n\n<p>By default, the engine automatically detects and verifies the most compatible charge control node on your device (supporting Qualcomm <code>qcom-battery</code>/<code>battery</code>, MediaTek <code>mtk-master-charger</code>/<code>mtk_battery_cmd</code>, Xiaomi <code>night_charging</code>, <code>constant_charge_current_max</code> fallback, etc.). If you want to manually select or test a specific node:</p>\n\n<li>Open the interactive dashboard: `su -c miyabi-charger`.</li>\n<li>Select Option `[5] Diagnose / Select Charge Node`.</li>\n<li>Choose one of the detected compatible nodes from the list, run `[T]` to test if Status changes out of `Charging` and current drops, or select option `[C] Custom Node Path Input` to enter an absolute path.</li>\n<p>   - *Example Qualcomm path*: <code>/sys/class/power_supply/battery/input_suspend</code> or <code>/sys/class/qcom-battery/input_suspend</code></p>\n<p>   - *Example MediaTek path*: <code>/sys/class/power_supply/mtk-master-charger/charging_enabled</code> or <code>/proc/mtk_battery_cmd/current_cmd</code></p>\n\n<p>Alternatively, you can configure it manually by adding <code>NODE_PATH=\"/your/custom/node/path\"</code> to <code>/data/adb/miyabi-core/charger/config.conf</code>.</p>\n\n<p>---</p>\n\n<h2>JSON API Output Sample</h2>\n\n<p>Calling <code>su -c miyabi-charger status-json</code> returns a lightweight JSON payload:</p>\n\n<pre>{\n  \"battery_level\": 85,\n  \"battery_status\": \"Discharging\",\n  \"temperature_c\": 34.2,\n  \"voltage_v\": 4.150,\n  \"current_ma\": -240,\n  \"cycle_count\": 120,\n  \"node_path\": \"/sys/class/power_supply/battery/input_suspend\",\n  \"node_value\": 1,\n  \"charging_state\": \"Disabled\",\n  \"protection_enabled\": 1,\n  \"stop_level\": 90,\n  \"resume_level\": 70,\n  \"manual_control\": 0,\n  \"manual_state\": 1,\n  \"daemon_running\": 1,\n  \"plugged_in\": 1,\n  \"hide_icon\": 1\n}</pre>\n\n<p>---</p>\n\n<h2>File Structure</h2>\n\n<li>[`system/bin/miyabi-charger`](system/bin/miyabi-charger) : Main CLI and background daemon executable.</li>\n<li>[`config/default.conf`](config/default.conf) : Default configuration template.</li>\n<li>[`customize.sh`](customize.sh) : Magisk/KernelSU installer script.</li>\n<li>[`service.sh`](service.sh) : Starts the background daemon during late_start service boot.</li>\n<li>[`post-fs-data.sh`](post-fs-data.sh) : Initializes directories, cleans stale runtime flags, and creates default configuration under `/data/adb/miyabi-core/charger/`.</li>\n<li>[`uninstall.sh`](uninstall.sh) : Restores BatteryService state and removes module data directory on uninstall.</li>",
+  "homepageUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases",
+  "sourceUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core",
+  "url": "https://github.com/Rama-X2/charger-protector-miyabi-core",
+  "latestRelease": {
+    "name": "v2.5.0",
+    "version": "v2.5.0",
+    "time": "2026-11-17T20:19:30Z",
+    "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v2.5.0/charger-protector-miyabi-core-v2.5.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.5.0",
+      "tagName": "v2.5.0",
+      "publishedAt": "2026-11-17T20:19:30Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "charger-protector-miyabi-core-v2.5.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v2.5.0/charger-protector-miyabi-core-v2.5.0.zip",
+          "size": 12424,
+          "downloadCount": 4
+        }
+      ]
+    },
+    {
+      "name": "v2.4.0",
+      "tagName": "v2.4.0",
+      "publishedAt": "2026-07-05T13:16:07Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "charger-protector-miyabi-core-v2.4.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v2.4.0/charger-protector-miyabi-core-v2.4.0.zip",
+          "size": 9518,
+          "downloadCount": 9
+        }
+      ]
+    },
+    {
+      "name": "v2.0.0",
+      "tagName": "v2.0.0",
+      "publishedAt": "2026-06-29T18:54:12Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "charger-protector-miyabi-core-v2.0.0.zip",
+          "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v2.0.0/charger-protector-miyabi-core-v2.0.0.zip",
+          "size": 9432,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.5.7",
+      "tagName": "v1.5.7",
+      "publishedAt": "2026-06-26T14:20:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Charger-Protector-Miyabi-Core-v1.5.7.zip",
+          "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v1.5.7/Charger-Protector-Miyabi-Core-v1.5.7.zip",
+          "size": 8840,
+          "downloadCount": 7
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-06-26T12:40:53Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "charger-protector-miyabi-core.zip",
+          "downloadUrl": "https://github.com/Rama-X2/charger-protector-miyabi-core/releases/download/v1.0.0/charger-protector-miyabi-core.zip",
+          "size": 7475,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}

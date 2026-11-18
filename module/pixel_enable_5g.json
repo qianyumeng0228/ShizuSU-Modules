@@ -1,0 +1,29 @@
+{
+  "readme": "# Pixel Enable 5G\n\n简体中文 | [English](README_EN.md)\n\n一个 KernelSU / Magisk / APatch 模块，为非官方支持地区的 Google Pixel 解锁 VoLTE、VoWiFi、5G（SA+NSA）、5/6 GHz 热点、Wi-Fi 中继和体温计。纯模块，不需要额外装 App。\n\n\n## 支持的功能\n\n- VoLTE\n- VoWiFi（Wi-Fi 通话）\n- 5G（SA + NSA）\n- 5 GHz & 6 GHz 热点\n- Wi-Fi 中继（连着 Wi-Fi 时也能开热点）\n- 体温计（Pixel Thermometer，仅 8/9/10 系列 Pro 机型）\n- 去掉网络 / Wi-Fi 上的感叹号\n\n## 要求\n\n- Google Pixel 6 及以上（Tensor）\n- 已 root：Magisk / KernelSU / APatch\n\n## 安装\n\n1. 从 release 下载 zip，在模块管理器里刷入\n2. 重启手机\n3. 设置 → 网络与互联网 → SIM → 打开 VoLTE、VoWiFi\n4. 开一次热点，让 5 GHz / 6 GHz 选项出现\n\n## 排查\n\n日志在 `/data/adb/modules/Pixel_Enable_5G/log.txt`，重点看两行：`CarrierConfig files patched`（必须大于 0）和 `IMS is REGISTERED`。\n\n还是显示 LTE？拨号盘输入 `*#*#4636#*#*` → 手机信息 → 首选网络类型选带 **NR** 的档位。\n\n不要和其他 IMS / 5G 模块同时安装，它们改的是同一批配置。\n\n**卸载后 5G 不会消失**：5G 配置写在 `carrierconfig-*.xml`（用户数据分区），卸载模块不会清除它，所以卸载重启后 5G 依旧可用、不会自动退回 LTE。其余项目（persist 属性、感叹号修复、体温计、6 GHz 热点、Wi-Fi 中继）都会随卸载失效。\n\n## 致谢\n\n- [WZL203](https://github.com/WZL203/Pixel-turn-on-5G-Volte-and-automatically-register-with-IMS) — IMS 注册流程\n- [karina-lab / SukkaLab](https://github.com/klab7/Pixel-Regional-Restrictions-Disabler) — 区域限制解除、热点、体温计\n- [ryfineZ](https://github.com/ryfineZ/carrier-ims-for-pixel) — 真正能解锁 5G 的 CarrierConfig 键\n- [cxOrz](https://github.com/cxOrz/pixel_ims_module) — CarrierConfig 注入手法",
+  "readmeHTML": "<h1>Pixel Enable 5G</h1>\n\n<p>简体中文 | <a href=\"README_EN.md\">English</a></p>\n\n<p>一个 KernelSU / Magisk / APatch 模块，为非官方支持地区的 Google Pixel 解锁 VoLTE、VoWiFi、5G（SA+NSA）、5/6 GHz 热点、Wi-Fi 中继和体温计。纯模块，不需要额外装 App。</p>\n\n\n<h2>支持的功能</h2>\n\n<li>VoLTE</li>\n<li>VoWiFi（Wi-Fi 通话）</li>\n<li>5G（SA + NSA）</li>\n<li>5 GHz & 6 GHz 热点</li>\n<li>Wi-Fi 中继（连着 Wi-Fi 时也能开热点）</li>\n<li>体温计（Pixel Thermometer，仅 8/9/10 系列 Pro 机型）</li>\n<li>去掉网络 / Wi-Fi 上的感叹号</li>\n\n<h2>要求</h2>\n\n<li>Google Pixel 6 及以上（Tensor）</li>\n<li>已 root：Magisk / KernelSU / APatch</li>\n\n<h2>安装</h2>\n\n<li>从 release 下载 zip，在模块管理器里刷入</li>\n<li>重启手机</li>\n<li>设置 → 网络与互联网 → SIM → 打开 VoLTE、VoWiFi</li>\n<li>开一次热点，让 5 GHz / 6 GHz 选项出现</li>\n\n<h2>排查</h2>\n\n<p>日志在 <code>/data/adb/modules/Pixel_Enable_5G/log.txt</code>，重点看两行：<code>CarrierConfig files patched</code>（必须大于 0）和 <code>IMS is REGISTERED</code>。</p>\n\n<p>还是显示 LTE？拨号盘输入 <code>*#*#4636#*#*</code> → 手机信息 → 首选网络类型选带 <b>NR</b> 的档位。</p>\n\n<p>不要和其他 IMS / 5G 模块同时安装，它们改的是同一批配置。</p>\n\n<p><b>卸载后 5G 不会消失</b>：5G 配置写在 <code>carrierconfig-*.xml</code>（用户数据分区），卸载模块不会清除它，所以卸载重启后 5G 依旧可用、不会自动退回 LTE。其余项目（persist 属性、感叹号修复、体温计、6 GHz 热点、Wi-Fi 中继）都会随卸载失效。</p>\n\n<h2>致谢</h2>\n\n<li>[WZL203](https://github.com/WZL203/Pixel-turn-on-5G-Volte-and-automatically-register-with-IMS) — IMS 注册流程</li>\n<li>[karina-lab / SukkaLab](https://github.com/klab7/Pixel-Regional-Restrictions-Disabler) — 区域限制解除、热点、体温计</li>\n<li>[ryfineZ](https://github.com/ryfineZ/carrier-ims-for-pixel) — 真正能解锁 5G 的 CarrierConfig 键</li>\n<li>[cxOrz](https://github.com/cxOrz/pixel_ims_module) — CarrierConfig 注入手法</li>",
+  "homepageUrl": "https://github.com/nmk0718/Pixel_Enable_5G",
+  "sourceUrl": "https://github.com/nmk0718/Pixel_Enable_5G",
+  "url": "https://github.com/nmk0718/Pixel_Enable_5G",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-11-17T09:12:03Z",
+    "downloadUrl": "https://github.com/nmk0718/Pixel_Enable_5G/releases/download/v1.0.0/Pixel_Enable_5G-v1.0.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-11-17T09:12:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "Pixel_Enable_5G-v1.0.0.zip",
+          "downloadUrl": "https://github.com/nmk0718/Pixel_Enable_5G/releases/download/v1.0.0/Pixel_Enable_5G-v1.0.0.zip",
+          "size": 9284,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
