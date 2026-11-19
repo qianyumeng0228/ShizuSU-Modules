@@ -1,0 +1,171 @@
+{
+  "readme": "# WOL Relay · 人在外面，一个按钮把家里的电脑开起来\n\n**发完包会真的去确认「醒没醒」** —— 不是「已广播，大概 10~20 秒起来」，\n是 **「已开机 · 23 秒」**。\n\n两种装法，**不需要 root**：\n\n| | 装在哪 | 需要 root |\n|---|---|---|\n| **裸二进制**（推荐） | 路由器 / NAS / 树莓派 / 软路由 / 旧笔记本，任何常开的 Linux | **不需要** |\n| **Magisk 模块** | 一台能 root 的闲置安卓机 | 需要 |\n\n一条命令装好（自动识别架构和启动方式，配好开机自启）：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/huangJUN6666/wol-relay-android/main/scripts/install.sh | sudo sh\n```\n\n作者：**神仙道**　QQ：**1974147300**\n\n<p align=\"center\">\n  <img src=\"docs/screenshots/app-main.jpg\" width=\"300\" alt=\"WOL Relay App 主界面：方式一直连公网、方式二备用机中继、目标设备 MAC\">\n</p>\n\n<p align=\"center\"><sub>配套 App 主界面。两种方式并行，哪条通走哪条；中继地址可以填多个，在家走局域网、在外走 Tailscale。</sub></p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/huangJUN6666/wol-relay-android/releases/latest\"><img src=\"https://img.shields.io/github/v/release/huangJUN6666/wol-relay-android?color=red\" alt=\"最新版本\"></a>\n  <img src=\"https://img.shields.io/badge/root-%E4%B8%8D%E9%9C%80%E8%A6%81-red\" alt=\"不需要 root\">\n  <img src=\"https://img.shields.io/badge/%E4%B8%8D%E9%9C%80%E5%85%AC%E7%BD%91IP-%E6%97%A0%E9%9C%80%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84-red\" alt=\"不需要公网 IP\">\n</p>\n\n---\n\n## 这东西解决什么问题\n\nWake-on-LAN 本身很简单，往局域网广播一个魔术包就行。麻烦在于两件事：\n\n1. **你在外面，广播进不了家门。**\n2. **包发出去了，但没人告诉你电脑到底醒没醒。**\n\n第一件事常见的绕法有三种：\n\n- 路由器端口映射 + DDNS —— 要公网 IP，多数宽带已经没有了\n- 路由器刷 OpenWrt 跑 WOL 插件 —— 得先能刷，还得路由器支持\n- 电脑装个联网插座 —— 电是来了，但断电关机对硬盘不友好\n\n这个项目的做法是：**留一台常开的设备在家，让它替你在局域网里发这个包。**\n\n第二件事是**所有 WOL 工具都不做的那一环**，也是这个项目和它们的区别：\n\n```\n  你在外面                    家里\n ┌─────────┐              ┌──────────────┐        ┌──────────┐\n │  手机   │  ① 请求      │  中继        │  ② 广播 │  电脑    │\n │  App    │ ───────────► │  (常开的设备) │ ──────► │ 网卡上电 │\n └─────────┘  Tailscale   └──────────────┘  UDP 9  └──────────┘\n      ▲                          │                      │\n      └──── ④ 已开机 · 23 秒 ─────┘  ③ 查 ARP + 探端口 ◄─┘\n```\n\n中继在发完包之后不会就此收工，它会继续盯：\n\n1. **查 ARP**（2~5 秒就有）—— 网卡上电了，比系统起来早十几秒\n2. **探端口**（445 / 3389 / 22 / 80 / 443，任一通即算醒）—— 系统真的起来了\n3. 两者都没有才扫网段兜底，且**必须回查 ARP 核验 MAC**\n\n所以 App 上显示的不是「已广播」，而是 **「已开机 · 23 秒」**。\n\n**没醒的时候它也不只说「超时」**，而是会告诉你是哪一侧的问题：\n\n- ARP 里从头到尾没出现那个 MAC → 网络侧（不同网段、网线没插、路由器没转发）\n- ARP 出现了但端口一直连不上 → 电脑侧（BIOS 设置、Windows 快速启动）\n- 3 秒内就通了 → 它本来就开着，不会谎报「已开机 · 1 秒」\n\n## 跟其他方案比，区别在哪\n\nGitHub 上同类项目基本都是用 Termux 跑个 Python 脚本。能跑，但撑不住，而且只会告诉你「包发出去了」：\n\n| | 常见的 Termux 脚本 | 本项目 |\n|---|---|---|\n| **确认醒没醒** | 无，只说「已发送」 | **ARP + TCP 双重确认，报「已开机 · N 秒」** |\n| **失败归因** | 无 | **区分网络侧 / 电脑侧** |\n| **多台设备** | 一个脚本一台机 | **一台中继管多台，`/wake?name=nas`** |\n| **装在哪** | 只能安卓 | **路由器 / NAS / 树莓派 / 软路由 / 安卓，全都能** |\n| **需要 root** | 否 | **否**（Magisk 模块是可选方案） |\n| 进程存活 | 普通 App，被厂商省电策略清掉 | systemd / procd 托管，或 Magisk 模块 root 常驻 |\n| 开机自启 | 靠 Termux:Boot，经常拉不起来 | 系统级服务，或模块 service.sh |\n| 挂掉恢复 | 手动重启 | 自动重拉，连续崩就退避（6s→12s→…→300s） |\n| 换网段/搬家 | 手改广播地址 | 自动算本网段广播地址，多网卡全发 |\n| 挂着 VPN | 包发进隧道，电脑不醒 | 认隧道网卡（tailscale/wg/tun…）直接跳过 |\n\n**为什么唤醒确认用 TCP 不用 ping**：ICMP 要 raw socket，非 root 跑不了。\n这一条直接决定了能不能做到「不需要 root」—— 用 ping 的话，\n确认功能就只能 root 用，那免 root 版就残了一半。\n\n## 需要什么\n\n**必须在手边的：**\n\n- **一台常开的 Linux 设备** —— 路由器（OpenWrt/爱快）、NAS、树莓派、软路由、旧笔记本，任选一台\n  （只有安卓机也行，能 root 用 Magisk 模块，不能 root 用 Termux 但会掉）\n- 家里那台电脑，**有线网卡**，主板 BIOS 支持网络唤醒\n- 家里的路由器管理密码\n\n**软件：**\n\n- 中继：不需要额外依赖，一个静态二进制\n- 手机端 App：本仓库 Releases 里的 `WOL-Relay-App-v2.2.1.apk`\n- 外网访问（可选）：Tailscale\n\n## 整体步骤\n\n```mermaid\nflowchart TD\n    A[开始] --> B{电脑支持网络唤醒吗}\n    B -->|查主板手册确认| C[BIOS 打开 Wake on LAN]\n    B -->|不支持| Z1[换 PCIe 网卡或放弃]\n    C --> D[Windows 关掉快速启动]\n    D --> E[设备管理器调网卡电源管理]\n    E --> F{家里有常开的<br/>Linux 设备吗}\n    F -->|有 路由器/NAS/树莓派| G[\"一条命令装中继<br/>curl ... | sudo sh\"]\n    F -->|只有安卓机| H[\"Magisk 模块（能 root）<br/>或 Termux（不能 root）<br/>见 docs/05\"]\n    G --> I[改 config.json 填 MAC]\n    H --> I\n    I --> J[重启服务]\n    J --> K[跑 -doctor 自检]\n    K --> L{全绿?}\n    L -->|否| M[按提示修<br/>docs/04 排错]\n    M --> K\n    L -->|是| N[装 App 填参数]\n    N --> O{只在家里用<br/>还是外面也要用}\n    O -->|只在家里| P[填中继局域网 IP]\n    O -->|外面也要| Q[装 Tailscale 并登录]\n    Q --> R[填 100.x 地址]\n    P --> S[测试：电脑关机后点唤醒]\n    R --> S\n    S --> T{显示 已开机 · N 秒?}\n    T -->|否| M\n    T -->|是| U[完成]\n```\n\n## 两条路怎么选\n\n| | 方式一 · 直连公网 | 方式二 · 中继 |\n|---|---|---|\n| 需要公网 IP | 要 | 不要 |\n| 需要端口映射 | 要 | 不要 |\n| 公网 IP 变了 | 改配置 | 不受影响 |\n| 需要备用机 | 不要 | 要 |\n| 成功率 | 看运营商 | 高 |\n\n**如果家用宽带已经没有公网 IPv4（现在很常见），方式一直接不用考虑，走方式二。**\n\n## 快速开始\n\n```bash\n# 依赖：go 1.21+、python3（打 zip 用）\nbash scripts/build-module.sh\n# 产物：dist/wol-relay-v2.2.1.zip\n\n# 推到手机并刷入\nadb push dist/wol-relay-v2.2.1.zip /sdcard/Download/\n# 手机上打开 Magisk → 模块 → 从本地安装 → 选这个 zip\n\n# 改配置\nsu -c 'vi /data/adb/wol-relay/config.json'\n# devices[0].mac 改成目标电脑的网卡地址，多台就往后加\n\n# 重启，然后自检\nadb reboot\nsu -c sh /data/adb/modules/wol-relay/doctor.sh\n```\n\nApp 那边：\n\n```bash\ncp build.env.example build.env   # 填本机 SDK / JDK 路径\nbash scripts/build-apk.sh\n# 产物：dist/WOL-Relay-App-v2.2.1.apk\n```\n\n### 想自己发一份到 GitHub\n\n仓库里带了两个脚本，只用 `api.github.com`，不碰 `github.com` 主站，\n所以挂着不稳定的代理也能传完。\n\n```bash\nexport GH_TOKEN=ghp_xxxxxxxx      # classic PAT 勾 repo 即可\n\npython scripts/push-via-api.py    # 建仓库 + 传全部文件\npython scripts/publish-release.py # 打 tag + 发 Release + 传 dist/ 产物\n```\n\n`GH_TOKEN` 用完去 Settings → Developer settings → Personal access tokens\n撤销，别留在 shell 历史里。\n\n如果本机 `git push` 能通，也可以走常规路子：\n\n```bash\nbash scripts/push-github.sh 你的用户名 wol-relay-android\n```\n\n## App 怎么用\n\n装完什么都不用配，界面自己会带你走：\n\n```mermaid\nflowchart TD\n    A[打开 App] --> B[填电脑网卡 MAC]\n    B --> C[点「一键自检」]\n    C --> D{扫到中继了吗}\n    D -->|扫到| E[自动回填地址]\n    D -->|没扫到| F[报告说明卡在哪层]\n    E --> G[点「通过备用机唤醒」]\n    F --> H1[备用机没联网<br/>或 AP 隔离]\n    F --> H2[中继进程没跑<br/>去跑 doctor.sh]\n    G --> I{电脑醒了?}\n    I -->|醒了| J[完成]\n    I -->|没醒| K[报告会说<br/>问题在电脑那头]\n    K --> L[查快速启动 / BIOS ErP / 网线]\n```\n\n自检做的事，一句话讲完：**扫本机 /24 网段，找到所有在 8080 上回 `/status` 的设备，\n逐个核对 MAC 是否跟 App 里填的一致、是否开了鉴权，最后给一句结论告诉你该点哪个按钮。**\n\n找不到中继的时候它不会只说「失败」，会分四种情况告诉你去哪查：\n\n| 现象 | 说明 |\n|---|---|\n| 中继连不上 | 备用机没开机、没连同一 WiFi，或路由器开了 AP 隔离 |\n| 中继通了，一个包没发出去 | 中继自己广播不出去，上备用机跑 `doctor.sh` 看广播目标 |\n| 中继回了 403 | 令牌不对，抄 `config.json` 里的 token |\n| 发包成功但电脑没醒 | 问题在电脑那头，查快速启动 / BIOS ErP / 网线 |\n\n中继地址填法很松，`192.168.1.50`、`192.168.1.50:8080`、`http://192.168.1.50:8080`\n都认，不用写 `/wake`，端口不写就按 8080 算。\n\n## 文档\n\n| 文档 | 讲什么 |\n|---|---|\n| [docs/01-电脑端设置.md](docs/01-电脑端设置.md) | BIOS、Windows 快速启动、网卡电源管理，逐项截图级说明 |\n| [docs/02-路由器设置.md](docs/02-路由器设置.md) | 光猫路由模式判断、端口映射、DMZ、AP 隔离，含各种常见型号 |\n| [docs/03-备用机部署.md](docs/03-备用机部署.md) | 刷模块、改配置、Tailscale、自检 |\n| [docs/04-排错.md](docs/04-排错.md) | 症状对照表，一条一条排查 |\n| [docs/05-没有root怎么办.md](docs/05-没有root怎么办.md) | Termux 替代方案，以及它的局限 |\n| [docs/06-适合哪些设备.md](docs/06-适合哪些设备.md) | 备用机、电脑、路由器分别什么要求 |\n| [CHANGELOG.md](CHANGELOG.md) | 每个版本改了什么，以及踩过的坑 |\n\n## 仓库结构\n\n```\nwol-relay-android/\n├── module/              Magisk 模块（service.sh 守护 + doctor.sh 自检）\n│   ├── service.sh       开机自启、进程守护、隧道巡检\n│   ├── customize.sh     安装时执行，首次装自动生成 config.json\n│   ├── doctor.sh        五层诊断，输出自动打码\n│   ├── module.prop      模块元信息\n│   └── META-INF/        Magisk 安装脚本\n├── relay/               Go 中继服务\n│   ├── main.go          HTTP 服务 + 魔术包广播 + 自动算广播地址\n│   └── config.example.json\n├── android/app/         App 源码（单 Activity，无第三方库）\n│   └── src/com/wol/remote/MainActivity.java\n├── scripts/\n│   ├── build-module.sh   交叉编译 + 打模块 zip\n│   ├── build-apk.sh      手工打包 APK（不用 Gradle）\n│   ├── check-version.sh  检查五处版本号是否一致，提交前跑\n│   ├── push-github.sh    走 git push 一键上传（需要 gh 登录）\n│   ├── push-via-api.py   走 REST API 上传（只需 PAT，绕开主站）\n│   ├── publish-release.py 打 tag、发 Release、传产物\n│   └── release.sh        本地打 tag 版\n├── docs/                六篇文档 + screenshots/（界面截图）\n└── .github/workflows/   CI 构建与 Release\n```\n\n## 已知限制\n\n- **Tailscale 在安卓上冷启动要 40~70 秒**。刚开机那一两分钟内点唤醒可能会失败，等一会儿再点。\n- **root shell 看不到 `tailscale0` 网卡**，因为 VPN 在 App 自己的命名空间。判断连接状态要查路由表或直接 ping，不能查网卡。\n- **NAT 回环**：在自己家的网络里往自己的公网 IP 发包，运营商会把包 SNAT 回来，看起来成功但走的不是真正的公网路径。所以方式一必须去别人家或公司 WiFi 下测才算数。\n- **Windows 快速启动是最大的坑**。默认开着，关机其实是休眠，网卡断电，WOL 必然失败。这一条排在所有排错的第一位。\n- 只支持 IPv4。IPv6 下的唤醒没做。\n\n## 两个花了我一晚上的坑\n\n记在这里，省得后来的人再踩一遍。\n\n**一、Android/Linux 默认不允许往广播地址发包。** 内核层面 `SO_BROADCAST` 不打开，\n`sendto` 直接返回 `EACCES permission denied`。Go 的 `net.Dial` 不会替你开，\n必须自己接管 socket：用 `net.Dialer.Control` 拿到 fd，`setsockopt` 把\n`SO_BROADCAST` 置 1，然后再连、再写。这个改完才真正能发出去。\n\n**二、挂了代理或 VPN 时，广播地址会算错。** Tailscale 一上线就抢默认路由，\n如果按\"默认出口网卡\"去算广播，算出来是 `100.x` 隧道网段的广播地址——\n魔术包从隧道出去，绕一圈不知道去哪了，家里电脑当然不醒，\n而日志上写着\"发送成功\"。\n\n现在的做法是遍历所有物理网卡（`FlagUp`、非 loopback），\n名字以 `tun/tap/tailscale/wg/ppp/ipsec/utun` 开头的一律跳过，\n`100.64.0.0/10` 的地址也跳过，剩下的每块网卡各算一个定向广播，全部发一遍。\n多网卡（比如 WiFi + USB 网卡同时在）也能覆盖到。跑 `doctor.sh` 会把这层单独打出来。\n\n## 许可\n\nMIT，见 [LICENSE](LICENSE)。\n\n用出问题欢迎提 issue，附上 `doctor.sh` 的输出（里面的 MAC 和 IP 会自己打码）。\n",
+  "readmeHTML": "<h1>WOL Relay · 人在外面，一个按钮把家里的电脑开起来</h1>\n\n<p><b>发完包会真的去确认「醒没醒」</b> —— 不是「已广播，大概 10~20 秒起来」，</p>\n<p>是 <b>「已开机 · 23 秒」</b>。</p>\n\n<p>两种装法，<b>不需要 root</b>：</p>\n\n<p>| | 装在哪 | 需要 root |</p>\n<p>|---|---|---|</p>\n<p>| <b>裸二进制</b>（推荐） | 路由器 / NAS / 树莓派 / 软路由 / 旧笔记本，任何常开的 Linux | <b>不需要</b> |</p>\n<p>| <b>Magisk 模块</b> | 一台能 root 的闲置安卓机 | 需要 |</p>\n\n<p>一条命令装好（自动识别架构和启动方式，配好开机自启）：</p>\n\n<pre>curl -fsSL https://raw.githubusercontent.com/huangJUN6666/wol-relay-android/main/scripts/install.sh | sudo sh</pre>\n\n<p>作者：<b>神仙道</b>　QQ：<b>1974147300</b></p>\n\n<p><p align=\"center\"></p>\n<p>  <img src=\"docs/screenshots/app-main.jpg\" width=\"300\" alt=\"WOL Relay App 主界面：方式一直连公网、方式二备用机中继、目标设备 MAC\"></p>\n<p></p></p>\n\n<p><p align=\"center\"><sub>配套 App 主界面。两种方式并行，哪条通走哪条；中继地址可以填多个，在家走局域网、在外走 Tailscale。</sub></p></p>\n\n<p><p align=\"center\"></p>\n<p>  <a href=\"https://github.com/huangJUN6666/wol-relay-android/releases/latest\"><img src=\"https://img.shields.io/github/v/release/huangJUN6666/wol-relay-android?color=red\" alt=\"最新版本\"></a></p>\n<p>  <img src=\"https://img.shields.io/badge/root-%E4%B8%8D%E9%9C%80%E8%A6%81-red\" alt=\"不需要 root\"></p>\n<p>  <img src=\"https://img.shields.io/badge/%E4%B8%8D%E9%9C%80%E5%85%AC%E7%BD%91IP-%E6%97%A0%E9%9C%80%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84-red\" alt=\"不需要公网 IP\"></p>\n<p></p></p>\n\n<p>---</p>\n\n<h2>这东西解决什么问题</h2>\n\n<p>Wake-on-LAN 本身很简单，往局域网广播一个魔术包就行。麻烦在于两件事：</p>\n\n<li>**你在外面，广播进不了家门。**</li>\n<li>**包发出去了，但没人告诉你电脑到底醒没醒。**</li>\n\n<p>第一件事常见的绕法有三种：</p>\n\n<li>路由器端口映射 + DDNS —— 要公网 IP，多数宽带已经没有了</li>\n<li>路由器刷 OpenWrt 跑 WOL 插件 —— 得先能刷，还得路由器支持</li>\n<li>电脑装个联网插座 —— 电是来了，但断电关机对硬盘不友好</li>\n\n<p>这个项目的做法是：<b>留一台常开的设备在家，让它替你在局域网里发这个包。</b></p>\n\n<p>第二件事是<b>所有 WOL 工具都不做的那一环</b>，也是这个项目和它们的区别：</p>\n\n<pre>  你在外面                    家里\n ┌─────────┐              ┌──────────────┐        ┌──────────┐\n │  手机   │  ① 请求      │  中继        │  ② 广播 │  电脑    │\n │  App    │ ───────────► │  (常开的设备) │ ──────► │ 网卡上电 │\n └─────────┘  Tailscale   └──────────────┘  UDP 9  └──────────┘\n      ▲                          │                      │\n      └──── ④ 已开机 · 23 秒 ─────┘  ③ 查 ARP + 探端口 ◄─┘</pre>\n\n<p>中继在发完包之后不会就此收工，它会继续盯：</p>\n\n<li>**查 ARP**（2~5 秒就有）—— 网卡上电了，比系统起来早十几秒</li>\n<li>**探端口**（445 / 3389 / 22 / 80 / 443，任一通即算醒）—— 系统真的起来了</li>\n<li>两者都没有才扫网段兜底，且**必须回查 ARP 核验 MAC**</li>\n\n<p>所以 App 上显示的不是「已广播」，而是 <b>「已开机 · 23 秒」</b>。</p>\n\n<p><b>没醒的时候它也不只说「超时」</b>，而是会告诉你是哪一侧的问题：</p>\n\n<li>ARP 里从头到尾没出现那个 MAC → 网络侧（不同网段、网线没插、路由器没转发）</li>\n<li>ARP 出现了但端口一直连不上 → 电脑侧（BIOS 设置、Windows 快速启动）</li>\n<li>3 秒内就通了 → 它本来就开着，不会谎报「已开机 · 1 秒」</li>\n\n<h2>跟其他方案比，区别在哪</h2>\n\n<p>GitHub 上同类项目基本都是用 Termux 跑个 Python 脚本。能跑，但撑不住，而且只会告诉你「包发出去了」：</p>\n\n<p>| | 常见的 Termux 脚本 | 本项目 |</p>\n<p>|---|---|---|</p>\n<p>| <b>确认醒没醒</b> | 无，只说「已发送」 | <b>ARP + TCP 双重确认，报「已开机 · N 秒」</b> |</p>\n<p>| <b>失败归因</b> | 无 | <b>区分网络侧 / 电脑侧</b> |</p>\n<p>| <b>多台设备</b> | 一个脚本一台机 | <b>一台中继管多台，<code>/wake?name=nas</code></b> |</p>\n<p>| <b>装在哪</b> | 只能安卓 | <b>路由器 / NAS / 树莓派 / 软路由 / 安卓，全都能</b> |</p>\n<p>| <b>需要 root</b> | 否 | <b>否</b>（Magisk 模块是可选方案） |</p>\n<p>| 进程存活 | 普通 App，被厂商省电策略清掉 | systemd / procd 托管，或 Magisk 模块 root 常驻 |</p>\n<p>| 开机自启 | 靠 Termux:Boot，经常拉不起来 | 系统级服务，或模块 service.sh |</p>\n<p>| 挂掉恢复 | 手动重启 | 自动重拉，连续崩就退避（6s→12s→…→300s） |</p>\n<p>| 换网段/搬家 | 手改广播地址 | 自动算本网段广播地址，多网卡全发 |</p>\n<p>| 挂着 VPN | 包发进隧道，电脑不醒 | 认隧道网卡（tailscale/wg/tun…）直接跳过 |</p>\n\n<p><b>为什么唤醒确认用 TCP 不用 ping</b>：ICMP 要 raw socket，非 root 跑不了。</p>\n<p>这一条直接决定了能不能做到「不需要 root」—— 用 ping 的话，</p>\n<p>确认功能就只能 root 用，那免 root 版就残了一半。</p>\n\n<h2>需要什么</h2>\n\n<p><b>必须在手边的：</b></p>\n\n<li>**一台常开的 Linux 设备** —— 路由器（OpenWrt/爱快）、NAS、树莓派、软路由、旧笔记本，任选一台</li>\n<p>  （只有安卓机也行，能 root 用 Magisk 模块，不能 root 用 Termux 但会掉）</p>\n<li>家里那台电脑，**有线网卡**，主板 BIOS 支持网络唤醒</li>\n<li>家里的路由器管理密码</li>\n\n<p><b>软件：</b></p>\n\n<li>中继：不需要额外依赖，一个静态二进制</li>\n<li>手机端 App：本仓库 Releases 里的 `WOL-Relay-App-v2.2.1.apk`</li>\n<li>外网访问（可选）：Tailscale</li>\n\n<h2>整体步骤</h2>\n\n<pre>flowchart TD\n    A[开始] --&gt; B{电脑支持网络唤醒吗}\n    B --&gt;|查主板手册确认| C[BIOS 打开 Wake on LAN]\n    B --&gt;|不支持| Z1[换 PCIe 网卡或放弃]\n    C --&gt; D[Windows 关掉快速启动]\n    D --&gt; E[设备管理器调网卡电源管理]\n    E --&gt; F{家里有常开的&lt;br/&gt;Linux 设备吗}\n    F --&gt;|有 路由器/NAS/树莓派| G[\"一条命令装中继&lt;br/&gt;curl ... | sudo sh\"]\n    F --&gt;|只有安卓机| H[\"Magisk 模块（能 root）&lt;br/&gt;或 Termux（不能 root）&lt;br/&gt;见 docs/05\"]\n    G --&gt; I[改 config.json 填 MAC]\n    H --&gt; I\n    I --&gt; J[重启服务]\n    J --&gt; K[跑 -doctor 自检]\n    K --&gt; L{全绿?}\n    L --&gt;|否| M[按提示修&lt;br/&gt;docs/04 排错]\n    M --&gt; K\n    L --&gt;|是| N[装 App 填参数]\n    N --&gt; O{只在家里用&lt;br/&gt;还是外面也要用}\n    O --&gt;|只在家里| P[填中继局域网 IP]\n    O --&gt;|外面也要| Q[装 Tailscale 并登录]\n    Q --&gt; R[填 100.x 地址]\n    P --&gt; S[测试：电脑关机后点唤醒]\n    R --&gt; S\n    S --&gt; T{显示 已开机 · N 秒?}\n    T --&gt;|否| M\n    T --&gt;|是| U[完成]</pre>\n\n<h2>两条路怎么选</h2>\n\n<p>| | 方式一 · 直连公网 | 方式二 · 中继 |</p>\n<p>|---|---|---|</p>\n<p>| 需要公网 IP | 要 | 不要 |</p>\n<p>| 需要端口映射 | 要 | 不要 |</p>\n<p>| 公网 IP 变了 | 改配置 | 不受影响 |</p>\n<p>| 需要备用机 | 不要 | 要 |</p>\n<p>| 成功率 | 看运营商 | 高 |</p>\n\n<p><b>如果家用宽带已经没有公网 IPv4（现在很常见），方式一直接不用考虑，走方式二。</b></p>\n\n<h2>快速开始</h2>\n\n<pre># 依赖：go 1.21+、python3（打 zip 用）\nbash scripts/build-module.sh\n# 产物：dist/wol-relay-v2.2.1.zip\n\n# 推到手机并刷入\nadb push dist/wol-relay-v2.2.1.zip /sdcard/Download/\n# 手机上打开 Magisk → 模块 → 从本地安装 → 选这个 zip\n\n# 改配置\nsu -c 'vi /data/adb/wol-relay/config.json'\n# devices[0].mac 改成目标电脑的网卡地址，多台就往后加\n\n# 重启，然后自检\nadb reboot\nsu -c sh /data/adb/modules/wol-relay/doctor.sh</pre>\n\n<p>App 那边：</p>\n\n<pre>cp build.env.example build.env   # 填本机 SDK / JDK 路径\nbash scripts/build-apk.sh\n# 产物：dist/WOL-Relay-App-v2.2.1.apk</pre>\n\n<h3>想自己发一份到 GitHub</h3>\n\n<p>仓库里带了两个脚本，只用 <code>api.github.com</code>，不碰 <code>github.com</code> 主站，</p>\n<p>所以挂着不稳定的代理也能传完。</p>\n\n<pre>export GH_TOKEN=ghp_xxxxxxxx      # classic PAT 勾 repo 即可\n\npython scripts/push-via-api.py    # 建仓库 + 传全部文件\npython scripts/publish-release.py # 打 tag + 发 Release + 传 dist/ 产物</pre>\n\n<p><code>GH_TOKEN</code> 用完去 Settings → Developer settings → Personal access tokens</p>\n<p>撤销，别留在 shell 历史里。</p>\n\n<p>如果本机 <code>git push</code> 能通，也可以走常规路子：</p>\n\n<pre>bash scripts/push-github.sh 你的用户名 wol-relay-android</pre>\n\n<h2>App 怎么用</h2>\n\n<p>装完什么都不用配，界面自己会带你走：</p>\n\n<pre>flowchart TD\n    A[打开 App] --&gt; B[填电脑网卡 MAC]\n    B --&gt; C[点「一键自检」]\n    C --&gt; D{扫到中继了吗}\n    D --&gt;|扫到| E[自动回填地址]\n    D --&gt;|没扫到| F[报告说明卡在哪层]\n    E --&gt; G[点「通过备用机唤醒」]\n    F --&gt; H1[备用机没联网&lt;br/&gt;或 AP 隔离]\n    F --&gt; H2[中继进程没跑&lt;br/&gt;去跑 doctor.sh]\n    G --&gt; I{电脑醒了?}\n    I --&gt;|醒了| J[完成]\n    I --&gt;|没醒| K[报告会说&lt;br/&gt;问题在电脑那头]\n    K --&gt; L[查快速启动 / BIOS ErP / 网线]</pre>\n\n<p>自检做的事，一句话讲完：**扫本机 /24 网段，找到所有在 8080 上回 <code>/status</code> 的设备，</p>\n<p>逐个核对 MAC 是否跟 App 里填的一致、是否开了鉴权，最后给一句结论告诉你该点哪个按钮。**</p>\n\n<p>找不到中继的时候它不会只说「失败」，会分四种情况告诉你去哪查：</p>\n\n<p>| 现象 | 说明 |</p>\n<p>|---|---|</p>\n<p>| 中继连不上 | 备用机没开机、没连同一 WiFi，或路由器开了 AP 隔离 |</p>\n<p>| 中继通了，一个包没发出去 | 中继自己广播不出去，上备用机跑 <code>doctor.sh</code> 看广播目标 |</p>\n<p>| 中继回了 403 | 令牌不对，抄 <code>config.json</code> 里的 token |</p>\n<p>| 发包成功但电脑没醒 | 问题在电脑那头，查快速启动 / BIOS ErP / 网线 |</p>\n\n<p>中继地址填法很松，<code>192.168.1.50</code>、<code>192.168.1.50:8080</code>、<code>http://192.168.1.50:8080</code></p>\n<p>都认，不用写 <code>/wake</code>，端口不写就按 8080 算。</p>\n\n<h2>文档</h2>\n\n<p>| 文档 | 讲什么 |</p>\n<p>|---|---|</p>\n<p>| <a href=\"docs/01-电脑端设置.md\">docs/01-电脑端设置.md</a> | BIOS、Windows 快速启动、网卡电源管理，逐项截图级说明 |</p>\n<p>| <a href=\"docs/02-路由器设置.md\">docs/02-路由器设置.md</a> | 光猫路由模式判断、端口映射、DMZ、AP 隔离，含各种常见型号 |</p>\n<p>| <a href=\"docs/03-备用机部署.md\">docs/03-备用机部署.md</a> | 刷模块、改配置、Tailscale、自检 |</p>\n<p>| <a href=\"docs/04-排错.md\">docs/04-排错.md</a> | 症状对照表，一条一条排查 |</p>\n<p>| <a href=\"docs/05-没有root怎么办.md\">docs/05-没有root怎么办.md</a> | Termux 替代方案，以及它的局限 |</p>\n<p>| <a href=\"docs/06-适合哪些设备.md\">docs/06-适合哪些设备.md</a> | 备用机、电脑、路由器分别什么要求 |</p>\n<p>| <a href=\"CHANGELOG.md\">CHANGELOG.md</a> | 每个版本改了什么，以及踩过的坑 |</p>\n\n<h2>仓库结构</h2>\n\n<pre>wol-relay-android/\n├── module/              Magisk 模块（service.sh 守护 + doctor.sh 自检）\n│   ├── service.sh       开机自启、进程守护、隧道巡检\n│   ├── customize.sh     安装时执行，首次装自动生成 config.json\n│   ├── doctor.sh        五层诊断，输出自动打码\n│   ├── module.prop      模块元信息\n│   └── META-INF/        Magisk 安装脚本\n├── relay/               Go 中继服务\n│   ├── main.go          HTTP 服务 + 魔术包广播 + 自动算广播地址\n│   └── config.example.json\n├── android/app/         App 源码（单 Activity，无第三方库）\n│   └── src/com/wol/remote/MainActivity.java\n├── scripts/\n│   ├── build-module.sh   交叉编译 + 打模块 zip\n│   ├── build-apk.sh      手工打包 APK（不用 Gradle）\n│   ├── check-version.sh  检查五处版本号是否一致，提交前跑\n│   ├── push-github.sh    走 git push 一键上传（需要 gh 登录）\n│   ├── push-via-api.py   走 REST API 上传（只需 PAT，绕开主站）\n│   ├── publish-release.py 打 tag、发 Release、传产物\n│   └── release.sh        本地打 tag 版\n├── docs/                六篇文档 + screenshots/（界面截图）\n└── .github/workflows/   CI 构建与 Release</pre>\n\n<h2>已知限制</h2>\n\n<li>**Tailscale 在安卓上冷启动要 40~70 秒**。刚开机那一两分钟内点唤醒可能会失败，等一会儿再点。</li>\n<li>**root shell 看不到 `tailscale0` 网卡**，因为 VPN 在 App 自己的命名空间。判断连接状态要查路由表或直接 ping，不能查网卡。</li>\n<li>**NAT 回环**：在自己家的网络里往自己的公网 IP 发包，运营商会把包 SNAT 回来，看起来成功但走的不是真正的公网路径。所以方式一必须去别人家或公司 WiFi 下测才算数。</li>\n<li>**Windows 快速启动是最大的坑**。默认开着，关机其实是休眠，网卡断电，WOL 必然失败。这一条排在所有排错的第一位。</li>\n<li>只支持 IPv4。IPv6 下的唤醒没做。</li>\n\n<h2>两个花了我一晚上的坑</h2>\n\n<p>记在这里，省得后来的人再踩一遍。</p>\n\n<p><b>一、Android/Linux 默认不允许往广播地址发包。</b> 内核层面 <code>SO_BROADCAST</code> 不打开，</p>\n<p><code>sendto</code> 直接返回 <code>EACCES permission denied</code>。Go 的 <code>net.Dial</code> 不会替你开，</p>\n<p>必须自己接管 socket：用 <code>net.Dialer.Control</code> 拿到 fd，<code>setsockopt</code> 把</p>\n<p><code>SO_BROADCAST</code> 置 1，然后再连、再写。这个改完才真正能发出去。</p>\n\n<p><b>二、挂了代理或 VPN 时，广播地址会算错。</b> Tailscale 一上线就抢默认路由，</p>\n<p>如果按\"默认出口网卡\"去算广播，算出来是 <code>100.x</code> 隧道网段的广播地址——</p>\n<p>魔术包从隧道出去，绕一圈不知道去哪了，家里电脑当然不醒，</p>\n<p>而日志上写着\"发送成功\"。</p>\n\n<p>现在的做法是遍历所有物理网卡（<code>FlagUp</code>、非 loopback），</p>\n<p>名字以 <code>tun/tap/tailscale/wg/ppp/ipsec/utun</code> 开头的一律跳过，</p>\n<p><code>100.64.0.0/10</code> 的地址也跳过，剩下的每块网卡各算一个定向广播，全部发一遍。</p>\n<p>多网卡（比如 WiFi + USB 网卡同时在）也能覆盖到。跑 <code>doctor.sh</code> 会把这层单独打出来。</p>\n\n<h2>许可</h2>\n\n<p>MIT，见 <a href=\"LICENSE\">LICENSE</a>。</p>\n\n<p>用出问题欢迎提 issue，附上 <code>doctor.sh</code> 的输出（里面的 MAC 和 IP 会自己打码）。</p>",
+  "homepageUrl": "https://github.com/huangJUN6666/wol-relay-android",
+  "sourceUrl": "https://github.com/huangJUN6666/wol-relay-android",
+  "url": "https://github.com/huangJUN6666/wol-relay-android",
+  "latestRelease": {
+    "name": "v2.2.1",
+    "version": "v2.2.1",
+    "time": "2026-11-19T04:29:58Z",
+    "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wol-relay-v2.2.1.zip"
+  },
+  "releases": [
+    {
+      "name": "v2.2.1",
+      "tagName": "v2.2.1",
+      "publishedAt": "2026-11-19T04:29:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/SHA256SUMS",
+          "size": 607,
+          "downloadCount": 1
+        },
+        {
+          "name": "WOL-Relay-App-v2.2.1.apk",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/WOL-Relay-App-v2.2.1.apk",
+          "size": 54045,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-amd64",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-amd64",
+          "size": 5406872,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-arm64",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-arm64",
+          "size": 5177496,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-mips",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-mips",
+          "size": 5963959,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-mipsle",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-mipsle",
+          "size": 5963959,
+          "downloadCount": 1
+        },
+        {
+          "name": "wol-relay-v2.2.1.zip",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wol-relay-v2.2.1.zip",
+          "size": 4295348,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-386",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-386",
+          "size": 5218456,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-armv7",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-armv7",
+          "size": 5308568,
+          "downloadCount": 1
+        },
+        {
+          "name": "wolrelay-linux-armv6",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.1/wolrelay-linux-armv6",
+          "size": 5308568,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.2.0",
+      "tagName": "v2.2.0",
+      "publishedAt": "2026-11-19T03:23:10Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wolrelay-linux-arm64",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-arm64",
+          "size": 5177496,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-mips",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-mips",
+          "size": 5963959,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-armv6",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-armv6",
+          "size": 5308568,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-armv7",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-armv7",
+          "size": 5308568,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-386",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-386",
+          "size": 5218456,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-mipsle",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-mipsle",
+          "size": 5963959,
+          "downloadCount": 2
+        },
+        {
+          "name": "SHA256SUMS",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/SHA256SUMS",
+          "size": 607,
+          "downloadCount": 2
+        },
+        {
+          "name": "wolrelay-linux-amd64",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wolrelay-linux-amd64",
+          "size": 5406872,
+          "downloadCount": 2
+        },
+        {
+          "name": "wol-relay-v2.2.0.zip",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/wol-relay-v2.2.0.zip",
+          "size": 4294071,
+          "downloadCount": 3
+        },
+        {
+          "name": "WOL-Relay-App-v2.2.0.apk",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.2.0/WOL-Relay-App-v2.2.0.apk",
+          "size": 54045,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v2.1.1",
+      "tagName": "v2.1.1",
+      "publishedAt": "2026-11-19T00:27:58Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "wol-relay-v2.1.1.zip",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.1.1/wol-relay-v2.1.1.zip",
+          "size": 5316777,
+          "downloadCount": 3
+        },
+        {
+          "name": "WOL-Relay-App-v2.1.1.apk",
+          "downloadUrl": "https://github.com/huangJUN6666/wol-relay-android/releases/download/v2.1.1/WOL-Relay-App-v2.1.1.apk",
+          "size": 33565,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ]
+}
