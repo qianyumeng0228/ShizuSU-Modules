@@ -1,0 +1,61 @@
+{
+  "readme": "# SSAL: Stacked System Abstraction Layer\n> The name came first. The acronym came later.\n\n![Showcase Ssal](./docs/assets/display.jpg)\n\nSSAL is a Rust-based native Android OS virtualization layer powered by KernelSU.\n\nIt runs a guest Android system, such as LineageOS **in Host OS**.\n\n## Architecture\n- Core runtime: Provide Guest Init, Binder, Property, SELinux, Mount, Lifecycle to Guest Android OS\n- Concurrent Mode: Keeping Host Framework and run Guest OS seperately.\n- Exclusive Mode: Stop Host Framework and run Guest OS exclusively. (not implemented)\n - switch & return command isn't implemented.\n\n## Requirements\n * KernelSU ROOT (Jailbreak mode supported)\n * Android 15+\n * Backup your data before trying\n\n\n## CLI Usage\n\n* Set PATH for easy access\n```sh\nPATH=/data/adb/modules/ssal/bin:$PATH\n```\n\n* See all commands:\n```sh\nssal --help\nssal <COMMAND> --help\nssal help <COMMAND>\n```\n\n### Environment Setup\nSetup only once (after install ssal).\n\n```sh\nadb install ssal-surface.apk\nssal allow alyac.android.ssalsurface\n```\n\n### Prepare system image\n\n```sh\nssal add lineage /sdcard/LineageOS-23.2-20260524-VANILLA-EXT4-GSI.img\nssal status\n```\n\nand see results like\n\n```\nHOST_ACTIVE\nimages:\nlineage: 1795218001400-7681\nprofiles:\nnone\n...\n```\n\n\n### Prepare profile\nCreate profile from system image (seperate userdata)\n\n```sh\nssal create lineage profile1\n# stdout: created profile profile1 for lineage (1795218001400-7681); userdata: 8589934592 bytes ext4 image; device compatibility unverified\n```\n\nCheck profile\n\n```sh\nssal doctor profile1\n```\n\nresults:\n\n```\nprofile: profile1\nimage: 1795218001400-7681\nimage SELinux context: u:object_r:ssal_image_file:s0 (expected)\nimage size and SHA-256: OK\nsystem ext4 magic: OK\nuserdata raw ext4 image: /data/local/ssal/guests/profile1/userdata.img\nspace: 218475212800 bytes available\nmount namespace: available\nloop control: available\n...\n```\n\n------\n\n### Start Guest OS\n\nPrepare environment before start\n\n```sh\nssal prepare profile1\n# mount cleanup and session loop backing release checks: OK\n# prepare complete; worker exited; session-path host mounts checked absent\n```\n\nand Boot Guest OS\n\n```sh\nssal start profile1\n```\n\n### Check Boot\n\n* Check setup log\n\n```sh\ntail -n 100 /data/local/ssal/logs/guest-profile1.log\n```\n\n* Check logcat (with lots of errors)\n\n```sh\nssal logcat\n```\n\n* Display\n\nWait until `Boot Completed` alert and open `SsalSurface` app.\n\nYou can watch and interact Guest OS's screen in app.\n\n### Stop Guest OS (Unstable)\n\n```sh\nssal stop profile1\n```\n\nMay have Guest profile1 stop failed, then just hard reboot host os.\n\n## Limitation\nOnly tested on `Lenovo Y702` with `ZYU 17.0.313`. No guaranteed to work for other devices.\n\n**Current implementation is still very early so only basic android features are working.**\n\n### Working\nBasic android feauture\n\n* Boot animation\n* System Boot\n* Launcher\n* Calculator\n\n### Not Working\n**ELSE**\n\nWebview, Almost HAL, some settings, display brightness, etc\n\n## Milestone\n* 0.0.1: Initial boot success\n* 0.0.2: Audio & Navbar \n* ... SoonTM\n\n## Build\n\nUse WSLc or Linux(manual rust/android ndk/jdk dependency required),\n\n```\nbun run build\n```\n\n## Reference\n\n* [OneLineage](https://github.com/WeWaffles/OneLineage)\n* [OneOS](https://github.com/fahadalijaved/OneOS)\n* [RSBinder](https://github.com/hiking90/rsbinder)\n* [RSProperties](https://github.com/hiking90/rsproperties)\n* [KernelSU](https://github.com/tiann/kernelSU)\n\n### AI Discorse\n\nI've used codex(gpt)/antigravity(gemini) to implement project.\n\nMay have wrong implementation, have bad code quality, AI Slop docs.\n",
+  "readmeHTML": "<h1>SSAL: Stacked System Abstraction Layer</h1>\n<p>> The name came first. The acronym came later.</p>\n\n<p>!<a href=\"./docs/assets/display.jpg\">Showcase Ssal</a></p>\n\n<p>SSAL is a Rust-based native Android OS virtualization layer powered by KernelSU.</p>\n\n<p>It runs a guest Android system, such as LineageOS <b>in Host OS</b>.</p>\n\n<h2>Architecture</h2>\n<li>Core runtime: Provide Guest Init, Binder, Property, SELinux, Mount, Lifecycle to Guest Android OS</li>\n<li>Concurrent Mode: Keeping Host Framework and run Guest OS seperately.</li>\n<li>Exclusive Mode: Stop Host Framework and run Guest OS exclusively. (not implemented)</li>\n<p> - switch & return command isn't implemented.</p>\n\n<h2>Requirements</h2>\n<p> * KernelSU ROOT (Jailbreak mode supported)</p>\n<p> * Android 15+</p>\n<p> * Backup your data before trying</p>\n\n\n<h2>CLI Usage</h2>\n\n<li>Set PATH for easy access</li>\n<pre>PATH=/data/adb/modules/ssal/bin:$PATH</pre>\n\n<li>See all commands:</li>\n<pre>ssal --help\nssal &lt;COMMAND&gt; --help\nssal help &lt;COMMAND&gt;</pre>\n\n<h3>Environment Setup</h3>\n<p>Setup only once (after install ssal).</p>\n\n<pre>adb install ssal-surface.apk\nssal allow alyac.android.ssalsurface</pre>\n\n<h3>Prepare system image</h3>\n\n<pre>ssal add lineage /sdcard/LineageOS-23.2-20260524-VANILLA-EXT4-GSI.img\nssal status</pre>\n\n<p>and see results like</p>\n\n<pre>HOST_ACTIVE\nimages:\nlineage: 1795218001400-7681\nprofiles:\nnone\n...</pre>\n\n\n<h3>Prepare profile</h3>\n<p>Create profile from system image (seperate userdata)</p>\n\n<pre>ssal create lineage profile1\n# stdout: created profile profile1 for lineage (1795218001400-7681); userdata: 8589934592 bytes ext4 image; device compatibility unverified</pre>\n\n<p>Check profile</p>\n\n<pre>ssal doctor profile1</pre>\n\n<p>results:</p>\n\n<pre>profile: profile1\nimage: 1795218001400-7681\nimage SELinux context: u:object_r:ssal_image_file:s0 (expected)\nimage size and SHA-256: OK\nsystem ext4 magic: OK\nuserdata raw ext4 image: /data/local/ssal/guests/profile1/userdata.img\nspace: 218475212800 bytes available\nmount namespace: available\nloop control: available\n...</pre>\n\n<p>------</p>\n\n<h3>Start Guest OS</h3>\n\n<p>Prepare environment before start</p>\n\n<pre>ssal prepare profile1\n# mount cleanup and session loop backing release checks: OK\n# prepare complete; worker exited; session-path host mounts checked absent</pre>\n\n<p>and Boot Guest OS</p>\n\n<pre>ssal start profile1</pre>\n\n<h3>Check Boot</h3>\n\n<li>Check setup log</li>\n\n<pre>tail -n 100 /data/local/ssal/logs/guest-profile1.log</pre>\n\n<li>Check logcat (with lots of errors)</li>\n\n<pre>ssal logcat</pre>\n\n<li>Display</li>\n\n<p>Wait until <code>Boot Completed</code> alert and open <code>SsalSurface</code> app.</p>\n\n<p>You can watch and interact Guest OS's screen in app.</p>\n\n<h3>Stop Guest OS (Unstable)</h3>\n\n<pre>ssal stop profile1</pre>\n\n<p>May have Guest profile1 stop failed, then just hard reboot host os.</p>\n\n<h2>Limitation</h2>\n<p>Only tested on <code>Lenovo Y702</code> with <code>ZYU 17.0.313</code>. No guaranteed to work for other devices.</p>\n\n<p><b>Current implementation is still very early so only basic android features are working.</b></p>\n\n<h3>Working</h3>\n<p>Basic android feauture</p>\n\n<li>Boot animation</li>\n<li>System Boot</li>\n<li>Launcher</li>\n<li>Calculator</li>\n\n<h3>Not Working</h3>\n<p><b>ELSE</b></p>\n\n<p>Webview, Almost HAL, some settings, display brightness, etc</p>\n\n<h2>Milestone</h2>\n<li>0.0.1: Initial boot success</li>\n<li>0.0.2: Audio & Navbar</li>\n<li>... SoonTM</li>\n\n<h2>Build</h2>\n\n<p>Use WSLc or Linux(manual rust/android ndk/jdk dependency required),</p>\n\n<pre>bun run build</pre>\n\n<h2>Reference</h2>\n\n<li>[OneLineage](https://github.com/WeWaffles/OneLineage)</li>\n<li>[OneOS](https://github.com/fahadalijaved/OneOS)</li>\n<li>[RSBinder](https://github.com/hiking90/rsbinder)</li>\n<li>[RSProperties](https://github.com/hiking90/rsproperties)</li>\n<li>[KernelSU](https://github.com/tiann/kernelSU)</li>\n\n<h3>AI Discorse</h3>\n\n<p>I've used codex(gpt)/antigravity(gemini) to implement project.</p>\n\n<p>May have wrong implementation, have bad code quality, AI Slop docs.</p>",
+  "homepageUrl": "https://github.com/craftingmod/ssal",
+  "sourceUrl": "https://github.com/craftingmod/ssal",
+  "url": "https://github.com/craftingmod/ssal",
+  "latestRelease": {
+    "name": "v0.0.2",
+    "version": "v0.0.2",
+    "time": "2026-11-22T00:27:03Z",
+    "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.2/ssal-module-v0.0.2.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.0.2",
+      "tagName": "v0.0.2",
+      "publishedAt": "2026-11-22T00:27:03Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ssal-module-v0.0.2.zip",
+          "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.2/ssal-module-v0.0.2.zip",
+          "size": 14274038,
+          "downloadCount": 2
+        },
+        {
+          "name": "ssal-surface-v0.0.2.apk",
+          "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.2/ssal-surface-v0.0.2.apk",
+          "size": 13775250,
+          "downloadCount": 0
+        }
+      ]
+    },
+    {
+      "name": "v0.0.1",
+      "tagName": "v0.0.1",
+      "publishedAt": "2026-11-21T00:58:32Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "ssal-module-v0.0.1.zip",
+          "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.1/ssal-module-v0.0.1.zip",
+          "size": 10527540,
+          "downloadCount": 1
+        },
+        {
+          "name": "ssal-surface-debug.apk",
+          "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.1/ssal-surface-debug.apk",
+          "size": 13775250,
+          "downloadCount": 1
+        },
+        {
+          "name": "before_boot_docs.zip",
+          "downloadUrl": "https://github.com/craftingmod/ssal/releases/download/v0.0.1/before_boot_docs.zip",
+          "size": 814089,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}

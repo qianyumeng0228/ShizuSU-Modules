@@ -1,0 +1,57 @@
+{
+  "readme": "# 玩转三段式 · oneplus_tri_key_remapper\n\n> 面向欧加系（一加 / OPPO）三段式物理按键机型的模块：把吃灰的「静音 / 振动 / 响铃」开关，重映射成你真正会用的快捷动作。\n\n![最新版本](https://img.shields.io/github/v/release/pumu21600-boop/three-act-structure?label=最新版本&style=flat-square)\n![license](https://img.shields.io/github/license/pumu21600-boop/three-act-structure?style=flat-square)\n\n## 这是什么\n\n一加 / OPPO 的三段式按键平时只能切换静音 / 振动 / 响铃。如果你根本用不到这个切换，本模块可以**接管三段式按键**，让上拨、中拨、下拨各触发一个自定义动作（微信扫码、支付宝付款、手电筒、AI 对话……），并通过 **WebUI 可视化配置**实时生效。\n\n## 功能特性\n\n- **三档独立映射**：上拨 / 中拨 / 下拨各绑一个动作，互不影响\n- **13 种快捷动作**：后台录音、录屏、截屏、AI 实景对话、音乐识别、小布识屏、小布闪记、AI 语音摘记、手电筒、相机、计算器、微信扫一扫/付款码、支付宝扫一扫/付款码、自定义 Shell 命令\n- **下拨自动关闭**：上拨触发的动作，下拨时自动关掉（含 App 强停与手电筒关闭）\n- **干掉原三段式**：彻底屏蔽系统静音/振动/响铃切换，随时可逆\n- **WebUI 可视化配置**：模块页直接打开，深浅主题、界面模糊与透明度可调\n- **运行日志窗口**：保存配置、按键动作全记录，WebUI 内实时查看\n- **多重保活**：独立看门狗 + OOM 保护 + cgroup 逃逸 + 进程自重启\n- **干净卸载**：卸载脚本完整恢复原功能，不留进程与文件\n\n## 「干掉原三段式」原理\n\n原生功能通过 `/dev/input/event5`（`oplus,hall_tri_state_key`）上报 `KEY_F3` 给 `system_server`。模块内置 `tri_grab` 对该设备做 `EVIOCGRAB` 独占，系统收不到事件，静音/振动/响铃切换即失效。模块自身仍从 `/proc/tristatekey/tri_state` 读状态，功能不受影响。\n\n主脚本会周期检查 `tri_grab` 存活，挂掉立即重启；关掉开关则释放独占，原生功能恢复。\n\n## 兼容性\n\n- **机型**：欧加系（一加 / OPPO / realme）带三段式物理按键、内核提供 `/proc/tristatekey/tri_state` 节点的机型\n- **系统**：ColorOS / OxygenOS（部分动作依赖 `com.coloros.*`、`com.oplus.*`、`com.heytap.*` 系统组件）\n- **Root**：Magisk / KernelSU / SukiSU（支持 WebUI 的版本）\n- **架构**：arm64-v8a（`tri_grab` 为静态编译的 ARM64 二进制）\n\n适配自检：root 下执行 `cat /proc/tristatekey/tri_state` 能读到 1/2/3，且 `getevent -pl` 能看到设备 `oplus,hall_tri_state_key`。\n\n## 安装与使用\n\n1. 到 [Releases](https://github.com/pumu21600-boop/three-act-structure/releases) 下载最新 zip\n2. 在 Magisk / KernelSU 中刷入，**重启手机**\n3. 打开模块页的 **WebUI** 进入配置\n4. 分别为上拨 / 中拨 / 下拨选择动作 → **保存配置**，热重载即时生效（无需重启）\n\n### 常用位置\n\n| 用途 | 路径 |\n|------|------|\n| 配置文件 | `/data/local/tmp/tri_key/tri_key_config.sh` |\n| 运行日志 | `/data/local/tmp/tri_key/tri_key.log` |\n| 独占进程日志 | `/data/local/tmp/tri_key/grab.log` |\n\n## 故障排查\n\n| 现象 | 处理 |\n|------|------|\n| WebUI 显示「模块未激活」 | 模块未启用或未重启 |\n| WebUI 显示「监控未运行」 | `cat /data/local/tmp/tri_key/tri_key.log` 看日志 |\n| 开关原三段式无效 | `cat /data/local/tmp/tri_key/grab.log`，应看到 `OK grabbed` |\n| 按键动作无反应 | 确认节点存在；手电筒 LED 路径因机型而异 |\n| 想恢复原三段式 | WebUI 关闭「干掉原三段式」，或卸载模块 |\n\n手动清理：`su -c sh /data/adb/modules/oneplus_tri_key_remapper/cleanup.sh`\n\n## 项目结构\n\n```\n.\n├── module.prop            # 模块元信息\n├── service.sh             # 开机自启\n├── tri_key_monitor.sh     # 核心：状态轮询 + 动作执行 + 屏蔽控制\n├── tri_watchdog.sh        # 看门狗：主进程挂了自动拉起\n├── tri_grab.c             # 源码：EVIOCGRAB 独占 event5\n├── tri_grab               # 编译产物：ARM64 静态二进制\n├── save_config.sh         # WebUI 保存配置（触发热重载）\n├── cleanup.sh             # 手动清理残留\n├── uninstall.sh           # 卸载时彻底清理\n├── tri_key_config.sh      # 默认配置\n└── webroot/               # WebUI 页面\n```\n\n### 重新编译 tri_grab\n\n```bash\n# 在 arm64 Linux 上（或安装 gcc-aarch64-linux-gnu 交叉工具链）\ngcc -O2 -static -o tri_grab tri_grab.c\n```\n\n## 版本\n\n当前 **v7.4.0**。历史 tag 可在 [Releases](https://github.com/pumu21600-boop/three-act-structure/releases) 查看。\n\n## 许可证\n\n[MIT](LICENSE) © 2026 袅\n",
+  "readmeHTML": "<h1>玩转三段式 · oneplus_tri_key_remapper</h1>\n\n<p>> 面向欧加系（一加 / OPPO）三段式物理按键机型的模块：把吃灰的「静音 / 振动 / 响铃」开关，重映射成你真正会用的快捷动作。</p>\n\n<p>!<a href=\"https://img.shields.io/github/v/release/pumu21600-boop/three-act-structure?label=最新版本&style=flat-square\">最新版本</a></p>\n<p>!<a href=\"https://img.shields.io/github/license/pumu21600-boop/three-act-structure?style=flat-square\">license</a></p>\n\n<h2>这是什么</h2>\n\n<p>一加 / OPPO 的三段式按键平时只能切换静音 / 振动 / 响铃。如果你根本用不到这个切换，本模块可以<b>接管三段式按键</b>，让上拨、中拨、下拨各触发一个自定义动作（微信扫码、支付宝付款、手电筒、AI 对话……），并通过 <b>WebUI 可视化配置</b>实时生效。</p>\n\n<h2>功能特性</h2>\n\n<li>**三档独立映射**：上拨 / 中拨 / 下拨各绑一个动作，互不影响</li>\n<li>**13 种快捷动作**：后台录音、录屏、截屏、AI 实景对话、音乐识别、小布识屏、小布闪记、AI 语音摘记、手电筒、相机、计算器、微信扫一扫/付款码、支付宝扫一扫/付款码、自定义 Shell 命令</li>\n<li>**下拨自动关闭**：上拨触发的动作，下拨时自动关掉（含 App 强停与手电筒关闭）</li>\n<li>**干掉原三段式**：彻底屏蔽系统静音/振动/响铃切换，随时可逆</li>\n<li>**WebUI 可视化配置**：模块页直接打开，深浅主题、界面模糊与透明度可调</li>\n<li>**运行日志窗口**：保存配置、按键动作全记录，WebUI 内实时查看</li>\n<li>**多重保活**：独立看门狗 + OOM 保护 + cgroup 逃逸 + 进程自重启</li>\n<li>**干净卸载**：卸载脚本完整恢复原功能，不留进程与文件</li>\n\n<h2>「干掉原三段式」原理</h2>\n\n<p>原生功能通过 <code>/dev/input/event5</code>（<code>oplus,hall_tri_state_key</code>）上报 <code>KEY_F3</code> 给 <code>system_server</code>。模块内置 <code>tri_grab</code> 对该设备做 <code>EVIOCGRAB</code> 独占，系统收不到事件，静音/振动/响铃切换即失效。模块自身仍从 <code>/proc/tristatekey/tri_state</code> 读状态，功能不受影响。</p>\n\n<p>主脚本会周期检查 <code>tri_grab</code> 存活，挂掉立即重启；关掉开关则释放独占，原生功能恢复。</p>\n\n<h2>兼容性</h2>\n\n<li>**机型**：欧加系（一加 / OPPO / realme）带三段式物理按键、内核提供 `/proc/tristatekey/tri_state` 节点的机型</li>\n<li>**系统**：ColorOS / OxygenOS（部分动作依赖 `com.coloros.*`、`com.oplus.*`、`com.heytap.*` 系统组件）</li>\n<li>**Root**：Magisk / KernelSU / SukiSU（支持 WebUI 的版本）</li>\n<li>**架构**：arm64-v8a（`tri_grab` 为静态编译的 ARM64 二进制）</li>\n\n<p>适配自检：root 下执行 <code>cat /proc/tristatekey/tri_state</code> 能读到 1/2/3，且 <code>getevent -pl</code> 能看到设备 <code>oplus,hall_tri_state_key</code>。</p>\n\n<h2>安装与使用</h2>\n\n<li>到 [Releases](https://github.com/pumu21600-boop/three-act-structure/releases) 下载最新 zip</li>\n<li>在 Magisk / KernelSU 中刷入，**重启手机**</li>\n<li>打开模块页的 **WebUI** 进入配置</li>\n<li>分别为上拨 / 中拨 / 下拨选择动作 → **保存配置**，热重载即时生效（无需重启）</li>\n\n<h3>常用位置</h3>\n\n<p>| 用途 | 路径 |</p>\n<p>|------|------|</p>\n<p>| 配置文件 | <code>/data/local/tmp/tri_key/tri_key_config.sh</code> |</p>\n<p>| 运行日志 | <code>/data/local/tmp/tri_key/tri_key.log</code> |</p>\n<p>| 独占进程日志 | <code>/data/local/tmp/tri_key/grab.log</code> |</p>\n\n<h2>故障排查</h2>\n\n<p>| 现象 | 处理 |</p>\n<p>|------|------|</p>\n<p>| WebUI 显示「模块未激活」 | 模块未启用或未重启 |</p>\n<p>| WebUI 显示「监控未运行」 | <code>cat /data/local/tmp/tri_key/tri_key.log</code> 看日志 |</p>\n<p>| 开关原三段式无效 | <code>cat /data/local/tmp/tri_key/grab.log</code>，应看到 <code>OK grabbed</code> |</p>\n<p>| 按键动作无反应 | 确认节点存在；手电筒 LED 路径因机型而异 |</p>\n<p>| 想恢复原三段式 | WebUI 关闭「干掉原三段式」，或卸载模块 |</p>\n\n<p>手动清理：<code>su -c sh /data/adb/modules/oneplus_tri_key_remapper/cleanup.sh</code></p>\n\n<h2>项目结构</h2>\n\n<pre>.\n├── module.prop            # 模块元信息\n├── service.sh             # 开机自启\n├── tri_key_monitor.sh     # 核心：状态轮询 + 动作执行 + 屏蔽控制\n├── tri_watchdog.sh        # 看门狗：主进程挂了自动拉起\n├── tri_grab.c             # 源码：EVIOCGRAB 独占 event5\n├── tri_grab               # 编译产物：ARM64 静态二进制\n├── save_config.sh         # WebUI 保存配置（触发热重载）\n├── cleanup.sh             # 手动清理残留\n├── uninstall.sh           # 卸载时彻底清理\n├── tri_key_config.sh      # 默认配置\n└── webroot/               # WebUI 页面</pre>\n\n<h3>重新编译 tri_grab</h3>\n\n<pre># 在 arm64 Linux 上（或安装 gcc-aarch64-linux-gnu 交叉工具链）\ngcc -O2 -static -o tri_grab tri_grab.c</pre>\n\n<h2>版本</h2>\n\n<p>当前 <b>v7.4.0</b>。历史 tag 可在 <a href=\"https://github.com/pumu21600-boop/three-act-structure/releases\">Releases</a> 查看。</p>\n\n<h2>许可证</h2>\n\n<p><a href=\"LICENSE\">MIT</a> © 2026 袅</p>",
+  "homepageUrl": "https://github.com/pumu21600-boop/three-act-structure",
+  "sourceUrl": "https://github.com/pumu21600-boop/three-act-structure",
+  "url": "https://github.com/pumu21600-boop/three-act-structure",
+  "latestRelease": {
+    "name": "v7.4.0",
+    "version": "v7.4.0",
+    "time": "2026-11-21T03:15:22Z",
+    "downloadUrl": "https://github.com/pumu21600-boop/three-act-structure/releases/download/v7.4.0/V7.4.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v7.4.0",
+      "tagName": "v7.4.0",
+      "publishedAt": "2026-11-21T03:15:22Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V7.4.0.zip",
+          "downloadUrl": "https://github.com/pumu21600-boop/three-act-structure/releases/download/v7.4.0/V7.4.0.zip",
+          "size": 511729,
+          "downloadCount": 10
+        }
+      ]
+    },
+    {
+      "name": "v7.3.0",
+      "tagName": "v7.3.0",
+      "publishedAt": "2026-08-06T14:02:08Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "V7.3.0.zip",
+          "downloadUrl": "https://github.com/pumu21600-boop/three-act-structure/releases/download/v7.3.0/V7.3.0.zip",
+          "size": 227635,
+          "downloadCount": 20
+        }
+      ]
+    },
+    {
+      "name": "v4.2",
+      "tagName": "v4.2",
+      "publishedAt": "2026-07-15T10:30:13Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "default.zip",
+          "downloadUrl": "https://github.com/pumu21600-boop/three-act-structure/releases/download/v4.2/default.zip",
+          "size": 10735,
+          "downloadCount": 5
+        }
+      ]
+    }
+  ]
+}
