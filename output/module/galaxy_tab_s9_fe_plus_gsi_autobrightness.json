@@ -1,0 +1,29 @@
+{
+  "readme": "# Galaxy Tab S9 FE+ GSI Auto-Brightness Fix\n\nA Magisk module that enables Adaptive brightness on the Samsung Galaxy Tab S9 FE+ Wi-Fi (SM-X610) running a compatible GSI. It applies an Android framework resource overlay with a brightness curve tuned for this tablet.\n\n## Tested setup\n\n| Component | Tested configuration |\n| --- | --- |\n| Tablet | Galaxy Tab S9 FE+ Wi-Fi (SM-X610, `gts9fepwifi`) |\n| Android | Android 15 |\n| GSI | [MisterZtr's LineageOS 22.2 build from January 5, 2026](https://github.com/MisterZtr/LineageOS_gsi/releases/tag/v2026.01.05-lineage22.2) |\n| GSI image | `LineageOS-22.2-20260105-GAPPS-EROFS-GSI.img` |\n| Root | Magisk 31.1 |\n\nThe ambient light sensor reported live lux readings on this setup. The overlay enables the Adaptive brightness setting and provides the framework with the corresponding backlight values. It targets the `gts9fepwifi` vendor device identifier. Verified compatibility covers the build above.\n\n## Installation\n\n1. Download the Magisk ZIP from [Releases](https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness/releases/latest).\n2. In Magisk, open **Modules → Install from storage** and select the ZIP.\n3. Reboot and turn on **Adaptive brightness** under **Settings → Display**.\n\nTo remove the fix, remove the module in Magisk and reboot.\n\n## Brightness calibration\n\nThe curve is an original calibration developed through on-device testing, independently of the stock ROM. We checked live ambient-light readings while changing the light around the tablet and adjusted the backlight response, especially in a dark room. The configured value at **0 lux** is **1**, the lowest backlight step in this curve.\n\n| Ambient light (lux) | Framework backlight value (0–255) |\n| ---: | ---: |\n| 0 | 1 |\n| 3 | 24 |\n| 12 | 31 |\n| 40 | 45 |\n| 100 | 66 |\n| 250 | 93 |\n| 600 | 120 |\n| 1,500 | 149 |\n| 3,500 | 183 |\n| 8,000 | 216 |\n| 20,000 | 250 |\n\nThe [overlay source](overlay/) contains the device match, lux points, and backlight values. The release packages the signed overlay at `system/product/overlay/FawpieAdaptiveBrightness.apk`. Its resource table is stored uncompressed and verified with Android SDK `zipalign`.\n",
+  "readmeHTML": "<h1>Galaxy Tab S9 FE+ GSI Auto-Brightness Fix</h1>\n\n<p>A Magisk module that enables Adaptive brightness on the Samsung Galaxy Tab S9 FE+ Wi-Fi (SM-X610) running a compatible GSI. It applies an Android framework resource overlay with a brightness curve tuned for this tablet.</p>\n\n<h2>Tested setup</h2>\n\n<p>| Component | Tested configuration |</p>\n<p>| --- | --- |</p>\n<p>| Tablet | Galaxy Tab S9 FE+ Wi-Fi (SM-X610, <code>gts9fepwifi</code>) |</p>\n<p>| Android | Android 15 |</p>\n<p>| GSI | <a href=\"https://github.com/MisterZtr/LineageOS_gsi/releases/tag/v2026.01.05-lineage22.2\">MisterZtr's LineageOS 22.2 build from January 5, 2026</a> |</p>\n<p>| GSI image | <code>LineageOS-22.2-20260105-GAPPS-EROFS-GSI.img</code> |</p>\n<p>| Root | Magisk 31.1 |</p>\n\n<p>The ambient light sensor reported live lux readings on this setup. The overlay enables the Adaptive brightness setting and provides the framework with the corresponding backlight values. It targets the <code>gts9fepwifi</code> vendor device identifier. Verified compatibility covers the build above.</p>\n\n<h2>Installation</h2>\n\n<li>Download the Magisk ZIP from [Releases](https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness/releases/latest).</li>\n<li>In Magisk, open **Modules → Install from storage** and select the ZIP.</li>\n<li>Reboot and turn on **Adaptive brightness** under **Settings → Display**.</li>\n\n<p>To remove the fix, remove the module in Magisk and reboot.</p>\n\n<h2>Brightness calibration</h2>\n\n<p>The curve is an original calibration developed through on-device testing, independently of the stock ROM. We checked live ambient-light readings while changing the light around the tablet and adjusted the backlight response, especially in a dark room. The configured value at <b>0 lux</b> is <b>1</b>, the lowest backlight step in this curve.</p>\n\n<p>| Ambient light (lux) | Framework backlight value (0–255) |</p>\n<p>| ---: | ---: |</p>\n<p>| 0 | 1 |</p>\n<p>| 3 | 24 |</p>\n<p>| 12 | 31 |</p>\n<p>| 40 | 45 |</p>\n<p>| 100 | 66 |</p>\n<p>| 250 | 93 |</p>\n<p>| 600 | 120 |</p>\n<p>| 1,500 | 149 |</p>\n<p>| 3,500 | 183 |</p>\n<p>| 8,000 | 216 |</p>\n<p>| 20,000 | 250 |</p>\n\n<p>The <a href=\"overlay/\">overlay source</a> contains the device match, lux points, and backlight values. The release packages the signed overlay at <code>system/product/overlay/FawpieAdaptiveBrightness.apk</code>. Its resource table is stored uncompressed and verified with Android SDK <code>zipalign</code>.</p>",
+  "homepageUrl": "https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness",
+  "sourceUrl": "https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness",
+  "url": "https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness",
+  "latestRelease": {
+    "name": "v1.2.0",
+    "version": "v1.2.0",
+    "time": "2026-11-23T10:57:01Z",
+    "downloadUrl": "https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness/releases/download/v1.2.0/galaxy-tab-s9-fe-plus-gsi-autobrightness-v1.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-11-23T10:57:01Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "galaxy-tab-s9-fe-plus-gsi-autobrightness-v1.2.0.zip",
+          "downloadUrl": "https://github.com/fawpie/galaxy-tab-s9-fe-plus-gsi-autobrightness/releases/download/v1.2.0/galaxy-tab-s9-fe-plus-gsi-autobrightness-v1.2.0.zip",
+          "size": 3565,
+          "downloadCount": 4
+        }
+      ]
+    }
+  ]
+}
