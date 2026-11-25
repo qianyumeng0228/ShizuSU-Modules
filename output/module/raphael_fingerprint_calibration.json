@@ -1,0 +1,29 @@
+{
+  "readme": "# Raphael Fingerprint Calibration\n\nA KernelSU module for calibrating the optical Goodix fingerprint sensor on Redmi K20 Pro / Mi 9T Pro (`raphael` and `raphaelin`). Uses the stock Goodix calibration code from Xiaomi's CIT APK, with sources generated at build time.\n\n## Installation\n\nYou'll need Android 9 or newer and flesh-coloured and black calibration flats.\n\n> [!WARNING]\n> Turn off adaptive brightness and colour filters before calibration.\n\n1. Install and enable a KernelSU mounting metamodule, such as [meta-overlayfs](https://github.com/KernelSU-Modules-Repo/meta-overlayfs/releases/latest) or [Meta Magic Mount RS](https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/latest), then reboot.\n2. Install this module's ZIP in KernelSU and reboot.\n3. In KernelSU's **Superuser** tab, grant **Raphael Fingerprint Calibration** root access.\n4. Tap the module's **Action** button and follow the calibration steps.\n\n> [!NOTE]\n> Tested on LineageOS 24 with the `Soviet-Zundamon-v1.1` kernel. Supported kernels must expose stock `disp_param` controls or a compatible 2047/4095 backlight and HBM implementation. Compatibility depends on the installed kernel and display. If it doesn't work on your device, [open an issue](https://github.com/amrbashir/raphael-fingerprint-calibration/issues/new) with your ROM and kernel versions and the error you encountered.\n\n## License\n\nLicensed under [MIT](LICENSE). Bundled Xiaomi/Goodix binaries and code derived from them are excluded from this license.\n",
+  "readmeHTML": "<h1>Raphael Fingerprint Calibration</h1>\n\n<p>A KernelSU module for calibrating the optical Goodix fingerprint sensor on Redmi K20 Pro / Mi 9T Pro (<code>raphael</code> and <code>raphaelin</code>). Uses the stock Goodix calibration code from Xiaomi's CIT APK, with sources generated at build time.</p>\n\n<h2>Installation</h2>\n\n<p>You'll need Android 9 or newer and flesh-coloured and black calibration flats.</p>\n\n<p>> [!WARNING]</p>\n<p>> Turn off adaptive brightness and colour filters before calibration.</p>\n\n<li>Install and enable a KernelSU mounting metamodule, such as [meta-overlayfs](https://github.com/KernelSU-Modules-Repo/meta-overlayfs/releases/latest) or [Meta Magic Mount RS](https://github.com/Tools-cx-app/meta-magic_mount-rs/releases/latest), then reboot.</li>\n<li>Install this module's ZIP in KernelSU and reboot.</li>\n<li>In KernelSU's **Superuser** tab, grant **Raphael Fingerprint Calibration** root access.</li>\n<li>Tap the module's **Action** button and follow the calibration steps.</li>\n\n<p>> [!NOTE]</p>\n<p>> Tested on LineageOS 24 with the <code>Soviet-Zundamon-v1.1</code> kernel. Supported kernels must expose stock <code>disp_param</code> controls or a compatible 2047/4095 backlight and HBM implementation. Compatibility depends on the installed kernel and display. If it doesn't work on your device, <a href=\"https://github.com/amrbashir/raphael-fingerprint-calibration/issues/new\">open an issue</a> with your ROM and kernel versions and the error you encountered.</p>\n\n<h2>License</h2>\n\n<p>Licensed under <a href=\"LICENSE\">MIT</a>. Bundled Xiaomi/Goodix binaries and code derived from them are excluded from this license.</p>",
+  "homepageUrl": "https://github.com/amrbashir/raphael-fingerprint-calibration",
+  "sourceUrl": "https://github.com/amrbashir/raphael-fingerprint-calibration",
+  "url": "https://github.com/amrbashir/raphael-fingerprint-calibration",
+  "latestRelease": {
+    "name": "v0.1.0",
+    "version": "v0.1.0",
+    "time": "2026-11-25T03:38:02Z",
+    "downloadUrl": "https://github.com/amrbashir/raphael-fingerprint-calibration/releases/download/v0.1.0/raphael-fingerprint-calibration-v0.1.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v0.1.0",
+      "tagName": "v0.1.0",
+      "publishedAt": "2026-11-25T03:38:02Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "raphael-fingerprint-calibration-v0.1.0.zip",
+          "downloadUrl": "https://github.com/amrbashir/raphael-fingerprint-calibration/releases/download/v0.1.0/raphael-fingerprint-calibration-v0.1.0.zip",
+          "size": 183249,
+          "downloadCount": 3
+        }
+      ]
+    }
+  ]
+}
