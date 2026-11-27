@@ -1,0 +1,57 @@
+{
+  "readme": "# 深度睡眠 + 省电守卫\n\n从 **Soc智能限频 V2.3** 裁剪而来的独立模块，并入了 **省电守卫 v1.1.3**。两个功能互不依赖：深度睡眠管 Doze，省电守卫管系统省电开关；**都不修改 CPU/GPU 频率，不碰系统调度**。\n\n## 做什么 / 不做什么\n\n| | |\n|---|---|\n| 深度睡眠 | 熄屏且未充电满 20 秒开始计时；满 60 秒执行 Doze `force-idle`，临时放行 push/短信/媒体；之后按 1/5/30/60 分钟复查，掉出 IDLE 就重新收口。亮屏或插电立即撤白名单、退出 Doze |\n| 省电守卫 | 名单内应用有进程（前台或后台）时关闭系统省电模式，全部退出后等 5 秒防抖再开启；插着充电器时关闭省电（优先级最高，可在 WebUI 关掉这条规则），拔掉后恢复 |\n| 永久豁免 | 深睡名单里的应用仍可被唤醒；默认已加入本机已安装的通讯/健康类应用，可自行增删 |\n| **不做** | 不写任何 CPU/GPU 频率节点、不换调速器、不碰 cpuset/uclamp、不写 MTK PPM 或高通 msm、不改温控/电量曲线 —— 原项目的 `socfreqd`、`socfreq.conf`、`adapt/`、游戏名单全部不随本模块安装 |\n| **不做** | 不冻结任何进程（冻结已从上游移除），不杀进程、不注入、不 Hook、不 ptrace、不联网 —— 对反作弊不可见 |\n\n两个模块都只调用系统公开的 Doze / PowerManager 接口。省电守卫用 `cmd power set-mode 1|0`（失败回落 `settings put global low_power`），进程判定读 `/proc/<pid>/cmdline`，事件驱动（logcat）+ 兜底轮询，空闲 CPU 开销极低。\n\n## 安装\n\n需要 root（KernelSU / Magisk / APatch），arm64-v8a。Doze 收口的 60 秒逻辑依赖 Android 12+ 的 DeviceIdleController shell 接口。\n\n| 管理器 | 安装 |\n|---|---|\n| KernelSU / SukiSU Ultra | 模块页「从本地安装」选 zip；SukiSU ≥ v4.2.1-r2 支持热安装，装完无需重启 |\n| Magisk | 模块页安装，重启生效（Magisk 的 WebUI 很可能不可用，命令行仍可用） |\n| APatch | 安装到 `/data/adb/ap/modules`，重启生效 |\n\n**从旧版「Soc智能限频」升级**：安装脚本自动把 `/data/adb/soc_freqcap/dsleep.conf` 搬到新目录 `/data/adb/deep_sleep/dsleep.conf`，开关和豁免名单不丢；限频配置一律不搬。**省电守卫的数据目录 `/data/adb/powersave_guard/` 原样保留**，老名单和配置不会被覆盖。如果原先单独装过「省电守卫」模块，请先卸载它，避免两个守护抢省电开关。\n\n## 使用\n\nWebUI：管理器模块页 → 打开 WebUI。顶部两个入口「深度睡眠 / 省电守卫」互切：\n\n- **深度睡眠**：开关、状态、永久豁免名单、唤醒榜、日志与维护\n- **省电守卫**：名单应用、运行态、充电规则开关、运行日志；每 3 秒刷新状态\n\n命令行（参数校验与 WebUI 同一份实现）：\n\n```sh\nA=/data/adb/modules/deep_sleep/webroot/api.sh   # APatch: /data/adb/ap/modules/deep_sleep/...\n# 深度睡眠\nsh \"$A\" ds_get                    # 配置 + 状态 + 豁免名单\nsh \"$A\" ds_set enable 1           # 1 开 / 0 关\nsh \"$A\" ds_white_add com.xxx      # 加永久豁免\nsh \"$A\" ds_white_del com.xxx      # 删永久豁免\nsh \"$A\" pause / resume            # 暂停 / 恢复\nsh \"$A\" safemode_off              # 退出安全模式\n# 省电守卫（也可直接 sh .../bin/cli.sh）\nsh \"$A\" psg_status                # 守护、名单、充电、当前省电模式\nsh \"$A\" psg_pkgs                  # 各名单应用是否在运行\nsh \"$A\" psg_add com.xxx           # 加名单\nsh \"$A\" psg_del com.xxx           # 删名单\nsh \"$A\" psg_set charge_off 0      # 充电时关闭省电模式：1 开 / 0 关\nsh \"$A\" psg_log 50                # 省电守卫日志\n# 日志\nsh \"$A\" logs service 30           # 关键\nsh \"$A\" logs sleep 30             # 深睡\nsh \"$A\" logs psg 30               # 省电守卫\n```\n\n音量键菜单：管理器点模块「执行」，音量＋换项、音量－选中。共 8 项，含深睡开关、暂停/恢复、安全模式、省电守卫状态与充电规则开关；改动项需再确认一次。\n\n## 数据与日志\n\n两个数据目录各自独立，升级都不动：\n\n```\n/data/adb/deep_sleep/         深度睡眠（0700）\n  dsleep.conf                 enable= 开关 + white= 豁免名单\n  ds_state                    进出状态与两张唤醒榜\n  ds_wakes.conf / ds_stats.conf   唤醒榜持久化\n  ds_snap.conf                深睡中被杀时留下的临时快照，用于还原\n  run/dsleep.pid              守护 pid\n  run/*.saved                 Doze 常量 / appops / 旧冻结账本\n\n/data/adb/powersave_guard/    省电守卫（保留原独立版目录）\n  config.conf                 charge_off= 充电规则\n  packages.txt                名单应用\n  state/                      pid / 事件管道 / 运行态\n  log/daemon.log              省电守卫日志\n```\n\n**日志三路**，与 WebUI 的三个标签对应：\n\n| 文件 | WebUI 标签 | 内容 |\n|---|---|---|\n| `service.log` | 关键 | 开机启动、短启动保护/安全模式、两个守护的拉起、音量键菜单操作 |\n| `dsleep.log` | 深睡 | 进出深睡、Doze 收口、加白/撤白、异常与守卫 |\n| `log/daemon.log` | 省电守卫 | **只在省电开关真的切换时写一行**（谁让它切的 + 切成什么），超 128KB 自动裁剪 |\n\n没有 `socfreqd.log`、没有 `install.log`。\n\n## 安全模式\n\n连续 3 次 120 秒内快速重启会自动进入安全模式（写 `safemode` 文件），深睡守护不再启动、省电守卫也不拉起。\n退出：WebUI「维护 → 退出安全模式」或音量键菜单第 5 项；等价命令 `sh $A safemode_off`。\n\n## 卸载\n\n管理器里卸载：\n\n- 深睡：先给守护发 TERM 撤掉 Doze 与临时白名单，再按账本逐项还原常量、appops 和旧冻结，异常退出的快照也兜底还原\n- 省电守卫：停 supervisor/daemon，并把系统省电模式留在**开启**状态\n- 删除 `/data/adb/deep_sleep`；`/data/adb/powersave_guard/` 的名单与配置**保留**（与原独立版一致），彻底清除需手动 `rm -rf`\n\n不 touch 任何频率节点。\n\n## 源码与自检\n\n```\nscripts/deep_sleep.sh   深睡守护\nscripts/hotinstall.sh   KernelSU 热安装（同时重启两个守护）\nscripts/builtin_white.txt  内置豁免清单\nbin/common.sh / daemon.sh / detect.sh / powerctl.sh / supervisor.sh / cli.sh\n                        省电守卫：公共函数 / 状态机 / 进程检测 / 省电开关 / 看门狗 / WebUI 接口\nwebroot/index.html + api.sh       统一风格 WebUI（单页三标签：深度睡眠 / 省电守卫 / 日志）与后端（三路日志）\nservice.sh / post-fs-data.sh / customize.sh / uninstall.sh / action.sh\nsrc/test_*.sh           深睡状态机 / 事件等待 / appops 还原台架\n```\n\nPC 自检：\n\n```sh\nbash src/test_deep_sleep.sh        # 用桩 dumpsys/settings 跑真脚本，验进出对称性\nsh   src/test_active_wait.sh <模块目录>   # 真机：亮屏事件退出\nsh   src/test_appops.sh <模块目录>        # 真机：唤醒锁账本还原\n```\n\n## License\n\n深睡部分沿用原项目 [LICENSE](LICENSE)：可查看、复制源码并为自己的设备修改/编译/使用（含个人备份），\n**不允许再分发**，**不允许任何商业用途**。修改版同样适用。\n",
+  "readmeHTML": "<h1>深度睡眠 + 省电守卫</h1>\n\n<p>从 <b>Soc智能限频 V2.3</b> 裁剪而来的独立模块，并入了 <b>省电守卫 v1.1.3</b>。两个功能互不依赖：深度睡眠管 Doze，省电守卫管系统省电开关；<b>都不修改 CPU/GPU 频率，不碰系统调度</b>。</p>\n\n<h2>做什么 / 不做什么</h2>\n\n<p>| | |</p>\n<p>|---|---|</p>\n<p>| 深度睡眠 | 熄屏且未充电满 20 秒开始计时；满 60 秒执行 Doze <code>force-idle</code>，临时放行 push/短信/媒体；之后按 1/5/30/60 分钟复查，掉出 IDLE 就重新收口。亮屏或插电立即撤白名单、退出 Doze |</p>\n<p>| 省电守卫 | 名单内应用有进程（前台或后台）时关闭系统省电模式，全部退出后等 5 秒防抖再开启；插着充电器时关闭省电（优先级最高，可在 WebUI 关掉这条规则），拔掉后恢复 |</p>\n<p>| 永久豁免 | 深睡名单里的应用仍可被唤醒；默认已加入本机已安装的通讯/健康类应用，可自行增删 |</p>\n<p>| <b>不做</b> | 不写任何 CPU/GPU 频率节点、不换调速器、不碰 cpuset/uclamp、不写 MTK PPM 或高通 msm、不改温控/电量曲线 —— 原项目的 <code>socfreqd</code>、<code>socfreq.conf</code>、<code>adapt/</code>、游戏名单全部不随本模块安装 |</p>\n<p>| <b>不做</b> | 不冻结任何进程（冻结已从上游移除），不杀进程、不注入、不 Hook、不 ptrace、不联网 —— 对反作弊不可见 |</p>\n\n<p>两个模块都只调用系统公开的 Doze / PowerManager 接口。省电守卫用 <code>cmd power set-mode 1|0</code>（失败回落 <code>settings put global low_power</code>），进程判定读 <code>/proc/<pid>/cmdline</code>，事件驱动（logcat）+ 兜底轮询，空闲 CPU 开销极低。</p>\n\n<h2>安装</h2>\n\n<p>需要 root（KernelSU / Magisk / APatch），arm64-v8a。Doze 收口的 60 秒逻辑依赖 Android 12+ 的 DeviceIdleController shell 接口。</p>\n\n<p>| 管理器 | 安装 |</p>\n<p>|---|---|</p>\n<p>| KernelSU / SukiSU Ultra | 模块页「从本地安装」选 zip；SukiSU ≥ v4.2.1-r2 支持热安装，装完无需重启 |</p>\n<p>| Magisk | 模块页安装，重启生效（Magisk 的 WebUI 很可能不可用，命令行仍可用） |</p>\n<p>| APatch | 安装到 <code>/data/adb/ap/modules</code>，重启生效 |</p>\n\n<p><b>从旧版「Soc智能限频」升级</b>：安装脚本自动把 <code>/data/adb/soc_freqcap/dsleep.conf</code> 搬到新目录 <code>/data/adb/deep_sleep/dsleep.conf</code>，开关和豁免名单不丢；限频配置一律不搬。<b>省电守卫的数据目录 <code>/data/adb/powersave_guard/</code> 原样保留</b>，老名单和配置不会被覆盖。如果原先单独装过「省电守卫」模块，请先卸载它，避免两个守护抢省电开关。</p>\n\n<h2>使用</h2>\n\n<p>WebUI：管理器模块页 → 打开 WebUI。顶部两个入口「深度睡眠 / 省电守卫」互切：</p>\n\n<li>**深度睡眠**：开关、状态、永久豁免名单、唤醒榜、日志与维护</li>\n<li>**省电守卫**：名单应用、运行态、充电规则开关、运行日志；每 3 秒刷新状态</li>\n\n<p>命令行（参数校验与 WebUI 同一份实现）：</p>\n\n<pre>A=/data/adb/modules/deep_sleep/webroot/api.sh   # APatch: /data/adb/ap/modules/deep_sleep/...\n# 深度睡眠\nsh \"$A\" ds_get                    # 配置 + 状态 + 豁免名单\nsh \"$A\" ds_set enable 1           # 1 开 / 0 关\nsh \"$A\" ds_white_add com.xxx      # 加永久豁免\nsh \"$A\" ds_white_del com.xxx      # 删永久豁免\nsh \"$A\" pause / resume            # 暂停 / 恢复\nsh \"$A\" safemode_off              # 退出安全模式\n# 省电守卫（也可直接 sh .../bin/cli.sh）\nsh \"$A\" psg_status                # 守护、名单、充电、当前省电模式\nsh \"$A\" psg_pkgs                  # 各名单应用是否在运行\nsh \"$A\" psg_add com.xxx           # 加名单\nsh \"$A\" psg_del com.xxx           # 删名单\nsh \"$A\" psg_set charge_off 0      # 充电时关闭省电模式：1 开 / 0 关\nsh \"$A\" psg_log 50                # 省电守卫日志\n# 日志\nsh \"$A\" logs service 30           # 关键\nsh \"$A\" logs sleep 30             # 深睡\nsh \"$A\" logs psg 30               # 省电守卫</pre>\n\n<p>音量键菜单：管理器点模块「执行」，音量＋换项、音量－选中。共 8 项，含深睡开关、暂停/恢复、安全模式、省电守卫状态与充电规则开关；改动项需再确认一次。</p>\n\n<h2>数据与日志</h2>\n\n<p>两个数据目录各自独立，升级都不动：</p>\n\n<pre>/data/adb/deep_sleep/         深度睡眠（0700）\n  dsleep.conf                 enable= 开关 + white= 豁免名单\n  ds_state                    进出状态与两张唤醒榜\n  ds_wakes.conf / ds_stats.conf   唤醒榜持久化\n  ds_snap.conf                深睡中被杀时留下的临时快照，用于还原\n  run/dsleep.pid              守护 pid\n  run/*.saved                 Doze 常量 / appops / 旧冻结账本\n\n/data/adb/powersave_guard/    省电守卫（保留原独立版目录）\n  config.conf                 charge_off= 充电规则\n  packages.txt                名单应用\n  state/                      pid / 事件管道 / 运行态\n  log/daemon.log              省电守卫日志</pre>\n\n<p><b>日志三路</b>，与 WebUI 的三个标签对应：</p>\n\n<p>| 文件 | WebUI 标签 | 内容 |</p>\n<p>|---|---|---|</p>\n<p>| <code>service.log</code> | 关键 | 开机启动、短启动保护/安全模式、两个守护的拉起、音量键菜单操作 |</p>\n<p>| <code>dsleep.log</code> | 深睡 | 进出深睡、Doze 收口、加白/撤白、异常与守卫 |</p>\n<p>| <code>log/daemon.log</code> | 省电守卫 | <b>只在省电开关真的切换时写一行</b>（谁让它切的 + 切成什么），超 128KB 自动裁剪 |</p>\n\n<p>没有 <code>socfreqd.log</code>、没有 <code>install.log</code>。</p>\n\n<h2>安全模式</h2>\n\n<p>连续 3 次 120 秒内快速重启会自动进入安全模式（写 <code>safemode</code> 文件），深睡守护不再启动、省电守卫也不拉起。</p>\n<p>退出：WebUI「维护 → 退出安全模式」或音量键菜单第 5 项；等价命令 <code>sh $A safemode_off</code>。</p>\n\n<h2>卸载</h2>\n\n<p>管理器里卸载：</p>\n\n<li>深睡：先给守护发 TERM 撤掉 Doze 与临时白名单，再按账本逐项还原常量、appops 和旧冻结，异常退出的快照也兜底还原</li>\n<li>省电守卫：停 supervisor/daemon，并把系统省电模式留在**开启**状态</li>\n<li>删除 `/data/adb/deep_sleep`；`/data/adb/powersave_guard/` 的名单与配置**保留**（与原独立版一致），彻底清除需手动 `rm -rf`</li>\n\n<p>不 touch 任何频率节点。</p>\n\n<h2>源码与自检</h2>\n\n<pre>scripts/deep_sleep.sh   深睡守护\nscripts/hotinstall.sh   KernelSU 热安装（同时重启两个守护）\nscripts/builtin_white.txt  内置豁免清单\nbin/common.sh / daemon.sh / detect.sh / powerctl.sh / supervisor.sh / cli.sh\n                        省电守卫：公共函数 / 状态机 / 进程检测 / 省电开关 / 看门狗 / WebUI 接口\nwebroot/index.html + api.sh       统一风格 WebUI（单页三标签：深度睡眠 / 省电守卫 / 日志）与后端（三路日志）\nservice.sh / post-fs-data.sh / customize.sh / uninstall.sh / action.sh\nsrc/test_*.sh           深睡状态机 / 事件等待 / appops 还原台架</pre>\n\n<p>PC 自检：</p>\n\n<pre>bash src/test_deep_sleep.sh        # 用桩 dumpsys/settings 跑真脚本，验进出对称性\nsh   src/test_active_wait.sh &lt;模块目录&gt;   # 真机：亮屏事件退出\nsh   src/test_appops.sh &lt;模块目录&gt;        # 真机：唤醒锁账本还原</pre>\n\n<h2>License</h2>\n\n<p>深睡部分沿用原项目 <a href=\"LICENSE\">LICENSE</a>：可查看、复制源码并为自己的设备修改/编译/使用（含个人备份），</p>\n<p><b>不允许再分发</b>，<b>不允许任何商业用途</b>。修改版同样适用。</p>",
+  "homepageUrl": "https://github.com/hhhmb763-collab/deep-sleep/releases",
+  "sourceUrl": "https://github.com/hhhmb763-collab/deep-sleep",
+  "url": "https://github.com/hhhmb763-collab/deep-sleep",
+  "latestRelease": {
+    "name": "v1.2.0",
+    "version": "v1.2.0",
+    "time": "2026-11-27T00:17:00Z",
+    "downloadUrl": "https://github.com/hhhmb763-collab/deep-sleep/releases/download/v1.2.0/deep-sleep-v1.2.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "publishedAt": "2026-11-27T00:17:00Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "deep-sleep-v1.2.0.zip",
+          "downloadUrl": "https://github.com/hhhmb763-collab/deep-sleep/releases/download/v1.2.0/deep-sleep-v1.2.0.zip",
+          "size": 72198,
+          "downloadCount": 2
+        }
+      ]
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "publishedAt": "2026-11-27T00:15:46Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "deep-sleep-v1.1.0.zip",
+          "downloadUrl": "https://github.com/hhhmb763-collab/deep-sleep/releases/download/v1.1.0/deep-sleep-v1.1.0.zip",
+          "size": 72196,
+          "downloadCount": 1
+        }
+      ]
+    },
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-11-26T23:13:04Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "deep-sleep-v1.0.0.zip",
+          "downloadUrl": "https://github.com/hhhmb763-collab/deep-sleep/releases/download/v1.0.0/deep-sleep-v1.0.0.zip",
+          "size": 55411,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
