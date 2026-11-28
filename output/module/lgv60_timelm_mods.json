@@ -1,0 +1,47 @@
+{
+  "readme": "# LG V60 (timelm) · LineageOS 23.2 模块集\n\n给 **LG V60 ThinQ（LM-V600 / timelm）跑 LineageOS 23.2（Android 16）** 补齐原厂功能的 Magisk 模块集合。\n每个模块只解决一个具体问题，都做过真机验证，都能单独卸载、只做 overlay / bind mount，**不改系统分区**。\n\n> 作者：漠鸣 · 设备实测环境：LG V60（LM-V600TM / timelm）+ LineageOS 23.2 + Magisk alpha 31100\n\n---\n\n## 为什么有这些模块\n\nLineageOS 在 V60 上很稳，但丢了四块原厂能力：LG 相机（含 ToF）、ESS ES9018 HiFi 的原生采样率、\nLG IMS 的短信通路、以及能用的 USB 网络共享。这四个模块各自把这四块补回来。\n\n| 模块 | 版本 | 解决的问题 | 关键做法 |\n|---|---|---|---|\n| [`lge-usb-tether-restore`](modules/lge-usb-tether-restore/) | 3.0 | USB 网络共享在 LOS 上电脑显示\"未识别的网络\"、上不了网 | 用 `tether_force_usb_functions=0` 让框架**原生**走 RNDIS（而不是改底层 prop 硬掰） |\n| [`lgv60-hifi-mixer`](modules/lgv60-hifi-mixer/) | v3.5 | HiFi DAC 只拿到 48kHz，hi-res 曲目被重采样 | 插耳机时把媒体混音线程切到曲目原生采样率（48k–384k），拔掉即恢复 |\n| [`v60-soi-hal`](modules/v60-soi-hal/) | v0.10-smsfix | IMS 短信收发异常 / 短信队列卡死 | 把原厂 `vendor.lge.hardware.soi@1.0` HAL + VINTF 片段静态 overlay 回 `/vendor`，配上 SELinux 策略 |\n| [`v60-integrated`](modules/v60-integrated/) | 1.3.0 | 缺 LG 相机、录音机、日历、图库，计算器不好用，拨号器无归属地 | LG 相机（LOS 兼容构建）+ 录音机（支持通话录音）+ 日历/图库（添加动态照片支持） + 小米计算器 + 带离线号段库的拨号器 |\n\n## 安装\n\n1. 手机已 root（Magisk v21+；`v60-soi-hal` 在 Magisk alpha 31100 上验证过）。\n2. Magisk App → 模块 → 从本地安装 → 选对应的 zip。\n3. **装完重启一次**（这几个模块的生效时机都在 `late_start` 之后）。\n\n推荐顺序（`v60_ims_volte` 是 IMS 基底，本仓库不含该模块；`soi-hal` 建议在它之后装）：\n\n```\nv60_ims_volte  →  v60_soi_hal  →  v60_integrated  →  lge_usb_tether_restore\nlgv60_hifi_mixer 与其他模块互不依赖，可随时单独装卸\n```\n\n支持覆盖安装（`module id` 不变，不需要先卸载）。\n\n## 下载\n\n编译好的 zip 见 [Releases](../../releases)。四个模块的源码在本仓库 `modules/` 下，\n`tools/pack.sh` 可以把任意模块目录重新打成可刷入的 zip：\n\n```sh\n./tools/pack.sh modules/lgv60-hifi-mixer        # 产物在 dist/\n```\n\n## 回滚\n\n| 模块 | 回滚方式 |\n|---|---|\n| 全部 | Magisk 里停用/卸载 → 重启。四个模块都只做 overlay / bind mount，分区没被改过 |\n| `lgv60-hifi-mixer` | `sh /data/adb/modules/lgv60_hifi_mixer/hifi.sh off` 立即回系统默认，不用重启 |\n| `lge-usb-tether-restore` | 卸载后 `settings delete global tether_force_usb_functions` 才会完全还原 |\n| `v60-integrated` | 卸载时 `uninstall.sh` 会把被停用的 LineageOS 自带应用重新启用 |\n\n## 目录\n\n```\nmodules/\n  lge-usb-tether-restore/   USB 网络共享 NCM → RNDIS\n  lgv60-hifi-mixer/         HiFi 采样率跟随（含 21 组 mixer 策略 XML）\n  v60-soi-hal/              LG SOI HAL + SELinux 策略（含 vendor 侧 ELF）\n  v60-integrated/           LG 相机 / 录音机 / 日历 / 图库 / 计算器 / 拨号器\ndocs/\n  idle-optimization.md      三个模块的待机优化改动说明（v3.4→v3.5 等）\ntools/\n  pack.sh                   把模块目录打成可刷入的 Magisk zip\n```\n\n## 说明\n\n- 模块里的 `system/vendor/**/*.so`、`*@1.0-service` 等 ELF 文件是从本人设备的原厂固件中提取的 LG 私有组件，\n  仅用于在同型号设备上恢复原厂功能；版权归 LG Electronics。\n- `v60-integrated` 的 APK（LG 相机、GKUI-Pack 应用、小米计算器）体积大且属第三方作品，\n  **不进本仓库**，只随 Release 的 zip 分发；仓库里保留脚本与版本号，便于替换为自己的 APK 重新打包。\n- 风险自负：涉及 telephony / audio HAL 的模块在异常时会自禁用（连续 3 次开机失败即 `touch disable`），\n  但刷机前仍建议留一份可启动的 boot 镜像。\n",
+  "readmeHTML": "<h1>LG V60 (timelm) · LineageOS 23.2 模块集</h1>\n\n<p>给 <b>LG V60 ThinQ（LM-V600 / timelm）跑 LineageOS 23.2（Android 16）</b> 补齐原厂功能的 Magisk 模块集合。</p>\n<p>每个模块只解决一个具体问题，都做过真机验证，都能单独卸载、只做 overlay / bind mount，<b>不改系统分区</b>。</p>\n\n<p>> 作者：漠鸣 · 设备实测环境：LG V60（LM-V600TM / timelm）+ LineageOS 23.2 + Magisk alpha 31100</p>\n\n<p>---</p>\n\n<h2>为什么有这些模块</h2>\n\n<p>LineageOS 在 V60 上很稳，但丢了四块原厂能力：LG 相机（含 ToF）、ESS ES9018 HiFi 的原生采样率、</p>\n<p>LG IMS 的短信通路、以及能用的 USB 网络共享。这四个模块各自把这四块补回来。</p>\n\n<p>| 模块 | 版本 | 解决的问题 | 关键做法 |</p>\n<p>|---|---|---|---|</p>\n<p>| <a href=\"modules/lge-usb-tether-restore/\"><code>lge-usb-tether-restore</code></a> | 3.0 | USB 网络共享在 LOS 上电脑显示\"未识别的网络\"、上不了网 | 用 <code>tether_force_usb_functions=0</code> 让框架<b>原生</b>走 RNDIS（而不是改底层 prop 硬掰） |</p>\n<p>| <a href=\"modules/lgv60-hifi-mixer/\"><code>lgv60-hifi-mixer</code></a> | v3.5 | HiFi DAC 只拿到 48kHz，hi-res 曲目被重采样 | 插耳机时把媒体混音线程切到曲目原生采样率（48k–384k），拔掉即恢复 |</p>\n<p>| <a href=\"modules/v60-soi-hal/\"><code>v60-soi-hal</code></a> | v0.10-smsfix | IMS 短信收发异常 / 短信队列卡死 | 把原厂 <code>vendor.lge.hardware.soi@1.0</code> HAL + VINTF 片段静态 overlay 回 <code>/vendor</code>，配上 SELinux 策略 |</p>\n<p>| <a href=\"modules/v60-integrated/\"><code>v60-integrated</code></a> | 1.3.0 | 缺 LG 相机、录音机、日历、图库，计算器不好用，拨号器无归属地 | LG 相机（LOS 兼容构建）+ 录音机（支持通话录音）+ 日历/图库（添加动态照片支持） + 小米计算器 + 带离线号段库的拨号器 |</p>\n\n<h2>安装</h2>\n\n<li>手机已 root（Magisk v21+；`v60-soi-hal` 在 Magisk alpha 31100 上验证过）。</li>\n<li>Magisk App → 模块 → 从本地安装 → 选对应的 zip。</li>\n<li>**装完重启一次**（这几个模块的生效时机都在 `late_start` 之后）。</li>\n\n<p>推荐顺序（<code>v60_ims_volte</code> 是 IMS 基底，本仓库不含该模块；<code>soi-hal</code> 建议在它之后装）：</p>\n\n<pre>v60_ims_volte  →  v60_soi_hal  →  v60_integrated  →  lge_usb_tether_restore\nlgv60_hifi_mixer 与其他模块互不依赖，可随时单独装卸</pre>\n\n<p>支持覆盖安装（<code>module id</code> 不变，不需要先卸载）。</p>\n\n<h2>下载</h2>\n\n<p>编译好的 zip 见 <a href=\"../../releases\">Releases</a>。四个模块的源码在本仓库 <code>modules/</code> 下，</p>\n<p><code>tools/pack.sh</code> 可以把任意模块目录重新打成可刷入的 zip：</p>\n\n<pre>./tools/pack.sh modules/lgv60-hifi-mixer        # 产物在 dist/</pre>\n\n<h2>回滚</h2>\n\n<p>| 模块 | 回滚方式 |</p>\n<p>|---|---|</p>\n<p>| 全部 | Magisk 里停用/卸载 → 重启。四个模块都只做 overlay / bind mount，分区没被改过 |</p>\n<p>| <code>lgv60-hifi-mixer</code> | <code>sh /data/adb/modules/lgv60_hifi_mixer/hifi.sh off</code> 立即回系统默认，不用重启 |</p>\n<p>| <code>lge-usb-tether-restore</code> | 卸载后 <code>settings delete global tether_force_usb_functions</code> 才会完全还原 |</p>\n<p>| <code>v60-integrated</code> | 卸载时 <code>uninstall.sh</code> 会把被停用的 LineageOS 自带应用重新启用 |</p>\n\n<h2>目录</h2>\n\n<pre>modules/\n  lge-usb-tether-restore/   USB 网络共享 NCM → RNDIS\n  lgv60-hifi-mixer/         HiFi 采样率跟随（含 21 组 mixer 策略 XML）\n  v60-soi-hal/              LG SOI HAL + SELinux 策略（含 vendor 侧 ELF）\n  v60-integrated/           LG 相机 / 录音机 / 日历 / 图库 / 计算器 / 拨号器\ndocs/\n  idle-optimization.md      三个模块的待机优化改动说明（v3.4→v3.5 等）\ntools/\n  pack.sh                   把模块目录打成可刷入的 Magisk zip</pre>\n\n<h2>说明</h2>\n\n<li>模块里的 `system/vendor/**/*.so`、`*@1.0-service` 等 ELF 文件是从本人设备的原厂固件中提取的 LG 私有组件，</li>\n<p>  仅用于在同型号设备上恢复原厂功能；版权归 LG Electronics。</p>\n<li>`v60-integrated` 的 APK（LG 相机、GKUI-Pack 应用、小米计算器）体积大且属第三方作品，</li>\n<p>  <b>不进本仓库</b>，只随 Release 的 zip 分发；仓库里保留脚本与版本号，便于替换为自己的 APK 重新打包。</p>\n<li>风险自负：涉及 telephony / audio HAL 的模块在异常时会自禁用（连续 3 次开机失败即 `touch disable`），</li>\n<p>  但刷机前仍建议留一份可启动的 boot 镜像。</p>",
+  "homepageUrl": "https://github.com/Moming23333/lgv60-timelm-mods",
+  "sourceUrl": "https://github.com/Moming23333/lgv60-timelm-mods",
+  "url": "https://github.com/Moming23333/lgv60-timelm-mods",
+  "latestRelease": {
+    "name": "v1.0.0",
+    "version": "v1.0.0",
+    "time": "2026-11-28T06:37:26Z",
+    "downloadUrl": "https://github.com/Moming23333/lgv60-timelm-mods/releases/download/v1.0.0/LGE_USB_Tether_Restore-3.0.zip"
+  },
+  "releases": [
+    {
+      "name": "v1.0.0",
+      "tagName": "v1.0.0",
+      "publishedAt": "2026-11-28T06:37:26Z",
+      "descriptionHTML": "",
+      "releaseAssets": [
+        {
+          "name": "LGE_USB_Tether_Restore-3.0.zip",
+          "downloadUrl": "https://github.com/Moming23333/lgv60-timelm-mods/releases/download/v1.0.0/LGE_USB_Tether_Restore-3.0.zip",
+          "size": 11272,
+          "downloadCount": 1
+        },
+        {
+          "name": "lgv60-hifi-mixer-v3.5.zip",
+          "downloadUrl": "https://github.com/Moming23333/lgv60-timelm-mods/releases/download/v1.0.0/lgv60-hifi-mixer-v3.5.zip",
+          "size": 94533,
+          "downloadCount": 1
+        },
+        {
+          "name": "v60_soi_hal-v0.10-smsfix.zip",
+          "downloadUrl": "https://github.com/Moming23333/lgv60-timelm-mods/releases/download/v1.0.0/v60_soi_hal-v0.10-smsfix.zip",
+          "size": 70165,
+          "downloadCount": 1
+        },
+        {
+          "name": "v60_integrated-1.3.0.zip",
+          "downloadUrl": "https://github.com/Moming23333/lgv60-timelm-mods/releases/download/v1.0.0/v60_integrated-1.3.0.zip",
+          "size": 219660458,
+          "downloadCount": 1
+        }
+      ]
+    }
+  ]
+}
